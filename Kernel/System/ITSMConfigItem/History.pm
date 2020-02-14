@@ -524,13 +524,16 @@ sub _EnrichHistoryEntries {
             UserID => $Entry->{CreateBy},
             Cached => 1,
         );
+        my %ContactData = $Kernel::OM->Get('Kernel::System::User')->ContactGet(
+            UserID => $Entry->{CreateBy},
+            Cached => 1,
+        );
 
         # save additional information for history entry
         $Entry->{UserID}        = $UserInfo{UserID};
         $Entry->{UserLogin}     = $UserInfo{UserLogin};
-        $Entry->{UserFirstname} = $UserInfo{UserFirstname};
-        $Entry->{UserLastname}  = $UserInfo{UserLastname};
-        $Entry->{UserFullname}  = $UserInfo{UserFullname};
+        $Entry->{UserFirstname} = $ContactData{Firstname};
+        $Entry->{UserLastname}  = $ContactData{Lastname};
 
         # prepare Comment
 

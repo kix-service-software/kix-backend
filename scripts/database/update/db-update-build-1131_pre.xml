@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <Table Name="contact_organisation">
+        <Column Name="contact_id" Required="true" Type="INTEGER"/>
+        <Column Name="org_id" Required="true" Type="INTEGER"/>
+        <Column Name="is_primary" Required="true" Default="0" Type="SMALLINT"/>
+    </Table>
+
+    <TableAlter Name="users">
+        <ColumnAdd Name="is_agent" Required="true" Type="SMALLINT" Default="0"/>
+        <ColumnAdd Name="is_customer" Required="true" Type="SMALLINT" Default="0"/>
+    </TableAlter>
+
+    <TableAlter Name="contact">
+        <ColumnAdd Name="user_id" Required="false" Type="INTEGER"/>
+    </TableAlter>
+
+    <TableAlter Name="ticket">
+        <ColumnAdd Name="contact_id_new" Required="false" Type="INTEGER" />
+        <ColumnAdd Name="organisation_id_new" Required="false" Type="INTEGER" />
+    </TableAlter>
+
+</database>

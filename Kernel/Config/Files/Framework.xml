@@ -9425,7 +9425,7 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FirstnameLastnameOrder" Required="1" Valid="1">
-        <Description Translatable="1">Specifies the order in which the firstname and the lastname of agents will be displayed.</Description>
+        <Description Translatable="1">Specifies the order in which the firstname and the lastname of contacts will be displayed.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Agent</SubGroup>
         <Setting>

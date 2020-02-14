@@ -88,7 +88,7 @@ sub new {
 
 =item GetUserData()
 
-get user data (UserLogin, UserFirstname, UserLastname, UserEmail, ...)
+get user data
 
     my %User = $UserObject->GetUserData(
         UserID => 123,
@@ -123,9 +123,6 @@ sub GetUserData {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    # get configuration for the full name order
-    my $FirstnameLastNameOrder = $ConfigObject->Get('FirstnameLastnameOrder') || 0;
-
     # check if result is cached
     if ( $Param{Valid} ) {
         $Param{Valid} = 1;
@@ -151,7 +148,6 @@ sub GetUserData {
         $CacheKey = join '::', 'GetUserData', 'User',
             $Param{User},
             $Param{Valid},
-            $FirstnameLastNameOrder,
             $Param{NoOutOfOffice},
             $Param{NoPreferences};
     }
@@ -159,7 +155,6 @@ sub GetUserData {
         $CacheKey = join '::', 'GetUserData', 'UserID',
             $Param{UserID},
             $Param{Valid},
-            $FirstnameLastNameOrder,
             $Param{NoOutOfOffice},
             $Param{NoPreferences};
     }
@@ -173,9 +168,8 @@ sub GetUserData {
 
     # get initial data
     my @Bind;
-    my $SQL = "SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, "
-        . " title, first_name, last_name, $Self->{UserTableUserPW}, email, phone, mobile, "
-        . " comments, valid_id, create_time, change_time, create_by, change_by FROM $Self->{UserTable} WHERE ";
+    my $SQL = "SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, $Self->{UserTableUserPW},"
+        . " comments, valid_id, create_time, change_time, create_by, change_by, is_agent, is_customer FROM $Self->{UserTable} WHERE ";
 
     if ( $Param{User} ) {
         my $User = lc $Param{User};
@@ -200,19 +194,15 @@ sub GetUserData {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Data{UserID}        = $Row[0];
         $Data{UserLogin}     = $Row[1];
-        $Data{UserTitle}     = $Row[2];
-        $Data{UserFirstname} = $Row[3];
-        $Data{UserLastname}  = $Row[4];
-        $Data{UserPw}        = $Row[5];
-        $Data{UserEmail}     = $Row[6];
-        $Data{UserPhone}     = $Row[7];
-        $Data{UserMobile}    = $Row[8];
-        $Data{UserComment}   = $Row[9];
-        $Data{ValidID}       = $Row[10];
-        $Data{CreateTime}    = $Row[11];
-        $Data{ChangeTime}    = $Row[12];
-        $Data{CreateBy}      = $Row[13];
-        $Data{ChangeBy}      = $Row[14];
+        $Data{UserPw}        = $Row[2];
+        $Data{UserComment}   = $Row[3];
+        $Data{ValidID}       = $Row[4];
+        $Data{CreateTime}    = $Row[5];
+        $Data{ChangeTime}    = $Row[6];
+        $Data{CreateBy}      = $Row[7];
+        $Data{ChangeBy}      = $Row[8];
+        $Data{IsAgent}       = $Row[9];
+        $Data{IsCustomer}    = $Row[10];
     }
 
     # check data
@@ -259,15 +249,6 @@ sub GetUserData {
             return;
         }
     }
-
-    # generate the full name and save it in the hash
-    my $UserFullname = $Self->_UserFullname(
-        %Data,
-        NameOrder => $FirstnameLastNameOrder,
-    );
-
-    # save the generated fullname in the hash.
-    $Data{UserFullname} = $UserFullname;
 
     # get preferences
     my %Preferences = $Self->GetPreferences( UserID => $Data{UserID} );
@@ -353,16 +334,13 @@ sub GetUserData {
 to add new users
 
     my $UserID = $UserObject->UserAdd(
-        UserFirstname => 'Huber',
-        UserLastname  => 'Manfred',
         UserLogin     => 'mhuber',
         UserPw        => 'some-pass',           # optional
-        UserEmail     => 'email@example.com',
-        UserPhone     => '1234567890',          # optional
-        UserMobile    => '1234567890',          # optional
         UserComment   => 'some comment',        # optional
         ValidID       => 1,
         ChangeUserID  => 123,
+        IsAgent       => 0 | 1                  # optional
+        IsCustomer    => 0 | 1                  # optional
     );
 
 =cut
@@ -371,7 +349,7 @@ sub UserAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(UserFirstname UserLastname UserLogin UserEmail ValidID ChangeUserID)) {
+    for (qw(UserLogin ValidID ChangeUserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -390,24 +368,13 @@ sub UserAdd {
         return;
     }
 
-    # check email address
-    if (
-        $Param{UserEmail}
-        && !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Param{UserEmail} )
-        )
-    {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Email address ($Param{UserEmail}) not valid ("
-                . $Kernel::OM->Get('Kernel::System::CheckItem')->CheckError() . ")!",
-        );
-        return;
-    }
-
     # check password
     if ( !$Param{UserPw} ) {
         $Param{UserPw} = $Self->GenerateRandomPassword();
     }
+
+    $Param{IsAgent} = (defined $Param{IsAgent} && IsInteger($Param{IsAgent})) ? $Param{IsAgent} : 0;
+    $Param{IsCustomer} = (defined $Param{IsCustomer} && IsInteger($Param{IsCustomer})) ? $Param{IsCustomer} : 0;
 
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
@@ -419,16 +386,13 @@ sub UserAdd {
     # sql
     return if !$DBObject->Do(
         SQL => "INSERT INTO $Self->{UserTable} "
-            . "(title, first_name, last_name, email, phone, mobile, "
-            . " $Self->{UserTableUser}, $Self->{UserTableUserPW}, "
-            . " comments, valid_id, create_time, create_by, change_time, change_by)"
+            . " ( $Self->{UserTableUser}, $Self->{UserTableUserPW}, "
+            . " comments, valid_id, create_time, create_by, change_time, change_by, is_agent, is_customer )"
             . " VALUES "
-            . " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
+            . " (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?, ?, ?)",
         Bind => [
-            \$Param{UserTitle}, \$Param{UserFirstname}, \$Param{UserLastname},
-            \$Param{UserEmail}, \$Param{UserPhone}, \$Param{UserMobile}, 
             \$Param{UserLogin}, \$RandomPassword, \$Param{UserComment}, \$Param{ValidID},
-            \$Param{ChangeUserID}, \$Param{ChangeUserID},
+            \$Param{ChangeUserID}, \$Param{ChangeUserID}, \$Param{IsAgent}, \$Param{IsCustomer},
         ],
     );
 
@@ -490,14 +454,11 @@ to update users
 
     $UserObject->UserUpdate(
         UserID        => 4321,
-        UserFirstname => 'Huber',
-        UserLastname  => 'Manfred',
         UserLogin     => 'mhuber',
         UserPw        => 'some-pass',           # optional
-        UserEmail     => 'email@example.com',
-        UserPhone     => '1234567890',          # optional
-        UserMobile    => '1234567890',          # optional
         UserComment   => 'some comment',        # optional
+        IsAgent       => 0 | 1,                 # optional
+        IsCustomer    => 0 | 1,                 # optional
         ValidID       => 1,
         ChangeUserID  => 123,
     );
@@ -508,7 +469,7 @@ sub UserUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(UserID UserFirstname UserLastname UserLogin ValidID UserID ChangeUserID)) {
+    for (qw(UserID UserLogin ValidID ChangeUserID)) {
 
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
@@ -535,32 +496,18 @@ sub UserUpdate {
         );
         return;
     }
-
-    # check email address
-    if (
-        $Param{UserEmail}
-        && !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Param{UserEmail} )
-        )
-    {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Email address ($Param{UserEmail}) not valid ("
-                . $Kernel::OM->Get('Kernel::System::CheckItem')->CheckError() . ")!",
-        );
-        return;
-    }
-
+    $Param{IsAgent} = (defined $Param{IsAgent} && IsInteger($Param{IsAgent})) ? $Param{IsAgent} : 0;
+    $Param{IsCustomer} = (defined $Param{IsCustomer} && IsInteger($Param{IsCustomer})) ? $Param{IsCustomer} : 0;
     # update db
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => "UPDATE $Self->{UserTable} SET title = ?, first_name = ?, last_name = ?, email = ?, phone = ?, mobile = ?, "
+        SQL => "UPDATE $Self->{UserTable} SET "
             . " $Self->{UserTableUser} = ?, comments = ?, valid_id = ?, "
-            . " change_time = current_timestamp, change_by = ? "
+            . " change_time = current_timestamp, change_by = ? , is_customer = ?, is_agent = ?"
             . " WHERE $Self->{UserTableUserID} = ?",
         Bind => [
-            \$Param{UserTitle}, \$Param{UserFirstname}, \$Param{UserLastname},
-            \$Param{UserEmail}, \$Param{UserPhone}, \$Param{UserMobile},
-            \$Param{UserLogin}, \$Param{UserComment}, \$Param{ValidID}, 
-            \$Param{ChangeUserID}, \$Param{UserID},
+            \$Param{UserLogin}, \$Param{UserComment}, \$Param{ValidID},
+            \$Param{ChangeUserID}, \$Param{IsCustomer}, \$Param{IsAgent},
+            \$Param{UserID},
         ],
     );
 
@@ -611,24 +558,12 @@ to search users
         Valid     => 1, # not required
     );
 
-    my %List = $UserObject->UserSearch(
-        PostMasterSearch => 'email@example.com',
-        Valid            => 1, # not required
-    );
-
 Returns hash of UserID, Login pairs:
 
     my %List = (
         1 => 'root@locahost',
         4 => 'admin',
         9 => 'joe',
-    );
-
-For PostMasterSearch, it returns hash of UserID, Email pairs:
-
-    my %List = (
-        4 => 'john@example.com',
-        9 => 'joe@example.com',
     );
 
 =cut
@@ -640,15 +575,15 @@ sub UserSearch {
     my $Valid = $Param{Valid} // 1;
 
     # check needed stuff
-    if ( !$Param{Search} && !$Param{UserLogin} && !$Param{PostMasterSearch} ) {
+    if ( !$Param{Search} && !$Param{UserLogin} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search, UserLogin or PostMasterSearch!',
+            Message  => 'Need Search or UserLogin!',
         );
         return;
     }
 
-    my $CacheKey = 'UserSearch::'.($Param{Search} || '').'::'.($Param{PostMasterSearch} || '').'::'.($Param{Userlogin} || '').'::'.($Param{Valid} || '').'::'.($Param{Limit} || '');
+    my $CacheKey = 'UserSearch::' . ($Param{Search} || '') . '::' . ($Param{Userlogin} || '') . '::' . ($Param{Valid} || '') . '::' . ($Param{Limit} || '');
 
     # check cache
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -670,38 +605,12 @@ sub UserSearch {
     if ( $Param{Search} ) {
 
         my %QueryCondition = $DBObject->QueryCondition(
-            Key      => [qw(login first_name last_name email phone mobile)],
+            Key      => [qw(login)],
             Value    => $Param{Search},
             BindMode => 1,
         );
         $SQL .= $QueryCondition{SQL} . ' ';
         push @Bind, @{ $QueryCondition{Values} };
-    }
-    elsif ( $Param{PostMasterSearch} ) {
-
-        return if !$DBObject->Prepare(
-            SQL   => $SQL. ' email = ?',
-            Bind  => [ \$Param{PostMasterSearch} ],
-        );
-
-        # fetch the result
-        my %UserList;
-        while ( my @Row = $DBObject->FetchrowArray() ) {
-            $UserList{ $Row[0] } = $Row[1];
-        }
-
-        foreach my $UserID ( sort keys %UserList ) {
-            my %User = $Self->GetUserData(
-                UserID => $UserID,
-                Valid  => $Param{Valid},
-            );
-            if (%User) {
-                $UserList{$UserID} = $User{UserEmail};
-                return %UserList;
-            }
-        }
-
-        return;
     }
     elsif ( $Param{UserLogin} ) {
 
@@ -1040,7 +949,7 @@ sub UserName {
     my %User = $Self->GetUserData(%Param);
 
     return if !%User;
-    return $User{UserFullname};
+    return $User{Login};
 }
 
 =item UserList()
@@ -1067,11 +976,10 @@ sub UserList {
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
     # get configuration for the full name order
-    my $FirstnameLastNameOrder = $ConfigObject->Get('FirstnameLastnameOrder') || 0;
     my $NoOutOfOffice = $Param{NoOutOfOffice} || 0;
 
     # check cache
-    my $CacheKey = join '::', 'UserList', $Type, $Valid, $FirstnameLastNameOrder, $NoOutOfOffice;
+    my $CacheKey = join '::', 'UserList', $Type, $Valid, $NoOutOfOffice;
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1080,21 +988,18 @@ sub UserList {
 
     my $SelectStr;
     if ( $Type eq 'Short' ) {
-        $SelectStr = "$Self->{UserTableUserID}, "
-            . " $Self->{UserTableUser}";
+        $SelectStr = "u.$Self->{UserTableUserID}, u.$Self->{UserTableUser}";
     }
     else {
-        $SelectStr = "$Self->{UserTableUserID}, "
-            . " last_name, first_name, "
-            . " $Self->{UserTableUser}";
+        $SelectStr = "u.$Self->{UserTableUserID}, c.last_name, c.first_name, u.$Self->{UserTableUser}";
     }
 
-    my $SQL = "SELECT $SelectStr FROM $Self->{UserTable}";
+    my $SQL = "SELECT $SelectStr FROM $Self->{UserTable} u LEFT JOIN contact c ON u.id = c.user_id ";
 
     # sql query
     if ($Valid) {
         $SQL
-            .= " WHERE valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )";
+            .= " WHERE u.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )";
     }
 
     # get database object
@@ -1116,14 +1021,12 @@ sub UserList {
     }
     else {
         for my $CurrentUserID ( sort keys %UsersRaw ) {
-            my @Data         = @{ $UsersRaw{$CurrentUserID} };
-            my $UserFullname = $Self->_UserFullname(
-                UserFirstname => $Data[2],
-                UserLastname  => $Data[1],
-                UserLogin     => $Data[3],
-                NameOrder     => $FirstnameLastNameOrder,
+            my @Data = @{$UsersRaw{$CurrentUserID}};
+            my $UserFullname = $Kernel::OM->Get('Kernel::System::Contact')->_ContactFullname(
+                UserLogin => $Data[1],
+                Firstname => $Data[2],
+                Lastname  => $Data[3],
             );
-
             $Users{$CurrentUserID} = $UserFullname;
         }
     }
@@ -1631,9 +1534,6 @@ sub SetPreferences {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 
-    # get configuration for the full name order
-    my $FirstnameLastNameOrder = $ConfigObject->Get('FirstnameLastnameOrder') || 0;
-
     # get user preferences config
     my $GeneratorModule = $ConfigObject->Get('User::PreferencesModule')
         || 'Kernel::System::User::Preferences::DB';
@@ -1674,7 +1574,7 @@ delete a user preference
 
     my $Succes = $UserObject->DeletePreferences(
         UserID => 123,
-        Key    => 'UserEmail',
+        Key    => 'some pref key',
     );
 
 =cut
@@ -1697,8 +1597,8 @@ sub DeletePreferences {
 search in user preferences
 
     my %UserList = $UserObject->SearchPreferences(
-        Key   => 'UserEmail',
-        Value => 'email@example.com',   # optional, limit to a certain value/pattern
+        Key   => 'UserLogin',
+        Value => 'some_name',   # optional, limit to a certain value/pattern
     );
 
 =cut
@@ -1795,84 +1695,6 @@ sub TokenCheck {
 
     # return false if token is invalid
     return;
-}
-
-=begin Internal:
-
-=item _UserFullname()
-
-Builds the user fullname based on firstname, lastname and login. The order
-can be configured.
-
-    my $Fullname = $Object->_UserFullname(
-        UserFirstname => 'Test',
-        UserLastname  => 'Person',
-        UserLogin     => 'tp',
-        NameOrder     => 0,         # optional 0, 1, 2, 3, 4, 5
-    );
-
-=cut
-
-sub _UserFullname {
-    my ( $Self, %Param ) = @_;
-
-    for my $Needed (qw(UserFirstname UserLastname UserLogin)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!",
-            );
-
-            return;
-        }
-    }
-
-    my $FirstnameLastNameOrder = $Param{NameOrder} || 0;
-
-    my $UserFullname;
-    if ( $FirstnameLastNameOrder eq '0' ) {
-        $UserFullname = $Param{UserFirstname} . ' '
-            . $Param{UserLastname};
-    }
-    elsif ( $FirstnameLastNameOrder eq '1' ) {
-        $UserFullname = $Param{UserLastname} . ', '
-            . $Param{UserFirstname};
-    }
-    elsif ( $FirstnameLastNameOrder eq '2' ) {
-        $UserFullname = $Param{UserFirstname} . ' '
-            . $Param{UserLastname} . ' ('
-            . $Param{UserLogin} . ')';
-    }
-    elsif ( $FirstnameLastNameOrder eq '3' ) {
-        $UserFullname = $Param{UserLastname} . ', '
-            . $Param{UserFirstname} . ' ('
-            . $Param{UserLogin} . ')';
-    }
-    elsif ( $FirstnameLastNameOrder eq '4' ) {
-        $UserFullname = '(' . $Param{UserLogin}
-            . ') ' . $Param{UserFirstname}
-            . ' ' . $Param{UserLastname};
-    }
-    elsif ( $FirstnameLastNameOrder eq '5' ) {
-        $UserFullname = '(' . $Param{UserLogin}
-            . ') ' . $Param{UserLastname}
-            . ', ' . $Param{UserFirstname};
-    }
-    elsif ( $FirstnameLastNameOrder eq '6' ) {
-        $UserFullname = $Param{UserLastname} . ' '
-            . $Param{UserFirstname};
-    }
-    elsif ( $FirstnameLastNameOrder eq '7' ) {
-        $UserFullname = $Param{UserLastname} . ' '
-            . $Param{UserFirstname} . ' ('
-            . $Param{UserLogin} . ')';
-    }
-    elsif ( $FirstnameLastNameOrder eq '8' ) {
-        $UserFullname = '(' . $Param{UserLogin}
-            . ') ' . $Param{UserLastname}
-            . ' ' . $Param{UserFirstname};
-    }
-    return $UserFullname;
 }
 
 sub _PermissionDebug {

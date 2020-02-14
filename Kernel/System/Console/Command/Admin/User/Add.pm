@@ -95,14 +95,12 @@ sub Run {
 
     # add user
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-        UserLogin     => $Self->GetOption('user-name'),
-        UserFirstname => $Self->GetOption('first-name'),
-        UserLastname  => $Self->GetOption('last-name'),
-        UserPw        => $Self->GetOption('password'),
-        UserEmail     => $Self->GetOption('email-address'),
-        ChangeUserID  => 1,
-        UserID        => 1,
-        ValidID       => 1,
+        UserLogin    => $Self->GetOption('user-name'),
+        UserPw       => $Self->GetOption('password'),
+        ChangeUserID => 1,
+        UserID       => 1,
+        ValidID      => 1,
+        IsAgent      => 1,
     );
 
     if ( !$UserID ) {

@@ -93,6 +93,10 @@ sub WatcherAdd {
     my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
         UserID => $Param{WatchUserID},
     );
+
+    my %UserContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        UserID => $Param{WatchUserID},
+    );
  
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -101,7 +105,7 @@ sub WatcherAdd {
         TicketID     => $Param{ObjectID},
         CreateUserID => $Param{UserID},
         HistoryType  => 'Subscribe',
-        Name         => "\%\%$User{UserFirstname} $User{UserLastname} ($User{UserLogin})",
+        Name         => "\%\%$UserContact{Firstname} $UserContact{Lastname} ($User{UserLogin})",
     );
 
     # trigger event
@@ -151,13 +155,17 @@ sub WatcherDelete {
         UserID => $Param{WatchUserID},
     );
 
+    my %UserContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        UserID => $Param{WatchUserID},
+    );
+
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     $TicketObject->HistoryAdd(
         TicketID     => $Param{ObjectID},
         CreateUserID => $Param{UserID},
         HistoryType  => 'Unsubscribe',
-        Name         => "\%\%$User{UserFirstname} $User{UserLastname} ($User{UserLogin})",
+        Name         => "\%\%$UserContact{Firstname} $UserContact{Lastname} ($User{UserLogin})",
     );
 
     $TicketObject->EventHandler(

@@ -240,7 +240,30 @@ sub Run {
 
             # inform API caching about a new dependency
             $Self->AddCacheDependency(Type => 'Ticket');
+            $Self->AddCacheDependency( Type => 'User' );
         }
+
+        #include assigned user login if requested (and existing)
+        if ($Param{Data}->{include}->{User}) {
+            $Self->AddCacheDependency( Type => 'User' );
+            $ContactData{User} = undef;
+            if ($ContactData{AssignedUserID}) {
+                my $UserData = $Self->ExecOperation(
+                    OperationType => 'V1::User::UserGet',
+                    Data          => {
+                        UserID => $ContactData{AssignedUserID},
+                    }
+                );
+                $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+            }
+        }
+        # delete the UserID in %ContactData, because it's some backwards compatibility fix (KIX2018-2515) masking the
+        # the contact ID as the user ID and should not be delivered through the API to the client.
+        delete($ContactData{UserID});
+
+        #always delete the User ID of the assigned User. If user information is requested, the assigned User Object is
+        # included.
+        #delete($ContactData{AssignedUserID});
 
         # add
         push(@ContactList, \%ContactData);

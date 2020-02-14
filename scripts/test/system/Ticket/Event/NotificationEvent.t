@@ -148,6 +148,7 @@ my $TicketWriteRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->Te
 # get objects
 my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
 my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+my $OrgaObject = $Kernel::OM->Get('Kernel::System::Organisation');
 
 # create a new user for current test
 my $UserLogin = $Helper->TestUserCreate(
@@ -160,6 +161,10 @@ my %UserData = $UserObject->GetUserData(
 
 my $UserID = $UserData{UserID};
 
+my %UserContactData = $ContactObject->ContactGet(
+    UserID => $UserID,
+);
+
 # create a new user without permissions
 my $UserLogin2 = $Helper->TestUserCreate(
     Roles => ["ticket_deny_$RandomID"],
@@ -169,6 +174,10 @@ my %UserData2 = $UserObject->GetUserData(
     User => $UserLogin2,
 );
 
+my %UserContactData2 = $ContactObject->ContactGet(
+    UserID => $UserData2{UserID},
+);
+
 # create a new user with read permissions but invalid
 my $UserLogin3 = $Helper->TestUserCreate(
     Roles => ["ticket_read_$RandomID"],
@@ -176,6 +185,10 @@ my $UserLogin3 = $Helper->TestUserCreate(
 
 my %UserData3 = $UserObject->GetUserData(
     User => $UserLogin3,
+);
+
+my %UserContactData3 = $ContactObject->ContactGet(
+    UserID => $UserData3{UserID},
 );
 
 # set User3 invalid
@@ -190,8 +203,12 @@ my $UserLogin4 = $Helper->TestUserCreate(
     Roles => ["example-role$RandomID", "ticket_read_$RandomID"]
 );
 
-my %UserData4 = $UserObject->GetUserData(
+my %UserContactData4 serObject->GetUserData(
     User => $UserLogin4,
+);
+
+my %UserContactData4 = $ContactObject->ContactGet(
+    UserID => $UserContactData4{ID},
 );
 
 # create a new contact for current test
@@ -199,6 +216,12 @@ my $ContactID = $Helper->TestContactCreate();
 
 my %Contact = $ContactObject->ContactGet(
     ID => $ContactID
+);
+
+#create a new organisation for current test
+my $OrgID = $OrgaObject->OrgansationAdd(
+    Name   => 'Dummy Orga',
+    Number => 'DUMMY',
 );
 
 # get queue object
@@ -214,16 +237,16 @@ my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
 # create ticket
 my $TicketID = $TicketObject->TicketCreate(
-    Title         => 'Ticket One Title',
-    QueueID       => 1,
-    Lock          => 'unlock',
-    Priority      => '3 normal',
-    State         => 'new',
-    OrganisationID => 'example.com',
-    ContactID     => $ContactID,
-    OwnerID       => $UserID,
-    ResponsibleID => $UserID,
-    UserID        => $UserID,
+    Title          => 'Ticket One Title',
+    QueueID        => 1,
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'new',
+    OrganisationID => $OrgID,
+    ContactID      => $ContactID,
+    OwnerID        => $UserID,
+    ResponsibleID  => $UserID,
+    UserID         => $UserID,
 );
 
 # sanity check
@@ -419,8 +442,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         SetOutOfOffice          => 1,
@@ -464,8 +487,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         SetOutOfOffice          => 1,
@@ -492,8 +515,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -515,8 +538,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         SetUserNotificationPreference => {
@@ -597,8 +620,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -619,8 +642,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -641,8 +664,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -663,12 +686,12 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
             {
-                ToArray => [ $UserData4{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData4{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -689,8 +712,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -711,8 +734,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -733,8 +756,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -756,12 +779,12 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
             {
                 ToArray => ['test@kixexample.com'],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -800,12 +823,12 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
             {
-                ToArray => [ $UserData4{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData4{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -827,12 +850,12 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
             {
-                ToArray => [ $UserData4{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData4{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -855,7 +878,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [$Contact{Email}],
             },
         ],
@@ -882,7 +905,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => ['test@kixexample.com'],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -906,7 +929,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ 'test@kixexample.com' ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -930,7 +953,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ 'test@kixexample.com' ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -953,8 +976,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
-                ToArray => [ $UserData{UserEmail} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
             },
         ],
         Success => 1,
@@ -977,7 +1000,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [$Contact{Email}],
             },
         ],
@@ -1002,8 +1025,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
-                ToArray => [ $UserData{UserEmail} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
             },
         ],
         Success => 1,
@@ -1027,7 +1050,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [$Contact{Email}],
             },
         ],
@@ -1050,7 +1073,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
+                ToArray => [ $UserContactData{Email} ],
             },
         ],
         Success => 1,
@@ -1227,23 +1250,23 @@ for my $Test (@Tests) {
         Message => (!$Test->{ContentType} || $Test->{ContentType} ne 'text/html') ? {
             en => {
                 Subject     => 'JobName',
-                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_Firstname>',
                 ContentType => 'text/plain',
             },
             de => {
                 Subject     => 'JobName',
-                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_Firstname>',
                 ContentType => 'text/plain',
             },
         } : {
             en => {
                 Subject     => 'JobName',
-                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_UserFirstname&gt;',
+                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_Firstname&gt;',
                 ContentType => 'text/html',
             },
             de => {
                 Subject     => 'JobName',
-                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_UserFirstname&gt;',
+                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_Firstname&gt;',
                 ContentType => 'text/html',
             },
         },

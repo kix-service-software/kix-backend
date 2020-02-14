@@ -5,6 +5,7 @@ In addition to its sub-resources this resource supports the following includes.
 |Include|Description|
 |-|-|
 |```TicketStats```|Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.|
+|```User```|Adds the corresponding user to the response. If no user is assigned to this contact, the attribute is empty. |
 
 This resource supports a special ```search``` property
 

@@ -165,12 +165,11 @@ sub Run {
     if ( !$Param{Config}->{From} ) {
 
         # Get current user data
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             UserID => $Param{UserID},
         );
 
-        # Set "From" field according to user - UserFullname <UserEmail>
-        $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
+        $Param{Config}->{From} = $Contact{Fullname} . ' <' . $Contact{Email} . '>';
     }
 
     my $ArticleID = $TicketObject->ArticleCreate(

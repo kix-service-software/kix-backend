@@ -7,7 +7,7 @@
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
-
+#todo firstname lastname now in contacts
 use strict;
 use warnings;
 use utf8;
@@ -53,12 +53,10 @@ for my $Try ( 1 .. 20 ) {
 
 # add user
 my $UserID = $UserObject->UserAdd(
-    UserFirstname => 'John',
-    UserLastname  => 'Doe',
-    UserLogin     => $UserRandom,
-    UserEmail     => $UserRandom . '@example.com',
-    ValidID       => 1,
-    ChangeUserID  => 1,
+    UserLogin    => $UserRandom,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1,
 );
 
 $Self->True(

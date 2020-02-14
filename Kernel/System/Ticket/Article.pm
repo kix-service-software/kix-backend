@@ -2371,12 +2371,12 @@ sub SendAutoResponse {
 
         $Param{Channel} //= '';
         if (
-            $Contact{UserEmail}
-            && $OrigHeader{From} !~ /\Q$Contact{UserEmail}\E/i
+            $Contact{Email}
+            && $OrigHeader{From} !~ /\Q$Contact{Email}\E/i
             && $Param{Channel} ne 'email'
             )
         {
-            $Cc = $Contact{UserEmail};
+            $Cc = $Contact{Email};
         }
     }
 
@@ -3187,35 +3187,18 @@ sub _HandleCustomerVisible {
     return 0 if ( !IsHashRefWithData(\%ContactList) );
 
     my %ContactMailAddresses;
-    for my $ContactID (keys %ContactList) {
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            ID => $ContactID
-        );
-        if ( IsHashRefWithData(\%Contact) ) {
 
-            my $MailAddress = $Contact{Email};
+    for my $ContactMail (values %ContactList) {
+        if ($ContactMail) {
 
             # get plain address
-            $MailAddress =~ s/.+ <(.+)>/$1/;
+            $ContactMail =~ s/.+ <(.+)>/$1/;
 
-            if ( !$ContactMailAddresses{$MailAddress} ) {
-                $ContactMailAddresses{$MailAddress} = 1;
+            if ( !$ContactMailAddresses{$ContactMail} ) {
+                $ContactMailAddresses{$ContactMail} = 1;
             }
         }
     }
-
-    # TODO: use with KIX2018-3057
-    # for my $ContactMail (values %ContactList) {
-    #     if ($ContactMail) {
-    #
-    #         # get plain address
-    #         $ContactMail =~ s/.+ <(.+)>/$1/;
-    #
-    #         if ( !$ContactMailAddresses{$ContactMail} ) {
-    #             $ContactMailAddresses{$ContactMail} = 1;
-    #         }
-    #     }
-    # }
 
     return 0 if (!scalar keys %ContactMailAddresses);
 

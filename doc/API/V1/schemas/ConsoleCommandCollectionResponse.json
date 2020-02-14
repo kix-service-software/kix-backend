@@ -7,89 +7,11 @@
       "ConsoleCommand" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConsoleCommand"
+            "$ref" : "ConsoleCommand.json"
          }
       }
    },
    "required" : [
       "ConsoleCommand"
-   ],
-   "definitions" : {
-      "ConsoleCommand" : {
-         "$id" : "#ConsoleCommand",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The console command object.",
-         "type" : "object",
-         "properties" : {
-            "AdditionalHelp" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "Arguments" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object",
-                  "properties" : {
-                     "Description" : {
-                        "type" : "string"
-                     },
-                     "Name" : {
-                        "type" : "string"
-                     },
-                     "Required" : {
-                        "description" : "is required = 1",
-                        "type" : "integer"
-                     }
-                  }
-               },
-               "readOnly" : true
-            },
-            "Command" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Description" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Parameters" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object",
-                  "properties" : {
-                     "Description" : {
-                        "type" : "string"
-                     },
-                     "HasValue" : {
-                        "description" : "needs value = 1",
-                        "type" : "integer"
-                     },
-                     "Name" : {
-                        "type" : "string"
-                     },
-                     "Required" : {
-                        "description" : "is required = 1",
-                        "type" : "integer"
-                     }
-                  }
-               },
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "AdditionalHelp",
-            "Arguments",
-            "Command",
-            "Description",
-            "Parameters"
-         ]
-      }
-   }
+   ]
 }

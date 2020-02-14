@@ -5,70 +5,10 @@
    "type" : "object",
    "properties" : {
       "TicketState" : {
-         "$ref" : "#/definitions/TicketState"
+         "$ref" : "TicketState.json"
       }
    },
    "required" : [
       "TicketState"
-   ],
-   "definitions" : {
-      "TicketState" : {
-         "$id" : "#TicketState",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The ticket state object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string"
-            },
-            "TypeID" : {
-               "type" : "integer"
-            },
-            "ValidID" : {
-               "type" : "integer"
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "TypeID",
-            "ValidID"
-         ]
-      }
-   }
+   ]
 }

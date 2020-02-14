@@ -99,6 +99,10 @@ my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
 
 my $UserID = $UserData{UserID};
 
+my %UserContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    UserID => $UserID,
+);
+
 # get ticket object
 my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
@@ -170,8 +174,8 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
     },
@@ -184,12 +188,12 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserData{UserEmail} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                ToArray => [ $UserContactData{Email} ],
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
             {
                 ToArray => ['test@kixexample.com'],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
     },
@@ -211,7 +215,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ 'customerOne@example.com', 'customerTwo@example.com' ],
-                Body => "JobName $TicketID Kernel::System::Email::Test $UserData{UserFirstname}=\n",
+                Body => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         JustToRealCustomer => 0,
@@ -245,7 +249,7 @@ for my $Test (@Tests) {
         Message => {
             en => {
                 Subject     => 'JobName',
-                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_UserFirstname>',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_Firstname>',
                 ContentType => 'text/plain',
             },
         },

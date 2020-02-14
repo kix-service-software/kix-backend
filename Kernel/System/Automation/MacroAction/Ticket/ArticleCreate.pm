@@ -157,10 +157,10 @@ sub Run {
 
     # if "From" is not set use current user
     if ( !$Param{Config}->{From} ) {
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->GetContact(
             UserID => $Param{UserID},
         );
-        $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
+        $Param{Config}->{From} = $Contact{Fullname} . ' <' . $Contact{Email} . '>';
     }
 
     $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} || 0,

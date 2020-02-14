@@ -46,20 +46,12 @@ $Self->Is(
     "Minimum options (but user doesn't exist)",
 );
 
-# disable email checks to create new user
-$Kernel::OM->Get('Kernel::Config')->Set(
-    Key   => 'CheckEmailAddresses',
-    Value => 0,
-);
-
 # add users
 my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-    UserFirstname => 'Firstname Test1',
-    UserLastname  => 'Lastname Test1',
-    UserLogin     => $UserRand,
-    UserEmail     => $UserRand . '@example.com',
-    ValidID       => 1,
-    ChangeUserID  => 1,
+    UserLogin    => $UserRand,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1,
 );
 
 $Self->True(

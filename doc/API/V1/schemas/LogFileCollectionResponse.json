@@ -7,83 +7,11 @@
       "LogFile" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/LogFile"
+            "$ref" : "LogFile.json"
          }
       }
    },
    "required" : [
       "LogFile"
-   ],
-   "definitions" : {
-      "LogFile" : {
-         "$id" : "#LogFile",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The log file object.",
-         "type" : "object",
-         "properties" : {
-            "AccessTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "AccessTimeUnix" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Content" : {
-               "description" : "if included",
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateTimeUnix" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "DisplayName" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Filename" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Filesize" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "FilesizeRaw" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ModifyTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ModifyTimeUnix" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "AccessTime",
-            "AccessTimeUnix",
-            "CreateTime",
-            "CreateTimeUnix",
-            "DisplayName",
-            "Filename",
-            "Filesize",
-            "FilesizeRaw",
-            "ID",
-            "ModifyTime",
-            "ModifyTimeUnix"
-         ]
-      }
-   }
+   ]
 }

@@ -353,12 +353,18 @@ sub EditFieldRender {
 
         # get user data to display value
         my $UserDataString = '';
-        if ( $Value ) {
-            my %UserData = $Self->{UserObject}->GetUserData(
-                User => $Value,
+        if ($Value) {
+            my $UserID = $Self->{UserObject}->UserLookup(
+                UserLogin => $Value
             );
-            $UserDataString = "$UserData{UserFirstname} $UserData{UserLastname}" . " <"
-                . $UserData{UserEmail} . ">";
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                $UserDataString
+                    = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
+                    . $ContactData{Email} . ">";
+            }
         }
 
         $HTMLString = <<"EOF";
@@ -392,16 +398,20 @@ EOF
         # create user hash
         my %UserHash = ();
         for my $User (keys %ObjectList) {
-            my %UserData = $Self->{UserObject}->GetUserData(
-                UserID => $User,
+            my $UserID = $Self->{UserObject}->UserLookup(
+                UserLogin => $User,
             );
-
-            if ( defined $UserData{UserFirstname} ) {
-                $UserHash{$ObjectList{$User}}
-                    = $UserData{UserFirstname} . " "
-                    . $UserData{UserLastname} . " <"
-                    . $UserData{UserEmail} . "> ("
-                    . $ObjectList{$User} . ")";
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                if (defined $ContactData{Firstname}) {
+                    $UserHash{$ObjectList{$User}}
+                        = $ContactData{Firstname} . " "
+                        . $ContactData{Lastname} . " <"
+                        . $ContactData{Email} . "> ("
+                        . $ObjectList{$User} . ")";
+                }
             }
         }
 
@@ -598,18 +608,22 @@ sub DisplayValueRender {
         # EO KIX4OTRS-capeIT
 
         # KIX4OTRS-capeIT
-        my %UserData = $Self->{UserObject}->GetUserData(
-            User => $ReadableValue,
+        my $UserID = $Self->{UserObject}->UserLookup(
+            UserLogin => $ReadableValue,
         );
-        $ReadableValue
-            = $UserData{UserFirstname} . " "
-            . $UserData{UserLastname} . " <"
-            . $UserData{UserEmail} . ">";
-
+        my %ContactData;
+        if ($UserID) {
+            my %ContactData = $Self->{ContactObject}->ContactGet(
+                UserID => $UserID,
+            );
+            $ReadableValue = $ContactData{Firstname} . " "
+                . $ContactData{Lastname} . " <"
+                . $ContactData{Email} . ">";
+        }
         # alternative display string defined ?
         if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
             $ReadableValue = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-            $ReadableValue =~ s{<(.+?)>}{$UserData{$1}}egx;
+            $ReadableValue =~ s{<(.+?)>}{$ContactData{$1}}egx;
         }
 
         # EO KIX4OTRS-capeIT
@@ -773,11 +787,16 @@ sub SearchFieldRender {
         # get user data to display value
         my $UserDataString = '';
         if ($Value) {
-            my %UserData = $Self->{UserObject}->GetUserData(
-                User => $Value,
+            my $UserID = $Self->{UserObject}->UserLookup(
+                UserLogin => $Value,
             );
-            $UserDataString = "$UserData{UserFirstname} $UserData{UserLastname}" . " <"
-                . $UserData{UserEmail} . ">";
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                $UserDataString = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
+                    . $ContactData{Email} . ">";
+            }
         }
 
         $HTMLString = <<"EOF";
@@ -811,16 +830,20 @@ EOF
         # create user hash
         my %UserHash = ();
         for my $User (keys %ObjectList) {
-            my %UserData = $Self->{UserObject}->GetUserData(
-                UserID => $User,
+            my $UserID = $Self->{UserObject}->UserLookup(
+                UserLogin => $User,
             );
-
-            if ( defined $UserData{UserFirstname} ) {
-                $UserHash{$ObjectList{$User}}
-                    = $UserData{UserFirstname} . " "
-                    . $UserData{UserLastname} . " <"
-                    . $UserData{UserEmail} . "> ("
-                    . $ObjectList{$User} . ")";
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                if (defined $ContactData{Firstname}) {
+                    $UserHash{$ObjectList{$User}}
+                        = $ContactData{Firstname} . " "
+                        . $ContactData{Lastname} . " <"
+                        . $ContactData{Email} . "> ("
+                        . $ObjectList{$User} . ")";
+                }
             }
         }
 
@@ -1076,16 +1099,20 @@ sub PossibleValuesGet {
         # create user hash
         my %UserHash = ();
         for my $User (keys %ObjectList) {
-            my %UserData = $Self->{UserObject}->GetUserData(
-                UserID => $User,
+            my $UserID = $Self->{UserObject}->UserLookup(
+                UserLogin => $User,
             );
-
-            if ( defined $UserData{UserFirstname} ) {
-                $UserHash{$ObjectList{$User}}
-                    = $UserData{UserFirstname} . " "
-                    . $UserData{UserLastname} . " <"
-                    . $UserData{UserEmail} . "> ("
-                    . $ObjectList{$User} . ")";
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                if (defined $ContactData{Firstname}) {
+                    $UserHash{$ObjectList{$User}}
+                        = $ContactData{Firstname} . " "
+                        . $ContactData{Lastname} . " <"
+                        . $ContactData{Email} . "> ("
+                        . $ObjectList{$User} . ")";
+                }
             }
         }
 
@@ -1160,42 +1187,48 @@ sub ValueLookup {
         # set the value as the key by default
         my $Value = $Item;
 
-# KIX4OTRS-capeIT
-#        # try to convert key to real value
-#        if ( $PossibleValues->{$Item} ) {
-#            $Value = $PossibleValues->{$Item};
-#
-#            # check if translation is possible
-#            if (
-#                defined $Param{LanguageObject}
-#                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-#                )
-#            {
-#
-#                # translate value
-#                $Value = $Param{LanguageObject}->Translate($Value);
-#            }
-#        }
-        my %UserData = $Self->{UserObject}->GetUserData(
-            User => $Value,
+        # KIX4OTRS-capeIT
+        #        # try to convert key to real value
+        #        if ( $PossibleValues->{$Item} ) {
+        #            $Value = $PossibleValues->{$Item};
+        #
+        #            # check if translation is possible
+        #            if (
+        #                defined $Param{LanguageObject}
+        #                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
+        #                )
+        #            {
+        #
+        #                # translate value
+        #                $Value = $Param{LanguageObject}->Translate($Value);
+        #            }
+        #        }
+        my $UserID = $Self->{UserObject}->UserLookup(
+            UserLogin => $Value,
         );
-        $Value = $UserData{UserFirstname}
-               . " "
-               . $UserData{UserLastname}
-               . " <"
-               . $UserData{UserEmail}
-               . ">";
+        if ($UserID) {
+            my %ContactData = $Self->{ContactObject}->ContactGet(
+                UserID => $UserID,
+            );
+            $Value = $ContactData{Firstname}
+                . " "
+                . $ContactData{Lastname}
+                . " <"
+                . $ContactData{Email}
+                . ">";
 
-        # alternative display string defined ?
-        if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
-            $Value = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-            $Value =~ s{<(.+?)>}{$UserData{$1}}egx;
+            # alternative display string defined ?
+            if ($Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay}) {
+                $Value = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
+                $Value =~ s{<(.+?)>}{$ContactData{$1} }egx;
+            }
+            # EO KIX4OTRS-capeIT
+            push @Values, $Value;
         }
-# EO KIX4OTRS-capeIT
-        push @Values, $Value;
-    }
 
-    return \@Values;
+        return \@Values;
+    }
+    return;
 }
 
 1;

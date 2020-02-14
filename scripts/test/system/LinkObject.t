@@ -35,23 +35,14 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 # create needed users
 my @UserIDs;
 
-# disable email checks to create new user
-$ConfigObject->Get('CheckEmailAddresses') || 1;
-$ConfigObject->Set(
-    Key   => 'CheckEmailAddresses',
-    Value => 0,
-);
-
 for my $Counter ( 1 .. 2 ) {
 
     # create new users for the tests
     my $UserID = $UserObject->UserAdd(
-        UserFirstname => 'LinkObject' . $Counter,
-        UserLastname  => 'UnitTest',
-        UserLogin     => 'LinkObject-' . $Counter . $Helper->GetRandomID(),
-        UserEmail     => 'UnitTest-LinkObject-' . $Counter . '@localhost',
-        ValidID       => 1,
-        ChangeUserID  => 1,
+        UserLogin    => 'LinkObject-' . $Counter . $Helper->GetRandomID(),
+        ValidID      => 1,
+        ChangeUserID => 1,
+        IsAgent      => 1,
     );
 
     push @UserIDs, $UserID;

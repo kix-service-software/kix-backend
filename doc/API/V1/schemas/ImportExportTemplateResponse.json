@@ -5,76 +5,10 @@
    "type" : "object",
    "properties" : {
       "ImportExportTemplate" : {
-         "$ref" : "#/definitions/_ImportExportTemplate_json"
+         "$ref" : "ImportExportTemplate.json"
       }
    },
    "required" : [
       "ImportExportTemplate"
-   ],
-   "definitions" : {
-      "_ImportExportTemplate_json" : {
-         "$id" : "#ImportExportTemplate",
-         "$schema" : "http://json-schema.org/schema",
-         "description" : "The import export template object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Format" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Number" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Object" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "Format",
-            "ID",
-            "Name",
-            "Number",
-            "Object",
-            "ValidID"
-         ]
-      }
-   }
+   ]
 }

@@ -1,5 +1,6 @@
 {
   "Contact": {
+    "AssignedUserID": 3,
     "ChangeBy":1,
     "ChangeTime":"2019-03-12 18:26:07",
     "City":"Musterstadt",
@@ -7,12 +8,11 @@
     "Country":"Germany",
     "CreateBy":1,
     "CreateTime":"2018-11-01 15:13:53",
-    "Email":"contact047@nomail.org",
+    "Email": "john.doe@example.com",
     "Fax":"",
-    "Firstname":"George",
+    "Firstname": "John",
+    "Fullname": "John Doe",
     "ID":102,
-    "Lastname":"Back",
-    "Login":"contact047",
     "Mobile":"+49 170 111 222 333",
     "OrganisationIDs":[
       1,
@@ -22,6 +22,18 @@
     "PrimaryOrganisationID":1,
     "Street":"Musterstraße 1",
     "Title":"Herr",
+    "User": {
+      "ChangeBy": 1,
+      "ChangeTime": "2018-10-01 12:01:53",
+      "CreateBy": 1,
+      "CreateTime": "2019-03-15 18:59:54",
+      "IsAgent": 1,
+      "IsCustomer": 0,
+      "UserComment": null,
+      "UserID": 3,
+      "UserLogin": "jdoe",
+      "ValidID": 1
+    },
     "ValidID":1,
     "Zip":"12345"
   }

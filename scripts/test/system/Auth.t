@@ -54,12 +54,10 @@ my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
 # add test user
 $TestUserID = $UserObject->UserAdd(
-    UserFirstname => 'Firstname Test1',
-    UserLastname  => 'Lastname Test1',
-    UserLogin     => $UserRand,
-    UserEmail     => $UserRand . '@example.com',
-    ValidID       => 1,
-    ChangeUserID  => 1,
+    UserLogin    => $UserRand,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1,
 ) || die "Could not create test user";
 
 my @Tests = (

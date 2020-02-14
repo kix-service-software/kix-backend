@@ -35,14 +35,15 @@ my $RandomID = $Helper->GetRandomID();
 # constructor
 my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
 
-my $TestUserLogin = $Helper->TestUserCreate(
+my $TestContactID = $Helper->TestContactCreate(
     Language => 'en',
 );
 
-my %TestUser = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-    User => $TestUserLogin,
+my $ContactObject = $Kernel::OM->Get('Kernel::System::User');
+
+my %TestContact = $ContactObject->ContactGet(
+    ID => $TestContactID,
 );
-my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
 # add SystemAddress
 my $SystemAddressEmail    = $Helper->GetRandomID() . '@example.com';
@@ -114,10 +115,10 @@ for my $Test (@Tests) {
         Realname => $Test->{SystemAddressName},
         UserID   => 1,
     );
-    $UserObject->UserUpdate(
-        %TestUser,
-        UserFirstname => $Test->{AgentFirstname},
-        UserLastname  => $Test->{AgentLastname},
+    $ContactObject->ContactUpdate(
+        %TestContact,
+        Firstname => $Test->{AgentFirstname},
+        Lastname  => $Test->{AgentLastname},
         ChangeUserID  => 1,
     );
 
@@ -130,7 +131,7 @@ for my $Test (@Tests) {
 
         my $Result = $TemplateGeneratorObject->Sender(
             QueueID => $QueueID,
-            UserID  => $TestUser{UserID}
+            UserID  => $TestContact{UserID}
         );
 
         $Self->Is(

@@ -92,14 +92,13 @@ sub ParameterDefinition {
         'User::UserLogin' => {
             RequiresValueIfUsed => 1
         },
-        'User::UserFirstname' => {
-            RequiresValueIfUsed => 1
+        'User::IsAgent' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [ 0, 1 ]
         },
-        'User::UserLastname' => {
-            RequiresValueIfUsed => 1
-        },
-        'User::UserEmail' => {
-            RequiresValueIfUsed => 1
+        'User::IsCustomer' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [ 0, 1 ]
         },
         }
 }
@@ -111,14 +110,11 @@ perform UserUpdate Operation. This will return the updated UserID.
     my $Result = $OperationObject->Run(
         Data => {
             User => {
-                UserLogin       => '...'                                        # requires a value if given
-                UserFirstname   => '...'                                        # requires a value if given
-                UserLastname    => '...'                                        # requires a value if given
-                UserEmail       => '...'                                        # requires a value if given
-                UserPassword    => '...'                                        # optional                
-                UserPhone       => '...'                                        # optional                
-                UserTitle       => '...'                                        # optional
-                ValidID         = 0 | 1 | 2                                     # optional
+                UserLogin       => '...',                                         # requires a value if given
+                UserPassword    => '...',                                         # optional
+                ValidID         => 0 | 1 | 2,                                     # optional
+                IsAgent         => 0 | 1,                                         # optional
+                IsCustomer      => 0 | 1,                                         # optional
             },
         },
     );
@@ -165,19 +161,6 @@ sub Run {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Can not update user. Another user with same login already exists.',
-            );
-        }
-    }
-
-    # check UserEmail exists
-    if ( IsStringWithData( $User->{UserEmail} ) ) {
-        my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-            PostMasterSearch => $User->{UserEmail},
-        );
-        if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
-            return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => 'Can not update user. Another user with same email address already exists.',
             );
         }
     }

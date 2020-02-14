@@ -11,7 +11,8 @@ package Kernel::API::Operation::V1::Ticket::TicketCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use  Kernel::System::EmailParser;
 
 use base qw(
     Kernel::API::Operation::V1::Ticket::Common
@@ -111,7 +112,7 @@ perform TicketCreate Operation. This will return the created TicketID.
         Data => {
             Ticket => {
                 Title           => 'some ticket title',
-                ContactID  => 'some customer user login',
+                ContactID       => '123 or some email',                           # ContactID or some email
                 StateID         => 123,                                           # StateID or State is required
                 State           => 'some state name',
                 PriorityID      => 123,                                           # PriorityID or Priority is required
@@ -260,22 +261,50 @@ sub _TicketCreate {
     my $Ticket = $Param{Ticket};
 
     # use not number value as email for contact search
-    if ( $Ticket->{ContactID} !~ /^\d+$/ ) {
-        my $ContactEmail = $Ticket->{ContactID};
-        $ContactEmail =~ s/.+ <(.+)>/$1/;
-        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
-            PostMasterSearch => $ContactEmail,
-            Valid            => 0,
+    if ($Ticket->{ContactID} !~ /^\d+$/) {
+        $Self->{ParserObject} = Kernel::System::EmailParser->new(
+            Mode => 'Standalone',
         );
-        if ( IsHashRefWithData( \%ContactList ) ) {
-            ( $Ticket->{ContactID} ) = keys %ContactList;
-            delete $Ticket->{OrganisationID};
+        my $ContactEmail = $Self->{ParserObject}->GetEmailAddress(
+            Email => $Ticket->{ContactID}
+        );
+
+        my $ContactEmailRealname = $Self->{ParserObject}->GetRealname(
+            Email => $Ticket->{ContactID}
+        );
+
+        if (!$ContactEmail && !$ContactEmailRealname) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToCreate',
+                Message => 'No Contact ID or valid Email provided.',
+            );
         }
+
+        my @NameChunks = split(' ', $ContactEmailRealname);
+        my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+            Email  => $ContactEmail,
+            Silent => 1,
+        );
+
+        if (!$ExistingContactID) {
+            $Ticket->{ContactID} = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+                Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
+                Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
+                Email                 => $ContactEmail,
+                PrimaryOrganisationID => ($Ticket->{OrganisationID}) ? $Ticket->{OrganisationID} : undef,
+                ValidID               => 1,
+                UserID                => $Self->{Authorization}->{UserID},
+            );
+        }
+        else {
+            $Ticket->{ContactID} = $ExistingContactID;
+        }
+
     }
 
-    # get customer information
-    # with information will be used to create the ticket if customer is not defined in the
-    # database, customer ticket information need to be empty strings
+    # get contact information
+    # with information will be used to create the ticket if contact is not defined in the
+    # database, contact ticket information need to be empty strings
     my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
         ID => $Ticket->{ContactID},
     );

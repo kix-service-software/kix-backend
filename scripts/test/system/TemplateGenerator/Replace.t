@@ -99,7 +99,7 @@ for my $DynamicField (@DynamicFieldsToAdd) {
 # constructor
 my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
 
-my $TestCustomerLogin = $Helper->TestContactCreate(
+my $TestContactID = $Helper->TestContactCreate(
     Language => 'en',
 );
 
@@ -111,12 +111,20 @@ my %TestUser = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
     User => $TestUserLogin,
 );
 
+my %TestUserContact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    UserID => $TestUser{UserID},
+);
+
 my $TestUser2Login = $Helper->TestUserCreate(
     Language => 'en',
 );
 
 my %TestUser2 = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
     User => $TestUserLogin,
+);
+
+my %TestUser2Contact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    UserID => $TestUser2{UserID},
 );
 
 my $TestUser3Login = $Helper->TestUserCreate(
@@ -127,12 +135,20 @@ my %TestUser3 = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
     User => $TestUserLogin,
 );
 
+my %TestUser3Contact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    UserID => $TestUser3{UserID},
+);
+
 my $TestUser4Login = $Helper->TestUserCreate(
     Language => 'en',
 );
 
 my %TestUser4 = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
     User => $TestUserLogin,
+);
+
+my %TestUser4Contact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    UserID => $TestUser4{UserID},
 );
 
 my $TicketID = $TicketObject->TicketCreate(
@@ -142,7 +158,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority      => '3 normal',
     State         => 'closed',
     OrganisationID => '123465',
-    ContactID     => $TestCustomerLogin,
+    ContactID     => $TestContactID,
     OwnerID       => $TestUser{UserID},
     ResponsibleID => $TestUser2{UserID},
     UserID        => $TestUser3{UserID},
@@ -254,22 +270,22 @@ my @Tests = (
         Result   => 'Test otrs',
     },
     {
-        Name => 'KIX responsible firstname',                     # <KIX_RESPONSIBLE_UserFirstname>
+        Name => 'KIX responsible firstname',                     # <KIX_RESPONSIBLE_Firstname>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <KIX_RESPONSIBLE_UserFirstname> <KIX_RESPONSIBLE_nonexisting>',
-        Result   => "Test $TestUser2{UserFirstname} -",
+        Template => 'Test <KIX_RESPONSIBLE_Firstname> <KIX_RESPONSIBLE_nonexisting>',
+        Result   => "Test $TestUser2Contact{Firstname} -",
     },
     {
-        Name => 'KIX_TICKET_RESPONSIBLE firstname',              # <KIX_RESPONSIBLE_UserFirstname>
+        Name => 'KIX_TICKET_RESPONSIBLE firstname',              # <KIX_RESPONSIBLE_Firstname>
         Data => {
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <KIX_TICKET_RESPONSIBLE_UserFirstname> <KIX_TICKET_RESPONSIBLE_nonexisting>',
-        Result   => "Test $TestUser2{UserFirstname} -",
+        Template => 'Test <KIX_TICKET_RESPONSIBLE_Firstname> <KIX_TICKET_RESPONSIBLE_nonexisting>',
+        Result   => "Test $TestUser2Contact{Firstname} -",
     },
     {
         Name => 'KIX owner firstname',                           # <KIX_OWNER_*>
@@ -277,8 +293,8 @@ my @Tests = (
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <KIX_OWNER_UserFirstname> <KIX_OWNER_nonexisting>',
-        Result   => "Test $TestUser{UserFirstname} -",
+        Template => 'Test <KIX_OWNER_Firstname> <KIX_OWNER_nonexisting>',
+        Result   => "Test $TestUserContact{Firstname} -",
     },
     {
         Name => 'KIX_TICKET_OWNER firstname',                    # <KIX_OWNER_*>
@@ -286,8 +302,8 @@ my @Tests = (
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <KIX_TICKET_OWNER_UserFirstname> <KIX_TICKET_OWNER_nonexisting>',
-        Result   => "Test $TestUser{UserFirstname} -",
+        Template => 'Test <KIX_TICKET_OWNER_Firstname> <KIX_TICKET_OWNER_nonexisting>',
+        Result   => "Test $TestUserContact{Firstname} -",
     },
     {
         Name => 'KIX current firstname',                         # <KIX_CURRENT_*>
@@ -295,8 +311,8 @@ my @Tests = (
             From => 'test@home.com',
         },
         RichText => 0,
-        Template => 'Test <KIX_CURRENT_UserFirstname> <KIX_CURRENT_nonexisting>',
-        Result   => "Test $TestUser3{UserFirstname} -",
+        Template => 'Test <KIX_CURRENT_Firstname> <KIX_CURRENT_nonexisting>',
+        Result   => "Test $TestUser3Contact{Firstname} -",
     },
     {
         Name => 'KIX ticket ticketid',                           # <KIX_TICKET_*>
@@ -538,21 +554,14 @@ Line7</div>',
         Data     => {},
         RichText => 0,
         Template => 'Test <KIX_CUSTOMER_REALNAME>',
-        Result   => "Test $TestCustomerLogin $TestCustomerLogin",
+        Result   => "Test $TestContactUserLogin $TestContactUserLogin",
     },
     {
-        Name     => 'KIX CUSTOMER DATA UserFirstname',
+        Name     => 'KIX CUSTOMER DATA Firstname',
         Data     => {},
         RichText => 0,
-        Template => 'Test <KIX_CUSTOMER_DATA_UserFirstname>',
-        Result   => "Test $TestCustomerLogin",
-    },
-    {
-        Name     => 'KIX <KIX_NOTIFICATION_RECIPIENT_UserFullname>',
-        Data     => {},
-        RichText => 0,
-        Template => 'Test <KIX_NOTIFICATION_RECIPIENT_UserFullname> <KIX_NOTIFICATION_RECIPIENT_nonexisting>',
-        Result   => "Test $TestUser4{UserFullname} -",
+        Template => 'Test <KIX_CUSTOMER_DATA_Firstname>',
+        Result   => "Test $TestContactUserLogin",
     },
 );
 

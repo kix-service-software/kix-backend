@@ -39,8 +39,8 @@ $ConfigObject->Set(
     Key   => 'DynamicFieldFromContact::Mapping',
     Value => {
         UserLogin     => 'CustomerLogin' . $RandomID,
-        UserFirstname => 'CustomerFirstname' . $RandomID,
-        UserLastname  => 'CustomerLastname' . $RandomID,
+        Firstname => 'CustomerFirstname' . $RandomID,
+        Lastname  => 'CustomerLastname' . $RandomID,
     },
 );
 $ConfigObject->Set(
@@ -106,8 +106,8 @@ my %TestContactData = $ContactObject->ContactGet(
 );
 
 # set customer Firstname and Lastname
-$TestContactData{UserFirstname} = 'UserFirstName' . $RandomID;
-$TestContactData{UserLastname}  = 'UserLastName' . $RandomID;
+$TestContactData{Firstname} = 'FirstName' . $RandomID;
+$TestContactData{Lastname}  = 'LastName' . $RandomID;
 
 # update the user manually because First and LastNames are important
 $ContactObject->ContactUpdate(
@@ -150,18 +150,13 @@ for my $DynamicFieldName (@AddedDynamicFieldNames) {
 }
 
 $Self->Is(
-    $Ticket{ 'DynamicField_CustomerLogin' . $RandomID },
-    $TestContactData{Login},
-    "DynamicField 'CustomerLogin$RandomID' for Ticket ID:'$TicketID' match TestUser Login",
-);
-$Self->Is(
     $Ticket{ 'DynamicField_CustomerFirstname' . $RandomID },
-    $TestContactData{UserFirstname},
+    $TestContactData{Firstname},
     "DynamicField 'CustomerFirstname$RandomID' for Ticket ID:'$TicketID' match TestUser Firstname",
 );
 $Self->Is(
     $Ticket{ 'DynamicField_CustomerLastname' . $RandomID },
-    $TestContactData{UserLastname},
+    $TestContactData{Lastname},
     "DynamicField 'CustomerLastname$RandomID' for Ticket ID:'$TicketID' match TestUser Lastname",
 );
 

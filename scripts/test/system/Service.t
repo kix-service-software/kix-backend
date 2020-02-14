@@ -39,33 +39,19 @@ my $RandomID = $Helper->GetRandomID();
 my @UserIDs;
 {
 
-    # disable email checks to create new user
-    my $CheckEmailAddressesOrg = $ConfigObject->Get('CheckEmailAddresses') || 1;
-    $ConfigObject->Set(
-        Key   => 'CheckEmailAddresses',
-        Value => 0,
-    );
-
     for my $Counter ( 1 .. 2 ) {
 
         # create new users for the tests
         my $UserID = $UserObject->UserAdd(
-            UserFirstname => 'Service' . $Counter,
-            UserLastname  => 'UnitTest',
-            UserLogin     => 'UnitTest-Service-' . $Counter . $RandomID,
-            UserEmail     => 'UnitTest-Service-' . $Counter . '@localhost',
-            ValidID       => 1,
-            ChangeUserID  => 1,
+            UserLogin    => 'UnitTest-Service-' . $Counter . $RandomID,
+            ValidID      => 1,
+            ChangeUserID => 1,
+            IsAgent      => 1,
         );
 
         push @UserIDs, $UserID;
     }
 
-    # restore original email check param
-    $ConfigObject->Set(
-        Key   => 'CheckEmailAddresses',
-        Value => $CheckEmailAddressesOrg,
-    );
 }
 
 # create needed random service names

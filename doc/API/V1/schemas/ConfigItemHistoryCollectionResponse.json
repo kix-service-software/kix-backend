@@ -7,76 +7,11 @@
       "ConfigItemHistory" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConfigItemHistory"
+            "$ref" : "ConfigItemHistory.json"
          }
       }
    },
    "required" : [
       "ConfigItemHistory"
-   ],
-   "definitions" : {
-      "ConfigItemHistory" : {
-         "$id" : "#ConfigItemHistory",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item history object.",
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ConfigItemID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "HistoryEntryID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "HistoryType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "HistoryTypeID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "UserFirstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "UserLastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserLogin" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "CreateBy",
-            "CreateTime",
-            "HistoryEntryID",
-            "HistoryType",
-            "HistoryTypeID",
-            "UserID",
-            "UserFirstname",
-            "UserLastname",
-            "UserLogin"
-         ]
-      }
-   }
+   ]
 }

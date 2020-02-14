@@ -137,7 +137,7 @@ sub Run {
         else {
 
             my @Files = $CryptObject->FetchFromCustomer(
-                Search => $Contact{UserEmail},
+                Search => $Contact{Email},
             );
 
             for my $Filename (@Files) {

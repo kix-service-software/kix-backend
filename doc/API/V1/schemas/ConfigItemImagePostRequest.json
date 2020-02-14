@@ -5,37 +5,10 @@
    "type" : "object",
    "properties" : {
       "Image" : {
-         "$ref" : "#/definitions/ConfigItemImagePostItem"
+         "$ref" : "ConfigItemImagePostItem.json"
       }
    },
    "required" : [
       "Image"
-   ],
-   "definitions" : {
-      "ConfigItemImagePostItem" : {
-         "$id" : "#ConfigItemImagePostItem",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item image request object for creation.",
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "type" : "string"
-            },
-            "Content" : {
-               "type" : "string"
-            },
-            "ContentType" : {
-               "type" : "string"
-            },
-            "Filename" : {
-               "type" : "string"
-            }
-         },
-         "required" : [
-            "Content",
-            "ContentType",
-            "Filename"
-         ]
-      }
-   }
+   ]
 }

@@ -24,7 +24,7 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 
 my %NewSessionData = (
     UserLogin => 'root',
-    UserEmail => 'root@example.com',
+    Email     => 'root@example.com',
     UserType  => 'User',
 );
 

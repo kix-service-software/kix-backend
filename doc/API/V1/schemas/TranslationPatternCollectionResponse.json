@@ -7,93 +7,11 @@
       "TranslationPattern" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/TranslationPattern"
+            "$ref" : "TranslationPattern.json"
          }
       }
    },
    "required" : [
       "TranslationPattern"
-   ],
-   "definitions" : {
-      "TranslationPattern" : {
-         "$id" : "#TranslationPattern",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The translation pattern object.",
-         "type" : "object",
-         "properties" : {
-            "AvailableLanguages" : {
-               "type" : "array",
-               "item" : {
-                  "type" : "string"
-               },
-               "readOnly" : true
-            },
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Languages" : {
-               "description" : "added via include \"Languages\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/TranslationLanguage"
-               },
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Value"
-         ]
-      },
-      "TranslationLanguage" : {
-         "$id" : "#TranslationLanguage",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The translation language object.",
-         "type" : "object",
-         "properties" : {
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "PatternID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "PatternID",
-            "Language",
-            "Value"
-         ]
-      }
-   }
+   ]
 }

@@ -85,16 +85,15 @@ sub ParameterDefinition {
         },
         'User::UserLogin' => {
             Required => 1
-        },            
-        'User::UserFirstname' => {
-            Required => 1
-        },            
-        'User::UserLastname' => {
-            Required => 1
-        },            
-        'User::UserEmail' => {
-            Required => 1
-        },            
+        },
+        'User::IsAgent' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [ 0, 1 ]
+        },
+        'User::IsCustomer' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [ 0, 1 ]
+        },
     }
 }
 
@@ -106,14 +105,11 @@ perform UserCreate Operation. This will return the created UserLogin.
         Data => {
             User => {
                 UserLogin       => '...'                                        # required
-                UserFirstname   => '...'                                        # required
-                UserLastname    => '...'                                        # required
-                UserEmail       => '...'                                        # required
-                UserPassword    => '...'                                        # optional                
-                UserPhone       => '...'                                        # optional                
-                UserTitle       => '...'                                        # optional
+                UserPassword    => '...'                                        # optional
                 ValidID         => 1,
-                RoleIDs         => [                                            # optional          
+                IsAgent         => 0 | 1,                                       # optional
+                IsCustomer      => 0 | 1,                                       # optional
+                RoleIDs         => [                                            # optional
                     123
                 ],
                 Preferences     => [                                            # optional
@@ -156,17 +152,6 @@ sub Run {
         );
     }
 
-    # check UserEmail exists
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        PostMasterSearch => $User->{UserEmail},
-    );
-    if ( %UserList ) {
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => 'Can not create user. Another user with same email address already exists.',
-        );
-    }
-    
     # create User
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
         ValidID      => 1,
@@ -222,7 +207,7 @@ sub Run {
     
     return $Self->_Success(
         Code   => 'Object.Created',
-        UserID => $UserID,
+        UserID => 0 + $UserID,
     );    
 }
 
