@@ -100,6 +100,10 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => \@DisplayGroupIDs
         },
+        'DynamicField::CustomerVisible' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [0, 1]
+        },
     }
 }
 
@@ -117,6 +121,7 @@ perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldI
                 DisplayGroupID  => 123,              # optional
                 ObjectType      => '...',            # optional
                 Config          => { }               # optional
+                CustomerVisible => 0                 # optional
 	            ValidID         => 1,                # optional
             }
 	    },
@@ -208,8 +213,9 @@ sub Run {
         DisplayGroupID  => $DynamicField->{DisplayGroupID} || $DynamicFieldData->{DisplayGroupID},
         ObjectType      => $DynamicField->{ObjectType} || $DynamicFieldData->{ObjectType},
         Config          => $DynamicField->{Config} || $DynamicFieldData->{Config},
+        CustomerVisible => exists $DynamicField->{CustomerVisible} ? $DynamicField->{CustomerVisible} : $DynamicFieldData->{CustomerVisible},
         ValidID         => $DynamicField->{ValidID} || $DynamicFieldData->{ValidID},
-        UserID          => $Self->{Authorization}->{UserID},
+        UserID          => $Self->{Authorization}->{UserID}
     );
 
     if ( !$Success ) {
