@@ -524,7 +524,7 @@ sub _EnrichHistoryEntries {
             UserID => $Entry->{CreateBy},
             Cached => 1,
         );
-        my %ContactData = $Kernel::OM->Get('Kernel::System::User')->ContactGet(
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             UserID => $Entry->{CreateBy},
             Cached => 1,
         );
