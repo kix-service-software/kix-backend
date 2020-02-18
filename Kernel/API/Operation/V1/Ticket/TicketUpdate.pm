@@ -182,8 +182,8 @@ sub Run {
     # everything is ok, let's update the ticket
     my $Result = $Self->_TicketUpdate(
         TicketID => $Param{Data}->{TicketID},
-        Ticket   => {
-            StateID => $TicketData{StateID},
+        Ticket   => {            
+            StateID => (!$Ticket->{State} && !$Ticket->{StateID}) ? $TicketData{StateID} : undef,
             %{$Ticket}
         },
         UserID   => $Self->{Authorization}->{UserID},
