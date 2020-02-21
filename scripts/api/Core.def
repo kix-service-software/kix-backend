@@ -181,6 +181,8 @@
 /system/ticket/states/:StateID                                                 |   PATCH           | V1::TicketState::TicketStateUpdate
 /system/ticket/states/types                                                    |   GET             | V1::StateType::StateTypeSearch
 /system/ticket/states/types/:StateTypeID                                       |   GET             | V1::StateType::StateTypeGet
+/system/ticket/templates                                                       |   GET             | V1::TicketTemplate::TicketTemplateSearch
+/system/ticket/templates/:TemplateName                                         |   GET             | V1::TicketTemplate::TicketTemplateGet
 /system/ticket/types                                                           |   GET             | V1::TicketType::TicketTypeSearch
 /system/ticket/types                                                           |   POST            | V1::TicketType::TicketTypeCreate
 /system/ticket/types/:TypeID                                                   |   DELETE          | V1::TicketType::TicketTypeDelete
