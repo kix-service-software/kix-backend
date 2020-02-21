@@ -3966,4 +3966,27 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::Template::Definitions" Required="0" Valid="1">
+        <Description Translatable="1">Defines a set of ticket templates filled with predefined values which are set in
+            specified ticket fields.
+        </Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <TextArea>[{"TemplateID":"IncidentReport","Title":"Incident","Hint":"Use this template if you encounter an incident or some limitation of a usually working service or function.","Keywords":["Incident","Report"],"CustomerVisible":true,"FormFields":[{"id":"ticket-new-form-field-channel","label":"Channel","required":false,"readonly":false,"defaultValue":{"value":"note","valid":true},"property":"ChannelID","name":"Channel","hint":"Helptext_Tickets_TicketCreate_AffectedAsset","visible":true},{"id":"ticket-new-form-field-priority","label":"Priority","required":false,"readonly":false,"defaultValue":{"value":3,"valid":true},"property":"PriorityID","name":"Priority","hint":"Helptext_Tickets_TicketCreate_AffectedAsset","visible":true},{"id":"ticket-new-form-field-affectedasset","label":"Affected Asset","required":false,"readonly":false,"defaultValue":{"value":null,"valid":true},"property":"DynamicFields","options":[{"option":"FIELD_NAME","value":"AffectedAsset"}],"name":"Contact","hint":"Helptext_Tickets_TicketCreate_AffectedAsset","visible":true},{"id":"ticket-new-form-field-queue","label":"Assign Team / Queue","required":true,"readonly":true,"defaultValue":{"value":1,"valid":true},"property":"QueueID","name":"Assign Team / Queue","hint":"Helptext_Tickets_TicketCreate_Queue","visible":false},{"id":"ticket-new-form-field-state","label":"State","required":true,"readonly":true,"defaultValue":{"value":2,"valid":true},"property":"StateID","name":"State","hint":"Helptext_Tickets_TicketCreate_State","visible":false},{"id":"ticket-new-form-field-type","label":"Type","required":true,"readonly":true,"defaultValue":{"value":1,"valid":true},"property":"TypeID","name":"Type","hint":"Helptext_Tickets_TicketCreate_Type","visible":true}]},{"TemplateID":"ServiceRequest","Title":"","Hint":"Any other request.","Keywords":["Service","Request"],"CustomerVisible":true,"FormFields":[{"id":"ticket-new-form-field-channel","label":"Channel","required":false,"readonly":false,"defaultValue":{"value":"note","valid":true},"property":"ChannelID","name":"Channel","hint":"Helptext_Tickets_TicketCreate_AffectedAsset","visible":true},{"id":"ticket-new-form-field-priority","label":"Priority","required":false,"readonly":false,"defaultValue":{"value":3,"valid":true},"property":"PriorityID","name":"Priority","hint":"Helptext_Tickets_TicketCreate_AffectedAsset","visible":true},{"id":"ticket-new-form-field-affectedasset","label":"Affected Asset","required":false,"readonly":false,"defaultValue":{"value":null,"valid":true},"property":"DynamicFields","options":[{"option":"FIELD_NAME","value":"AffectedAsset"}],"name":"Contact","hint":"Helptext_Tickets_TicketCreate_AffectedAsset","visible":true},{"id":"ticket-new-form-field-queue","label":"Assign Team / Queue","required":true,"readonly":true,"defaultValue":{"value":1,"valid":true},"property":"QueueID","name":"Assign Team / Queue","hint":"Helptext_Tickets_TicketCreate_Queue","visible":false},{"id":"ticket-new-form-field-state","label":"State","required":true,"readonly":true,"defaultValue":{"value":2,"valid":true},"property":"StateID","name":"State","hint":"Helptext_Tickets_TicketCreate_State","visible":false},{"id":"ticket-new-form-field-type","label":"Type","required":true,"readonly":true,"defaultValue":{"value":1,"valid":true},"property":"TypeID","name":"Type","hint":"Helptext_Tickets_TicketCreate_Type","visible":true}]}]</TextArea>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="external" Name="Ticket::Template::Definitions::List::Public" Required="0" Valid="1">
+        <Description Translatable="1">Defines which ticket templates are delivered over API to the public domain. The
+            lists consists of template names or regular expressions matching template names.
+        </Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Array>
+                <Item>IncidentReport</Item>
+                <Item>ServiceRequest</Item>
+            </Array>
+        </Setting>
+    </ConfigItem>
 </kix_config>

@@ -1280,6 +1280,20 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::StateType::StateTypeGet
+    V1::TicketTemplate::TicketTemplateSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketTemplate::TicketTemplateSearch
+    V1::TicketTemplate::TicketTemplateGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::TicketTemplate::TicketTemplateGet
     V1::TicketType::TicketTypeSearch:
         Description: ''
         MappingInbound:
@@ -2883,6 +2897,14 @@ Provider:
           RequestMethod:
           - GET
           Route: /system/ticket/states/types/:StateTypeID
+        V1::TicketTemplate::TicketTemplateSearch:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/templates
+        V1::TicketTemplate::TicketTemplateGet:
+          RequestMethod:
+          - GET
+          Route: /system/ticket/templates/:TemplateName
         V1::TicketType::TicketTypeSearch:
           RequestMethod:
           - GET

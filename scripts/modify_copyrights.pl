@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2019, c.a.p.e. IT GmbH, https://www.cape-it.de/
+# Copyright (C) 2006-2020, c.a.p.e. IT GmbH, https://www.cape-it.de/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -15,7 +15,7 @@ use File::Basename;
 # check if directory is given
 if ( scalar(@ARGV) < 1 ) {
     print "kix.ModifyCopyright.pl\n";
-    print "Copyright (c) 2006-2019 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
+    print "Copyright (c) 2006-2020 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
     print "USAGE: kix.ModifyCopyright.pl <otrs archive file> <directory>\n";
     exit -1;
 }
@@ -64,7 +64,7 @@ sub _ModifyPerl {
     my ( $FileList ) = @_;
 
     my $OTRSHEADER = '# --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -75,7 +75,7 @@ sub _ModifyPerl {
 ';
 
     my $CAPEHEADER = '# --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -158,7 +158,7 @@ sub _ModifyTemplate {
     my ( $FileList ) = @_;
 
     my $OTRSHEADER = '# --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -169,7 +169,7 @@ sub _ModifyTemplate {
 ';
 
     my $CAPEHEADER = '# --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -222,7 +222,7 @@ sub _ModifyJS {
     my ( $FileList ) = @_;
 
     my $OTRSHEADER = '// --
-// Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+// Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 // based on the original work of:
 // Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 // --
@@ -233,7 +233,7 @@ sub _ModifyJS {
 ';
 
     my $CAPEHEADER = '// --
-// Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+// Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -287,7 +287,7 @@ sub _ModifyCSS {
 
     my $OTRSHEADER = '/**
  * This software is part of the KIX project, https://www.kixdesk.com/
- *  Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+ *  Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
  *  based on the original work of:
  *  Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
  *  --
@@ -305,7 +305,7 @@ sub _ModifyCSS {
 
     my $CAPEHEADER = '/**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+ * Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
  * --
  * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
  * @copyright c.a.p.e. IT GmbH
