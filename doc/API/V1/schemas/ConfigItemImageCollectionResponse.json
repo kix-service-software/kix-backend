@@ -7,11 +7,59 @@
       "Image" : {
          "type" : "array",
          "items" : {
-            "$ref" : "ConfigItemImage.json"
+            "$ref" : "#/definitions/_ConfigItemImage_json"
          }
       }
    },
    "required" : [
       "Image"
-   ]
+   ],
+   "definitions" : {
+      "_ConfigItemImage_json" : {
+         "$id" : "#ConfigItemImage",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item image object.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Comment",
+            "ConfigItemID",
+            "ContentType",
+            "Filename",
+            "ID"
+         ]
+      }
+   }
 }

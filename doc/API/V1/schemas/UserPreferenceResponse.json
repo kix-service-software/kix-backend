@@ -5,10 +5,37 @@
    "type" : "object",
    "properties" : {
       "UserPreference" : {
-         "$ref" : "UserPreference.json"
+         "$ref" : "#/definitions/_UserPreference_json"
       }
    },
    "required" : [
       "UserPreference"
-   ]
+   ],
+   "definitions" : {
+      "_UserPreference_json" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "UserID",
+            "Value"
+         ]
+      }
+   }
 }

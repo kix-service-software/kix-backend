@@ -50,15 +50,13 @@
          "readOnly" : true
       },
       "CurrentDefinition" : {
-         "$ref" : "ConfigItemClassDefinition.json",
-         "description" : "added via include \"CurrentDefinition\"",
-         "type" : "object"
+         "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
       },
       "Definitions" : {
          "description" : "added via include \"Definitions\"",
          "type" : "array",
          "item" : {
-            "$ref" : "ConfigItemClassDefinition.json"
+            "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
          }
       },
       "ID" : {
@@ -82,5 +80,60 @@
       "ID",
       "Name",
       "ValidID"
-   ]
+   ],
+   "definitions" : {
+      "_ConfigItemClassDefinition_json" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
+      }
+   }
 }

@@ -7,11 +7,83 @@
       "ConfigItemHistory" : {
          "type" : "array",
          "items" : {
-            "$ref" : "ConfigItemHistory.json"
+            "$ref" : "#/definitions/_ConfigItemHistory_json"
          }
       }
    },
    "required" : [
       "ConfigItemHistory"
-   ]
+   ],
+   "definitions" : {
+      "_ConfigItemHistory_json" : {
+         "$id" : "#ConfigItemHistory",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item history object.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryEntryID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "HistoryType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryTypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserFirstname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserLastname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserLogin" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "HistoryEntryID",
+            "HistoryType",
+            "HistoryTypeID",
+            "UserID",
+            "UserFirstname",
+            "UserLastname",
+            "UserLogin"
+         ]
+      }
+   }
 }

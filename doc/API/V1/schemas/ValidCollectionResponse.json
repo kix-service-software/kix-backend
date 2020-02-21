@@ -7,11 +7,29 @@
       "Valid" : {
          "type" : "array",
          "items" : {
-            "$ref" : "Valid.json"
+            "$ref" : "#/definitions/_Valid_json"
          }
       }
    },
    "required" : [
       "Valid"
-   ]
+   ],
+   "definitions" : {
+      "_Valid_json" : {
+         "$id" : "#Valid",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The valid object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         }
+      }
+   }
 }

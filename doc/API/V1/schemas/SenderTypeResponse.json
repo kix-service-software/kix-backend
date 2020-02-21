@@ -5,10 +5,32 @@
    "type" : "object",
    "properties" : {
       "SenderType" : {
-         "$ref" : "SenderType.json"
+         "$ref" : "#/definitions/_SenderType_json"
       }
    },
    "required" : [
       "SenderType"
-   ]
+   ],
+   "definitions" : {
+      "_SenderType_json" : {
+         "$id" : "#SenderType",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The sender type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   }
 }

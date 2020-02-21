@@ -5,10 +5,160 @@
    "type" : "object",
    "properties" : {
       "SysConfigOptionDefinition" : {
-         "$ref" : "SysConfigOptionDefinition.json"
+         "$ref" : "#/definitions/_SysConfigOptionDefinition_json"
       }
    },
    "required" : [
       "SysConfigOptionDefinition"
-   ]
+   ],
+   "definitions" : {
+      "_SysConfigOptionDefinition_json" : {
+         "$id" : "#SysConfigOptionDefinition",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The SysConfig option definition object.",
+         "type" : "object",
+         "properties" : {
+            "AccessLevel" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Context" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ContextMetadata" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Default" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Description" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ExperienceLevel" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Group" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "IsModified" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IsRequired" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Setting" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "Name",
+            "Type",
+            "ValidID"
+         ]
+      }
+   }
 }

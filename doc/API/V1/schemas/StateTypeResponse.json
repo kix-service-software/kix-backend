@@ -5,10 +5,32 @@
    "type" : "object",
    "properties" : {
       "StateType" : {
-         "$ref" : "StateType.json"
+         "$ref" : "#/definitions/_StateType_json"
       }
    },
    "required" : [
       "StateType"
-   ]
+   ],
+   "definitions" : {
+      "_StateType_json" : {
+         "$id" : "#StateType",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The state type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   }
 }

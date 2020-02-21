@@ -5,10 +5,71 @@
    "type" : "object",
    "properties" : {
       "MacroActionType" : {
-         "$ref" : "MacroActionType.json"
+         "$ref" : "#/definitions/_MacroActionType_json"
       }
    },
    "required" : [
       "MacroActionType"
-   ]
+   ],
+   "definitions" : {
+      "_MacroActionType_json" : {
+         "$id" : "#MacroActionType",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro action type object.",
+         "type" : "object",
+         "properties" : {
+            "Description" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayName" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "MacroType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Options" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "object",
+                     "properties" : {
+                        "Description" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Label" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Name" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Required" : {
+                           "type" : "integer",
+                           "readOnly" : true
+                        }
+                     },
+                     "required" : [
+                        "Label",
+                        "Name"
+                     ]
+                  }
+               }
+            }
+         },
+         "required" : [
+            "Description",
+            "MacroType",
+            "Name"
+         ]
+      }
+   }
 }

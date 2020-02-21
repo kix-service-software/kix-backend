@@ -1,16 +1,14 @@
 {
-  "User": [
-    {
-      "ChangeBy": 1,
-      "ChangeTime": "2020-01-20 11:30:26",
-      "CreateBy": 1,
-      "CreateTime": "2020-01-20 11:30:26",
-      "IsAgent": 1,
-      "IsCustomer": 0,
-      "UserComment": null,
-      "UserID": 3,
-      "UserLogin": "jdoe",
-      "ValidID": 1
+    "User": {
+        "ChangeBy": 1,
+        "ChangeTime": "2020-01-20 11:30:26",
+        "CreateBy": 1,
+        "CreateTime": "2020-01-20 11:30:26",
+        "IsAgent": 1,
+        "IsCustomer": 0,
+        "UserComment": null,
+        "UserID": 3,
+        "UserLogin": "jdoe",
+        "ValidID": 1
     }
-  ]
 }

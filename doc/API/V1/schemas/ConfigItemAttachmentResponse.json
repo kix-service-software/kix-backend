@@ -5,10 +5,51 @@
    "type" : "object",
    "properties" : {
       "Attachment" : {
-         "$ref" : "ConfigItemAttachment.json"
+         "$ref" : "#/definitions/_ConfigItemAttachment_json"
       }
    },
    "required" : [
       "Attachment"
-   ]
+   ],
+   "definitions" : {
+      "_ConfigItemAttachment_json" : {
+         "$id" : "#ConfigItemAttachment",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item attachment object.",
+         "type" : "object",
+         "properties" : {
+            "AttachmentID" : {
+               "type" : "integer"
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "AttachmentID",
+            "ContentType",
+            "Content",
+            "Filesize",
+            "FilesizeRaw",
+            "Filename"
+         ]
+      }
+   }
 }

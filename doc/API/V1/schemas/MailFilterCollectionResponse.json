@@ -7,11 +7,104 @@
       "MailFilter" : {
          "type" : "array",
          "items" : {
-            "$ref" : "MailFilter.json"
+            "$ref" : "#/definitions/_MailFilter_json"
          }
       }
    },
    "required" : [
       "MailFilter"
-   ]
+   ],
+   "definitions" : {
+      "_MailFilter_json" : {
+         "$id" : "#MailFilter",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The mail filter object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Match" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Key" : {
+                        "description" : "relevant email or x-kix header",
+                        "type" : "string"
+                     },
+                     "Not" : {
+                        "description" : "to negate value",
+                        "type" : "integer"
+                     },
+                     "Value" : {
+                        "description" : "value of header, regular expression is possible",
+                        "type" : "string"
+                     }
+                  }
+               },
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Set" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Key" : {
+                        "description" : "relevant x-kix header",
+                        "type" : "string"
+                     },
+                     "Value" : {
+                        "description" : "value for header",
+                        "type" : "string"
+                     }
+                  }
+               },
+               "readOnly" : true
+            },
+            "StopAfterMatch" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
 }

@@ -7,11 +7,62 @@
       "FollowUpType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "FollowUpType.json"
+            "$ref" : "#/definitions/_FollowUpType_json"
          }
       }
    },
    "required" : [
       "FollowUpType"
-   ]
+   ],
+   "definitions" : {
+      "_FollowUpType_json" : {
+         "$id" : "#FollowUpType",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The followup type object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
 }

@@ -5,10 +5,99 @@
    "type" : "object",
    "properties" : {
       "Service" : {
-         "$ref" : "Service.json"
+         "$ref" : "#/definitions/_Service_json"
       }
    },
    "required" : [
       "Service"
-   ]
+   ],
+   "definitions" : {
+      "_Service_json" : {
+         "$id" : "#Service",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The service object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Criticality" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurInciStateTypeFromCIs" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Fullame" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ParentID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ServiceID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "description" : "See GeneralCatalog class \"ITSM::Service::Type\" for the list of possible types.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "Criticality",
+            "Fullname",
+            "Name",
+            "ServiceID",
+            "TypeID",
+            "ValidID"
+         ]
+      }
+   }
 }

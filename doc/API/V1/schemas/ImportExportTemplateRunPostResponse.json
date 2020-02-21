@@ -1,6 +1,6 @@
 {
    "$id" : "#ImportExportTemplateRunPostResponse",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The response of the run create request.",
    "type" : "object",
    "properties" : {

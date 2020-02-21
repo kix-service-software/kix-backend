@@ -5,10 +5,93 @@
    "type" : "object",
    "properties" : {
       "MailAccount" : {
-         "$ref" : "MailAccount.json"
+         "$ref" : "#/definitions/_MailAccount_json"
       }
    },
    "required" : [
       "MailAccount"
-   ]
+   ],
+   "definitions" : {
+      "_MailAccount_json" : {
+         "$id" : "#MailAccount",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The mail account object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DispatchingBy" : {
+               "description" : "Can be either 'From' or 'Queue'.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Host" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IMAPFolder" : {
+               "description" : "The IMAP folder to use if type is 'IMAP'.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Login" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "QueueID" : {
+               "description" : "The ID of the queue to dispatch to if DispatchingBy is 'Queue'.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Trusted" : {
+               "description" : "If set to 1 the KIX-X-Headers will be interpreted.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Type" : {
+               "description" : "One of the available types from resource /system/communication/mailaccounts/types.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "DispatchingBy",
+            "ID",
+            "Host",
+            "Login",
+            "Type",
+            "ValidID"
+         ]
+      }
+   }
 }

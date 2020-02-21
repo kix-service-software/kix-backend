@@ -5,10 +5,149 @@
    "type" : "object",
    "properties" : {
       "ConfigItemClass" : {
-         "$ref" : "ConfigItemClass.json"
+         "$ref" : "#/definitions/_ConfigItemClass_json"
       }
    },
    "required" : [
       "ConfigItemClass"
-   ]
+   ],
+   "definitions" : {
+      "_ConfigItemClassDefinition_json" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
+      },
+      "_ConfigItemClass_json" : {
+         "$id" : "#ConfigItemClass",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item class object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ConfigItemStats" : {
+               "description" : "result of include \"ConfigItemStats\"",
+               "type" : "object",
+               "properties" : {
+                  "PostProductiveCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "ProductiveCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "PostProductiveCount",
+                  "ProductiveCount"
+               ]
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CurrentDefinition" : {
+               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+            },
+            "Definitions" : {
+               "description" : "added via include \"Definitions\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+               }
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
 }

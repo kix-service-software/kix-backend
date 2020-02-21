@@ -5,10 +5,68 @@
    "type" : "object",
    "properties" : {
       "TicketType" : {
-         "$ref" : "TicketType.json"
+         "$ref" : "#/definitions/_TicketType_json"
       }
    },
    "required" : [
       "TicketType"
-   ]
+   ],
+   "definitions" : {
+      "_TicketType_json" : {
+         "$id" : "#TicketType",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket type object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
 }

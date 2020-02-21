@@ -16,7 +16,7 @@
             "Permissions" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "PermissionPostItem.json"
+                  "$ref" : "#/definitions/_PermissionPostItem_json"
                }
             },
             "UserIDs" : {
@@ -37,5 +37,36 @@
    },
    "required" : [
       "Role"
-   ]
+   ],
+   "definitions" : {
+      "_PermissionPostItem_json" : {
+         "$id" : "#PermissionPostItem",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The permission item object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "IsRequired" : {
+               "type" : "integer"
+            },
+            "Target" : {
+               "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            },
+            "Value" : {
+               "description" : "bitmask, please see documentation for bit descriptions",
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Target",
+            "TypeID",
+            "Value"
+         ]
+      }
+   }
 }

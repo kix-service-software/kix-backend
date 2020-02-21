@@ -5,10 +5,67 @@
    "type" : "object",
    "properties" : {
       "Link" : {
-         "$ref" : "Link.json"
+         "$ref" : "#/definitions/_Link_json"
       }
    },
    "required" : [
       "Link"
-   ]
+   ],
+   "definitions" : {
+      "_Link_json" : {
+         "$id" : "#Link",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The link object.",
+         "type" : "object",
+         "properties" : {
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SourceKey" : {
+               "description" : "The primary ID of the source object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SourceObject" : {
+               "description" : "The type of the source object. See resource /links/types for possible object types.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TargetKey" : {
+               "description" : "The primary ID of the target object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TargetObject" : {
+               "description" : "The type of the target object. See resource /links/types for possible object types.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Type" : {
+               "description" : "One of the available link types from resource /links/types.",
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "SourceKey",
+            "SourceObject",
+            "TargetKey",
+            "TargetObject",
+            "Type"
+         ]
+      }
+   }
 }
