@@ -373,6 +373,43 @@ sub _TicketCreate {
         );
     }
 
+    # set owner (if owner or owner id is given)
+    if ($OwnerID) {
+        $TicketObject->TicketOwnerSet(
+            TicketID  => $TicketID,
+            NewUserID => $OwnerID,
+            UserID    => $Param{UserID},
+        );
+
+        # set lock if no lock was defined
+        if ( !$Ticket->{Lock} && !$Ticket->{LockID} ) {
+            $TicketObject->TicketLockSet(
+                TicketID => $TicketID,
+                Lock     => 'lock',
+                UserID   => $Param{UserID},
+            );
+        }
+    }
+
+    # else set owner to current agent but do not lock it
+    else {
+        $TicketObject->TicketOwnerSet(
+            TicketID           => $TicketID,
+            NewUserID          => $Param{UserID},
+            SendNoNotification => 1,
+            UserID             => $Param{UserID},
+        );
+    }
+
+    # set responsible
+    if ($ResponsibleID) {
+        $TicketObject->TicketResponsibleSet(
+            TicketID  => $TicketID,
+            NewUserID => $ResponsibleID,
+            UserID    => $Param{UserID},
+        );
+    }
+
     # set lock if specified
     if ( $Ticket->{Lock} || $Ticket->{LockID} ) {
         $TicketObject->TicketLockSet(
@@ -425,43 +462,6 @@ sub _TicketCreate {
                 String   => $Ticket->{PendingTime},
             );
         }
-    }
-
-    # set owner (if owner or owner id is given)
-    if ($OwnerID) {
-        $TicketObject->TicketOwnerSet(
-            TicketID  => $TicketID,
-            NewUserID => $OwnerID,
-            UserID    => $Param{UserID},
-        );
-
-        # set lock if no lock was defined
-        if ( !$Ticket->{Lock} && !$Ticket->{LockID} ) {
-            $TicketObject->TicketLockSet(
-                TicketID => $TicketID,
-                Lock     => 'lock',
-                UserID   => $Param{UserID},
-            );
-        }
-    }
-
-    # else set owner to current agent but do not lock it
-    else {
-        $TicketObject->TicketOwnerSet(
-            TicketID           => $TicketID,
-            NewUserID          => $Param{UserID},
-            SendNoNotification => 1,
-            UserID             => $Param{UserID},
-        );
-    }
-
-    # set responsible
-    if ($ResponsibleID) {
-        $TicketObject->TicketResponsibleSet(
-            TicketID  => $TicketID,
-            NewUserID => $ResponsibleID,
-            UserID    => $Param{UserID},
-        );
     }
 
     # set dynamic fields
