@@ -240,10 +240,10 @@ sub Run {
 
             # inform API caching about a new dependency
             $Self->AddCacheDependency(Type => 'Ticket');
-            $Self->AddCacheDependency( Type => 'User' );
+            $Self->AddCacheDependency(Type => 'User');
         }
 
-        #include assigned user login if requested (and existing)
+        # include assigned user if requested (and existing)
         if ($Param{Data}->{include}->{User}) {
             $Self->AddCacheDependency( Type => 'User' );
             $ContactData{User} = undef;
@@ -257,6 +257,33 @@ sub Run {
                 $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
             }
         }
+
+        # include assigned config items if requested
+        if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
+
+            # add user data for
+            my %CIContact = %ContactData;
+            if (!$CIContact{User} && $CIContact{AssignedUserID}) {
+                my $UserData = $Self->ExecOperation(
+                    OperationType => 'V1::User::UserGet',
+                    Data          => {
+                        UserID => $CIContact{AssignedUserID},
+                    }
+                );
+                $CIContact{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+                $Self->AddCacheDependency(Type => 'User');
+            }
+
+            my $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                ObjectType => 'Contact',
+                Object     => \%CIContact
+            );
+
+            $ContactData{AssignedConfigItems} = IsArrayRef($ItemIDs) ? $ItemIDs : [];
+
+            $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
+        }
+
         # delete the UserID in %ContactData, because it's some backwards compatibility fix (KIX2018-2515) masking the
         # the contact ID as the user ID and should not be delivered through the API to the client.
         delete($ContactData{UserID});

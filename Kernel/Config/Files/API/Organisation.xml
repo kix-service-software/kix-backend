@@ -94,12 +94,21 @@
             <Hash>
             </Hash>
         </Setting>
-    </ConfigItem>    
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::V1::Organisation::OrganisationGet###AttributeBlacklist" Required="0" Valid="1">
         <Description Translatable="1">Defines which attributes of the organisation data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported</Description>
         <Setting>
             <Hash>
             </Hash>
         </Setting>
-    </ConfigItem>  
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Organisation.AssignedConfigItems" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::CMDB::ConfigItemGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>

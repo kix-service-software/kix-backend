@@ -244,6 +244,20 @@ sub Run {
             $Self->AddCacheDependency( Type => 'Contact' );
         }
 
+        # include assigned config items if requested
+        if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
+
+            my $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                ObjectType => 'Organisation',
+                Object     => \%OrganisationData
+            );
+
+            $OrganisationData{AssignedConfigItems} = IsArrayRef($ItemIDs) ? $ItemIDs : [];
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
+        }
+
         # add
         push(@OrganisationSearch, \%OrganisationData);
     }
