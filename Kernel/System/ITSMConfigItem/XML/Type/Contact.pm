@@ -70,7 +70,7 @@ sub ValueLookup {
     );
 
     if ( IsHashRefWithData( \%Contact ) ) {
-        return $Contact{Login}
+        return $Contact{Fullname}
     }
     return $Param{Value};
 }
