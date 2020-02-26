@@ -149,6 +149,37 @@ sub Search {
     # increase count
     my $Count = $Self->{ModuleData}->{JoinCounter}++;
 
+    # join tables
+    my $JoinTable = "dfv$Count";
+    $Self->{ModuleData}->{JoinTables}->{$DFName} = $JoinTable;
+
+    my $Alias = "";
+    if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable\_left ON (CAST(st.id AS char(255)) = CAST($JoinTable\_left.object_id AS char(255)) AND $JoinTable\_left.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            push( @SQLJoin, "RIGHT OUTER JOIN dynamic_field_value $JoinTable\_right ON (CAST(st.id AS char(255)) = CAST($JoinTable\_right.object_id AS char(255)) AND $JoinTable\_right.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            $Alias = "_right";
+        } else {
+            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        }
+    } 
+    elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
+        if ( $Param{BoolOperator} eq 'OR') {
+            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
+                push( @SQLJoin, "LEFT OUTER JOIN article artdfjoin_left ON st.id = artdfjoin_left.ticket_id");
+                push( @SQLJoin, "RIGHT OUTER JOIN article artdfjoin_right ON st.id = artdfjoin_right.ticket_id");
+                $Self->{ModuleData}->{ArticleTableJoined} = 1;
+            }
+            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON ((CAST(artdfjoin_left.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) OR (CAST(artdfjoin_right.id AS char(255)) = CAST($JoinTable.object_id AS char(255))) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        } else {
+            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
+                push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
+                $Self->{ModuleData}->{ArticleTableJoined} = 1;
+            }
+            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        }
+    }
+
     my $DynamicFieldSQL;
     foreach my $ValueItem ( @{$Value} ) {
         # validate data type
@@ -174,7 +205,7 @@ sub Search {
         # get field specific SQL
         my $SQL = $DynamicFieldBackendObject->SearchSQLGet(
             DynamicFieldConfig => $DynamicFieldConfig,
-            TableAlias         => "dfv$Count",
+            TableAlias         => "dfv$Count$Alias",
             Operator           => $OperatorMap{$Param{Search}->{Operator}},
             SearchTerm         => $ValueItem,
         );
@@ -182,37 +213,8 @@ sub Search {
         if ( $DynamicFieldSQL ) {
             $DynamicFieldSQL .= " OR ";
         }
-        $DynamicFieldSQL .= $SQL;
-    }
-
-    # join tables
-    my $JoinTable = "dfv$Count";
-    $Self->{ModuleData}->{JoinTables}->{$DFName} = $JoinTable;
-
-    if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable\_left ON (CAST(st.id AS char(255)) = CAST($JoinTable\_left.object_id AS char(255)) AND $JoinTable\_left.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-            push( @SQLJoin, "RIGHT OUTER JOIN dynamic_field_value $JoinTable\_right ON (CAST(st.id AS char(255)) = CAST($JoinTable\_right.object_id AS char(255)) AND $JoinTable\_right.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        } else {
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        }
-    } 
-    elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
-                push( @SQLJoin, "LEFT OUTER JOIN article artdfjoin_left ON st.id = artdfjoin_left.ticket_id");
-                push( @SQLJoin, "RIGHT OUTER JOIN article artdfjoin_right ON st.id = artdfjoin_right.ticket_id");
-                $Self->{ModuleData}->{ArticleTableJoined} = 1;
-            }
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON ((CAST(artdfjoin_left.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) OR (CAST(artdfjoin_right.id AS char(255)) = CAST($JoinTable.object_id AS char(255))) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        } else {
-            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
-                push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
-                $Self->{ModuleData}->{ArticleTableJoined} = 1;
-            }
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        }
-    }
+        $DynamicFieldSQL .= "($SQL)";
+    }    
 
     # add field specific SQL
     push( @SQLWhere, "($DynamicFieldSQL)" );
