@@ -175,7 +175,7 @@ sub Run {
 
     # import SysConfig definitions if given
     if ( IsArrayRefWithData($ClientRegistration->{SysConfigOptionDefinitions}) ) {
-        my %SysConfigOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->ValueGetAll();
+        my %SysConfigOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
 
         foreach my $Item ( @{$ClientRegistration->{SysConfigOptionDefinitions}} ) {
             if ( !exists $SysConfigOptions{$Item->{Name}} ) {
@@ -193,7 +193,7 @@ sub Run {
                     IsRequired      => $Item->{IsRequired},
                     Setting         => $Item->{Setting},
                     Default         => $Item->{Default},
-                    ValidID         => $Item->{ValidID} || 1,
+                    DefaultValidID  => $Item->{DefaultValidID},                    
                     UserID          => $Self->{Authorization}->{UserID},
                 );
 
@@ -207,20 +207,9 @@ sub Run {
             else {
                 # update existing option
                 my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
-                    Name            => $Item->{Name},
-                    AccessLevel     => $Item->{AccessLevel},
-                    Type            => $Item->{Type},
-                    Context         => $Item->{Context},
-                    ContextMetadata => $Item->{ContextMetadata},
-                    Description     => $Item->{Description},
-                    Comment         => $Item->{Comment},
-                    Level           => $Item->{Level},
-                    Group           => $Item->{Group},
-                    IsRequired      => $Item->{IsRequired},
-                    Setting         => $Item->{Setting},
-                    Default         => $Item->{Default},
-                    ValidID         => $Item->{ValidID} || 1,
-                    Value           => $SysConfigOptions{$Item->{Name}},
+                    %{ $SysConfigOptions{ $Item->{Name} } },
+                    %{$Item},
+                    Value           => $SysConfigOptions{ $Item->{Name} }->{IsModified} ? $SysConfigOptions{ $Item->{Name} }->{Value} : undef,
                     UserID          => $Self->{Authorization}->{UserID},
                 );
 

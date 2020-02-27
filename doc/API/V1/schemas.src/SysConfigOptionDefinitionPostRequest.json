@@ -89,19 +89,6 @@
                 },
                 "ValidID": {
                     "type": "integer"
-                },
-                "Value": {
-                    "anyOf": [
-                        {
-                            "type": "object"
-                        },
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
                 }
             },
             "required": [
