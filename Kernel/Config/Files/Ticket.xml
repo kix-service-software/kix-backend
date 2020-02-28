@@ -3766,14 +3766,14 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###ITSMConfigItemLinkAdd" Required="0" Valid="0">
-        <Description Translatable="1">Create link between ticket and config item on DynamicFieldUpdate (This event only create link, links can only be deleted manually).</Description>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###ITSMConfigItemLinkAdd" Required="0" Valid="1">
+        <Description Translatable="1">Create link between ticket and config item on DynamicFieldUpdate (This event only create links, links can only be deleted manually).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::ITSMConfigItemLinkAdd</Item>
-                <Item Key="Event">(TicketCreate|TicketDynamicFieldUpdate)</Item>
+                <Item Key="Event">(TicketDynamicFieldUpdate_AffectedAsset)</Item>
                 <Item Key="LinkType">RelevantTo</Item>
             </Hash>
         </Setting>

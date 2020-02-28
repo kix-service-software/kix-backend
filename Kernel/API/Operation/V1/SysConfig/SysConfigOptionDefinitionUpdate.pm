@@ -114,12 +114,12 @@ perform SysConfigOptionDefinitionUpdate Operation. This will return the updated 
     my $Result = $OperationObject->Run(
         Data => {
             Option => 'test',
-    	    SysConfigOptionDefinition   => {
+        SysConfigOptionDefinition   => {
                 ...
-    	    },
+            },
         }
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
@@ -129,7 +129,7 @@ perform SysConfigOptionDefinitionUpdate Operation. This will return the updated 
             Option  => '',                      # Option
         },
     };
-   
+
 =cut
 
 
@@ -155,24 +155,17 @@ sub Run {
     # get SysConfigOptionDefinition
     my %OptionData = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
         Name => $Param{Data}->{Option},
-    );    
+    );
 
     # update SysConfigOptionDefinition
     my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
-        Name            => $Param{Data}->{Option},
-        Type            => exists $SysConfigOptionDefinition->{Type} ? $SysConfigOptionDefinition->{Type} : $OptionData{Type},
-        Context         => exists $SysConfigOptionDefinition->{Context} ? $SysConfigOptionDefinition->{Context} : $OptionData{Context},
-        ContextMetadata => exists $SysConfigOptionDefinition->{ContextMetadata} ? $SysConfigOptionDefinition->{ContextMetadata} : $OptionData{ContextMetadata},
-        Description     => exists $SysConfigOptionDefinition->{Description} ? $SysConfigOptionDefinition->{Description} : $OptionData{Description},
-        Comment         => exists $SysConfigOptionDefinition->{Comment} ? $SysConfigOptionDefinition->{Comment} : $OptionData{Comment},
-        AccessLevel     => exists $SysConfigOptionDefinition->{AccessLevel} ? $SysConfigOptionDefinition->{AccessLevel} : $OptionData{AccessLevel},
-        ExperienceLevel => exists $SysConfigOptionDefinition->{ExperienceLevel} ? $SysConfigOptionDefinition->{ExperienceLevel} : $OptionData{ExperienceLevel},
-        Group           => exists $SysConfigOptionDefinition->{Group} ? $SysConfigOptionDefinition->{Group} : $OptionData{Group},
-        IsRequired      => exists $SysConfigOptionDefinition->{IsRequired} ? $SysConfigOptionDefinition->{IsRequired} : $OptionData{IsRequired},
-        Setting         => exists $SysConfigOptionDefinition->{Setting} ? $SysConfigOptionDefinition->{Setting} : $OptionData{Setting},
-        Default         => exists $SysConfigOptionDefinition->{Default} ? $SysConfigOptionDefinition->{Default} : $OptionData{Default},
-        ValidID         => exists $SysConfigOptionDefinition->{ValidID} ? $SysConfigOptionDefinition->{ValidID} : $OptionData{ValidID},
-        UserID          => $Self->{Authorization}->{UserID},
+        %OptionData,
+        %{$SysConfigOptionDefinition},
+        Name   => $Param{Data}->{Option},
+        UserID => $Self->{Authorization}->{UserID},
+
+        # keep current value and valid id
+        Value => $OptionData{IsModified} ? $OptionData{Value} : undef
     );
 
     if ( !$Success ) {
@@ -181,10 +174,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         Option => $Param{Data}->{Option},
-    );    
+    );
 }
 
 1;

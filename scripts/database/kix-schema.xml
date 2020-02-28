@@ -2921,6 +2921,7 @@
     <Column Name="default_value" Required="false" Type="VARCHAR" Size="100000" />
     <Column Name="value" Required="false" Type="VARCHAR" Size="100000" />
     <Column Name="comments" Required="false" Type="VARCHAR" Size="255" />
+    <Column Name="default_valid_id" Required="false" Type="SMALLINT" Default="1"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE" />
     <Column Name="create_by" Required="true" Type="INTEGER" />
