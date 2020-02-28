@@ -99,12 +99,11 @@ perform SysConfigOptionUpdate Operation. This will return the updated SysConfigO
         Data => {
             Option => 'DefaultLanguage',
             SysConfigOption => {
-                Value   => ...                # optional 
-                ValidID => 1                  # optional  
+                Value   => ...                # optional
+                ValidID => 1                  # optional
             }
-	    },
-	);
-    
+        },
+    );
 
     $Result = {
         Success     => 1,                       # 0 or 1
@@ -114,9 +113,8 @@ perform SysConfigOptionUpdate Operation. This will return the updated SysConfigO
             Option  => 123,                     # ID of the updated SysConfigOption 
         },
     };
-   
-=cut
 
+=cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
@@ -133,7 +131,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
         %OptionData,
         Value   => exists $SysConfigOption->{Value} ? $SysConfigOption->{Value} : $OptionData{Value},
-        ValidID => $SysConfigOption->{ValidID} || $OptionData{ValidID},
+        ValidID => exists $SysConfigOption->{ValidID} ? $SysConfigOption->{ValidID} : $OptionData{ValidID},
         UserID  => $Self->{Authorization}->{UserID}
     );
 

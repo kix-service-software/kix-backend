@@ -163,7 +163,7 @@ sub Run {
         IsRequired      => $SysConfigOptionDefinition->{IsRequired},
         Setting         => $SysConfigOptionDefinition->{Setting},
         Default         => $SysConfigOptionDefinition->{Default},
-        ValidID         => $SysConfigOptionDefinition->{ValidID} || 1,
+        DefaultValidID  => $SysConfigOptionDefinition->{DefaultValidID},
         UserID          => $Self->{Authorization}->{UserID},
     );
 

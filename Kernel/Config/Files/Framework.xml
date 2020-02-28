@@ -1899,7 +1899,7 @@
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">ITSMConfigItemReference</Item>
+                <Item Key="DisplayName" Translatable="1">AssetReference</Item>
                 <Item Key="Module">Kernel::System::DynamicField::Driver::ITSMConfigItemReference</Item>
                 <Item Key="ConfigDialog">AdminDynamicFieldITSMConfigItem</Item>
             </Hash>

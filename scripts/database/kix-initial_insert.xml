@@ -2838,7 +2838,7 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
 
 <p><strong><span style="font-size:small">Um die Suche zu nutzen</span></strong><span style="font-size:small">, klicken Sie im Modulmen&uuml; </span><span style="font-size:small">(linke Seite)</span><span style="font-size:small"> auf die Lupe. Es &ouml;ffnet sich ein Dialogfenster. Eine n&auml;here n&auml;here Erl&auml;uterung zu den Suchoperatoren finden Sie in der FAQ &quot;Wie suche ich mit KIX </span><span style="font-size:small">Cloud</span><span style="font-size:small">&quot;.</span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -2960,7 +2960,7 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
 
 <p><span style="font-style:normal"><span style="font-weight:normal"><span style="font-size:small">To open<b> the Search dialog</b>, click on the magnifier icon in the modul menu at the left side. You can find this icon also on several other places within the application. For more detailed information about the serach function read the FAQ &bdquo;How to search in KIX 18&ldquo;.</span></span></span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3034,7 +3034,7 @@ z.B.: Der Nutzer m&ouml;chte wissen, wie viele Tickets seit Anfang des Monats i<
 <span style="font-family:Carlito,sans-serif">Alle Tickets zwischen einem eingegebenen Startdatum/-uhrzeit und Enddatum/-uhrzeit werden gefunden. Es ist m&ouml;glich, nur ein Datum oder Datum &amp; Uhrzeit zu suchen<br />
 z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Juli von einem bestimmten Kunden erstellt wurden, wird gefunden, indem der entsprechende Kunde als Suchattribut ausgew&auml;hlt wird und als weiteres Suchattribut &quot;Erstellt&quot; &amp; &quot;zwischen&quot; dem 1.7. und 31.7.</span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3152,7 +3152,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p><span style="font-weight:normal"><span style="color:#000000">You can find tickets in between a given start- and end time. Example: A user wants to know how many tickets appeared for a certain customer in July. Can be found by selecting the customer as search attribute, second attribute: &bdquo;Created at&ldquo; + &bdquo;greater or equal&ldquo; + 1th July, third attribute: &bdquo;Created at&ldquo; + &bdquo;less or equal&ldquo; + 31th July.</span></span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3180,7 +3180,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>In der Ticket Detailansicht k&ouml;nnen Sie ein Ticket zum beobachten ausw&auml;hlen und/oder auf sich sperren. Klicken Sie dazu auf das Auge-Symbol (beobachten) oder das Schloss-Symbol (sperren) im Widget Header der Ticketdetailansicht. Ein erneuter klick auf das jeweilige Icon macht diese Aktion r&uuml;ckg&auml;ngig. &Uuml;ber das entsprechende Benachrichtigungsicon im Kopfmen&uuml; k&ouml;nnen Sie Ihre beobachteten und Ihre gesperrten Tickets einsehen.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3208,7 +3208,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>You can find the action to watch and/or lock a ticket in the ticket detail view. Therefore, click the eye-icon (watch) or the lock-icon (lock) in the widget header. Klick the icon again to undo the action. At the right side of the header menu at the very top of the page you can always find the notification icons so see all your watched and locked tickets.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3228,7 +3228,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>Die mit Sternchen markierten Formularfelder sind Pflichtfelder. Über das Fragezeichen vor dem Eingabefeld können Sie kurze Hilfetexte zu diesem Feld aufrufen. Für die Ticketbeschreibung stehen Ihnen Textbausteine zur Verfügung. Nähere Infos dazu finden Sie in der Sidebar Textbausteine. Sie können ein neues Ticket als Notiz anlegen oder eine E-Mail versenden. Nachdem Sie das Formular ausgefüllt und auf Speichern geklickt haben, wird Ihnen Ihr eben erstelltes Ticket in der Ticket Detailansicht angezeigt.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3248,7 +3248,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>Forms marked by an asterisk are obligational. Click the question mark in front of form fields to see a short help text about this field. You can use text modules in the ticket description. Further information about how to insert text modules can be found in the text modules sidebar. You can create a new ticket as a note, but also send an email. After filling in the form and saving the ticket, the dialog closes automatically and you can see your ticket in the ticket detailed view.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -9620,6 +9620,29 @@ DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \
 RegExList: []
 Rows: ''
         ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="internal_field">0</Data>
+        <Data Key="name" Type="Quote" Translatable="1">AffectedAsset</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Affected Asset</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">ITSMConfigItemReference</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="displaygroup_id">0</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+CountMin: 0
+CountMax: 15
+CountDefault: 0
+DefaultValue: ''
+DeploymentStates: []
+ITSMConfigItemClasses: []
+ItemSeparator: ', '
+    ]]></Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
