@@ -2534,7 +2534,7 @@
     <Insert Table="notification_event_item">
         <Data Key="notification_id">11</Data>
         <Data Key="event_key" Type="Quote">CreateArticle</Data>
-        <Data Key="event_value" Type="Quote">1</Data>
+        <Data Key="event_value" Type="Quote">0</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">11</Data>
