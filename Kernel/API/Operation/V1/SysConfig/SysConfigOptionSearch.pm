@@ -85,7 +85,22 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform SysConfig search
-    my %AllOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->ValueGetAll();
+    my %AllOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
+
+    # prepare search if given
+    if ( IsHashRefWithData( $Self->{Search}->{SysConfigOption} ) ) {
+        my @Options = values %AllOptions;
+        my $Data = {
+            SysConfigOption => \@Options,
+        };
+
+        # use the in-API filter to do that, because the AllOptions hash already contains everything we need
+        my $Result = $Self->_ApplyFilter(
+            Filter => $Self->{Search},
+            Data   => $Data
+        );
+        %AllOptions = map { $_->{Name} => 1 } @{$Data->{SysConfigOption}};
+    }
 
 	# get already prepared SysConfig data from SysConfigGet operation
     if ( IsHashRefWithData(\%AllOptions) ) {  	
@@ -100,7 +115,7 @@ sub Run {
         if ( !IsHashRefWithData($SysConfigGetResult) || !$SysConfigGetResult->{Success} ) {
             return $SysConfigGetResult;
         }
-
+        
         my @SysConfigDataList = ref $SysConfigGetResult->{Data}->{SysConfigOption} eq 'ARRAY' ? @{$SysConfigGetResult->{Data}->{SysConfigOption}} : ( $SysConfigGetResult->{Data}->{SysConfigOption} );
 
         if ( IsArrayRefWithData(\@SysConfigDataList) ) {
