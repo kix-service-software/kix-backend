@@ -1912,9 +1912,9 @@ sub _ApplyInclude {
     # handle generic includes
     my $GenericIncludes = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::GenericInclude');
     if ( IsHashRefWithData($GenericIncludes) ) {
-        foreach my $Include ( keys %{ $Self->{Include} } ) {
+        foreach my $Include ( keys %{ $Self->{Include} } ) {          
             next if !$GenericIncludes->{$Include};
-            next if $Self->{OperationType} =~ /$GenericIncludes->{$Include}->{IgnoreOperationRegEx}/;
+            next if $GenericIncludes->{$Include}->{IgnoreOperationRegEx} && $Self->{OperationType} =~ /$GenericIncludes->{$Include}->{IgnoreOperationRegEx}/;
 
             # we've found a requested generic include, now we have to handle it
             my $IncludeHandler = 'Kernel::API::Operation::' . $GenericIncludes->{$Include}->{Module};
@@ -1945,7 +1945,7 @@ sub _ApplyInclude {
                 if ( IsArrayRefWithData( $Param{Data}->{$Object} ) ) {
 
                     my $Index = 0;
-                    foreach my $ObjectID ( split( /\s*,\s*/, $Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) ) {
+                    foreach my $ObjectID ( split( /\s*,\s*/, $Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) ) {                        
 
                         $Param{Data}->{$Object}->[ $Index++ ]->{$Include} = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
                             OperationConfig => $Self->{OperationConfig},
