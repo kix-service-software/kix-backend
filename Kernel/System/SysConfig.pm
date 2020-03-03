@@ -836,7 +836,7 @@ sub Rebuild {
         }
     }
 
-    my $XMLObject = XML::Simple->new( KeepRoot => 1, ForceArray => ['Item'] );
+    my $XMLObject = XML::Simple->new( KeepRoot => 1, ForceArray => ['ConfigItem','Item'] );
 
     # read and parse each XML file
     my %Data;
@@ -857,8 +857,8 @@ sub Rebuild {
             next FILE;
         }
 
-        $Data{$File} = $XMLObject->XMLin($ConfigFile, ForceArray => ['ConfigItem']);
-    }    
+        $Data{$File} = $XMLObject->XMLin($ConfigFile);
+    }
 
     # This is the sorted configuration XML entry list that we must populate here.
     $Self->{XMLConfig} = [];
@@ -891,7 +891,7 @@ sub Rebuild {
 
         # Just use valid entries.
         if ( IsArrayRefWithData($Data{$File}->{kix_config}->{ConfigItem}) ) {
-            my $ConfigItemList = $Data{$File}->{kix_config}->{ConfigItem};            
+            my $ConfigItemList = $Data{$File}->{kix_config}->{ConfigItem};
 
             foreach my $ConfigItem ( @{$ConfigItemList} ) {
                 # prepare group
