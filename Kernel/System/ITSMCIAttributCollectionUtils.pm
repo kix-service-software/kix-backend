@@ -137,12 +137,10 @@ sub GetAttributeContentsByKey {
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
-            # no content then stop loop...
-            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
-
             # get the value...
             my $Content
-                = length( $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} )
+                = defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}
+                && length( $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} )
                 ? $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}
                 : '';
 
