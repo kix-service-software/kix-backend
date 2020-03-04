@@ -250,12 +250,6 @@ sub _CreateCIReferencesHash {
 
             COUNTER:
             for my $Counter ( 1 .. $Item->{CountMax} ) {
-
-                # no content then stop loop...
-                last COUNTER
-                    if !
-                        defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]
-                        ->{Content};
                 if ( $Item->{Key} eq $Key ) {
                     for my $ParamRef (
                         qw(ReferencedCIClassLinkType ReferencedCIClassLinkDirection)
@@ -273,7 +267,7 @@ sub _CreateCIReferencesHash {
                         $Self->_CreateCIReferencesHash(
                             XMLDefinition => $Item->{Sub},
                             XMLData       => $Param{XMLData}->{ $Item->{Key} }->[$Counter],
-                            )
+                        )
                     );
                 }
             }
@@ -323,9 +317,6 @@ sub _GetAttributeDataByKey {
 }
 
 1;
-
-
-
 
 =back
 
