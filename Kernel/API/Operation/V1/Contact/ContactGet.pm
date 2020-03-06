@@ -244,18 +244,31 @@ sub Run {
         }
 
         # include assigned user if requested (and existing)
-        if ($Param{Data}->{include}->{User}) {
-            $Self->AddCacheDependency( Type => 'User' );
-            $ContactData{User} = undef;
-            if ($ContactData{AssignedUserID}) {
-                my $UserData = $Self->ExecOperation(
-                    OperationType => 'V1::User::UserGet',
-                    Data          => {
-                        UserID => $ContactData{AssignedUserID},
-                    }
-                );
-                $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+
+        #FIXME: workaround KIX2018-3308####################
+        $Self->AddCacheDependency(Type => 'User');
+        my $UserData = $Self->ExecOperation(
+            OperationType => 'V1::User::UserGet',
+            Data          => {
+                UserID => $ContactData{AssignedUserID},
             }
+        );
+        $ContactData{Login} = ($UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
+        #######################
+
+        #comment back in when 3308 is resolved properly
+        if ($Param{Data}->{include}->{User}) {
+            # $Self->AddCacheDependency( Type => 'User' );
+            # $ContactData{User} = undef;
+            # if ($ContactData{AssignedUserID}) {
+            #     my $UserData = $Self->ExecOperation(
+            #         OperationType => 'V1::User::UserGet',
+            #         Data          => {
+            #             UserID => $ContactData{AssignedUserID},
+            #         }
+            #     );
+                $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+            # }
         }
 
         # include assigned config items if requested

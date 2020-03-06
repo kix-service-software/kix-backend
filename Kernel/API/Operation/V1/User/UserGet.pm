@@ -156,12 +156,24 @@ sub Run {
             }
         }
 
+        #FIXME: workaoround KIX2018-3308###########
+        $Self->AddCacheDependency(Type => 'Contact');
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            UserID => $Self->{Authorization}->{UserID},
+        );
+        $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
+        $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
+        $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;
+        $UserData{UserEmail} = %ContactData ? $ContactData{Email} : undef;
+        ##################################
+
+        #FIXME: comment back in when 3308 is resolved properly
         if ($Param{Data}->{include}->{Contact}) {
-            $Self->AddCacheDependency( Type => 'Contact' );
+            # $Self->AddCacheDependency( Type => 'Contact' );
             $UserData{Contact} = undef;
-            my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-                    UserID => $UserID,
-            );
+            # my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            #         UserID => $UserID,
+            # );
             $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
         }
                 
