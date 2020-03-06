@@ -140,18 +140,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###Dropdown" Required="0" Valid="1">
-        <Description Translatable="1">DynamicField backend registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Dropdown</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::Dropdown</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldDropdown</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###DateTime" Required="0" Valid="1">
         <Description Translatable="1">DynamicField backend registration.</Description>
         <Group>Framework</Group>
@@ -182,7 +170,7 @@
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">Multiselect</Item>
+                <Item Key="DisplayName" Translatable="1">Selection</Item>
                 <Item Key="Module">Kernel::System::DynamicField::Driver::Multiselect</Item>
                 <Item Key="ConfigDialog">AdminDynamicFieldMultiselect</Item>
                 <Item Key="ItemSeparator">, </Item>
@@ -626,18 +614,6 @@
                 <Item Key="0">No</Item>
                 <Item Key="1">Yes</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###DropdownGeneralCatalog" Required="0" Valid="1">
-        <Description Translatable="1">DynamicField backend registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">DropdownGeneralCatalog</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::DropdownGeneralCatalog</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldDropdownGeneralCatalog</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###MultiselectGeneralCatalog" Required="0" Valid="1">

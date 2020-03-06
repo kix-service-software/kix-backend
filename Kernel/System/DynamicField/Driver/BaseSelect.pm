@@ -27,7 +27,6 @@ our @ObjectDependencies = (
 =head1 NAME
 
 Kernel::System::DynamicField::Driver::BaseSelect - sub module of
-Kernel::System::DynamicField::Driver::Dropdown and
 Kernel::System::DynamicField::Driver::Multiselect
 
 =head1 SYNOPSIS

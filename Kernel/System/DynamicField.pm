@@ -319,6 +319,23 @@ sub DynamicFieldGet {
         );
     }
 
+    # get display name
+    if ( %Data && defined $Data{FieldType} && $Data{FieldType} ) {
+
+        # get config object
+        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    
+        # get the Dynamic Field Backends configuration
+        my $DynamicFieldsConfig = $ConfigObject->Get('DynamicFields::Driver');
+        
+        if ( defined $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName} && $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName} ) {
+            $Data{FieldTypeDisplayName} = $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName};
+        }
+        else {
+            $Data{FieldTypeDisplayName} = $Data{FieldType};
+        }
+    }
+
     if (%Data) {
 
         # Set the cache only, if the YAML->Load was successful (see bug#12483).

@@ -41,17 +41,17 @@ sub _ReconfigureNotificationCreateArticle {
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
-    my $Notification = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet(
+    my %Notification = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet(
         Name => 'Customer - New Ticket Receipt'
     );
 
-    if($Notification) {
+    if( %Notification ) {
         # check and re-add transport "Email"
-        if ( IsArrayRefWithData($Notification->{Data}->{CreateArticle}) ) {
-            $Notification->{Data}->{CreateArticle} = ['0'];
+        if ( IsArrayRefWithData( $Notification{Data}->{CreateArticle} ) ) {
+            $Notification{Data}->{CreateArticle} = ['0'];
             $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationUpdate(
-                ID => $NotificationID,
-                %{$Notification},
+                ID => $Notification{ID},
+                %Notification,
                 UserID => 1
             )
         }
