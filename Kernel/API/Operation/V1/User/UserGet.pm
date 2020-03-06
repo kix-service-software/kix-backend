@@ -159,7 +159,7 @@ sub Run {
         #FIXME: workaoround KIX2018-3308###########
         $Self->AddCacheDependency(Type => 'Contact');
         my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-            UserID => $Self->{Authorization}->{UserID},
+            UserID => $UserID,
         );
         $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
         $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;

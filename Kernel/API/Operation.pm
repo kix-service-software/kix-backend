@@ -105,6 +105,13 @@ sub new {
         );
     }
 
+    if ( !IsHashRefWithData($Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => 'No OperationConfig found!',
+        );
+    }
+    
     $Self->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
     if ( !IsHashRefWithData($Self->{OperationConfig}) ) {
         return $Self->_Error(
