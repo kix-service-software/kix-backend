@@ -184,6 +184,18 @@ sub Run {
             }
             $UserData{RoleIDs} = \@RoleIDs;
         }
+
+        #FIXME: workaoround KIX2018-3308
+        $Self->AddCacheDependency(Type => 'Contact');
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            UserID => $Self->{Authorization}->{UserID},
+        );
+        $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
+        $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
+        $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;
+        $UserData{UserEmail} = %ContactData ? $ContactData{Email} : undef;
+        ###########################################################
+        $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
     }
 
     return $Self->_Success(

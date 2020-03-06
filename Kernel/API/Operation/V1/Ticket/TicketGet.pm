@@ -429,6 +429,10 @@ sub Run {
             );
         }
 
+        #FIXME: workaround KIX2018-3308
+        $TicketData{ContactID} = "" . $TicketData{ContactID};
+        $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
+
         # add
         push(@TicketList, \%TicketData);
     }
