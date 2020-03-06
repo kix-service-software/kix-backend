@@ -45,18 +45,6 @@ sub _CreateDynamicFields {
         Valid => 0,
     );
 
-    # get the list of order numbers (is already sorted).
-    my @DynamicfieldOrderList;
-    for my $Dynamicfield ( @{$DynamicFieldList} ) {
-        push @DynamicfieldOrderList, $Dynamicfield->{FieldOrder};
-    }
-
-    # get the last element from the order list and add 1
-    my $NextOrderNumber = 1;
-    if (@DynamicfieldOrderList) {
-        $NextOrderNumber = $DynamicfieldOrderList[-1] + 1;
-    }
-
     # get the definition for dynamic fields
     my @DynamicFields = ( IsArrayRefWithData( $Param{DynamicFieldList} ) )
         ?
@@ -117,7 +105,6 @@ sub _CreateDynamicFields {
             my $FieldID = $Self->{DynamicFieldObject}->DynamicFieldAdd(
                 Name       => $DynamicField->{Name},
                 Label      => $DynamicField->{Label},
-                FieldOrder => $NextOrderNumber,
                 FieldType  => $DynamicField->{FieldType},
                 ObjectType => $DynamicField->{ObjectType},
                 Config     => $DynamicField->{Config},
@@ -126,8 +113,6 @@ sub _CreateDynamicFields {
             );
             next DYNAMICFIELD if !$FieldID;
 
-            # increase the order number
-            $NextOrderNumber++;
         }
     }
 
@@ -228,7 +213,6 @@ sub _GetDynamicFieldsDefinition {
             ObjectType => 'Ticket',
             Config     => {
                 DefaultValue       => '',
-                Link               => '',
                 TranslatableValues => 1,
                 PossibleNone       => 1,
                 CountMin           => 1,
@@ -244,7 +228,6 @@ sub _GetDynamicFieldsDefinition {
             ObjectType => 'Ticket',
             Config     => {
                 DefaultValue => '',
-                Link         => '',
                 CountMin     => 0,
                 CountMax     => 1,
                 CountDefault => 0,
@@ -252,12 +235,11 @@ sub _GetDynamicFieldsDefinition {
         },
         {
             Name       => 'MobileProcessingChecklist010',
-            Label      => '"Checklist 01',
-            FieldType  => 'TextArea',
+            Label      => 'Checklist 01',
+            FieldType  => 'Checklist',
             ObjectType => 'Ticket',
             Config     => {
                 DefaultValue => $CheckList01DefaultValue,
-                Link         => '',
                 CountMin     => 1,
                 CountMax     => 1,
                 CountDefault => 1,
@@ -266,11 +248,10 @@ sub _GetDynamicFieldsDefinition {
         {
             Name       => 'MobileProcessingChecklist020',
             Label      => 'Checklist 02',
-            FieldType  => 'TextArea',
+            FieldType  => 'Checklist',
             ObjectType => 'Ticket',
             Config     => {
                 DefaultValue => $CheckList02DefaultValue,
-                Link         => '',
                 CountMin     => 1,
                 CountMax     => 1,
                 CountDefault => 1,

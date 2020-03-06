@@ -9501,7 +9501,7 @@ vielen Dank für Ihre Nachricht.
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">MobileProcessingState</Data>
         <Data Key="label" Type="Quote" Translatable="1">Mobile Processing</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">Dropdown</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Multiselect</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
@@ -9556,16 +9556,14 @@ DefaultValue: ''
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">MobileProcessingChecklist010</Data>
         <Data Key="label" Type="Quote" Translatable="1">Checklist 01</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Checklist</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 ---
-TTL: ''
 CountMin: '1'
 CountMax: '1'
 CountDefault: '1'
-Link: ''
 ItemSeparator: ''
 Cols: ''
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n 
@@ -9600,15 +9598,13 @@ Rows: ''
         <Data Key="internal_field">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">MobileProcessingChecklist020</Data>
         <Data Key="label" Type="Quote" Translatable="1">Checklist 02</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Checklist</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
-TTL: ''
 CountMin: '1'
 CountMax: '1'
 CountDefault: '1'
-Link: ''
 ItemSeparator: ''
 Cols: ''
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \"description\":
