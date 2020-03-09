@@ -192,19 +192,24 @@ sub ArticleCreate {
                 return;
             }
         }
-        $Param{Charset} = '';
+        my $Charset = '';
         if ( $Param{ContentType} =~ /charset=/i ) {
-            $Param{Charset} = $Param{ContentType};
-            $Param{Charset} =~ s/.+?charset=("|'|)(\w+)/$2/gi;
-            $Param{Charset} =~ s/"|'//g;
-            $Param{Charset} =~ s/(.+?);.*/$1/g;
+            $Charset = $Param{ContentType};
+            $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+            $Charset =~ s/"|'//g;
+            $Charset =~ s/(.+?);.*/$1/g;
 
+            # only change if we extracted a charset
+            $Param{Charset} = $Charset || $Param{Charset};
         }
-        $Param{MimeType} = '';
+        my $MimeType = '';
         if ( $Param{ContentType} =~ /^(\w+\/\w+)/i ) {
-            $Param{MimeType} = $1;
-            $Param{MimeType} =~ s/"|'//g;
+            $MimeType = $1;
+            $MimeType =~ s/"|'//g;
         }
+
+        # only change if we extracted a mime type
+        $Param{MimeType} = $MimeType || $Param{MimeType};
     }
 
     # for the event handler, before any actions have taken place
