@@ -410,6 +410,9 @@ Returns the new message body (or from the first attachment) "ContentType" header
 sub GetReturnContentType {
     my $Self = shift;
 
+use CGI::Carp qw(cluck);
+cluck();
+
     my $ContentType = $Self->GetContentType();
     $ContentType =~ s/(charset=)(.*)/$1utf-8/ig;
 

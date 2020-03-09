@@ -516,7 +516,7 @@ sub TicketCreate {
                 Email                 => $ContactEmail,
                 PrimaryOrganisationID => ($Param{OrganisationID}) ? $Param{OrganisationID} : undef,
                 ValidID               => 1,
-                UserID                => $Self->{Authorization}->{UserID}
+                UserID                => $Param{UserID}
             );
         }
         else {

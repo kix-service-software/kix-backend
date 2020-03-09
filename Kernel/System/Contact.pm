@@ -920,7 +920,7 @@ sub ContactSearch {
         # get valid object
         my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
 
-        $SQL .= "contact.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
+        $SQL .= "c.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
     }
 
     # where
