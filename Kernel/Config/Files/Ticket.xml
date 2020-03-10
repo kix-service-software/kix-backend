@@ -3984,8 +3984,8 @@ Thanks for your help!
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Array>
-                <Item>IncidentReport</Item>
-                <Item>ServiceRequest</Item>
+                <Item>NewIncidentReport</Item>
+                <Item>NewServiceRequest</Item>
             </Array>
         </Setting>
     </ConfigItem>
