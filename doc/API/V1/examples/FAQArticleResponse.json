@@ -1,0 +1,25 @@
+{
+    "FAQArticle": {
+        "Approved": 1,
+        "CategoryID": 2,
+        "Changed": "2019-08-09 08:13:38",
+        "ChangedBy": 1,
+        "ContentType": "text/html",
+        "Created": "2019-08-09 08:13:38",
+        "CreatedBy": 1,
+        "CustomerVisible": 1,
+        "Field1": "",
+        "Field2": "<p><span style=\"font-size:small\">It is necessary to get a first overview on how to work with KIX Cloud.</span></p>\n",
+        "Field3": "<p><span style=\"font-size:small\"><b>Structure</b></span></p>\n\n<p><span style=\"font-size:small\">The application consists in a Modul [...] How to search in KIX 18&ldquo;.</span></span></span></p>\n",
+        "Field4": "",
+        "Field5": "",
+        "Field6": "",
+        "ID": 2,
+        "Keywords": [],
+        "Language": "en",
+        "Name": "1563537503-86.2410868161835",
+        "Number": "17002",
+        "Title": "General information on how to work with KIX 18",
+        "ValidID": 1
+    }
+}

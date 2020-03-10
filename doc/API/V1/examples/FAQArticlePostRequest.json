@@ -1,0 +1,28 @@
+{
+    "ExecPlan": {
+        "Approved": 1,
+        "CategoryID": 2,
+        "ContentType": "text/html",
+        "CustomerVisible": 1,
+        "Field1": "some symptom",
+        "Field2": "problem",
+        "Field3": "solution",
+        "Field4": "",
+        "Field5": "",
+        "Field6": "comment",
+        "ID": 2,
+        "Keywords": ["some", "keyword"],
+        "Language": "en",
+        "Number": "17002",
+        "Title": "Some title",
+        "ValidID": 1,
+        "Attachments": [
+            {
+                "Content": "base64 coded file content",
+                "ContentType": "text/xml",
+                "Filename": "somename.xml",
+                "Inline": 0
+            }
+        ]
+    }
+}

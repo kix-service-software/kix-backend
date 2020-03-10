@@ -2,6 +2,40 @@
   description: !include ../descriptions/resources/faq.md
   /articles:
     description: !include ../descriptions/resources/faq/articles.md
+    type: { collection: { typeName: FAQArticle } }
+    /{faqArticleId}:
+      type: { item: { typeName: FAQArticle } }
+      uriParameters:
+        classId:
+          displayName: FAQArticleID
+          type: integer
+      /attachments:
+        description: !include ../descriptions/resources/faq/articles/attachments.md
+        type: { collection: { typeName: FAQAttachment } }
+        /{faqAttachmentId}:
+          type: { item-nopatch: { typeName: FAQAttachment } }
+          uriParameters:
+            classId:
+              displayName: FAQAttachmentID
+              type: integer
+      /history:
+        description: !include ../descriptions/resources/faq/articles/history.md
+        type: { collection-readonly: { typeName: FAQHistory } }
+        /{faqAttachmentId}:
+          type: { item-readonly: { typeName: FAQHistory } }
+          uriParameters:
+            classId:
+              displayName: FAQHistoryID
+              type: integer
+      /votes:
+        description: !include ../descriptions/resources/faq/articles/votes.md
+        type: { collection: { typeName: FAQVote } }
+        /{faqVoteId}:
+          type: { item-nopatch: { typeName: FAQVote } }
+          uriParameters:
+            classId:
+              displayName: FAQVoteID
+              type: integer
     /keywords:
       description: !include ../descriptions/resources/faq/articles/keywords.md
       type: { collection-readonly: { typeName: FAQKeyword } }
