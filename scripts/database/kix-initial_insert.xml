@@ -2149,7 +2149,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2195,7 +2195,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">3</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">2</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2431,7 +2431,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">9</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">2</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2492,7 +2492,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">10</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
     <Insert Table="notification_event_item">
