@@ -148,6 +148,10 @@ sub Run {
         $Vote{ArticleID} = $Vote{ItemID};
         delete $Vote{ItemID};
 
+        # rename IP to IPAddress
+        $Vote{IPAddress} = $Vote{IP};
+        delete $Vote{IP};
+
         # add
         push(@FAQArticleVoteData, \%Vote);
     }

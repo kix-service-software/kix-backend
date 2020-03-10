@@ -1,0 +1,47 @@
+{
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "#FAQVote",
+   "type": "object",
+   "description": "The FAQ vote object.",
+   "properties": {
+      "ArticleID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "Created": {
+         "type": "string",
+         "readOnly": true
+      },
+      "CreatedBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "ID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "IPAddress": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Interface": {
+         "type": "string",
+         "readOnly": true,
+         "description": "if rating is from \"agent\" or \"customer\" interface"
+      },
+      "Rating": {
+         "type": "integer",
+         "readOnly": true,
+         "description": "an interger from 1 to 5"
+      }
+   },
+   "required" : [
+      "ArticleID",
+      "Created",
+      "CreatedBy",
+      "ID",
+      "IPAddres",
+      "Interface",
+      "Rating"
+   ]
+}

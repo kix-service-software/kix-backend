@@ -1,0 +1,12 @@
+{
+    "FAQArticle": {
+        "Approved": 1,
+        "CategoryID": 2,
+        "ContentType": "text/html",
+        "CustomerVisible": 2,
+        "Field3": "changed text",
+        "Keywords": ["new keyword"],
+        "Title": "New title",
+        "ValidID": 2
+    }
+}

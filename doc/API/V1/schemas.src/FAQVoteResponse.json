@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#FAQVoteResponse",
+  "type": "object",
+  "description": "A response for execution FAQ vote GET request.",
+  "properties": {
+    "FAQVote": {
+      "$ref": "FAQVote.json"
+    }
+  },
+  "required": [
+    "FAQVote"
+  ]  
+}

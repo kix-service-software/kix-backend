@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#FAQArticleCollectionResponse",
+  "type": "object",
+  "description": "A list of all FAQ articles.",
+  "properties": {
+    "FAQArticle": {
+      "type": "array",
+      "items": {
+        "$ref": "FAQArticle.json"
+      }
+    }
+  },
+  "required": [
+    "FAQArticle"
+  ]  
+}
