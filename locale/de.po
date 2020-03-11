@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-09 11:19+0000\n"
+"POT-Creation-Date: 2020-03-11 13:20+0000\n"
 "PO-Revision-Date: 2019-12-12 12:02+0000\n"
 "Last-Translator: fwichmann <Felix.Wichmann@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
@@ -40,6 +40,10 @@ msgid "Admin Tool"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Affected Asset"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - FUP Notification (if locked)"
 msgstr ""
 
@@ -60,7 +64,7 @@ msgid "Agent - New Ticket Notification"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Agent - Owner Assginment"
+msgid "Agent - Owner Assignment"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -132,6 +136,18 @@ msgid "Camera"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "CheckList"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Checklist 01"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Checklist 02"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Client Application"
 msgstr ""
 
@@ -145,6 +161,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Concurrent Users"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -232,6 +252,10 @@ msgid "IT Facility"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "ITSMConfigItemReference"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Inactive"
 msgstr ""
 
@@ -260,6 +284,10 @@ msgid "Middleware"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Mobile Processing"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Modem"
 msgstr ""
 
@@ -269,6 +297,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Mouse"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Multiselect"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -362,6 +394,10 @@ msgid "Review"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Risk Assumption Remark"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Router"
 msgstr ""
 
@@ -434,6 +470,10 @@ msgid "Test/QA"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "TextArea"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent"
 msgstr ""
 
@@ -496,6 +536,13 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "agent"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"allows the customer to login and read ticket, FAQ and asset data, allows to "
+"create FAQ votes, allows to change data of the personal user, allows to set "
+"ticket article flags"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -629,15 +676,33 @@ msgid "The last job run has been finished."
 msgstr ""
 
 #. Database: scripts/database/update/db-update-build-1078_pre.xml
+msgid "warning"
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-1090_pre.xml
+msgid "The import is running."
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-1090_pre.xml
+msgid "The import run has been finished."
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-1090_pre.xml
 msgid "finished"
 msgstr ""
 
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
+#. Database: scripts/database/update/db-update-build-1090_pre.xml
 msgid "running"
 msgstr ""
 
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
-msgid "warning"
+#. Database: scripts/database/update/db-update-build-1132_pre.xml
+msgid ""
+"Permission type that restricts access on object properties (QueueID in "
+"tickets)."
+msgstr ""
+
+#. Database: scripts/database/update/db-update-build-1132_pre.xml
+msgid "Property"
 msgstr ""
 
 #. Database: scripts/database/update/db-update-build-807_pre.xml
@@ -2428,6 +2493,10 @@ msgid "Article"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "AssetReference"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Auto-subscribe search profiles from other agents depending on selected "
 "categories."
@@ -2474,6 +2543,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checkbox"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Checklist"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2721,6 +2794,10 @@ msgid "Defines default auth module."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines default auth sync module."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Defines if CSV-mappings are re-created on next package reinstallation or "
 "upgrade if already existent."
@@ -2787,6 +2864,10 @@ msgstr ""
 msgid ""
 "Defines out of office message template. Two string parameters (%s) "
 "available: end date and number of days left."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines possible actions for objects ."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3413,14 +3494,6 @@ msgid "Display of pending time"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Dropdown"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "DropdownGeneralCatalog"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Dynamic Fields Overview Limit"
 msgstr ""
 
@@ -3593,10 +3666,6 @@ msgid "Graph: Stacked Area Chart"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "ITSMConfigItemReference"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "If \"DB\" was selected for Contact::AuthModule, a database driver (normally "
 "autodetection is used) can be specified."
@@ -3662,6 +3731,155 @@ msgid ""
 "If \"HTTPBasicAuth\" was selected for Contact::AuthModule, you can specify "
 "to strip leading parts of user names (e. g. for domains like example_domain\\"
 "\\user to user)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule and if you want to add a suffix to "
+"every contact login name, specifiy it here, e. g. you just want to write the "
+"username user but in your LDAP directory exists user@domain."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule and special paramaters are needed "
+"for the Net::LDAP perl module, you can specify them here. See \"perldoc Net::"
+"LDAP\" for more information about the parameters."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule and your users have only anonymous "
+"access to the LDAP tree, but you want to search through the data, you can do "
+"this with a user who has access to the LDAP directory. Specify the password "
+"for this special user here."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule and your users have only anonymous "
+"access to the LDAP tree, but you want to search through the data, you can do "
+"this with a user who has access to the LDAP directory. Specify the username "
+"for this special user here."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "If \"LDAP\" was selected for AuthModule, the BaseDN must be specified."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule, the LDAP host can be specified."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule, the user identifier must be "
+"specified."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule, user attributes can be specified. "
+"For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule, you can specify access attributes "
+"here."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule, you can specify if the applications "
+"will stop if e. g. a connection to a server can't be established due to "
+"network problems."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule, you can specify which LDAP "
+"attribute(s) are synced to which DB attribute."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthModule, you can specify which LDAP "
+"attribute(s) are synced to which roles."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule and if you want to add a suffix "
+"to every contact login name, specifiy it here, e. g. you just want to write "
+"the username user but in your LDAP directory exists user@domain."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule and special paramaters are "
+"needed for the Net::LDAP perl module, you can specify them here. See "
+"\"perldoc Net::LDAP\" for more information about the parameters."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule and your users have only "
+"anonymous access to the LDAP tree, but you want to search through the data, "
+"you can do this with a user who has access to the LDAP directory. Specify "
+"the password for this special user here."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule and your users have only "
+"anonymous access to the LDAP tree, but you want to search through the data, "
+"you can do this with a user who has access to the LDAP directory. Specify "
+"the username for this special user here."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule, the BaseDN must be specified."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule, the LDAP host can be specified."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule, the user identifier must be "
+"specified."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule, user attributes can be "
+"specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full "
+"user DN."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule, you can specify access "
+"attributes here."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for AuthSyncModule, you can specify if the "
+"applications will stop if e. g. a connection to a server can't be "
+"established due to network problems."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If \"LDAP\" was selected for Authmodule, you can check if the user is "
+"allowed to authenticate because he is in a posixGroup, e.g. user needs to be "
+"in a group xyz to use KIX. Specify the group, who may access the system."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4044,10 +4262,6 @@ msgid "Multiple Selection"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Multiselect"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "MultiselectGeneralCatalog"
 msgstr ""
 
@@ -4357,6 +4571,10 @@ msgid "Select your out of office substitute."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Selection"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Selection Style"
 msgstr ""
 
@@ -4654,7 +4872,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Specifies the order in which the firstname and the lastname of agents will "
+"Specifies the order in which the firstname and the lastname of contacts will "
 "be displayed."
 msgstr ""
 
@@ -5098,6 +5316,15 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
+"Defines for which object type in which configitem class in which configitem "
+"attributes will be search with which object attributes values "
+"(SearchAttributes) or static values (SearchStatic). Configitem attributes "
+"should contain their structure separated with double colon "
+"(\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid ""
 "Defines in which CI-classes (keys) which attributes need to match the search "
 "pattern (values, comma separated if more than one attribute should be "
 "searched). For use with sub-attributes try this, key: attribute::sub-"
@@ -5264,6 +5491,76 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Warning"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ", (comma)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid "-> (tab)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ". (dot)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ": (colon)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid "; (semicolon)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid "Defines if CSV-mappings are re-created if already existent."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid "Defines the maximum number of each array attribute in CSV-mapping."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ""
+"Defines whether empty fields should retain the old values during imports "
+"(option for CSV-mapping)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid "Defines whether the column headings should be used for CSV-mapping."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid "Defines which character should be used in CSV-mapping."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid "Defines which column separator should be used in CSV-mapping."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ""
+"Defines which default deployment status should be used during imports "
+"(option for CSV-mapping)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ""
+"Defines which default incident status should be used during imports (option "
+"for CSV-mapping)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ""
+"Defines which default name should be used during imports (option for CSV-"
+"mapping)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ImportExport.xml
+msgid ""
+"Event module to add or change the CSV-mapping if config item class defintion "
+"is changed."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ProcessManagement.xml
@@ -5444,13 +5741,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Allows extended search conditions in ticket search of the generic agent "
-"interface. With this feature you can search e. g. ticket title with this "
-"kind of conditions like \"(*key1*&amp;&amp;*key2*)\" or \"(*key1*||*key2*)\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Answer"
 msgstr ""
 
@@ -5593,7 +5883,7 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Create link between ticket and config item on DynamicFieldUpdate (This event "
-"only create link, links can only be deleted manually)."
+"only create links, links can only be deleted manually)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6613,12 +6903,6 @@ msgstr ""
 msgid ""
 "Set the default height (in pixels) of inline HTML articles in "
 "AgentTicketZoom."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Set the limit of tickets that will be executed on a single genericagent job "
-"execution."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
