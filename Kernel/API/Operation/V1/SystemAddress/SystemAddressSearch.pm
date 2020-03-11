@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared SystemAddress data from SystemAddressGet operation
     if ( IsHashRefWithData(\%SystemAddressList) ) {  	
         my $SystemAddressGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SystemAddress::SystemAddressGet',
+            OperationType            => 'V1::SystemAddress::SystemAddressGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 SystemAddressID => join(',', sort keys %SystemAddressList),
             }

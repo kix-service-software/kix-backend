@@ -350,7 +350,7 @@ sub NotifyClients {
         );
 
         return;
-    }    
+    }
 
     return 1;
 }
@@ -397,7 +397,7 @@ sub NotificationCleanup {
         );
 
         return;
-    }    
+    }
 
     return 1;
 }
@@ -456,7 +456,7 @@ sub NotificationSend {
         }
 
         $Self->{LogObject}->Log( 
-            Priority => 'debug', 
+            Priority => 'info', 
             Message  => "Sending ". @EventList . " notifications to client \"$Param{ClientID}\" (" . (join(', ', @StatsParts)) . ').' 
         );
 
@@ -505,7 +505,7 @@ sub NotificationSend {
         }
         else {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'debug',
+                Priority => 'info',
                 Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
             );
         }
@@ -523,7 +523,7 @@ sub NotificationSend {
     # schedule new task if the scheduler executed this method
     if ( $Param{IsScheduler} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'debug',
+            Priority => 'info',
             Message  => "Rescheduling notification task for client \"$Param{ClientID}\".",
         );
         my $Result = $Self->ScheduleNotificationTask(
@@ -600,9 +600,6 @@ sub ScheduleNotificationTask {
 }
 
 1;
-
-
-
 
 =back
 

@@ -90,7 +90,8 @@ sub Run {
     # get already prepared MailAccount data from MailAccountGet operation
     if ( IsHashRefWithData( \%MailAccountList ) ) {
         my $MailAccountGetResult = $Self->ExecOperation(
-            OperationType => 'V1::MailAccount::MailAccountGet',
+            OperationType            => 'V1::MailAccount::MailAccountGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 MailAccountID => join( ',', sort keys %MailAccountList ),
                 }

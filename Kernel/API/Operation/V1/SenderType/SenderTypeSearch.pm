@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared SenderType data from SenderTypeGet operation
     if ( IsHashRefWithData(\%SenderTypeList) ) {  	
         my $SenderTypeGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SenderType::SenderTypeGet',
+            OperationType            => 'V1::SenderType::SenderTypeGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 SenderTypeID => join(',', sort keys %SenderTypeList),
             }

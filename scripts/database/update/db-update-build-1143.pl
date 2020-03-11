@@ -31,13 +31,14 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 use vars qw(%INC);
 
-# remove obsolete permission type 'Object'
+# adjust notifaction for new ticket
 _ReconfigureNotificationCreateArticle();
 
 exit 0;
 
 
 sub _ReconfigureNotificationCreateArticle {
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -46,7 +47,8 @@ sub _ReconfigureNotificationCreateArticle {
     );
 
     if( %Notification ) {
-        # check and re-add transport "Email"
+
+        # prevent article create for notification
         if ( IsArrayRefWithData( $Notification{Data}->{CreateArticle} ) ) {
             $Notification{Data}->{CreateArticle} = ['0'];
             $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationUpdate(

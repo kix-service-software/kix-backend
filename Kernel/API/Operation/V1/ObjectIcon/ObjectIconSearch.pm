@@ -90,7 +90,8 @@ sub Run {
 	# get already prepared ObjectIcon data from ObjectIconGet operation
     if ( IsArrayRefWithData($ObjectIconList) ) {  	
         my $ObjectIconGetResult = $Self->ExecOperation(
-            OperationType => 'V1::ObjectIcon::ObjectIconGet',
+            OperationType            => 'V1::ObjectIcon::ObjectIconGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ObjectIconID => join(',', sort @{$ObjectIconList}),
             }

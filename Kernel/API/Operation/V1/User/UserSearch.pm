@@ -122,7 +122,8 @@ sub Run {
                     my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                         UserID              => $UserID,
                         Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
-                        RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission}
+                        RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission},
+                        UsageContext        => $Self->{Authorization}->{UserType}
                     );
 
                     if ($Granted) {
@@ -137,7 +138,8 @@ sub Run {
 
         # get already prepared user data from UserGet operation
         my $UserGetResult = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
+            OperationType            => 'V1::User::UserGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 UserID => join(',', @GetUserIDs),
             }

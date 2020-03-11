@@ -100,7 +100,8 @@ sub Run {
         }
 
         my $FAQCategoryGetResult = $Self->ExecOperation(
-            OperationType => 'V1::FAQ::FAQCategoryGet',
+            OperationType            => 'V1::FAQ::FAQCategoryGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 FAQCategoryID => join(',', sort keys %{$FAQCategories}),
             }

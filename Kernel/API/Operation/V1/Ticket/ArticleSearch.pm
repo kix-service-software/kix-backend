@@ -122,7 +122,8 @@ sub Run {
 
         # get already prepared Article data from ArticleGet operation
         my $ArticleGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Ticket::ArticleGet',
+            OperationType            => 'V1::Ticket::ArticleGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 TicketID  => $Param{Data}->{TicketID},
                 ArticleID => join(',', @ArticleIndex),

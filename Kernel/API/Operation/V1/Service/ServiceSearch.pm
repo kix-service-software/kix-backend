@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared Service data from ServiceGet operation
     if ( IsHashRefWithData(\%ServiceList) ) {  	
         my $ServiceGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Service::ServiceGet',
+            OperationType            => 'V1::Service::ServiceGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ServiceID => join(',', sort keys %ServiceList),
             }

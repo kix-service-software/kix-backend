@@ -3192,7 +3192,6 @@ sub _HandleCustomerVisible {
     return 0 if ( !IsHashRefWithData(\%ContactList) );
 
     my %ContactMailAddresses;
-
     for my $ContactMail (values %ContactList) {
         if ($ContactMail) {
 

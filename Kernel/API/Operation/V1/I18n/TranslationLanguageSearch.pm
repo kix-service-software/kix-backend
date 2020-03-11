@@ -124,7 +124,8 @@ sub Run {
 
         # get already prepared Translation data from TranslationLanguageGet operation
         my $TranslationLanguageGetResult = $Self->ExecOperation(
-            OperationType => 'V1::I18n::TranslationLanguageGet',
+            OperationType            => 'V1::I18n::TranslationLanguageGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 PatternID => $Param{Data}->{PatternID},
                 Language      => join(',', @{$PatternData{AvailableLanguages}}),

@@ -106,7 +106,8 @@ sub Run {
 	# get already prepared Link data from LinkGet operation
     if ( IsArrayRefWithData($LinkList) ) {  	
         my $LinkGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Link::LinkGet',
+            OperationType            => 'V1::Link::LinkGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 LinkID => join(',', sort @{$LinkList}),
             }

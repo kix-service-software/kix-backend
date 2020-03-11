@@ -90,7 +90,8 @@ sub Run {
 	# get already prepared ClientRegistration data from ClientRegistrationGet operation
     if ( IsArrayRefWithData($ClientList) ) {  	
         my $ClientRegistrationGetResult = $Self->ExecOperation(
-            OperationType => 'V1::ClientRegistration::ClientRegistrationGet',
+            OperationType            => 'V1::ClientRegistration::ClientRegistrationGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ClientID => join(',', @{$ClientList}),
             }

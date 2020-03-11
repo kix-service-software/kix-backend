@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared CI Class data from ClassGet operation
     if ( IsHashRefWithData($ItemList) ) {  	
         my $GetResult = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ClassGet',
+            OperationType            => 'V1::CMDB::ClassGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ClassID => join(',', sort keys %{$ItemList}),
             }

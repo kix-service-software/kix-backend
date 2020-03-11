@@ -98,7 +98,7 @@ sub _CheckMailFilter {
 
     if ( !IsArrayRefWithData( $MailFilter->{Set} ) ) {
     }
-    $Index = 1;
+    my $Index = 1;
     for my $Set ( @{ $MailFilter->{Set} } ) {
         for my $KeyValue (qw(Key Value)) {
             if ( !defined $Set->{$KeyValue} ) {

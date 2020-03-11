@@ -79,17 +79,19 @@ sub RunOperation {
         # get the relevant permission for the current request method
         my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
-        # get all PropertyValue permissions for this user
+        # get all PropertyValue and Property permissions for this user
         my %Permissions = $Kernel::OM->Get('Kernel::System::User')->PermissionList(
-            UserID => $Self->{Authorization}->{UserID},
-            Types  => [ 'PropertyValue' ],
+            UserID       => $Self->{Authorization}->{UserID},
+            UsageContext => $Self->{Authorization}->{UserType},
+            Types        => [ 'PropertyValue', 'Property' ],
         );
 
-        # get all relevant PropertyValue permissions
+        # get all relevant permissions
+        my @RelevantPropertyPermissions;
         my @RelevantPropertyValuePermissions;
         foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
 
-            # ignore targets without filter expression (non PropertyValue permission)
+            # ignore targets without filter expression (resource permission)
             next if $Permission->{Target} !~ /[{}]/;
 
             # prepare target
@@ -102,9 +104,12 @@ sub RunOperation {
             next if $Self->{RequestURI} !~ /^$Target$/;
 
             # extract property value permission
-            next if $Permission->{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/;
-
-            push @RelevantPropertyValuePermissions, $Permission;
+            if ( $Permission->{Target} =~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/ ) {
+                push @RelevantPropertyValuePermissions, $Permission;
+            }
+            elsif ( $Permission->{Target} =~ /^.*?\{(\w+)\.\[(.*?)\]\}$/ ) {
+                push @RelevantPropertyPermissions, $Permission;
+            }
         }
 
         # do something if we have at least one PropertyValue permission
@@ -141,65 +146,85 @@ sub RunOperation {
             foreach my $Permission ( @RelevantPropertyValuePermissions ) {
 
                 # extract property value permission
-                next if $Permission->{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/;
+                next if $Permission->{Target} !~ /^.*?\{(.*?)\}$/;
 
-                my ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+                # every permission will be a part of a logical OR
+                my $UseAnd = 0;
 
-                # init Result
-                $ResultingPermission = 0 if $ResultingPermission == -1;
-
-                # replace string quotes
-                $Value =~ s/["']//g;
-
-                $Self->_PermissionDebug( sprintf( "found relevant permission (PropertyValue) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
-
-                # prepare value for IN operator
-                if ( $Operator eq 'IN' ) {
-                    if ( $Value =~ /^\[(.*?)\]$/ ) {
-                        my @ValueParts = split(/\s*,\s*/, $1);
-                        $Value = \@ValueParts;
-                    }
-                    else {
-                        $Self->_PermissionDebug( sprintf("Value part of PropertyValue permission on target \"%s\" is invalid!", $Permission->{Target}) );
-                        $Self->_Error(
-                            Code    => 'InternalError',
-                            Message => 'Permission value is invalid!',
-                        );
-                    }
+                # check for && and split accordingly
+                my @Parts = $1;
+                if ( $Parts[0] =~ /&&/ ) {
+                    @Parts = split(/\s+&&\s+/, $Parts[0]);
+                
+                    # the single parts of the permission are a part of a logical AND
+                    $UseAnd = 1;
                 }
 
                 my $Not = 0;
-                if ( $Self->{RequestMethod} eq 'GET') {
-                    # GET need some special handling
+                my %Filter;                
+                foreach my $Part ( @Parts ) {
+                    next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
 
-                    # add a NOT filter if we have no READ permission (including DENY)
-                    $Not = 1 if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{READ} ) != Kernel::System::Role::Permission->PERMISSION->{READ} );
+                    my ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+
+                    # replace string quotes
+                    $Value =~ s/["']//g;
+
+                    if ( $Part eq $Parts[0] ) {
+                        # only print this information once
+                        $Self->_PermissionDebug( sprintf( "found relevant permission (PropertyValue) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+                    }
+
+                    # prepare value for IN operator
+                    if ( $Operator eq 'IN' ) {
+                        if ( $Value =~ /^\[(.*?)\]$/ ) {
+                            my @ValueParts = map { $_ = $Self->_ReplaceVariablesInProperyValuePermission(Data => $_) } split(/\s*,\s*/, $1);
+                            $Value = \@ValueParts;
+                        }
+                        else {
+                            $Self->_PermissionDebug( sprintf("Value part of PropertyValue permission on target \"%s\" is invalid!", $Permission->{Target}) );
+                            $Self->_Error(
+                                Code    => 'InternalError',
+                                Message => 'Permission value is invalid!',
+                            );
+                        }
+                    }
+                    else {
+                        $Value = $Self->_ReplaceVariablesInProperyValuePermission(
+                            Data => $Value
+                        );
+                    }
+
+                    # add a NOT filter if we should have no permission (including DENY)
+                    $Not = 1 if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} );
 
                     if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
                         $Not = 1;
                         # also clear all existing permission filters
                         $Self->_ClearPermissionFilters();
                     }
-                }
 
-                # add a filter accordingly
-                my %Filter = $Self->_AddPermissionFilterForObject(
-                    Object   => $Object,
-                    Field    => $Attribute,
-                    Operator => $Operator,
-                    Value    => $Value,
-                    Not      => $Not,
-                );
-                if ( !%Filter ) {
-
-                    return $Self->_Error(
-                        Code    => 'InternalError',
-                        Message => 'Unable to add permission filter!',
+                    # add a filter accordingly
+                    my %Result = $Self->_AddPermissionFilterForObject(
+                        Filter   => \%Filter,
+                        Object   => $Object,
+                        Field    => $Attribute,
+                        Operator => $Operator,
+                        Value    => $Value,
+                        Not      => $Not,
+                        UseAnd   => $UseAnd,
                     );
-                }
+                    if ( !%Result ) {
 
-                # save info that this object is permission filtered for later use
-                $PermissionFilteredObjects{$Object} = 1;
+                        return $Self->_Error(
+                            Code    => 'InternalError',
+                            Message => 'Unable to add permission filter!',
+                        );
+                    }
+
+                    # save info that this object is permission filtered for later use
+                    $PermissionFilteredObjects{$Object} = 1;
+                }
 
                 if ( $Self->{RequestMethod} ne 'GET' ) {
                     my %ObjectDataToFilter = %{$ObjectData};        # a deref is required here, because the filter method will change the data
@@ -212,33 +237,40 @@ sub RunOperation {
                     );
 
                     # if the filtered object is undef then the filter doesn't match and we have to determine what to do depending on the desired permission
-                    if ( defined $ObjectDataToFilter{$Object} ) {
-                        $ResultingPermission |= $Permission->{Value};
+                    foreach my $FilteredObject ( sort keys %PermissionFilteredObjects ) {
+                        if ( (!$Not && defined $ObjectDataToFilter{$FilteredObject}) || ($Not && !defined $ObjectDataToFilter{$FilteredObject}) ) {
+                            # init Result
+                            $ResultingPermission = 0 if $ResultingPermission == -1;
 
-                        my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
-                            Value  => $ResultingPermission,
-                            Format => 'Short'
-                        );
+                            $ResultingPermission |= $Permission->{Value};
 
-                        $Self->_PermissionDebug("resulting PropertyValue permission: $ResultingPermissionShort");
+                            my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+                                Value  => $ResultingPermission,
+                                Format => 'Short'
+                            );
 
-                        # check if we have a DENY already
-                        if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                            $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
-                            last PERMISSION;
+                            $Self->_PermissionDebug("resulting PropertyValue permission: $ResultingPermissionShort");
+
+                            # check if we have a DENY already
+                            if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                                last PERMISSION;
+                            }
                         }
                     }
 
-                    # check if we have the desired permission
-                    if ( $ResultingPermission != -1 && ( ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} 
-                        || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} )
-                    ) {
-                        $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
+                    if ( $ResultingPermission != -1 ) {
+                       # check if we have the desired permission
+                        my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission->PERMISSION->{$PermissionName};
 
-                        # return 403, because we don't have permission to execute this
-                        return $Self->_Error(
-                            Code => 'Forbidden',
-                        );
+                        if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                            $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
+
+                            # return 403, because we don't have permission to execute this
+                            return $Self->_Error(
+                                Code => 'Forbidden',
+                            );
+                        }
                     }
                 }
                 elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
@@ -250,6 +282,87 @@ sub RunOperation {
             if ( $Self->{RequestMethod} eq 'GET' && IsArrayRefWithData($Self->{PermissionFilters}) ) {
                 # activate the permission filters for the GET operation
                 $Self->_ActivatePermissionFilters();        
+            }
+        }
+
+        # do something if we have at least one Property permission
+        if ( IsArrayRefWithData(\@RelevantPropertyPermissions) ) {
+            # inspect the object data
+            my $ObjectData = {};
+            if ( $Self->{RequestMethod} =~ /^POST|PATCH$/ ) {
+                # we have to use the object given in the request data
+                $ObjectData = $Param{Data};
+            }
+
+            my $ResultingPermission = -1;
+
+            # check each permission and merge them for each attribute
+            my %AttributePermissions;
+            PERMISSION:
+            foreach my $Permission ( @RelevantPropertyPermissions ) {
+
+                # extract property value permission
+                next if $Permission->{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/;
+
+                my ( $Object, $Attributes) = ( $1, $2 );
+                my @AttributeList = split(/\s*,\s*/, $Attributes);
+
+                $Self->_PermissionDebug( sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+
+                foreach my $Attribute (sort @AttributeList) {
+                    # init
+                    $AttributePermissions{"$Object.$Attribute"} = 0 if !exists $AttributePermissions{"$Object.$Attribute"};
+                    $AttributePermissions{"$Object.$Attribute"} |= $Permission->{Value};
+                }
+            }
+
+            foreach my $Attribute ( sort keys %AttributePermissions ) {
+
+                my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+                    Value  => $AttributePermissions{$Attribute},
+                    Format => 'Short'
+                );
+
+                $Self->_PermissionDebug("resulting Property permission for property \"$Attribute\": $ResultingPermissionShort");
+
+                if ( $Self->{RequestMethod} eq 'GET' ) {
+                    # add attribute to field selector
+                    my ($Object, $AttributeName) = split(/\./, $Attribute, 2);
+
+                    # init field selector
+                    $Self->{PermissionFieldSelector}->{$Object} = [ $Self->{OperationConfig}->{ObjectID} || 'ID' ] if !exists $Self->{PermissionFieldSelector}->{$Object};
+
+                    my $Ignore = '';
+                    if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} 
+                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} 
+                    ) {
+                        # access is denied, so we have to add an ignore selector for this attribute
+                        $Ignore = '!'
+                    }
+                    push @{$Self->{PermissionFieldSelector}->{$Object}}, "$Ignore$AttributeName";
+                }
+                else {
+                    # we need a flat data structure to easily find the attributes
+                    my $FlatData = Hash::Flatten::flatten(
+                        $Param{Data},
+                        {
+                            HashDelimiter  => '.',
+                            ArrayDelimiter => ':'
+                        }
+                    );
+
+                    # if the attribute exists in the data hash we have to check whether the needed permission is granted
+                    if ( exists $FlatData->{$Attribute} && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} 
+                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) 
+                    ) {
+                        $Self->_PermissionDebug( sprintf("request data doesn't match the required criteria - denying request") );
+
+                        # return 403, because we don't have permission to execute this
+                        return $Self->_Error(
+                            Code => 'Forbidden',
+                        );
+                    }
+                }
             }
         }
     }
@@ -308,7 +421,7 @@ sub RunOperation {
     }
 
     # check the result for filtered objects
-    if ( $Self->{RequestMethod} eq 'GET' && IsHashRefWithData($Result) && $Result->{Success} && %PermissionFilteredObjects ) {
+    if ( $Self->{RequestMethod} eq 'GET' && !$Self->{SuppressPermissionErrors} && IsHashRefWithData($Result) && $Result->{Success} && %PermissionFilteredObjects ) {
 
         foreach my $Object ( keys %PermissionFilteredObjects ) {
             next if !exists $Result->{Data}->{$Object};
@@ -386,8 +499,7 @@ sub Options {
             my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
                 my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-                    Location        => "$SchemaLocation/$Object.json",
-                    DisableWarnings => 1, 
+                    Location => "$SchemaLocation/$Object.json",
                 );
                 if ($Content) {
                     $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
@@ -405,8 +517,7 @@ sub Options {
             my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
                 my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-                    Location        => "$ExampleLocation/$Object.json",
-                    DisableWarnings => 1,
+                    Location => "$ExampleLocation/$Object.json",
                 );
                 if ($Content) {
                     $Data{$Type}->{Example} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
@@ -992,11 +1103,18 @@ sub _Success {
         }
 
         # honor a field selector, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Fields} ) ) {
+        if ( !$Self->{'_CachedResponse'} && (IsHashRefWithData( $Self->{Fields} ) || IsHashRefWithData( $Self->{PermissionFieldSelector} )) ) {
             my $StartTime = Time::HiRes::time();
 
+            my $FieldSelector = $Self->{Fields};
+            if ( IsHashRefWithData( $Self->{PermissionFieldSelector} ) ) {
+                $Self->_Debug($Self->{LevelIndent}, "using permission field selector");    
+                $FieldSelector = $Self->{PermissionFieldSelector};
+            }
+
             $Self->_ApplyFieldSelector(
-                Data => \%Param,
+                Data   => \%Param,
+                Fields => $FieldSelector,
             );
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -1089,9 +1207,10 @@ sub _Error {
 helper function to execute another operation to work with its result.
 
     my $Return = $CommonObject->ExecOperation(
-        OperationType     => '...',                              # required
-        Data              => {},                                 # required
-        IgnorePermissions => 1,                                  # optional
+        OperationType            => '...',                              # required
+        Data                     => {},                                 # required
+        IgnorePermissions        => 1,                                  # optional
+        SuppressPermissionErrors => 1,                                  # optional
     );
 
 =cut
@@ -1151,18 +1270,19 @@ sub ExecOperation {
 
     # init new Operation object
     my $OperationObject = Kernel::API::Operation->new(
-        DebuggerObject          => $Self->{DebuggerObject},
-        Operation               => (split(/::/, $Param{OperationType}))[-1],
-        OperationType           => $Param{OperationType},
-        WebserviceID            => $Self->{WebserviceID},
-        RequestMethod           => $Param{RequestMethod} || $Self->{RequestMethod},
-        AvailableMethods        => \%AvailableMethods,
-        RequestURI              => $RequestURI,
-        CurrentRoute            => $TransportConfig->{RouteOperationMapping}->{$Param{OperationType}}->{Route},
-        OperationRouteMapping   => $Self->{OperationRouteMapping},
-        Authorization           => $Self->{Authorization},
-        Level                   => $Self->{Level} + 1,
-        IgnorePermissions       => $Param{IgnorePermissions},
+        DebuggerObject           => $Self->{DebuggerObject},
+        Operation                => (split(/::/, $Param{OperationType}))[-1],
+        OperationType            => $Param{OperationType},
+        WebserviceID             => $Self->{WebserviceID},
+        RequestMethod            => $Param{RequestMethod} || $Self->{RequestMethod},
+        AvailableMethods         => \%AvailableMethods,
+        RequestURI               => $RequestURI,
+        CurrentRoute             => $TransportConfig->{RouteOperationMapping}->{$Param{OperationType}}->{Route},
+        OperationRouteMapping    => $Self->{OperationRouteMapping},
+        Authorization            => $Self->{Authorization},
+        Level                    => ($Self->{Level} || 0) + 1,
+        IgnorePermissions        => $Param{IgnorePermissions},
+        SuppressPermissionErrors => $Param{SuppressPermissionErrors},
     );
 
     # if operation init failed, bail out
@@ -1432,7 +1552,7 @@ sub _ApplyFilter {
                                 }
                             }
                             else {
-                                my $FieldValue  = $ObjectItem->{ $FilterItem->{Field} };
+                                my $FieldValue  = $ObjectItem->{ $FilterItem->{Field} } || '';
                                 my $FilterValue = $FilterItem->{Value};
                                 my $Type        = $FilterItem->{Type} || 'STRING';
 
@@ -1651,28 +1771,51 @@ sub _ApplyFilter {
 sub _ApplyFieldSelector {
     my ( $Self, %Param ) = @_;
 
-    if ( !IsHashRefWithData( \%Param ) || !IsHashRefWithData( $Param{Data} ) ) {
+    if ( !IsHashRefWithData( \%Param ) || !IsHashRefWithData( $Param{Data} ) || !IsHashRefWithData($Param{Fields})) {
 
         # nothing to do
         return;
     }
 
-    foreach my $Object ( keys %{ $Self->{Fields} } ) {
+    foreach my $Object ( keys %{ $Param{Fields} } ) {
         if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
+
+            my @Fields = (
+                @{ $Param{Fields}->{$Object} }, 
+                keys %{ $Self->{Include} }, 
+            );
 
             # extract filtered fields from hash
             my %NewObject;
-            foreach my $Field ( ( @{ $Self->{Fields}->{$Object} }, keys %{ $Self->{Include} } ) ) {
+            my @FieldsToRemove;
+            foreach my $Field ( @Fields ) {
+                my $Not = 0;
+                if ( $Field =~ /^!(.*?)$/ ) {
+                    $Not   = 1;
+                    $Field = $1;
+                }
                 if ( $Field eq '*' ) {
-
                     # include all fields
-                    %NewObject = %{ $Param{Data}->{$Object} };
+                    %NewObject = %{ $Param{Data}->{$Object} } if !$Not;
                     last;
                 }
                 else {
-                    $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                    if ( !$Not ) {
+                        # "select field"
+                        $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                    }
+                    else {
+                        # remember field to be removed later
+                        push @FieldsToRemove, $Field;
+                    }
                 }
             }
+
+            # remove all attributes that should be ignored
+            foreach my $Field ( @FieldsToRemove ) {
+                delete $NewObject{$Field};
+            }
+
             $Param{Data}->{$Object} = \%NewObject;
         }
         elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
@@ -1680,18 +1823,43 @@ sub _ApplyFieldSelector {
             # filter keys in each contained hash
             foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
-                    my %NewObjectItem;
-                    foreach my $Field ( ( @{ $Self->{Fields}->{$Object} }, keys %{ $Self->{Include} } ) ) {
-                        if ( $Field eq '*' ) {
 
+                    my @Fields = (
+                        @{ $Param{Fields}->{$Object} }, 
+                        keys %{ $Self->{Include} } , 
+                    );
+
+                    # extract filtered fields from hash
+                    my %NewObjectItem;
+                    my @FieldsToRemove;
+                    foreach my $Field ( @Fields ) {
+                        my $Not = 0;
+                        if ( $Field =~ /^!(.*?)$/ ) {
+                            $Not   = 1;
+                            $Field = $1;
+                        }
+                        if ( $Field eq '*' ) {
                             # include all fields
-                            %NewObjectItem = %{$ObjectItem};
+                            %NewObjectItem = %{$ObjectItem} if !$Not;
                             last;
                         }
                         else {
-                            $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                            if ( !$Not ) {
+                                # "select field"
+                                $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                            }
+                            else {
+                                # remember field to be removed later
+                                push @FieldsToRemove, $Field;
+                            }
                         }
                     }
+
+                    # remove all attributes that should be ignored
+                    foreach my $Field ( @FieldsToRemove ) {
+                        delete $NewObjectItem{$Field};
+                    }
+
                     $ObjectItem = \%NewObjectItem;
                 }
             }
@@ -1870,16 +2038,18 @@ sub _ApplyInclude {
             next if !$IncludeOperation;
 
             foreach my $Object ( keys %{ $Param{Data} } ) {
+                next if !$Param{Data}->{$Object};
+
                 if ( IsArrayRefWithData( $Param{Data}->{$Object} ) ) {
                     my $Index = 0;
-                    foreach my $ObjectID ( split( /\s*,\s*/, $Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) ) {
+                    foreach my $Item ( @{$Param{Data}->{$Object}} ) {
 
                         # we found a sub-resource include
                         my $Result = $Self->ExecOperation(
                             OperationType => $IncludeOperation,
                             Data          => {
                                 %{ $Self->{RequestData} },
-                                $Self->{OperationConfig}->{ObjectID} => $ObjectID,
+                                $Self->{OperationConfig}->{ObjectID} => $Item->{$Self->{OperationConfig}->{ObjectID}} || $Item->{ID},
                                 }
                         );
                         if ( IsHashRefWithData($Result) && $Result->{Success} ) {
@@ -1896,8 +2066,8 @@ sub _ApplyInclude {
                         OperationType => $IncludeOperation,
                         Data          => {
                             %{ $Self->{RequestData} },
-                            $Self->{OperationConfig}->{ObjectID} => $Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} }
-                            }
+                            $Self->{OperationConfig}->{ObjectID} => $Param{Data}->{$Object}->{ $Self->{OperationConfig}->{ObjectID} } || $Param{Data}->{$Object}->{ID}
+                        }
                     );
                     if ( IsHashRefWithData($Result) && $Result->{Success} ) {
 
@@ -1942,16 +2112,18 @@ sub _ApplyInclude {
 
             # do it for every object in the response
             foreach my $Object ( keys %{ $Param{Data} } ) {
+                next if !$Param{Data}->{$Object};
+
                 if ( IsArrayRefWithData( $Param{Data}->{$Object} ) ) {
 
                     my $Index = 0;
-                    foreach my $ObjectID ( split( /\s*,\s*/, $Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) ) {
+                    foreach my $Item ( @{$Param{Data}->{$Object}} ) {
 
                         $Param{Data}->{$Object}->[ $Index++ ]->{$Include} = $Self->{IncludeHandler}->{$IncludeHandler}->Run(
                             OperationConfig => $Self->{OperationConfig},
                             RequestURI      => $Self->{RequestURI},
                             Object          => $Object,
-                            ObjectID        => $ObjectID,
+                            ObjectID        => $Item->{$Self->{OperationConfig}->{ObjectID}},
                             UserID          => $Self->{Authorization}->{UserID},
                         );
 
@@ -1968,7 +2140,7 @@ sub _ApplyInclude {
                         OperationConfig => $Self->{OperationConfig},
                         RequestURI      => $Self->{RequestURI},
                         Object          => $Object,
-                        ObjectID        => $Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} },
+                        ObjectID        => $Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } || $Self->{RequestData}->{ID},
                         UserID          => $Self->{Authorization}->{UserID},
                     );
 
@@ -2274,11 +2446,13 @@ sub _CacheRequest {
 adds a permission filter 
 
     my $Return = $CommonObject->_AddPermissionFilterForObject(
+        Filter    => {},            # optional, if given the method adds the new filter the the existing one
         Object    => 'Ticket',
         Field     => 'QueueID',
         Operator  => 'EQ',
         Value     => 12,
-        Not       => 0|1
+        Not       => 0|1,
+        UseAnd    => 0|1
     );
 
     $Return = %Filter
@@ -2297,6 +2471,8 @@ sub _AddPermissionFilterForObject {
         }
     }
 
+    my $Logical = $Param{UseAnd} ? 'AND' : 'OR';
+
     use Data::Dumper;
     $Self->_PermissionDebug( "adding permission filter: " . Dumper( \%Param ) );
 
@@ -2307,8 +2483,13 @@ sub _AddPermissionFilterForObject {
     push( @{ $Self->{PermissionFilters} }, {%Param} );
 
     my %Filter;
-    $Filter{ $Param{Object} }->{OR} = [];
-    push( @{ $Filter{ $Param{Object} }->{OR} }, { %Param } );
+    $Filter{ $Param{Object} }->{$Logical} = [];
+    push( @{ $Filter{ $Param{Object} }->{$Logical} }, { %Param } );
+
+    if ( IsHashRef($Param{Filter}) ) {
+        $Param{Filter}->{ $Param{Object} }->{$Logical} = [] if !IsArrayRef($Param{Filter}->{ $Param{Object} }->{$Logical});
+        push( @{ $Param{Filter}->{ $Param{Object} }->{$Logical} }, { %Param } );
+    }
 
     return %Filter;
 }
@@ -2319,7 +2500,7 @@ sub _ActivatePermissionFilters {
     $Self->{PermissionFilters} ||= [];
 
     use Data::Dumper;
-    $Self->_PermissionDebug( "activating permission filters: " . Dumper( $Self->{PermissionFilters} ) );
+    $Self->_PermissionDebug( "activating permission filters");
     foreach my $Filter ( @{ $Self->{PermissionFilters} } ) {
 
         # prepare filter definition
@@ -2330,19 +2511,82 @@ sub _ActivatePermissionFilters {
             Not      => $Filter->{Not},
         );
 
+        my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
+
+# TODO: don't wotk with search right now because ticket DB search can't cope with the negated PropertyValue filters
         # init filter and search if not done already
-        $Self->{Filter}->{ $Filter->{Object} }->{OR} ||= [];
-        $Self->{Search}->{ $Filter->{Object} }->{OR} ||= [];
+        $Self->{Filter}->{ $Filter->{Object} }->{$Logical} ||= [];
+#        $Self->{Search}->{ $Filter->{Object} }->{$Logical} ||= [];
 
         # add definition to filters
-        push( @{ $Self->{Filter}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
-        push( @{ $Self->{Search}->{ $Filter->{Object} }->{OR} }, \%FilterDef );
+        push( @{ $Self->{Filter}->{ $Filter->{Object} }->{$Logical} }, \%FilterDef );
+#        push( @{ $Self->{Search}->{ $Filter->{Object} }->{$Logical} }, \%FilterDef );
     }
 
     $Self->_PermissionDebug( "filter after activation of permission filters: " . Dumper( $Self->{Filter} ) );
     $Self->_PermissionDebug( "search after activation of permission filters: " . Dumper( $Self->{Search} ) );
 
     return 1;
+}
+
+=item _ReplaceVariablesInProperyValuePermission()
+
+replaces special variables in PropertyValue permission expressions with actual value
+
+    my $ReplacedData = $CommonObject->_ReplaceVariablesInProperyValuePermission(
+        Data => '...'
+    );
+
+=cut
+
+sub _ReplaceVariablesInProperyValuePermission {
+    my ( $Self, %Param ) = @_;
+    my $Result = $Param{Data};
+
+    return $Param{Data} if !$Param{Data};
+
+    # handle CurrentUser variable
+    if ( $Param{Data} =~ /^\$CurrentUser\.(.*?)$/ ) {
+        my $Attribute = $1;
+
+        # get user data
+        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            UserID => $Self->{Authorization}->{UserID},
+        );
+        if ( %User ) {
+            # get contact for user
+            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                UserID => $Self->{Authorization}->{UserID},
+            );
+            if ( %Contact ) {
+                if ( $Contact{PrimaryOrganisationID} ) {
+                    # get primary organisation of contact
+                    my %Organisation = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                        ID => $Contact{PrimaryOrganisationID},
+                    );
+                    if ( %Organisation ) {
+                        $Contact{PrimaryOrganisation} = \%Organisation;
+                    }
+                }
+
+                $User{Contact} = \%Contact;
+            }
+        }
+
+        # get the relevant attribute
+        my $FlatData = Hash::Flatten::flatten(
+            \%User,
+            {
+                HashDelimiter  => '.',
+                ArrayDelimiter => ':'
+            }
+        );
+
+        $Result = $FlatData->{$Attribute};
+
+    }
+
+    return $Result;
 }
 
 sub _Debug {

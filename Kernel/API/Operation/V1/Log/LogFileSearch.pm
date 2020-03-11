@@ -89,7 +89,8 @@ sub Run {
 	# get already prepared LogFile data from LogFileGet operation
     if ( IsHashRefWithData(\%LogFileList) ) {  	
         my $LogFileGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Log::LogFileGet',
+            OperationType            => 'V1::Log::LogFileGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 LogFileID => join(',', sort keys %LogFileList),
             }

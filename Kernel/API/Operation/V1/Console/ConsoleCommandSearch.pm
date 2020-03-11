@@ -89,7 +89,8 @@ sub Run {
 	# get already prepared Command data from CommandGet operation
     if ( IsArrayRefWithData(\@CommandList) ) {  	
         my $CommandGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Console::ConsoleCommandGet',
+            OperationType            => 'V1::Console::ConsoleCommandGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 Command => join(',', sort @CommandList),
             }

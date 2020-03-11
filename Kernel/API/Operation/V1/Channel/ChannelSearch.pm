@@ -89,7 +89,8 @@ sub Run {
 	# get already prepared Channel data from ChannelGet operation
     if ( IsHashRefWithData(\%ChannelList) ) {  	
         my $ChannelGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Channel::ChannelGet',
+            OperationType            => 'V1::Channel::ChannelGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ChannelID => join(',', sort keys %ChannelList),
             }

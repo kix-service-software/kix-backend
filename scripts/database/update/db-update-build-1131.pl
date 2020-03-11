@@ -130,8 +130,8 @@ sub _MigrateUserInfoToContact() {
 
     foreach my $row (@FetchedRowArray) {
         my @Row = @{$row};
-        my $uuid = Data::UUID->new(); #temporary workaround to ensure constraint unique constraint on "login" and "login" not null
-        my $DummyLogin = $uuid->to_hexstring($uuid->create());
+        my $uuid = Data::UUID->new();
+        my $DummyLogin = $uuid->to_hexstring($uuid->create()); #temporary workaround to ensure unique constraint on "login" and "login" not null
         return if !$DBObject->Do(
             SQL  => 'INSERT INTO contact (login, email, primary_org_id, org_ids, title, firstname, lastname,
                      phone, mobile, valid_id, create_time, create_by, change_time, change_by, user_id)
@@ -329,7 +329,7 @@ sub _PrepareAndValidateTableTicket {
             my $Firstname = (@NameChunks) ? $NameChunks[0] : $ContactEmail;
             my $Lastname = (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail;
             my $uuid = Data::UUID->new();
-            my $DummyLogin = $uuid->to_hexstring($uuid->create()); #temporary workaround to ensure constraint unique constraint on "login" and "login" not null
+            my $DummyLogin = $uuid->to_hexstring($uuid->create()); #temporary workaround to ensure unique constraint on "login" and "login" not null
             return if !$DBObject->Do(
                 SQL  => 'INSERT INTO contact (login, firstname, lastname, email, valid_id, change_by, change_time, create_by, create_time)
                         VALUES (?,?,?,?,1,1,current_timestamp,1,current_timestamp)',

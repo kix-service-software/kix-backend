@@ -627,7 +627,7 @@ sub _TranslationLanguageGet {
     my $IDStrg = join(',', @{$Param{PatternIDs}});
 
     # check cache
-    my $CacheKey = "TranslationLanguageGet::$IDStrg::$Param{Language}";
+    my $CacheKey = "TranslationLanguageGet::" . ($IDStrg || '') . "::$Param{Language}";
     my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,

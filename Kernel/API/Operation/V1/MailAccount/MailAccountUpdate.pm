@@ -81,7 +81,6 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
-    my @TypeList    = sort keys %BackendList;
 
     return {
         'MailAccountID' => {
@@ -93,7 +92,7 @@ sub ParameterDefinition {
         },
         'MailAccount::Type' => {
             RequiresValueIfUsed => 1,
-            OneOf               => \@TypeList,
+            OneOf               => sort keys %BackendList,
         },
         'MailAccount::DispatchingBy' => {
             RequiresValueIfUsed => 1,

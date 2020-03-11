@@ -104,7 +104,8 @@ sub Run {
 	# get already prepared SearchProfile data from SearchProfileGet operation
     if ( IsArrayRefWithData(\@SearchProfileList) ) {  	
         my $SearchProfileGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SearchProfile::SearchProfileGet',
+            OperationType            => 'V1::SearchProfile::SearchProfileGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 SearchProfileID => join(',', @SearchProfileList),
             }

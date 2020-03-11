@@ -481,10 +481,6 @@ sub _DataDiff {
 }
 
 1;
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/rel-18_FEATURE
 
 =back
 

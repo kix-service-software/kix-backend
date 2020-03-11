@@ -170,7 +170,7 @@ sub new {
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
     # pass information to backend
-    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions) ) {
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions SuppressPermissionErrors) ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
     }
 
@@ -326,6 +326,7 @@ sub _CheckPermission {
     foreach my $Resource ( @Resources ) {
         ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
             UserID              => $Param{Authorization}->{UserID},
+            UsageContext        => $Param{Authorization}->{UserType},
             Target              => $ResourceBase.$Resource,
             RequestedPermission => $RequestedPermission,
         );

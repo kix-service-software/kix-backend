@@ -809,6 +809,14 @@ sub _CheckDynamicField {
         }
     }
 
+    # check DF access
+    if ( $Self->{Authorization}->{UserType} eq 'Customer' && !$Self->{DynamicFieldLookup}->{ $DynamicField->{Name} }->{CustomerVisible} ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => "DynamicField \"$Param{Name}\" cannot be set!",
+        );
+    }
+
     # check DynamicField->Name
     if ( !$Self->ValidateDynamicFieldName( %{$DynamicField} ) ) {
         return $Self->_Error(

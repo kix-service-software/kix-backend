@@ -157,7 +157,8 @@ sub Run {
 
         # get already prepared Article data from ArticleGet operation
         my $AttachmentGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Ticket::ArticleAttachmentGet',
+            OperationType            => 'V1::Ticket::ArticleAttachmentGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 TicketID     => $Param{Data}->{TicketID},
                 ArticleID    => $Param{Data}->{ArticleID},

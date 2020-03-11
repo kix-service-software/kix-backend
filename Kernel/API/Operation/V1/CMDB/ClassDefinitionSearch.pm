@@ -140,7 +140,8 @@ sub Run {
         }
 
         my $GetResult = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ClassDefinitionGet',
+            OperationType            => 'V1::CMDB::ClassDefinitionGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ClassID      => $Param{Data}->{ClassID},
                 DefinitionID => join(',', sort @DefinitionIDs),

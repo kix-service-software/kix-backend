@@ -90,7 +90,8 @@ sub Run {
 	# get already prepared StandardTemplate data from StandardTemplateGet operation
     if ( IsHashRefWithData(\%StandardTemplateList) ) {  	
         my $StandardTemplateGetResult = $Self->ExecOperation(
-            OperationType => 'V1::StandardTemplate::StandardTemplateGet',
+            OperationType            => 'V1::StandardTemplate::StandardTemplateGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 StandardTemplateID => join(',', sort keys %StandardTemplateList),
             }

@@ -41,17 +41,18 @@ sub Run {
         3 => 'no(temp)',
     );
 
-    $Self->Print("    ID Role                                               Valid    Comment\n");
-    $Self->Print("------ -------------------------------------------------- -------- --------------------------------------------------------------------------------\n");
+    $Self->Print("    ID Role                                               Usage Context           Valid    Comment\n");
+    $Self->Print("------ -------------------------------------------------- ----------------------- -------- --------------------------------------------------------------------------------\n");
 
     foreach my $ID ( sort { $Roles{$a} cmp $Roles{$b} } keys %Roles ) {
         my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
             ID => $ID
         );
 
-        my $Valid = $ValidStr{$Role{ValidID}};
+        my $Valid        = $ValidStr{$Role{ValidID}};
+        my $UsageContext = join(', ', @{$Role{UsageContextList}});
 
-        $Self->Print(sprintf("%6i %-50s %-8s %-80s\n", $Role{ID}, $Role{Name}, $Valid, $Role{Comment}));
+        $Self->Print(sprintf("%6i %-50s %-23s %-8s %-80s\n", $Role{ID}, $Role{Name}, $UsageContext, $Valid, $Role{Comment}));
     }
 
     $Self->Print("<green>Done</green>\n");

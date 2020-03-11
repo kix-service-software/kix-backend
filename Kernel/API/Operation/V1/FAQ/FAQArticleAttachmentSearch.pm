@@ -100,7 +100,8 @@ sub Run {
         
         # get already prepared Article data from ArticleGet operation
         my $AttachmentGetResult = $Self->ExecOperation(
-            OperationType => 'V1::FAQ::FAQArticleAttachmentGet',
+            OperationType            => 'V1::FAQ::FAQArticleAttachmentGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 FAQArticleID    => $Param{Data}->{FAQArticleID},
                 FAQAttachmentID => join(',', @AttachmentIDs),

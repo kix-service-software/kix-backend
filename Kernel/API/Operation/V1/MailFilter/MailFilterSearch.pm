@@ -87,7 +87,8 @@ sub Run {
     # get already prepared MailFilter data from MailFilterGet operation
     if ( IsHashRefWithData( \%MailFilterList ) ) {
         my $MailFilterGetResult = $Self->ExecOperation(
-            OperationType => 'V1::MailFilter::MailFilterGet',
+            OperationType            => 'V1::MailFilter::MailFilterGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 MailFilterID => join( ',', sort keys %MailFilterList )
                 }

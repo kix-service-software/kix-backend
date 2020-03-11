@@ -85,7 +85,7 @@ sub Run {
 
     # get roles list
     my @RoleList = $Kernel::OM->Get('Kernel::System::User')->RoleList(
-        UserID => $Param{Data}->{UserID},
+        UserID => $Self->{Authorization}->{UserID},
     );
 
     my @ResultList;

@@ -835,12 +835,19 @@ sub Dump {
         # Enable utf8 flag.
         Encode::_utf8_on($String);
 
+        # reset indention
+        $Data::Dumper::Indent = 1;
+
         return $String;
     }
 
     # fallback if Storable can not be loaded
-    return Data::Dumper::Dumper($Data);                      ## no critic
+    my $Result = Data::Dumper::Dumper($Data);                      ## no critic
 
+    # reset indention;
+    $Data::Dumper::Indent = 1;
+
+    return $Result;
 }
 
 =item DirectoryRead()

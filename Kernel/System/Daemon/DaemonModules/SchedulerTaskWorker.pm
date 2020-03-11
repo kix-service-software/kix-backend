@@ -154,11 +154,27 @@ sub Run {
         # At the child, execute task.
         if ( !$PID ) {
 
-            # make sure every child uses its own clean environment.
-            local $Kernel::OM = Kernel::System::ObjectManager->new(
-                'Kernel::System::Log' => {
-                    LogPrefix => 'KIX-SchedulerTaskWorker-' . $$,
-                },
+            # Define the ZZZ files.
+            my @ZZZFiles = (
+                'ZZZAAuto.pm',
+                'ZZZAuto.pm',
+            );
+
+            # Reload the ZZZ files.
+            for my $ZZZFile (@ZZZFiles) {
+
+                PREFIX:
+                for my $Prefix (@INC) {
+                    my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
+                    next PREFIX if !-f $File;
+                    do $File;
+                    last PREFIX;
+                }
+            }
+
+            # Destroy objects.
+            $Kernel::OM->ObjectsDiscard(
+                ForcePackageReload => 1,
             );
 
             # Disable in memory cache because many processes runs at the same time.

@@ -132,7 +132,8 @@ sub Run {
     if ( IsArrayRefWithData($VersionList) ) {  	
 
         my $GetResult = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ConfigItemVersionGet',
+            OperationType            => 'V1::CMDB::ConfigItemVersionGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 VersionID    => join(',', sort @{$VersionList}),

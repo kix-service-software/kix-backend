@@ -178,7 +178,7 @@ sub GetRegisteredCustomPackages {
     }
     else {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'debug',
+            Priority => 'notice',
             Message  => "KIX-Install: could not read <$KIXPackageFile> - using empty hash.",
         );
     }
@@ -303,7 +303,7 @@ sub CleanUpConfigPm {
     # delete storage for custom packages in <KIX_HOME>/var/CustomPackages...
     if ( unlink($KIXPackageFile) ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'debug',
+            Priority => 'notice',
             Message  => "KIX-Install: deleted <$KIXPackageFile> !",
         );
     }
@@ -351,7 +351,7 @@ sub CleanUpConfigPm {
             close($OUT);
 
             $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'debug',
+                Priority => 'notice',
                 Message  => "Updated $ConfigFile.",
             );
 
@@ -403,7 +403,7 @@ sub CleanUpConfigPm {
             close($OUT);
 
             $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'debug',
+                Priority => 'notice',
                 Message  => "Updated $Apache2PerlStartUpFile.",
             );
 
@@ -533,7 +533,7 @@ sub _UpdateConfigPm {
             }
 
             $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'debug',
+                Priority => 'notice',
                 Message  => "Updated $ConfigFile.",
             );
 
@@ -659,7 +659,7 @@ sub _UpdateApachePerlStartup {
             }
 
             $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'debug',
+                Priority => 'notice',
                 Message  => "Updated $Apache2PerlStartUp.",
             );
 
@@ -788,7 +788,7 @@ sub _UpdateCGIScripts {
                 }
 
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'debug',
+                    Priority => 'notice',
                     Message  => "Updated $ScriptFile.",
                 );
 

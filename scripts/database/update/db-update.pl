@@ -203,6 +203,9 @@ sub _ExecSQL {
         }
     }
 
+    # delete whole cache to make sure any new data is available in the following scripts
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+
     return 1;
 }
 

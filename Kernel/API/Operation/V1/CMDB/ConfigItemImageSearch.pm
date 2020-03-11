@@ -132,7 +132,8 @@ sub Run {
     if ( IsArrayRefWithData($ImageList) ) {  	
 
         my $GetResult = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ConfigItemImageGet',
+            OperationType            => 'V1::CMDB::ConfigItemImageGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 ImageID    => join(',', @{$ImageList}),

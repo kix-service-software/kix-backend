@@ -92,7 +92,8 @@ sub Run {
     # get already prepared ExecPlan data from ExecPlanGet operation
     if ( IsHashRefWithData(\%ExecPlanList) ) {   
         my $ExecPlanGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Automation::ExecPlanGet',
+            OperationType            => 'V1::Automation::ExecPlanGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ExecPlanID => join(',', sort keys %ExecPlanList),
             }

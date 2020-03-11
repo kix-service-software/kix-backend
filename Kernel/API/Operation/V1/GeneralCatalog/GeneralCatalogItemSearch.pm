@@ -98,7 +98,8 @@ sub Run {
 	    # get already prepared GeneralCatalog data from GeneralCatalogGet operation
 	    if ( IsHashRefWithData($GeneralCatalogItemList) ) {   
 	        my $GeneralCatalogGetResult = $Self->ExecOperation(
-	            OperationType => 'V1::GeneralCatalog::GeneralCatalogItemGet',
+	            OperationType            => 'V1::GeneralCatalog::GeneralCatalogItemGet',
+                SuppressPermissionErrors => 1,
 	            Data      => {
 	                GeneralCatalogItemID => join(',', sort keys %$GeneralCatalogItemList),
 	            }

@@ -134,7 +134,7 @@ foreach my $Key (sort keys %ConfigItemUsage) {
             $Class = 'parentused';
         }
     }
-    
+
     $HTML .= '<tr class="'.$Class.'">
 <td>'.++$Index.'</td>
 <td>'.$Key.'</td>
@@ -152,6 +152,7 @@ $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
     Content  => \(join("\n", @Rows))
 );
 
+1;
 
 =back
 

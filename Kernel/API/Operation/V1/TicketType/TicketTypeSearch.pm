@@ -88,7 +88,8 @@ sub Run {
     # get already prepared tickettype data from TicketTypeGet operation
     if ( IsHashRefWithData(\%TicketTypeList) ) {
         my $TicketTypeGetResult = $Self->ExecOperation(
-            OperationType => 'V1::TicketType::TicketTypeGet',
+            OperationType            => 'V1::TicketType::TicketTypeGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 TypeID => join(',', sort keys %TicketTypeList),
             }

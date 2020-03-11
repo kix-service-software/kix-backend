@@ -25,6 +25,12 @@ our @ObjectDependencies = (
     'Kernel::System::Valid',
 );
 
+# define usage context bit values
+use constant USAGE_CONTEXT => {
+    AGENT    => 0x0001,
+    CUSTOMER => 0x0002,
+};
+
 =head1 NAME
 
 Kernel::System::Role - roles lib
@@ -112,14 +118,15 @@ returns a hash with role data
 This returns something like:
 
     %RoleData = (
-        'Name'       => 'role_helpdesk_agent',
-        'ID'         => 2,
-        'Comment'    => 'Role for help-desk people.',
-        'ValidID'    => '1',
-        'CreateTime' => '2010-04-07 15:41:15',
-        'CreateBy'   => 1,
-        'ChangeTime' => '2010-04-07 15:41:15',
-        'ChangeBy'   => 1
+        'Name'         => 'role_helpdesk_agent',
+        'ID'           => 2,
+        'Comment'      => 'Role for help-desk people.',
+        'ValidID'      => '1',
+        'UsageContext' => 1,
+        'CreateTime'   => '2010-04-07 15:41:15',
+        'CreateBy'     => 1,
+        'ChangeTime'   => '2010-04-07 15:41:15',
+        'ChangeBy'     => 1
     );
 
 =cut
@@ -143,28 +150,37 @@ sub RoleGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
-        SQL   => "SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM roles WHERE id = ?",
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        SQL =>
+            "SELECT id, name, comments, valid_id, usage_context, create_time, create_by, change_time, change_by FROM roles WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
     my %Role;
-    
+
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
         %Role = (
-            ID         => $Row[0],
-            Name       => $Row[1],
-            Comment    => $Row[2],
-            ValidID    => $Row[3],
-            CreateTime => $Row[4],
-            CreateBy   => $Row[5],
-            ChangeTime => $Row[6],
-            ChangeBy   => $Row[7],
+            ID           => $Row[0],
+            Name         => $Row[1],
+            Comment      => $Row[2],
+            ValidID      => $Row[3],
+            UsageContext => $Row[4],
+            CreateTime   => $Row[5],
+            CreateBy     => $Row[6],
+            ChangeTime   => $Row[7],
+            ChangeBy     => $Row[8],
         );
+
+        # translate usage contexts
+        $Role{UsageContextList} = [];
+        foreach ( qw(Agent Customer) ) {
+            next if ( ($Role{UsageContext} & Kernel::System::Role->USAGE_CONTEXT->{uc($_)}) != Kernel::System::Role->USAGE_CONTEXT->{uc($_)} );
+            push @{$Role{UsageContextList}}, $_;
+        }
     }
-    
+
     # no data found...
     if ( !%Role ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -173,14 +189,14 @@ sub RoleGet {
         );
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Kernel::System::Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Role,
-    ); 
+    );
 
     return %Role;
 }
@@ -193,6 +209,7 @@ adds a new role
         Name    => 'example-role',
         Comment => 'comment describing the role',   # optional
         ValidID => 1,
+        UsageContext => 0x0003,
         UserID  => 123,
     );
 
@@ -202,7 +219,7 @@ sub RoleAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Name ValidID UserID)) {
+    for my $Needed (qw(Name ValidID UserID UsageContext)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -226,11 +243,12 @@ sub RoleAdd {
 
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO roles (name, comments, valid_id, '
+        SQL => 'INSERT INTO roles (name, comments, valid_id, usage_context, '
             . 'create_time, create_by, change_time, change_by) '
-            . 'VALUES (?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            . 'VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Name}, \$Param{Comment}, \$Param{ValidID}, \$Param{UsageContext},
+            \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -266,11 +284,12 @@ sub RoleAdd {
 update of a role
 
     my $Success = $RoleObject->RoleUpdate(
-        ID      => 123,
-        Name    => 'example-group',
-        Comment => 'comment describing the role',   # optional
-        ValidID => 1,
-        UserID  => 123,
+        ID           => 123,
+        Name         => 'example-group',
+        Comment      => 'comment describing the role',   # optional
+        ValidID      => 1,
+        UsageContext => 0x0003,
+        UserID       => 123,
     );
 
 =cut
@@ -279,7 +298,7 @@ sub RoleUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID Name ValidID UserID)) {
+    for (qw(ID Name ValidID UsageContext UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -322,10 +341,10 @@ sub RoleUpdate {
 
     # update role in database
     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-        SQL => 'UPDATE roles SET name = ?, comments = ?, valid_id = ?, '
+        SQL => 'UPDATE roles SET name = ?, comments = ?, valid_id = ?, usage_context = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{Name}, \$Param{Comment}, \$Param{ValidID}, \$Param{UsageContext}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -349,7 +368,8 @@ sub RoleUpdate {
 returns a hash of all roles
 
     my %Roles = $RoleObject->RoleList(
-        Valid => 1,
+        Valid        => 1,
+        UsageContext => 'Agent'|'Customer' # optional
     );
 
 the result looks like
@@ -370,7 +390,7 @@ sub RoleList {
     my $Valid = $Param{Valid} ? 1 : 0;
 
     # create cache key
-    my $CacheKey = 'RoleList::' . $Valid;
+    my $CacheKey = 'RoleList::' . $Valid . '::' . ($Param{UsageContext} || '');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -385,13 +405,20 @@ sub RoleList {
         $SQL .= ' WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    if ( $Param{UsageContext} && $Param{Valid} ) {
+        $SQL .= ' AND usage_context = ' . Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}
+    }
+    elsif ( $Param{UsageContext} ) {
+        $SQL .= ' WHERE usage_context = ' . Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}
+    }
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL => $SQL,
     );
 
     my %Result;
     while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
-        $Result{$Row[0]} = $Row[1];
+        $Result{ $Row[0] } = $Row[1];
     }
 
     # set cache
@@ -434,7 +461,7 @@ sub RoleDelete {
         SQL  => 'DELETE FROM roles WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-   
+
     # delete cache
     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
         Type => $Self->{CacheType}
@@ -451,7 +478,6 @@ sub RoleDelete {
 }
 
 1;
-
 
 =back
 

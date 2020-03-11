@@ -165,7 +165,8 @@ sub Run {
 
         # get already prepared Contact data from ContactGet operation
         my $ContactGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Contact::ContactGet',
+            OperationType            => 'V1::Contact::ContactGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 ContactID => join( ',', sort keys %ContactList ),
                 }
