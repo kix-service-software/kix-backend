@@ -79,35 +79,35 @@ one or more ticket templates in one call.
 sub Run {
     my ($Self, %Param) = @_;
 
-    my @TicketTemplateList;
-    my %SysConfigOptionPublicTemplateList = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
-        Name => 'Ticket::Template::Definitions::List::Public',
-    );
-    my @PublicTemplates = @{($SysConfigOptionPublicTemplateList{isModified}) ?
-        $SysConfigOptionPublicTemplateList{Value} : $SysConfigOptionPublicTemplateList{Default}};
+    my @TicketTemplateList = $Kernel::OM->Get('Kernel::System::TicketTemplate')->TicketTemplateList();
 
-    my %SysConfigOptionTemplateDefinitions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
-        Name => 'Ticket::Template::Definitions'
-    );
-    my @AllTemplates = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
-        Data => ($SysConfigOptionTemplateDefinitions{isModified}) 
-            ? $SysConfigOptionTemplateDefinitions{Value} 
-            : $SysConfigOptionTemplateDefinitions{Default}
-    );
+    # get already prepared template data from TicketTemplateGet operation
+    if ( IsArrayRefWithData(\@TicketTemplateList) ) {
 
-    foreach my $Template (@AllTemplates) {
-        next if ($Self->{Authorization}->{UserType} eq 'Customer' && !grep (/^$Template->{TemplateID}$/, @PublicTemplates) && !$Template->{CustomerVisible});
-        push(@TicketTemplateList, $Template);
-    }
-
-    if (scalar(@TicketTemplateList) == 1) {
-        return $Self->_Success(
-            TicketTemplate => $TicketTemplateList[0],
+        my $TicketTemplateGetResult = $Self->ExecOperation(
+            OperationType            => 'V1::TicketTemplate::TicketTemplateGet',
+            SuppressPermissionErrors => 1,
+            Data      => {
+                TemplateName => join(',', map { $_->{TemplateID} } @TicketTemplateList),
+            }
         );
+ 
+        if ( !IsHashRefWithData($TicketTemplateGetResult) || !$TicketTemplateGetResult->{Success} ) {
+            return $TicketTemplateGetResult;
+        }
+
+        my @ResultList = IsArrayRef($TicketTemplateGetResult->{Data}->{TicketTemplate}) ? @{$TicketTemplateGetResult->{Data}->{TicketTemplate}} : ( $TicketTemplateGetResult->{Data}->{TicketTemplate} );
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                TicketTemplate => \@ResultList,
+            )
+        }
     }
 
+    # return result
     return $Self->_Success(
-        TicketTemplate => \@TicketTemplateList,
+        TicketTemplate => [],
     );
 }
 

@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::TicketTemplate;
+package Kernel::System::TicketTemplate;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Ticket::TicketTemplate
+Kernel::System::TicketTemplate
 
 =head1 SYNOPSIS
 
@@ -64,26 +64,41 @@ sub new {
     return $Self;
 }
 
+=item TicketTemplateList()
+
+Returns all available ticket templates
+
+    my @TemplateList = $TicketObject->TicketTemplateList();
+
+=cut
+
+sub TicketTemplateList {
+    my ($Self, %Param) = @_;
+
+    my $TemplateDefinitionsJSON = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Template::Definitions');
+
+    my $TemplateDefinitions = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+        Data => $TemplateDefinitionsJSON
+    );
+
+    # return empty array if wqe have no templates
+    return () if !IsArrayRefWithData($TemplateDefinitions);
+
+    return @{$TemplateDefinitions};
+}
+
 =item TicketTemplateGet()
 
 Returns data of one ticket template
 
-    my %Hash = $TicketObject->TicketTemplateGet(
+    my %Template = $TicketObject->TicketTemplateGet(
         Name  => 'TicketTemplateName'
     );
-
-    my %Result = {
-    Name => 'TicketTemplateName',
-    title => 'some template title',
-    ....
-    }
 
 =cut
 
 sub TicketTemplateGet {
     my ($Self, %Param) = @_;
-
-    my %Template;
 
     # check needed stuff
     if (!$Param{Name}) {
@@ -93,48 +108,24 @@ sub TicketTemplateGet {
         return;
     }
 
-    # check if template is cached
-    my $CacheKey = 'Cache::TicketTemplateGet::' . $Param{Name};
-    if ($Self->{$CacheKey}) {
-        return %{$Self->{$CacheKey}};
-    }
+    my @TemplateList = $Self->TicketTemplateList();
 
-    my %SysConfigOption = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
-        Name => 'Ticket::Template::Definitions'
-    );
-
-    my $AllTemplates = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
-        Data => ($SysConfigOption{isModified}) ? $SysConfigOption{Value} : $SysConfigOption{Default},
-    );
-
-    if(!isArrayRefWithData($AllTemplates)) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message => "TicketTemplateGet: No templates found!");
-        return;
-    }
-
-    my $Result;
-    foreach my $Template (@{$AllTemplates}) {
+    my %Result;
+    foreach my $Template (@TemplateList) {
         next if $Template->{TemplateID} ne $Param{Name};
 
-        $Result = $Template;
+        %Result = %{$Template};
         last;
     }
 
-    if (!$Result) {
+    if (!%Result) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message => "TicketTemplateGet: No template wit name '$Param{Name}' found!");
+            Message => "TicketTemplateGet: No template with name '$Param{Name}' found!");
         return;
     }
     
-    # set ticket template cache
-    $Self->{$CacheKey} = {
-        $Result,
-    };
-
-    return $Result;
+    return %Result;
 }
 
 1;

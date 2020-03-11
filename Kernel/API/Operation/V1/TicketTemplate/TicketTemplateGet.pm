@@ -11,8 +11,6 @@ package Kernel::API::Operation::V1::TicketTemplate::TicketTemplateGet;
 use strict;
 use warnings;
 
-use MIME::Base64;
-
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -110,32 +108,18 @@ one or more ticket templates in one call.
 sub Run {
     my ($Self, %Param) = @_;
 
-    my $TicketTemplateObject = $Kernel::OM->Get('Kernel::System::Ticket::TicketTemplate');
     my @TicketTemplateList;
-    my %SysConfigOptionPublicTemplateList = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
-        Name => 'Ticket::Template::Definitions::List::Public',
-    );
-    my @PublicTemplates = @{($SysConfigOptionPublicTemplateList{isModified}) ?
-        $SysConfigOptionPublicTemplateList{Value} : $SysConfigOptionPublicTemplateList{Default}};
-
     foreach my $Name (@{$Param{Data}->{TemplateName}}) {
-        my $TemplateData;
-        $TemplateData = $TicketTemplateObject->TicketTemplateGet(
+        my %TemplateData = $Kernel::OM->Get('Kernel::System::TicketTemplate')->TicketTemplateGet(
             Name => $Name,
         );
-        if (!IsHashRefWithData($TemplateData)) {
+        if (!IsHashRefWithData(\%TemplateData)) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
 
-        if ($Self->{Authorization}->{UserType} eq 'Customer' && !grep (/^$Name$/, @PublicTemplates) && !$TemplateData->{CustomerVisible}) {
-            return $Self->_Error(
-                Code => 'Object.NoPermission'
-            );
-        }
-
-        push(@TicketTemplateList, $TemplateData);
+        push(@TicketTemplateList, \%TemplateData);
     }
 
     if (scalar(@TicketTemplateList) == 1) {
