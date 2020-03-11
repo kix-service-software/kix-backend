@@ -114,6 +114,9 @@ sub RunOperation {
 
         # do something if we have at least one PropertyValue permission
         if ( IsArrayRefWithData(\@RelevantPropertyValuePermissions) ) {
+
+            my $StartTime = Time::HiRes::time();
+
             # load the object data (if we have to)
             my $ObjectData = {};
             if ( $Self->{RequestMethod} eq 'POST' ) {
@@ -132,6 +135,10 @@ sub RunOperation {
                 );
 
                 if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+
+                    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
                     # no success, simply return what we got
                     return $GetResult;
                 }
@@ -266,6 +273,9 @@ sub RunOperation {
                         if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
                             $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
 
+                            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
                             # return 403, because we don't have permission to execute this
                             return $Self->_Error(
                                 Code => 'Forbidden',
@@ -283,10 +293,16 @@ sub RunOperation {
                 # activate the permission filters for the GET operation
                 $Self->_ActivatePermissionFilters();        
             }
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
         }
 
         # do something if we have at least one Property permission
         if ( IsArrayRefWithData(\@RelevantPropertyPermissions) ) {
+
+            my $StartTime = Time::HiRes::time();
+
             # inspect the object data
             my $ObjectData = {};
             if ( $Self->{RequestMethod} =~ /^POST|PATCH$/ ) {
@@ -357,6 +373,9 @@ sub RunOperation {
                     ) {
                         $Self->_PermissionDebug( sprintf("request data doesn't match the required criteria - denying request") );
 
+                        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
                         # return 403, because we don't have permission to execute this
                         return $Self->_Error(
                             Code => 'Forbidden',
@@ -364,6 +383,9 @@ sub RunOperation {
                     }
                 }
             }
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
         }
     }
 
@@ -1088,7 +1110,7 @@ sub _Success {
         }
 
         # honor permission filters
-        if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{PermissionFilters} ) ) {
+        if ( IsHashRefWithData( \%Param ) && IsHashRefWithData( $Self->{PermissionFilters} ) ) {
             my $StartTime = Time::HiRes::time();
 
             # in case of a GET request to a collection resource, this should have been done in the filter already
