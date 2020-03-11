@@ -121,7 +121,7 @@ sub new {
     }
 
     # init call level
-    $Self->{Level} = $Param{Level};
+    $Self->{Level} = $Param{Level} || 0;
     $Self->{LevelIndent} = '    ' x $Self->{Level} || '';
 
     # check permission
