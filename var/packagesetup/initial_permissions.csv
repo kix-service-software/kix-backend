@@ -94,7 +94,7 @@
 "Customer";"Resource";"/contacts";"x";"x";;;
 "Customer";"Resource";"/faq";;"x";;;
 "Customer";"Resource";"/faq/*";;;;;
-"Customer";"Resource";"/faq/articles";;"x";;;
+"Customer";"Resource";"/faq/articles";;"x";;;   
 "Customer";"PropertyValue";"/faq/articles/*{FAQArticle.CustomerVisible EQ 1}";;"x";;;
 "Customer";"Resource";"/faq/articles/*/votes";"x";"x";;;
 "Customer";"Resource";"/i18n";;"x";;;
@@ -115,6 +115,7 @@
 "Customer";"Resource";"/system/faq/*";;;;;
 "Customer";"Resource";"/system/faq/categories";;"x";;;
 "Customer";"Resource";"/system/ticket";;"x";;;
+"Customer";"PropertyValue";"/system/ticket/templates/*{TicketTemplate.CustomerVisible EQ 1}";;"x";;;
 "Customer";"Resource";"/system/users";;"x";;;
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
@@ -126,4 +127,3 @@
 "Customer";"PropertyValue";"/tickets/*/articles/*{Article.CustomerVisible EQ 1}";;"x";;;
 "Customer";"Property";"/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles/*/flags";"x";"x";;;
-"Customer";"Resource";"/system/config/Ticket::Template::Definitions::List::Public";;"x";;;

@@ -463,17 +463,6 @@ sub _AddPermissionsForRoleCustomer {
         <Data Key=\"change_by\">1</Data>
         <Data Key=\"change_time\">current_timestamp</Data>
     </Insert>
-    <!-- role \"Customer\": permission _R___ on /system/config/Ticket::Template::Definitions::List::Public -->
-    <Insert Table=\"role_permission\">
-        <Data Key=\"role_id\">$RoleID</Data>
-        <Data Key=\"type_id\">1</Data>
-        <Data Key=\"target\" Type=\"Quote\">/system/config/Ticket::Template::Definitions::List::Public</Data>
-        <Data Key=\"value\">2</Data>
-        <Data Key=\"create_by\">1</Data>
-        <Data Key=\"create_time\">current_timestamp</Data>
-        <Data Key=\"change_by\">1</Data>
-        <Data Key=\"change_time\">current_timestamp</Data>
-    </Insert>
 </database>";
 
     my @XMLArray = $Kernel::OM->Get('Kernel::System::XML')->XMLParse(
