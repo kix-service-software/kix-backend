@@ -135,7 +135,7 @@ perform ConfigItemCreate Operation. This will return the created ConfigItemLogin
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # isolate and trim ConfigItem parameter
     my $ConfigItem = $Self->_Trim(
         Data => $Param{Data}->{ConfigItem}
@@ -204,7 +204,6 @@ sub Run {
 }
 
 1;
-
 
 =back
 

@@ -628,7 +628,10 @@ sub ConvertDataToExternal {
 
             my $AttributeName = $RootHashKey;
 
-            if ( $AttrDef->{CountMax} > 1 ) {
+            # ignore attribute if user is logged in as Customer and attribute should not be visible
+            next if IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer' && !$AttrDef->{CustomerVisible};
+
+            if ( $AttrDef->{CountMax} && $AttrDef->{CountMax} > 1 ) {
 
                 # we have multiple items
                 my $Counter = 0;
@@ -924,15 +927,63 @@ sub _CheckDefinition {
     return $Self->_Success();
 }
 
+=item _CheckCustomerAssignedConfigItem()
 
+checks the configitem ids for current customer user if necessary
+
+    my $CustomerCheck = $OperationObject->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList  => [1,2,3] | 1            # array ref or number
+    );
+
+    returns:
+
+    $CustomerCheck = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $CustomerCheck = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub _CheckCustomerAssignedConfigItem {
+    my ( $Self, %Param ) = @_;
+
+    my $IDList = $Param{ConfigItemIDList};
+    if ( $IDList && !IsArrayRefWithData($IDList) ) {
+        $IDList = [ $IDList ];
+    }
+
+    if (
+        IsArrayRefWithData($IDList) &&
+        IsHashRefWithData($Self->{Authorization}) &&
+        $Self->{Authorization}->{UserType} eq 'Customer'
+    ) {
+        my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
+            ConfigItemIDList => $IDList
+        );
+        my %ConfigItemIDListHash = map { $_ => 1 } @ConfigItemIDList;
+        
+        foreach my $ConfigItemID ( @{ $IDList } ) {
+
+            if ( !$ConfigItemIDListHash{$ConfigItemID} ) {
+                return $Self->_Error(
+                    Code => 'Forbidden',
+                    Message => "Could not access config item with id $ConfigItemID"
+                );
+            }
+        }
+    }
+    
+    # if everything is OK then return Success
+    return $Self->_Success();
+}
 
 1;
 
 =end Internal:
-
-
-
-
 
 =back
 

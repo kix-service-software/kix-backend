@@ -111,6 +111,16 @@ perform ConfigItemHistorySearch Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
+
     # check if ConfigItem exists
     my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},
@@ -166,7 +176,6 @@ sub Run {
 }
 
 1;
-
 
 =back
 

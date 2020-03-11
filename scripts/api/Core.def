@@ -228,7 +228,7 @@
 /cmdb/configitems/:ConfigItemID/versions                                       |   GET             | V1::CMDB::ConfigItemVersionSearch
 /cmdb/configitems/:ConfigItemID/versions                                       |   POST            | V1::CMDB::ConfigItemVersionCreate
 /cmdb/configitems/:ConfigItemID/versions/:VersionID                            |   GET             | V1::CMDB::ConfigItemVersionGet
-/cmdb/configitems/attachments/:AttachmentID                                    |   GET             | V1::CMDB::ConfigItemAttachmentGet
+/cmdb/configitems/:ConfigItemID/versions/:VersionID/attachments/:AttachmentID  |   GET             | V1::CMDB::ConfigItemAttachmentGet
 /contacts                                                                      |   GET             | V1::Contact::ContactSearch
 /contacts                                                                      |   POST            | V1::Contact::ContactCreate
 /contacts/:ContactID                                                           |   DELETE          | V1::Contact::ContactDelete

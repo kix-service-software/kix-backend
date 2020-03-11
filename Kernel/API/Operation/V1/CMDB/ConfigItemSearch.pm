@@ -189,14 +189,20 @@ sub Run {
         @ConfigItemList = @{$SearchResult};
     }
 
-	# get already prepared CI data from ConfigItemGet operation
-    if ( IsArrayRefWithData(\@ConfigItemList) ) {  	  
+    # filter for customer assigned config items if necessary
+    my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
+        ConfigItemIDList => \@ConfigItemList
+    );
+
+    # get already prepared CI data from ConfigItemGet operation
+    if ( IsArrayRefWithData(\@ConfigItemIDList) ) {
+
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data      => {
-                ConfigItemID => join(',', sort @ConfigItemList),
+                ConfigItemID => join(',', sort @ConfigItemIDList),
             }
-        );    
+        );   
 
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
@@ -218,7 +224,6 @@ sub Run {
 }
 
 1;
-
 
 =back
 

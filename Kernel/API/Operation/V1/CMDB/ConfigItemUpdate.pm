@@ -114,7 +114,17 @@ perform ConfigItemUpdate Operation. This will return the created ConfigItemLogin
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
+
     # get config item data
     my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID}
@@ -163,7 +173,6 @@ sub Run {
 }
 
 1;
-
 
 =back
 
