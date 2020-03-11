@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -113,6 +113,10 @@ sub ParameterDefinition {
             Type => 'HASH',
             Required => 1
         },
+        'DynamicField::CustomerVisible' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [0, 1]
+        }
     }
 }
 
@@ -129,7 +133,8 @@ perform DynamicFieldCreate Operation. This will return the created DynamicFieldI
                 FieldType       => '...',            
                 DisplayGroupID  => 123,              
                 ObjectType      => '...',            
-                Config          => { }
+                Config          => { },
+                CustomerVisible => 0,
 	            InternalField   => 0|1,              # optional
 	            ValidID         => 1,                # optional
             }
@@ -195,6 +200,7 @@ sub Run {
         DisplayGroupID  => $DynamicField->{DisplayGroupID},
         ObjectType      => $DynamicField->{ObjectType},
         Config          => $DynamicField->{Config},
+        CustomerVisible => $DynamicField->{CustomerVisible},
         ValidID         => $DynamicField->{ValidID} || 1,
         UserID          => $Self->{Authorization}->{UserID},
     );
@@ -212,6 +218,7 @@ sub Run {
     );    
 }
 
+1;
 
 =back
 

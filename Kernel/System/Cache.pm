@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -695,6 +695,7 @@ sub _Debug {
     printf STDERR "(%5i) %-15s %s%s\n", $$, "[Cache]", $Indent, $Message;
 }
 
+1;
 
 =back
 

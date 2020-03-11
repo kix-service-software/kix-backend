@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -835,12 +835,19 @@ sub Dump {
         # Enable utf8 flag.
         Encode::_utf8_on($String);
 
+        # reset indention
+        $Data::Dumper::Indent = 1;
+
         return $String;
     }
 
     # fallback if Storable can not be loaded
-    return Data::Dumper::Dumper($Data);                      ## no critic
+    my $Result = Data::Dumper::Dumper($Data);                      ## no critic
 
+    # reset indention;
+    $Data::Dumper::Indent = 1;
+
+    return $Result;
 }
 
 =item DirectoryRead()

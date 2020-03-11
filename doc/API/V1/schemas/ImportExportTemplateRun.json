@@ -1,6 +1,6 @@
 {
    "$id" : "#ImportExportTemplateRun",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The import export template run object.",
    "type" : "object",
    "properties" : {
@@ -9,11 +9,25 @@
          "readOnly" : true
       },
       "EndTime" : {
-         "type" : "string",
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "null"
+            }
+         ],
          "readOnly" : true
       },
       "FailCount" : {
-         "type" : "integer",
+         "anyOf" : [
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "null"
+            }
+         ],
          "readOnly" : true
       },
       "ID" : {
@@ -33,7 +47,14 @@
          "readOnly" : true
       },
       "SuccessCount" : {
-         "type" : "integer",
+         "anyOf" : [
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "null"
+            }
+         ],
          "readOnly" : true
       },
       "TemplateID" : {

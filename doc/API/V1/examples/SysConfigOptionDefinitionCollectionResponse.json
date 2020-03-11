@@ -14,6 +14,7 @@
                 "Name": "Agent Notification (Popup/Dashboard)",
                 "Prio": "110"
             },
+            "DefaultValidID": 1,
             "Description": "Defines all the parameters for this notification transport.",
             "Group": "Ticket",
             "IsModified": 1,
@@ -33,6 +34,7 @@
             "CreateBy": 1,
             "CreateTime": "2019-05-14 20:06:44",
             "Default": "15",
+            "DefaultValidID": 2,
             "Description": "Sets the timeout (in seconds) for http/ftp downloads.",
             "Group": "Framework",
             "IsModified": 1,
@@ -43,7 +45,7 @@
               "Regex": ""
             },
             "Type": "String",
-            "ValidID": 1,
+            "ValidID": 2,
             "Value": null
           }
     ]

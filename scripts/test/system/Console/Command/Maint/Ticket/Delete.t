@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -30,23 +30,22 @@ $Kernel::OM->Get('Kernel::System::Cache')->Configure(
     CacheInMemory => 0,
 );
 
-my $Contact = $Helper->GetRandomID() . '@example.com';
+my $ContactID = $Helper->TestContactCreate();
 
 # create a new tickets
 my @Tickets;
 for ( 1 .. 4 ) {
     my $TicketNumber = $TicketObject->TicketCreateNumber();
-    my $TicketID     = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
-        TN           => $TicketNumber,
-        Title        => 'Test ticket',
-        Queue        => 'Junk',
-        Lock         => 'unlock',
-        Priority     => '3 normal',
-        State        => 'open',
-        CustomerNo   => '123465',
-        Contact => $Contact,
-        OwnerID      => 1,
-        UserID       => 1,
+    my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
+        TN        => $TicketNumber,
+        Title     => 'Test ticket',
+        Queue     => 'Junk',
+        Lock      => 'unlock',
+        Priority  => '3 normal',
+        State     => 'open',
+        ContactID => $ContactID,
+        OwnerID   => 1,
+        UserID    => 1,
     );
 
     $Self->True(
@@ -78,9 +77,9 @@ $Self->Is(
 );
 
 my %TicketIDs = $TicketObject->TicketSearch(
-    Result            => 'HASH',
-    ContactLogin => $Contact,
-    UserID            => 1,
+    Result       => 'HASH',
+    ContactLogin => $ContactID,
+    UserID       => 1,
 );
 
 $Self->False(
@@ -103,7 +102,7 @@ $Self->Is(
 
 %TicketIDs = $TicketObject->TicketSearch(
     Result            => 'HASH',
-    ContactLogin => $Contact,
+    ContactLogin => $ContactID,
     UserID            => 1,
 );
 

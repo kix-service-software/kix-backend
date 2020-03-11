@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -271,19 +271,6 @@ sub Run {
         if ( %List ) {
             $GetParam{'X-KIX-Contact'} = (keys %List)[0];
         }
-    }
-
-    # KIX4OTRS-capeIT
-    # if there is no customer id found
-    if ( !$GetParam{'X-KIX-Contact'} && $TicketTemplate{CustomerLogin} ) {
-        $GetParam{'X-KIX-Contact'} = $TicketTemplate{CustomerLogin};
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # if there is no customer id found!
-    if ( !$GetParam{'X-KIX-CustomerNo'} ) {
-        $GetParam{'X-KIX-CustomerNo'} = $GetParam{SenderEmailAddress};
     }
 
     # if there is no customer user found!
@@ -563,19 +550,19 @@ sub Run {
         }
     }
 
-    # KIX4OTRS-capeIT
-    # get body
-    my $Body = $GetParam{Body};
-    my $RichTextUsed = $ConfigObject->Get('Frontend::RichText');
-    if ( defined $TicketTemplate{Body} ) {
-        if ( $RichTextUsed && $TicketTemplate{Body} =~ m/(.*?)&lt;KIX_EMAIL_BODY&gt;(.*)/msg ) {
-            $Body = $1 . $Body . $3;
-            $GetParam{'Content-Type'} = 'text/html';
-        }
-        elsif ( !$RichTextUsed && $TicketTemplate{Body} =~ m/(.*?)<KIX_EMAIL_BODY>(.*)/msg ) {
-            $Body = $1 . $Body . $3;
-        }
-    }
+    # # KIX4OTRS-capeIT
+    # # get body
+    # my $Body = $GetParam{Body};
+    # my $RichTextUsed = $ConfigObject->Get('Frontend::RichText');
+    # if ( defined $TicketTemplate{Body} ) {
+    #     if ( $RichTextUsed && $TicketTemplate{Body} =~ m/(.*?)&lt;KIX_EMAIL_BODY&gt;(.*)/msg ) {
+    #         $Body = $1 . $Body . $3;
+    #         $GetParam{'Content-Type'} = 'text/html';
+    #     }
+    #     elsif ( !$RichTextUsed && $TicketTemplate{Body} =~ m/(.*?)<KIX_EMAIL_BODY>(.*)/msg ) {
+    #         $Body = $1 . $Body . $3;
+    #     }
+    # }
 
     # get channel
     my $Channel;
@@ -599,7 +586,9 @@ sub Run {
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},
         ContentType      => $GetParam{'Content-Type'},
-        Body             => $Body,
+        Charset          => $GetParam{'Charset'},
+        MimeType         => $GetParam{'Content-Type'},
+        Body             => $GetParam{Body},
         UserID           => $Param{InmailUserID},
         HistoryType      => 'EmailCustomer',
         HistoryComment   => "\%\%$Comment",

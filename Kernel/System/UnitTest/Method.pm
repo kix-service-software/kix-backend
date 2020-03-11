@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -54,6 +54,8 @@ if it's true, returning 1 in this case or undef, otherwise.
 sub True {
     my ( $Self, $True, $Name ) = @_;
 
+    $True = 0 if ($True < 0 && $Self->{Output} ne 'ALLURE');
+
     if ( !$Name ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
@@ -84,6 +86,8 @@ for a false value instead.
 
 sub False {
     my ( $Self, $False, $Name ) = @_;
+
+    $False = 0 if ($False < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -127,6 +131,8 @@ Returns 1 if the values were equal, or undef otherwise.
 sub Is {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
 
+    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
+
     if ( !$Name ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
@@ -169,6 +175,8 @@ for inequality instead.
 
 sub IsNot {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
+
+    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -226,6 +234,8 @@ Returns 1 if the data structures are the same, or undef otherwise.
 sub IsDeeply {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
 
+    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
+
     if ( !$Name ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
@@ -275,6 +285,8 @@ for inequality instead.
 
 sub IsNotDeeply {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
+
+    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -469,7 +481,6 @@ sub _DataDiff {
 }
 
 1;
-
 
 =back
 

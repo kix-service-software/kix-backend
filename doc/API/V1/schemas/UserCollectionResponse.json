@@ -7,7 +7,7 @@
       "User" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/User"
+            "$ref" : "#/definitions/_User_json"
          }
       }
    },
@@ -15,7 +15,32 @@
       "User"
    ],
    "definitions" : {
-      "User" : {
+      "_UserPreference_json" : {
+         "$id" : "#UserPreference",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "UserID",
+            "Value"
+         ]
+      },
+      "_User_json" : {
          "$id" : "#User",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user object.",
@@ -41,7 +66,7 @@
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreference"
+                  "$ref" : "#/definitions/_UserPreference_json"
                }
             },
             "RoleIDs" : {
@@ -62,53 +87,11 @@
                ],
                "readOnly" : true
             },
-            "UserEmail" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserFirstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserFullname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
             "UserID" : {
                "type" : "integer",
                "readOnly" : true
             },
-            "UserLastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
             "UserLogin" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserMobile" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "UserPhone" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "UserTitle" : {
                "type" : "string",
                "readOnly" : true
             },
@@ -123,34 +106,7 @@
             "CreateBy",
             "CreateTime",
             "UserID",
-            "UserFirstname",
-            "UserLastname",
             "UserLogin"
-         ]
-      },
-      "UserPreference" : {
-         "$id" : "#UserPreference",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The user preference object.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ID",
-            "UserID",
-            "Value"
          ]
       }
    }

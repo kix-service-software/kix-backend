@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -105,6 +105,13 @@ sub new {
         );
     }
 
+    if ( !IsHashRefWithData($Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => 'No OperationConfig found!',
+        );
+    }
+    
     $Self->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
     if ( !IsHashRefWithData($Self->{OperationConfig}) ) {
         return $Self->_Error(
@@ -163,7 +170,7 @@ sub new {
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
     # pass information to backend
-    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions) ) {
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions SuppressPermissionErrors) ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
     }
 
@@ -319,6 +326,7 @@ sub _CheckPermission {
     foreach my $Resource ( @Resources ) {
         ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
             UserID              => $Param{Authorization}->{UserID},
+            UsageContext        => $Param{Authorization}->{UserType},
             Target              => $ResourceBase.$Resource,
             RequestedPermission => $RequestedPermission,
         );

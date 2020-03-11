@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -240,7 +240,75 @@ sub Run {
 
             # inform API caching about a new dependency
             $Self->AddCacheDependency(Type => 'Ticket');
+            $Self->AddCacheDependency(Type => 'User');
         }
+
+        # include assigned user if requested (and existing)
+
+        #FIXME: workaround KIX2018-3308####################
+        $Self->AddCacheDependency(Type => 'User');
+        my $UserData = $Self->ExecOperation(
+            OperationType => 'V1::User::UserGet',
+            Data          => {
+                UserID => $ContactData{AssignedUserID},
+            }
+        );
+        $ContactData{Login} = ($UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
+        #######################
+
+        #comment back in when 3308 is resolved properly
+        if ($Param{Data}->{include}->{User}) {
+            # $Self->AddCacheDependency( Type => 'User' );
+            # $ContactData{User} = undef;
+            # if ($ContactData{AssignedUserID}) {
+            #     my $UserData = $Self->ExecOperation(
+            #         OperationType => 'V1::User::UserGet',
+            #         Data          => {
+            #             UserID => $ContactData{AssignedUserID},
+            #         }
+            #     );
+                $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+            # }
+        }
+
+        # include assigned config items if requested
+        if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
+
+            # add user data for
+            my %CIContact = %ContactData;
+            if (!$CIContact{User} && $CIContact{AssignedUserID}) {
+                my $UserData = $Self->ExecOperation(
+                    OperationType => 'V1::User::UserGet',
+                    Data          => {
+                        UserID => $CIContact{AssignedUserID},
+                    }
+                );
+                $CIContact{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+                $Self->AddCacheDependency(Type => 'User');
+            }
+
+            my $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                ObjectType => 'Contact',
+                Object     => \%CIContact
+            );
+
+            # filter for customer assigned config items if necessary
+            my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
+                ConfigItemIDList => $ItemIDs
+            );
+
+            $ContactData{AssignedConfigItems} = \@ConfigItemIDList;
+
+            $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
+        }
+
+        # delete the UserID in %ContactData, because it's some backwards compatibility fix (KIX2018-2515) masking the
+        # the contact ID as the user ID and should not be delivered through the API to the client.
+        delete($ContactData{UserID});
+
+        #always delete the User ID of the assigned User. If user information is requested, the assigned User Object is
+        # included.
+        #delete($ContactData{AssignedUserID});
 
         # add
         push(@ContactList, \%ContactData);

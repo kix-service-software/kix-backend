@@ -1,0 +1,11 @@
+  displayName: "[System] FAQ"
+  description: !include ../descriptions/resources/system/faq.md
+  /categories:
+    description: !include ../descriptions/resources/system/faq/categories.md
+    type: { collection: { typeName: FAQCategory } }
+    /{faqCategoryId}:
+      type: { item: { typeName: FAQCategory } }
+      uriParameters:
+        classId:
+          displayName: FAQCategoryID
+          type: integer

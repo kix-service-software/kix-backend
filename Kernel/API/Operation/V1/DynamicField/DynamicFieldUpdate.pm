@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -100,6 +100,10 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => \@DisplayGroupIDs
         },
+        'DynamicField::CustomerVisible' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [0, 1]
+        }
     }
 }
 
@@ -116,7 +120,8 @@ perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldI
                 FieldType       => '...',            # optional
                 DisplayGroupID  => 123,              # optional
                 ObjectType      => '...',            # optional
-                Config          => { }               # optional
+                Config          => { },              # optional
+                CustomerVisible => 0                 # optional
 	            ValidID         => 1,                # optional
             }
 	    },
@@ -208,8 +213,9 @@ sub Run {
         DisplayGroupID  => $DynamicField->{DisplayGroupID} || $DynamicFieldData->{DisplayGroupID},
         ObjectType      => $DynamicField->{ObjectType} || $DynamicFieldData->{ObjectType},
         Config          => $DynamicField->{Config} || $DynamicFieldData->{Config},
+        CustomerVisible => exists $DynamicField->{CustomerVisible} ? $DynamicField->{CustomerVisible} : $DynamicFieldData->{CustomerVisible},
         ValidID         => $DynamicField->{ValidID} || $DynamicFieldData->{ValidID},
-        UserID          => $Self->{Authorization}->{UserID},
+        UserID          => $Self->{Authorization}->{UserID}
     );
 
     if ( !$Success ) {
@@ -224,6 +230,7 @@ sub Run {
     );    
 }
 
+1;
 
 =back
 

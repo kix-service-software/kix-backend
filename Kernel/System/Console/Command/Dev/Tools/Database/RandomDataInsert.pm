@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -469,22 +469,29 @@ sub UserCreate {
 
     my @UserIDs;
     for ( 1 .. $Count ) {
-        my $Name = 'fill-up-user' . int( rand(100_000_000) );
-        my $ID   = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-            UserFirstname => "$Name-Firstname",
-            UserLastname  => "$Name-Lastname",
-            UserLogin     => $Name,
-            UserEmail     => $Name . '@example.com',
-            ValidID       => 1,
-            ChangeUserID  => 1,
+        my $Name = 'fill-up-agent' . int( rand(100_000_000) );
+        my $UserID   = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+            UserLogin    => $Name,
+            ValidID      => 1,
+            ChangeUserID => 1,
+            IsAgent      => 1,
         );
-        if ($ID) {
-            print "User '$Name' with ID '$ID' created.\n";
-            push( @UserIDs, $ID );
+        if ($UserID) {
+            my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+                AssignedUserID => $UserID,
+                Firstname      => $Name,
+                LastName       => $Name,
+                Email          => $Name . '@example2.com',
+                ValidID        => 1,
+                UserID         => 1,
+                ValidID        => 1,
+            );
+            print "Agent '$Name' with ID '$UserID' and and contact ID '$ContactID' created.\n";
+            push( @UserIDs, $UserID );
             for my $RoleID (@RoleIDs) {
                 my $RoleAdd = int( rand(3) );
                 $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
-                    AssignUserID => $ID,
+                    AssignUserID => $UserID,
                     RoleID       => $RoleID,
                     UserID       => 1,
                 );
@@ -498,18 +505,23 @@ sub CustomerCreate {
     my $Count = shift || return;
 
     for ( 1 .. $Count ) {
-        my $Name      = 'fill-up-user' . int( rand(100_000_000) );
-        my $UserLogin = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
-            Source         => 'Contact',            # Contact source config
-            UserFirstname  => $Name,
-            UserLastname   => $Name,
-            UserCustomerID => $Name,
-            UserLogin      => $Name,
-            UserEmail      => $Name . '@example2.com',
+        my $Name      = 'fill-up-customer' . int( rand(100_000_000) );
+        my $UserID   = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+            UserLogin    => $Name,
+            ValidID      => 1,
+            ChangeUserID => 1,
+            IsCustomer   => 1,
+        );
+        my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            AssignedUserID => $UserID,
+            Firstname      => $Name,
+            LastName       => $Name,
+            Email          => $Name . '@example2.com',
             ValidID        => 1,
             UserID         => 1,
+            ValidID        => 1,
         );
-        print "Contact '$Name' created.\n";
+        print "Contact '$Name' (UserID '$UserID', ContactID '$ContactID') created.\n";
     }
 }
 
@@ -518,7 +530,7 @@ sub OrganisationCreate {
 
     for ( 1 .. $Count ) {
 
-        my $Name       = 'fill-up-company' . int( rand(100_000_000) );
+        my $Name       = 'fill-up-organisation' . int( rand(100_000_000) );
         my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
             Number   => $Name . '_CustomerID',
             Name     => $Name,
@@ -538,7 +550,7 @@ sub OrganisationCreate {
 
 1;
 
-
+#TODO add function to randomly assign contacts to organisation
 
 
 =back

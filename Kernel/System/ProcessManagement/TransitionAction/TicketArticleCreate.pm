@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -165,12 +165,11 @@ sub Run {
     if ( !$Param{Config}->{From} ) {
 
         # Get current user data
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             UserID => $Param{UserID},
         );
 
-        # Set "From" field according to user - UserFullname <UserEmail>
-        $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
+        $Param{Config}->{From} = $Contact{Fullname} . ' <' . $Contact{Email} . '>';
     }
 
     my $ArticleID = $TicketObject->ArticleCreate(

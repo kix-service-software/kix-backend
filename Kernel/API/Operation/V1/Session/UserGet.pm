@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -168,6 +168,7 @@ sub Run {
             # inform API caching about a new dependency
             $Self->AddCacheDependency( Type => 'Ticket' );
             $Self->AddCacheDependency( Type => 'Watcher' );
+            $Self->AddCacheDependency( Type => 'Contact' );
         }
 
         # include roleids if requested
@@ -183,6 +184,18 @@ sub Run {
             }
             $UserData{RoleIDs} = \@RoleIDs;
         }
+
+        #FIXME: workaoround KIX2018-3308
+        $Self->AddCacheDependency(Type => 'Contact');
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            UserID => $Self->{Authorization}->{UserID},
+        );
+        $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
+        $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
+        $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;
+        $UserData{UserEmail} = %ContactData ? $ContactData{Email} : undef;
+        ###########################################################
+        $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
     }
 
     return $Self->_Success(

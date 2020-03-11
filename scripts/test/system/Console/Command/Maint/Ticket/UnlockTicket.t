@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -31,8 +31,6 @@ my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
     Lock         => 'lock',
     Priority     => '3 normal',
     State        => 'open',
-    CustomerNo   => '123465',
-    Contact => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

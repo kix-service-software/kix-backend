@@ -1,0 +1,8 @@
+{
+    "Attachment": {
+        "Content": "base64 encoded file content",
+        "ContentType": "text/xml",
+        "Filename": "somename.xml",
+        "Inline": 0
+    }
+}

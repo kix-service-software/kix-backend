@@ -14,7 +14,7 @@
                "type" : "string"
             },
             "Parameters" : {
-               "$ref" : "#/definitions/ExecPlanParametersPostPatchItem"
+               "$ref" : "#/definitions/_ExecPlanParametersPostPatchItem_json"
             },
             "Type" : {
                "description" : "",
@@ -30,7 +30,7 @@
       "ExecPlan"
    ],
    "definitions" : {
-      "ExecPlanParametersPostPatchItem" : {
+      "_ExecPlanParametersPostPatchItem_json" : {
          "$id" : "#ExecPlanParametersPostPatchItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The parameters object for creation and update, for when and/or by what the corresponding job of the execution plan will be triggert.",

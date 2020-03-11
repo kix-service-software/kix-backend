@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#FAQCategoryPostRequest",
+  "type": "object",
+  "description": "The FAQ category request object for create.",
+  "properties": {
+    "FAQCategory": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "ParentID": {
+          "type": "integer"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Name"
+      ]
+    }
+  },
+  "required": [
+    "FAQCategory"
+  ]
+}

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -347,37 +347,9 @@ and will transform dates to the current user's timezone.
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    for my $Needed (qw(DynamicFieldConfig)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
+    return if !$Self->_CheckParams(%Param);
+
     $Param{LayoutObject} //= $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-
-    # check DynamicFieldConfig (general)
-    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "The field configuration is invalid",
-        );
-        return;
-    }
-
-    # check DynamicFieldConfig (internally)
-    for my $Needed (qw(ID FieldType ObjectType Config Name)) {
-        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed in DynamicFieldConfig!"
-            );
-            return;
-        }
-    }
 
     # set the dynamic field specific backend
     my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
@@ -392,6 +364,134 @@ sub DisplayValueRender {
 
     # call DisplayValueRender on the specific backend
     my $ValueStrg = $Self->{$DynamicFieldBackend}->DisplayValueRender(%Param);
+
+    return $ValueStrg;
+}
+
+=item HTMLDisplayValueRender()
+
+creates value and title strings to be used in display masks. Supports HTML output
+and will transform dates to the current user's timezone.
+
+    my $ValueStrg = $BackendObject->DisplayValueRender(
+        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
+        Value              => 'Any value'               # Optional
+    );
+
+    Returns
+
+    $ValueStrg = {
+        Title       => $Title,
+        Value       => $Value
+    }
+
+=cut
+
+sub HTMLDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_CheckParams(%Param);
+
+    $Param{LayoutObject} //= $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    # call DisplayValueRender on the specific backend
+    my $ValueStrg = $Self->{$DynamicFieldBackend}->HTMLDisplayValueRender(%Param);
+
+    return $ValueStrg;
+}
+
+=item ShortDisplayValueRender()
+
+creates short value and title strings to be used in display masks. Supports HTML output
+and will transform dates to the current user's timezone.
+
+    my $ValueStrg = $BackendObject->DisplayValueRender(
+        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
+        Value              => 'Any value'               # Optional
+    );
+
+    Returns
+
+    $ValueStrg = {
+        Title       => $Title,
+        Value       => $ShortValue
+    }
+
+=cut
+
+sub ShortDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_CheckParams(%Param);
+
+    $Param{LayoutObject} //= $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    # call DisplayValueRender on the specific backend
+    my $ValueStrg = $Self->{$DynamicFieldBackend}->ShortDisplayValueRender(%Param);
+
+    return $ValueStrg;
+}
+
+=item DisplayKeyRender()
+
+creates key string to be used to be used in display masks.
+
+    my $ValueStrg = $BackendObject->DisplayKeyRender(
+        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
+        Value              => 'Any value',              # Optional
+    );
+
+    Returns
+
+    $ValueStrg = {
+        Title => $Title,
+        Value => $Value,
+    }
+
+=cut
+
+sub DisplayKeyRender {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_CheckParams(%Param);
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    $Param{LayoutObject} //= $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+
+    # call DisplayValueRender on the specific backend
+    my $ValueStrg = $Self->{$DynamicFieldBackend}->DisplayKeyRender(%Param);
 
     return $ValueStrg;
 }
@@ -1606,34 +1706,7 @@ Produces text output and does not transform time zones of dates.
 sub ReadableValueRender {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{DynamicFieldConfig} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need DynamicFieldConfig!"
-        );
-        return;
-    }
-
-    # check DynamicFieldConfig (general)
-    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "The field configuration is invalid",
-        );
-        return;
-    }
-
-    # check DynamicFieldConfig (internally)
-    for my $Needed (qw(ID FieldType ObjectType Config Name)) {
-        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed in DynamicFieldConfig!"
-            );
-            return;
-        }
-    }
+    return if !$Self->_CheckParams(%Param);
 
     # set the dynamic field specific backend
     my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
@@ -1918,9 +1991,7 @@ as the value key
 
     my $Value = $BackendObject->ValueLookup(
         DynamicFieldConfig => $DynamicFieldConfig,       # complete config of the DynamicField
-        Key                => 'sotred value',             # could also be an array ref for
-                                                         #    MultipleSelect fields
-        LanguageObject     => $LanguageObject,            # optional, used to get value translations
+        Key                => 'sorted value',            # could also be an array ref for MultipleSelect fields
     );
 
     Returns:
@@ -1932,34 +2003,7 @@ as the value key
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{DynamicFieldConfig} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need DynamicFieldConfig!"
-        );
-        return;
-    }
-
-    # check DynamicFieldConfig (general)
-    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "The field configuration is invalid",
-        );
-        return;
-    }
-
-    # check DynamicFieldConfig (internally)
-    for my $Needed (qw(ID FieldType ObjectType Config Name)) {
-        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed in DynamicFieldConfig!"
-            );
-            return;
-        }
-    }
+    return if !$Self->_CheckParams(%Param);
 
     # set the dynamic field specific backend
     my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
@@ -1970,11 +2014,6 @@ sub ValueLookup {
             Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
         );
         return;
-    }
-
-    # remove LanguageObject param if is not a real LanguageObject
-    if ( defined $Param{LanguageObject} && ref $Param{LanguageObject} ne 'Kernel::Language' ) {
-        delete $Param{LanguageObject};
     }
 
     # call ValueLookup on the specific backend
@@ -2145,6 +2184,46 @@ sub ObjectMatch {
     # call ObjectMatch on the specific backend
     return $Self->{$DynamicFieldBackend}->ObjectMatch(%Param);
 }
+
+sub _CheckParams {
+    my ( $Self, %Param ) = @_;
+
+
+    # check needed stuff
+    for my $Needed (qw(DynamicFieldConfig)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # check DynamicFieldConfig (general)
+    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "The field configuration is invalid",
+        );
+        return;
+    }
+
+    # check DynamicFieldConfig (internally)
+    for my $Needed (qw(ID FieldType ObjectType Config Name)) {
+        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed in DynamicFieldConfig!"
+            );
+            return;
+        }
+    }
+
+    return 1;
+}
+
+1;
 
 =back
 

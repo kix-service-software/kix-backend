@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -124,6 +124,9 @@ sub DynamicFieldAdd {
         return;
     }
 
+    # check CustomerVisible
+    $Param{CustomerVisible} = $Param{CustomerVisible} ? 1 : 0;
+
     # get database object
     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
@@ -160,11 +163,11 @@ sub DynamicFieldAdd {
     return if !$DBObject->Do(
         SQL =>
             'INSERT INTO dynamic_field (internal_field, name, label, field_type, displaygroup_id, object_type,' .
-            ' config, valid_id, create_time, create_by, change_time, change_by)' .
-            ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            ' config, customer_visible, valid_id, create_time, create_by, change_time, change_by)' .
+            ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$InternalField, \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{DisplayGroupID},
-            \$Param{ObjectType}, \$Config, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
+            \$Param{ObjectType}, \$Config, \$Param{CustomerVisible}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
         ],
     );
 
@@ -216,19 +219,20 @@ get Dynamic Field attributes
 Returns:
 
     $DynamicField = {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'NameForField',
-        Label         => 'The label to show',
-        FieldType     => 'Text',
-        ObjectType    => 'Article',
-        Config        => $ConfigHashRef,
-        DisplayGroupID => 123,
-        ValidID       => 1,
-        CreateBy      => 1,
-        CreateTime    => '2011-02-08 15:08:00',
-        ChangeBy      => 1,
-        ChangeTime    => '2011-06-11 17:22:00',
+        ID              => 123,
+        InternalField   => 0,
+        Name            => 'NameForField',
+        Label           => 'The label to show',
+        FieldType       => 'Text',
+        ObjectType      => 'Article',
+        Config          => $ConfigHashRef,
+        DisplayGroupID  => 123,
+        CustomerVisible => 0,
+        ValidID         => 1,
+        CreateBy        => 1,
+        CreateTime      => '2011-02-08 15:08:00',
+        ChangeBy        => 1,
+        ChangeTime      => '2011-06-11 17:22:00',
     };
 
 =cut
@@ -270,7 +274,7 @@ sub DynamicFieldGet {
     if ( $Param{ID} ) {
         return if !$DBObject->Prepare(
             SQL =>
-                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config,'
+                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config, customer_visible,'
                 .
                 ' valid_id, create_by, create_time, change_by, change_time ' .
                 'FROM dynamic_field WHERE id = ?',
@@ -280,7 +284,7 @@ sub DynamicFieldGet {
     else {
         return if !$DBObject->Prepare(
             SQL =>
-                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config,'
+                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config, customer_visible,'
                 .
                 ' valid_id, create_by, create_time, change_by, change_time ' .
                 'FROM dynamic_field WHERE name = ?',
@@ -295,6 +299,7 @@ sub DynamicFieldGet {
     while ( my @Data = $DBObject->FetchrowArray() ) {
 
         my $Config = $YAMLObject->Load( Data => $Data[7] );
+        my $CustomerVisible = $Data[8] ? 1 : 0;
 
         %Data = (
             ID              => $Data[0],
@@ -305,12 +310,30 @@ sub DynamicFieldGet {
             DisplayGroupID  => $Data[5],
             ObjectType      => $Data[6],
             Config          => $Config,
-            ValidID         => $Data[8],
-            CreateBy        => $Data[9],
-            CreateTime      => $Data[10],
-            ChangeBy        => $Data[11],
-            ChangeTime      => $Data[12],
+            CustomerVisible => $CustomerVisible,
+            ValidID         => $Data[9],
+            CreateBy        => $Data[10],
+            CreateTime      => $Data[11],
+            ChangeBy        => $Data[12],
+            ChangeTime      => $Data[13]
         );
+    }
+
+    # get display name
+    if ( %Data && defined $Data{FieldType} && $Data{FieldType} ) {
+
+        # get config object
+        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    
+        # get the Dynamic Field Backends configuration
+        my $DynamicFieldsConfig = $ConfigObject->Get('DynamicFields::Driver');
+        
+        if ( defined $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName} && $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName} ) {
+            $Data{FieldTypeDisplayName} = $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName};
+        }
+        else {
+            $Data{FieldTypeDisplayName} = $Data{FieldType};
+        }
     }
 
     if (%Data) {
@@ -348,6 +371,7 @@ returns 1 on success or undef on error
                                         # allow only lowercase letters
         Config          => $ConfigHashRef,  # it is stored on YAML format
                                         # to individual articles, otherwise to tickets
+        CustomerVisible => 0,
         ValidID         => 1,
         Reorder         => 1,               # or 0, to trigger reorder function, default 1
         UserID          => 123,
@@ -425,11 +449,11 @@ sub DynamicFieldUpdate {
     # sql
     return if !$DBObject->Do(
         SQL => 'UPDATE dynamic_field SET name = ?, label = ?, field_type = ?, displaygroup_id = ?,'
-            . 'object_type = ?, config = ?, valid_id = ?, change_time = current_timestamp, '
+            . 'object_type = ?, config = ?, customer_visible = ?, valid_id = ?, change_time = current_timestamp, '
             . ' change_by = ? WHERE id = ?',
         Bind => [
             \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{DisplayGroupID},
-            \$Param{ObjectType}, \$Config, \$Param{ValidID}, \$Param{UserID}, \$Param{ID},
+            \$Param{ObjectType}, \$Config, \$Param{CustomerVisible}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID},
         ],
     );
 
@@ -853,28 +877,30 @@ Returns:
 
     $List = (
         {
-            ID          => 123,
-            InternalField => 0,
-            Name        => 'nameforfield',
-            Label       => 'The label to show',
-            FieldType   => 'Text',
-            ObjectType  => 'Article',
-            Config      => $ConfigHashRef,
-            ValidID     => 1,
-            CreateTime  => '2011-02-08 15:08:00',
-            ChangeTime  => '2011-06-11 17:22:00',
+            ID              => 123,
+            InternalField   => 0,
+            Name            => 'nameforfield',
+            Label           => 'The label to show',
+            FieldType       => 'Text',
+            ObjectType      => 'Article',
+            Config          => $ConfigHashRef,
+            CustomerVisible => 0,
+            ValidID         => 1,
+            CreateTime      => '2011-02-08 15:08:00',
+            ChangeTime      => '2011-06-11 17:22:00',
         },
         {
-            ID            => 321,
-            InternalField => 0,
-            Name          => 'fieldname',
-            Label         => 'It is not a label',
-            FieldType     => 'Text',
-            ObjectType    => 'Ticket',
-            Config        => $ConfigHashRef,
-            ValidID       => 1,
-            CreateTime    => '2010-09-11 10:08:00',
-            ChangeTime    => '2011-01-01 01:01:01',
+            ID              => 321,
+            InternalField   => 0,
+            Name            => 'fieldname',
+            Label           => 'It is not a label',
+            FieldType       => 'Text',
+            ObjectType      => 'Ticket',
+            Config          => $ConfigHashRef,
+            CustomerVisible => 0,
+            ValidID         => 1,
+            CreateTime      => '2010-09-11 10:08:00',
+            ChangeTime      => '2011-01-01 01:01:01',
         },
         ...
     );

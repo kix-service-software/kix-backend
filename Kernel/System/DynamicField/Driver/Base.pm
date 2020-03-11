@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -251,6 +251,24 @@ sub ObjectMatch {
     }
 
     return $Match;
+}
+
+sub HTMLDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->DisplayValueRender(%Param);
+}
+
+sub ShortDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->DisplayValueRender(%Param);
+}
+
+sub DisplayKeyRender {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->DisplayValueRender(%Param);
 }
 
 1;

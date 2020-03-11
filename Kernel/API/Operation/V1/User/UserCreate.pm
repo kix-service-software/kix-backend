@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -85,16 +85,15 @@ sub ParameterDefinition {
         },
         'User::UserLogin' => {
             Required => 1
-        },            
-        'User::UserFirstname' => {
-            Required => 1
-        },            
-        'User::UserLastname' => {
-            Required => 1
-        },            
-        'User::UserEmail' => {
-            Required => 1
-        },            
+        },
+        'User::IsAgent' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [ 0, 1 ]
+        },
+        'User::IsCustomer' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [ 0, 1 ]
+        },
     }
 }
 
@@ -106,14 +105,11 @@ perform UserCreate Operation. This will return the created UserLogin.
         Data => {
             User => {
                 UserLogin       => '...'                                        # required
-                UserFirstname   => '...'                                        # required
-                UserLastname    => '...'                                        # required
-                UserEmail       => '...'                                        # required
-                UserPassword    => '...'                                        # optional                
-                UserPhone       => '...'                                        # optional                
-                UserTitle       => '...'                                        # optional
+                UserPassword    => '...'                                        # optional
                 ValidID         => 1,
-                RoleIDs         => [                                            # optional          
+                IsAgent         => 0 | 1,                                       # optional
+                IsCustomer      => 0 | 1,                                       # optional
+                RoleIDs         => [                                            # optional
                     123
                 ],
                 Preferences     => [                                            # optional
@@ -149,30 +145,19 @@ sub Run {
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
         User => $User->{UserLogin},
     );
-    if ( %UserData ) {
+    if (%UserData) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => "Can not create user. Another user with same login already exists.",
         );
     }
 
-    # check UserEmail exists
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
-        PostMasterSearch => $User->{UserEmail},
-    );
-    if ( %UserList ) {
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => 'Can not create user. Another user with same email address already exists.',
-        );
-    }
-    
     # create User
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-        ValidID      => 1,
+        ValidID => 1,
         %{$User},
         ChangeUserID => $Self->{Authorization}->{UserID},
-    );    
+    );
     if ( !$UserID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
@@ -181,9 +166,9 @@ sub Run {
     }
 
     # add preferences
-    if ( IsArrayRefWithData($User->{Preferences}) ) {
+    if ( IsArrayRefWithData( $User->{Preferences} ) ) {
 
-        foreach my $Pref ( @{$User->{Preferences}} ) {
+        foreach my $Pref ( @{ $User->{Preferences} } ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserPreferenceCreate',
                 Data          => {
@@ -191,7 +176,7 @@ sub Run {
                     UserPreference => $Pref
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     %{$Result},
@@ -201,9 +186,9 @@ sub Run {
     }
 
     # assign roles
-    if ( IsArrayRefWithData($User->{RoleIDs}) ) {
+    if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
 
-        foreach my $RoleID ( @{$User->{RoleIDs}} ) {
+        foreach my $RoleID ( @{ $User->{RoleIDs} } ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserRoleIDCreate',
                 Data          => {
@@ -211,7 +196,7 @@ sub Run {
                     RoleID => $RoleID,
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     %{$Result},
@@ -219,12 +204,46 @@ sub Run {
             }
         }
     }
-    
+
+    # auto assign customer role
+    if ( $User->{IsCustomer} ) {
+
+        # get RoleID from Role "Customer"
+        my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+            Role => "Customer",
+        );
+
+        my $RoleIDFound = 0;
+        if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
+            if ( grep( /^$RoleID/, @{ $User->{RoleIDs} } ) ) {
+                $RoleIDFound = 1;
+            }
+        }
+
+        if ( !$RoleIDFound ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserRoleIDCreate',
+                Data          => {
+                    UserID => $UserID,
+                    RoleID => $RoleID,
+                }
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    %{$Result},
+                )
+            }
+        }
+    }
+
     return $Self->_Success(
         Code   => 'Object.Created',
-        UserID => $UserID,
-    );    
+        UserID => 0 + $UserID,
+    );
 }
+
+1;
 
 =back
 

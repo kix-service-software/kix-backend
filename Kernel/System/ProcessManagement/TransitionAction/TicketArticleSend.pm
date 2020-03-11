@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -178,12 +178,11 @@ sub Run {
     if ( !$Param{Config}->{From} ) {
 
         # Get current user data
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             UserID => $Param{UserID},
         );
 
-        # Set "From" field according to user - UserFullname <UserEmail>
-        $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
+        $Param{Config}->{From} = $Contact{Fullname} . ' <' . $Contact{Email} . '>';
     }
 
     my $ArticleID = $TicketObject->ArticleCreate(

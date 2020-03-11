@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -408,10 +408,10 @@ sub ExportDataGet {
     );
 
     # check object data
-    if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
+    if ( !$ObjectData || ref $ObjectData ne 'HASH'  || !$ObjectData->{ClassID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "No object data found for the template id $Param{TemplateID}",
+            Message  => "No valid object data found for the template id $Param{TemplateID}",
         );
         return;
     }

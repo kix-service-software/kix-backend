@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -90,7 +90,8 @@ sub Run {
 	# get already prepared StandardTemplate data from StandardTemplateGet operation
     if ( IsHashRefWithData(\%StandardTemplateList) ) {  	
         my $StandardTemplateGetResult = $Self->ExecOperation(
-            OperationType => 'V1::StandardTemplate::StandardTemplateGet',
+            OperationType            => 'V1::StandardTemplate::StandardTemplateGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 StandardTemplateID => join(',', sort keys %StandardTemplateList),
             }

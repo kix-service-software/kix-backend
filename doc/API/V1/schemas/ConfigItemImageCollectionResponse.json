@@ -7,7 +7,7 @@
       "Image" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConfigItemImage"
+            "$ref" : "#/definitions/_ConfigItemImage_json"
          }
       }
    },
@@ -15,14 +15,21 @@
       "Image"
    ],
    "definitions" : {
-      "ConfigItemImage" : {
+      "_ConfigItemImage_json" : {
          "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
          "type" : "object",
          "properties" : {
             "Comment" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "ConfigItemID" : {

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -124,33 +124,34 @@ sub Sender {
     if ( $UseAgentRealName && $UseAgentRealName =~ /^(AgentName|AgentNameSystemAddressName)$/ ) {
 
         # get data from current agent
-        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
-            UserID        => $Param{UserID},
-            NoOutOfOffice => 1,
-        );
+        if ($Param{UserID}) {
+            my %ContactData = $Self->{ContactObject}->ContactGet(
+                UserID => $Param{UserID},
+            );
 
-        # set real name with user name
-        if ( $UseAgentRealName eq 'AgentName' ) {
+            # set real name with user name
+            if ($UseAgentRealName eq 'AgentName') {
 
-            # check for user data
-            if ( $UserData{UserLastname} && $UserData{UserFirstname} ) {
+                # check for user data
+                if ($ContactData{Lastname} && $ContactData{Firstname}) {
 
-                # rewrite RealName
-                $Address{RealName} = "$UserData{UserFirstname} $UserData{UserLastname}";
+                    # rewrite RealName
+                    $Address{RealName} = "$ContactData{Firstname} $ContactData{Lastname}";
+                }
             }
-        }
 
-        # set real name with user name
-        if ( $UseAgentRealName eq 'AgentNameSystemAddressName' ) {
+            # set real name with user name
+            if ($UseAgentRealName eq 'AgentNameSystemAddressName') {
 
-            # check for user data
-            if ( $UserData{UserLastname} && $UserData{UserFirstname} ) {
+                # check for user data
+                if ($ContactData{Lastname} && $ContactData{Firstname}) {
 
-                # rewrite RealName
-                my $Separator = ' ' . $ConfigObject->Get('Ticket::DefineEmailFromSeparator')
-                    || '';
-                $Address{RealName} = $UserData{UserFirstname} . ' ' . $UserData{UserLastname}
-                    . $Separator . ' ' . $Address{RealName};
+                    # rewrite RealName
+                    my $Separator = ' ' . $ConfigObject->Get('Ticket::DefineEmailFromSeparator')
+                        || '';
+                    $Address{RealName} = $ContactData{Firstname} . ' ' . $ContactData{Lastname}
+                        . $Separator . ' ' . $Address{RealName};
+                }
             }
         }
     }
@@ -1067,28 +1068,27 @@ sub _Replace {
 
         # EO KIX4OTRS-capeIT
 
-        my %CurrentUser = $UserObject->GetUserData(
+        my %CurrentContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             UserID        => $Param{UserID},
-            NoOutOfOffice => 1,
         );
 
         # html quoting of content
         if ( $Param{RichText} ) {
 
             ATTRIBUTE:
-            for my $Attribute ( sort keys %CurrentUser ) {
-                next ATTRIBUTE if !$CurrentUser{$Attribute};
-                $CurrentUser{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
-                    String => $CurrentUser{$Attribute},
+            for my $Attribute ( sort keys %CurrentContact ) {
+                next ATTRIBUTE if !$CurrentContact{$Attribute};
+                $CurrentContact{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                    String => $CurrentContact{$Attribute},
                 );
             }
         }
 
-        $HashGlobalReplace->( "$Tag|$Tag2", %CurrentUser );
+        $HashGlobalReplace->( "$Tag|$Tag2", %CurrentContact );
 
         # replace other needed stuff
-        $Param{Text} =~ s/$Start KIX_FIRST_NAME $End/$CurrentUser{UserFirstname}/gxms;
-        $Param{Text} =~ s/$Start KIX_LAST_NAME $End/$CurrentUser{UserLastname}/gxms;
+        $Param{Text} =~ s/$Start KIX_FIRST_NAME $End/$CurrentContact{Firstname}/gxms;
+        $Param{Text} =~ s/$Start KIX_LAST_NAME $End/$CurrentContact{Lastname}/gxms;
 
         # cleanup
         $Param{Text} =~ s/$Tag2.+?$End/-/gi;
@@ -1115,21 +1115,25 @@ sub _Replace {
 
     # Dropdown, Checkbox and MultipleSelect DynamicFields, can store values (keys) that are
     # different from the the values to display
-    # <KIX_TICKET_DynamicField_NameX> and
-    # <KIX_TICKET_DynamicField_NameX_Value> returns the display value
-    # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for multiselect fields
+    # <KIX_TICKET_DynamicField_NameX> returns the display value
+    # <KIX_TICKET_DynamicField_NameX_Value> also returns the display value
+    # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for select fields (multiselect, reference)
+    # <KIX_TICKET_DynamicField_NameX_HTML> returns a special HTML display value (e.g. checklist) or default display value
+    # <KIX_TICKET_DynamicField_NameX_Short> returns a short display value (e.g. checklist) or default display value
 
     my %DynamicFields;
 
     # For systems with many Dynamic fields we do not want to load them all unless needed
     # Find what Dynamic Field Values are requested
-    while ( $Param{Text} =~ m/$Tag DynamicField_(\S+?)(_Value|_Key)? $End/gixms ) {
+    while ( $Param{Text} =~ m/$Tag DynamicField_(\S+?)(_Value|_Key|_HTML|_Short)? $End/gixms ) {
         $DynamicFields{$1} = 1;
     }
 
     # to store all the required DynamicField display values
     my %DynamicFieldDisplayValues;
     my %DynamicFieldDisplayKeys;
+    my %DynamicFieldHTMLDisplayValues;
+    my %DynamicFieldShortDisplayValues;
 
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
@@ -1159,45 +1163,55 @@ sub _Replace {
             );
         }
 
-        # get the display value for each dynamic field
-        my $DisplayValue = $DynamicFieldBackendObject->ValueLookup(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            Key                => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
-            LanguageObject     => $LanguageObject,
-        );
-
-        # get the display value (value) for each dynamic field
+        # get the display values for each dynamic field
         my $DisplayValueStrg = $DynamicFieldBackendObject->DisplayValueRender(
             DynamicFieldConfig => $DynamicFieldConfig,
-            Value              => $DisplayValue,
+            Value              => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+            HTMLOutput         => $Param{RichText}
         );
-
-        # fill the DynamicFielsDisplayValues
-        if ($DisplayValueStrg) {
+        if ( IsHashRefWithData($DisplayValueStrg) ) {
             $DynamicFieldDisplayValues{ 'DynamicField_' . $DynamicFieldConfig->{Name} . '_Value' }
                 = $DisplayValueStrg->{Value};
         }
 
-        # get the readable value (key) for each dynamic field
-        my $DisplayKeyStrg = $DynamicFieldBackendObject->ReadableValueRender(
+        # get the display keys for each dynamic field
+        my $DisplayKeyStrg = $DynamicFieldBackendObject->DisplayKeyRender(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
         );
-
-        # fill the DynamicFielsDisplayKeys
-        if ($DynamicFieldConfig && $DynamicFieldConfig->{FieldType}) {
+        if (IsHashRefWithData($DisplayKeyStrg)) {
             $DynamicFieldDisplayKeys{ 'DynamicField_' . $DynamicFieldConfig->{Name} . '_Key' }
                 = $DisplayKeyStrg->{Value};
         }
 
-        # replace ticket content with the value from ReadableValueRender (if any)
+        # get the html display values for each dynamic field
+        my $HTMLDisplayValueStrg = $DynamicFieldBackendObject->HTMLDisplayValueRender(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+        );
+        if ( IsHashRefWithData($HTMLDisplayValueStrg) ) {
+            $DynamicFieldHTMLDisplayValues{ 'DynamicField_' . $DynamicFieldConfig->{Name} . '_HTML' }
+                = $HTMLDisplayValueStrg->{Value};
+        }
+
+        # get the short display values for each dynamic field
+        my $ShortDisplayValueStrg = $DynamicFieldBackendObject->ShortDisplayValueRender(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+        );
+        if ( IsHashRefWithData($ShortDisplayValueStrg) ) {
+            $DynamicFieldShortDisplayValues{ 'DynamicField_' . $DynamicFieldConfig->{Name} . '_Short' }
+                = $ShortDisplayValueStrg->{Value};
+        }
+
+        # replace ticket content with the value from DisplayValueRender (if any - do now and not above, because it overwrite orignal ticket value)
         if ( IsHashRefWithData($DisplayValueStrg) ) {
             $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $DisplayValueStrg->{Value};
         }
     }
 
     # replace it
-    $HashGlobalReplace->( $Tag, %Ticket, %DynamicFieldDisplayValues, %DynamicFieldDisplayKeys );
+    $HashGlobalReplace->( $Tag, %Ticket, %DynamicFieldDisplayValues, %DynamicFieldDisplayKeys, %DynamicFieldHTMLDisplayValues, %DynamicFieldShortDisplayValues );
 
     # COMPAT
     $Param{Text} =~ s/$Start KIX_TICKET_ID $End/$Ticket{TicketID}/gixms;
@@ -1408,18 +1422,20 @@ sub _Replace {
 
                     if (
 
-                        # Check if Customer 'UserEmail' match article data 'From'.
+                        # Check if Contact 'Email' match article data 'From'.
                         # Or check if this is auto response replacement.
                         # Take ticket customer as 'From'.
                         (
-                            $ContactData{UserEmail}
+                            $ContactData{Email}
                             && $Data{From}
-                            && $ContactData{UserEmail} =~ /$Data{From}/
+                            && $ContactData{Email} =~ /$Data{From}/
                         )
                         || $Param{AutoResponse}
                         )
                     {
-                        $From = $Kernel::OM->Get('Kernel::System::Contact')->CustomerName(
+                        $From = $Kernel::OM->Get('Kernel::System::Contact')->_ContactFullname(
+                            Firstname => $ContactData{Firstname},
+                            Lastname => $ContactData{Lastname},
                             UserLogin => $Ticket{ContactID}
                         );
                     }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="dynamic_field">
+        <ColumnAdd Name="customer_visible" Type="SMALLINT" Required="false" Default="0"/>
+    </TableAlter>
+
+</database>

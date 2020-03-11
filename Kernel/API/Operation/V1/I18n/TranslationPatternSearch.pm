@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -93,7 +93,8 @@ sub Run {
 
         # get already prepared Pattern data from TranslationPatternGet operation
         my $PatternGetResult = $Self->ExecOperation(
-            OperationType => 'V1::I18n::TranslationPatternGet',
+            OperationType            => 'V1::I18n::TranslationPatternGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 PatternID => join(',', sort keys %PatternList),
             }

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -99,12 +99,11 @@ perform SysConfigOptionUpdate Operation. This will return the updated SysConfigO
         Data => {
             Option => 'DefaultLanguage',
             SysConfigOption => {
-                Value   => ...                # optional 
-                ValidID => 1                  # optional  
+                Value   => ...                # optional
+                ValidID => 1                  # optional
             }
-	    },
-	);
-    
+        },
+    );
 
     $Result = {
         Success     => 1,                       # 0 or 1
@@ -114,9 +113,8 @@ perform SysConfigOptionUpdate Operation. This will return the updated SysConfigO
             Option  => 123,                     # ID of the updated SysConfigOption 
         },
     };
-   
-=cut
 
+=cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
@@ -133,7 +131,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
         %OptionData,
         Value   => exists $SysConfigOption->{Value} ? $SysConfigOption->{Value} : $OptionData{Value},
-        ValidID => $SysConfigOption->{ValidID} || $OptionData{ValidID},
+        ValidID => exists $SysConfigOption->{ValidID} ? $SysConfigOption->{ValidID} : $OptionData{ValidID},
         UserID  => $Self->{Authorization}->{UserID}
     );
 
@@ -149,6 +147,8 @@ sub Run {
         Option => $Param{Data}->{Option},
     );
 }
+
+1;
 
 =back
 

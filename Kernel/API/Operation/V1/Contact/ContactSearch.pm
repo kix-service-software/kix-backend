@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -100,7 +100,7 @@ sub Run {
                     $Value = '*' . $Value;
                 }
 
-                if ( $SearchItem->{Field} =~ /^(PrimaryOrganisationID|Login)$/g ) {
+                if ( $SearchItem->{Field} =~ /^(PrimaryOrganisationID|Email|Login|AssignedUserID)$/g ) {
                     $SearchParam{ $SearchItem->{Field} } = $Value;
                 }
                 elsif ( $SearchItem->{Field} =~ /^(ValidID)$/g ) {
@@ -165,7 +165,8 @@ sub Run {
 
         # get already prepared Contact data from ContactGet operation
         my $ContactGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Contact::ContactGet',
+            OperationType            => 'V1::Contact::ContactGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 ContactID => join( ',', sort keys %ContactList ),
                 }

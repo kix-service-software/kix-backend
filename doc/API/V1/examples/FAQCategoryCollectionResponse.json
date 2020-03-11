@@ -1,0 +1,28 @@
+{
+    "FAQCategory": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-08-29 13:44:55",
+            "Comment": "Misc articles",
+            "CreateBy": 1,
+            "CreateTime": "2019-08-09 08:13:38",
+            "Fullname": "Misc",
+            "ID": 1,
+            "Name": "Misc",
+            "ParentID": null,
+            "ValidID": 1
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-08-09 08:13:38",
+            "Comment": "KIX related articles",
+            "CreateBy": 1,
+            "CreateTime": "2019-08-09 08:13:38",
+            "Fullname": "KIX",
+            "ID": 2,
+            "Name": "KIX",
+            "ParentID": null,
+            "ValidID": 1
+        }
+    ]
+}

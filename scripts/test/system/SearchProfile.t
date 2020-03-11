@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -282,10 +282,7 @@ my %User = $UserObject->GetUserData(
 $Login = 'new' . $Login;
 $UserObject->UserUpdate(
     UserID        => $UserID,
-    UserFirstname => $User{UserFirstname},
-    UserLastname  => $User{UserLastname},
     UserLogin     => $Login,
-    UserEmail     => $User{UserEmail},
     ValidID       => 1,
     ChangeUserID  => 1,
 );

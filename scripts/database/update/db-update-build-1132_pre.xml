@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Property</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access on object properties (QueueID in tickets).</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    
+    <TableAlter Name="roles">
+        <ColumnAdd Name="usage_context" Required="true" Type="INTEGER" Default="1"/>
+    </TableAlter>
+    
+    <Insert Table="roles">
+        <Data Key="id" Type="AutoIncrement">13</Data>
+        <Data Key="name" Type="Quote">Customer</Data>
+        <Data Key="comments" Type="Quote"></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="usage_context">2</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+    </Insert>
+
+</database>

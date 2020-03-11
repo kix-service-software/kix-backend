@@ -1,6 +1,6 @@
 <!DOCTYPE HTML><html><head><title>KIX 2018 REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.2.1"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
       // --
-// Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+// Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -32,7 +32,7 @@ $(document).ready(function() {
   // add toggle of resource descriptions
   $('.resource-description > h4').each(function(i, item) {
     $(this).parent().hide();
-    $(this).closest('.panel').prepend('<a class="description-toggle toggle" href="#" title="Show or hide description">')
+    $(this).closest('.panel').prepend('<a class="description-toggle toggle" href="#" title="Show or hide description">');
     $(this).closest('.panel').children('a.description-toggle').append($(this).detach());
   });
   $('a.description-toggle').click(function(e) {
@@ -88,7 +88,7 @@ $(document).ready(function() {
   });
 });
       // --
-// Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+// Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -113,7 +113,7 @@ $(document).ready(function() {
      * @return boolean
      */
     function isUrl(string) {
-       var regexp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+       var regexp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
        return regexp.test(string);
     }
   
@@ -144,7 +144,7 @@ $(document).ready(function() {
         if (json.length > 0) {
           html += '[<ol class="json-array">';
           for (var i = 0; i < json.length; ++i) {
-            html += '<li>'
+            html += '<li>';
             // Add toggle button if item is collapsable
             if (!options.noToggle && isCollapsable(json[i])) {
                 html += '<a href class="json-toggle"></a>';
@@ -200,12 +200,12 @@ $(document).ready(function() {
         return this.each(function() {
 
             // Transform to HTML
-            var html = json2html(json, { withQuotes: true, noToggle: true })
+            var html = json2html(json, { withQuotes: true, noToggle: true });
 
             // Insert HTML in target DOM element
             $(this).html(html);    
         });
-    }
+    };
 
     /**
      * jQuery plugin method
@@ -219,7 +219,7 @@ $(document).ready(function() {
       return this.each(function() {
   
         // Transform to HTML
-        var html = json2html(json, options)
+        var html = json2html(json, options);
         if (isCollapsable(json))
           html = '<a href></a>' + html;
   
@@ -259,7 +259,7 @@ $(document).ready(function() {
     </script><style>
       /**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+ * Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
  * --
  * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
  * @copyright c.a.p.e. IT GmbH
@@ -508,7 +508,7 @@ pre code {
 }
       /**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+ * Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
  * --
  * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
  * @copyright c.a.p.e. IT GmbH

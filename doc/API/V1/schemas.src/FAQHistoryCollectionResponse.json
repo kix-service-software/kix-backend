@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#FAQHistoryCollectionResponse",
+  "type": "object",
+  "description": "A list of all FAQ history entries of an FAQ article.",
+  "properties": {
+    "FAQHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "FAQHistory.json"
+      }
+    }
+  },
+  "required": [
+    "FAQHistory"
+  ]  
+}

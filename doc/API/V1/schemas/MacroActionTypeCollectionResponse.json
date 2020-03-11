@@ -7,7 +7,7 @@
       "MacroActionType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/MacroActionType"
+            "$ref" : "#/definitions/_MacroActionType_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "MacroActionType"
    ],
    "definitions" : {
-      "MacroActionType" : {
+      "_MacroActionType_json" : {
          "$id" : "#MacroActionType",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action type object.",

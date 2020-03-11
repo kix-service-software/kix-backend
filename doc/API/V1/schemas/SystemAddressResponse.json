@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "SystemAddress" : {
-         "$ref" : "#/definitions/SystemAddress"
+         "$ref" : "#/definitions/_SystemAddress_json"
       }
    },
    "required" : [
       "SystemAddress"
    ],
    "definitions" : {
-      "SystemAddress" : {
+      "_SystemAddress_json" : {
          "$id" : "#SystemAddress",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The system address object.",

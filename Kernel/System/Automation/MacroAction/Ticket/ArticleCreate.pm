@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -157,10 +157,12 @@ sub Run {
 
     # if "From" is not set use current user
     if ( !$Param{Config}->{From} ) {
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
             UserID => $Param{UserID},
         );
-        $Param{Config}->{From} = $User{UserFullname} . ' <' . $User{UserEmail} . '>';
+        if (IsHashRefWithData(\%Contact)) {
+            $Param{Config}->{From} = $Contact{Fullname} . ' <' . $Contact{Email} . '>';
+        }
     }
 
     $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} || 0,

@@ -30,10 +30,9 @@
 <!-- users -->
     <Insert Table="users">
         <Data Key="id" Type="AutoIncrement">1</Data>
-        <Data Key="first_name" Type="Quote">not</Data>
-        <Data Key="last_name" Type="Quote">assigned</Data>
         <Data Key="login" Type="Quote">admin</Data>
-        <Data Key="email" Type="Quote">admin@localhost</Data>
+        <Data Key="is_agent">1</Data>
+        <Data Key="is_customer">0</Data>
         <Data Key="pw" Type="Quote">ab38eadaeb746599f2c1ee90f8267f31f467347462764a24d71ac1843ee77fe3</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -42,11 +41,45 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
+<!-- contact -->
+    <Insert Table="contact">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="firstname" Type="Quote">not</Data>
+        <Data Key="lastname" Type="Quote">assigned</Data>
+        <Data Key="email" Type="Quote">admin@localhost</Data>
+        <Data Key="user_id">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+<!-- organisation -->
+    <Insert Table="organisation">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="number" Type="Quote">MY_ORGA</Data>
+        <Data Key="name" Type="Quote">My Organisation</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+<!-- contact_organisation -->
+    <Insert Table="contact_organisation">
+        <Data Key="contact_id">1</Data>
+        <Data Key="org_id">1</Data>
+        <Data Key="is_primary">1</Data>
+    </Insert>
+
 <!-- roles -->
     <Insert Table="roles">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">Superuser</Data>
         <Data Key="comments" Type="Quote" Translatable="1">full permissions on everything (CRUD on resource /*)</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -57,6 +90,7 @@
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">System Admin</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to change/edit any system configuration found in the Admin-Module, requires Agent-User role though in order to log in the system</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -67,6 +101,7 @@
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote" Translatable="1">Agent User</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to login in both frontend- and backend application but does not grant any further permissions</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -77,6 +112,7 @@
         <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="name" Type="Quote" Translatable="1">Ticket Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any ticket in any queue and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -87,6 +123,7 @@
         <Data Key="id" Type="AutoIncrement">5</Data>
         <Data Key="name" Type="Quote" Translatable="1">Ticket Agent</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as Ticket Reader, but additionally allows to create new or edit any existing ticket and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -97,6 +134,7 @@
         <Data Key="id" Type="AutoIncrement">6</Data>
         <Data Key="name" Type="Quote" Translatable="1">Ticket Creator</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any information required to create a ticket (queues, types, priorities, etc.), allows to create new tickets and allows to CREATE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -107,6 +145,7 @@
         <Data Key="id" Type="AutoIncrement">7</Data>
         <Data Key="name" Type="Quote" Translatable="1">FAQ Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any FAQ article in any FAQ category and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -117,6 +156,7 @@
         <Data Key="id" Type="AutoIncrement">8</Data>
         <Data Key="name" Type="Quote" Translatable="1">FAQ Editor</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as FAQ Reader, but additionally allows to create new or edit any existing FAQ article and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -127,6 +167,7 @@
         <Data Key="id" Type="AutoIncrement">9</Data>
         <Data Key="name" Type="Quote" Translatable="1">Asset Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any asset information in any asset class and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -137,6 +178,7 @@
         <Data Key="id" Type="AutoIncrement">10</Data>
         <Data Key="name" Type="Quote" Translatable="1">Asset Maintainer</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as Asset-Reader, but additionally  allows to create new or update any existing asset entry and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -147,6 +189,7 @@
         <Data Key="id" Type="AutoIncrement">11</Data>
         <Data Key="name" Type="Quote" Translatable="1">Customer Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read information of any organization or contact and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -157,6 +200,18 @@
         <Data Key="id" Type="AutoIncrement">12</Data>
         <Data Key="name" Type="Quote" Translatable="1">Customer Manager</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as Customer Reader, but additionally allows to create new or update any existing contact or organization entry and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="roles">
+        <Data Key="id" Type="AutoIncrement">13</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Customer</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows the customer to login and read ticket, FAQ and asset data, allows to create FAQ votes, allows to change data of the personal user, allows to set ticket article flags</Data>
+        <Data Key="usage_context">2</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -190,6 +245,16 @@
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">PropertyValue</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1).</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Property</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access on object properties (QueueID in tickets).</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -258,28 +323,6 @@
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/system/config</Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/config/*{SysConfigOption.AccessLevel EQ 'internal'} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel EQ 'internal'}</Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ 'internal'} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ 'internal'}</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -357,17 +400,6 @@
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/system/communication/notifications</Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/dynamicfields -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/dynamicfields</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -567,28 +599,6 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/links</Data>
         <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission CRUD_ on /watchers -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/watchers</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission CRUD_ on /watchers -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/watchers</Data>
-        <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -935,17 +945,6 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "FAQ Reader": permission CRUD_ on /faq/articles/*/votes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/faq/articles/*/votes</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
     <!-- role "FAQ Reader": permission _R___ on /links -->
     <Insert Table="role_permission">
         <Data Key="role_id">7</Data>
@@ -1243,28 +1242,6 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "System Admin": permission CRUD_ on /system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission CRUD_ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
     <!-- role "Superuser": permission CRUD_ on /* -->
     <Insert Table="role_permission">
         <Data Key="role_id">1</Data>
@@ -1276,23 +1253,408 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Superuser": permission CRUD_ on /system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <!-- role "Customer": permission C____ on /auth -->
     <Insert Table="role_permission">
-        <Data Key="role_id">1</Data>
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/auth</Data>
+        <Data Key="value">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /cmdb -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/cmdb</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /contacts -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/contacts</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /faq -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /faq/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /faq/articles -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/articles</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /faq/articles/*{FAQArticle.CustomerVisible EQ 1} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
         <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
+        <Data Key="target" Type="Quote">/faq/articles/*{FAQArticle.CustomerVisible EQ 1}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /faq/articles/*/votes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/articles/*/votes</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /i18n -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/i18n</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /links -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/links</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CRUD_ on /session -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/session</Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Superuser": permission CRUD_ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <!-- role "Customer": permission _R___ on /system -->
     <Insert Table="role_permission">
-        <Data Key="role_id">1</Data>
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/cmdb -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/cmdb</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/cmdb/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/cmdb/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/cmdb/classes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/cmdb/classes</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/communication/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/channels -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/channels</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/notifications -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/notifications</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/sendertypes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/sendertypes</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/systemaddresses -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/systemaddresses</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/faq -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/faq</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/faq/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/faq/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/faq/categories -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/faq/categories</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/ticket -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission C____ on /system/users -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/users</Data>
+        <Data Key="value">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /tickets -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
         <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
-        <Data Key="value">15</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">3</Data>
+        <Data Key="target" Type="Quote">/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /tickets/*/articles -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*/articles/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*/articles/*{Article.CustomerVisible EQ 1} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*{Article.CustomerVisible EQ 1}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">3</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /tickets/*/articles/*/flags -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*/flags</Data>
+        <Data Key="value">3</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -2117,7 +2479,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2163,7 +2525,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">3</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">2</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2399,7 +2761,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">9</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">2</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2460,7 +2822,7 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">10</Data>
-        <Data Key="event_key" Type="Quote">LockID</Data>
+        <Data Key="event_key" Type="Quote">Ticket::LockID</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
     <Insert Table="notification_event_item">
@@ -2502,7 +2864,7 @@
     <Insert Table="notification_event_item">
         <Data Key="notification_id">11</Data>
         <Data Key="event_key" Type="Quote">CreateArticle</Data>
-        <Data Key="event_value" Type="Quote">1</Data>
+        <Data Key="event_value" Type="Quote">0</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">11</Data>
@@ -2806,7 +3168,7 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
 
 <p><strong><span style="font-size:small">Um die Suche zu nutzen</span></strong><span style="font-size:small">, klicken Sie im Modulmen&uuml; </span><span style="font-size:small">(linke Seite)</span><span style="font-size:small"> auf die Lupe. Es &ouml;ffnet sich ein Dialogfenster. Eine n&auml;here n&auml;here Erl&auml;uterung zu den Suchoperatoren finden Sie in der FAQ &quot;Wie suche ich mit KIX </span><span style="font-size:small">Cloud</span><span style="font-size:small">&quot;.</span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -2928,7 +3290,7 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
 
 <p><span style="font-style:normal"><span style="font-weight:normal"><span style="font-size:small">To open<b> the Search dialog</b>, click on the magnifier icon in the modul menu at the left side. You can find this icon also on several other places within the application. For more detailed information about the serach function read the FAQ &bdquo;How to search in KIX 18&ldquo;.</span></span></span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3002,7 +3364,7 @@ z.B.: Der Nutzer m&ouml;chte wissen, wie viele Tickets seit Anfang des Monats i<
 <span style="font-family:Carlito,sans-serif">Alle Tickets zwischen einem eingegebenen Startdatum/-uhrzeit und Enddatum/-uhrzeit werden gefunden. Es ist m&ouml;glich, nur ein Datum oder Datum &amp; Uhrzeit zu suchen<br />
 z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Juli von einem bestimmten Kunden erstellt wurden, wird gefunden, indem der entsprechende Kunde als Suchattribut ausgew&auml;hlt wird und als weiteres Suchattribut &quot;Erstellt&quot; &amp; &quot;zwischen&quot; dem 1.7. und 31.7.</span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3120,7 +3482,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p><span style="font-weight:normal"><span style="color:#000000">You can find tickets in between a given start- and end time. Example: A user wants to know how many tickets appeared for a certain customer in July. Can be found by selecting the customer as search attribute, second attribute: &bdquo;Created at&ldquo; + &bdquo;greater or equal&ldquo; + 1th July, third attribute: &bdquo;Created at&ldquo; + &bdquo;less or equal&ldquo; + 31th July.</span></span></p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3148,7 +3510,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>In der Ticket Detailansicht k&ouml;nnen Sie ein Ticket zum beobachten ausw&auml;hlen und/oder auf sich sperren. Klicken Sie dazu auf das Auge-Symbol (beobachten) oder das Schloss-Symbol (sperren) im Widget Header der Ticketdetailansicht. Ein erneuter klick auf das jeweilige Icon macht diese Aktion r&uuml;ckg&auml;ngig. &Uuml;ber das entsprechende Benachrichtigungsicon im Kopfmen&uuml; k&ouml;nnen Sie Ihre beobachteten und Ihre gesperrten Tickets einsehen.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3176,7 +3538,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>You can find the action to watch and/or lock a ticket in the ticket detail view. Therefore, click the eye-icon (watch) or the lock-icon (lock) in the widget header. Klick the icon again to undo the action. At the right side of the header menu at the very top of the page you can always find the notification icons so see all your watched and locked tickets.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3196,7 +3558,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>Die mit Sternchen markierten Formularfelder sind Pflichtfelder. Über das Fragezeichen vor dem Eingabefeld können Sie kurze Hilfetexte zu diesem Feld aufrufen. Für die Ticketbeschreibung stehen Ihnen Textbausteine zur Verfügung. Nähere Infos dazu finden Sie in der Sidebar Textbausteine. Sie können ein neues Ticket als Notiz anlegen oder eine E-Mail versenden. Nachdem Sie das Formular ausgefüllt und auf Speichern geklickt haben, wird Ihnen Ihr eben erstelltes Ticket in der Ticket Detailansicht angezeigt.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -3216,7 +3578,7 @@ z.B.: Der Nutzer m&ouml;chte sich alle Tickets anzeigen lassen, die im Monat Jul
 
 <p>Forms marked by an asterisk are obligational. Click the question mark in front of form fields to see a short help text about this field. You can use text modules in the ticket description. Further information about how to insert text modules can be found in the text modules sidebar. You can create a new ticket as a note, but also send an email. After filling in the form and saving the ticket, the dialog closes automatically and you can see your ticket in the ticket detailed view.</p>
 ]]></Data>
-        <Data Key="category_id">2</Data>        
+        <Data Key="category_id">2</Data>
         <Data Key="created">current_timestamp</Data>
         <Data Key="created_by">1</Data>
         <Data Key="changed">current_timestamp</Data>
@@ -7907,61 +8269,69 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         <Data Key="class_id">4</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key   => 'SectionGeneral',
-        Name  => 'General Information',
-        Input => {
+        Key              => 'SectionGeneral',
+        Name             => 'General Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'Type',
-                Name       => 'Type',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Type',
+                Name             => 'Type',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type        => 'GeneralCatalog',
                     Class       => 'ITSM::ConfigItem::Computer::Type',
                     Translation => 1,
                 },
             },
             {
-                Key        => 'Vendor',
-                Name       => 'Vendor',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Vendor',
+                Name             => 'Vendor',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 50,
+
                     # example for CI attribute RegEx check...
                     #RegEx             => '^ABC.*',
                     #RegExErrorMessage => 'Value must start with \"ABC\"!',
                 },
             },
             {
-                Key        => 'Model',
-                Name       => 'Model',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Model',
+                Name             => 'Model',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 50,
                 },
             },
             {
-                Key        => 'Location',
-                Name       => 'Location',
-                Searchable => 1,
-                Input      => {
-                    Type                           => 'CIClassReference',
-                    ReferencedCIClassName          =>  ['Location','Building','Room'],
+                Key              => 'Location',
+                Name             => 'Location',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type                  => 'CIClassReference',
+                    ReferencedCIClassName => ['Location', 'Building', 'Room'],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
+
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
                     #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
                 },
             },
             {
-                Key        => 'Description',
-                Name       => 'Description',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Description',
+                Name             => 'Description',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'TextArea',
                 },
                 CountMin     => 0,
@@ -7969,10 +8339,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'Note',
-                Name       => 'Note',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Note',
+                Name             => 'Note',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'TextArea',
                     Required => 1,
                 },
@@ -7980,11 +8351,12 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'Attachment',
-                Name       => 'Attachment',
-                Searchable => 1,
-                Input => {
-                    Type      => 'Attachment',
+                Key              => 'Attachment',
+                Name             => 'Attachment',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -7994,25 +8366,28 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 
     {
-        Key   => 'SectionOwner',
-        Name  => 'Owner Information',
-        Input => {
+        Key              => 'SectionOwner',
+        Name             => 'Owner Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'OwnerOrganisation',
-                Name       => 'Assigned Organisation',
-                Searchable => 1,
-                Input      => {
+                Key              => 'OwnerOrganisation',
+                Name             => 'Assigned Organisation',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Organisation',
                 },
             },
             {
-                Key        => 'OwnerContact',
-                Name       => 'Assigned Contact',
-                Searchable => 1,
-                Input      => {
+                Key              => 'OwnerContact',
+                Name             => 'Assigned Contact',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Contact',
                 },
                 CountMin     => 0,
@@ -8024,104 +8399,113 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 
     {
-        Key   => 'SectionNetwork',
-        Name  => 'Network Information',
-        Input => {
+        Key              => 'SectionNetwork',
+        Name             => 'Network Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
-          {
-              Key        => 'FQDN',
-              Name       => 'FQDN',
-              Searchable => 1,
-              Input      => {
-                  Type      => 'Text',
-                  MaxLength => 100,
-              },
-              CountMin     => 1,
-              CountMax     => 8,
-              CountDefault => 1,
-          },
+            {
+                Key              => 'FQDN',
+                Name             => 'FQDN',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
+                    MaxLength => 100,
+                },
+                CountMin     => 1,
+                CountMax     => 8,
+                CountDefault => 1,
+            },
+            {
+                Key              => 'NIC',
+                Name             => 'Network Interface',
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
+                    MaxLength => 100,
+                    Required  => 1,
+                },
+                CountMin     => 0,
+                CountMax     => 10,
+                CountDefault => 0,
+                Sub          => [
+                    {
+                        Key              => 'IPoverDHCP',
+                        Name             => 'IP over DHCP',
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type        => 'GeneralCatalog',
+                            Class       => 'ITSM::ConfigItem::YesNo',
+                            Translation => 1,
+                            Required    => 1,
+                        },
+                    },
+                    {
+                        Key              => 'IPAddress',
+                        Name             => 'IP Address',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type  => 'Text',
+                            RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+                            RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
+                            MaxLength         => 40,
+                            Required          => 1,
+                        },
+                        CountMin     => 0,
+                        CountMax     => 20,
+                        CountDefault => 0,
+                    },
+                    {
+                        Key              => 'Network',
+                        Name             => 'Network',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type                           => 'CIClassReference',
+                            ReferencedCIClassName          => 'Network',
+                            ReferencedCIClassLinkType      => 'ConnectedTo',
+                            ReferencedCIClassLinkDirection => 'Normal',
 
-          {
-              Key   => 'NIC',
-              Name  => 'Network Interface',
-              Input => {
-                  Type      => 'Text',
-                  MaxLength => 100,
-                  Required  => 1,
-              },
-              CountMin     => 0,
-              CountMax     => 10,
-              CountDefault => 0,
-              Sub          => [
-                  {
-                      Key   => 'IPoverDHCP',
-                      Name  => 'IP over DHCP',
-                      Input => {
-                          Type        => 'GeneralCatalog',
-                          Class       => 'ITSM::ConfigItem::YesNo',
-                          Translation => 1,
-                          Required    => 1,
-                      },
-                  },
-                  {
-                      Key        => 'IPAddress',
-                      Name       => 'IP Address',
-                      Searchable => 1,
-                      Input      => {
-                          Type      => 'Text',
-                          RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                          RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
-                          MaxLength => 40,
-                          Required  => 1,
-                      },
-                      CountMin     => 0,
-                      CountMax     => 20,
-                      CountDefault => 0,
-                  },
-                  {
-                      Key        => 'Network',
-                      Name       => 'Network',
-                      Searchable => 1,
-                      Input      => {
-                          Type                           => 'CIClassReference',
-                          ReferencedCIClassName          => 'Network',
-                          ReferencedCIClassLinkType      => 'ConnectedTo',
-                          ReferencedCIClassLinkDirection => 'Normal',
-                          # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
-                          #ReferencedCIClassReferenceAttributeKey => '',
-                      },
-                      CountMin     => 0,
-                      CountMax     => 1,
-                      CountDefault => 0,
-                  },
-              ],
-          },
+                            # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
+                            #ReferencedCIClassReferenceAttributeKey => '',
+                        },
+                        CountMin     => 0,
+                        CountMax     => 1,
+                        CountDefault => 0,
+                    },
+                ],
+            },
         ],
     },
 
 
     {
-        Key   => 'SectionHardware',
-        Name  => 'Hardware Information',
-        Input => {
+        Key              => 'SectionHardware',
+        Name             => 'Hardware Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'SerialNumber',
-                Name       => 'Serial Number',
-                Searchable => 1,
-                Input      => {
+                Key              => 'SerialNumber',
+                Name             => 'Serial Number',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                 },
             },
             {
-                Key   => 'CPU',
-                Name  => 'CPU',
-                Input => {
+                Key              => 'CPU',
+                Name             => 'CPU',
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                 },
@@ -8130,9 +8514,10 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 1,
             },
             {
-                Key   => 'RAM',
-                Name  => 'RAM',
-                Input => {
+                Key              => 'RAM',
+                Name             => 'RAM',
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                 },
@@ -8140,9 +8525,10 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountMax     => 8,
             },
             {
-                Key   => 'HardDisk',
-                Name  => 'Hard Disk',
-                Input => {
+                Key              => 'HardDisk',
+                Name             => 'Hard Disk',
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                 },
@@ -8150,9 +8536,10 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountMax     => 8,
                 Sub          => [
                     {
-                        Key   => 'Capacity',
-                        Name  => 'Capacity',
-                        Input => {
+                        Key              => 'Capacity',
+                        Name             => 'Capacity',
+                        CustomerVisible  => 0,
+                        Input            => {
                             Type      => 'Text',
                             MaxLength => 10,
                         },
@@ -8160,9 +8547,10 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 ],
             },
             {
-                Key   => 'GraphicAdapter',
-                Name  => 'Graphic Adapter',
-                Input => {
+                Key              => 'GraphicAdapter',
+                Name             => 'Graphic Adapter',
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                 },
@@ -8171,9 +8559,10 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key   => 'OtherEquipment',
-                Name  => 'Other Equipment',
-                Input => {
+                Key              => 'OtherEquipment',
+                Name             => 'Other Equipment',
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'TextArea',
                     Required => 1,
                 },
@@ -8185,32 +8574,37 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 
     {
-        Key   => 'SectionSoftware',
-        Name  => 'Software Information',
-        Input => {
+        Key              => 'SectionSoftware',
+        Name             => 'Software Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key   => 'OperatingSystem',
-                Name  => 'Operating System',
-                Input => {
+                Key              => 'OperatingSystem',
+                Name             => 'Operating System',
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                 },
             },
             {
-                Key        => 'InstalledSoftware',
-                Name       => 'Installed Software',
-                Searchable => 1,
-                Input      => {
+                Key              => 'InstalledSoftware',
+                Name             => 'Installed Software',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type                           => 'CIClassReference',
                     ReferencedCIClassName          => 'Software',
                     ReferencedCIClassLinkType      => 'RelevantTo',
                     ReferencedCIClassLinkDirection => 'Normal',
+
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
                     #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
                     SearchInputType => 'AutoComplete',
+
                     # enables detailed CI-search (not just auto complete on CI-name/-number)
                     #ActivateExtendedSearch => 1,
                 },
@@ -8223,27 +8617,30 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 
     {
-        Key   => 'SectionWarranty',
-        Name  => 'Warranty Information',
-        Input => {
+        Key              => 'SectionWarranty',
+        Name             => 'Warranty Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'WarrantyExpirationDate',
-                Name       => 'Warranty Expiration Date',
-                Searchable => 1,
-                Input      => {
+                Key              => 'WarrantyExpirationDate',
+                Name             => 'Warranty Expiration Date',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type             => 'Date',
                     YearPeriodPast   => 20,
                     YearPeriodFuture => 10,
                 },
             },
             {
-                Key        => 'FirstUsageDate',
-                Name       => 'First Usage Date',
-                Searchable => 1,
-                Input      => {
+                Key              => 'FirstUsageDate',
+                Name             => 'First Usage Date',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type             => 'Date',
                     Required         => 1,
                     YearPeriodPast   => 20,
@@ -8252,7 +8649,6 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
             },
         ],
     },
-
 ];</Data>
         <Data Key="version">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -8263,60 +8659,69 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         <Data Key="class_id">5</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key   => 'SectionGeneral',
-        Name  => 'General Information',
-        Input => {
+        Key              => 'SectionGeneral',
+        Name             => 'General Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'Type',
-                Name       => 'Type',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Type',
+                Name             => 'Type',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type        => 'GeneralCatalog',
                     Class       => 'ITSM::ConfigItem::Hardware::Type',
                     Translation => 1,
                 },
             },
             {
-                Key        => 'Vendor',
-                Name       => 'Vendor',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Vendor',
+                Name             => 'Vendor',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 50,
+
                     # example for CI attribute RegEx check...
                     #RegEx             => '^ABC.*',
                     #RegExErrorMessage => 'Value must start with \"ABC\"!',
                 },
             },
             {
-                Key        => 'Model',
-                Name       => 'Model',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Model',
+                Name             => 'Model',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 50,
                 },
             },
             {
-                Key        => 'Location',
-                Name       => 'Location',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Location',
+                Name             => 'Location',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type                           => 'CIClassReference',
-                    ReferencedCIClassName          =>  ['Location','Building','Room'],
+                    ReferencedCIClassName          => [ 'Location', 'Building', 'Room' ],
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
+
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
                     #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
-                },            },
+                },
+            },
             {
-                Key        => 'Description',
-                Name       => 'Description',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Description',
+                Name             => 'Description',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'TextArea',
                 },
                 CountMin     => 0,
@@ -8324,10 +8729,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'Note',
-                Name       => 'Note',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Note',
+                Name             => 'Note',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'TextArea',
                     Required => 1,
                 },
@@ -8335,11 +8741,12 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'Attachment',
-                Name       => 'Attachment',
-                Searchable => 1,
-                Input => {
-                    Type      => 'Attachment',
+                Key              => 'Attachment',
+                Name             => 'Attachment',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type => 'Attachment',
                 },
                 CountMin => 0,
                 CountMax => 5,
@@ -8349,25 +8756,28 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 
     {
-        Key   => 'SectionOwner',
-        Name  => 'Owner Information',
-        Input => {
+        Key              => 'SectionOwner',
+        Name             => 'Owner Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'OwnerOrganisation',
-                Name       => 'Assigned Organisation',
-                Searchable => 1,
-                Input      => {
+                Key              => 'OwnerOrganisation',
+                Name             => 'Assigned Organisation',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Organisation',
                 },
             },
             {
-                Key        => 'OwnerContact',
-                Name       => 'Assigned Contact',
-                Searchable => 1,
-                Input      => {
+                Key              => 'OwnerContact',
+                Name             => 'Assigned Contact',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Contact',
                 },
                 CountMin     => 0,
@@ -8379,110 +8789,120 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 
     {
-        Key   => 'SectionNetwork',
-        Name  => 'Network Information',
-        Input => {
+        Key              => 'SectionNetwork',
+        Name             => 'Network Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
-          {
-              Key        => 'FQDN',
-              Name       => 'FQDN',
-              Searchable => 1,
-              Input      => {
-                  Type      => 'Text',
-                  MaxLength => 100,
-              },
-              CountMin     => 1,
-              CountMax     => 8,
-              CountDefault => 1,
-          },
+            {
+                Key              => 'FQDN',
+                Name             => 'FQDN',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
+                    MaxLength => 100,
+                },
+                CountMin     => 1,
+                CountMax     => 8,
+                CountDefault => 1,
+            },
 
-          {
-              Key   => 'NIC',
-              Name  => 'Network Adapter',
-              Input => {
-                  Type      => 'Text',
-                  MaxLength => 100,
-                  Required  => 1,
-              },
-              CountMin     => 0,
-              CountMax     => 10,
-              CountDefault => 1,
-              Sub          => [
-                  {
-                      Key   => 'IPoverDHCP',
-                      Name  => 'IP over DHCP',
-                      Input => {
-                          Type        => 'GeneralCatalog',
-                          Class       => 'ITSM::ConfigItem::YesNo',
-                          Translation => 1,
-                          Required    => 1,
-                      },
-                  },
-                  {
-                      Key        => 'IPAddress',
-                      Name       => 'IP Address',
-                      Searchable => 1,
-                      Input      => {
-                          Type      => 'Text',
-                          RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
-                          RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
-                          MaxLength => 40,
-                          Required  => 1,
-                      },
-                      CountMin     => 0,
-                      CountMax     => 20,
-                      CountDefault => 0,
-                  },
-                  {
-                      Key        => 'Network',
-                      Name       => 'Network',
-                      Searchable => 1,
-                      Input      => {
-                          Type                           => 'CIClassReference',
-                          ReferencedCIClassName          => 'Network',
-                          ReferencedCIClassLinkType      => 'ConnectedTo',
-                          ReferencedCIClassLinkDirection => 'Normal',
-                          # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
-                          #ReferencedCIClassReferenceAttributeKey => '',
-                      },
-                      CountMin     => 0,
-                      CountMax     => 1,
-                      CountDefault => 0,
-                  },
-              ],
-          },
+            {
+                Key              => 'NIC',
+                Name             => 'Network Adapter',
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
+                    MaxLength => 100,
+                    Required  => 1,
+                },
+                CountMin     => 0,
+                CountMax     => 10,
+                CountDefault => 1,
+                Sub          => [
+                    {
+                        Key              => 'IPoverDHCP',
+                        Name             => 'IP over DHCP',
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type        => 'GeneralCatalog',
+                            Class       => 'ITSM::ConfigItem::YesNo',
+                            Translation => 1,
+                            Required    => 1,
+                        },
+                    },
+                    {
+                        Key              => 'IPAddress',
+                        Name             => 'IP Address',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type              => 'Text',
+                            RegEx             => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+                            RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
+                            MaxLength         => 40,
+                            Required          => 1,
+                        },
+                        CountMin     => 0,
+                        CountMax     => 20,
+                        CountDefault => 0,
+                    },
+                    {
+                        Key              => 'Network',
+                        Name             => 'Network',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type                           => 'CIClassReference',
+                            ReferencedCIClassName          => 'Network',
+                            ReferencedCIClassLinkType      => 'ConnectedTo',
+                            ReferencedCIClassLinkDirection => 'Normal',
+
+                            # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
+                            #ReferencedCIClassReferenceAttributeKey => '',
+                        },
+                        CountMin     => 0,
+                        CountMax     => 1,
+                        CountDefault => 0,
+                    },
+                ],
+            },
         ],
     },
 
 
     {
-        Key   => 'SectionHardware',
-        Name  => 'Hardware Information',
-        Input => {
+        Key              => 'SectionHardware',
+        Name             => 'Hardware Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'SerialNumber',
-                Name       => 'Serial Number',
-                Searchable => 1,
-                Input      => {
+                Key              => 'SerialNumber',
+                Name             => 'Serial Number',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                 },
             },
             {
-                Key   => 'FirmwareVersion',
-                Name  => 'Firmware Version',
-                Input => {
+                Key              => 'FirmwareVersion',
+                Name             => 'Firmware Version',
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 100,
                     Required  => 1,
                 },
-                CountMin => 0,
-                CountMax => 1,
+                CountMin     => 0,
+                CountMax     => 1,
                 CountDefault => 1,
             },
         ],
@@ -8490,27 +8910,30 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
 
 
     {
-        Key   => 'SectionWarranty',
-        Name  => 'Warranty Information',
-        Input => {
+        Key              => 'SectionWarranty',
+        Name             => 'Warranty Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'WarrantyExpirationDate',
-                Name       => 'Warranty Expiration Date',
-                Searchable => 1,
-                Input      => {
+                Key              => 'WarrantyExpirationDate',
+                Name             => 'Warranty Expiration Date',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type             => 'Date',
                     YearPeriodPast   => 20,
                     YearPeriodFuture => 10,
                 },
             },
             {
-                Key        => 'FirstUsageDate',
-                Name       => 'First Usage Date',
-                Searchable => 1,
-                Input      => {
+                Key              => 'FirstUsageDate',
+                Name             => 'First Usage Date',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type             => 'Date',
                     Required         => 1,
                     YearPeriodPast   => 20,
@@ -8530,26 +8953,29 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         <Data Key="class_id">6</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key => 'SectionGeneral',
-        Name  => 'General Information',
-        Input => {
+        Key              => 'SectionGeneral',
+        Name             => 'General Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'GLN',
-                Name       => 'Global Location Number',
-                Searchable => 1,
-                Input      => {
-                    Type => 'Text',
+                Key              => 'GLN',
+                Name             => 'Global Location Number',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
                     MaxLength => 13,
                 },
             },
             {
-                Key => 'Note',
-                Name       => 'Note',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Note',
+                Name             => 'Note',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'TextArea',
                     Required => 1,
                 },
@@ -8558,10 +8984,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key => 'Attachment',
-                Name       => 'Attachment',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Attachment',
+                Name             => 'Attachment',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Attachment',
                 },
                 CountMin => 0,
@@ -8570,25 +8997,28 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         ],
     },
     {
-        Key   => 'SectionAddress',
-        Name  => 'Address Information',
-        Input => {
+        Key              => 'SectionAddress',
+        Name             => 'Address Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'Street',
-                Name       => 'Street',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Street',
+                Name             => 'Street',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Text',
                 },
             },
             {
-                Key        => 'Street2',
-                Name       => 'Street 2',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Street2',
+                Name             => 'Street 2',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 0,
                 },
@@ -8597,26 +9027,29 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'City',
-                Name       => 'City',
-                Searchable => 1,
-                Input      => {
+                Key              => 'City',
+                Name             => 'City',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Text',
                 },
             },
             {
-                Key        => 'ZIP',
-                Name       => 'ZIP',
-                Searchable => 1,
-                Input      => {
+                Key              => 'ZIP',
+                Name             => 'ZIP',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Text',
                 },
             },
             {
-                Key        => 'Region',
-                Name       => 'Region',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Region',
+                Name             => 'Region',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 0,
                 },
@@ -8625,10 +9058,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'Country',
-                Name       => 'Country',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Country',
+                Name             => 'Country',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 1,
                 },
@@ -8640,27 +9074,30 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     },
 
     {
-        Key => 'SectionContacts',
-        Name  => 'Contact Information',
-        Input => {
+        Key              => 'SectionContacts',
+        Name             => 'Contact Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key => 'ContactRole',
-                Name       => 'Contact Role',
-                Searchable => 1,
-                Input      => {
+                Key              => 'ContactRole',
+                Name             => 'Contact Role',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 1,
                 },
                 Sub => [
                     {
-                        Key => 'Contact',
-                        Name       => 'Contact',
-                        Searchable => 1,
-                        Input      => {
-                            Type     => 'Contact',
+                        Key              => 'Contact',
+                        Name             => 'Contact',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type => 'Contact',
                         },
                     },
                 ],
@@ -8680,22 +9117,25 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         <Data Key="class_id">7</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key => 'SectionGeneral',
-        Name  => 'General Information',
-        Input => {
+        Key              => 'SectionGeneral',
+        Name             => 'General Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'ParentLocation',
-                Name       => 'Parent Location',
-                Searchable => 1,
-                Input      => {
+                Key              => 'ParentLocation',
+                Name             => 'Parent Location',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Required                       => 1,
                     Type                           => 'CIClassReference',
                     ReferencedCIClassName          => 'Location',
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
+
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
                     #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
                 },
@@ -8704,19 +9144,21 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'GLN',
-                Name       => 'Global Location Number',
-                Searchable => 1,
-                Input      => {
-                    Type => 'Text',
+                Key              => 'GLN',
+                Name             => 'Global Location Number',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
                     MaxLength => 13,
                 },
             },
             {
-                Key => 'Note',
-                Name       => 'Note',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Note',
+                Name             => 'Note',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'TextArea',
                     Required => 1,
                 },
@@ -8725,10 +9167,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key => 'Attachment',
-                Name       => 'Attachment',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Attachment',
+                Name             => 'Attachment',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Attachment',
                 },
                 CountMin => 0,
@@ -8737,28 +9180,31 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         ],
     },
     {
-        Key   => 'SectionAddress',
-        Name  => 'Address Information',
-        Input => {
+        Key              => 'SectionAddress',
+        Name             => 'Address Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
-        CountMin => 0,
-        CountMax => 1,
+        CountMin     => 0,
+        CountMax     => 1,
         CountDefault => 0,
-        Sub => [
+        Sub          => [
             {
-                Key        => 'Street',
-                Name       => 'Street',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Street',
+                Name             => 'Street',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Text',
                 },
             },
             {
-                Key        => 'Street2',
-                Name       => 'Street 2',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Street2',
+                Name             => 'Street 2',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 1,
                 },
@@ -8767,26 +9213,29 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'City',
-                Name       => 'City',
-                Searchable => 1,
-                Input      => {
+                Key              => 'City',
+                Name             => 'City',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Text',
                 },
             },
             {
-                Key        => 'ZIP',
-                Name       => 'ZIP',
-                Searchable => 1,
-                Input      => {
+                Key              => 'ZIP',
+                Name             => 'ZIP',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Text',
                 },
             },
             {
-                Key        => 'Region',
-                Name       => 'Region',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Region',
+                Name             => 'Region',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 0,
                 },
@@ -8795,10 +9244,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'Country',
-                Name       => 'Country',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Country',
+                Name             => 'Country',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 0,
                 },
@@ -8810,27 +9260,30 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     },
 
     {
-        Key => 'SectionContacts',
-        Name  => 'Contact Information',
-        Input => {
+        Key              => 'SectionContacts',
+        Name             => 'Contact Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key => 'ContactRole',
-                Name       => 'Contact Role',
-                Searchable => 1,
-                Input      => {
+                Key              => 'ContactRole',
+                Name             => 'Contact Role',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 1,
                 },
                 Sub => [
                     {
-                        Key => 'Contact',
-                        Name       => 'Contact',
-                        Searchable => 1,
-                        Input      => {
-                            Type     => 'Contact',
+                        Key              => 'Contact',
+                        Name             => 'Contact',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type => 'Contact',
                         },
                     },
                 ],
@@ -8850,22 +9303,25 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         <Data Key="class_id">8</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key   => 'SectionGeneral',
-        Name  => 'General Information',
-        Input => {
+        Key              => 'SectionGeneral',
+        Name             => 'General Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key => 'ParentLocation',
-                Name       => 'Building',
-                Searchable => 1,
-                Input      => {
+                Key              => 'ParentLocation',
+                Name             => 'Building',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Required                       => 1,
                     Type                           => 'CIClassReference',
                     ReferencedCIClassName          => 'Building',
                     ReferencedCIClassLinkType      => 'Includes',
                     ReferencedCIClassLinkDirection => 'Reverse',
+
                     # defines reference attribute key from Ref.-CI-Class which should be used as identifier during the import, if not name or CI-number
                     #ReferencedCIClassReferenceAttributeKey => 'SerialNumber',
                 },
@@ -8874,39 +9330,43 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key        => 'RoomType',
-                Name       => 'Room Type',
-                Searchable => 1,
-                Input      => {
-                    Type => 'Text',
+                Key              => 'RoomType',
+                Name             => 'Room Type',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
                     MaxLength => 50,
                 },
             },
             {
-                Key        => 'Floor',
-                Name       => 'Floor',
-                Searchable => 1,
-                Input      => {
-                    Type => 'Text',
-                    MaxLength => 50,
+                Key              => 'Floor',
+                Name             => 'Floor',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type              => 'Text',
+                    MaxLength         => 50,
                     RegEx             => '\d',
                     RegExErrorMessage => 'Please enter decimal numbers only.',
                 },
             },
             {
-                Key        => 'RoomLabel',
-                Name       => 'Room Label',
-                Searchable => 1,
-                Input      => {
-                    Type => 'Text',
+                Key              => 'RoomLabel',
+                Name             => 'Room Label',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
+                    Type      => 'Text',
                     MaxLength => 50,
                 },
             },
             {
-                Key => 'Note',
-                Name       => 'Note',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Note',
+                Name             => 'Note',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'TextArea',
                     Required => 1,
                 },
@@ -8915,10 +9375,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
             },
             {
-                Key => 'Attachment',
-                Name       => 'Attachment',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Attachment',
+                Name             => 'Attachment',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Attachment',
                 },
                 CountMin => 0,
@@ -8928,30 +9389,33 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     },
 
     {
-        Key => 'SectionContacts',
-        Name  => 'Contact Information',
-        Input => {
+        Key              => 'SectionContacts',
+        Name             => 'Contact Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         CountMin     => 0,
         CountMax     => 1,
         CountDefault => 0,
-        Sub => [
+        Sub          => [
             {
-                Key => 'ContactRole',
-                Name       => 'Contact Role',
-                Searchable => 1,
-                Input      => {
+                Key              => 'ContactRole',
+                Name             => 'Contact Role',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type     => 'Text',
                     Required => 1,
                 },
                 Sub => [
                     {
-                        Key => 'Contact',
-                        Name       => 'Contact',
-                        Searchable => 1,
-                        Input      => {
-                            Type     => 'Contact',
+                        Key              => 'Contact',
+                        Name             => 'Contact',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
+                            Type => 'Contact',
                         },
                     },
                 ],
@@ -8971,57 +9435,62 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         <Data Key="class_id">9</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key        => 'Type',
-        Name       => 'Type',
-        Searchable => 1,
-        Input      => {
+        Key              => 'Type',
+        Name             => 'Type',
+        Searchable       => 1,
+        CustomerVisible  => 0,
+        Input            => {
             Type        => 'GeneralCatalog',
             Class       => 'ITSM::ConfigItem::Network::Type',
             Translation => 1,
         },
     },
     {
-        Key        => 'Description',
-        Name       => 'Description',
-        Searchable => 1,
-        Input      => {
+        Key              => 'Description',
+        Name             => 'Description',
+        Searchable       => 1,
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'TextArea',
         },
     },
     {
-        Key        => 'NetworkAddress',
-        Name       => 'Network Address',
-        Searchable => 1,
-        Input      => {
-            Type      => 'Text',
-            RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+        Key              => 'NetworkAddress',
+        Name             => 'Network Address',
+        Searchable       => 1,
+        CustomerVisible  => 0,
+        Input            => {
+            Type              => 'Text',
+            RegEx             => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
             RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
-            MaxLength => 20,
-            Required  => 1,
+            MaxLength         => 20,
+            Required          => 1,
         },
         CountMin     => 0,
         CountMax     => 100,
         CountDefault => 1,
         Sub          => [
             {
-                Key   => 'SubnetMask',
-                Name  => 'Subnet Mask',
-                Input => {
-                    Type         => 'Text',
-                    RegEx => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+                Key              => 'SubnetMask',
+                Name             => 'Subnet Mask',
+                CustomerVisible  => 0,
+                Input            => {
+                    Type              => 'Text',
+                    RegEx             => '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
                     RegExErrorMessage => 'Please enter a valid IPv4 address in form 123.123.123.123.',
-                    MaxLength    => 20,
-                    ValueDefault => '255.255.255.0',
-                    Required     => 1,
+                    MaxLength         => 20,
+                    ValueDefault      => '255.255.255.0',
+                    Required          => 1,
                 },
                 CountMin     => 0,
                 CountMax     => 1,
                 CountDefault => 0,
             },
             {
-                Key   => 'Gateway',
-                Name  => 'Gateway',
-                Input => {
+                Key              => 'Gateway',
+                Name             => 'Gateway',
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 20,
                     Required  => 1,
@@ -9033,10 +9502,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         ],
     },
     {
-        Key        => 'Note',
-        Name       => 'Note',
-        Searchable => 1,
-        Input      => {
+        Key              => 'Note',
+        Name             => 'Note',
+        Searchable       => 1,
+        CustomerVisible  => 0,
+        Input            => {
             Type     => 'TextArea',
             Required => 1,
         },
@@ -9054,45 +9524,50 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
         <Data Key="class_id">10</Data>
         <Data Key="configitem_definition" Type="Quote">[
     {
-        Key   => 'SectionGeneral',
-        Name  => 'General Information',
-        Input => {
+        Key              => 'SectionGeneral',
+        Name             => 'General Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'Type',
-                Name       => 'Type',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Type',
+                Name             => 'Type',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type        => 'GeneralCatalog',
                     Class       => 'ITSM::ConfigItem::Software::Type',
                     Translation => 1,
                 },
             },
             {
-                Key        => 'Vendor',
-                Name       => 'Vendor',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Vendor',
+                Name             => 'Vendor',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 50,
                 },
             },
             {
-                Key        => 'Product',
-                Name       => 'Product',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Product',
+                Name             => 'Product',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 50,
                 },
                 Sub => [
                     {
-                        Key        => 'Version',
-                        Name       => 'Version',
-                        Searchable => 1,
-                        Input      => {
+                        Key              => 'Version',
+                        Name             => 'Version',
+                        Searchable       => 1,
+                        CustomerVisible  => 0,
+                        Input            => {
                             Type      => 'Text',
                             MaxLength => 50,
                         },
@@ -9103,10 +9578,11 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 ],
             },
             {
-                Key        => 'Description',
-                Name       => 'Description',
-                Searchable => 1,
-                Input      => {
+                Key              => 'Description',
+                Name             => 'Description',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'TextArea',
                 },
                 CountMin     => 0,
@@ -9117,25 +9593,28 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     },
 
     {
-        Key   => 'SectionOwner',
-        Name  => 'Owner Information',
-        Input => {
+        Key              => 'SectionOwner',
+        Name             => 'Owner Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'OwnerOrganisation',
-                Name       => 'Assigned Organisation',
-                Searchable => 1,
-                Input      => {
+                Key              => 'OwnerOrganisation',
+                Name             => 'Assigned Organisation',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Organisation',
                 },
             },
             {
-                Key        => 'OwnerContact',
-                Name       => 'Assigned Contact',
-                Searchable => 1,
-                Input      => {
+                Key              => 'OwnerContact',
+                Name             => 'Assigned Contact',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type => 'Contact',
                 },
                 CountMin     => 0,
@@ -9146,27 +9625,30 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     },
 
     {
-        Key   => 'SectionLicense',
-        Name  => 'License Information',
-        Input => {
+        Key              => 'SectionLicense',
+        Name             => 'License Information',
+        CustomerVisible  => 0,
+        Input            => {
             Type => 'Dummy',
         },
         Sub => [
             {
-                Key        => 'LicenceType',
-                Name       => 'Licence Type',
-                Searchable => 1,
-                Input      => {
+                Key              => 'LicenceType',
+                Name             => 'Licence Type',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type        => 'GeneralCatalog',
                     Class       => 'ITSM::ConfigItem::Software::LicenceType',
                     Translation => 1,
                 },
             },
             {
-                Key        => 'LicenceKey',
-                Name       => 'License Key',
-                Searchable => 1,
-                Input      => {
+                Key              => 'LicenceKey',
+                Name             => 'License Key',
+                Searchable       => 1,
+                CustomerVisible  => 0,
+                Input            => {
                     Type      => 'Text',
                     MaxLength => 50,
                     Required  => 1,
@@ -9176,10 +9658,12 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                 CountDefault => 0,
                 Sub          => [
                     {
-                        Key   => 'Quantity',
-                        Name  => 'Quantity',
-                        Input => {
+                        Key              => 'Quantity',
+                        Name             => 'Quantity',
+                        CustomerVisible  => 0,
+                        Input            => {
                             Type => 'Text',
+
                             # enforce integer input by using regex...
                             RegEx             => '^(?:(?:\d*))$',
                             RegExErrorMessage => 'Please enter decimal numbers only.',
@@ -9191,9 +9675,10 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
                         CountDefault => 0,
                     },
                     {
-                        Key   => 'ExpirationDate',
-                        Name  => 'Expiration Date',
-                        Input => {
+                        Key              => 'ExpirationDate',
+                        Name             => 'Expiration Date',
+                        CustomerVisible  => 0,
+                        Input            => {
                             Type             => 'Date',
                             Required         => 1,
                             YearPeriodPast   => 20,
@@ -9209,23 +9694,25 @@ DyGEJxgqFwJKAAAAAElFTkSuQmCC
     },
 
     {
-        Key        => 'Note',
-        Name       => 'Note',
-        Searchable => 1,
-        Input      => {
+        Key              => 'Note',
+        Name             => 'Note',
+        Searchable       => 1,
+        CustomerVisible  => 0,
+        Input            => {
             Type     => 'TextArea',
             Required => 1,
         },
         CountMin     => 0,
         CountMax     => 1,
         CountDefault => 0,
-    },
-    {
-        Key        => 'Attachment',
-        Name       => 'Attachment',
-        Searchable => 1,
-        Input => {
-            Type      => 'Attachment',
+        },
+        {
+        Key              => 'Attachment',
+        Name             => 'Attachment',
+        Searchable       => 1,
+        CustomerVisible  => 0,
+        Input            => {
+            Type => 'Attachment',
         },
         CountMin => 0,
         CountMax => 5,
@@ -9342,9 +9829,9 @@ vielen Dank für Ihre Nachricht.
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="internal_field">1</Data>
-        <Data Key="name" Type="Quote" Translatable="1">MobileProcessingState</Data>
+        <Data Key="name" Type="Quote" Translatable="0">MobileProcessingState</Data>
         <Data Key="label" Type="Quote" Translatable="1">Mobile Processing</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">Dropdown</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Multiselect</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
@@ -9376,7 +9863,7 @@ TranslatableValues: '1'
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="internal_field">1</Data>
-        <Data Key="name" Type="Quote" Translatable="1">RiskAssumptionRemark</Data>
+        <Data Key="name" Type="Quote" Translatable="0">RiskAssumptionRemark</Data>
         <Data Key="label" Type="Quote" Translatable="1">Risk Assumption Remark</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
@@ -9397,18 +9884,16 @@ DefaultValue: ''
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="internal_field">1</Data>
-        <Data Key="name" Type="Quote" Translatable="1">MobileProcessingChecklist010</Data>
+        <Data Key="name" Type="Quote" Translatable="0">MobileProcessingChecklist010</Data>
         <Data Key="label" Type="Quote" Translatable="1">Checklist 01</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">CheckList</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 ---
-TTL: ''
 CountMin: '1'
 CountMax: '1'
 CountDefault: '1'
-Link: ''
 ItemSeparator: ''
 Cols: ''
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n 
@@ -9441,28 +9926,48 @@ Rows: ''
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="internal_field">1</Data>
-        <Data Key="name" Type="Quote" Translatable="1">MobileProcessingChecklist020</Data>
+        <Data Key="name" Type="Quote" Translatable="0">MobileProcessingChecklist020</Data>
         <Data Key="label" Type="Quote" Translatable="1">Checklist 02</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">CheckList</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
-TTL: ''
 CountMin: '1'
 CountMax: '1'
 CountDefault: '1'
-Link: ''
 ItemSeparator: ''
-Cols: ''
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
   \ {\r\n    \"id\": \"200\",\r\n    \"title\": \"task 2\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
   \ {\r\n    \"id\": \"300\",\r\n    \"title\": \"task 3\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  }\r\n]"
-RegExList: []
-Rows: ''
         ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+<!-- EO dynamic fields for use in app -->
+
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="internal_field">0</Data>
+        <Data Key="name" Type="Quote" Translatable="0">AffectedAsset</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Affected Asset</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">ITSMConfigItemReference</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="displaygroup_id">0</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+CountMin: 0
+CountMax: 15
+CountDefault: 0
+DefaultValue: ''
+DeploymentStates: []
+ITSMConfigItemClasses: []
+ItemSeparator: ', '
+    ]]></Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
