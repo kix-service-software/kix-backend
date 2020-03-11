@@ -90,7 +90,8 @@ sub Run {
 	# get already prepared StandardAttachment data from StandardAttachmentGet operation
     if ( IsHashRefWithData(\%StandardAttachmentList) ) {  	
         my $StandardAttachmentGetResult = $Self->ExecOperation(
-            OperationType => 'V1::StandardAttachment::StandardAttachmentGet',
+            OperationType            => 'V1::StandardAttachment::StandardAttachmentGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 AttachmentID => join(',', sort keys %StandardAttachmentList),
             }

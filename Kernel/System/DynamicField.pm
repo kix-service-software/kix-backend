@@ -124,7 +124,7 @@ sub DynamicFieldAdd {
         return;
     }
 
-    # Check CustomerVisible
+    # check CustomerVisible
     $Param{CustomerVisible} = $Param{CustomerVisible} ? 1 : 0;
 
     # get database object
@@ -219,20 +219,20 @@ get Dynamic Field attributes
 Returns:
 
     $DynamicField = {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'NameForField',
-        Label         => 'The label to show',
-        FieldType     => 'Text',
-        ObjectType    => 'Article',
-        Config        => $ConfigHashRef,
-        DisplayGroupID => 123,
+        ID              => 123,
+        InternalField   => 0,
+        Name            => 'NameForField',
+        Label           => 'The label to show',
+        FieldType       => 'Text',
+        ObjectType      => 'Article',
+        Config          => $ConfigHashRef,
+        DisplayGroupID  => 123,
         CustomerVisible => 0,
-        ValidID       => 1,
-        CreateBy      => 1,
-        CreateTime    => '2011-02-08 15:08:00',
-        ChangeBy      => 1,
-        ChangeTime    => '2011-06-11 17:22:00',
+        ValidID         => 1,
+        CreateBy        => 1,
+        CreateTime      => '2011-02-08 15:08:00',
+        ChangeBy        => 1,
+        ChangeTime      => '2011-06-11 17:22:00',
     };
 
 =cut
@@ -315,7 +315,7 @@ sub DynamicFieldGet {
             CreateBy        => $Data[10],
             CreateTime      => $Data[11],
             ChangeBy        => $Data[12],
-            ChangeTime      => $Data[13],
+            ChangeTime      => $Data[13]
         );
     }
 
@@ -877,30 +877,30 @@ Returns:
 
     $List = (
         {
-            ID          => 123,
-            InternalField => 0,
-            Name        => 'nameforfield',
-            Label       => 'The label to show',
-            FieldType   => 'Text',
-            ObjectType  => 'Article',
-            Config      => $ConfigHashRef,
-            CustomerVisible => 0
-            ValidID     => 1,
-            CreateTime  => '2011-02-08 15:08:00',
-            ChangeTime  => '2011-06-11 17:22:00',
+            ID              => 123,
+            InternalField   => 0,
+            Name            => 'nameforfield',
+            Label           => 'The label to show',
+            FieldType       => 'Text',
+            ObjectType      => 'Article',
+            Config          => $ConfigHashRef,
+            CustomerVisible => 0,
+            ValidID         => 1,
+            CreateTime      => '2011-02-08 15:08:00',
+            ChangeTime      => '2011-06-11 17:22:00',
         },
         {
-            ID            => 321,
-            InternalField => 0,
-            Name          => 'fieldname',
-            Label         => 'It is not a label',
-            FieldType     => 'Text',
-            ObjectType    => 'Ticket',
-            Config        => $ConfigHashRef,
+            ID              => 321,
+            InternalField   => 0,
+            Name            => 'fieldname',
+            Label           => 'It is not a label',
+            FieldType       => 'Text',
+            ObjectType      => 'Ticket',
+            Config          => $ConfigHashRef,
             CustomerVisible => 0,
-            ValidID       => 1,
-            CreateTime    => '2010-09-11 10:08:00',
-            ChangeTime    => '2011-01-01 01:01:01',
+            ValidID         => 1,
+            CreateTime      => '2010-09-11 10:08:00',
+            ChangeTime      => '2011-01-01 01:01:01',
         },
         ...
     );

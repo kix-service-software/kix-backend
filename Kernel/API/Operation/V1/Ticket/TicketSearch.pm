@@ -103,7 +103,8 @@ sub Run {
 
         # get already prepared Ticket data from TicketGet operation
         my $TicketGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Ticket::TicketGet',
+            OperationType            => 'V1::Ticket::TicketGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 TicketID  => join(',', @TicketIndex),
                 include   => $Param{Data}->{include},

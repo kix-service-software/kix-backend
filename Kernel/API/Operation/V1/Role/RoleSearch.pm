@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared Role data from RoleGet operation
     if ( IsHashRefWithData(\%RoleList) ) {  	
         my $RoleGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Role::RoleGet',
+            OperationType            => 'V1::Role::RoleGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 RoleID => join(',', sort keys %RoleList),
             }

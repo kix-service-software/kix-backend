@@ -92,7 +92,8 @@ sub Run {
     # get already prepared Macro data from MacroGet operation
     if ( IsHashRefWithData(\%MacroList) ) {
         my $MacroGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Automation::MacroGet',
+            OperationType            => 'V1::Automation::MacroGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 MacroID => join(',', sort keys %MacroList),
             }

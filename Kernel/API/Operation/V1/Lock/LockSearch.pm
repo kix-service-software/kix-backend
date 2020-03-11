@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared Lock data from LockGet operation
     if ( IsHashRefWithData(\%LockList) ) {  	
         my $LockGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Lock::LockGet',
+            OperationType            => 'V1::Lock::LockGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 LockID => join(',', sort keys %LockList),
             }

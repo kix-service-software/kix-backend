@@ -104,7 +104,8 @@ sub Run {
 	# get already prepared TextModule data from TextModuleGet operation
     if ( IsArrayRefWithData($TextModuleList) ) {  	
         my $TextModuleGetResult = $Self->ExecOperation(
-            OperationType => 'V1::TextModule::TextModuleGet',
+            OperationType            => 'V1::TextModule::TextModuleGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 TextModuleID => join(',', @{$TextModuleList}),
             }

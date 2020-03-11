@@ -130,7 +130,8 @@ sub Run {
     # get already prepared MacroAction data from MacroActionGet operation
     if ( IsHashRefWithData(\%MacroActionList) ) {   
         my $MacroActionGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Automation::MacroActionGet',
+            OperationType            => 'V1::Automation::MacroActionGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 MacroID       => $Param{Data}->{MacroID},
                 MacroActionID => join(',', sort keys %MacroActionList),

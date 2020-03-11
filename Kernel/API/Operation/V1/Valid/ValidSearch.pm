@@ -90,7 +90,8 @@ sub Run {
 	# get already prepared Valid data from ValidGet operation
     if ( IsHashRefWithData(\%ValidList) ) {  	
         my $ValidGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Valid::ValidGet',
+            OperationType            => 'V1::Valid::ValidGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ValidID => join(',', sort keys %ValidList),
             }

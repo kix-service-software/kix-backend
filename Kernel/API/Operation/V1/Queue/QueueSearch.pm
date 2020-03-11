@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared Queue data from QueueGet operation
     if ( IsHashRefWithData(\%QueueList) ) {  	
         my $QueueGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Queue::QueueGet',
+            OperationType            => 'V1::Queue::QueueGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 QueueID => join(',', sort keys %QueueList),
             }

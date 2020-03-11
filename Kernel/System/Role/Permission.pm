@@ -818,7 +818,7 @@ sub PermissionListForObject {
 
 =item ValidatePermission()
 
-returns true if the permission is valid - at the moment only the target for type PropertyValue will be validated
+returns true if the permission is valid
 
     my $Result = $RoleObject->ValidatePermission(
         TypeID => 3,
@@ -840,6 +840,11 @@ sub ValidatePermission {
     if ( $PermissionTypeList{$Param{TypeID}} eq 'PropertyValue' ) {
         # check if the target contains a filter expression and the pattern matches the required format
         if ( $Param{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/ ) {
+            return;
+        }
+    } elsif ( $PermissionTypeList{$Param{TypeID}} eq 'Property' ) {
+        # check if the target contains a filter expression and the pattern matches the required format
+        if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/ ) {
             return;
         }
     }

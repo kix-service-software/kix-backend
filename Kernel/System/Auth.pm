@@ -131,7 +131,7 @@ sub GetOption {
 
 The authentication function.
 
-    if ( $AuthObject->Auth( User => $User, Pw => $Pw ) ) {
+    if ( $AuthObject->Auth( User => $User, UsageContext => 'Agent', Pw => $Pw ) ) {
         print "Auth ok!\n";
     }
     else {
@@ -243,6 +243,32 @@ sub Auth {
         );
 
         last COUNT;
+    }
+
+    # check usage context
+    if ( $Param{UsageContext} && $User ) {
+        # remember failed logins
+        my $UserID = $UserObject->UserLookup(
+            UserLogin => $Param{User},
+        );
+
+        return if !$UserID;
+
+        my %UserData = $UserObject->GetUserData(
+            UserID => $UserID,
+            Valid  => 1,
+        );
+
+        # reset user if the user is not allowed for this usage context
+        $User = undef if ( $Param{UsageContext} eq 'Agent'    && !$UserData{IsAgent} );
+        $User = undef if ( $Param{UsageContext} eq 'Customer' && !$UserData{IsCustomer} );
+
+        if ( !$User ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'notice',
+                Message  => "Login failed. User is not allowed for usage context \"$Param{UsageContext}\".",
+            );
+        }
     }
 
     # return if no auth user

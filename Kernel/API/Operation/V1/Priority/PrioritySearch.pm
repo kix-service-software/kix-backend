@@ -93,7 +93,8 @@ sub Run {
 
     if (IsHashRefWithData(\%PriorityList)) {
         my $PriorityGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Priority::PriorityGet',
+            OperationType            => 'V1::Priority::PriorityGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 PriorityID => join(',', sort keys %PriorityList),
             }

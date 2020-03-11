@@ -54,12 +54,14 @@ sub Run {
         'CMDB Reader'      => 9,
         'CMDB Maintainer'  => 10,
         'Customer Reader'  => 11,
-        'Customer Manager' => 12
+        'Customer Manager' => 12,
+        'Customer'         => 13,
     );
 
     my %PermissionTypeList = (
         'Resource'         => 1,
         'PropertyValue'    => 2,
+        'Property'         => 3,
     );
 
     my $CSVFile = $Self->GetOption('file');
@@ -111,7 +113,7 @@ sub Run {
     <Insert Table=\"role_permission\">
         <Data Key=\"role_id\">$RoleList{$Role}</Data>
         <Data Key=\"type_id\">$PermissionTypeList{$Type}</Data>
-        <Data Key=\"target\" Type=\"Quote\">$Target</Data>
+        <Data Key=\"target\" Type=\"Quote\"><![CDATA[$Target]]></Data>
         <Data Key=\"value\">$Value</Data>
         <Data Key=\"create_by\">1</Data>
         <Data Key=\"create_time\">current_timestamp</Data>

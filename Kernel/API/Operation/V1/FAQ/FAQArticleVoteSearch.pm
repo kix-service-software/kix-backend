@@ -123,7 +123,8 @@ sub Run {
         $Self->HandleSearchInAPI();
 
         my $FAQArticleVoteGetResult = $Self->ExecOperation(
-            OperationType => 'V1::FAQ::FAQArticleVoteGet',
+            OperationType            => 'V1::FAQ::FAQArticleVoteGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 FAQArticleID => $Param{Data}->{FAQArticleID},
                 FAQVoteID    => join(',', sort @{$VoteIDs}),

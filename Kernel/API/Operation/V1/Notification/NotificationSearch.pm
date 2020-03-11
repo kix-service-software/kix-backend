@@ -90,7 +90,8 @@ sub Run {
     # get already prepared Notification data from NotificationGet operation
     if ( IsHashRefWithData( \%NotificationList ) ) {
         my $NotificationGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Notification::NotificationGet',
+            OperationType            => 'V1::Notification::NotificationGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 NotificationID => join( ',', sort keys %NotificationList )
             }

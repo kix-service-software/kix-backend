@@ -93,7 +93,8 @@ sub Run {
 	# get already prepared StateType data from StateTypeGet operation
     if ( IsHashRefWithData(\%StateTypeList) ) {  	
         my $StateTypeGetResult = $Self->ExecOperation(
-            OperationType => 'V1::StateType::StateTypeGet',
+            OperationType            => 'V1::StateType::StateTypeGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 StateTypeID => join(',', sort keys %StateTypeList),
             }

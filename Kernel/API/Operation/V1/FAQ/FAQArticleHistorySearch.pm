@@ -123,7 +123,8 @@ sub Run {
         $Self->HandleSearchInAPI();
 
         my $FAQArticleHistoryGetResult = $Self->ExecOperation(
-            OperationType => 'V1::FAQ::FAQArticleHistoryGet',
+            OperationType            => 'V1::FAQ::FAQArticleHistoryGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 FAQArticleID => $Param{Data}->{FAQArticleID},
                 FAQHistoryID => join(',', sort @{$HistoryIDs}),

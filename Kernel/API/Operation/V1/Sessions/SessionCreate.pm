@@ -125,19 +125,22 @@ sub Run {
     # get params
     my $PostPw = $Param{Data}->{Password} || '';
 
-    if ( defined $Param{Data}->{UserType} && $Param{Data}->{UserType} eq 'Agent' ) {
+    if ( defined $Param{Data}->{UserType} ) {
         # check submitted data
         $User = $Kernel::OM->Get('Kernel::System::Auth')->Auth(
-            User => $Param{Data}->{UserLogin} || '',
-            Pw   => $PostPw,
+            User         => $Param{Data}->{UserLogin} || '',
+            UsageContext => $Param{Data}->{UserType},
+            Pw           => $PostPw,
         );
         if ( $User ) {
             $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
                 UserLogin => $Param{Data}->{UserLogin},
             );
+
             # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
             my $HasPermission = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                 UserID              => $UserID,
+                UsageContext        => $Param{Data}->{UserType},
                 Target              => '/auth',
                 RequestedPermission => 'CREATE'
             );
@@ -147,27 +150,6 @@ sub Run {
                 );
             }
         }
-    }
-    elsif ( defined $Param{Data}->{UserType} && $Param{Data}->{UserType} eq 'Customer' ) {
-        # check submitted data
-        $User = $Kernel::OM->Get('Kernel::System::ContactAuth')->Auth(
-            User => $Param{Data}->{UserLogin} || '',
-            Pw   => $PostPw,
-        );
-        if ( $User ) {
-            $UserID = $Param{Data}->{UserLogin};
-            # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
-            my $HasPermission = $Kernel::OM->Get('Kernel::System::Contact')->CheckResourcePermission(
-                UserID              => $UserID,
-                Target              => '/auth',
-                RequestedPermission => 'CREATE'
-            );
-            if ( !$HasPermission ) {
-                return $Self->_Error(
-                    Code => 'Forbidden'
-                );
-            }
-        }        
     }
 
     # not authenticated

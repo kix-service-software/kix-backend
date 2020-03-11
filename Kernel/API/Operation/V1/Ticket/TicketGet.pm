@@ -349,6 +349,9 @@ sub Run {
                     );
                     if ( IsHashRefWithData($DynamicFieldConfig) ) {
 
+                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
                         # get prepared value
                         my $DFPreparedValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueLookup(
                             DynamicFieldConfig => $DynamicFieldConfig,

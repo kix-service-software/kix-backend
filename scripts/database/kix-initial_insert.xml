@@ -79,6 +79,7 @@
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">Superuser</Data>
         <Data Key="comments" Type="Quote" Translatable="1">full permissions on everything (CRUD on resource /*)</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -89,6 +90,7 @@
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">System Admin</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to change/edit any system configuration found in the Admin-Module, requires Agent-User role though in order to log in the system</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -99,6 +101,7 @@
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote" Translatable="1">Agent User</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to login in both frontend- and backend application but does not grant any further permissions</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -109,6 +112,7 @@
         <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="name" Type="Quote" Translatable="1">Ticket Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any ticket in any queue and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -119,6 +123,7 @@
         <Data Key="id" Type="AutoIncrement">5</Data>
         <Data Key="name" Type="Quote" Translatable="1">Ticket Agent</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as Ticket Reader, but additionally allows to create new or edit any existing ticket and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -129,6 +134,7 @@
         <Data Key="id" Type="AutoIncrement">6</Data>
         <Data Key="name" Type="Quote" Translatable="1">Ticket Creator</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any information required to create a ticket (queues, types, priorities, etc.), allows to create new tickets and allows to CREATE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -139,6 +145,7 @@
         <Data Key="id" Type="AutoIncrement">7</Data>
         <Data Key="name" Type="Quote" Translatable="1">FAQ Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any FAQ article in any FAQ category and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -149,6 +156,7 @@
         <Data Key="id" Type="AutoIncrement">8</Data>
         <Data Key="name" Type="Quote" Translatable="1">FAQ Editor</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as FAQ Reader, but additionally allows to create new or edit any existing FAQ article and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -159,6 +167,7 @@
         <Data Key="id" Type="AutoIncrement">9</Data>
         <Data Key="name" Type="Quote" Translatable="1">Asset Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read any asset information in any asset class and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -169,6 +178,7 @@
         <Data Key="id" Type="AutoIncrement">10</Data>
         <Data Key="name" Type="Quote" Translatable="1">Asset Maintainer</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as Asset-Reader, but additionally  allows to create new or update any existing asset entry and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -179,6 +189,7 @@
         <Data Key="id" Type="AutoIncrement">11</Data>
         <Data Key="name" Type="Quote" Translatable="1">Customer Reader</Data>
         <Data Key="comments" Type="Quote" Translatable="1">allows to read information of any organization or contact and allows to READ links</Data>
+        <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -189,6 +200,18 @@
         <Data Key="id" Type="AutoIncrement">12</Data>
         <Data Key="name" Type="Quote" Translatable="1">Customer Manager</Data>
         <Data Key="comments" Type="Quote" Translatable="1">same as Customer Reader, but additionally allows to create new or update any existing contact or organization entry and allows to CREATE, UPDATE, DELETE links</Data>
+        <Data Key="usage_context">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="roles">
+        <Data Key="id" Type="AutoIncrement">13</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Customer</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows the customer to login and read ticket, FAQ and asset data, allows to create FAQ votes, allows to change data of the personal user, allows to set ticket article flags</Data>
+        <Data Key="usage_context">2</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -222,6 +245,16 @@
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">PropertyValue</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1).</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Property</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access on object properties (QueueID in tickets).</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -290,28 +323,6 @@
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/system/config</Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/config/*{SysConfigOption.AccessLevel EQ 'internal'} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel EQ 'internal'}</Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ 'internal'} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ 'internal'}</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -389,17 +400,6 @@
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/system/communication/notifications</Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/dynamicfields -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/system/dynamicfields</Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -599,28 +599,6 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote">/links</Data>
         <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission CRUD_ on /watchers -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/watchers</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission CRUD_ on /watchers -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/watchers</Data>
-        <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -967,17 +945,6 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "FAQ Reader": permission CRUD_ on /faq/articles/*/votes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/faq/articles/*/votes</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
     <!-- role "FAQ Reader": permission _R___ on /links -->
     <Insert Table="role_permission">
         <Data Key="role_id">7</Data>
@@ -1275,28 +1242,6 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "System Admin": permission CRUD_ on /system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission CRUD_ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
     <!-- role "Superuser": permission CRUD_ on /* -->
     <Insert Table="role_permission">
         <Data Key="role_id">1</Data>
@@ -1308,23 +1253,419 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Superuser": permission CRUD_ on /system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <!-- role "Customer": permission C____ on /auth -->
     <Insert Table="role_permission">
-        <Data Key="role_id">1</Data>
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/auth</Data>
+        <Data Key="value">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /cmdb -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/cmdb</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /contacts -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/contacts</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /faq -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /faq/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /faq/articles -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/articles</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /faq/articles/*{FAQArticle.CustomerVisible EQ 1} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
         <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/*{SysConfigOption.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
+        <Data Key="target" Type="Quote">/faq/articles/*{FAQArticle.CustomerVisible EQ 1}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /faq/articles/*/votes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/articles/*/votes</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /i18n -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/i18n</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /links -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/links</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CRUD_ on /session -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/session</Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Superuser": permission CRUD_ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']} -->
+    <!-- role "Customer": permission _R___ on /system -->
     <Insert Table="role_permission">
-        <Data Key="role_id">1</Data>
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/cmdb -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/cmdb</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/cmdb/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/cmdb/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/cmdb/classes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/cmdb/classes</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/communication/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/channels -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/channels</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/notifications -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/notifications</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/sendertypes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/sendertypes</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/communication/systemaddresses -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/communication/systemaddresses</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/faq -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/faq</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /system/faq/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/faq/*</Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/faq/categories -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/faq/categories</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/ticket -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/ticket</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission C____ on /system/users -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/users</Data>
+        <Data Key="value">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /tickets -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
         <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote">/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel IN ['public', 'internal', 'confidential']}</Data>
-        <Data Key="value">15</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _____ on /tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">3</Data>
+        <Data Key="target" Type="Quote">/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /tickets/*/articles -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*/articles/* -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*/articles/*{Article.CustomerVisible EQ 1} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*{Article.CustomerVisible EQ 1}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">3</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}</Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission CR___ on /tickets/*/articles/*/flags -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/tickets/*/articles/*/flags</Data>
+        <Data Key="value">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on /system/config/Ticket::Template::Definitions::List::Public -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/system/config/Ticket::Template::Definitions::List::Public</Data>
+        <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -9606,15 +9947,12 @@ CountMin: '1'
 CountMax: '1'
 CountDefault: '1'
 ItemSeparator: ''
-Cols: ''
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
   \ {\r\n    \"id\": \"200\",\r\n    \"title\": \"task 2\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
   \ {\r\n    \"id\": \"300\",\r\n    \"title\": \"task 3\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  }\r\n]"
-RegExList: []
-Rows: ''
         ]]></Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>

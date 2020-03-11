@@ -89,7 +89,8 @@ sub Run {
 	# get already prepared ticketstate data from TicketStateGet operation
     if ( IsHashRefWithData(\%TicketStateList) ) {  	
         my $TicketStateGetResult = $Self->ExecOperation(
-            OperationType => 'V1::TicketState::TicketStateGet',
+            OperationType            => 'V1::TicketState::TicketStateGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 StateID => join(',', sort keys %TicketStateList),
             }

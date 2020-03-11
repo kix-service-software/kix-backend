@@ -105,7 +105,8 @@ sub Run {
 	# get already prepared SysConfig data from SysConfigGet operation
     if ( IsHashRefWithData(\%AllOptions) ) {  	
         my $SysConfigGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SysConfig::SysConfigOptionGet',
+            OperationType            => 'V1::SysConfig::SysConfigOptionGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 Option  => join(',', sort keys %AllOptions),
                 include => $Param{Data}->{include},

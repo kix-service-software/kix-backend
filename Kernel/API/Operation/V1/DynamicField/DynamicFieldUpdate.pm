@@ -103,7 +103,7 @@ sub ParameterDefinition {
         'DynamicField::CustomerVisible' => {
             RequiresValueIfUsed => 1,
             OneOf => [0, 1]
-        },
+        }
     }
 }
 
@@ -120,7 +120,7 @@ perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldI
                 FieldType       => '...',            # optional
                 DisplayGroupID  => 123,              # optional
                 ObjectType      => '...',            # optional
-                Config          => { }               # optional
+                Config          => { },              # optional
                 CustomerVisible => 0                 # optional
 	            ValidID         => 1,                # optional
             }

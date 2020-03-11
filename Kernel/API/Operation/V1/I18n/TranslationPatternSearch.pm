@@ -93,7 +93,8 @@ sub Run {
 
         # get already prepared Pattern data from TranslationPatternGet operation
         my $PatternGetResult = $Self->ExecOperation(
-            OperationType => 'V1::I18n::TranslationPatternGet',
+            OperationType            => 'V1::I18n::TranslationPatternGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 PatternID => join(',', sort keys %PatternList),
             }

@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared AddressBook data from AddressGet operation
     if ( IsHashRefWithData(\%AddressList) ) {  	
         my $AddressBookGetResult = $Self->ExecOperation(
-            OperationType => 'V1::AddressBook::AddressGet',
+            OperationType            => 'V1::AddressBook::AddressGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 AddressID => join(',', sort keys %AddressList),
             }

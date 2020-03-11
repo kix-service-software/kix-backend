@@ -145,7 +145,7 @@ sub Run {
     my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
         User => $User->{UserLogin},
     );
-    if ( %UserData ) {
+    if (%UserData) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => "Can not create user. Another user with same login already exists.",
@@ -154,10 +154,10 @@ sub Run {
 
     # create User
     my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-        ValidID      => 1,
+        ValidID => 1,
         %{$User},
         ChangeUserID => $Self->{Authorization}->{UserID},
-    );    
+    );
     if ( !$UserID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
@@ -166,9 +166,9 @@ sub Run {
     }
 
     # add preferences
-    if ( IsArrayRefWithData($User->{Preferences}) ) {
+    if ( IsArrayRefWithData( $User->{Preferences} ) ) {
 
-        foreach my $Pref ( @{$User->{Preferences}} ) {
+        foreach my $Pref ( @{ $User->{Preferences} } ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserPreferenceCreate',
                 Data          => {
@@ -176,7 +176,7 @@ sub Run {
                     UserPreference => $Pref
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     %{$Result},
@@ -186,9 +186,9 @@ sub Run {
     }
 
     # assign roles
-    if ( IsArrayRefWithData($User->{RoleIDs}) ) {
+    if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
 
-        foreach my $RoleID ( @{$User->{RoleIDs}} ) {
+        foreach my $RoleID ( @{ $User->{RoleIDs} } ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserRoleIDCreate',
                 Data          => {
@@ -196,7 +196,7 @@ sub Run {
                     RoleID => $RoleID,
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     %{$Result},
@@ -204,11 +204,43 @@ sub Run {
             }
         }
     }
-    
+
+    # auto assign customer role
+    if ( $User->{IsCustomer} ) {
+
+        # get RoleID from Role "Customer"
+        my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+            Role => "Customer",
+        );
+
+        my $RoleIDFound = 0;
+        if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
+            if ( grep( /^$RoleID/, @{ $User->{RoleIDs} } ) ) {
+                $RoleIDFound = 1;
+            }
+        }
+
+        if ( !$RoleIDFound ) {
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserRoleIDCreate',
+                Data          => {
+                    UserID => $UserID,
+                    RoleID => $RoleID,
+                }
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    %{$Result},
+                )
+            }
+        }
+    }
+
     return $Self->_Success(
         Code   => 'Object.Created',
         UserID => 0 + $UserID,
-    );    
+    );
 }
 
 1;

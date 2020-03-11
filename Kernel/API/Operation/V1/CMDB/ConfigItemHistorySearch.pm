@@ -138,7 +138,8 @@ sub Run {
         }
 
         my $GetResult = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ConfigItemHistoryGet',
+            OperationType            => 'V1::CMDB::ConfigItemHistoryGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 HistoryID    => join(',', sort @HistoryIDs),

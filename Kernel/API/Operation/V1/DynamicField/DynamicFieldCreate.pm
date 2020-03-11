@@ -134,7 +134,7 @@ perform DynamicFieldCreate Operation. This will return the created DynamicFieldI
                 DisplayGroupID  => 123,              
                 ObjectType      => '...',            
                 Config          => { },
-                CustomerVisible => 0
+                CustomerVisible => 0,
 	            InternalField   => 0|1,              # optional
 	            ValidID         => 1,                # optional
             }

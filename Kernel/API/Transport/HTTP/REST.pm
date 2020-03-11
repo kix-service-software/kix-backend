@@ -1019,11 +1019,8 @@ sub _Output {
     if ( $Param{HTTPCode} =~ /^2/ ) {
         $DebugLevel = 'debug';
     }
-    elsif ($Param{HTTPCode} =~ /^5/) {
-        $DebugLevel = 'error';
-    }
     else {
-        $DebugLevel = 'notice';
+        $DebugLevel = 'error';
     }
     $Self->{DebuggerObject}->DebugLog(
         DebugLevel => $DebugLevel,

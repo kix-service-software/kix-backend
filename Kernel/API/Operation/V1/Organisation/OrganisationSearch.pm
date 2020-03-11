@@ -93,7 +93,8 @@ sub Run {
         
         # get already prepared Organisation data from OrganisationGet operation
         my $OrganisationGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Organisation::OrganisationGet',
+            OperationType            => 'V1::Organisation::OrganisationGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 OrganisationID => join(',', sort keys %OrganisationSearch),
             }

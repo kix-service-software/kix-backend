@@ -58,12 +58,12 @@ sub Run {
     );
 
     foreach my $ID ( sort @RoleIDs ) {
-        my $RoleName = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
-            RoleID => $ID
+        my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+            ID => $ID
         );
-        next if !$RoleName;
+        next if !%Role;
 
-        $Self->Print("$RoleName\n");
+        $Self->Print("$Role{Name} (" . (join(', ', @{$Role{UsageContextList}})) . ")\n");
     }
 
     $Self->Print("<green>Done</green>\n");

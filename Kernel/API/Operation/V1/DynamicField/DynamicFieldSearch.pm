@@ -90,7 +90,8 @@ sub Run {
 	# get already prepared DynamicField data from DynamicFieldGet operation
     if ( IsArrayRefWithData($DynamicFieldList) ) {  	
         my $DynamicFieldGetResult = $Self->ExecOperation(
-            OperationType => 'V1::DynamicField::DynamicFieldGet',
+            OperationType            => 'V1::DynamicField::DynamicFieldGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 DynamicFieldID => join(',', sort @{$DynamicFieldList}),
                 include        => $Param{Data}->{include},

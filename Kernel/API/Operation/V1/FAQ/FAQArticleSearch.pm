@@ -100,7 +100,8 @@ sub Run {
         $Self->HandleSearchInAPI();
 
         my $FAQArticleGetResult = $Self->ExecOperation(
-            OperationType => 'V1::FAQ::FAQArticleGet',
+            OperationType            => 'V1::FAQ::FAQArticleGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 FAQArticleID => join( ',', sort @ArticleIDs ),
             }

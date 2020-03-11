@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared SLA data from SLAGet operation
     if ( IsHashRefWithData(\%SLAList) ) {  	
         my $SLAGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SLA::SLAGet',
+            OperationType            => 'V1::SLA::SLAGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 SLAID => join(',', sort keys %SLAList),
             }

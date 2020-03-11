@@ -145,7 +145,8 @@ sub Run {
 
         # get already prepared ArticleFlag data from ArticleFlagGet operation
         my $FlagGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Ticket::ArticleFlagGet',
+            OperationType            => 'V1::Ticket::ArticleFlagGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 TicketID  => $Param{Data}->{TicketID},
                 ArticleID => $Param{Data}->{ArticleID},

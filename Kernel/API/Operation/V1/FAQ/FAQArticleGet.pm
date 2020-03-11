@@ -146,7 +146,7 @@ sub Run {
         delete $FAQArticle{ItemID};
 
         # convert Keywords to array
-        my @Keywords = split(/\s+/, $FAQArticle{Keywords});
+        my @Keywords = split(/\s+/, $FAQArticle{Keywords} || '');
         $FAQArticle{Keywords} = \@Keywords;
 
         $FAQArticle{CustomerVisible} = $FAQArticle{Visibility} 

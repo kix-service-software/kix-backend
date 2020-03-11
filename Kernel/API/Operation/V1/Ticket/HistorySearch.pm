@@ -121,7 +121,8 @@ sub Run {
 
         # get already prepared history data from HistoryGet operation
         my $HistoryGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Ticket::HistoryGet',
+            OperationType            => 'V1::Ticket::HistoryGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 TicketID  => $Param{Data}->{TicketID},
                 HistoryID => join(',', sort keys %HistoryHash),

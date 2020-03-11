@@ -92,7 +92,8 @@ sub Run {
     # get already prepared Job data from JobGet operation
     if ( IsHashRefWithData(\%JobList) ) {   
         my $JobGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Automation::JobGet',
+            OperationType            => 'V1::Automation::JobGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 JobID => join(',', sort keys %JobList),
             }
