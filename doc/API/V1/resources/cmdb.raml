@@ -36,10 +36,10 @@
             versionId:
               displayName: VersionID
               type: integer
-    /attachments/{attachmentId}:
-        description: !include ../descriptions/resources/cmdb/configitems/attachments.md
-        type: { item-readonly: { typeName: ConfigItemAttachment } }
-        uriParameters:
-          attachmentId:
-            displayName: AttachmentID
-            type: integer
+          /attachments/{attachmentId}:
+              description: !include ../descriptions/resources/cmdb/configitems/attachments.md
+              type: { item-readonly: { typeName: ConfigItemAttachment } }
+              uriParameters:
+                attachmentId:
+                  displayName: AttachmentID
+                  type: integer

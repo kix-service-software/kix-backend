@@ -115,7 +115,17 @@ perform ConfigItemGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @ConfigItemList;        
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
+
+    my @ConfigItemList;
     foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {                 
 
         my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
@@ -164,10 +174,6 @@ sub Run {
 }
 
 1;
-
-
-
-
 
 =back
 

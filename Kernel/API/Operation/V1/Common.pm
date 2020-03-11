@@ -2513,7 +2513,7 @@ sub _ActivatePermissionFilters {
 
         my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
 
-# TODO: don't wotk with search right now because ticket DB search can't cope with the negated PropertyValue filters
+# TODO: don't work with search right now because ticket DB search can't cope with the negated PropertyValue filters
         # init filter and search if not done already
         $Self->{Filter}->{ $Filter->{Object} }->{$Logical} ||= [];
 #        $Self->{Search}->{ $Filter->{Object} }->{$Logical} ||= [];
@@ -2607,8 +2607,65 @@ sub _PermissionDebug {
     printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
 }
 
-1;
 
+=item _FilterCustomerUserVisibleConfigItems()
+
+filters config items ids for current customer user if necessary
+
+    @ConfigItemIDList = $ConfigItemObject->_FilterCustomerUserVisibleConfigItems(
+        ConfigItemIDList => \@ConfigItemList
+    )
+
+=cut
+
+sub _FilterCustomerUserVisibleConfigItems {
+    my ( $Self, %Param ) = @_;
+
+    my @ConfigItemIDList = IsArrayRefWithData($Param{ConfigItemIDList}) ? @{$Param{ConfigItemIDList}} : ();
+
+    if (
+        IsArrayRefWithData(\@ConfigItemIDList) &&
+        IsHashRefWithData($Self->{Authorization}) &&
+        $Self->{Authorization}->{UserType} eq 'Customer'
+    ) {
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            UserID => $Self->{Authorization}->{UserID},
+        );
+        if (!$ContactData{User} && $ContactData{AssignedUserID}) {
+            my $UserData = $Self->ExecOperation(
+                OperationType => 'V1::User::UserGet',
+                Data          => {
+                    UserID => $ContactData{AssignedUserID},
+                }
+            );
+            $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+            $Self->AddCacheDependency(Type => 'User');
+        }
+
+        my $ItemIDs;
+        if ( IsHashRefWithData(\%ContactData) ) {
+            $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                ObjectType => 'Contact',
+                Object     => \%ContactData
+            );
+        }
+
+        if ( IsArrayRefWithData($ItemIDs) ) {
+            my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
+            my @Result;
+            foreach my $ConfigItemID ( @ConfigItemIDList ) {
+                push(@Result, 0 + $ConfigItemID) if $ItemIDsHash{$ConfigItemID};
+            }
+            @ConfigItemIDList = @Result;
+        } else {
+            @ConfigItemIDList = ();
+        }
+    }
+
+    return @ConfigItemIDList;
+}
+
+1;
 
 =back
 

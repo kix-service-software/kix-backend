@@ -252,7 +252,12 @@ sub Run {
                 Object     => \%OrganisationData
             );
 
-            $OrganisationData{AssignedConfigItems} = IsArrayRef($ItemIDs) ? $ItemIDs : [];
+            # filter for customer assigned config items if necessary
+            my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
+                ConfigItemIDList => $ItemIDs
+            );
+
+            $OrganisationData{AssignedConfigItems} = \@ConfigItemIDList;
 
             # inform API caching about a new dependency
             $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');

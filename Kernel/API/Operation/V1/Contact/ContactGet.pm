@@ -292,7 +292,12 @@ sub Run {
                 Object     => \%CIContact
             );
 
-            $ContactData{AssignedConfigItems} = IsArrayRef($ItemIDs) ? $ItemIDs : [];
+            # filter for customer assigned config items if necessary
+            my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
+                ConfigItemIDList => $ItemIDs
+            );
+
+            $ContactData{AssignedConfigItems} = \@ConfigItemIDList;
 
             $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
         }

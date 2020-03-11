@@ -3080,7 +3080,7 @@ Provider:
         V1::CMDB::ConfigItemAttachmentGet:
           RequestMethod:
           - GET
-          Route: /cmdb/configitems/attachments/:AttachmentID
+          Route: /cmdb/configitems/:ConfigItemID/versions/:VersionID/attachments/:AttachmentID
         V1::Contact::ContactSearch:
           RequestMethod:
           - GET

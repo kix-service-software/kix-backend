@@ -120,7 +120,15 @@ perform ConfigItemVersionGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @VersionList;        
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
 
     # check if ConfigItem exists
     my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
@@ -133,6 +141,8 @@ sub Run {
         );
     }
 
+    my @VersionList;
+
     # get all versions of ConfigItem (it's cheaper than getting selected version by single requests)
     my $Versions = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionZoomList(
         ConfigItemID => $Param{Data}->{ConfigItemID},
@@ -141,7 +151,7 @@ sub Run {
     if (IsArrayRefWithData($Versions)) {
         my %VersionListMap = map { $_->{VersionID} => $_ } @{$Versions};
     
-        foreach my $VersionID ( @{$Param{Data}->{VersionID}} ) {                 
+        foreach my $VersionID ( @{$Param{Data}->{VersionID}} ) {
 
             my $Version = $VersionListMap{$VersionID};
 
@@ -190,9 +200,17 @@ sub Run {
                     XMLDataGet => 1,
                 );
 
+                my $Data = $Version->{Data};
+                if ( !IsHashRefWithData($Data) ) {
+                    $Data = $Self->ConvertDataToExternal(
+                        Definition => $VersionData->{XMLDefinition},
+                        Data       => $VersionData->{XMLData}->[1]->{Version}
+                    );
+                }
+
                 $Version->{PreparedData} = $Self->_PrepareData(
                     Definition => $VersionData->{XMLDefinition},
-                    Data       => $Version->{Data},
+                    Data       => $Data,
                 );
             }
 
@@ -233,6 +251,9 @@ sub _PrepareData {
 
         # don't look at details if we don't have any value for this
         next if !$Data->{$ItemKey};
+        
+        # ignore attribute if user is logged in as Customer and attribute should not be visible
+        next if IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer' && !$DefItem->{CustomerVisible};
 
         if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
             for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
@@ -369,10 +390,6 @@ sub _GetDisplayValue {
 }
 
 1;
-
-
-
-
 
 =back
 
