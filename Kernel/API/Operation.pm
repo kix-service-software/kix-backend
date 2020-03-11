@@ -120,6 +120,10 @@ sub new {
         );
     }
 
+    # init call level
+    $Self->{Level} = $Param{Level};
+    $Self->{LevelIndent} = '    ' x $Self->{Level} || '';
+
     # check permission
     if ( IsHashRefWithData($Param{Authorization}) ) {
         if ( !$Param{IgnorePermissions} ) {
@@ -175,7 +179,6 @@ sub new {
     }
 
     # add call level
-    $Self->{Level} = $Param{Level};
     $Self->{BackendObject}->{Level} = $Self->{Level};    
 
     return $Self;
@@ -204,6 +207,8 @@ perform the selected Operation.
 sub Run {
     my ( $Self, %Param ) = @_;    
 
+    my $StartTime = Time::HiRes::time();
+
     # validate data
     my $ValidatorResult = $Self->{ValidatorObject}->Validate(
         %Param
@@ -223,7 +228,12 @@ sub Run {
     }
 
     # start the backend
-    return $Self->{BackendObject}->RunOperation(%Param);
+    my $Result = $Self->{BackendObject}->RunOperation(%Param);
+
+    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+    $Self->_Debug($Self->{LevelIndent}, sprintf("execution took %i ms", $TimeDiff));
+
+    return $Result;
 }
 
 =item Options()
@@ -283,6 +293,8 @@ checks whether the user is allowed to execute this operation (Resource and Objec
 
 sub _CheckPermission {
     my ( $Self, %Param ) = @_;    
+
+    my $StartTime = Time::HiRes::time();
 
     my $RequestedPermission = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
 
@@ -367,7 +379,20 @@ sub _CheckPermission {
     # OPTIONS requests are always possible
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
 
+    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
     return ($Granted, @AllowedMethods);
+}
+
+sub _Debug {
+    my ( $Self, $Indent, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
+
+    $Indent ||= '';
+
+    printf STDERR "(%5i) %-15s %s%s: %s\n", $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 sub _PermissionDebug {
