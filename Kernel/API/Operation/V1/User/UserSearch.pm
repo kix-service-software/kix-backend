@@ -99,12 +99,80 @@ perform UserSearch Operation. This will return a User ID list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+    my %UserList;
 
-    # perform user search
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
-        Type  => 'Short',
-        Valid => 0,
-    );
+    # prepare search if given
+    if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
+        foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
+            my %SearchTypeResult;
+            foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
+                my $Value = $SearchItem->{Value};
+                my %SearchParam;
+
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
+                    $Value = '*' . $Value . '*';
+                }
+                elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                    $Value = $Value . '*';
+                }
+                if ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                    $Value = '*' . $Value;
+                }
+
+                if ( $SearchItem->{Field} =~ /^(UserLogin)$/g ) {
+                    $SearchParam{ $SearchItem->{Field} } = $Value;
+                }
+                elsif ( $SearchItem->{Field} =~ /^(ValidID)$/g ) {
+                    $SearchParam{Valid} = $Value;
+                }
+                else {
+                    $SearchParam{Search} = $Value;
+                }
+
+                # perform User search
+                my %SearchResult = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+                    %SearchParam,
+                    Valid => 0
+                );
+
+                # merge results
+                if ( $SearchType eq 'AND' ) {
+                    if ( !%SearchTypeResult ) {
+                        %SearchTypeResult = %SearchResult;
+                    }
+                    else {
+                        # remove all IDs from type result that we don't have in this search
+                        foreach my $Key ( keys %SearchTypeResult ) {
+                            delete $SearchTypeResult{$Key} if !exists $SearchResult{$Key};
+                        }
+                    }
+                }
+                elsif ( $SearchType eq 'OR' ) {
+                    %SearchTypeResult = (
+                        %SearchTypeResult,
+                        %SearchResult,
+                    );
+                }
+            }
+
+            if ( !%UserList ) {
+                %UserList = %SearchTypeResult;
+            }
+            else {
+                # combine both results by AND
+                # remove all IDs from type result that we don't have in this search
+                foreach my $Key ( keys %UserList ) {
+                    delete $UserList{$Key} if !exists $SearchTypeResult{$Key};
+                }
+            }
+        }
+    }
+    else {
+        # perform User search without any search params
+        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+            Valid => 0
+        );
+    }
 
     if (IsHashRefWithData(\%UserList)) {
 
