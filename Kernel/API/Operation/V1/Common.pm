@@ -2166,7 +2166,7 @@ sub _ApplyInclude {
                         UserID          => $Self->{Authorization}->{UserID},
                     );
 
-                    if ($Result) {
+                    if ($Result && IsHashRef($Param{Data}->{$Object}) ) {
                         $Param{Data}->{$Object}->{$Include} = $Result;
 
                         # add specific cache dependencies after exec if available
