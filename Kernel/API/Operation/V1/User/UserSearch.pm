@@ -169,7 +169,8 @@ sub Run {
     }
     else {
         # perform User search without any search params
-        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+            Type  => 'Short',
             Valid => 0
         );
     }
