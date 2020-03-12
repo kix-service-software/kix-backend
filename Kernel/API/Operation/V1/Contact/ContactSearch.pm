@@ -100,7 +100,7 @@ sub Run {
                     $Value = '*' . $Value;
                 }
 
-                if ( $SearchItem->{Field} =~ /^(PrimaryOrganisationID|Email|Login|AssignedUserID)$/g ) {
+                if ( $SearchItem->{Field} =~ /^(.*?OrganisationID|Login|AssignedUserID)$/g ) {
                     $SearchParam{ $SearchItem->{Field} } = $Value;
                 }
                 elsif ( $SearchItem->{Field} =~ /^(ValidID)$/g ) {
