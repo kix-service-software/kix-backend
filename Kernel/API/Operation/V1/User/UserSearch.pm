@@ -101,31 +101,41 @@ sub Run {
     my ( $Self, %Param ) = @_;
     my %UserList;
 
-    # prepare search if given
+    # TODO: filter search - currently only UserLogin and Search are possible search parameter
+    my %UserSearch;
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
-            my %SearchTypeResult;
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
+                if ($SearchItem->{Field} eq 'UserLogin' || $SearchItem->{Field} eq 'Search') {
+                    if (!$UserSearch{$SearchType}) {
+                        $UserSearch{$SearchType} = [];
+                    }
+                    push(@{$UserSearch{$SearchType}}, $SearchItem);
+                }
+            }
+        }
+    }
+
+    # prepare search if given
+    if ( IsHashRefWithData( \%UserSearch ) ) {
+        foreach my $SearchType ( keys %UserSearch ) {
+            my %SearchTypeResult;
+            foreach my $SearchItem ( @{ %UserSearch{$SearchType} } ) {
+
                 my $Value = $SearchItem->{Value};
                 my %SearchParam;
 
                 if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
                     $Value = '*' . $Value . '*';
-                }
-                elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
                     $Value = $Value . '*';
-                }
-                if ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
                     $Value = '*' . $Value;
                 }
 
-                if ( $SearchItem->{Field} =~ /^(UserLogin)$/g ) {
+                if ( $SearchItem->{Field} eq 'UserLogin' ) {
                     $SearchParam{ $SearchItem->{Field} } = $Value;
-                }
-                elsif ( $SearchItem->{Field} =~ /^(ValidID)$/g ) {
-                    $SearchParam{Valid} = $Value;
-                }
-                else {
+                } else {
                     $SearchParam{Search} = $Value;
                 }
 
