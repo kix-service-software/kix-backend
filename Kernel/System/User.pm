@@ -658,8 +658,7 @@ sub UserSearch {
     elsif ( $Param{UserLoginEquals} ) {
 
         $SQL .= " $Self->{UserTableUser} = ?";
-        $Param{UserLogin} = $DBObject->Quote( $Param{UserLogin} );
-        push @Bind, \$Param{UserLogin};
+        push @Bind, \$Param{UserLoginEquals};
     }
 
     # add valid option
