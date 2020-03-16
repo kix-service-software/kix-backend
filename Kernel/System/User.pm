@@ -582,6 +582,12 @@ to search users
         Valid     => 1, # not required
     );
 
+    my %List = $UserObject->UserSearch(
+        UserLoginEquals => 'some',              # exact match
+        Limit           => 50,
+        Valid           => 1, # not required
+    );
+
 Returns hash of UserID, Login pairs:
 
     my %List = (
@@ -611,6 +617,7 @@ sub UserSearch {
         = 'UserSearch::'
         . ( $Param{Search}    || '' ) . '::'
         . ( $Param{Userlogin} || '' ) . '::'
+        . ( $Param{UserloginExact} || '' ) . '::'
         . ( $Param{Valid}     || '' ) . '::'
         . ( $Param{Limit}     || '' );
 
@@ -646,6 +653,12 @@ sub UserSearch {
         $SQL .= " $Self->{Lower}($Self->{UserTableUser}) LIKE ? $LikeEscapeString";
         $Param{UserLogin} =~ s/\*/%/g;
         $Param{UserLogin} = $DBObject->Quote( $Param{UserLogin}, 'Like' );
+        push @Bind, \$Param{UserLogin};
+    }
+    elsif ( $Param{UserLoginEquals} ) {
+
+        $SQL .= " $Self->{UserTableUser} = ?";
+        $Param{UserLogin} = $DBObject->Quote( $Param{UserLogin} );
         push @Bind, \$Param{UserLogin};
     }
 

@@ -133,8 +133,11 @@ sub Run {
                     $Value = '*' . $Value;
                 }
 
-                if ( $SearchItem->{Field} eq 'UserLogin' ) {
-                    $SearchParam{ $SearchItem->{Field} } = $Value;
+                if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'UserLogin' ) {
+                    $SearchParam{UserLoginEquals} = $Value;
+                }
+                elsif ( $SearchItem->{Field} eq 'UserLogin' ) {
+                    $SearchParam{UserLogin} = $Value;
                 } else {
                     $SearchParam{Search} = $Value;
                 }
