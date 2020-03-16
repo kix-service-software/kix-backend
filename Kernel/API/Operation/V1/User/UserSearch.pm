@@ -120,7 +120,7 @@ sub Run {
     if ( IsHashRefWithData( \%UserSearch ) ) {
         foreach my $SearchType ( keys %UserSearch ) {
             my %SearchTypeResult;
-            foreach my $SearchItem ( @{ %UserSearch{$SearchType} } ) {
+            foreach my $SearchItem ( @{ $UserSearch{$SearchType} } ) {
 
                 my $Value = $SearchItem->{Value};
                 my %SearchParam;

@@ -605,10 +605,10 @@ sub UserSearch {
     my $Valid = $Param{Valid} // 1;
 
     # check needed stuff
-    if ( !$Param{Search} && !$Param{UserLogin} ) {
+    if ( !$Param{Search} && !$Param{UserLogin} && !$Param{UserLoginEquals}) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search or UserLogin!',
+            Message  => 'Need Search or UserLogin or UserLoginEquals!',
         );
         return;
     }
@@ -616,8 +616,8 @@ sub UserSearch {
     my $CacheKey
         = 'UserSearch::'
         . ( $Param{Search}    || '' ) . '::'
-        . ( $Param{Userlogin} || '' ) . '::'
-        . ( $Param{UserloginExact} || '' ) . '::'
+        . ( $Param{UserLogin} || '' ) . '::'
+        . ( $Param{UserLoginEquals} || '' ) . '::'
         . ( $Param{Valid}     || '' ) . '::'
         . ( $Param{Limit}     || '' );
 
