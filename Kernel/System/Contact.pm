@@ -1022,6 +1022,11 @@ sub ContactSearch {
     }
     elsif ($Param{LoginEquals}) {
         $Join = 'LEFT JOIN users u ON c.user_id = u.id';
+
+        if ( defined $SQL ) {
+            $SQL .= " AND ";
+        }
+
         $SQL .= "u.login = ?";
         push(@Bind, \$Param{LoginEquals});
     }
