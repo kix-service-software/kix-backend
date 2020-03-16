@@ -867,26 +867,26 @@ to search contacts
 
     # email search
     my %List = $ContactObject->ContactSearch(
-        PostMasterSearch => 'email@example.com',
-        Valid            => 1,                    # (optional) default 1
+        PostMasterSearch => '*email@example.com*',
+        Valid            => 1,                      # (optional) default 1
     );
 
     # search by OrganisationID
     my %List = $ContactObject->ContactSearch(
         OrganisationID => 123
-        Valid          => 1,                # (optional) default 1
+        Valid          => 1,                    # (optional) default 1
     );
 
     #search by UserID
     my %List = $ContactObject->ContactSearch(
         UserID         => 123,
-        Valid          => 1,                # (optional) default 1
+        Valid          => 1,                    # (optional) default 1
     );
 
     #search by UserLogin
     my %List = $ContactObject->ContactSearch(
-        Login         => 'some_user_login',
-        Valid          => 1,                # (optional) default 1
+        Login         => '*some_user_login*',
+        Valid          => 1,                    # (optional) default 1
     );
 
 =cut
@@ -902,7 +902,7 @@ sub ContactSearch {
 
     # check cache
     my $CacheKey = "ContactSearch::${Valid}::";
-    foreach my $Key ( qw(OrganisationID PrimaryOrganisationID Search PostMasterSearch Limit Login) ) {
+    foreach my $Key ( qw(OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login) ) {
         $CacheKey .= '::'.($Param{$Key} || '');
     }
     my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -914,6 +914,7 @@ sub ContactSearch {
     # add valid option if required
     my $SQL;
     my @Bind;
+    my $Join = '';
 
     if ($Valid) {
 
@@ -972,6 +973,7 @@ sub ContactSearch {
         }
     }
     elsif ( $Param{OrganisationID}) {
+        $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
         if ( defined $SQL ) {
             $SQL .= " AND ";
         }
@@ -993,28 +995,29 @@ sub ContactSearch {
         push(@Bind, \$Param{UserID}) if $Param{UserID};
     }
     elsif ($Param{Login}) {
-        my $ExistingUserID = $Kernel::OM->('Kernel::System::User')->UserLookup(
-            UserLogin => $Param{Login},
-        );
-        if (!$ExistingUserID) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'notice',
-                Message  => "Unable to Search. No user with login $Param{Login}.",
-            );
-            return;
+        $Join = 'LEFT JOIN users u ON c.user_id = u.id';
+
+        my $Login = $Param{Login};
+        $Login =~ s/\*/%/g;
+        $Login =~ s/%%/%/g;
+
+        if ( defined $SQL ) {
+            $SQL .= " AND ";
+        }
+
+        if ( $Self->{CaseSensitive} ) {
+            $SQL .= "u.login LIKE ?";
+            push(@Bind, \$Login);
         }
         else {
-            if ( defined $SQL ) {
-                $SQL .= " AND ";
-            }
-            $SQL .= "c.user_id = ?";
-            push(@Bind, \$ExistingUserID);
+            $SQL .= "LOWER(u.login) LIKE LOWER(?)";
+            push(@Bind, \$Login);
         }
     }
 
     # ask database
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL   => "SELECT DISTINCT c.id, c.email FROM contact c LEFT JOIN contact_organisation co ON c.id = co.contact_id "
+        SQL   => "SELECT DISTINCT c.id, c.email FROM contact c $Join "
             . ($SQL ? "WHERE $SQL" : ''),
         Bind  => \@Bind,
         Limit => $Param{Limit},
