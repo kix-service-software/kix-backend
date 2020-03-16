@@ -89,7 +89,7 @@ sub Run {
             foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
                 next if ( 
                     !($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} =~ m/^(PrimaryOrganisationID|OrganisationID|AssignedUserID|UserID)$/)
-                    && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|UserLogin|Login)$/
+                    && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|Login)$/
                 );
                 if (!$ContactSearch{$SearchType}) {
                     $ContactSearch{$SearchType} = [];
@@ -122,7 +122,9 @@ sub Run {
                 } else {
                     my %SearchParam;
 
-                    if ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationID)$/ ) {
+                    if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Login' ) {
+                        $SearchParam{LoginEquals} = $Value;
+                    elsif ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationID)$/ ) {
                         $SearchParam{ $SearchItem->{Field} } = $Value;
                     } elsif ($SearchItem->{Field} eq 'Email') {
                         $SearchParam{PostMasterSearch} = $Value;

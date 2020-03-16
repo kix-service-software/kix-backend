@@ -889,6 +889,12 @@ to search contacts
         Valid          => 1,                    # (optional) default 1
     );
 
+    #search by UserLogin (exact match)
+    my %List = $ContactObject->ContactSearch(
+        LoginEquals    => 'some_user_login,
+        Valid          => 1,                    # (optional) default 1
+    );
+
 =cut
 
 sub ContactSearch {
@@ -902,7 +908,7 @@ sub ContactSearch {
 
     # check cache
     my $CacheKey = "ContactSearch::${Valid}::";
-    foreach my $Key ( qw(OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login) ) {
+    foreach my $Key ( qw(OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals) ) {
         $CacheKey .= '::'.($Param{$Key} || '');
     }
     my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -1013,6 +1019,10 @@ sub ContactSearch {
             $SQL .= "LOWER(u.login) LIKE LOWER(?)";
             push(@Bind, \$Login);
         }
+    }
+    elsif ($Param{LoginEquals}) {
+        $SQL .= "u.login = ?";
+        push(@Bind, \$Param{LoginEquals});
     }
 
     # ask database
