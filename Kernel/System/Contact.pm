@@ -485,7 +485,7 @@ sub ContactLookup {
     if ( $Param{Email}) {
 
         # check cache
-        my $CacheKey = 'ContactLookup::ID::' . $Param{Email};
+        my $CacheKey = 'ContactLookup::Email::' . $Param{Email};
         my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -533,7 +533,7 @@ sub ContactLookup {
         return if $Param{ID} && $Param{ID} !~ /^\d+$/;
 
         # check cache
-        my $CacheKey = 'ContactLookup::Email::' . $Param{ID};
+        my $CacheKey = 'ContactLookup::ID::' . $Param{ID};
         my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -579,7 +579,7 @@ sub ContactLookup {
         return if $Param{UserID} && $Param{UserID} !~ /^\d+$/;
 
         # check cache
-        my $CacheKey = 'ContactLookup::ID::' . $Param{UserID};
+        my $CacheKey = 'ContactLookup::UserID::' . $Param{UserID};
         my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
