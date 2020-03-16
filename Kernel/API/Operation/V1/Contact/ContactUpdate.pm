@@ -163,7 +163,7 @@ sub Run {
             if ($ExistingContactID && $ExistingContactID != $Param{Data}->{ContactID}) {
                 return $Self->_Error(
                     Code    => 'Object.AlreadyExists',
-                    Message => "Cannot update contact. User already assigned to another contact.",
+                    Message => "Cannot update contact. User already assigned to contact $ExistingContactID.",
                 );
             }
         }
