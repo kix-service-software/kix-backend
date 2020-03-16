@@ -1564,17 +1564,16 @@ sub _ExportXMLDataPrepare {
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
-            # stop loop, if no content was given
-            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
-
             # create key
             my $Key = $Param{Prefix} . $Item->{Key} . '::' . $Counter;
 
             # prepare value
-            $Param{XMLData2D}->{$Key} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->XMLExportValuePrepare(
-                Item  => $Item,
-                Value => $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content},
-            );
+            if (defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}) {
+                $Param{XMLData2D}->{$Key} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->XMLExportValuePrepare(
+                    Item  => $Item,
+                    Value => $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content},
+                );
+            }
 
             next COUNTER if !$Item->{Sub};
 
