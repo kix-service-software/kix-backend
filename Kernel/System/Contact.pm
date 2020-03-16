@@ -1000,6 +1000,15 @@ sub ContactSearch {
         $SQL .= "c.user_id = ?";
         push(@Bind, \$Param{UserID}) if $Param{UserID};
     }
+    elsif ($Param{EmailEquals}) {
+
+        if ( defined $SQL ) {
+            $SQL .= " AND ";
+        }
+
+        $SQL .= "c.email = ?";
+        push(@Bind, \$Param{EmailEquals});
+    }
     elsif ($Param{Login}) {
         $Join = 'LEFT JOIN users u ON c.user_id = u.id';
 

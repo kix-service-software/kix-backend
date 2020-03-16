@@ -126,6 +126,8 @@ sub Run {
                         $SearchParam{LoginEquals} = $Value;
                     } elsif ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationID)$/ ) {
                         $SearchParam{ $SearchItem->{Field} } = $Value;
+                    } elsif ($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Email') {
+                        $SearchParam{EmailEquals} = $Value;
                     } elsif ($SearchItem->{Field} eq 'Email') {
                         $SearchParam{PostMasterSearch} = $Value;
                     } elsif ($SearchItem->{Field} eq 'PrimaryOrganisationID') {
