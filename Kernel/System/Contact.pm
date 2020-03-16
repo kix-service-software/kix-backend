@@ -908,7 +908,7 @@ sub ContactSearch {
 
     # check cache
     my $CacheKey = "ContactSearch::${Valid}::";
-    foreach my $Key ( qw(OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals) ) {
+    foreach my $Key ( qw(OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals) ) {
         $CacheKey .= '::'.($Param{$Key} || '');
     }
     my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
