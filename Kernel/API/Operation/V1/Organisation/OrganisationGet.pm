@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -240,6 +240,27 @@ sub Run {
 
             # inform API caching about a new dependency
             $Self->AddCacheDependency(Type => 'Ticket');
+            $Self->AddCacheDependency( Type => 'User' );
+            $Self->AddCacheDependency( Type => 'Contact' );
+        }
+
+        # include assigned config items if requested
+        if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
+
+            my $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                ObjectType => 'Organisation',
+                Object     => \%OrganisationData
+            );
+
+            # filter for customer assigned config items if necessary
+            my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
+                ConfigItemIDList => $ItemIDs
+            );
+
+            $OrganisationData{AssignedConfigItems} = \@ConfigItemIDList;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
         }
 
         # add

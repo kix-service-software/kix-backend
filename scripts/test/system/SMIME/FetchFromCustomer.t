@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -343,14 +343,14 @@ my %ContactConfig = (
         # note: Login, Email and CustomerID are mandatory!
         # if you need additional attributes from AD, just map them here.
         # var, frontend, storage, shown (1=always,2=lite), required, storage-type, http-link, readonly
-        [ 'UserSalutation',       'Title or salutation', 'title',                1, 0, 'var', '', 0 ],
-        [ 'UserFirstname',        'Firstname',           'first_name',           1, 1, 'var', '', 0 ],
-        [ 'UserLastname',         'Lastname',            'last_name',            1, 1, 'var', '', 0 ],
-        [ 'UserLogin',            'Username',            'login',                1, 1, 'var', '', 0 ],
-        [ 'UserPassword',         'Password',            'pw',                   0, 0, 'var', '', 0 ],
-        [ 'UserEmail',            'Email',               'email',                1, 1, 'var', '', 0 ],
-        [ 'UserCustomerID',       'CustomerID',          'customer_id',          0, 1, 'var', '', 0 ],
-        [ 'UserSMIMECertificate', 'SMIMECertificate',    'userSMIMECertificate', 0, 1, 'var', '', 0 ],
+        [ 'Salutation',       'Title or salutation', 'title',                1, 0, 'var', '', 0 ],
+        [ 'Firstname',        'Firstname',           'first_name',           1, 1, 'var', '', 0 ],
+        [ 'Lastname',         'Lastname',            'last_name',            1, 1, 'var', '', 0 ],
+        [ 'Login',            'Username',            'login',                1, 1, 'var', '', 0 ],
+        [ 'Password',         'Password',            'pw',                   0, 0, 'var', '', 0 ],
+        [ 'Email',            'Email',               'email',                1, 1, 'var', '', 0 ],
+        [ 'CustomerID',       'CustomerID',          'customer_id',          0, 1, 'var', '', 0 ],
+        [ 'SMIMECertificate', 'SMIMECertificate',    'userSMIMECertificate', 0, 1, 'var', '', 0 ],
     ],
 );
 my $Return = $ConfigObject->Set(
@@ -403,20 +403,20 @@ my %List               = $ContactObject->CustomerSearch(
 
 CUSTOMERUSER:
 for my $Contact ( sort keys %List ) {
-    my %User = $ContactObject->ContactGet(
+    my %UserContact = $ContactObject->ContactGet(
         ID => $Contact,
     );
-    next CUSTOMERUSER if !$User{UserSMIMECertificate};
+    next CUSTOMERUSER if !$UserContact{UserSMIMECertificate};
 
     # 1st try with CertificateSearch
     # add
     my @CertificateFilename = $SMIMEObject->CertificateSearch(
-        Search => $User{UserEmail},
+        Search => $UserContact{Email},
     );
 
     $Self->True(
         $CertificateFilename[0]{Filename},
-        "Certificate for $User{UserEmail} was imported",
+        "Certificate for $UserContact{Email} was imported",
     );
 
     # check
@@ -435,17 +435,17 @@ for my $Contact ( sort keys %List ) {
 
     #2nd try - fetching from customer
     my @Files = $SMIMEObject->FetchFromCustomer(
-        Search => $User{UserEmail},
+        Search => $UserContact{Email},
     );
 
     my @CertificateFilename2nd = $SMIMEObject->CertificateSearch(
-        Search  => $User{UserEmail},
+        Search  => $UserContact{Email},
         DontAdd => 1,
     );
 
     $Self->True(
         $CertificateFilename2nd[0],
-        "Certificate for $User{UserEmail} found",
+        "Certificate for $UserContact{Email} found",
     );
 
     # remove

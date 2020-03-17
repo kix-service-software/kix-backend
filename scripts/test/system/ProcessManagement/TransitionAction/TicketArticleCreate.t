@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -616,10 +616,10 @@ for my $Test (@Tests) {
             my $ExpectedValue = $Test->{Config}->{Config}->{$Attribute};
 
             if ( $Attribute eq 'From' && !defined $Test->{Config}->{Config}->{$Attribute} ) {
-                my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+                my %UserContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
                     UserID => $UserID,
                 );
-                $ExpectedValue = "$User{UserFullName} <$User{UserEmail}>";
+                $ExpectedValue = "$UserContact{FullName} <$UserContact{Email}>";
             }
 
             if (

@@ -7,7 +7,7 @@
       "Lock" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Lock"
+            "$ref" : "#/definitions/_Lock_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Lock"
    ],
    "definitions" : {
-      "Lock" : {
+      "_Lock_json" : {
          "$id" : "#Lock",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket lock object.",

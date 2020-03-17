@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -97,7 +97,7 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
 
     my $Result = $OperationObject->Run(
         Data => {
-        	ClientRegistration => {
+            ClientRegistration => {
                 ClientID         => '...',
                 CallbackURL      => '...',        # optional
                 CallbackInterval => '...',        # optional
@@ -109,12 +109,12 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
                     }
                 ]
             }
-	    },
+        },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             ClientID  => '',                        # ID of the created ClientRegistration
@@ -129,8 +129,8 @@ sub Run {
     # isolate and trim ClientRegistration parameter
     my $ClientRegistration = $Self->_Trim(
         Data => $Param{Data}->{ClientRegistration},
-    );        
-   
+    );
+
     # check if ClientRegistration exists
     my %ClientRegistration = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationGet(
         ClientID => $ClientRegistration->{ClientID},
@@ -158,7 +158,7 @@ sub Run {
             Message => 'Could not create client registration, please contact the system administrator',
         );
     }
-    
+
     # import translations if given
     if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
         foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
@@ -175,7 +175,7 @@ sub Run {
 
     # import SysConfig definitions if given
     if ( IsArrayRefWithData($ClientRegistration->{SysConfigOptionDefinitions}) ) {
-        my %SysConfigOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->ValueGetAll();
+        my %SysConfigOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
 
         foreach my $Item ( @{$ClientRegistration->{SysConfigOptionDefinitions}} ) {
             if ( !exists $SysConfigOptions{$Item->{Name}} ) {
@@ -193,7 +193,7 @@ sub Run {
                     IsRequired      => $Item->{IsRequired},
                     Setting         => $Item->{Setting},
                     Default         => $Item->{Default},
-                    ValidID         => $Item->{ValidID} || 1,
+                    DefaultValidID  => $Item->{DefaultValidID},
                     UserID          => $Self->{Authorization}->{UserID},
                 );
 
@@ -202,26 +202,15 @@ sub Run {
                         Code    => 'Object.UnableToCreate',
                         Message => 'Could not create SysConfigOptionDefinition "'.$Item->{Name}.'", please contact the system administrator',
                     );
-                }                
+                }
             }
             else {
                 # update existing option
                 my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
-                    Name            => $Item->{Name},
-                    AccessLevel     => $Item->{AccessLevel},
-                    Type            => $Item->{Type},
-                    Context         => $Item->{Context},
-                    ContextMetadata => $Item->{ContextMetadata},
-                    Description     => $Item->{Description},
-                    Comment         => $Item->{Comment},
-                    Level           => $Item->{Level},
-                    Group           => $Item->{Group},
-                    IsRequired      => $Item->{IsRequired},
-                    Setting         => $Item->{Setting},
-                    Default         => $Item->{Default},
-                    ValidID         => $Item->{ValidID} || 1,
-                    Value           => $SysConfigOptions{$Item->{Name}},
-                    UserID          => $Self->{Authorization}->{UserID},
+                    %{ $SysConfigOptions{ $Item->{Name} } },
+                    %{$Item},
+                    Value  => $SysConfigOptions{ $Item->{Name} }->{IsModified} ? $SysConfigOptions{ $Item->{Name} }->{Value} : undef,
+                    UserID => $Self->{Authorization}->{UserID},
                 );
 
                 if ( !$Success ) {
@@ -239,12 +228,12 @@ sub Run {
         $SystemInfo{$Key} = $Kernel::OM->Get('Kernel::Config')->Get($Key);
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         ClientID => $ClientID,
         SystemInfo => \%SystemInfo,
-    );    
+    );
 }
 
 1;

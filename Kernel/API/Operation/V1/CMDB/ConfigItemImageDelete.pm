@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -113,6 +113,16 @@ perform Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
+
     # get config item data
     my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID}
@@ -158,10 +168,6 @@ sub Run {
 }
 
 1;
-
-
-
-
 
 =back
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -23,14 +23,6 @@ sub Configure {
     # rkaiser - T#2017020290001194 - changed customer user to contact
     $Self->Description('Add a contact.');
     $Self->AddOption(
-        Name        => 'user-name',
-        # rkaiser - T#2017020290001194 - changed customer user to contact
-        Description => "User name for the new contact.",
-        Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
         Name        => 'first-name',
         # rkaiser - T#2017020290001194 - changed customer user to contact
         Description => "First name of the new contact.",
@@ -47,18 +39,18 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'email-address',
+        Name        => 'primary-customer-id',
         # rkaiser - T#2017020290001194 - changed customer user to contact
-        Description => "Email address of the new contact.",
+        Description => "The primary customer ID for the new contact.",
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'primary-customer-id',
+        Name        => 'email-address',
         # rkaiser - T#2017020290001194 - changed customer user to contact
-        Description => "The primary customer ID for the new contact.",
-        Required    => 1,
+        Description => "Email address of the new contact.",
+        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -70,9 +62,8 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'password',
-        # rkaiser - T#2017020290001194 - changed customer user to contact
-        Description => "Password for the new contact. If left empty, a password will be generated automatically.",
+        Name        => 'user-login',
+        Description => "Login of an existing user which is going to be assigned to the new contact.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -86,22 +77,27 @@ sub Run {
 
     $Self->Print("<yellow>Adding a new customer user...</yellow>\n");
 
-    # add customer user
+    my $AssignedUserID;
+    if ($Self->GetOption('user-login')) {
+        $AssignedUserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+            UserLogin => $Self->GetOption('user-login'),
+            Silent    => 1,
+        );
+    }
     if (
         !$Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
-            Source         => 'Contact',
-            UserLogin      => $Self->GetOption('user-name'),
-            UserFirstname  => $Self->GetOption('first-name'),
-            UserLastname   => $Self->GetOption('last-name'),
-            UserCustomerID => $Self->GetOption('primary-customer-id'),
-            UserCustomerIDs => $Self->GetOption('customer-ids') || $Self->GetOption('primary-customer-id'),
-            UserPassword   => $Self->GetOption('password'),
-            UserEmail      => $Self->GetOption('email-address'),
-            UserID         => 1,
-            ChangeUserID   => 1,
-            ValidID        => 1,
+            Source                => 'Contact',
+            Firstname             => $Self->GetOption('first-name'),
+            Lastname              => $Self->GetOption('last-name'),
+            PrimaryOrganisationID => $Self->GetOption('primary-customer-id'),
+            OrganisationIDs       => $Self->GetOption('customer-ids') || $Self->GetOption('primary-customer-id'),
+            Email                 => $Self->GetOption('email-address'),
+            AssignedUserID        => $AssignedUserID,
+            UserID                => 1,
+            ChangeUserID          => 1,
+            ValidID               => 1,
         )
-        )
+    )
     {
         $Self->PrintError("Can't add customer user.");
         return $Self->ExitCodeError();

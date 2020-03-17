@@ -1,0 +1,20 @@
+{
+    "FAQCategory": {
+        "Articles": [
+            1, 2, 3
+        ],
+        "ChangeBy": 1,
+        "ChangeTime": "2019-08-09 08:13:38",
+        "Comment": "KIX related articles",
+        "CreateBy": 1,
+        "CreateTime": "2019-08-09 08:13:38",
+        "Fullname": "KIX",
+        "ID": 2,
+        "Name": "KIX",
+        "ParentID": null,
+        "SubCategories": [
+            4
+        ],
+        "ValidID": 1
+    }
+}

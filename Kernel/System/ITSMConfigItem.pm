@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -2540,7 +2540,242 @@ sub CountLinkedObjects {
 
 # EO KIX4OTRS-capeIT
 
+=item GetAssignedConfigItemsForObject()
+
+return all assigned config item IDs
+
+    my $ConfigItemIDList = $ITSMConfigItemObject->GetAssignedConfigItemsForObject(
+        ObjectType => 'Contact',
+        Object     => $ContactHashRef
+    );
+
+=cut
+
+sub GetAssignedConfigItemsForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedCIIDs = ();
+
+    for ( qw(ObjectType Object) ) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    if ( !IsHashRefWithData( $Param{Object} ) ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "Object is no hash ref!"
+        );
+        return;
+    }
+
+    my $MappingString = $Kernel::OM->Get('Kernel::Config')->Get('AssignedConfigItemsMapping') || '';
+
+    if ( IsStringWithData($MappingString) ) {
+
+        my $Mapping = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            Data => $MappingString
+        );
+
+        if ( !IsHashRefWithData($Mapping) ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid JSON for sysconfig option 'AssignedConfigItemsMapping'."
+            );
+        } elsif ( IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) ) {
+
+            CICLASS:
+            for my $CIClass ( keys %{ $Mapping->{ $Param{ObjectType} } } ) {
+                next CICLASS if ( !IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{$CIClass} ) );
+
+                # get class
+                my $ClassItemRef = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+                    Class => 'ITSM::ConfigItem::Class',
+                    Name  => $CIClass,
+                );
+
+                next CICLASS if ( !IsHashRefWithData($ClassItemRef) || !$ClassItemRef->{ItemID} );
+
+                # get CI-class definition...
+                my $XMLDefinition = $Self->DefinitionGet(
+                    ClassID => $ClassItemRef->{ItemID},
+                );
+
+                if ( !$XMLDefinition->{DefinitionID} ) {
+                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        Priority => 'error',
+                        Message  => "No Definition definied for class $CIClass!",
+                    );
+                    next CICLASS;
+                }
+
+                # prepare search data
+                my %SearchData;
+                for my $CISearchAttribute ( keys %{ $Mapping->{ $Param{ObjectType} }->{$CIClass} } ) {
+                    next if (!$CISearchAttribute);
+                    next if ( !IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute} ) );
+
+                    my $ObjectSearchAttributes = $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute}->{SearchAttributes};
+                    my $SearchStatics = $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute}->{SearchStatic};
+                    next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
+
+                    $CISearchAttribute =~ s/^\s+//g;
+                    $CISearchAttribute =~ s/\s+$//g;
+
+                    next if !$CISearchAttribute;
+
+                    # ignore not xml attributes
+                    next if (
+                        $CISearchAttribute eq 'Name' || 
+                        $CISearchAttribute eq 'Number' ||
+                        $CISearchAttribute eq 'DeploymentState' ||
+                        $CISearchAttribute eq 'IncidentState'
+                    );
+
+                    $SearchData{$CISearchAttribute} = [];
+
+                    # get attributes search data
+                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                        my $Value;
+                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                        } else {
+                            $Value = $Param{Object}->{$ObjectSearchAttribute};
+                        }
+
+                        next if ( !defined $Value );
+
+                        push ( 
+                            @{ $SearchData{$CISearchAttribute} },
+                            IsArrayRefWithData($Value) ? @{$Value} : $Value
+                        );
+                    }
+
+                    # get static search data
+                    for my $SearchStatic ( @{$SearchStatics} ) {
+                        next if ( !defined $SearchStatic );
+                        push ( @{ $SearchData{$CISearchAttribute} }, $SearchStatic );
+                    }
+                }
+
+                # build search params (What)
+                my %SearchWhat;
+                $Self->_GetXMLSearchDataForAssignedCIs(
+                    XMLDefinition => $XMLDefinition->{DefinitionRef},
+                    SearchWhat    => \%SearchWhat,
+                    SearchData    => \%SearchData,
+                );
+
+                # do search
+                if (scalar keys %SearchWhat) {
+
+                    # if this CI class doesn't contain all the search attributes then we have to ignore it
+                    next CICLASS if scalar( keys %SearchWhat ) < scalar( keys %SearchData );
+
+                    my $ConfigItemList = $Self->ConfigItemSearchExtended(
+                        What     => [ \%SearchWhat ],
+                        ClassIDs => [ $ClassItemRef->{ItemID} ],
+                        UserID   => $Param{UserID}
+                    );
+                    if ( IsArrayRefWithData($ConfigItemList) ) {
+
+                        # add only not existing items
+                        for my $ListItem ( @{$ConfigItemList} ) {
+                            next if grep { $_ == $ListItem } @AssignedCIIDs;
+                            push @AssignedCIIDs, $ListItem;
+                        }
+                    }
+                }
+            }
+        } else {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'info',
+                Message  => "'$Param{ObjectType}' not contained in 'AssignedConfigItemsMapping'."
+            );
+        }
+    }
+
+    if ( IsArrayRefWithData(\@AssignedCIIDs) ) {
+        @AssignedCIIDs = map { 0 + $_ } @AssignedCIIDs;
+    }
+
+    return \@AssignedCIIDs;
+}
+
 =begin Internal:
+
+=item _GetXMLSearchDataForAssignedCIs()
+
+recusion function to prepare the export XML search params
+
+    $ObjectBackend->_GetXMLSearchDataForAssignedCIs(
+        XMLDefinition => $ArrayRef,
+        SearchWhat    => $HashRef,     # empty at first
+        SearchData    => $HashRef,     # { "ParentAttribute::ChildAttribute" => [1,2,'test'], ... }
+    );
+
+=cut
+
+sub _GetXMLSearchDataForAssignedCIs {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    return if !$Param{XMLDefinition} || ref $Param{XMLDefinition} ne 'ARRAY';
+    return if !$Param{SearchWhat}    || ref $Param{SearchWhat}    ne 'HASH';
+    return if !$Param{SearchData}    || ref $Param{SearchData}    ne 'HASH';
+
+    for my $Item ( @{ $Param{XMLDefinition} } ) {
+        my $Key = $Param{Prefix} ? $Param{Prefix} . '::' . $Item->{Key} : $Item->{Key};
+
+        # prepare value
+        my $Values = [];
+        if ( IsArrayRefWithData($Param{SearchData}->{$Key}) ) {
+
+            for my $SingleValue ( @{$Param{SearchData}->{$Key}} ) {
+                my $ValuePart = $Self->XMLExportSearchValuePrepare(
+                    Item  => $Item,
+                    Value => $SingleValue,
+                );
+
+                if (defined $ValuePart && $ValuePart ne '') {
+                    if ( IsArrayRefWithData($ValuePart) ) {
+                        push( @{$Values}, @{$ValuePart} );
+                    } else {
+                        push( @{$Values}, $ValuePart);
+                    }
+                }
+            }
+        }
+
+        if ( IsArrayRefWithData($Values) ) {
+
+            # create search key
+            my $SearchKey = $Key;
+            $SearchKey =~ s{ :: }{\'\}[%]\{\'}xmsg;
+
+            # create search hash
+            $Param{SearchWhat}->{ "[1]{'Version'}[1]{'" . $SearchKey. "'}[%]{'Content'}" } = $Values;
+        }
+
+        next if !$Item->{Sub};
+
+        # start recursion, if "Sub" was found
+        $Self->_GetXMLSearchDataForAssignedCIs(
+            XMLDefinition => $Item->{Sub},
+            SearchWhat    => $Param{SearchWhat},
+            SearchData    => $Param{SearchData},
+            Prefix        => $Key,
+        );
+    }
+    return 1;
+}
 
 =item _FindInciConfigItems()
 
@@ -2729,10 +2964,6 @@ sub _PrepareLikeString {
 1;
 
 =end Internal:
-
-
-
-
 
 =back
 

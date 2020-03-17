@@ -13,11 +13,11 @@
             "Images" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemImagePostItem"
+                  "$ref" : "#/definitions/_ConfigItemImagePostItem_json"
                }
             },
             "Version" : {
-               "$ref" : "#/definitions/ConfigItemVersionPostItem"
+               "$ref" : "#/definitions/_ConfigItemVersionPostItem_json"
             }
          },
          "required" : [
@@ -30,32 +30,7 @@
       "ConfigItem"
    ],
    "definitions" : {
-      "ConfigItemVersionPostItem" : {
-         "$id" : "#ConfigItemVersionPostItem",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item version request object for creation.",
-         "type" : "object",
-         "properties" : {
-            "Data" : {
-               "type" : "object"
-            },
-            "DeplStateID" : {
-               "type" : "integer"
-            },
-            "InciStateID" : {
-               "type" : "integer"
-            },
-            "Name" : {
-               "type" : "string"
-            }
-         },
-         "required" : [
-            "Name",
-            "DeplStateID",
-            "InciStateID"
-         ]
-      },
-      "ConfigItemImagePostItem" : {
+      "_ConfigItemImagePostItem_json" : {
          "$id" : "#ConfigItemImagePostItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image request object for creation.",
@@ -78,6 +53,31 @@
             "Content",
             "ContentType",
             "Filename"
+         ]
+      },
+      "_ConfigItemVersionPostItem_json" : {
+         "$id" : "#ConfigItemVersionPostItem",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item version request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Data" : {
+               "type" : "object"
+            },
+            "DeplStateID" : {
+               "type" : "integer"
+            },
+            "InciStateID" : {
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Name",
+            "DeplStateID",
+            "InciStateID"
          ]
       }
    }

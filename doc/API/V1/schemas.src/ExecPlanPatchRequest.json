@@ -17,8 +17,7 @@
            "$ref": "ExecPlanParametersPostPatchItem.json"
         },
         "Type": {
-          "type": "string",
-          "description": ""
+          "type": "string"
         },
         "ValidID": {
           "type": "integer"

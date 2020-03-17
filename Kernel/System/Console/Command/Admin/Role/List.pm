@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -41,17 +41,18 @@ sub Run {
         3 => 'no(temp)',
     );
 
-    $Self->Print("    ID Role                                               Valid    Comment\n");
-    $Self->Print("------ -------------------------------------------------- -------- --------------------------------------------------------------------------------\n");
+    $Self->Print("    ID Role                                               Usage Context           Valid    Comment\n");
+    $Self->Print("------ -------------------------------------------------- ----------------------- -------- --------------------------------------------------------------------------------\n");
 
     foreach my $ID ( sort { $Roles{$a} cmp $Roles{$b} } keys %Roles ) {
         my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
             ID => $ID
         );
 
-        my $Valid = $ValidStr{$Role{ValidID}};
+        my $Valid        = $ValidStr{$Role{ValidID}};
+        my $UsageContext = join(', ', @{$Role{UsageContextList}});
 
-        $Self->Print(sprintf("%6i %-50s %-8s %-80s\n", $Role{ID}, $Role{Name}, $Valid, $Role{Comment}));
+        $Self->Print(sprintf("%6i %-50s %-23s %-8s %-80s\n", $Role{ID}, $Role{Name}, $UsageContext, $Valid, $Role{Comment}));
     }
 
     $Self->Print("<green>Done</green>\n");

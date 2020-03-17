@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "GeneralCatalogItem" : {
-         "$ref" : "#/definitions/GeneralCatalogItem"
+         "$ref" : "#/definitions/_GeneralCatalogItem_json"
       }
    },
    "required" : [
       "GeneralCatalogItem"
    ],
    "definitions" : {
-      "GeneralCatalogItem" : {
+      "_GeneralCatalogItem_json" : {
          "$id" : "#GeneralCatalogItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The GeneralCatalog item object.",

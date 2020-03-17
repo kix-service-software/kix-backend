@@ -127,7 +127,7 @@ builder {
     enable "Plack::Middleware::AccessLog::Timed",
         format => "%h %l %u %t \"%r\" %>s %b %D";
     enable "StackTrace", 
-        force => 1;         
+        force => 1;
     $App;
 };
 

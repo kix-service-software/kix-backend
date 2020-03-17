@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#FAQAttachmentPostRequest",
+  "type": "object",
+  "description": "The FAQ article request object for create.",
+  "properties": {
+    "FAQAttachment": {
+      "type": "object",
+      "properties": {
+        "Content": {
+          "type": "string",
+          "description": "base64 encoded file ontent string"
+        },
+        "ContentType": {
+          "type": "integer"
+        },
+        "CustomerVisible": {
+          "type": "integer"
+        },
+        "Filename": {
+          "type": "string"
+        },
+        "Inline": {
+          "type": "integer",
+          "description": "1 if attachment is an inline attachment of a text field property (e.g. \"Field1\") or 0 if not"
+        }
+      },
+      "required": [
+        "Content",
+        "ContentType",
+        "Filename"
+      ]
+    }
+  },
+  "required": [
+    "FAQAttachment"
+  ]
+}

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -58,12 +58,12 @@ sub Run {
     );
 
     foreach my $ID ( sort @RoleIDs ) {
-        my $RoleName = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
-            RoleID => $ID
+        my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+            ID => $ID
         );
-        next if !$RoleName;
+        next if !%Role;
 
-        $Self->Print("$RoleName\n");
+        $Self->Print("$Role{Name} (" . (join(', ', @{$Role{UsageContextList}})) . ")\n");
     }
 
     $Self->Print("<green>Done</green>\n");

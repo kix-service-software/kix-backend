@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -27,37 +27,19 @@ my $Helper             = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 # create needed users
 my @UserIDs;
 {
-
-    # disable email checks to create new user
-    my $CheckEmailAddressesOrg =
-        $ConfigObject->Get('CheckEmailAddresses') || 1;
-
-    $ConfigObject->Set(
-        Key   => 'CheckEmailAddresses',
-        Value => 0,
-    );
-
     for my $Counter ( 1 .. 2 ) {
 
         # create new users for the tests
         my $UserID = $UserObject->UserAdd(
-            UserFirstname => 'ImportExport' . $Counter,
-            UserLastname  => 'UnitTest',
-            UserLogin     => 'UnitTest-ImportExport-' . $Counter . $Helper->GetRandomID(),
-            UserEmail     => 'UnitTest-ImportExport-' . $Counter . '@localhost',
-            ValidID       => 1,
-            ChangeUserID  => 1,
+            UserLogin    => 'UnitTest-ImportExport-' . $Counter . $Helper->GetRandomID(),
+            ValidID      => 1,
+            ChangeUserID => 1,
+            IsAgent      => 1,
         );
 
         push @UserIDs, $UserID;
     }
 
-    # restore original email check param
-
-    $ConfigObject->Set(
-        Key   => 'CheckEmailAddresses',
-        Value => $CheckEmailAddressesOrg,
-    );
 }
 
 # create needed random template names

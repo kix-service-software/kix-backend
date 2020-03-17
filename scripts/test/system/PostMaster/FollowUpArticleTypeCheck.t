@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -343,14 +343,14 @@ $ContactObject->ContactUpdate(
     %ContactData,
     Source    => 'Contact',       # Contact source config
     ID        => $TestContactID,
-    UserEmail => $CustomerAddress,
+    Email     => $CustomerAddress,
     UserID    => 1,
 );
 %ContactData = $ContactObject->ContactGet(
     ID => $TestContactID,
 );
 $TicketObject->TicketCustomerSet(
-    OrganisationID => $ContactData{CustomerID},
+    OrganisationID => $ContactData{PrimaryOrganisationID},
     ContactID      => $TestContactID,
     TicketID       => $TicketID,
     UserID         => 1,

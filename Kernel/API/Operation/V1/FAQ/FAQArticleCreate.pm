@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -97,12 +97,11 @@ sub ParameterDefinition {
         'FAQArticle::Title' => {
             Required => 1
         },
-        'FAQArticle::Visibility' => {
+        'FAQArticle::CustomerVisible' => {
             RequiresValueIfUsed => 1,
             OneOf => [
-                'internal',
-                'external',
-                'public'
+                0,
+                1
             ]
         },
         'FAQArticle::Language' => {
@@ -126,14 +125,14 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
     my $Result = $OperationObject->Run(
         Data => {
             FAQArticle  => {
-                Title       => 'Some Text',
-                CategoryID  => 1,
-                ValidID     => 1,
-                Visibility  => 'internal',       # optional, possible values 'internal', 'external', 'public' with fallback to 'internal'
-                Language    => 'en',             # optional, if not given set to DefaultLanguage with fallback 'en'
-                ContentType => 'text/plain',     # optional, if not given set to 'text/plain'
-                Number      => '13402',          # optional
-                Keywords    => [                 # optional
+                Title           => 'Some Text',
+                CategoryID      => 1,
+                ValidID         => 1,
+                CustomerVisible => 1,                # optional, 1|0, default 0
+                Language        => 'en',             # optional, if not given set to DefaultLanguage with fallback 'en'
+                ContentType     => 'text/plain',     # optional, if not given set to 'text/plain'
+                Number          => '13402',          # optional
+                Keywords        => [                 # optional
                     'some', 'keywords',  
                 ]
                 Field1      => 'Symptom...',     # optional
@@ -179,7 +178,7 @@ sub Run {
     my $FAQArticleID = $Kernel::OM->Get('Kernel::System::FAQ')->FAQAdd(
         Title       => $FAQArticle->{Title},
         CategoryID  => $FAQArticle->{CategoryID},
-        Visibility  => $FAQArticle->{Visibility} || 'internal',
+        Visibility  => exists $FAQArticle->{CustomerVisible} && $FAQArticle->{CustomerVisible} ? 'external' : 'internal',
         Language    => $FAQArticle->{Language} || 'en',
         Number      => $FAQArticle->{Number} || '',
         Keywords    => IsArrayRefWithData($FAQArticle->{Keywords}) ? join(' ', @{$FAQArticle->{Keywords}}) : '',

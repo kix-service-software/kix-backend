@@ -7,7 +7,7 @@
       "Service" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Service"
+            "$ref" : "#/definitions/_Service_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Service"
    ],
    "definitions" : {
-      "Service" : {
+      "_Service_json" : {
          "$id" : "#Service",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The service object.",
@@ -30,7 +30,14 @@
                "readOnly" : true
             },
             "Comment" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "CreateBy" : {

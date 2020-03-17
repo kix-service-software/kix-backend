@@ -7,7 +7,7 @@
       "Macro" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Macro"
+            "$ref" : "#/definitions/_Macro_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Macro"
    ],
    "definitions" : {
-      "MacroAction" : {
+      "_MacroAction_json" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
@@ -73,7 +73,7 @@
             "ValidID"
          ]
       },
-      "Macro" : {
+      "_Macro_json" : {
          "$id" : "#Macro",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
@@ -83,7 +83,7 @@
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction"
+                  "$ref" : "#/definitions/_MacroAction_json"
                },
                "readOnly" : true
             },

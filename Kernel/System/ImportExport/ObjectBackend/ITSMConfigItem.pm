@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -408,10 +408,10 @@ sub ExportDataGet {
     );
 
     # check object data
-    if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
+    if ( !$ObjectData || ref $ObjectData ne 'HASH'  || !$ObjectData->{ClassID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
-            Message  => "No object data found for the template id $Param{TemplateID}",
+            Message  => "No valid object data found for the template id $Param{TemplateID}",
         );
         return;
     }
@@ -1564,17 +1564,16 @@ sub _ExportXMLDataPrepare {
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
-            # stop loop, if no content was given
-            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
-
             # create key
             my $Key = $Param{Prefix} . $Item->{Key} . '::' . $Counter;
 
             # prepare value
-            $Param{XMLData2D}->{$Key} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->XMLExportValuePrepare(
-                Item  => $Item,
-                Value => $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content},
-            );
+            if (defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}) {
+                $Param{XMLData2D}->{$Key} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->XMLExportValuePrepare(
+                    Item  => $Item,
+                    Value => $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content},
+                );
+            }
 
             next COUNTER if !$Item->{Sub};
 

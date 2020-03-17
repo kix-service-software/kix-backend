@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -146,8 +146,13 @@ sub Run {
         delete $FAQArticle{ItemID};
 
         # convert Keywords to array
-        my @Keywords = split(/\s+/, $FAQArticle{Keywords});
+        my @Keywords = split(/\s+/, $FAQArticle{Keywords} || '');
         $FAQArticle{Keywords} = \@Keywords;
+
+        $FAQArticle{CustomerVisible} = $FAQArticle{Visibility} 
+            && ($FAQArticle{Visibility} eq 'external' || $FAQArticle{Visibility} eq 'public' )
+            ? 1 : 0;
+        delete $FAQArticle{Visibility};
 
         # add
         push(@FAQArticleData, \%FAQArticle);

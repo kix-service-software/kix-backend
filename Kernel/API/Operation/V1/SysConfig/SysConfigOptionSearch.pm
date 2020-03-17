@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -85,12 +85,28 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform SysConfig search
-    my %AllOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->ValueGetAll();
+    my %AllOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
+
+    # prepare search if given
+    if ( IsHashRefWithData( $Self->{Search}->{SysConfigOption} ) ) {
+        my @Options = values %AllOptions;
+        my $Data = {
+            SysConfigOption => \@Options,
+        };
+
+        # use the in-API filter to do that, because the AllOptions hash already contains everything we need
+        my $Result = $Self->_ApplyFilter(
+            Filter => $Self->{Search},
+            Data   => $Data
+        );
+        %AllOptions = map { $_->{Name} => 1 } @{$Data->{SysConfigOption}};
+    }
 
 	# get already prepared SysConfig data from SysConfigGet operation
     if ( IsHashRefWithData(\%AllOptions) ) {  	
         my $SysConfigGetResult = $Self->ExecOperation(
-            OperationType => 'V1::SysConfig::SysConfigOptionGet',
+            OperationType            => 'V1::SysConfig::SysConfigOptionGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 Option  => join(',', sort keys %AllOptions),
                 include => $Param{Data}->{include},
@@ -100,7 +116,7 @@ sub Run {
         if ( !IsHashRefWithData($SysConfigGetResult) || !$SysConfigGetResult->{Success} ) {
             return $SysConfigGetResult;
         }
-
+        
         my @SysConfigDataList = ref $SysConfigGetResult->{Data}->{SysConfigOption} eq 'ARRAY' ? @{$SysConfigGetResult->{Data}->{SysConfigOption}} : ( $SysConfigGetResult->{Data}->{SysConfigOption} );
 
         if ( IsArrayRefWithData(\@SysConfigDataList) ) {

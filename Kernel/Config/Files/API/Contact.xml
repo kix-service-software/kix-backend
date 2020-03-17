@@ -90,6 +90,14 @@
                 <Item Key="UserPassword">1</Item>
             </Hash>
         </Setting>
-    </ConfigItem>  
+    </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Contact.AssignedConfigItems" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::CMDB::ConfigItemGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>

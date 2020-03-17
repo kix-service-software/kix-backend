@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -177,19 +177,29 @@ sub TestUserCreate {
     # create test user
     my $TestUserID;
     my $TestUserLogin;
+    my $TestUserContactID;
     COUNT:
     for my $Count ( 1 .. 10 ) {
 
         $TestUserLogin = $Self->GetRandomID();
 
         $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-            UserFirstname => $TestUserLogin,
-            UserLastname  => $TestUserLogin,
-            UserLogin     => $TestUserLogin,
-            UserPw        => $TestUserLogin,
-            UserEmail     => $TestUserLogin . '@localunittest.com',
-            ValidID       => 1,
-            ChangeUserID  => 1,
+            UserLogin    => $TestUserLogin,
+            UserPw       => $TestUserLogin,
+            ValidID      => 1,
+            ChangeUserID => 1,
+            IsAgent      => 1,
+        );
+
+        $TestUserContactID =  $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            AssignedUserID        => $TestUserID,
+            Firstname             => $TestUserLogin,
+            Lastname              => $TestUserLogin,
+            Email                 => $TestUserLogin . '@localunittest.com',
+            PrimaryOrganisationID => 1,
+            OrganisationIDs       => [ 1 ],
+            ValidID               => 1,
+            UserID                => 1,
         );
 
         last COUNT if $TestUserID;
@@ -197,13 +207,14 @@ sub TestUserCreate {
 
     die 'Could not create test user login' if !$TestUserLogin;
     die 'Could not create test user'       if !$TestUserID;
+    die 'Could not create test user contact' if !$TestUserContactID;
 
     # Remember UserID of the test user to later set it to invalid
     #   in the destructor.
     $Self->{TestUsers} ||= [];
     push( @{ $Self->{TestUsers} }, $TestUserID );
 
-    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserLogin ($TestUserID)" );
+    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserLogin (UserID $TestUserID, ContactID $TestUserContactID)" );
 
     # Add user to roles
     ROLE_NAME:
@@ -242,7 +253,7 @@ creates a test customer user that can be used in tests. It will
 be set to invalid automatically during the destructor. Returns
 the login name of the new customer user, the password is the same.
 
-    my $TestUserID = $Helper->TestContactCreate(
+    my $TestContactID = $Helper->TestContactCreate(
         Language => 'de',   # optional, defaults to 'en' if not set
     );
 
@@ -258,12 +269,22 @@ sub TestContactCreate {
     # create test user
     my $TestContactID;
     my $TestContactLogin;
+    my $TestContactUserID;
+    my $OrgID;
     COUNT:
     for my $Count ( 1 .. 10 ) {
 
         $TestContactLogin = $Self->GetRandomID();
 
-        my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+        $TestContactUserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+            UserLogin    => $TestContactLogin,
+            UserPw       => $TestContactLogin,
+            ValidID      => 1,
+            ChangeUserID => 1,
+            IsCustomer   => 1,
+        );
+
+        $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
             Number  => $TestContactLogin,
             Name    => $TestContactLogin,
             ValidID => 1,
@@ -285,7 +306,9 @@ sub TestContactCreate {
         last COUNT if $TestContactID;
     }
 
-    die 'Could not create test user' if !$TestContactID;
+    die 'Could not create test user contact' if !$TestContactID;
+    die 'Could not create test user organisation' if !$OrgID;
+    die 'Could not create test user login' if !$TestContactUserID;
 
     # Remember IDs of the test user and organisation to later set it to invalid
     #   in the destructor.
@@ -293,7 +316,7 @@ sub TestContactCreate {
     push( @{ $Self->{TestContacts} }, $TestContactID );
 
     # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True( 1, "Created test contact $TestContactLogin ($TestContactID)" );
+    $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, UserID $TestContactUserID)");
 
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
@@ -577,6 +600,10 @@ sub DESTROY {
                 UserID => $TestUser,
             );
 
+            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                UserID => $TestUser,
+            );
+
             if ( !$User{UserID} ) {
 
                 # if no such user exists, there is no need to set it to invalid;
@@ -593,37 +620,14 @@ sub DESTROY {
             );
 
             $Self->{UnitTestObject}->True( $Success, "Set test user $TestUser to invalid" );
-        }
-    }
 
-    # invalidate test customer users
-    if ( ref $Self->{TestContacts} eq 'ARRAY' && @{ $Self->{TestContacts} } ) {
-        TESTCUSTOMERUSERS:
-        for my $TestContact ( @{ $Self->{TestContacts} } ) {
-
-            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
-                ID => $TestContact,
-            );
-
-            if ( !$Contact{UserLogin} ) {
-
-                # if no such customer user exists, there is no need to set it to invalid;
-                # happens when the test customer user is created inside a transaction
-                # that is later rolled back.
-                next TESTCUSTOMERUSERS;
-            }
-
-            my $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+            $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
                 %Contact,
-                ID      => $Contact{UserID},
-                ValidID => 2,
-                UserID  => 1,
+                ValidID      => 2,
+                ChangeUserID => 1,
             );
 
-            $Self->{UnitTestObject}->True(
-                # rkaiser - T#2017020290001194 - changed customer user to contact
-                $Success, "Set test contact $TestContact to invalid"
-            );
+            $Self->{UnitTestObject}->True( $Success, "Set test contact $Contact{ID} for user $TestUser to invalid" );
 
             # disable assigned organisation
             my %Organisation = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(

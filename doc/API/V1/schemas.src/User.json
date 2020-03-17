@@ -41,45 +41,11 @@
       ],
       "readOnly": true
     },
-    "UserEmail": {
-      "type": "string",
-      "readOnly": true
-    },
-    "UserFirstname": {
-      "type": "string",
-      "readOnly": true
-    },
-    "UserFullname": {
-      "type": "string",
-      "readOnly": true
-    },
     "UserID": {
       "type": "integer",
       "readOnly": true
     },
-    "UserLastname": {
-      "type": "string",
-      "readOnly": true
-    },
     "UserLogin": {
-      "type": "string",
-      "readOnly": true
-    },
-    "UserMobile": {
-      "anyOf": [
-        {"type": "string"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
-    "UserPhone": {
-      "anyOf": [
-        {"type": "string"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
-    "UserTitle": {
       "type": "string",
       "readOnly": true
     },
@@ -94,8 +60,6 @@
     "CreateBy",
     "CreateTime",
     "UserID",
-    "UserFirstname",
-    "UserLastname",
     "UserLogin"
   ]
 }

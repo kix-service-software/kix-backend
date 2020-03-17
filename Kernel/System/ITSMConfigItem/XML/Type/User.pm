@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -47,6 +47,7 @@ sub new {
 
     $Self->{LogObject}  = $Kernel::OM->Get('Kernel::System::Log');
     $Self->{UserObject} = $Kernel::OM->Get('Kernel::System::User');
+    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
 
     return $Self;
 }
@@ -67,15 +68,15 @@ sub ValueLookup {
     return '' if !$Param{Value};
 
     # get User data
-    my %UserSearchList = $Self->{UserObject}->GetUserData(
+    my %ContactInfo = $Self->{ContactObject}->ContactGet(
         UserID => $Param{Value},
     );
     my $UserName = '';
-    if (%UserSearchList) {
+    if (%ContactInfo) {
         $UserName = '"'
-            . $UserSearchList{UserFirstname} . ' '
-            . $UserSearchList{UserLastname} . '" <'
-            . $UserSearchList{UserEmail} . '>';
+            . $ContactInfo{Firstname} . ' '
+            . $ContactInfo{Lastname} . '" <'
+            . $ContactInfo{Email} . '>';
     }
 
     return $UserName || '';

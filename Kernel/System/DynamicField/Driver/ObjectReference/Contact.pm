@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -358,8 +358,8 @@ sub EditFieldRender {
                 ID => $Value,
             );
             $UserDataString
-                = "$ContactData{UserFirstname} $ContactData{UserLastname}" . " <"
-                . $ContactData{UserEmail} . ">";
+                = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
+                . $ContactData{Email} . ">";
         }
 
         $HTMLString = <<"EOF";
@@ -607,9 +607,9 @@ sub DisplayValueRender {
             }
         }
         $ReadableValue
-            = $ContactData{UserFirstname} . " "
-            . $ContactData{UserLastname} . " <"
-            . $ContactData{UserEmail} . ">";
+            = $ContactData{Firstname} . " "
+            . $ContactData{Lastname} . " <"
+            . $ContactData{Email} . ">";
 
         # alternative display string defined ?
         if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
@@ -778,12 +778,17 @@ sub SearchFieldRender {
         # get user data to display value
         my $UserDataString = '';
         if ($Value) {
-            my %ContactData = $Self->{ContactObject}->ContactGet(
-                ID => $Value,
+            my $UserID = $Self->{UserObject}->UserLookup(
+                UserLogin => $Value
             );
-            $UserDataString
-                = "$ContactData{UserFirstname} $ContactData{UserLastname}" . " <"
-                . $ContactData{UserEmail} . ">";
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserIDID => $UserID,
+                );
+                $UserDataString
+                    = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
+                    . $ContactData{Email} . ">";
+            }
         }
 
         $HTMLString = <<"EOF";
@@ -1173,11 +1178,11 @@ sub ValueLookup {
         my %ContactData = $Self->{ContactObject}->ContactGet(
             ID => $Value,
         );
-        $Value = $ContactData{UserFirstname}
+        $Value = $ContactData{Firstname}
                . " "
-               . $ContactData{UserLastname}
+               . $ContactData{Lastname}
                . " <"
-               . $ContactData{UserEmail}
+               . $ContactData{Email}
                . ">";
 
         # alternative display string defined ?

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#FAQVoteCollectionResponse",
+  "type": "object",
+  "description": "A list of all votes of an FAQ article.",
+  "properties": {
+    "FAQVote": {
+      "type": "array",
+      "items": {
+        "$ref": "FAQVote.json"
+      }
+    }
+  },
+  "required": [
+    "FAQVote"
+  ]  
+}

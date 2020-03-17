@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -99,12 +99,91 @@ perform UserSearch Operation. This will return a User ID list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+    my %UserList;
 
-    # perform user search
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
-        Type  => 'Short',
-        Valid => 0,
-    );
+    # TODO: filter search - currently only UserLogin and Search are possible search parameter
+    my %UserSearch;
+    if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
+        foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
+            foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
+                if ($SearchItem->{Field} eq 'UserLogin' || $SearchItem->{Field} eq 'Search') {
+                    if (!$UserSearch{$SearchType}) {
+                        $UserSearch{$SearchType} = [];
+                    }
+                    push(@{$UserSearch{$SearchType}}, $SearchItem);
+                }
+            }
+        }
+    }
+
+    # prepare search if given
+    if ( IsHashRefWithData( \%UserSearch ) ) {
+        foreach my $SearchType ( keys %UserSearch ) {
+            my %SearchTypeResult;
+            foreach my $SearchItem ( @{ %UserSearch{$SearchType} } ) {
+
+                my $Value = $SearchItem->{Value};
+                my %SearchParam;
+
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
+                    $Value = '*' . $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                    $Value = $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                    $Value = '*' . $Value;
+                }
+
+                if ( $SearchItem->{Field} eq 'UserLogin' ) {
+                    $SearchParam{ $SearchItem->{Field} } = $Value;
+                } else {
+                    $SearchParam{Search} = $Value;
+                }
+
+                # perform User search
+                my %SearchResult = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+                    %SearchParam,
+                    Valid => 0
+                );
+
+                # merge results
+                if ( $SearchType eq 'AND' ) {
+                    if ( !%SearchTypeResult ) {
+                        %SearchTypeResult = %SearchResult;
+                    }
+                    else {
+                        # remove all IDs from type result that we don't have in this search
+                        foreach my $Key ( keys %SearchTypeResult ) {
+                            delete $SearchTypeResult{$Key} if !exists $SearchResult{$Key};
+                        }
+                    }
+                }
+                elsif ( $SearchType eq 'OR' ) {
+                    %SearchTypeResult = (
+                        %SearchTypeResult,
+                        %SearchResult,
+                    );
+                }
+            }
+
+            if ( !%UserList ) {
+                %UserList = %SearchTypeResult;
+            }
+            else {
+                # combine both results by AND
+                # remove all IDs from type result that we don't have in this search
+                foreach my $Key ( keys %UserList ) {
+                    delete $UserList{$Key} if !exists $SearchTypeResult{$Key};
+                }
+            }
+        }
+    }
+    else {
+        # perform User search without any search params
+        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+            Type  => 'Short',
+            Valid => 0
+        );
+    }
 
     if (IsHashRefWithData(\%UserList)) {
 
@@ -122,7 +201,8 @@ sub Run {
                     my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
                         UserID              => $UserID,
                         Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
-                        RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission}
+                        RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission},
+                        UsageContext        => $Self->{Authorization}->{UserType}
                     );
 
                     if ($Granted) {
@@ -137,7 +217,8 @@ sub Run {
 
         # get already prepared user data from UserGet operation
         my $UserGetResult = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
+            OperationType            => 'V1::User::UserGet',
+            SuppressPermissionErrors => 1,
             Data          => {
                 UserID => join(',', @GetUserIDs),
             }

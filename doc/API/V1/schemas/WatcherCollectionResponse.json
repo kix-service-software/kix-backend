@@ -7,7 +7,7 @@
       "Watcher" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Watcher"
+            "$ref" : "#/definitions/_Watcher_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Watcher"
    ],
    "definitions" : {
-      "Watcher" : {
+      "_Watcher_json" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -429,7 +429,8 @@ sub Do {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
-                    Message  => 'No SCALAR param in Bind!',
+                    Message  => 'No SCALAR param in Bind! Bind: ' .
+                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper \$Param{Bind} : '',
                 );
                 return;
             }
@@ -667,7 +668,8 @@ sub Prepare {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
-                    Message  => 'No SCALAR param in Bind!',
+                    Message  => 'No SCALAR param in Bind! Bind: ' .
+                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper \$Param{Bind} : '',
                 );
                 return;
             }

@@ -7,7 +7,7 @@
       "ConsoleCommand" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ConsoleCommand"
+            "$ref" : "#/definitions/_ConsoleCommand_json"
          }
       }
    },
@@ -15,21 +15,14 @@
       "ConsoleCommand"
    ],
    "definitions" : {
-      "ConsoleCommand" : {
+      "_ConsoleCommand_json" : {
          "$id" : "#ConsoleCommand",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The console command object.",
          "type" : "object",
          "properties" : {
             "AdditionalHelp" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
+               "type" : "string",
                "readOnly" : true
             },
             "Arguments" : {

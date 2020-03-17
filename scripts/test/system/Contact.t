@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -78,9 +78,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         OrganisationIDs       => [
             $OrganisationID
         ],
-        Login    => $ContactRandom,
         Email    => $ContactRandom . '-Email@example.com',
-        Password => 'some_pass',
         ValidID  => 1,
         UserID   => 1,
     );
@@ -103,11 +101,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         $Contact{Lastname},
         "Lastname Test$Key",
         "ContactGet() - Lastname",
-    );
-    $Self->Is(
-        $Contact{Login},
-        $ContactRandom,
-        "ContactGet() - Login",
     );
     $Self->Is(
         $Contact{Email},
@@ -139,8 +132,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         OrganisationIDs       => [
             $OrganisationIDForUpdate
         ],
-        Login   => $ContactRandom,
-        Email   => $ContactRandom . '-Update@example.com',
         ValidID => 1,
         UserID  => 1,
     );
@@ -162,11 +153,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         $Contact{Lastname},
         "Lastname Test Update$Key",
         "ContactGet() - Lastname",
-    );
-    $Self->Is(
-        $Contact{Login},
-        $ContactRandom,
-        "ContactGet() - Login",
     );
     $Self->Is(
         $Contact{Email},
@@ -409,41 +395,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         "ContactSearch() - Search uc('*\$ContactRandom*') - $ContactID",
     );
 
-    # check password support
-    for my $Config (qw( plain crypt apr1 md5 sha1 sha2 bcrypt )) {
-
-        $ConfigObject->Set(
-            Key   => 'Contact::AuthModule::DB::CryptType',
-            Value => $Config,
-        );
-
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::ContactAuth'] );
-        my $ContactAuth = $Kernel::OM->Get('Kernel::System::ContactAuth');
-
-        for my $Password (qw(some_pass someカス someäöü)) {
-
-            my $Set = $ContactObject->SetPassword(
-                ID       => $ContactID,
-                Password => $Password,
-                UserID   => 1
-            );
-
-            $Self->True(
-                $Set,
-                "SetPassword() - $Config - $ContactID - $Password",
-            );
-
-            my $Ok = $ContactAuth->Auth(
-                User => $Contact{Login},
-                Pw   => $Password
-            );
-            $Self->True(
-                $Ok,
-                "Auth() - $Config - $Contact{Login} - $Password",
-            );
-        }
-    }
-
     # check token support
     my $Token = $ContactObject->TokenGenerate(
         ContactID => $ContactID,
@@ -583,7 +534,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     #update customer user
     my $Update = $ContactObject->ContactUpdate(
         ID                    => $ContactID,
-        Login                 => 'NewLogin' . $ContactID,
         Firstname             => 'Firstname Update' . $ContactID,
         Lastname              => 'Lastname Update' . $ContactID,
         Email                 => $ContactID . 'new@example.com',

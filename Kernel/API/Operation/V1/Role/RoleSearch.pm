@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -92,7 +92,8 @@ sub Run {
 	# get already prepared Role data from RoleGet operation
     if ( IsHashRefWithData(\%RoleList) ) {  	
         my $RoleGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Role::RoleGet',
+            OperationType            => 'V1::Role::RoleGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 RoleID => join(',', sort keys %RoleList),
             }

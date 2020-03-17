@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,6 +81,14 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
+        'ConfigItemID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },
+        'VersionID' => {
+            DataType => 'NUMERIC',
+            Required => 1
+        },
         'AttachmentID' => {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
@@ -115,8 +123,29 @@ perform ConfigItemAttachmentGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @AttachmentList;        
-    foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {                 
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
+
+    # check if attachment is "visible" (the version attribute)
+    my $CustomerAttachmentAttributeCheck = $Self->_CheckAttachmentAttributeForCustomer(
+        VersionID     => $Param{Data}->{VersionID},
+        AttachmentIDs => $Param{Data}->{AttachmentID}
+    );
+    if ( !$CustomerAttachmentAttributeCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerAttachmentAttributeCheck},
+        );
+    }
+
+    my @AttachmentList;
+    foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
         my $StoredAttachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
             ID => $AttachmentID,
@@ -168,11 +197,150 @@ sub Run {
     );
 }
 
+=item _CheckAttachmentAttributeForCustomer()
+
+checks the configitem ids for current customer user if necessary
+
+    my $CustomerCheck = $OperationObject->_CheckAttachmentAttributeForCustomer(
+        VersionID     => 1,
+        AttachmentIDs => [1,2,3]
+    );
+
+    returns:
+
+    $CustomerCheck = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $CustomerCheck = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub _CheckAttachmentAttributeForCustomer {
+    my ( $Self, %Param ) = @_;
+
+    if ( IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer') {
+        if ( $Param{VersionID} ) {
+            if ( $Param{AttachmentIDs} && !IsArrayRefWithData($Param{AttachmentIDs}) ) {
+                $Param{AttachmentIDs} = [ $Param{AttachmentIDs} ];
+            }
+
+            if ( IsArrayRefWithData($Param{AttachmentIDs}) ) {
+                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                    VersionID  => $Param{VersionID},
+                    XMLDataGet => 1,
+                );
+
+                if ( IsHashRefWithData($VersionData) ) {
+                    my $VisibleAttachments = $Self->_GetVisibleAttachments(
+                        Definition => $VersionData->{XMLDefinition},
+                        Data       => $VersionData->{XMLData}->[1]->{Version}
+                    ) || {};
+
+                    for my $AttachmentID ( @{ $Param{AttachmentIDs} } ) {
+                        if ( !$VisibleAttachments->{$AttachmentID} ) {
+                            return $Self->_Error(
+                                Code => 'Forbidden',
+                                Message => "Could not access attachment with id $AttachmentID"
+                            );
+                        }
+                    }
+                } else {
+                    return $Self->_Error(
+                        Code => 'Error',
+                        Message => "No version for given VersionID $Param{VersionID} found"
+                    );
+                }
+            }
+        } else {
+            return $Self->_Error(
+                Code => 'Error',
+                Message => "No VersionID given"
+            );
+        }
+    }
+
+    # if everything is OK then return Success
+    return $Self->_Success();
+}
+
+=item _GetVisibleAttachments()
+
+checks the configitem ids for current customer user if necessary
+
+    my $CustomerCheck = $OperationObject->_GetVisibleAttachments(
+        Definition => $XMLDefinition,
+        Data       => $XMLData
+    );
+
+    returns:
+
+    $VisibleAttachments = {
+        1 => 1,               # ID of attachment => 1 = visible | 0 = not visible
+        2 => 0
+    }
+
+=cut
+
+sub _GetVisibleAttachments {
+    my ( $Self, %Param ) = @_;
+
+    my %VisibleAttachments;
+
+    if ( IsArrayRefWithData($Param{Data}) ) {
+        ROOTHASH:
+        for my $RootHash ( @{ $Param{Data} } ) {
+            next ROOTHASH if !defined $RootHash || !IsHashRefWithData($RootHash);
+
+            for my $RootHashKey ( sort keys %{$RootHash} ) {
+                next if $RootHashKey eq 'TagKey' || !IsArrayRefWithData($RootHash->{$RootHashKey});
+
+                # get attribute definition 
+                my $AttrDef = $Self->_GetAttributeDefByKey(
+                    Key        => $RootHashKey,
+                    Definition => $Param{Definition},
+                );
+
+                ARRAYITEM:
+                for my $ArrayItem ( @{ $RootHash->{$RootHashKey} } ) {
+                    next ARRAYITEM if !defined $ArrayItem || !IsHashRefWithData($ArrayItem);
+
+                    # only attachments with content (AttachmentID) are relevant
+                    if ( $AttrDef->{Input}->{Type} && $AttrDef->{Input}->{Type} eq 'Attachment' && $ArrayItem->{Content}) {
+                        $VisibleAttachments{$ArrayItem->{Content}} = $AttrDef->{CustomerVisible} || 0;
+                    }
+
+                    # look if we have a sub structure
+                    if ( $AttrDef->{Sub} ) {
+                        delete $ArrayItem->{TagKey};
+
+                        # start recursion
+                        for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
+                            next if $ArrayItemKey eq 'TagKey' || !IsArrayRefWithData($ArrayItem->{$ArrayItemKey});
+
+                            my $ChildVisibleAttachments = $Self->_GetVisibleAttachments(
+                                Definition => $Param{Definition},
+                                Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
+                                RootKey    => $RootHashKey
+                            );
+
+                            if ( IsHashRefWithData($ChildVisibleAttachments) ) {
+                                %VisibleAttachments = (%VisibleAttachments, %{$ChildVisibleAttachments});
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return \%VisibleAttachments;
+}
+
 1;
-
-
-
-
 
 =back
 

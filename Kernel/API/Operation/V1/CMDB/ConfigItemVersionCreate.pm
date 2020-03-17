@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -124,7 +124,17 @@ perform ConfigItemVersionCreate Operation. This will return the created VersionI
 
 sub Run {
     my ( $Self, %Param ) = @_;
-        
+
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
+
     # isolate and trim Version parameter
     my $Version = $Self->_Trim(
         Data => $Param{Data}->{ConfigItemVersion}
@@ -205,8 +215,6 @@ sub Run {
 }
 
 1;
-
-
 
 =back
 

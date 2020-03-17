@@ -1,0 +1,13 @@
+{
+    "FAQVote": [
+        {
+            "ArticleID": 5,
+            "Created": "2020-02-10 13:29:17",
+            "CreatedBy": "1",
+            "ID": 1,
+            "IPAddress": "1.1.1.1",
+            "Interface": "agent",
+            "Rating": 2
+        }
+    ]
+}

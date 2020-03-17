@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -354,26 +354,26 @@ sub _ArticleCreate {
 
     # create article
     my $ArticleID = $TicketObject->ArticleCreate(
-        NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
-        TicketID       => $Ticket->{TicketID},
-        ChannelID      => $Article->{ChannelID}      || '',
-        Channel        => $Article->{Channel}        || '',
-        CustomerVisible => $Article->{CustomerVisible} || 0,
-        SenderTypeID   => $Article->{SenderTypeID}   || '',
-        SenderType     => $Article->{SenderType}     || '',
-        From           => $From,
-        To             => $To,
-        Cc             => $Article->{Cc}             || '',
-        Bcc            => $Article->{Bcc}            || '',
-        Subject        => $Article->{Subject},
-        Body           => $Article->{Body},
-        IncomingTime   => $Article->{IncomingTime}   || '',
-        MimeType       => $Article->{MimeType}       || '',
-        Charset        => $Article->{Charset}        || '',
-        ContentType    => $Article->{ContentType}    || '',
-        UserID         => $Param{UserID},
-        HistoryType    => $Article->{HistoryType},
-        HistoryComment => $Article->{HistoryComment} || '%%',
+        NoAgentNotify    => $Article->{NoAgentNotify}  || 0,
+        TicketID         => $Ticket->{TicketID},
+        ChannelID        => $Article->{ChannelID}      || '',
+        Channel          => $Article->{Channel}        || '',
+        CustomerVisible  => $Article->{CustomerVisible}, # no fallback, core handles it
+        SenderTypeID     => $Article->{SenderTypeID}   || '',
+        SenderType       => $Article->{SenderType}     || '',
+        From             => $From,
+        To               => $To,
+        Cc               => $Article->{Cc}             || '',
+        Bcc              => $Article->{Bcc}            || '',
+        Subject          => $Article->{Subject},
+        Body             => $Article->{Body},
+        IncomingTime     => $Article->{IncomingTime}   || '',
+        MimeType         => $Article->{MimeType}       || '',
+        Charset          => $Article->{Charset}        || '',
+        ContentType      => $Article->{ContentType}    || '',
+        UserID           => $Param{UserID},
+        HistoryType      => $Article->{HistoryType},
+        HistoryComment   => $Article->{HistoryComment} || '%%',
         AutoResponseType => $Article->{AutoResponseType},
         OrigHeader       => {
             From    => $From,

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -27,7 +27,6 @@ our @ObjectDependencies = (
 =head1 NAME
 
 Kernel::System::DynamicField::Driver::BaseSelect - sub module of
-Kernel::System::DynamicField::Driver::Dropdown and
 Kernel::System::DynamicField::Driver::Multiselect
 
 =head1 SYNOPSIS
@@ -52,31 +51,70 @@ sub ValueGet {
     return if !IsArrayRefWithData($DFValue);
     return if !IsHashRefWithData( $DFValue->[0] );
 
-    return $DFValue->[0]->{ValueText};
+    # extract real values
+    my @ReturnData;
+    for my $Item ( @{$DFValue} ) {
+        push @ReturnData, $Item->{ValueText}
+    }
+
+    return \@ReturnData;
 }
 
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
-    # check for valid possible values list
-    if ( !$Param{DynamicFieldConfig}->{Config}->{PossibleValues} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Need PossibleValues in DynamicFieldConfig!",
-        );
-        return;
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
     }
+    else {
+        @Values = ( $Param{Value} );
+    }    
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
-        FieldID  => $Param{DynamicFieldConfig}->{ID},
-        ObjectID => $Param{ObjectID},
-        Value    => [
-            {
-                ValueText => $Param{Value},
-            },
-        ],
-        UserID => $Param{UserID},
-    );
+    # get dynamic field value object
+    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+
+    my $Success;
+
+    if ( IsArrayRefWithData( \@Values ) ) {
+
+        # if there is at least one value to set, this means one or more values are selected,
+        #    set those values!
+        my $Valid = $Self->ValueValidate(
+            Value              => $Param{Value},
+            UserID             => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig}
+        );
+
+        if (!$Valid) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "The value for the field is invalid!"
+            );
+            return;
+        }
+
+        my @ValueText;
+        for my $Item (@Values) {
+            push @ValueText, { ValueText => $Item };
+        }
+
+        $Success = $DynamicFieldValueObject->ValueSet(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            Value    => \@ValueText,
+            UserID   => $Param{UserID},
+        );
+    } else {
+
+        # otherwise no value was selected, then in fact this means that any value there should be deleted
+        $Success = $DynamicFieldValueObject->ValueDelete(
+            FieldID  => $Param{DynamicFieldConfig}->{ID},
+            ObjectID => $Param{ObjectID},
+            UserID   => $Param{UserID},
+        );
+    }
 
     return $Success;
 }
@@ -84,12 +122,59 @@ sub ValueSet {
 sub ValueValidate {
     my ( $Self, %Param ) = @_;
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueValidate(
-        Value => {
-            ValueText => $Param{Value},
-        },
-        UserID => $Param{UserID}
-    );
+    # check value
+    my @Values;
+    if ( IsArrayRefWithData( $Param{Value} ) ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    if(!$Param{SearchValidation}) {
+
+        my $CountMin = $Param{DynamicFieldConfig}->{Config}->{CountMin};
+        if ($CountMin && scalar(@Values) < $CountMin) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message => "At least $CountMin values must be selected."
+            );
+            return;
+        }
+
+        my $CountMax = $Param{DynamicFieldConfig}->{Config}->{CountMax};
+        if ($CountMax && $CountMax > 1 && scalar(@Values) > $CountMax) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message => "A maximum of $CountMax values can be selected."
+            );
+            return;
+        }
+
+        if((!$CountMax || 1 == $CountMax || 0 == $CountMax) && scalar(@Values) > 1) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message => "A maximum of 1 value can be selected. (Singleselect)"
+            );
+            return;
+        }
+    }
+
+    # get dynamic field value object
+    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+
+    my $Success;
+    for my $Item (@Values) {
+
+        $Success = $DynamicFieldValueObject->ValueValidate(
+            Value => {
+                ValueText => $Item,
+            },
+            UserID => $Param{UserID}
+        );
+
+        return if !$Success
+    }
 
     return $Success;
 }
@@ -797,16 +882,6 @@ sub ValueLookup {
             # get readable value
             $Value = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Value};
 
-            # check if translation is possible
-            if (
-                defined $Param{LanguageObject}
-                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-                )
-            {
-
-                # translate value
-                $Value = $Param{LanguageObject}->Translate($Value);
-            }
         }
     }
 
@@ -983,11 +1058,82 @@ sub ColumnFilterValuesGet {
     return $ColumnFilterValues;
 }
 
+sub ValueIsDifferent {
+    my ( $Self, %Param ) = @_;
+
+    # special cases where the values are different but they should be reported as equals
+    if (
+        !defined $Param{Value1}
+        && ref $Param{Value2} eq 'ARRAY'
+        && !IsArrayRefWithData( $Param{Value2} )
+        )
+    {
+        return
+    }
+    if (
+        !defined $Param{Value2}
+        && ref $Param{Value1} eq 'ARRAY'
+        && !IsArrayRefWithData( $Param{Value1} )
+        )
+    {
+        return
+    }
+
+    # compare the results
+    return DataIsDifferent(
+        Data1 => \$Param{Value1},
+        Data2 => \$Param{Value2}
+    );
+}
+
+sub DisplayKeyRender {
+    my ( $Self, %Param ) = @_;
+
+    # set Value and Title variables
+    my $Value = '';
+    my $Title = '';
+
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    my @Keys;
+    VALUEITEM:
+    for my $Item (@Values) {
+        next VALUEITEM if !$Item;
+
+        push @Keys, $Item;
+    }
+
+    # set new line separator
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+    }
+
+    # output transformations
+    $Value = join( $Separator, @Keys );
+    $Title = $Value;
+
+    # create return structure
+    my $Data = {
+        Value => $Value,
+        Title => $Title,
+    };
+
+    return $Data;
+}
+
 1;
-
-
-
-
 
 =back
 

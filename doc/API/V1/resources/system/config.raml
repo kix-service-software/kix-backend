@@ -1,8 +1,8 @@
   displayName: "[System] Config"
-  description: !include ../descriptions/resources/system/config.md
+  description: !include ../../descriptions/resources/system/config.md
   type: { collection-readonly: { typeName: SysConfigOption } }
   /optiontypes:
-    description: !include ../descriptions/resources/system/config/optiontypes.md
+    description: !include ../../descriptions/resources/system/config/optiontypes.md
     type: { collection-readonly: { typeName: SysConfigOptionType } }
   /{option}:
     type: { item-nodelete: { typeName: SysConfigOption } }
@@ -11,7 +11,7 @@
         displayName: Option
         type: string
   /definitions:
-    description: !include ../descriptions/resources/system/config/definitions.md
+    description: !include ../../descriptions/resources/system/config/definitions.md
     type: { collection: { typeName: SysConfigOptionDefinition } }
     /{option}:
       type: { item: { typeName: SysConfigOptionDefinition } }
