@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketTemplate::TicketTemplateGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TicketTemplateGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">TypeID</Item>
+                <Item Key="ResponseSchema">TicketTemplateResponse</Item>
+                <Item Key="CacheType">API_tickettemplates</Item>
+                <Item Key="CacheTypeDependency">TicketTemplate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::TicketTemplate::TicketTemplateSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">TickeTypeSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">TicketTemplateCollectionResponse</Item>
+                <Item Key="CacheType">API_tickettemplates</Item>
+                <Item Key="CacheTypeDependency">TicketTemplate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>

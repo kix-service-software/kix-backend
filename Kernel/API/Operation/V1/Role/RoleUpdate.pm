@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -85,7 +85,7 @@ sub ParameterDefinition {
             Required => 1
         },
         'Role' => {
-            Type => 'HASH',
+            Type     => 'HASH',
             Required => 1
         },
     }
@@ -94,18 +94,17 @@ sub ParameterDefinition {
 =item Run()
 
 perform RoleUpdate Operation. This will return the updated RoleID.
-
     my $Result = $OperationObject->Run(
         Data => {
             RoleID => 123,
             Role   => {
-	            Name    => '...',
-	            Comment => '...',
-	            ValidID => 1,
+                Name    => '...',
+                Comment => '...',
+                ValidID => 1,
+                UsageContext => 0x0003,
             }
-	    },
-	);
-    
+        },
+    );
 
     $Result = {
         Success     => 1,                       # 0 or 1
@@ -115,9 +114,8 @@ perform RoleUpdate Operation. This will return the updated RoleID.
             RoleID  => 123,                     # ID of the updated Role 
         },
     };
-   
-=cut
 
+=cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
@@ -127,11 +125,11 @@ sub Run {
         Data => $Param{Data}->{Role}
     );
 
-    # check if Role exists 
+    # check if Role exists
     my %RoleData = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
         ID => $Param{Data}->{RoleID},
     );
-  
+
     if ( !%RoleData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -140,11 +138,12 @@ sub Run {
 
     # update Role
     my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUpdate(
-        ID      => $Param{Data}->{RoleID},
-        Name    => $Role->{Name} || $RoleData{Name},
-        Comment => exists $Role->{Comment} ? $Role->{Comment} : $RoleData{Comment},
-        ValidID => defined $Role->{ValidID} ? $Role->{ValidID} : $RoleData{ValidID},
-        UserID  => $Self->{Authorization}->{UserID},
+        ID           => $Param{Data}->{RoleID},
+        Name         => $Role->{Name} || $RoleData{Name},
+        Comment      => exists $Role->{Comment} ? $Role->{Comment} : $RoleData{Comment},
+        ValidID      => defined $Role->{ValidID} ? $Role->{ValidID} : $RoleData{ValidID},
+        UsageContext => defined $Role->{UsageContext} ? $Role->{UsageContext} : $RoleData{UsageContext},
+        UserID       => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -153,10 +152,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         RoleID => 0 + $Param{Data}->{RoleID},
-    );    
+    );
 }
 
 1;

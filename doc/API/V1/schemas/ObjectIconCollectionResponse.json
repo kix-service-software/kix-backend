@@ -7,7 +7,7 @@
       "ObjectIcon" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/ObjectIcon"
+            "$ref" : "#/definitions/_ObjectIcon_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "ObjectIcon"
    ],
    "definitions" : {
-      "ObjectIcon" : {
+      "_ObjectIcon_json" : {
          "$id" : "#ObjectIcon",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The object icon object.",

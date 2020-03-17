@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -7,7 +7,7 @@
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
-
+#todo firstname lastname now in contacts
 use strict;
 use warnings;
 use utf8;
@@ -53,12 +53,10 @@ for my $Try ( 1 .. 20 ) {
 
 # add user
 my $UserID = $UserObject->UserAdd(
-    UserFirstname => 'John',
-    UserLastname  => 'Doe',
-    UserLogin     => $UserRandom,
-    UserEmail     => $UserRandom . '@example.com',
-    ValidID       => 1,
-    ChangeUserID  => 1,
+    UserLogin    => $UserRandom,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1,
 );
 
 $Self->True(

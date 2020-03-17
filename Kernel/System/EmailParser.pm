@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -409,6 +409,9 @@ Returns the new message body (or from the first attachment) "ContentType" header
 
 sub GetReturnContentType {
     my $Self = shift;
+
+use CGI::Carp qw(cluck);
+cluck();
 
     my $ContentType = $Self->GetContentType();
     $ContentType =~ s/(charset=)(.*)/$1utf-8/ig;

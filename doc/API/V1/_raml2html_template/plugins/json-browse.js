@@ -1,5 +1,5 @@
 // --
-// Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+// Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -24,7 +24,7 @@
      * @return boolean
      */
     function isUrl(string) {
-       var regexp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+       var regexp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
        return regexp.test(string);
     }
   
@@ -55,7 +55,7 @@
         if (json.length > 0) {
           html += '[<ol class="json-array">';
           for (var i = 0; i < json.length; ++i) {
-            html += '<li>'
+            html += '<li>';
             // Add toggle button if item is collapsable
             if (!options.noToggle && isCollapsable(json[i])) {
                 html += '<a href class="json-toggle"></a>';
@@ -111,12 +111,12 @@
         return this.each(function() {
 
             // Transform to HTML
-            var html = json2html(json, { withQuotes: true, noToggle: true })
+            var html = json2html(json, { withQuotes: true, noToggle: true });
 
             // Insert HTML in target DOM element
             $(this).html(html);    
         });
-    }
+    };
 
     /**
      * jQuery plugin method
@@ -130,7 +130,7 @@
       return this.each(function() {
   
         // Transform to HTML
-        var html = json2html(json, options)
+        var html = json2html(json, options);
         if (isCollapsable(json))
           html = '<a href></a>' + html;
   
@@ -166,4 +166,3 @@
       });
     };
   })(jQuery);
-  

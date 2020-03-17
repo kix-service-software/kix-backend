@@ -52,6 +52,9 @@
                         }
                     ]
                 },
+                "DefaultValidID": {
+                    "type": "integer"
+                },
                 "Description": {
                     "type": "string"
                 },
@@ -89,19 +92,6 @@
                 },
                 "ValidID": {
                     "type": "integer"
-                },
-                "Value": {
-                    "anyOf": [
-                        {
-                            "type": "object"
-                        },
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
                 }
             }
         }

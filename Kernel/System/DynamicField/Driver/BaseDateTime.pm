@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1272,9 +1272,16 @@ sub HistoricalValuesGet {
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    my $Value = defined $Param{Key} ? $Param{Key} : '';
+    # check key
+    my @Keys;
+    if ( ref $Param{Key} eq 'ARRAY' ) {
+        @Keys = @{ $Param{Key} };
+    }
+    else {
+        @Keys = ( $Param{Key} );
+    }
 
-    return $Value;
+    return \@Keys;
 }
 
 1;

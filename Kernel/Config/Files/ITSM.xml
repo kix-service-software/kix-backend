@@ -393,5 +393,99 @@
             </Array>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="AssignedConfigItemsMapping" Required="1" Valid="1">
+        <Description Translatable="1">Defines for which object type in which configitem class in which configitem attributes will be search with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon ("ParentAttribute::ChildAttribute::RelevantAttribut").</Description>
+        <Group>ITSM</Group>
+        <SubGroup>Core::ITSMConfigItem</SubGroup>
+        <Setting>
+            <String Regex="">
+{
+  "Contact": {
+    "Computer": {
+      "SectionOwner::OwnerContact": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      },
+      "SectionOwner::OwnerOrganisation": {
+        "SearchAttributes": [
+          "PrimaryOrganisationID"
+        ]
+      }
+    },
+    "Hardware": {
+      "SectionOwner::OwnerContact": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      },
+      "SectionOwner::OwnerOrganisation": {
+        "SearchAttributes": [
+          "PrimaryOrganisationID"
+        ]
+      }
+    },
+    "Location": {
+      "SectionContacts::ContactRole::Contact": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      }
+    },
+    "Building": {
+      "SectionContacts::ContactRole::Contact": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      }
+    },
+    "Room": {
+      "SectionContacts::ContactRole::Contact": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      }
+    },
+    "Software": {
+      "SectionOwner::OwnerContact": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      },
+      "SectionOwner::OwnerOrganisation": {
+        "SearchAttributes": [
+          "PrimaryOrganisationID"
+        ]
+      }
+    }
+  },
+  "Organisation": {
+    "Computer": {
+      "SectionOwner::OwnerOrganisation": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      }
+    },
+    "Hardware": {
+      "SectionOwner::OwnerOrganisation": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      }
+    },
+    "Software": {
+      "SectionOwner::OwnerOrganisation": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      }
+    }
+  }
+}
+            </String>
+        </Setting>
+    </ConfigItem>
 </kix_config>
     

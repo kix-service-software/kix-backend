@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -46,20 +46,12 @@ $Self->Is(
     "Minimum options (but user doesn't exist)",
 );
 
-# disable email checks to create new user
-$Kernel::OM->Get('Kernel::Config')->Set(
-    Key   => 'CheckEmailAddresses',
-    Value => 0,
-);
-
 # add users
 my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
-    UserFirstname => 'Firstname Test1',
-    UserLastname  => 'Lastname Test1',
-    UserLogin     => $UserRand,
-    UserEmail     => $UserRand . '@example.com',
-    ValidID       => 1,
-    ChangeUserID  => 1,
+    UserLogin    => $UserRand,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1,
 );
 
 $Self->True(

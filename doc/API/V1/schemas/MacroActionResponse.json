@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "MacroAction" : {
-         "$ref" : "#/definitions/MacroAction"
+         "$ref" : "#/definitions/_MacroAction_json"
       }
    },
    "required" : [
       "MacroAction"
    ],
    "definitions" : {
-      "MacroAction" : {
+      "_MacroAction_json" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",

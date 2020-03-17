@@ -1,0 +1,79 @@
+{
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "#FAQCategory",
+   "type": "object",
+   "description": "The FAQ category object.",
+   "properties": {
+      "Articles": {
+         "type": "array",
+         "readOnly": true,
+         "description": "added via include and expand \"Articles\" (only IDs without expand)",
+         "items": {
+            "$ref": "FAQArticle.json"
+         }
+      },
+      "ChangeBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "ChangeTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Comment": {
+         "type": "string",
+         "readOnly": true
+      },
+      "CreateBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "CreateTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Fullname": {
+         "type": "string",
+         "readOnly": true,
+         "description": "contains also parent category names e.g. \"parent::child::grandchild\""
+      },
+      "ID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "Name": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ParentID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "SubCategories": {
+         "type": "array",
+         "readOnly": true,
+         "description": "added via include and expand \"SubCategories\" (only IDs without expand)",
+         "items": {
+            "$ref": "FAQCategory.json"
+         }
+      },
+      "ValidID": {
+         "type": "integer",
+         "readOnly": true
+      }
+   },
+   "required" : [
+      "Article",
+      "ChangeBy",
+      "ChangeTime",
+      "Comment",
+      "CreateBy",
+      "CreateTime",
+      "Fullname",
+      "ID",
+      "Name",
+      "ParentID",
+      "SubCategories",
+      "ValidID"
+   ]
+}

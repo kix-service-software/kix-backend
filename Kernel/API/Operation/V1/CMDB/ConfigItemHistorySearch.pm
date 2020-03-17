@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -111,6 +111,16 @@ perform ConfigItemHistorySearch Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # if necessary check if config item is accessible for current customer user
+    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
+        ConfigItemIDList => $Param{Data}->{ConfigItemID}
+    );
+    if ( !$CustomerCheck->{Success} ) {
+        return $Self->_Error(
+            %{$CustomerCheck},
+        );
+    }
+
     # check if ConfigItem exists
     my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},
@@ -138,7 +148,8 @@ sub Run {
         }
 
         my $GetResult = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ConfigItemHistoryGet',
+            OperationType            => 'V1::CMDB::ConfigItemHistoryGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 HistoryID    => join(',', sort @HistoryIDs),
@@ -165,7 +176,6 @@ sub Run {
 }
 
 1;
-
 
 =back
 

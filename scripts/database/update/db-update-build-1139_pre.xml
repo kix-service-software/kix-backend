@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="sysconfig">
+        <ColumnAdd Name="default_valid_id" Required="false" Type="SMALLINT" Default="1"/>
+    </TableAlter>
+
+</database>

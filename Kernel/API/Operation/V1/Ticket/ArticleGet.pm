@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -202,13 +202,6 @@ sub Run {
 	        );
 	    }
     
-        # restrict article sender types
-        if ( $Self->{Authorization}->{UserType} eq 'Customer' && $ArticleRaw{ArticleSenderType} ne 'external') {
-            return $Self->_Error(
-                Code => 'Object.NoPermission',
-            );
-        }
-
         my %ArticleData;
         my @DynamicFields;
 
@@ -244,28 +237,14 @@ sub Run {
             $ArticleData{Flags} = [ sort keys %ArticleFlags ];
         }
 
-        if ($Kernel::OM->Get('Kernel::System::Queue')->NameExistsCheck(Name => $ArticleData{To})) {
+        if ( $Kernel::OM->Get('Kernel::System::Queue')->NameExistsCheck(Name => $ArticleData{To}) ) {
             my %QueueInfo = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
                 Name => $ArticleData{To},
             );
 
-            if ($Self->{Debug} > 0) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'info',
-                    Message  => Data::Dumper::Dumper \%QueueInfo,
-                );
-            }
-
             my %QueueSystemeMailAddress = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
                 ID => $QueueInfo{SystemAddressID},
             );
-
-            if ($Self->{Debug} > 0) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
-                    Priority => 'info',
-                    Message  => $QueueSystemeMailAddress{Name},
-                );
-            }
 
             $ArticleData{To} = $ArticleData{To} . ' <' . $QueueSystemeMailAddress{Name} . '>';
         }

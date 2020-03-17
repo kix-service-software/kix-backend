@@ -56,7 +56,7 @@ sub _ReconfigureNotificationTransports {
                 ID => $NotificationID,
                 %{$Notification},
                 UserID => 1
-            }
+            )
         }
     }
 

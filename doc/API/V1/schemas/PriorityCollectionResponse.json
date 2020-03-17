@@ -7,7 +7,7 @@
       "Priority" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Priority"
+            "$ref" : "#/definitions/_Priority_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Priority"
    ],
    "definitions" : {
-      "Priority" : {
+      "_Priority_json" : {
          "$id" : "#Priority",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The priority object.",
@@ -53,8 +53,7 @@
                "readOnly" : true
             },
             "Name" : {
-               "type" : "string",
-               "readOnly" : true               
+               "type" : "string"
             },
             "ValidID" : {
                "type" : "integer"

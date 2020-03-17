@@ -13,6 +13,8 @@ package Kernel::System::VariableCheck;
 use strict;
 use warnings;
 
+use Data::Validate::IP qw(is_ipv4 is_ipv6);
+
 use Exporter qw(import);
 our %EXPORT_TAGS = (    ## no critic
     all => [
@@ -314,29 +316,13 @@ returns 1 if data matches criteria or undef otherwise
 
 sub IsIPv4Address {
     my $TestData = $_[0];
-
-    return if !IsStringWithData(@_);
-    return if $TestData !~ m{ \A [\d\.]+ \z }xms;
-    my @Part = split '\.', $TestData;
-
-    # four parts delimited by '.' needed
-    return if scalar @Part ne 4;
-    for my $Part (@Part) {
-
-        # allow numbers 0 to 255, no leading zeroes
-        return if $Part !~ m{
-            \A (?: \d | [1-9] \d | [1] \d{2} | [2][0-4]\d | [2][5][0-5] ) \z
-        }xms;
-    }
-
-    return 1;
+    return is_ipv4($TestData);
 }
 
 =item IsIPv6Address()
 
 test supplied data to determine if it is a valid IPv6 address (syntax check only)
 shorthand notation and mixed IPv6/IPv4 notation allowed
-# FIXME IPv6/IPv4 notation currently not supported
 
 returns 1 if data matches criteria or undef otherwise
 
@@ -348,72 +334,7 @@ returns 1 if data matches criteria or undef otherwise
 
 sub IsIPv6Address {
     my $TestData = $_[0];
-
-    return if !IsStringWithData(@_);
-
-    # only hex characters (0-9,A-Z) plus separator ':' allowed
-    return if $TestData !~ m{ \A [\da-f:]+ \z }xmsi;
-
-    # special case - equals only zeroes
-    return 1 if $TestData eq '::';
-
-    # special cases - address must not start or end with single ':'
-    return if $TestData =~ m{ \A : [^:] }xms;
-    return if $TestData =~ m{ [^:] : \z }xms;
-
-    # special case - address must not start and end with ':'
-    return if $TestData =~ m{ \A : .+ : \z }xms;
-
-    my $SkipFirst;
-    if ( $TestData =~ m{ \A :: }xms ) {
-        $TestData  = 'X' . $TestData;
-        $SkipFirst = 1;
-    }
-    my $SkipLast;
-    if ( $TestData =~ m{ :: \z }xms ) {
-        $TestData .= 'X';
-        $SkipLast = 1;
-    }
-    my @Part = split ':', $TestData;
-    if ($SkipFirst) {
-        shift @Part;
-    }
-    if ($SkipLast) {
-        delete $Part[-1];
-    }
-    return if scalar @Part < 2 || scalar @Part > 8;
-    return if scalar @Part ne 8 && $TestData !~ m{ :: }xms;
-
-    # handle full addreses
-    if ( scalar @Part eq 8 ) {
-        my $EmptyPart;
-        PART:
-        for my $Part (@Part) {
-            if ( $Part eq '' ) {
-                return if $EmptyPart;
-                $EmptyPart = 1;
-                next PART;
-            }
-            return if $Part !~ m{ \A [\da-f]{1,4} \z }xmsi;
-        }
-    }
-
-    # handle shorthand addresses
-    my $ShortHandUsed;
-    PART:
-    for my $Part (@Part) {
-        next PART if $Part eq 'X';
-
-        # empty part means shorthand - do we already have more than one consecutive empty parts?
-        return if $Part eq '' && $ShortHandUsed;
-        if ( $Part eq '' ) {
-            $ShortHandUsed = 1;
-            next PART;
-        }
-        return if $Part !~ m{ \A [\da-f]{1,4} \z }xmsi;
-    }
-
-    return 1;
+    return is_ipv6($TestData);
 }
 
 =item IsMD5Sum()

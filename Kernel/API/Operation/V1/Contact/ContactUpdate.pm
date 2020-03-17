@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -100,12 +100,10 @@ perform ContactUpdate Operation. This will return the updated ContactID.
         Data => {
             ContactID => '...'                                              # required
             Contact => {
-                Login       => '...'                                        # optional
                 Firstname   => '...'                                        # optional
                 Lastname    => '...'                                        # optional
                 Email       => '...'                                        # optional
-                Password    => '...'                                        # optional                
-                Phone       => '...'                                        # optional                
+                Phone       => '...'                                        # optional
                 Title       => '...'                                        # optional
                 ValidID     => 0 | 1 | 2                                     # optional
                 ...
@@ -145,28 +143,42 @@ sub Run {
         );
     }
 
-    # check if ContactLogin already exists
-    if ( IsStringWithData( $Contact->{Login} ) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
-            Login => $Contact->{Login},
+    if ($Contact->{AssignedUserID}) {
+        my $ExistingUser = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+            UserID => $Contact->{AssignedUserID},
+            Silent => 1,
         );
-        if ( %ContactList && ( scalar( keys %ContactList ) > 1 || !$ContactList{ $ContactData{ID} } ) ) {
+        if (!$ExistingUser) {
             return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update contact. Another contact with same login already exists.',
+                Code    => 'Object.NotFound',
+                Message => "Cannot update contact. User does not exist.",
             );
+        }
+        else {
+            my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+                UserID => $Contact->{AssignedUserID},
+                Silent => 1,
+            );
+
+            if ($ExistingContactID && $ExistingContactID != $Param{Data}->{ContactID}) {
+                return $Self->_Error(
+                    Code    => 'Object.AlreadyExists',
+                    Message => "Cannot update contact. User already assigned",
+                );
+            }
         }
     }
 
     # check ContactEmail exists
     if ( IsStringWithData( $Contact->{Email} ) ) {
-        my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
-            PostMasterSearch => $Contact->{Email},
+        my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+            Email  => $Contact->{Email},
+            Silent => 1,
         );
-        if ( %ContactList && ( scalar( keys %ContactList ) > 1 || !$ContactList{ $ContactData{ID} } ) ) {
+        if ( $ExistingContactID && $ExistingContactID != $Param{Data}->{ContactID} ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update contact. Another contact with same email address already exists.',
+                Message => 'Cannot update contact. Different Contact with this email already exists.',
             );
         }
     }

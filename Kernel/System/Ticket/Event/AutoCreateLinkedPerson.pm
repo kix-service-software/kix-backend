@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -251,7 +251,7 @@ sub Run {
         return 1 if ( !$User{UserLogin} );
         $Blacklisted = 0;
         for my $Item (@Blacklist) {
-            next if $User{UserLogin} !~ m/$Item/ && $User{UserEmail} !~ m/$Item/;
+            next if $User{UserLogin} !~ m/$Item/ && $User{Email} !~ m/$Item/; #todo email moved to contact
             $Blacklisted = 1;
             last;
         }
@@ -301,7 +301,7 @@ sub Run {
         return 1 if ( !$User{UserLogin} );
         $Blacklisted = 0;
         for my $Item (@Blacklist) {
-            next if $User{UserLogin} !~ m/$Item/ && $User{UserEmail} !~ m/$Item/;
+            next if $User{UserLogin} !~ m/$Item/ && $User{UserEmail} !~ m/$Item/; #todo email moved to contact
             $Blacklisted = 1;
             last;
         }
@@ -336,7 +336,7 @@ sub Run {
 
         $Blacklisted = 0;
         for my $Item (@Blacklist) {
-            next if $Ticket{ContactID} !~ m/$Item/ && $ContactData{UserEmail} !~ m/$Item/;
+            next if $Ticket{ContactID} !~ m/$Item/ && $ContactData{Email} !~ m/$Item/;
             $Blacklisted = 1;
             last;
         }

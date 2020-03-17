@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -132,17 +132,20 @@ sub SendNotification {
             my $AddressLine = '';
             # handle dynamic field by type
             if ($Recipient{DynamicFieldType} eq 'User') {
-                my %UserData = $UserObject->GetUserData(
-                    User  => $FieldRecipient,
-                    Valid => 1
+                my $ExistingUserID = $Kernel::OM->('Kernel::System::User')->UserLookup(
+                    UserLogin => $FieldRecipient,
                 );
-                next FIELDRECIPIENT if !$UserData{UserEmail};
-                $AddressLine = $UserData{UserEmail};
+                my %UserContactData = $ContactObject->ContactGet(
+                    UserID => $ExistingUserID,
+                    Valid  => 1,
+                );
+                next FIELDRECIPIENT if !$UserContactData{Email};
+                $AddressLine = $UserContactData{Email};
             } elsif ($Recipient{DynamicFieldType} eq 'Contact') {
                 my %Contact = $ContactObject->ContactGet(
                     ID => $FieldRecipient,
                 );
-                next FIELDRECIPIENT if !$Contact{UserEmail};
+                next FIELDRECIPIENT if !$Contact{Email};
                 $AddressLine = $Contact{Email};
             } else {
                 $AddressLine = $FieldRecipient;

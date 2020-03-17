@@ -1,0 +1,1 @@
+#### Votes of a FAQ article

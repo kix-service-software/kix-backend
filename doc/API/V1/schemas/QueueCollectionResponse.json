@@ -7,7 +7,7 @@
       "Queue" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/Queue"
+            "$ref" : "#/definitions/_Queue_json"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Queue"
    ],
    "definitions" : {
-      "Queue" : {
+      "_Queue_json" : {
          "$id" : "#Priority",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The priority object.",
@@ -34,7 +34,14 @@
                "readOnly" : true
             },
             "Comment" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "CreateBy" : {
@@ -102,14 +109,7 @@
                "readOnly" : true
             },
             "Signature" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
+               "type" : "string",
                "readOnly" : true
             },
             "SubQueues" : {

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -254,9 +254,9 @@ You should be able to continue reading these lessons, however.
         Name => 'Safety - script tag'
     },
     {
-        Input => '<center>
+        Input => '\'<center>
 <SCRIPT SRC=http://ha.ckers.org/xss.js?<B>
-</center>',
+</center>;\'',
         Result => {
             Output => '<center>
 /center>',

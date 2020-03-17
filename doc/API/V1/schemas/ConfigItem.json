@@ -55,20 +55,20 @@
          "readOnly" : true
       },
       "CurrentVersion" : {
-         "$ref" : "#/definitions/ConfigItemVersion"
+         "$ref" : "#/definitions/_ConfigItemVersion_json"
       },
       "History" : {
          "description" : "added via include \"History\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/ConfigItemHistory"
+            "$ref" : "#/definitions/_ConfigItemHistory_json"
          }
       },
       "Images" : {
          "description" : "added via include \"Images\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/ConfigItemImage"
+            "$ref" : "#/definitions/_ConfigItemImage_json"
          }
       },
       "LastVersionID" : {
@@ -86,7 +86,7 @@
          "description" : "added via include \"Versions\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/ConfigItemVersion"
+            "$ref" : "#/definitions/_ConfigItemVersion_json"
          }
       }
    },
@@ -100,7 +100,176 @@
       "ConfigItemID"
    ],
    "definitions" : {
-      "ConfigItemVersion" : {
+      "_ConfigItemClassDefinition_json" : {
+         "$id" : "#ConfigItemClassDefinition",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
+      },
+      "_ConfigItemHistory_json" : {
+         "$id" : "#ConfigItemHistory",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item history object.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryEntryID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "HistoryType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryTypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserFirstname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserLastname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserLogin" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "HistoryEntryID",
+            "HistoryType",
+            "HistoryTypeID",
+            "UserID",
+            "UserFirstname",
+            "UserLastname",
+            "UserLogin"
+         ]
+      },
+      "_ConfigItemImage_json" : {
+         "$id" : "#ConfigItemImage",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item image object.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ConfigItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Comment",
+            "ConfigItemID",
+            "ContentType",
+            "Filename",
+            "ID"
+         ]
+      },
+      "_ConfigItemVersion_json" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
@@ -155,7 +324,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition"
+               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
             },
             "DeplState" : {
                "type" : "string",
@@ -214,161 +383,6 @@
             "InciStateType",
             "Name",
             "VersionID"
-         ]
-      },
-      "ConfigItemHistory" : {
-         "$id" : "#ConfigItemHistory",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item history object.",
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ConfigItemID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "HistoryEntryID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "HistoryType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "HistoryTypeID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "UserFirstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "UserLastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserLogin" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "CreateBy",
-            "CreateTime",
-            "HistoryEntryID",
-            "HistoryType",
-            "HistoryTypeID",
-            "UserID",
-            "UserFirstname",
-            "UserLastname",
-            "UserLogin"
-         ]
-      },
-      "ConfigItemImage" : {
-         "$id" : "#ConfigItemImage",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item image object.",
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ConfigItemID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Content" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ContentType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Filename" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "Comment",
-            "ConfigItemID",
-            "ContentType",
-            "Filename",
-            "ID"
-         ]
-      },
-      "ConfigItemClassDefinition" : {
-         "$id" : "#ConfigItemClassDefinition",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item class definition object.",
-         "type" : "object",
-         "properties" : {
-            "Class" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ClassID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Definition" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object"
-               },
-               "readOnly" : true
-            },
-            "DefinitionID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "DefinitionString" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Version" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "Class",
-            "ClassID",
-            "CreateBy",
-            "CreateTime",
-            "Definition",
-            "DefinitionID",
-            "DefinitionString",
-            "Version"
          ]
       }
    }

@@ -24,7 +24,7 @@
          "description" : "added via include \"Preferences\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/UserPreference"
+            "$ref" : "#/definitions/_UserPreference_json"
          }
       },
       "RoleIDs" : {
@@ -45,53 +45,11 @@
          ],
          "readOnly" : true
       },
-      "UserEmail" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "UserFirstname" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "UserFullname" : {
-         "type" : "string",
-         "readOnly" : true
-      },
       "UserID" : {
          "type" : "integer",
          "readOnly" : true
       },
-      "UserLastname" : {
-         "type" : "string",
-         "readOnly" : true
-      },
       "UserLogin" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "UserMobile" : {
-         "anyOf" : [
-            {
-               "type" : "string"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "UserPhone" : {
-         "anyOf" : [
-            {
-               "type" : "string"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "UserTitle" : {
          "type" : "string",
          "readOnly" : true
       },
@@ -106,12 +64,10 @@
       "CreateBy",
       "CreateTime",
       "UserID",
-      "UserFirstname",
-      "UserLastname",
       "UserLogin"
    ],
    "definitions" : {
-      "UserPreference" : {
+      "_UserPreference_json" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",

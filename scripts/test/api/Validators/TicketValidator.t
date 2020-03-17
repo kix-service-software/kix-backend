@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -41,7 +41,6 @@ my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
     Title           => 'Testticket Unittest',
     TypeID          => 1,
-    Contact    => 'customer@test.org',
     StateID         => 1,
     PriorityID      => 1,
     QueueID         => 1,

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -517,6 +517,12 @@ sub TemplateDelete {
         UserID     => $Param{UserID},
     );
 
+    # delete existing run data
+    $Self->_TemplateRunDelete(
+        TemplateID => $Param{TemplateID},
+        UserID     => $Param{UserID}
+    );
+
     # create the template id string
     my $TemplateIDString = join q{, }, map {'?'} @{ $Param{TemplateID} };
 
@@ -536,11 +542,13 @@ sub TemplateDelete {
 
     # push client callback event
     if ($Success) {
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
-            Event     => 'DELETE',
-            Namespace => 'ImportExportTemplate',
-            ObjectID  => $Param{TemplateID},
-        );
+        for my $TemplateID ( @{$Param{TemplateID}} ) {
+            $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+                Event     => 'DELETE',
+                Namespace => 'ImportExportTemplate',
+                ObjectID  => $TemplateID
+            );
+        }
     }
 
     return $Success;
@@ -2703,6 +2711,46 @@ sub _TemplateRunUpdate {
         TemplateID => $Param{TemplateID},
         UPDATE     => 1
     );
+
+    return 1;
+}
+
+sub _TemplateRunDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(TemplateID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    if ( !ref $Param{TemplateID} ) {
+        $Param{TemplateID} = [ $Param{TemplateID} ];
+    } elsif ( ref $Param{TemplateID} ne 'ARRAY' ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'TemplateID must be an array reference or a string!',
+        );
+        return;
+    }
+
+    # create the template id string
+    my $TemplateIDString = join q{, }, map {'?'} @{ $Param{TemplateID} };
+
+    # create and add bind parameters
+    my @Bind = map { \$_ } @{ $Param{TemplateID} };
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        SQL  => "DELETE FROM imexport_template_run WHERE template_id IN ( $TemplateIDString )",
+        Bind => \@Bind,
+    );
+
+    return 1;
 }
 
 sub _ClearCacheAndNotify {

@@ -2490,7 +2490,7 @@
         <Group>Ticket</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
-            <Option SelectedID="1">
+            <Option SelectedID="0">
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
@@ -3766,14 +3766,14 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###ITSMConfigItemLinkAdd" Required="0" Valid="0">
-        <Description Translatable="1">Create link between ticket and config item on DynamicFieldUpdate (This event only create link, links can only be deleted manually).</Description>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###ITSMConfigItemLinkAdd" Required="0" Valid="1">
+        <Description Translatable="1">Create link between ticket and config item on DynamicFieldUpdate (This event only create links, links can only be deleted manually).</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::ITSMConfigItemLinkAdd</Item>
-                <Item Key="Event">(TicketCreate|TicketDynamicFieldUpdate)</Item>
+                <Item Key="Event">(TicketDynamicFieldUpdate_AffectedAsset)</Item>
                 <Item Key="LinkType">RelevantTo</Item>
             </Hash>
         </Setting>
@@ -3964,6 +3964,288 @@ Thanks for your help!
                 <Item>RiskAssumptionRemark</Item>
                 <Item>MobileProcessingChecklist.*</Item>
             </Array>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::Template::Definitions" Required="0" Valid="1">
+        <Description Translatable="1">Defines a set of ticket templates filled with predefined values which are set in
+            specified ticket fields.
+        </Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <TextArea><![CDATA[
+[
+  {
+    "CustomerVisible": 1,
+    "TemplateID": "NewIncidentReport",
+    "Context": [
+      "new"
+    ],
+    "Title": "Incident Report",
+    "Hint": "Use this template if you encounter an incident or some limitation of a usually working service or function.",
+    "Keywords": [
+      "incident",
+      "report",
+      "issue"
+    ],
+    "FormFields": [
+      {
+        "id": "ticket-new-form-field-contact",
+        "label": "Contact",
+        "required": true,
+        "readonly": false,
+        "defaultValue": {
+          "value": null,
+          "valid": true
+        },
+        "property": "ContactID",
+        "name": "Contact",
+        "hint": "Helptext_Tickets_TicketCreate_Contact",
+        "visible": true
+      },
+      {
+        "id": "ticket-new-form-field-channel",
+        "label": "Channel",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 1,
+          "valid": true
+        },
+        "property": "ChannelID",
+        "name": "Channel",
+        "hint": "Helptext_Tickets_TicketCreate_Channel",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-affectedasset",
+        "label": "Affected Asset",
+        "required": false,
+        "readonly": false,
+        "defaultValue": {
+          "value": null,
+          "valid": true
+        },
+        "property": "DynamicFields",
+        "options": [
+          {
+            "option": "FIELD_NAME",
+            "value": "AffectedAsset"
+          }
+        ],
+        "name": "Contact",
+        "hint": "Helptext_Tickets_TicketCreate_AffectedAsset",
+        "visible": true
+      },
+      {
+        "id": "ticket-new-form-field-priority",
+        "label": "Priority",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 3,
+          "valid": true
+        },
+        "property": "PriorityID",
+        "name": "Priority",
+        "hint": "Helptext_Tickets_TicketCreate_Priority",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-queue",
+        "label": "Assign Team / Queue",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 1,
+          "valid": true
+        },
+        "property": "QueueID",
+        "name": "Assign Team / Queue",
+        "hint": "Helptext_Tickets_TicketCreate_Queue",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-state",
+        "label": "State",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 2,
+          "valid": true
+        },
+        "property": "StateID",
+        "name": "State",
+        "hint": "Helptext_Tickets_TicketCreate_State",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-type",
+        "label": "Type",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 1,
+          "valid": true
+        },
+        "property": "TypeID",
+        "name": "Type",
+        "hint": "Helptext_Tickets_TicketCreate_Type",
+        "visible": true
+      }
+    ]
+  },
+  {
+    "CustomerVisible": 1,
+    "TemplateID": "NewServiceRequest",
+    "Context": [
+      "new"
+    ],
+    "Title": "Service Request",
+    "Hint": "Any other request.",
+    "Keywords": [
+      "request",
+      "information",
+      "question",
+      "ask"
+    ],
+    "FormFields": [
+      {
+        "id": "ticket-new-form-field-channel",
+        "label": "Channel",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 1,
+          "valid": true
+        },
+        "property": "ChannelID",
+        "name": "Channel",
+        "hint": "Helptext_Tickets_TicketCreate_Channel",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-contact",
+        "label": "Contact",
+        "required": true,
+        "readonly": false,
+        "defaultValue": {
+          "value": null,
+          "valid": true
+        },
+        "property": "ContactID",
+        "name": "Contact",
+        "hint": "Helptext_Tickets_TicketCreate_Contact",
+        "visible": true
+      },
+      {
+        "id": "ticket-new-form-field-affectedasset",
+        "label": "Affected Asset",
+        "required": false,
+        "readonly": false,
+        "defaultValue": {
+          "value": null,
+          "valid": true
+        },
+        "property": "DynamicFields",
+        "options": [
+          {
+            "option": "FIELD_NAME",
+            "value": "AffectedAsset"
+          }
+        ],
+        "name": "Contact",
+        "hint": "Helptext_Tickets_TicketCreate_AffectedAsset",
+        "visible": true
+      },
+      {
+        "id": "ticket-new-form-field-priority",
+        "label": "Priority",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 3,
+          "valid": true
+        },
+        "property": "PriorityID",
+        "name": "Priority",
+        "hint": "Helptext_Tickets_TicketCreate_Priority",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-queue",
+        "label": "Assign Team / Queue",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 1,
+          "valid": true
+        },
+        "property": "QueueID",
+        "name": "Assign Team / Queue",
+        "hint": "Helptext_Tickets_TicketCreate_Queue",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-state",
+        "label": "State",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 2,
+          "valid": true
+        },
+        "property": "StateID",
+        "name": "State",
+        "hint": "Helptext_Tickets_TicketCreate_State",
+        "visible": false
+      },
+      {
+        "id": "ticket-new-form-field-type",
+        "label": "Type",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 1,
+          "valid": true
+        },
+        "property": "TypeID",
+        "name": "Type",
+        "hint": "Helptext_Tickets_TicketCreate_Type",
+        "visible": true
+      }
+    ]
+  },
+  {
+    "CustomerVisible": 1,
+    "TemplateID": "FollowUpInquiry",
+    "Context": [],
+    "Title": "Follow Up Inquiry",
+    "Hint": "Use this action if you like to add some information to your request or respond to a question asked.",
+    "Keywords": [
+      "follow up",
+      "update",
+      "message"
+    ],
+    "FormFields": [
+      {
+        "id": "ticket-new-form-field-channel",
+        "label": "Channel",
+        "required": true,
+        "readonly": true,
+        "defaultValue": {
+          "value": 1,
+          "valid": true
+        },
+        "property": "ChannelID",
+        "name": "Channel",
+        "hint": "Helptext_Tickets_TicketCreate_Channel",
+        "visible": false
+      }
+    ]
+  }
+]
+        ]]></TextArea>
         </Setting>
     </ConfigItem>
 </kix_config>

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -86,6 +86,9 @@ sub ParameterDefinition {
         'Role::Name' => {
             Required => 1
         },
+        'Role::UsageContext' => {
+            Required => 1
+        },
     }
 }
 
@@ -96,9 +99,10 @@ perform RoleCreate Operation. This will return the created RoleID.
     my $Result = $OperationObject->Run(
         Data => {
 	    	Role  => {
-	        	Name    => '...',
-	        	Comment => '...',                 # optional
-	        	ValidID => '...',                 # optional
+	        	Name         => '...',
+	        	Comment      => '...',                 # optional
+	        	ValidID      => '...',                 # optional
+                UsageContext => 0x0003,
 	    	},
 	    },
     );
@@ -126,8 +130,8 @@ sub Run {
     my $Exists = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
         Role => $Role->{Name},
     );
-    
-    if ( $Exists ) {
+
+    if ($Exists) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => "Cannot create role. Role with the name '$Role->{Name}' already exists.",
@@ -136,10 +140,11 @@ sub Run {
 
     # create Role
     my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
-        Name    => $Role->{Name},
-        Comment => $Role->{Comment} || '',
-        ValidID => $Role->{ValidID} || 1,
-        UserID  => $Self->{Authorization}->{UserID},
+        Name         => $Role->{Name},
+        Comment      => $Role->{Comment} || '',
+        ValidID      => $Role->{ValidID} || 1,
+        UsageContext => $Role->{UsageContext},
+        UserID       => $Self->{Authorization}->{UserID},
     );
 
     if ( !$RoleID ) {
@@ -148,10 +153,10 @@ sub Run {
             Message => 'Could not create role, please contact the system administrator',
         );
     }
-    
+
     # assign users
-    if ( IsArrayRefWithData($Role->{UserIDs}) ) {
-        foreach my $UserID ( @{$Role->{UserIDs}} ) {
+    if ( IsArrayRefWithData( $Role->{UserIDs} ) ) {
+        foreach my $UserID ( @{ $Role->{UserIDs} } ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Role::RoleUserIDCreate',
                 Data          => {
@@ -159,7 +164,7 @@ sub Run {
                     UserID => $UserID,
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Result;
             }
@@ -167,8 +172,8 @@ sub Run {
     }
 
     # assign permissions
-    if ( IsArrayRefWithData($Role->{Permissions}) ) {
-        foreach my $Permission ( @{$Role->{Permissions}} ) {
+    if ( IsArrayRefWithData( $Role->{Permissions} ) ) {
+        foreach my $Permission ( @{ $Role->{Permissions} } ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Role::PermissionCreate',
                 Data          => {
@@ -176,18 +181,18 @@ sub Run {
                     Permission => $Permission,
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Result;
             }
         }
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         RoleID => 0 + $RoleID,
-    );    
+    );
 }
 
 1;

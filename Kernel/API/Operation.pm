@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -105,6 +105,13 @@ sub new {
         );
     }
 
+    if ( !IsHashRefWithData($Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => 'No OperationConfig found!',
+        );
+    }
+    
     $Self->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
     if ( !IsHashRefWithData($Self->{OperationConfig}) ) {
         return $Self->_Error(
@@ -112,6 +119,10 @@ sub new {
             Message => 'No OperationConfig found!',
         );
     }
+
+    # init call level
+    $Self->{Level} = $Param{Level} || 0;
+    $Self->{LevelIndent} = '    ' x $Self->{Level} || '';
 
     # check permission
     if ( IsHashRefWithData($Param{Authorization}) ) {
@@ -163,12 +174,11 @@ sub new {
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
     # pass information to backend
-    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions) ) {
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions SuppressPermissionErrors) ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
     }
 
     # add call level
-    $Self->{Level} = $Param{Level};
     $Self->{BackendObject}->{Level} = $Self->{Level};    
 
     return $Self;
@@ -197,6 +207,8 @@ perform the selected Operation.
 sub Run {
     my ( $Self, %Param ) = @_;    
 
+    my $StartTime = Time::HiRes::time();
+
     # validate data
     my $ValidatorResult = $Self->{ValidatorObject}->Validate(
         %Param
@@ -216,7 +228,12 @@ sub Run {
     }
 
     # start the backend
-    return $Self->{BackendObject}->RunOperation(%Param);
+    my $Result = $Self->{BackendObject}->RunOperation(%Param);
+
+    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+    $Self->_Debug($Self->{LevelIndent}, sprintf("execution took %i ms", $TimeDiff));
+
+    return $Result;
 }
 
 =item Options()
@@ -277,6 +294,8 @@ checks whether the user is allowed to execute this operation (Resource and Objec
 sub _CheckPermission {
     my ( $Self, %Param ) = @_;    
 
+    my $StartTime = Time::HiRes::time();
+
     my $RequestedPermission = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
 
     # check if token allows access, first check denials
@@ -319,6 +338,7 @@ sub _CheckPermission {
     foreach my $Resource ( @Resources ) {
         ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
             UserID              => $Param{Authorization}->{UserID},
+            UsageContext        => $Param{Authorization}->{UserType},
             Target              => $ResourceBase.$Resource,
             RequestedPermission => $RequestedPermission,
         );
@@ -359,7 +379,20 @@ sub _CheckPermission {
     # OPTIONS requests are always possible
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
 
+    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
     return ($Granted, @AllowedMethods);
+}
+
+sub _Debug {
+    my ( $Self, $Indent, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
+
+    $Indent ||= '';
+
+    printf STDERR "(%5i) %-15s %s%s: %s\n", $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 sub _PermissionDebug {

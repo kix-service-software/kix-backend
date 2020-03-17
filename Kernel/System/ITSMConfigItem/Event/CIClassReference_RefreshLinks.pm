@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -250,12 +250,6 @@ sub _CreateCIReferencesHash {
 
             COUNTER:
             for my $Counter ( 1 .. $Item->{CountMax} ) {
-
-                # no content then stop loop...
-                last COUNTER
-                    if !
-                        defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]
-                        ->{Content};
                 if ( $Item->{Key} eq $Key ) {
                     for my $ParamRef (
                         qw(ReferencedCIClassLinkType ReferencedCIClassLinkDirection)
@@ -273,7 +267,7 @@ sub _CreateCIReferencesHash {
                         $Self->_CreateCIReferencesHash(
                             XMLDefinition => $Item->{Sub},
                             XMLData       => $Param{XMLData}->{ $Item->{Key} }->[$Counter],
-                            )
+                        )
                     );
                 }
             }
@@ -323,9 +317,6 @@ sub _GetAttributeDataByKey {
 }
 
 1;
-
-
-
 
 =back
 

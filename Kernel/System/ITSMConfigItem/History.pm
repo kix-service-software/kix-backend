@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -524,13 +524,16 @@ sub _EnrichHistoryEntries {
             UserID => $Entry->{CreateBy},
             Cached => 1,
         );
+        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            UserID => $Entry->{CreateBy},
+            Cached => 1,
+        );
 
         # save additional information for history entry
         $Entry->{UserID}        = $UserInfo{UserID};
         $Entry->{UserLogin}     = $UserInfo{UserLogin};
-        $Entry->{UserFirstname} = $UserInfo{UserFirstname};
-        $Entry->{UserLastname}  = $UserInfo{UserLastname};
-        $Entry->{UserFullname}  = $UserInfo{UserFullname};
+        $Entry->{UserFirstname} = $ContactData{Firstname};
+        $Entry->{UserLastname}  = $ContactData{Lastname};
 
         # prepare Comment
 

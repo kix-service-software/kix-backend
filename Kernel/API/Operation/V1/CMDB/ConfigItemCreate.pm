@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -135,7 +135,7 @@ perform ConfigItemCreate Operation. This will return the created ConfigItemLogin
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # isolate and trim ConfigItem parameter
     my $ConfigItem = $Self->_Trim(
         Data => $Param{Data}->{ConfigItem}
@@ -204,7 +204,6 @@ sub Run {
 }
 
 1;
-
 
 =back
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -349,6 +349,9 @@ sub Run {
                     );
                     if ( IsHashRefWithData($DynamicFieldConfig) ) {
 
+                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
                         # get prepared value
                         my $DFPreparedValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueLookup(
                             DynamicFieldConfig => $DynamicFieldConfig,
@@ -358,7 +361,7 @@ sub Run {
                         # get display value string
                         my $DisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->DisplayValueRender(
                             DynamicFieldConfig => $DynamicFieldConfig,
-                            Value              => $TicketRaw{$Attribute},
+                            Value              => $TicketRaw{$Attribute}
                         );
 
                         if (!IsHashRefWithData($DisplayValue)) {
@@ -383,14 +386,28 @@ sub Run {
                                 Value => join($Separator, @Values)
                             };
                         }
+
+                        # get html display value string
+                        my $DisplayValueHTML = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->HTMLDisplayValueRender(
+                            DynamicFieldConfig => $DynamicFieldConfig,
+                            Value              => $TicketRaw{$Attribute},
+                        );
+
+                        # get short display value string
+                        my $DisplayValueShort = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ShortDisplayValueRender(
+                            DynamicFieldConfig => $DynamicFieldConfig,
+                            Value              => $TicketRaw{$Attribute}
+                        );
                         
                         push @DynamicFields, {
-                            ID            => $DynamicFieldConfig->{ID},
-                            Name          => $DynamicFieldConfig->{Name},
-                            Label         => $DynamicFieldConfig->{Label},
-                            Value         => $TicketRaw{$Attribute},
-                            DisplayValue  => $DisplayValue->{Value},
-                            PreparedValue => $DFPreparedValue
+                            ID                => $DynamicFieldConfig->{ID},
+                            Name              => $DynamicFieldConfig->{Name},
+                            Label             => $DynamicFieldConfig->{Label},
+                            Value             => $TicketRaw{$Attribute},
+                            DisplayValue      => $DisplayValue->{Value},
+                            DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
+                            DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
+                            PreparedValue     => $DFPreparedValue
                         };
                     }
                 }
@@ -414,6 +431,10 @@ sub Run {
                 TicketID => $TicketID,
             );
         }
+
+        #FIXME: workaround KIX2018-3308
+        $TicketData{ContactID} = "" . $TicketData{ContactID};
+        $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
 
         # add
         push(@TicketList, \%TicketData);

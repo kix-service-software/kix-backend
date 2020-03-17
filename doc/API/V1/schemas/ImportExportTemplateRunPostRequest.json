@@ -1,6 +1,6 @@
 {
    "$id" : "#ImportExportTemplateRunPostRequest",
-   "$schema" : "http://json-schema.org/schema",
+   "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The import export template run post request object for create.",
    "type" : "object",
    "properties" : {
@@ -15,7 +15,10 @@
                "description" : "the type of the run: use 'import' trigger an import and 'export' for export action",
                "type" : "string"
             }
-         }
+         },
+         "required" : [
+            "Type"
+         ]
       }
    },
    "required" : [

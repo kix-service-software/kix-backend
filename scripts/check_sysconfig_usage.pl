@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -71,7 +71,7 @@ foreach my $File (sort @FileList) {
         if ( $Content =~ /$Key/m ) {
             if ( $SubKey && $Content =~ /$SubKey/m ) {
                 print STDERR "     subkey $SubKey found\n";
-                $ConfigItemUsage{$OptionName}->{$File} = 1;                
+                $ConfigItemUsage{$OptionName}->{$File} = 1;
             }
             else {
                 print STDERR "     key $Key found\n";
@@ -134,7 +134,7 @@ foreach my $Key (sort keys %ConfigItemUsage) {
             $Class = 'parentused';
         }
     }
-    
+
     $HTML .= '<tr class="'.$Class.'">
 <td>'.++$Index.'</td>
 <td>'.$Key.'</td>
@@ -152,6 +152,7 @@ $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
     Content  => \(join("\n", @Rows))
 );
 
+1;
 
 =back
 

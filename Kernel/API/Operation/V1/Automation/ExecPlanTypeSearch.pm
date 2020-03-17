@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2019 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -89,7 +89,8 @@ sub Run {
 	# get already prepared ExecPlanType data from ExecPlanTypeGet operation
     if ( IsHashRefWithData($ExecPlanTypes) ) {
         my $ExecPlanTypeGetResult = $Self->ExecOperation(
-            OperationType => 'V1::Automation::ExecPlanTypeGet',
+            OperationType            => 'V1::Automation::ExecPlanTypeGet',
+            SuppressPermissionErrors => 1,
             Data      => {
                 ExecPlanType => join(',', sort keys %{$ExecPlanTypes}),
             }
