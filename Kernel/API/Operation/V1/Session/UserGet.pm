@@ -144,18 +144,34 @@ sub Run {
         if ( $Param{Data}->{include}->{Tickets} ) {
             my @TicketIDs;
 
+            my $TicketFilter;
+            if ( $Param{Data}->{'Tickets.StateType'} ) {
+                $TicketFilter = {
+                    Field    => 'StateType',
+                    Operator => 'IN',
+                    Value    => [ split(/,/, $Param{Data}->{'Tickets.StateType'}) ],
+                };
+            }
+            elsif ( $Param{Data}->{'Tickets.StateID'} ) {
+                $TicketFilter = {
+                    Field    => 'StateID',
+                    Operator => 'IN',
+                    Value    => [ split(/,/, $Param{Data}->{'Tickets.StateID'}) ],
+                };
+            }
+
             # get tickets owned by user
-            my $Tickets = $Self->_GetOwnedTickets();
+            my $Tickets = $Self->_GetOwnedTickets(TicketFilter => $TicketFilter);
             $UserData{Tickets}->{Owned}          = $Tickets->{All};
             $UserData{Tickets}->{OwnedAndUnseen} = $Tickets->{Unseen};
 
             # get tickets owned by user and locked
-            $Tickets                                      = $Self->_GetOwnedAndLockedTickets();
+            $Tickets                                      = $Self->_GetOwnedAndLockedTickets(TicketFilter => $TicketFilter);
             $UserData{Tickets}->{OwnedAndLocked}          = $Tickets->{All};
             $UserData{Tickets}->{OwnedAndLockedAndUnseen} = $Tickets->{Unseen};
 
             # get tickets watched by user
-            $Tickets                               = $Self->_GetWatchedTickets();
+            $Tickets                               = $Self->_GetWatchedTickets(TicketFilter => $TicketFilter);
             $UserData{Tickets}->{Watched}          = $Tickets->{All};
             $UserData{Tickets}->{WatchedAndUnseen} = $Tickets->{Unseen};
 
@@ -205,45 +221,58 @@ sub Run {
 
 sub _GetOwnedTickets {
     my ( $Self, %Param ) = @_;
-    my %Tickets;
+    my %Tickets;   
+
+    my @Filter = (
+        {
+            Field    => 'OwnerID',
+            Operator => 'EQ',
+            Value    => $Self->{Authorization}->{UserID},
+        }
+    );    
+
+    if ( IsHashRefWithData($Param{TicketFilter}) ) {
+        push(@Filter, $Param{TicketFilter});
+    }
 
     # execute ticket search
     my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
         Search => {
-            AND => [
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $Self->{Authorization}->{UserID},
-                },
-                ]
+            AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
+
+    @Filter = (
+        {
+            Field    => 'OwnerID',
+            Operator => 'EQ',
+            Value    => $Self->{Authorization}->{UserID},
+        },
+        {
+            Field    => 'TicketFlag',
+            Operator => 'EQ',
+            Value    => [
+                {
+                    Flag   => 'Seen',
+                    Value  => '1',
+                    UserID => $Self->{Authorization}->{UserID},
+                }
+                ]
+        }
+    );    
+
+    if ( IsHashRefWithData($Param{TicketFilter}) ) {
+        push(@Filter, $Param{TicketFilter});
+    }
+    
     # execute ticket search
     my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
         Search => {
-            AND => [
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $Self->{Authorization}->{UserID},
-                },
-                {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $Self->{Authorization}->{UserID},
-                        }
-                        ]
-                },
-                ]
+            AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
@@ -264,53 +293,65 @@ sub _GetOwnedAndLockedTickets {
     my ( $Self, %Param ) = @_;
     my %Tickets;
 
+    my @Filter = (
+        {
+            Field    => 'OwnerID',
+            Operator => 'EQ',
+            Value    => $Self->{Authorization}->{UserID},
+        },
+        {
+            Field    => 'LockID',
+            Operator => 'EQ',
+            Value    => 2,
+        }
+    );    
+
+    if ( IsHashRefWithData($Param{TicketFilter}) ) {
+        push(@Filter, $Param{TicketFilter});
+    }
+
     # execute ticket search
     my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
         Search => {
-            AND => [
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $Self->{Authorization}->{UserID},
-                },
-                {
-                    Field    => 'LockID',
-                    Operator => 'EQ',
-                    Value    => 2,
-                },
-                ]
+            AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
+    @Filter = (
+        {
+            Field    => 'OwnerID',
+            Operator => 'EQ',
+            Value    => $Self->{Authorization}->{UserID},
+        },
+        {
+            Field    => 'LockID',
+            Operator => 'EQ',
+            Value    => 2,
+        },
+        {
+            Field    => 'TicketFlag',
+            Operator => 'EQ',
+            Value    => [
+                {
+                    Flag   => 'Seen',
+                    Value  => '1',
+                    UserID => $Self->{Authorization}->{UserID},
+                }
+                ]
+        }
+    );    
+
+    if ( IsHashRefWithData($Param{TicketFilter}) ) {
+        push(@Filter, $Param{TicketFilter});
+    }
+
     # execute ticket search
     my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
         Search => {
-            AND => [
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $Self->{Authorization}->{UserID},
-                },
-                {
-                    Field    => 'LockID',
-                    Operator => 'EQ',
-                    Value    => 2,
-                },
-                {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $Self->{Authorization}->{UserID},
-                        }
-                        ]
-                },
-                ]
+            AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
@@ -329,45 +370,57 @@ sub _GetOwnedAndLockedTickets {
 
 sub _GetWatchedTickets {
     my ( $Self, %Param ) = @_;
-    my %Tickets;
+    my %Tickets;       
+
+    my @Filter = (
+        {
+            Field    => 'WatcherUserID',
+            Operator => 'EQ',
+            Value    => $Self->{Authorization}->{UserID},
+        }
+    );    
+
+    if ( IsHashRefWithData($Param{TicketFilter}) ) {
+        push(@Filter, $Param{TicketFilter});
+    }
 
     # execute ticket search
     my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
         Search => {
-            AND => [
-                {
-                    Field    => 'WatcherUserID',
-                    Operator => 'EQ',
-                    Value    => $Self->{Authorization}->{UserID},
-                },
-                ]
+            AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
+    @Filter = (
+        {
+            Field    => 'WatcherUserID',
+            Operator => 'EQ',
+            Value    => $Self->{Authorization}->{UserID},
+        },
+        {
+            Field    => 'TicketFlag',
+            Operator => 'EQ',
+            Value    => [
+                {
+                    Flag   => 'Seen',
+                    Value  => '1',
+                    UserID => $Self->{Authorization}->{UserID},
+                }
+                ]
+        }
+    );    
+
+    if ( IsHashRefWithData($Param{TicketFilter}) ) {
+        push(@Filter, $Param{TicketFilter});
+    }
+
     # execute ticket search
     my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
         Search => {
-            AND => [
-                {
-                    Field    => 'WatcherUserID',
-                    Operator => 'EQ',
-                    Value    => $Self->{Authorization}->{UserID},
-                },
-                {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $Self->{Authorization}->{UserID},
-                        }
-                        ]
-                },
-                ]
+            AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
         Result => 'ARRAY',
