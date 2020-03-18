@@ -328,7 +328,7 @@ sub RoleUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key (qw(Name Comment ValidID)) {
+    for my $Key (qw(Name Comment ValidID UsageContext)) {
 
         next KEY if defined $RoleData{$Key} && $RoleData{$Key} eq $Param{$Key};
 
