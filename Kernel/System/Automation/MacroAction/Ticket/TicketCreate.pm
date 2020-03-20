@@ -182,21 +182,31 @@ sub Run {
                 );
                 $TicketParam{'OrganisationID'} = $OrganisationID || $Param{Config}->{Organisation};
             } elsif ($Attribute eq 'Contact') {
-                my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
-                    Login  => $Param{Config}->{Contact},
-                    Silent => 1
-                );
-                $TicketParam{'ContactID'} = $ContactID || $Param{Config}->{Contact};
+                my $ContactID;
+                
+                if ($Param{Config}->{Contact} =~ /\d+/) {
+                    $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+                        ID  => $Param{Config}->{Contact},
+                        Silent => 1
+                    );
+                } elsif ( index($Param{Config}->{Contact}, '@') != -1 ) {
+                    $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+                        Email  => $Param{Config}->{Contact},
+                        Silent => 1
+                    );
+                }
+
                 if (!$TicketParam{OrganisationID}) {
                     if ($ContactID) {
                         my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
                             ID => $ContactID
                         );
                         $TicketParam{OrganisationID} = $Contact{PrimaryOrganisationID};
-                    } else {
-                        $TicketParam{OrganisationID} = $TicketParam{'ContactID'};
                     }
                 }
+
+                $TicketParam{'ContactID'} = $ContactID || $Param{Config}->{Contact};
+
             } else {
                 $TicketParam{$Attribute} = $Param{Config}->{$Attribute}
             }
