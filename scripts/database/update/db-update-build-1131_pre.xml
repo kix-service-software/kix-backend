@@ -2,6 +2,7 @@
 <database Name="kix">
 
     <Table Name="contact_organisation">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
         <Column Name="contact_id" Required="true" Type="INTEGER"/>
         <Column Name="org_id" Required="true" Type="INTEGER"/>
         <Column Name="is_primary" Required="true" Default="0" Type="SMALLINT"/>
