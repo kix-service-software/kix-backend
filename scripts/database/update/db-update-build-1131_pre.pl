@@ -45,18 +45,28 @@ sub _FreeOrgIDOneAndAddMyOrga {
         Message  => "Freeing ID 1 in table 'organisation'..."
     );
     return if !$DBObject->Prepare(
-        SQL   => 'SELECT number, name FROM organisation WHERE id = 1',
+        SQL   => 'SELECT * FROM organisation WHERE id = 1',
         Limit => 1,
     );
 
+    my @Orga;
     while (my @Row = $DBObject->FetchrowArray()) {
-        $OrgNumber = $Row[0];
-        $OrgName = $Row[1];
+        @Orga = @Row;
     }
+
+    splice(@Orga, 0, 1); #delete first element (old org id)
+
     return if !$DBObject->Do(
-        SQL  => 'UPDATE organisation SET id = (SELECT MAX(id)+1 FROM organisation LIMIT 1)
-                WHERE name = ? AND number = ?',
-        Bind => [ \$OrgName, \$OrgNumber ],
+        SQL => 'UPDATE organisation
+                SET name = "My Organisation", number = "MY_ORGA", street = NULL, zip = NULL,
+                    city = NULL, country = NULL, url = NULL, valid_id = 1, create_time = current_timestamp,
+                    create_by = 1, change_time = current_timestamp, change_by = 1
+                WHERE id = 1'
+    );
+
+    return if !$DBObject->(
+        SQL  => 'INSERT INTO organisation VALUES(NULL.?.?.?.?.?.?.?.?.?.?.?.?.?)',
+        Bind => [ \@Orga ]
     );
 
     return if !$DBObject->Prepare(
@@ -91,19 +101,7 @@ sub _FreeOrgIDOneAndAddMyOrga {
         Priority => "info",
         Message  => "Done!"
     );
-    $LogObject->Log(
-        Priority => "info",
-        Message  => "Inserting new own organisation..."
-    );
 
-    return if !$DBObject->Do(
-        SQL => 'INSERT INTO organisation (id, number, name, valid_id, change_time, create_time, change_by, create_by)
-                    VALUES (1, \'MY_ORGA\', \'My Organisation\',1,current_timestamp,current_timestamp,1,1)',
-    );
-    $LogObject->Log(
-        Priority => "info",
-        Message  => "Done!"
-    );
     return 1;
 }
 
