@@ -159,17 +159,13 @@ sub Search {
                     push( @SQLWhere, 'th_left.state_id IN ('.(join(', ', sort @List)).')' );
                     push( @SQLWhere, 'th_right.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th_right.state_id IN ('.(join(', ', sort @List)).')' );
+                    push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
+                    push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
                 } else {
                     push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)).')' );
+                    push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
                 }
-            }
-        } else {
-            if ( $Param{BoolOperator} eq 'OR') {
-                push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
-                push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
-            } else {
-                push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
             }
         }
     }
