@@ -241,20 +241,45 @@ sub _PrepareAndValidateTableOrganisation {
         Priority => "info",
         Message  => "Validating columns 'change_by' and 'create_by' in table 'organisation'..."
     );
-    return if !$DBObject->Do(
-        SQL => 'UPDATE organisation SET create_by = 1 WHERE create_by IN (
-                    SELECT DISTINCT create_by FROM organisation o WHERE o.create_by  NOT IN (
-                        SELECT id FROM users
-                        )
-                )'
+
+    return if !$DBObject->Prepare(
+        SQL => 'SELECT DISTINCT(o.create_by)
+                FROM organisation o
+                WHERE o.create_by NOT IN (
+                    SELECT id FROM users
+                )',
     );
+
+    my @UnknownUserIDs;
+    while (my @Row = $DBObject->FetchrowArray()) {
+        push(@UnknownUserIDs, $Row[0]);
+    }
+    my $UnknownUserIDsString = join(',', @UnknownUserIDs);
+
     return if !$DBObject->Do(
-        SQL => 'UPDATE organisation SET change_by = 1 WHERE change_by IN (
-                    SELECT DISTINCT o.change_by FROM organisation o WHERE o.change_by  NOT IN (
-                        SELECT id FROM users
-                        )
-                )'
+        SQL  => 'UPDATE organisation SET create_by = 1 WHERE create_by IN (?)',
+        Bind => [ \$UnknownUserIDsString ]
     );
+
+    return if !$DBObject->Prepare(
+        SQL => 'SELECT DISTINCT(o.change_by)
+                FROM organisation o
+                WHERE o.change_by  NOT IN (
+                    SELECT id FROM users
+                )',
+    );
+
+    @UnknownUserIDs = undef;
+    while (my @Row = $DBObject->FetchrowArray()) {
+        push(@UnknownUserIDs, $Row[0]);
+    }
+    $UnknownUserIDsString = join(',', @UnknownUserIDs);
+
+    return if !$DBObject->Do(
+        SQL  => 'UPDATE organisation SET change_by = 1 WHERE change_by IN (?)',
+        Bind => [ \$UnknownUserIDsString ]
+    );
+
     $LogObject->Log(
         Priority => "info",
         Message  => "Done!"
@@ -270,12 +295,23 @@ sub _PrepareAndValidateTableTicket {
     # prepare organisations and validate
     # remove all non existing organisations from ticket table. this is possible because so far organisation id was an
     # varchar with no foreign key constraint on table organisation.id
+    return if !$DBObject->Prepare(
+        SQL => 'SELECT DISTINCT(t.organisation_id)
+                FROM ticket t WHERE t.organisation_id NOT IN (
+                    SELECT CAST(id AS varchar) FROM organisation
+                )',
+    );
+
+    my @UnknownOrgIDs = undef;
+    while (my @Row = $DBObject->FetchrowArray()) {
+        push(@UnknownOrgIDs, $Row[0]);
+    }
+    my $UnknownOrgIDString = join(',', @UnknownOrgIDs);
+
+
     return if !$DBObject->Do(
-        SQL => "UPDATE ticket SET organisation_id = '1' WHERE organisation_id IN (
-                    SELECT DISTINCT(t.organisation_id) FROM ticket t WHERE t.organisation_id NOT IN (
-                        SELECT CAST(id AS varchar) FROM organisation
-                        )
-                )"
+        SQL  => "UPDATE ticket SET organisation_id = '1' WHERE organisation_id IN (?)",
+        Bind => [ \$UnknownOrgIDString ]
     );
 
     return if !$DBObject->Do(
