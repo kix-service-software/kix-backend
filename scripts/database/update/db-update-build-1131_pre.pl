@@ -64,9 +64,9 @@ sub _FreeOrgIDOneAndAddMyOrga {
                 WHERE id = 1'
     );
 
-    return if !$DBObject->(
-        SQL  => 'INSERT INTO organisation VALUES(NULL.?.?.?.?.?.?.?.?.?.?.?.?.?)',
-        Bind => [ \@Orga ]
+    return if !$DBObject->Do(
+        SQL  => 'INSERT INTO organisation VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        Bind => \@Orga
     );
 
     return if !$DBObject->Prepare(
