@@ -51,21 +51,23 @@ sub _FreeOrgIDOneAndAddMyOrga {
 
     my @Orga;
     while (my @Row = $DBObject->FetchrowArray()) {
-        @Orga = @Row;
+        for my $i (1..$#Row) {
+            push @Orga, \$Row[$i];
+        }
     }
-
-    splice(@Orga, 0, 1); #delete first element (old org id)
 
     return if !$DBObject->Do(
         SQL => 'UPDATE organisation
-                SET name = "My Organisation", number = "MY_ORGA", street = NULL, zip = NULL,
-                    city = NULL, country = NULL, url = NULL, valid_id = 1, create_time = current_timestamp,
-                    create_by = 1, change_time = current_timestamp, change_by = 1
+                SET name = \'My Organisation\', number = \'MY_ORGA\', street = NULL, zip = NULL,
+                    city = NULL, country = NULL, url = NULL, comments = NULL, valid_id = 1,
+                    create_time = current_timestamp, create_by = 1, change_time = current_timestamp, change_by = 1
                 WHERE id = 1'
     );
 
     return if !$DBObject->Do(
-        SQL  => 'INSERT INTO organisation VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        SQL  => 'INSERT INTO organisation (number, name, street, zip, city, country, url, comments,
+                          valid_id, create_time, create_by, change_time, change_by)
+                 VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
         Bind => \@Orga
     );
 
