@@ -96,7 +96,7 @@ sub _FreeOrgIDOneAndAddMyOrga {
     );
 
     return if !$DBObject->Do(
-        SQL  => "UPDATE contact SET org_ids = REPLACE(org_ids,',1,',CONCAT(',',CAST(? AS VARCHAR),',')) WHERE org_ids LIKE '%,1,%' ",
+        SQL  => "UPDATE contact SET org_ids = REPLACE(org_ids,',1,',CONCAT(',',CAST(? AS CHAR(255)),',')) WHERE org_ids LIKE '%,1,%' ",
         Bind => [ \$NewOrgID ],
     );
     $LogObject->Log(

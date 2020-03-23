@@ -303,7 +303,7 @@ sub _PrepareAndValidateTableTicket {
     return if !$DBObject->Prepare(
         SQL => 'SELECT DISTINCT(t.organisation_id)
                 FROM ticket t WHERE t.organisation_id NOT IN (
-                    SELECT CAST(id AS varchar) FROM organisation
+                    SELECT CAST(id AS CHAR(255)) FROM organisation
                 )',
     );
 
@@ -410,7 +410,7 @@ sub _PopulateContactOrganisationMappingTable {
     );
 
     return if !$DBObject->Prepare(
-        SQL => "SELECT id, primary_org_id , REPLACE(org_ids, CAST(primary_org_id AS VARCHAR),'') FROM contact c",
+        SQL => "SELECT id, primary_org_id , REPLACE(org_ids, CAST(primary_org_id AS CHAR(255)),'') FROM contact c",
     );
     # 0 id
     # 1 primary org ID
