@@ -250,11 +250,13 @@ sub _PrepareAndValidateTableOrganisation {
                 )',
     );
 
-    my @UnknownUserIDs;
+    my @UnknownUserIDs = ();
+    my $UnknownUserIDsString = '';
     while (my @Row = $DBObject->FetchrowArray()) {
         push(@UnknownUserIDs, $Row[0]);
     }
-    my $UnknownUserIDsString = join(',', @UnknownUserIDs);
+
+    $UnknownUserIDsString = join(',', @UnknownUserIDs) if (scalar @UnknownUserIDs > 0);
 
     if ($UnknownUserIDsString) {
         return if !$DBObject->Do(
@@ -271,12 +273,13 @@ sub _PrepareAndValidateTableOrganisation {
                 )',
     );
 
-    @UnknownUserIDs = undef;
-    $UnknownUserIDsString = undef;
+    @UnknownUserIDs = ();
+    $UnknownUserIDsString = '';
     while (my @Row = $DBObject->FetchrowArray()) {
         push(@UnknownUserIDs, $Row[0]);
     }
-    $UnknownUserIDsString = join(',', @UnknownUserIDs);
+
+    $UnknownUserIDsString = join(',', @UnknownUserIDs) if (scalar @UnknownUserIDs > 0);
 
     if ($UnknownUserIDsString) {
         return if !$DBObject->Do(
@@ -300,24 +303,22 @@ sub _PrepareAndValidateTableTicket {
     # prepare organisations and validate
     # remove all non existing organisations from ticket table. this is possible because so far organisation id was an
     # varchar with no foreign key constraint on table organisation.id
-    return if !$DBObject->Prepare(
-        SQL => 'SELECT DISTINCT(t.organisation_id)
-                FROM ticket t WHERE t.organisation_id NOT IN (
-                    SELECT CAST(id AS CHAR(255)) FROM organisation
-                )',
+    return if !$DBObject->Do(
+        SQL => 'SELECT id FROM organisation'
     );
-
-    my @UnknownOrgIDs = undef;
+    my @UnknownOrgIDs = ();
+    my $UnknownOrgIDString = '';
     while (my @Row = $DBObject->FetchrowArray()) {
         push(@UnknownOrgIDs, $Row[0]);
     }
-    my $UnknownOrgIDString = join(',', @UnknownOrgIDs);
+    $UnknownOrgIDString = join(',', @UnknownOrgIDs) if (scalar @UnknownOrgIDs > 0);
 
-
-    return if !$DBObject->Do(
-        SQL  => "UPDATE ticket SET organisation_id = '1' WHERE organisation_id IN (?)",
-        Bind => [ \$UnknownOrgIDString ]
-    );
+    if ($UnknownOrgIDString) {
+        return if !$DBObject->Do(
+            SQL  => "UPDATE ticket SET organisation_id = NULL WHERE organisation_id NOT IN (?)",
+            Bind => [ \$UnknownOrgIDString ]
+        );
+    }
 
     return if !$DBObject->Do(
         SQL => 'UPDATE ticket SET organisation_id_new = CAST(organisation_id AS INTEGER)'
