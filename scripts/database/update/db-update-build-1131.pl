@@ -256,10 +256,12 @@ sub _PrepareAndValidateTableOrganisation {
     }
     my $UnknownUserIDsString = join(',', @UnknownUserIDs);
 
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE organisation SET create_by = 1 WHERE create_by IN (?)',
-        Bind => [ \$UnknownUserIDsString ]
-    );
+    if ($UnknownUserIDsString) {
+        return if !$DBObject->Do(
+            SQL  => 'UPDATE organisation SET create_by = 1 WHERE create_by IN (?)',
+            Bind => [ \$UnknownUserIDsString ]
+        );
+    }
 
     return if !$DBObject->Prepare(
         SQL => 'SELECT DISTINCT(o.change_by)
@@ -270,15 +272,18 @@ sub _PrepareAndValidateTableOrganisation {
     );
 
     @UnknownUserIDs = undef;
+    $UnknownUserIDsString = undef;
     while (my @Row = $DBObject->FetchrowArray()) {
         push(@UnknownUserIDs, $Row[0]);
     }
     $UnknownUserIDsString = join(',', @UnknownUserIDs);
 
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE organisation SET change_by = 1 WHERE change_by IN (?)',
-        Bind => [ \$UnknownUserIDsString ]
-    );
+    if ($UnknownUserIDsString) {
+        return if !$DBObject->Do(
+            SQL  => 'UPDATE organisation SET change_by = 1 WHERE change_by IN (?)',
+            Bind => [ \$UnknownUserIDsString ]
+        );
+    }
 
     $LogObject->Log(
         Priority => "info",
