@@ -49,56 +49,63 @@ sub _FreeOrgIDOneAndAddMyOrga {
         Limit => 1,
     );
 
-    my @Orga;
+    my @Orga = ();
     while (my @Row = $DBObject->FetchrowArray()) {
         for my $i (1..$#Row) {
             push @Orga, \$Row[$i];
         }
     }
-
-    return if !$DBObject->Do(
-        SQL => 'UPDATE organisation
+    if (scalar @Orga > 0) {
+        return if !$DBObject->Do(
+            SQL => 'UPDATE organisation
                 SET name = \'My Organisation\', number = \'MY_ORGA\', street = NULL, zip = NULL,
                     city = NULL, country = NULL, url = NULL, comments = NULL, valid_id = 1,
                     create_time = current_timestamp, create_by = 1, change_time = current_timestamp, change_by = 1
                 WHERE id = 1'
-    );
+        );
 
-    return if !$DBObject->Do(
-        SQL  => 'INSERT INTO organisation (number, name, street, zip, city, country, url, comments,
+        return if !$DBObject->Do(
+            SQL  => 'INSERT INTO organisation (number, name, street, zip, city, country, url, comments,
                           valid_id, create_time, create_by, change_time, change_by)
                  VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        Bind => \@Orga
-    );
+            Bind => \@Orga
+        );
 
-    return if !$DBObject->Prepare(
-        SQL   => 'SELECT id FROM organisation WHERE name = ? AND number = ?',
-        Bind  => [ \$OrgName, \$OrgNumber ],
-        Limit => 1,
-    );
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM organisation WHERE name = ? AND number = ?',
+            Bind  => [ \$OrgName, \$OrgNumber ],
+            Limit => 1,
+        );
 
-    while (my @Row = $DBObject->FetchrowArray()) {
-        $NewOrgID = $Row[0];
+        while (my @Row = $DBObject->FetchrowArray()) {
+            $NewOrgID = $Row[0];
+        }
+        return if !$DBObject->Do(
+            SQL  => 'UPDATE organisation_prefs SET org_id = ? WHERE org_id = 1',
+            Bind => [ \$NewOrgID ],
+        );
+
+        return if !$DBObject->Do(
+            SQL  => 'UPDATE ticket SET organisation_id = ? WHERE organisation_id = \'1\' ',
+            Bind => [ \$NewOrgID ],
+        );
+
+        return if !$DBObject->Do(
+            SQL  => 'UPDATE contact SET primary_org_id = ? WHERE primary_org_id = 1 ',
+            Bind => [ \$NewOrgID ],
+        );
+
+        return if !$DBObject->Do(
+            SQL  => "UPDATE contact SET org_ids = REPLACE(org_ids,',1,',CONCAT(',',CAST(? AS CHAR(255)),',')) WHERE org_ids LIKE '%,1,%' ",
+            Bind => [ \$NewOrgID ],
+        );
     }
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE organisation_prefs SET org_id = ? WHERE org_id = 1',
-        Bind => [ \$NewOrgID ],
-    );
-
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE ticket SET organisation_id = ? WHERE organisation_id = \'1\' ',
-        Bind => [ \$NewOrgID ],
-    );
-
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE contact SET primary_org_id = ? WHERE primary_org_id = 1 ',
-        Bind => [ \$NewOrgID ],
-    );
-
-    return if !$DBObject->Do(
-        SQL  => "UPDATE contact SET org_ids = REPLACE(org_ids,',1,',CONCAT(',',CAST(? AS CHAR(255)),',')) WHERE org_ids LIKE '%,1,%' ",
-        Bind => [ \$NewOrgID ],
-    );
+    else {
+        return if !$DBObject->Do(
+            SQL  => 'INSERT INTO organisation (id, number, name, valid_id, create_time, create_by, change_time, change_by)
+                     VALUES (1, \'MY_ORGA\', \'My Organisation\', 1, current_timestamp, 1, current_timestamp, 1)'
+        );
+    }
     $LogObject->Log(
         Priority => "info",
         Message  => "Done!"
