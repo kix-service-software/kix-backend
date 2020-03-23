@@ -2145,7 +2145,7 @@ sub _ApplyInclude {
                             OperationConfig => $Self->{OperationConfig},
                             RequestURI      => $Self->{RequestURI},
                             Object          => $Object,
-                            ObjectID        => $Item->{$Self->{OperationConfig}->{ObjectID}},
+                            ObjectID        => $Item->{$Self->{OperationConfig}->{ObjectID}} || $Item->{ID},
                             UserID          => $Self->{Authorization}->{UserID},
                         );
 
