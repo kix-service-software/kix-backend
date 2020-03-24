@@ -104,7 +104,7 @@ sub _MigrateUserInfoToContact() {
     }
 
     #migrate all other user info
-    return if !$DBObject->Do(
+    return if !$DBObject->Prepare(
         SQL => 'SELECT u.* FROM users u JOIN contact c on LOWER(c.email) <> LOWER(u.email) AND c.user_id IS NULL',
     );
     #  0 id
