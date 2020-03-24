@@ -436,11 +436,13 @@ sub _PopulateContactOrganisationMappingTable {
 
         my @OrgIDs = split /,/, $Row[2];
         foreach my $ID (@OrgIDs) {
-            my $is_primary = ($ID == $Row[1]) ? 1 : 0;
-            return if !$DBObject->Do(
-                SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,?)',
-                Bind => [ \$Row[0], \$ID, \$is_primary ]
-            );
+            if ($ID) {
+                my $is_primary = ($ID == $Row[1]) ? 1 : 0;
+                return if !$DBObject->Do(
+                    SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,?)',
+                    Bind => [ \$Row[0], \$ID, \$is_primary ]
+                );
+            }
         }
     }
 
