@@ -95,10 +95,24 @@ sub _FreeOrgIDOneAndAddMyOrga {
             Bind => [ \$NewOrgID ],
         );
 
-        return if !$DBObject->Do(
-            SQL  => "UPDATE contact SET org_ids = REPLACE(org_ids,',1,',CONCAT(',',CAST(? AS CHAR(255)),',')) WHERE org_ids LIKE '%,1,%' ",
-            Bind => [ \$NewOrgID ],
+        return if !$DBObject->Prepare(
+            SQL => 'SELECT id, org_ids FROM contact WHERE org_ids LIKE \'%,1,%\'',
         );
+
+        my @FetchedRowArray = ();
+        while (my @Row = $DBObject->FetchrowArray()) {
+            push(@FetchedRowArray, [ @Row ]);
+        }
+
+        foreach my $row (@FetchedRowArray) {
+            my @Row = @{$row};
+            my $UpdatedOrgIDs = $Row[1] =~ s/,1,/,$NewOrgID,/r;
+            return if !$DBObject->Do(
+                SQL  => "UPDATE contact SET org_ids = ? WHERE id = ? ",
+                Bind => [ \$UpdatedOrgIDs, \$Row[0] ],
+            );
+        }
+
     }
     else {
         return if !$DBObject->Do(
