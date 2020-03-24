@@ -105,7 +105,7 @@ sub _MigrateUserInfoToContact() {
 
     #migrate all other user info
     return if !$DBObject->Prepare(
-        SQL => 'SELECT u.* FROM users u JOIN contact c on LOWER(c.email) <> LOWER(u.email) AND c.user_id IS NULL',
+        SQL => 'SELECT u.* FROM users u WHERE u.id NOT IN (SELECT DISTINCT(c.userid) FROM contact c WHERE c.user_id IS NOT NULL)',
     );
     #  0 id
     #  1 login
