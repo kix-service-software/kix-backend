@@ -303,7 +303,7 @@ sub _PrepareAndValidateTableTicket {
     # prepare organisations and validate
     # remove all non existing organisations from ticket table. this is possible because so far organisation id was an
     # varchar with no foreign key constraint on table organisation.id
-    return if !$DBObject->Do(
+    return if !$DBObject->Prepare(
         SQL => 'SELECT id FROM organisation'
     );
     my @UnknownOrgIDs = ();
