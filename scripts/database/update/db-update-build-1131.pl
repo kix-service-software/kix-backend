@@ -320,13 +320,28 @@ sub _PrepareAndValidateTableTicket {
         );
     }
 
-    return if !$DBObject->Do(
-        SQL => 'UPDATE ticket SET organisation_id_new = CAST(organisation_id AS INTEGER)'
+    return if $DBObject->Prepare(
+        SQL => 'SELECT DISTINCT(organisation_id) FROM ticket WHERE organisation_id IS NOT NULL'
     );
+
+    my @OrgIDs = ();
+    while (my @Row = $DBObject->FetchrowArray()) {
+        push(@OrgIDs, \$Row[0]);
+    }
+
+    foreach my $id (@OrgIDs) {
+        return if !$DBObject->Do(
+            SQL  => 'UPDATE ticket SET organisation_id_new = ? WHERE organisation_id = \'?\'',
+            Bind => [ \$id, \$id ]
+        );
+    }
+
     $LogObject->Log(
         Priority => "info",
         Message  => "Done!"
     );
+
+    #########Contacts#########
     $LogObject->Log(
         Priority => "info",
         Message  => "Checking column 'contactid' for non-integer values..."
@@ -377,8 +392,6 @@ sub _PrepareAndValidateTableTicket {
                         VALUES (?,?,?,?,1,1,current_timestamp,1,current_timestamp)',
                 Bind => [ \$DummyLogin, \$Firstname, \$Lastname, \$ContactEmail ]
             );
-
-            return if ()
         }
 
         return if !$DBObject->Do(
@@ -386,9 +399,6 @@ sub _PrepareAndValidateTableTicket {
             Bind => [ \$ContactID, \$Row[0] ],
         );
 
-        return if !$DBObject->Do(
-            SQL => 'UPDATE ticket SET contact_id_new = CAST(contact_id AS INTEGER)',
-        );
         $LogObject->Log(
             Priority => "info",
             Message  => "Mapped '$Row[0]' to contact '$ContactID' "
@@ -411,11 +421,11 @@ sub _PopulateContactOrganisationMappingTable {
     );
 
     return if !$DBObject->Prepare(
-        SQL => "SELECT id, primary_org_id , REPLACE(org_ids, CAST(primary_org_id AS CHAR(255)),'') FROM contact c",
+        SQL => 'SELECT id, primary_org_id, org_ids FROM contact',
     );
     # 0 id
     # 1 primary org ID
-    # 2 all org IDs without primary org ID, comma separated: e.g. ',12,3,4,'
+    # 2 all org IDs comma separated: e.g. ',12,3,4,'
     my @FetchedRowArray = ();
     while (my @Row = $DBObject->FetchrowArray()) {
         push(@FetchedRowArray, [ @Row ]);
@@ -424,21 +434,16 @@ sub _PopulateContactOrganisationMappingTable {
     foreach my $row (@FetchedRowArray) {
         my @Row = @{$row};
 
-        return if !$DBObject->Do(
-            SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,1)',
-            Bind => [ \$Row[0], \$Row[1] ]
-        );
-
         my @OrgIDs = split /,/, $Row[2];
         foreach my $ID (@OrgIDs) {
-            if ($ID) {
-                return if !$DBObject->Do(
-                    SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,0)',
-                    Bind => [ \$Row[0], \$ID ]
-                );
-            }
+            my $is_primary = ($ID == $Row[1]) ? 1 : 0;
+            return if !$DBObject->Do(
+                SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,?)',
+                Bind => [ \$Row[0], \$ID, \$is_primary ]
+            );
         }
     }
+
     $LogObject->Log(
         Priority => "info",
         Message  => "Done!"
