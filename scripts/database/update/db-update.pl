@@ -179,7 +179,7 @@ sub _ExecSQL {
         Database => \@XMLArray,
     );
     if (!@SQL) {
-        print STDERR "ERROR: Unable to create SQL Start file \"$XMLFile\"!\n"; 
+        print STDERR "ERROR: Unable to generate SQL from file \"$XMLFile\"!\n"; 
         return;
     }
 
@@ -188,7 +188,7 @@ sub _ExecSQL {
             SQL => $SQL 
         );
         if (!$Result) {
-            print STDERR "ERROR: Unable to execute SQL Start file \"$XMLFile\"!\n"; 
+            print STDERR "ERROR: Unable to execute SQL from file \"$XMLFile\"!\n"; 
         }
     }
 
