@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Automation::Macro::Ticket;
+package Kernel::System::Automation::Macro::Synchronisation;
 
 use strict;
 use warnings;
@@ -28,11 +28,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Automation::Macro::Ticket - macro type for automation lib
+Kernel::System::Automation::Macro::Synchronisation - macro type for automation lib
 
 =head1 SYNOPSIS
 
-Handles ticket based macros.
+Handles sync macros.
 
 =head1 PUBLIC INTERFACE
 
@@ -72,7 +72,7 @@ sub Run {
     foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
         my $Result = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionExecute(
             ID        => $MacroActionID,
-            TicketID  => $Param{ObjectID},
+            ObjectID  => $Param{ObjectID},
             UserID    => $Param{UserID},
         );
         # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here

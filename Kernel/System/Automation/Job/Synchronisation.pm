@@ -6,16 +6,14 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Automation::Macro::Ticket;
+package Kernel::System::Automation::Job::Synchronisation;
 
 use strict;
 use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-use base qw(
-    Kernel::System::Automation::Macro::Common
-);
+use base qw(Kernel::System::Automation::Job::Common);
 
 our @ObjectDependencies = (
     'Kernel::Config',
@@ -28,11 +26,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Automation::Macro::Ticket - macro type for automation lib
+Kernel::System::Automation::Job::Synchronisation - job type for automation lib
 
 =head1 SYNOPSIS
 
-Handles ticket based macros.
+Handles sync jobs.
 
 =head1 PUBLIC INTERFACE
 
@@ -42,13 +40,12 @@ Handles ticket based macros.
 
 =item Run()
 
-Run this macro module.
+Run this job module. Returns 1 if the job was executed successful.
 
 Example:
     my $Result = $Object->Run(
-        ObjectID     => 123,
-        ExecOrder    => [],
-        UserID       => 123,
+        Data   => {},        # optional, contains the relevant data given by an event or otherwise
+        UserID => 123,
     );
 
 =cut
@@ -57,7 +54,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ObjectID ExecOrder UserID)) {
+    for (qw(UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
@@ -67,18 +64,8 @@ sub Run {
         }
     }
 
-    
-    # execute all macro action given in the execution order attribute
-    foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
-        my $Result = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionExecute(
-            ID        => $MacroActionID,
-            TicketID  => $Param{ObjectID},
-            UserID    => $Param{UserID},
-        );
-        # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here
-    }
-
-    return 1;
+    # return dummy value to make sure the macros will be executed
+    return ('AnyObject');
 }
 
 1;

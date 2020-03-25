@@ -10312,149 +10312,22 @@ via the Preferences button after logging in.
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Ticket" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Synchronisation" Required="0" Valid="1">
         <Description Translatable="1">Registration of a job type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">Ticket</Item>
+                <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Ticket" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Synchronisation" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro type for automation.</Description>
         <Group>Automation</Group>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###ArticleCreate" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Create Article</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###ContactSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Contact</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###DynamicFieldSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Dynamic Field</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###LockSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Lock</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###OrganisationSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Organisation</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###OwnerSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Owner</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###PrioritySet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Priority</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###ResponsibleSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Responsible</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###StateSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set State</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TeamSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Team</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TicketCreate" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Create Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TicketDelete" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Delete Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TitleSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Title</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TypeSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Type</Item>
+                <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -77,6 +77,11 @@ define parameter preparation and check for this operation
 
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
+    my @MacroTypes;
+    
+    if ( IsHashRefWithData($Kernel::OM->Get('Kernel::Config')->Get('Automation::MacroType')) ) {
+        @MacroTypes = sort keys %{ $Kernel::OM->Get('Kernel::Config')->Get('Automation::MacroType') };
+    }
 
     return {
         'Macro' => {
@@ -85,7 +90,7 @@ sub ParameterDefinition {
         },
         'Macro::Type' => {
             Required => 1,
-            OneOf    => [ 'Ticket' ]
+            OneOf    => \@MacroTypes,
         },
         'Macro::Name' => {
             Required => 1

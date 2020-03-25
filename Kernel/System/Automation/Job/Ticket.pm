@@ -26,7 +26,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Automation::Job::Ticket - job type ticket for automation lib
+Kernel::System::Automation::Job::Ticket - job type for automation lib
 
 =head1 SYNOPSIS
 
@@ -55,7 +55,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Filter UserID)) {
+    for (qw(UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
