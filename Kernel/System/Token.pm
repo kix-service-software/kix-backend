@@ -24,11 +24,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Session - handling of user session tokens
+Kernel::System::Token - handling of user session tokens
 
 =head1 SYNOPSIS
 
-All session functions.
+All token functions.
 
 =head1 PUBLIC INTERFACE
 

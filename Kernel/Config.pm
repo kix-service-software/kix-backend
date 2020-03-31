@@ -133,50 +133,34 @@ sub LoadSysConfig {
     my $Home = $Self->Get('Home');
 
     # load basic RELEASE file to check integrity of installation
-    if ( -e ! "$Home/RELEASE" ) {
-        print STDERR "($$) ERROR: $Home/RELEASE does not exist! This file is needed by central system parts of KIX, the system will not work without this file.\n";
-        die;
-    }
-    # load most recent RELEASE file
-    if ( opendir(my $HOME, "$Home") ) {
-        my @ReleaseFiles = grep { /^RELEASE\.*?/ && -f "$Home/$_" } readdir($HOME);
-        closedir $HOME;
-        @ReleaseFiles = reverse sort @ReleaseFiles;
-        my $MostRecentReleaseFile = $ReleaseFiles[0];
-        
-        if ( open( my $Product, '<', "$Home/$MostRecentReleaseFile" ) ) { ## no critic
-            while (my $Line = <$Product>) {
-    
-                # filtering of comment lines
-                if ( $Line !~ /^#/ ) {
-                    if ( $Line =~ /^PRODUCT\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
-                        $Self->{Config}->{Product} = $1;
-                    }
-                    elsif ( $Line =~ /^VERSION\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
-                        $Self->{Config}->{Version} = $1;
-                    }
-                    elsif ( $Line =~ /^BUILDDATE\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
-                        $Self->{Config}->{BuildDate} = $1;
-                    }
-                    elsif ( $Line =~ /^BUILDHOST\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
-                        $Self->{Config}->{BuildHost} = $1;
-                    }
-                    elsif ( $Line =~ /^BUILDNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
-                        $Self->{Config}->{BuildNumber} = $1;
-                    }
+    if ( open( my $Product, '<', "$Home/RELEASE" ) ) { ## no critic
+        while (my $Line = <$Product>) {
+
+            # filtering of comment lines
+            if ( $Line !~ /^#/ ) {
+                if ( $Line =~ /^PRODUCT\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                    $Self->{Config}->{Product} = $1;
+                }
+                elsif ( $Line =~ /^VERSION\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                    $Self->{Config}->{Version} = $1;
+                }
+                elsif ( $Line =~ /^BUILDDATE\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                    $Self->{Config}->{BuildDate} = $1;
+                }
+                elsif ( $Line =~ /^BUILDHOST\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                    $Self->{Config}->{BuildHost} = $1;
+                }
+                elsif ( $Line =~ /^BUILDNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                    $Self->{Config}->{BuildNumber} = $1;
                 }
             }
-            close($Product);
         }
-        else {
-            print STDERR "($$) ERROR: Can't read $Home/$MostRecentReleaseFile: $! This file is needed by central system parts of KIX, the system will not work without this file.\n";
-            die;
-        }
+        close($Product);
     }
     else {
-        print STDERR "($$) ERROR: Can't read $Home: $!\n";
+        print STDERR "($$) ERROR: $Home/RELEASE does not exist! This file is needed by core components of KIX and the system will not work without this file.\n";
         die;
-    }    
+    }
 
     return 1;
 }
