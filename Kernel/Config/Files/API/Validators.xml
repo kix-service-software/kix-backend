@@ -148,7 +148,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::JobRunValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::JobRunValidator</Item>
                 <Item Key="Validates">JobRunID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">JobRunGet</Item>

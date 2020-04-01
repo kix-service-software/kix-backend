@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LockGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Lock::LockGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">LockID</Item>
                 <Item Key="ResponseSchema">LockResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LockSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Lock::LockSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">LockCollectionResponse</Item>
                 <Item Key="CacheType">API_ticketlocks</Item>                

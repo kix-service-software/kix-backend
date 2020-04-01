@@ -1291,7 +1291,16 @@ sub ExecOperation {
     }
 
     # init new Operation object
-    my $OperationObject = Kernel::API::Operation->new(
+    my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
+    if ( !$Kernel::OM->Get('Main')->Require($OperationModule) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message => "Can't load module $OperationModule",
+        );
+        return;    # bail out, this will generate 500 Error
+    }    
+
+    my $OperationObject = $OperationModule->new(
         DebuggerObject           => $Self->{DebuggerObject},
         Operation                => (split(/::/, $Param{OperationType}))[-1],
         OperationType            => $Param{OperationType},
@@ -1308,7 +1317,7 @@ sub ExecOperation {
     );
 
     # if operation init failed, bail out
-    if ( ref $OperationObject ne 'API::Operation' ) {
+    if ( ref $OperationObject ne $OperationModule ) {
         return $Self->_Error(
             %{$OperationObject},
         );

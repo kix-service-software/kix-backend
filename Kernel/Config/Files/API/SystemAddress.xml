@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SystemAddress::SystemAddressGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">SystemAddressID</Item>
                 <Item Key="ResponseSchema">SystemAddressResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SystemAddress::SystemAddressSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">SystemAddressCollectionResponse</Item>
                 <Item Key="CacheType">API_systemaddresses</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SystemAddress::SystemAddressCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">SystemAddressPostRequest</Item>
                 <Item Key="ResponseSchema">SystemAddressPostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SystemAddress::SystemAddressUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">SystemAddressPatchRequest</Item>
                 <Item Key="ResponseSchema">SystemAddressPostPatchResponse</Item>
@@ -53,6 +57,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SystemAddress::SystemAddressDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

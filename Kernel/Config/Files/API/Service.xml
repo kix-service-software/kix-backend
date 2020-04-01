@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ServiceGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Service::ServiceGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ServiceID</Item>
                 <Item Key="ResponseSchema">ServiceResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ServiceSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Service::ServiceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ServiceCollectionResponse</Item>
                 <Item Key="CacheType">API_services</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ServiceCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Service::ServiceCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ServicePostRequest</Item>
                 <Item Key="ResponseSchema">ServicePostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ServiceUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Service::ServiceUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ServicePatchRequest</Item>
                 <Item Key="ResponseSchema">ServicePostPatchResponse</Item>
@@ -53,6 +57,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ServiceDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Service::ServiceDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

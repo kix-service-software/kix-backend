@@ -167,7 +167,7 @@ sub new {
     }
 
     # load backend module
-    my $GenericModule = $OperationConfig->{Module};
+    my $GenericModule = $Self->{OperationConfig}->{Module};
     if ( !$Kernel::OM->Get('Main')->Require($GenericModule) ) {
 
         return $Self->_Error(

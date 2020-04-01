@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTypeGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TicketType::TicketTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TypeID</Item>
                 <Item Key="ResponseSchema">TicketTypeResponse</Item>
@@ -31,6 +32,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTypeCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TicketType::TicketTypeCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketTypePostRequest</Item>
                 <Item Key="ResponseSchema">TicketTypePostPatchResponse</Item>
@@ -42,6 +44,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTypeUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TicketType::TicketTypeUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketTypePatchRequest</Item>
                 <Item Key="ResponseSchema">TicketTypePostPatchResponse</Item>
@@ -53,6 +56,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTypeDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TicketType::TicketTypeDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

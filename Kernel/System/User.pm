@@ -1653,7 +1653,7 @@ sub SetPreferences {
 
     # get user preferences config
     my $GeneratorModule = $ConfigObject->Get('User::PreferencesModule')
-        || 'User::Preferences::DB';
+        || 'Kernel::System::User::Preferences::DB';
 
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
@@ -1677,7 +1677,7 @@ sub GetPreferences {
 
     # get user preferences config
     my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-        || 'User::Preferences::DB';
+        || 'Kernel::System::User::Preferences::DB';
 
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
@@ -1701,7 +1701,7 @@ sub DeletePreferences {
 
     # get user preferences config
     my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-        || 'User::Preferences::DB';
+        || 'Kernel::System::User::Preferences::DB';
 
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
@@ -1725,7 +1725,7 @@ sub SearchPreferences {
 
     # get user preferences config
     my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-        || 'User::Preferences::DB';
+        || 'Kernel::System::User::Preferences::DB';
 
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);

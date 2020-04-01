@@ -7,6 +7,7 @@
             <Hash>
                 <Item Key="Name">AddressGet</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">AddressID</Item>
                 <Item Key="CacheType">API_addressbook</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">AddressSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressSearch</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="CacheType">API_addressbook</Item>

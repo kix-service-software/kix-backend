@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Notification::NotificationGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">NotificationID</Item>
                 <Item Key="ResponseSchema">NotificationResponse</Item>
@@ -17,6 +18,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Notification::NotificationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">NotificationCollectionResponse</Item>
             </Hash>
@@ -27,6 +29,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Notification::NotificationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">NotificationPostRequest</Item>
                 <Item Key="ResponseSchema">NotificationPostPatchResponse</Item>
@@ -38,6 +41,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Notification::NotificationUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">NotificationPatchRequest</Item>
                 <Item Key="ResponseSchema">NotificationPostPatchResponse</Item>
@@ -49,6 +53,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">NotificationDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Notification::NotificationDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

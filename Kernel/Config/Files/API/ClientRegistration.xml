@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClientRegistrationGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ClientRegistration::ClientRegistrationGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ClientID</Item>
                 <Item Key="ResponseSchema">ClientRegistrationResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClientRegistrationSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ClientRegistration::ClientRegistrationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ClientRegistrationCollectionResponse</Item>
                 <Item Key="CacheType">API_clientregistration</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClientRegistrationCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ClientRegistration::ClientRegistrationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ClientRegistrationPostRequest</Item>
                 <Item Key="ResponseSchema">ClientRegistrationPostResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClientRegistrationDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ClientRegistration::ClientRegistrationDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

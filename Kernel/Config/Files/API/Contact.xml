@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ContactGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Contact::ContactGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ContactID</Item>
                 <Item Key="ResponseSchema">ContactResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ContactSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Contact::ContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ContactCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Contact::ContactCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ContactPostRequest</Item>
                 <Item Key="ResponseSchema">ContactPostPatchResponse</Item>
@@ -45,6 +48,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ContactUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Contact::ContactUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ContactPatchRequest</Item>
                 <Item Key="ResponseSchema">ContactPostPatchResponse</Item>
@@ -58,6 +62,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ContactDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Contact::ContactDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -68,6 +73,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ContactTicketSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Contact::ContactTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_contacts</Item>                

@@ -263,7 +263,7 @@ sub GetModuleFor {
 sub _ObjectBuild {
     my ( $Self, %Param ) = @_;
 
-    my $Package  = $Self->{ObjectMap}->{$Param{Package}} || $Param{Package};
+    my $Package  = $Self->GetModuleFor($Param{Package}) || $Param{Package};
     my $FileName = $Package;
     $FileName =~ s{::}{/}g;
     $FileName .= '.pm';

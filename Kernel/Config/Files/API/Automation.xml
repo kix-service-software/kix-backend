@@ -7,6 +7,7 @@
             <Hash>
                 <Item Key="Name">JobTypeSearch</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobTypeCollectionResponse</Item>
             </Hash>
@@ -18,6 +19,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobGet</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">JobID</Item>
@@ -31,6 +33,7 @@
             <Hash>
                 <Item Key="Name">JobSearch</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobCollectionResponse</Item>
             </Hash>
@@ -41,6 +44,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobCreate</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">JobPostRequest</Item>
@@ -54,6 +58,7 @@
             <Hash>
                 <Item Key="Name">JobUpdate</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">JobPatchRequest</Item>
                 <Item Key="ResponseSchema">JobPostPatchResponse</Item>
@@ -66,6 +71,7 @@
             <Hash>
                 <Item Key="Name">JobDelete</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -77,6 +83,7 @@
             <Hash>
                 <Item Key="Name">JobExecPlanIDSearch</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobExecPlanIDCollectionResponse</Item>
             </Hash>
@@ -87,6 +94,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobExecPlanIDCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDCreate</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">JobExecPlanIDPostRequest</Item>
@@ -100,6 +108,7 @@
             <Hash>
                 <Item Key="Name">JobExecPlanIDDelete</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -110,6 +119,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobMacroIDSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobMacroIDSearch</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Automation::JobMacroIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobMacroIDCollectionResponse</Item>
@@ -155,7 +165,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanTypeGet</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::ExecPlanTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ExecPlanTypeResponse</Item>
             </Hash>
@@ -167,6 +177,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::ExecPlanGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ExecPlanID</Item>
                 <Item Key="ResponseSchema">ExecPlanResponse</Item>
@@ -178,6 +189,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::ExecPlanSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ExecPlanCollectionResponse</Item>
             </Hash>
@@ -188,6 +200,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::ExecPlanCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ExecPlanPostRequest</Item>
                 <Item Key="ResponseSchema">ExecPlanPostPatchResponse</Item>
@@ -199,6 +212,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::ExecPlanUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ExecPlanPatchRequest</Item>
                 <Item Key="ResponseSchema">ExecPlanPostPatchResponse</Item>
@@ -210,6 +224,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::ExecPlanDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -220,6 +235,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MacroTypeCollectionResponse</Item>
             </Hash>
@@ -231,6 +247,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">MacroID</Item>
                 <Item Key="ResponseSchema">MacroResponse</Item>
@@ -242,6 +259,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MacroCollectionResponse</Item>
             </Hash>
@@ -252,6 +270,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MacroPostRequest</Item>
                 <Item Key="ResponseSchema">MacroPostPatchResponse</Item>
@@ -263,6 +282,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MacroPatchRequest</Item>
                 <Item Key="ResponseSchema">MacroPostPatchResponse</Item>
@@ -274,6 +294,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -284,6 +305,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroActionTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroActionTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MacroActionTypeCollectionResponse</Item>
             </Hash>
@@ -294,6 +316,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroActionTypeGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroActionTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MacroActionTypeResponse</Item>
             </Hash>
@@ -305,6 +328,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroActionGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroActionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">MacroActionID</Item>
                 <Item Key="ResponseSchema">MacroActionResponse</Item>
@@ -316,6 +340,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroActionSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroActionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MacroActionCollectionResponse</Item>
             </Hash>
@@ -326,6 +351,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroActionCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroActionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MacroActionPostRequest</Item>
                 <Item Key="ResponseSchema">MacroActionPostPatchResponse</Item>
@@ -337,6 +363,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroActionUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroActionUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MacroActionPatchRequest</Item>
                 <Item Key="ResponseSchema">MacroActionPostPatchResponse</Item>
@@ -348,6 +375,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MacroActionDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::MacroActionDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

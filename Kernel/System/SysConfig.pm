@@ -804,64 +804,87 @@ Rebuild the configuration database from XML files.
 sub Rebuild {
     my ( $Self, %Param ) = @_;
 
-    my $Directory = $Kernel::OM->Get('Config')->Get('Home').'/Kernel/Config/Files/';
+    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
+    if ( !$Home ) {
+        use FindBin qw($Bin);
+        $Home = $Bin.'/..';
+    }
 
-    return if !-e $Directory;
+    # add framework
+    my @Directories = (
+        $Home.'/Kernel/Config/Files'
+    );
+
+    # add plugin folders
+    my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
+        Valid     => 1,
+        InitOrder => 1
+    );
+    foreach my $Plugin ( @Plugins ) {
+        my $Directory = $Plugin->{Directory}.'/Kernel/Config/Files';
+        next if ! -e $Directory;
+
+        push @Directories, $Directory;
+    }    
 
     # get main object
     my $MainObject = $Kernel::OM->Get('Main');
 
-    # get list of XML config files
-    my @Files = $MainObject->DirectoryRead(
-        Directory => $Directory,
-        Filter    => "*.xml",
-        Recursive => 1,
-    );
-
-    # get list of XML files from registered custom packages
-    my @CustomPackages = $Kernel::OM->Get('KIXUtils')->GetRegisteredCustomPackages(
-        Result => 'ARRAY',
-    );
-
-    for my $Dir (@CustomPackages) {
-        my $ConfDir = "$Self->{Home}/extensions/$Dir/Kernel/Config/Files";
-        $ConfDir =~ s'\s'\\s'g;
-        if ( -e "$ConfDir" ) {
-            my @KIXFiles = $MainObject->DirectoryRead(
-                Directory => $ConfDir,
-                Filter    => "*.xml",
-                Recursive => 1,
-            );
-            push @Files, @KIXFiles;
-        }
-    }
-
-    my $XMLObject = XML::Simple->new( KeepRoot => 1, ForceArray => ['ConfigItem','Item'] );
-
-    # read and parse each XML file
-    my %Data;
-    FILE:
-    for my $File (sort @Files) {
-
-        my $ConfigFile = $MainObject->FileRead(
-            Location => $File,
-            Mode     => 'binmode',
-            Result   => 'SCALAR',
-        );
-
-        if ( !ref $ConfigFile || !${$ConfigFile} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Can't open file $File: $!",
-            );
-            next FILE;
-        }
-
-        $Data{$File} = $XMLObject->XMLin($ConfigFile);
-    }
-
     # This is the sorted configuration XML entry list that we must populate here.
     $Self->{XMLConfig} = [];
+    
+    foreach my $Directory ( @Directories ) {
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => "Rebuilding config from directory $Directory.",
+        );
+
+        # get list of XML config files
+        my @Files = $MainObject->DirectoryRead(
+            Directory => $Directory,
+            Filter    => "*.xml",
+            Recursive => 1,
+        );
+
+        my $XMLObject = XML::Simple->new( KeepRoot => 1, ForceArray => ['ConfigItem','Item'] );
+
+        # read and parse each XML file
+        my %Data;
+        FILE:
+        for my $File (sort @Files) {
+
+            my $ConfigFile = $MainObject->FileRead(
+                Location => $File,
+                Mode     => 'binmode',
+                Result   => 'SCALAR',
+            );
+
+            if ( !ref $ConfigFile || !${$ConfigFile} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Can't open file $File: $!",
+                );
+                next FILE;
+            }
+
+            $Data{$File} = $XMLObject->XMLin($ConfigFile);
+        }
+
+        my $Result = $Self->_RebuildFromFile(
+            Data => \%Data,
+        );
+    }
+
+    return 1;
+}
+
+sub _RebuildFromFile {
+    my ( $Self, %Param ) = @_;
+
+    return if !IsHashRefWithData($Param{Data});
+
+    my %Data = %{$Param{Data}};
 
     # These are the valid "init" values that the config XML may use. Settings must be processed in this order, and inside each group alphabetically.
     my %ValidInit = (

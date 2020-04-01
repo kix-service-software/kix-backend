@@ -154,8 +154,6 @@ sub Run {
 
     my $ProviderConfig = $Webservice->{Config}->{Provider};
 
-print STDERR "here!!\n";
-
     my $TransportModule = $Kernel::OM->GetModuleFor('API::Transport');
     if ( !$Kernel::OM->Get('Main')->Require($TransportModule) ) {
         $Kernel::OM->Get('Log')->Log(
@@ -178,7 +176,6 @@ print STDERR "here!!\n";
             Data    => $Self->{TransportObject},
         );
     }
-print STDERR "here2!!\n";
 
     # read request content
     my $FunctionResult = $Self->{TransportObject}->ProviderProcessRequest();
