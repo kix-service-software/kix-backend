@@ -122,7 +122,7 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Checklist = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistGet(
+    my $Checklist = $Kernel::OM->Get('Ticket')->TicketChecklistGet(
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Self->{Authorization}->{UserID},
     );

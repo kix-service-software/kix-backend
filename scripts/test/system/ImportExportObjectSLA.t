@@ -12,7 +12,7 @@ use utf8;
 
 use vars qw($Self);
 
-my $ImportExportObject   = $Kernel::OM->Get('Kernel::System::ImportExport');
+my $ImportExportObject   = $Kernel::OM->Get('ImportExport');
 
 # ------------------------------------------------------------ #
 # make preparations

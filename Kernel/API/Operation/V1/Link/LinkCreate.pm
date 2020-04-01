@@ -148,7 +148,7 @@ sub Run {
     }
         	
     # check if Link exists
-    my $LinkList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
+    my $LinkList = $Kernel::OM->Get('LinkObject')->LinkSearch(
         %{$Link},
         UserID => $Self->{Authorization}->{UserID},
     );
@@ -161,7 +161,7 @@ sub Run {
     }
 
     # create Link
-    my $LinkID = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkAdd(
+    my $LinkID = $Kernel::OM->Get('LinkObject')->LinkAdd(
         %{$Link},
         UserID  => $Self->{Authorization}->{UserID},        
     );

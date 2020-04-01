@@ -14,7 +14,7 @@ use File::Basename;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . '/Kernel/cpan-lib';
-use lib dirname($RealBin) . '/Custom';
+use lib dirname($RealBin) . '/plugins';
 
 use Kernel::System::Environment;
 use Kernel::System::VariableCheck qw( :all );

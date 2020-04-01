@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Main',
-    'Kernel::System::XML',
+    'DB',
+    'Main',
+    'XML',
 
 );
 
@@ -57,15 +57,15 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $XML = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $XML = $Kernel::OM->Get('Main')->FileRead(
         Location => $Self->GetArgument('source-path'),
     );
     if ( !$XML ) {
         $Self->PrintError("Could not read XML source.");
         return $Self->ExitCodeError();
     }
-    my @XMLArray = $Kernel::OM->Get('Kernel::System::XML')->XMLParse( String => $XML );
-    my @SQL = $Kernel::OM->Get('Kernel::System::DB')->SQLProcessor(
+    my @XMLArray = $Kernel::OM->Get('XML')->XMLParse( String => $XML );
+    my @SQL = $Kernel::OM->Get('DB')->SQLProcessor(
         Database => \@XMLArray,
     );
     if ( !@SQL ) {
@@ -73,7 +73,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my @SQLPost = $Kernel::OM->Get('Kernel::System::DB')->SQLProcessorPost();
+    my @SQLPost = $Kernel::OM->Get('DB')->SQLProcessorPost();
 
     my $SQLPart = $Self->GetOption('sql-part') || 'both';
     my @SQLCollection;
@@ -89,7 +89,7 @@ sub Run {
 
     for my $SQL (@SQLCollection) {
         $Self->Print("$SQL\n");
-        my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do( SQL => $SQL );
+        my $Success = $Kernel::OM->Get('DB')->Do( SQL => $SQL );
         if ( !$Success ) {
             $Self->PrintError("Database action failed. Exiting.");
             return $Self->ExitCodeError();

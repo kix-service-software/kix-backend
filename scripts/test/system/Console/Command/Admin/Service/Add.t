@@ -14,17 +14,17 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::Service::Add');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Service::Add');
 
 my ( $Result, $ExitCode );
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ParentServiceName = "ParentService" . $Helper->GetRandomID();
 my $ChildServiceName  = "ChildService" . $Helper->GetRandomID();

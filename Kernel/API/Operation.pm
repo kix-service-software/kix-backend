@@ -105,14 +105,14 @@ sub new {
         );
     }
 
-    if ( !IsHashRefWithData($Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')) ) {
+    if ( !IsHashRefWithData($Kernel::OM->Get('Config')->Get('API::Operation::Module')) ) {
         return $Self->_Error(
             Code    => 'Operation.InternalError',
             Message => 'No OperationConfig found!',
         );
     }
     
-    $Self->{OperationConfig} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{$Param{OperationType}};
+    $Self->{OperationConfig} = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Param{OperationType}};
     if ( !IsHashRefWithData($Self->{OperationConfig}) ) {
         return $Self->_Error(
             Code    => 'Operation.InternalError',
@@ -146,20 +146,29 @@ sub new {
     }
 
     # create validator
-    $Self->{ValidatorObject} = Kernel::API::Validator->new(
+    my $ValidatorModule = $Kernel::OM->GetModuleFor('API::Validator');
+    if ( !$Kernel::OM->Get('Main')->Require($ValidatorModule) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message => "Can't load module $ValidatorModule",
+        );
+        return;    # bail out, this will generate 500 Error
+    }    
+
+    $Self->{ValidatorObject} = $ValidatorModule->new(
         %{$Self},
     );
 
     # if validator init failed, bail out
-    if ( ref $Self->{ValidatorObject} ne 'Kernel::API::Validator' ) {
+    if ( ref $Self->{ValidatorObject} ne $ValidatorModule ) {
         return $Self->_Error(
             %{$Self->{ValidatorObject}},
         );
     }
 
     # load backend module
-    my $GenericModule = 'Kernel::API::Operation::' . $Param{OperationType};
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
+    my $GenericModule = $OperationConfig->{Module};
+    if ( !$Kernel::OM->Get('Main')->Require($GenericModule) ) {
 
         return $Self->_Error(
             Code    => 'Operation.InternalError',
@@ -336,14 +345,14 @@ sub _CheckPermission {
     my $AllowedPermission;
     my @GrantedResources;
     foreach my $Resource ( @Resources ) {
-        ($Granted, $AllowedPermission) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
+        ($Granted, $AllowedPermission) = $Kernel::OM->Get('User')->CheckResourcePermission(
             UserID              => $Param{Authorization}->{UserID},
             UsageContext        => $Param{Authorization}->{UserType},
             Target              => $ResourceBase.$Resource,
             RequestedPermission => $RequestedPermission,
         );
 
-        my $AllowedPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+        my $AllowedPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
             Value  => $AllowedPermission || 0,
             Format => 'Short'
         );
@@ -360,7 +369,7 @@ sub _CheckPermission {
     if ( scalar(@Resources) > 1 && scalar(@GrantedResources) < scalar(@Resources) ) {
         $Granted = 1;
         $Self->{AlteredRequestURI} = $ResourceBase.join(',', @GrantedResources);
-        my $AllowedPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+        my $AllowedPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
             Value  => $AllowedPermission || 0,
             Format => 'Short'
         );
@@ -388,7 +397,7 @@ sub _CheckPermission {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
+    return if ( !$Kernel::OM->Get('Config')->Get('API::Debug') );
 
     $Indent ||= '';
 
@@ -398,7 +407,7 @@ sub _Debug {
 sub _PermissionDebug {
     my ( $Self, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Permission::Debug') );
+    return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
 
     printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
 }

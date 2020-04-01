@@ -10318,6 +10318,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
+                <Item Key="Module">Kernel::System::Automation::Job::Synchronisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -10328,6 +10329,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
+                <Item Key="Module">Kernel::System::Automation::Macro::Synchronisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -10338,6 +10340,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Event Based</Item>
+                <Item Key="Module">Kernel::System::Automation::ExecPlan::EventBased</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -10347,6 +10350,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Time Based</Item>
+                <Item Key="Module">Kernel::System::Automation::TimeBased::EventBased</Item>
             </Hash>
         </Setting>
     </ConfigItem>

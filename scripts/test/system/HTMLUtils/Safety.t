@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get HTMLUtils object
-my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
 # Safety tests
 my @Tests = (

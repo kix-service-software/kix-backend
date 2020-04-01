@@ -30,7 +30,7 @@ my $MappingObject;
 $MappingObject = Kernel::API::Mapping->new();
 $Self->IsNot(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'Mapping::new() constructor failure - no arguments',
 );
 
@@ -40,7 +40,7 @@ $MappingObject = Kernel::API::Mapping->new(
 );
 $Self->IsNot(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'Mapping::new() constructor failure - no MappingType',
 );
 
@@ -52,7 +52,7 @@ $MappingObject = Kernel::API::Mapping->new(
 );
 $Self->IsNot(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'Mapping::new() constructor failure - wrong MappingType',
 );
 
@@ -66,7 +66,7 @@ $MappingObject = Kernel::API::Mapping->new(
 );
 $Self->IsNot(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'Mapping::new() constructor failure - empty config',
 );
 
@@ -80,7 +80,7 @@ $MappingObject = Kernel::API::Mapping->new(
 );
 $Self->IsNot(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'Mapping::new() constructor failure - invalid config, string',
 );
 
@@ -94,7 +94,7 @@ $MappingObject = Kernel::API::Mapping->new(
 );
 $Self->IsNot(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'Mapping::new() constructor failure - invalid config, array',
 );
 
@@ -108,7 +108,7 @@ $MappingObject = Kernel::API::Mapping->new(
 );
 $Self->IsNot(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'Mapping::new() constructor failure - invalid config, empty string',
 );
 
@@ -121,7 +121,7 @@ $MappingObject = Kernel::API::Mapping->new(
 );
 $Self->Is(
     ref $MappingObject,
-    'Kernel::API::Mapping',
+    'API::Mapping',
     'MappingObject creation check without config',
 );
 

@@ -122,7 +122,7 @@ sub Run {
         Data => $Param{Data}->{ConfigItemClass}
     );
 
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     );
 
@@ -137,12 +137,12 @@ sub Run {
 
     # validate definition if given
     if ( $ConfigItemClass->{DefinitionString} ) {
-        my $Check = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionCheck(
+        my $Check = $Kernel::OM->Get('ITSMConfigItem')->DefinitionCheck(
             Definition => $ConfigItemClass->{DefinitionString},
         );
 
         if ( !$Check ) {
-            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error', 
                 What => 'Message',
             );
@@ -154,7 +154,7 @@ sub Run {
     }
 
     # create class
-    my $GeneralCatalogItemID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
+    my $GeneralCatalogItemID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
         Class    => 'ITSM::ConfigItem::Class',
         Name     => $ConfigItemClass->{Name},
         Comment  => $ConfigItemClass->{Comment} || '',

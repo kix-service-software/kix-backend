@@ -17,10 +17,10 @@ use Digest::HMAC qw(hmac_hex);
 use base qw(Kernel::System::Auth::TwoFactor::GoogleAuthenticator);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'Contact',
+    'Log',
+    'Time',
 );
 
 sub new {
@@ -40,18 +40,18 @@ sub Auth {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need User!"
         );
         return;
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     my $SecretPreferencesKey
         = $ConfigObject->Get("Contact::AuthTwoFactorModule$Self->{Count}::SecretPreferencesKey") || '';
     if ( !$SecretPreferencesKey ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no configuration for SecretPreferencesKey in Contact::AuthTwoFactorModule.",
         );
@@ -59,7 +59,7 @@ sub Auth {
     }
 
     # check if customer has secret stored in preferences
-    my %UserPreferences = $Kernel::OM->Get('Kernel::System::Contact')->GetPreferences(
+    my %UserPreferences = $Kernel::OM->Get('Contact')->GetPreferences(
         UserID => $Param{User},
     );
     if ( !$UserPreferences{$SecretPreferencesKey} ) {
@@ -70,7 +70,7 @@ sub Auth {
         }
 
         # otherwise login counts as failed
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no SecretPreferencesKey for customer $Param{User}.",
         );
@@ -79,7 +79,7 @@ sub Auth {
 
     # if we get to here (user has preference), we need a passed token
     if ( !$Param{TwoFactorToken} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TwoFactorToken!"
         );
@@ -107,7 +107,7 @@ sub Auth {
         if ( $Param{TwoFactorToken} ne $OTP ) {
 
             # log failure
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Contact: $Param{User} two factor customer authentication failed (non-matching otp).",
             );
@@ -116,7 +116,7 @@ sub Auth {
     }
 
     # log success
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "Contact: $Param{User} two factor customer authentication ok.",
     );

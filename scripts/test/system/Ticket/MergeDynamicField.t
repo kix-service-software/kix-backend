@@ -15,17 +15,17 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
-my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
+my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @DynamicFields = map { $Helper->GetRandomID() } 1 .. 2;
 my @Config;

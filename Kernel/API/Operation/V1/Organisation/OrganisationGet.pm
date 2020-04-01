@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Organisation::OrganisationGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Organisation::OrganisationGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $ID ( @{$Param{Data}->{OrganisationID}} ) {
 
         # get the Organisation data
-        my %OrganisationData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        my %OrganisationData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $ID,
         );
 
@@ -160,7 +160,7 @@ sub Run {
             # execute ticket searches
             my %TicketStats;
             # new tickets
-            $TicketStats{NewCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{NewCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -179,7 +179,7 @@ sub Run {
                 Result => 'COUNT',
             );
             # open tickets
-            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{OpenCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -198,7 +198,7 @@ sub Run {
                 Result => 'COUNT',
             );
             # pending tickets
-            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -217,7 +217,7 @@ sub Run {
                 Result => 'COUNT',
             );
             # escalated tickets
-            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -229,7 +229,7 @@ sub Run {
                             Field    => 'EscalationTime',
                             Operator => 'LT',
                             DataType => 'NUMERIC',
-                            Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                            Value    => $Kernel::OM->Get('Time')->CurrentTimestamp(),
                         },
                     ]
                 },
@@ -247,7 +247,7 @@ sub Run {
         # include assigned config items if requested
         if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
 
-            my $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+            my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
                 ObjectType => 'Organisation',
                 Object     => \%OrganisationData
             );

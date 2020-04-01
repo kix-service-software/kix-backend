@@ -14,12 +14,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::CheckItem',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Cache',
+    'CheckItem',
+    'DB',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
 =cut
 
@@ -54,9 +54,9 @@ sub new {
     bless( $Self, $Type );
 
     # load generator preferences module
-    my $GeneratorModule = $Kernel::OM->Get('Kernel::Config')->Get('GeneralCatalog::PreferencesModule')
+    my $GeneratorModule = $Kernel::OM->Get('Config')->Get('GeneralCatalog::PreferencesModule')
         || 'Kernel::System::GeneralCatalog::PreferencesDB';
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require($GeneratorModule) ) {
+    if ( $Kernel::OM->Get('Main')->Require($GeneratorModule) ) {
         $Self->{PreferencesObject} = $GeneratorModule->new(%Param);
     }
 
@@ -79,20 +79,20 @@ sub ClassList {
     my ( $Self, %Param ) = @_;
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT DISTINCT(general_catalog_class) '
             . 'FROM general_catalog ORDER BY general_catalog_class',
     );
 
     # fetch the result
     my @ClassList;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push @ClassList, $Row[0];
     }
 
     # cache the result
     my $CacheKey = 'ClassList';
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -119,7 +119,7 @@ sub ClassRename {
     # check needed stuff
     for my $Argument (qw(ClassOld ClassNew)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -129,7 +129,7 @@ sub ClassRename {
 
     # cleanup given params
     for my $Argument (qw(ClassOld ClassNew)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -140,7 +140,7 @@ sub ClassRename {
     return 1 if $Param{ClassNew} eq $Param{ClassOld};
 
     # check if new class name already exists
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT id FROM general_catalog WHERE general_catalog_class = ?',
         Bind  => [ \$Param{ClassNew} ],
         Limit => 1,
@@ -148,12 +148,12 @@ sub ClassRename {
 
     # fetch the result
     my $AlreadyExists = 0;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $AlreadyExists = 1;
     }
 
     if ($AlreadyExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't rename class $Param{ClassOld}! New classname already exists."
         );
@@ -161,12 +161,12 @@ sub ClassRename {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # rename general catalog class
-    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Result = $Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE general_catalog SET general_catalog_class = ? '
             . 'WHERE general_catalog_class = ?',
         Bind => [ \$Param{ClassNew}, \$Param{ClassOld} ],
@@ -175,7 +175,7 @@ sub ClassRename {
     return if !$Result;
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'GeneralCatalog.Class',
         ObjectID  => $Param{ClassOld}.'::'.$Param{ClassNew},
@@ -203,7 +203,7 @@ sub ItemList {
 
     # check needed stuff
     if ( !$Param{Class} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Class!'
         );
@@ -262,21 +262,21 @@ sub ItemList {
     my $CacheKey = 'ItemList::' . $Param{Class} . '####' . $Param{Valid} . '####' . $PreferencesCacheKey;
 
     # check if result is already cached
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => \@BIND,
     );
 
     # fetch the result
     my %Data;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Data{ $Row[0] } = $Row[1];
     }
 
@@ -284,7 +284,7 @@ sub ItemList {
     return if !%Data;
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -330,7 +330,7 @@ sub ItemGet {
 
     # check needed stuff
     if ( !$Param{ItemID} && ( !$Param{Class} || $Param{Name} eq '' ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ItemID OR Class and Name!'
         );
@@ -347,7 +347,7 @@ sub ItemGet {
 
         # check if result is already cached
         my $CacheKey = 'ItemGet::Class::' . $Param{Class} . '::' . $Param{Name};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -361,7 +361,7 @@ sub ItemGet {
 
         # check if result is already cached
         my $CacheKey = 'ItemGet::ItemID::' . $Param{ItemID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -373,7 +373,7 @@ sub ItemGet {
     }
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Bind  => \@BIND,
         Limit => 1,
@@ -381,7 +381,7 @@ sub ItemGet {
 
     # fetch the result
     my %ItemData;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ItemData{ItemID}     = $Row[0];
         $ItemData{Class}      = $Row[1];
         $ItemData{Name}       = $Row[2];
@@ -395,7 +395,7 @@ sub ItemGet {
 
     # check item
     if ( !$ItemData{ItemID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Item not found in database!',
         );
@@ -411,13 +411,13 @@ sub ItemGet {
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => 'ItemGet::Class::' . $ItemData{Class} . '::' . $ItemData{Name},
         Value => \%ItemData,
     );
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => 'ItemGet::ItemID::' . $ItemData{ItemID},
@@ -447,7 +447,7 @@ sub ItemAdd {
     # check needed stuff
     for my $Argument (qw(Class ValidID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -457,7 +457,7 @@ sub ItemAdd {
 
     # name must be not empty, but number zero (0) is allowed
     if ( $Param{Name} eq '' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Name!",
         );
@@ -471,7 +471,7 @@ sub ItemAdd {
 
     # cleanup given params
     for my $Argument (qw(Class)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -479,7 +479,7 @@ sub ItemAdd {
         );
     }
     for my $Argument (qw(Name Comment)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -487,7 +487,7 @@ sub ItemAdd {
     }
 
     # find exiting item with same name
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id FROM general_catalog '
             . 'WHERE general_catalog_class = ? AND name = ?',
         Bind  => [ \$Param{Class}, \$Param{Name} ],
@@ -496,13 +496,13 @@ sub ItemAdd {
 
     # fetch the result
     my $NoAdd;
-    while ( $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $NoAdd = 1;
     }
 
     # abort insert of new item, if item name already exists
     if ($NoAdd) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Can't add new item! General catalog item with same name already exists in this class.",
@@ -511,12 +511,12 @@ sub ItemAdd {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # insert new item
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO general_catalog '
             . '(general_catalog_class, name, valid_id, comments, '
             . 'create_time, create_by, change_time, change_by) VALUES '
@@ -530,7 +530,7 @@ sub ItemAdd {
     );
 
     # find id of new item
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id FROM general_catalog '
             . 'WHERE general_catalog_class = ? AND name = ?',
         Bind  => [ \$Param{Class}, \$Param{Name} ],
@@ -539,12 +539,12 @@ sub ItemAdd {
 
     # fetch the result
     my $ItemID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ItemID = $Row[0];
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'GeneralCatalog',
         ObjectID  => $ItemID,
@@ -573,7 +573,7 @@ sub ItemUpdate {
     # check needed stuff
     for my $Argument (qw(ItemID ValidID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -583,7 +583,7 @@ sub ItemUpdate {
 
     # name must be not empty, but number zero (0) is allowed
     if ( $Param{Name} eq '' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Name!",
         );
@@ -597,7 +597,7 @@ sub ItemUpdate {
 
     # cleanup given params
     for my $Argument (qw(Class)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -605,7 +605,7 @@ sub ItemUpdate {
         );
     }
     for my $Argument (qw(Name Comment)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -613,7 +613,7 @@ sub ItemUpdate {
     }
 
     # get class of item
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT general_catalog_class FROM general_catalog WHERE id = ?',
         Bind  => [ \$Param{ItemID} ],
         Limit => 1,
@@ -621,12 +621,12 @@ sub ItemUpdate {
 
     # fetch the result
     my $Class;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Class = $Row[0];
     }
 
     if ( !$Class ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't update item! General catalog item not found in this class.",
         );
@@ -634,7 +634,7 @@ sub ItemUpdate {
     }
 
     # find exiting item with same name
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT id FROM general_catalog WHERE general_catalog_class = ? AND name = ?',
         Bind  => [ \$Class, \$Param{Name} ],
         Limit => 1,
@@ -642,14 +642,14 @@ sub ItemUpdate {
 
     # fetch the result
     my $Update = 1;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         if ( $Param{ItemID} ne $Row[0] ) {
             $Update = 0;
         }
     }
 
     if ( !$Update ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Can't update item! General catalog item with same name already exists in this class.",
@@ -658,11 +658,11 @@ sub ItemUpdate {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
-    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Result = $Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE general_catalog SET '
             . 'name = ?, valid_id = ?, comments = ?, '
             . 'change_time = current_timestamp, change_by = ? '
@@ -677,7 +677,7 @@ sub ItemUpdate {
     return if !$Result;
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'GeneralCatalog',
         ObjectID  => $Param{ItemID},
@@ -702,7 +702,7 @@ sub GeneralCatalogPreferencesSet {
     my $Self = shift;
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -732,7 +732,7 @@ sub GeneralCatalogItemDelete {
     # check needed stuff
     for (qw(GeneralCatalogItemID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -741,19 +741,19 @@ sub GeneralCatalogItemDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM general_catalog WHERE id = ?',
         Bind => [ \$Param{GeneralCatalogItemID} ],
     );
    
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'GeneralCatalog',
         ObjectID  => $Param{ItemID},

@@ -16,13 +16,13 @@ use warnings;
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::SystemMaintenance',
-    'Kernel::System::Time',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Log',
+    'Main',
+    'SystemMaintenance',
+    'Time',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AuthObject = $Kernel::OM->Get('Kernel::System::Auth');
+    my $AuthObject = $Kernel::OM->Get('Auth');
 
 =cut
 
@@ -57,8 +57,8 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $MainObject   = $Kernel::OM->Get('Main');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # load auth modules
     COUNT:
@@ -144,8 +144,8 @@ sub Auth {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $UserObject   = $Kernel::OM->Get('Kernel::System::User');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $UserObject   = $Kernel::OM->Get('User');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # use all 11 auth backends and return on first true
     my $User;
@@ -264,7 +264,7 @@ sub Auth {
         $User = undef if ( $Param{UsageContext} eq 'Customer' && !$UserData{IsCustomer} );
 
         if ( !$User ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Login failed. User is not allowed for usage context \"$Param{UsageContext}\".",
             );
@@ -307,7 +307,7 @@ sub Auth {
         return if !$PasswordMaxLoginFailed;
         return if $Count < $PasswordMaxLoginFailed;
 
-        my $ValidID = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        my $ValidID = $Kernel::OM->Get('Valid')->ValidLookup(
             Valid => 'invalid-temporarily',
         );
 
@@ -319,7 +319,7 @@ sub Auth {
 
         return if !$Update;
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Login failed $Count times. Set $User{UserLogin} to "
                 . "'invalid-temporarily'.",
@@ -337,7 +337,7 @@ sub Auth {
 
     # on system maintenance just admin users
     # should be allowed to get into the system
-    my $ActiveMaintenance = $Kernel::OM->Get('Kernel::System::SystemMaintenance')->SystemMaintenanceIsActive();
+    my $ActiveMaintenance = $Kernel::OM->Get('SystemMaintenance')->SystemMaintenanceIsActive();
 
     # reset failed logins
     $UserObject->SetPreferences(
@@ -352,7 +352,7 @@ sub Auth {
         # TODO!!! rbo-190327
         # # check if user is allow to login
         # # get current user groups
-        # my %Groups = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+        # my %Groups = $Kernel::OM->Get('Group')->PermissionUserGet(
         #     UserID => $UserID,
         #     Type   => 'move_into',
         # );
@@ -375,7 +375,7 @@ sub Auth {
     # last login preferences update
     $UserObject->SetPreferences(
         Key    => 'UserLastLogin',
-        Value  => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
+        Value  => $Kernel::OM->Get('Time')->SystemTime(),
         UserID => $UserID,
     );
 

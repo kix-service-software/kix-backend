@@ -16,13 +16,13 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::LinkObject',
+    'Config',
+    'Log',
+    'Ticket',
+    'User',
+    'ITSMConfigItem',
+    'GeneralCatalog',
+    'LinkObject',
 );
 
 sub new {
@@ -41,7 +41,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Data Event Config)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -50,7 +50,7 @@ sub Run {
     }
 
     # check if functionality is enabled
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     return 1 if !$ConfigObject->Get('ITSMConfigItem::SetIncidentStateOnLink');
 
     # get ticket id depending on event
@@ -58,7 +58,7 @@ sub Run {
     if ( $Param{Event} eq 'LinkAdd' || $Param{Event} eq 'LinkDelete' ) {
         for my $Needed (qw(ConfigItemID Comment)) {
             if ( !$Param{Data}->{$Needed} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $Needed in Data!",
                 );
@@ -72,7 +72,7 @@ sub Run {
     }
     else {
         if ( !$Param{Data}->{TicketID} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need TicketID in Data!",
             );
@@ -81,7 +81,7 @@ sub Run {
         $TicketID = $Param{Data}->{TicketID};
     }
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
     my %Ticket       = $TicketObject->TicketGet(
         TicketID => $TicketID,
         UserID   => 1,
@@ -111,7 +111,7 @@ sub Run {
             last LINE;
         }
         if ( !$OldTicketType ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Found no previous ticket type for ticket id $TicketID!",
             );
@@ -136,7 +136,7 @@ sub Run {
     my @OpenStateTypes = ( 'new', 'open', 'pending reminder', 'pending auto' );
     if ( $Param{Event} eq 'TicketStateUpdate' ) {
         if ( !$Param{Data}->{OldTicketData} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need TicketID in OldTicketData!",
             );
@@ -156,7 +156,7 @@ sub Run {
 
     # shortcut for ticket events (check if ticket has any potentially relevant links)
     if ( $Param{Event} eq 'TicketStateUpdate' || $Param{Event} eq 'TicketTypeUpdate' ) {
-        my %LinkKeyList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
+        my %LinkKeyList = $Kernel::OM->Get('LinkObject')->LinkKeyList(
             Object1 => 'Ticket',
             Key1    => $TicketID,
             Object2 => 'ConfigItem',
@@ -170,7 +170,7 @@ sub Run {
     my $IncidentStates = $ConfigObject->Get('ITSMConfigItem::LinkStatus::IncidentStates');
     my $LinkTypes      = $ConfigObject->Get('ITSMConfigItem::LinkStatus::LinkTypes');
     if ( !IsHashRefWithData($LinkTypes) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need configuration for 'ITSMConfigItem::LinkStatus::LinkTypes'!",
         );
@@ -185,7 +185,7 @@ sub Run {
     # handle added or removed links
     if ( $Param{Event} eq 'LinkAdd' || $Param{Event} eq 'LinkDelete' ) {
         my $ConfigItemID = $Param{Data}->{ConfigItemID};
-        my $Version      = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+        my $Version      = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
             ConfigItemID => $ConfigItemID,
         );
 
@@ -244,7 +244,7 @@ sub Run {
 
                 CONFIGITEMID:
                 for my $ConfigItemID (@LinkedCIs) {
-                    my $Version = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                    my $Version = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
                         ConfigItemID => $ConfigItemID,
                     );
 
@@ -324,7 +324,7 @@ sub _CheckRaiseIncidentState {
     # check needed stuff
     for my $Needed (qw(Version IncidentStates LinkTypesByIncidentState TicketID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -373,7 +373,7 @@ sub _CheckLowerIncidentState {
     # check needed stuff
     for my $Needed (qw(Version IncidentStates LinkTypesByIncidentState TicketID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -432,7 +432,7 @@ sub _SetCIStatus {
     # check needed stuff
     for my $Needed (qw(Version IncidentState TicketID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -442,7 +442,7 @@ sub _SetCIStatus {
     }
 
     # get incident state list
-    my $IncidentStateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $IncidentStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::Core::IncidentState',
     );
     return if !IsHashRefWithData($IncidentStateList);
@@ -450,7 +450,7 @@ sub _SetCIStatus {
     # check if incident state is valid
     my %ReverseIncidentStateList = reverse %{$IncidentStateList};
     if ( !$ReverseIncidentStateList{ $Param{IncidentState} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Have invalid incident state '$Param{IncidentState}'!",
         );
@@ -458,7 +458,7 @@ sub _SetCIStatus {
     }
 
     # add a new version with the new incident state
-    my $VersionID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionAdd(
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         %{ $Param{Version} },
         InciStateID => $ReverseIncidentStateList{ $Param{IncidentState} },
         UserID      => 1,
@@ -466,7 +466,7 @@ sub _SetCIStatus {
     return if !$VersionID;
 
     # log change in ticket
-    $Kernel::OM->Get('Kernel::System::Ticket')->HistoryAdd(
+    $Kernel::OM->Get('Ticket')->HistoryAdd(
         TicketID     => $Param{TicketID},
         HistoryType  => 'Misc',
         Name         => "Updated incident state of config item '$Param{Version}->{Number}' to '$Param{IncidentState}'.",
@@ -483,7 +483,7 @@ sub _CheckTicketLinks {
     # check needed stuff
     for my $Needed (qw(TicketID Type)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -494,7 +494,7 @@ sub _CheckTicketLinks {
     # get link type lookup
     my $LinkTypeLookup = $Self->_LinkTypeLookupGet();
 
-    my %LinkKeyList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
+    my %LinkKeyList = $Kernel::OM->Get('LinkObject')->LinkKeyList(
         Object1   => 'Ticket',
         Key1      => $Param{TicketID},
         Object2   => 'ConfigItem',
@@ -514,7 +514,7 @@ sub _CheckConfigItemLinks {
     # check needed stuff
     for my $Needed (qw(ConfigItemID Type)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -525,7 +525,7 @@ sub _CheckConfigItemLinks {
     # get link type lookup
     my $LinkTypeLookup = $Self->_LinkTypeLookupGet();
 
-    my %LinkKeyList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
+    my %LinkKeyList = $Kernel::OM->Get('LinkObject')->LinkKeyList(
         Object1   => 'ConfigItem',
         Key1      => $Param{ConfigItemID},
         Object2   => 'Ticket',
@@ -540,11 +540,11 @@ sub _CheckConfigItemLinks {
     my @OpenStateTypes = ( 'new', 'open', 'pending reminder', 'pending auto' );
 
     # use ticket type check?
-    my $TicketTypes = $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::LinkStatus::TicketTypes');
+    my $TicketTypes = $Kernel::OM->Get('Config')->Get('ITSMConfigItem::LinkStatus::TicketTypes');
     my $CheckTicketTypes;
     $CheckTicketTypes = 1 if IsArrayRefWithData($TicketTypes);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
     TICKETID:
     for my $TicketID ( sort keys %LinkKeyList ) {
         my %Ticket = $TicketObject->TicketGet(
@@ -570,7 +570,7 @@ sub _LinkTypeLookupGet {
     return $Self->{LinkTypeLookup} if $Self->{LinkTypeLookup};
 
     my %LinkTypeLookup;
-    my %TypeList = $Kernel::OM->Get('Kernel::System::LinkObject')->TypeList();
+    my %TypeList = $Kernel::OM->Get('LinkObject')->TypeList();
     for my $TypeNameInternal ( sort keys %TypeList ) {
         my $SourceName = $TypeList{$TypeNameInternal}->{SourceName};
         my $TargetName = $TypeList{$TypeNameInternal}->{TargetName};

@@ -15,24 +15,20 @@ use utf8;
 # Perl 5.10.0 is the required minimum version to use KIX.
 use 5.010_000;
 
-# prepend '../Custom', '../Kernel/cpan-lib' and '../' to the module search path @INC
+# prepend '../plugins' and '../Kernel/cpan-lib' to the module search path @INC
 use File::Basename;
 use FindBin qw($Bin);
 use lib dirname($Bin);
 use lib dirname($Bin) . '/Kernel/cpan-lib';
-use lib dirname($Bin) . '/Custom';
-
-use File::stat;
-use Digest::MD5;
-use Module::Refresh;
+use lib dirname($Bin) . '/plugins';
 
 use Exporter qw(import);
 
-use Kernel::System::SysConfig;
-
 our @EXPORT = qw(Translatable);
 
-our @ObjectDependencies = ();
+our @ObjectDependencies = (
+    'SysConfig',
+);
 
 =head1 NAME
 
@@ -112,7 +108,7 @@ sub LoadSysConfig {
 
     $Self->{SysConfigLoaded} = 1;
 
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
     # load the current config
     my %SysConfig = $SysConfigObject->ValueGetAll( Valid => 1 );

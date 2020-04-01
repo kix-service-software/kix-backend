@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Queue',
-    'Kernel::System::SystemAddress',
+    'Queue',
+    'SystemAddress',
 );
 
 sub Configure {
@@ -80,12 +80,12 @@ sub Run {
 
     # check System Address
     if ($SystemAddressName) {
-        my %SystemAddressList = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressList(
+        my %SystemAddressList = $Kernel::OM->Get('SystemAddress')->SystemAddressList(
             Valid => 1
         );
         ADDRESS:
         for my $ID ( sort keys %SystemAddressList ) {
-            my %SystemAddressInfo = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
+            my %SystemAddressInfo = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
                 ID => $ID
             );
             if ( $SystemAddressInfo{Name} eq $SystemAddressName ) {
@@ -100,7 +100,7 @@ sub Run {
     }
 
     # add queue
-    my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
+    my $Success = $Kernel::OM->Get('Queue')->QueueAdd(
         Name              => $Self->GetOption('name'),
         SystemAddressID   => $SystemAddressID || $Self->GetOption('system-address-id') || undef,
         Comment           => $Self->GetOption('comment'),

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SystemAddressUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SystemAddressUpdate');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     );
 
     # check if SystemAddress exists 
-    my %SystemAddressData = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
+    my %SystemAddressData = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
         ID => $Param{Data}->{SystemAddressID},
         UserID      => $Self->{Authorization}->{UserID},        
     );
@@ -141,7 +141,7 @@ sub Run {
     }
 
     # update SystemAddress
-    my $Success = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressUpdate(
+    my $Success = $Kernel::OM->Get('SystemAddress')->SystemAddressUpdate(
         ID       => $Param{Data}->{SystemAddressID},    
         Name     => $SystemAddress->{Name} || $SystemAddressData{Name},
         Comment  => exists $SystemAddress->{Comment} ? $SystemAddress->{Comment} : $SystemAddressData{Comment},

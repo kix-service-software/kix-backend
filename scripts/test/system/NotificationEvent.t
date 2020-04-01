@@ -17,31 +17,31 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get notification event object
-my $NotificationEventObject = $Kernel::OM->Get('Kernel::System::NotificationEvent');
+my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
 my $UserID     = 1;
 my $TestNumber = 1;
 
-my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+my $CacheObject = $Kernel::OM->Get('Cache');
 
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+$Kernel::OM->Get('Cache')->CleanUp(
     Type => 'NotificationEvent',
 );
 
 # workaround for oracle
 # oracle databases can't determine the difference between NULL and ''
 my $IsNotOracle = 1;
-if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('Type') eq 'oracle' ) {
+if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('Type') eq 'oracle' ) {
     $IsNotOracle = 0;
 }
 
@@ -851,7 +851,7 @@ for my $NotificationID ( sort keys %NotificationIDs ) {
 }
 
 # clear cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+$Kernel::OM->Get('Cache')->CleanUp(
     Type => 'NotificationEvent',
 );
 
@@ -899,7 +899,7 @@ for my $NotificationID ( sort keys %NotificationIDs ) {
 }
 
 # clear cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+$Kernel::OM->Get('Cache')->CleanUp(
     Type => 'NotificationEvent',
 );
 

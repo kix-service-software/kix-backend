@@ -16,10 +16,10 @@ use File::stat;
 use Digest::MD5 qw(md5_hex);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log'
+    'Config',
+    'DB',
+    'Encode',
+    'Log'
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create AttachmentStorageFS object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AttachmentStorageObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::AttachmentStorage::FS');
+    my $AttachmentStorageObject = $Kernel::OM->Get('ITSMConfigItem::AttachmentStorage::FS');
 
 =cut
 
@@ -74,19 +74,19 @@ sub AttachmentAdd {
     #check required stuff...
     foreach (qw(AttDirID DataRef)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
     #build attachment data file path...
-    $retVal = $Kernel::OM->Get('Kernel::Config')->Get('Home') .
-        $Kernel::OM->Get('Kernel::Config')->Get('AttachmentStorageFS::StorageDirectory');
+    $retVal = $Kernel::OM->Get('Config')->Get('Home') .
+        $Kernel::OM->Get('Config')->Get('AttachmentStorageFS::StorageDirectory');
 
     #check if destination path exists...
     if ( !-d $retVal ) {
         if ( !File::Path::mkpath( [$retVal], 0, 0775 ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "AttachmentStorageFS path does not exist neither I can create it ($retVal): $!"
@@ -106,7 +106,7 @@ sub AttachmentAdd {
         return $retVal;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can NOT write file ($retVal): $!",
         );
@@ -133,7 +133,7 @@ sub AttachmentGet {
 
     #check required stuff...
     if ( !$Param{AttDirID} && !$Param{FilePath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need AttDirID or FilePath!" );
+        $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need AttDirID or FilePath!" );
         return \%Data;
     }
 
@@ -146,24 +146,24 @@ sub AttachmentGet {
 
         #db quoting...
         foreach (qw( AttDirID)) {
-            $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_}, 'Integer' );
+            $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_}, 'Integer' );
         }
 
         #build sql...
         my $SQL = "SELECT file_path FROM attachment_directory "
             . "WHERE id=$Param{AttDirID}";
 
-        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        $Kernel::OM->Get('DB')->Prepare(
             SQL => $SQL,
         );
 
-        while ( my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $FilePath = $Data[0];
         }
     }
 
     if ( !$FilePath ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Could NOT find file path for given attachment directory id ($Param{AttDirID})!"
@@ -185,7 +185,7 @@ sub AttachmentGet {
         $Data{DataRef} = \$Data;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not open $FilePath: $! !",
         );
@@ -211,7 +211,7 @@ sub AttachmentGetRealProperties {
 
     #check required stuff...
     if ( !$Param{AttDirID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need AttDirID!" );
+        $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need AttDirID!" );
         return %RealProperties;
     }
 
@@ -224,7 +224,7 @@ sub AttachmentGetRealProperties {
 
     if (defined $Data && $Data->{DataRef}) {
         my $Content = ${ $Data->{DataRef} };
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Content );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$Content );
 
         $RealFileSize = bytes::length($Content);
         $RealMD5Sum   = md5_hex($Content);

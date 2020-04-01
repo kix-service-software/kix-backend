@@ -45,7 +45,7 @@ sub XMLValueLookup {
 
     # check needed stuff
     if ( !$Param{Item} || ( $Param{Item} && ref $Param{Item} ne 'HASH' ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Item!',
         );
@@ -54,7 +54,7 @@ sub XMLValueLookup {
 
     # load backend
     my $BackendObject = $Kernel::OM->Get(
-        'Kernel::System::ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
+        'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
     );
 
     return '' if !$BackendObject;
@@ -80,7 +80,7 @@ sub XMLStatsAttributeCreate {
 
     # check needed stuff
     if ( !$Param{Item} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Item!',
         );
@@ -89,7 +89,7 @@ sub XMLStatsAttributeCreate {
 
     # load backend
     my $BackendObject = $Kernel::OM->Get(
-        'Kernel::System::ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
+        'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
     );
 
     return if !$BackendObject;
@@ -116,7 +116,7 @@ sub XMLExportSearchValuePrepare {
 
     # check needed stuff
     if ( !$Param{Item} || ( $Param{Item} && ref $Param{Item} ne 'HASH' ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Item!',
         );
@@ -125,7 +125,7 @@ sub XMLExportSearchValuePrepare {
 
     # load backend
     my $BackendObject = $Kernel::OM->Get(
-        'Kernel::System::ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
+        'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
     );
 
     return if !$BackendObject;
@@ -152,7 +152,7 @@ sub XMLExportValuePrepare {
 
     # check needed stuff
     if ( !$Param{Item} || ( $Param{Item} && ref $Param{Item} ne 'HASH' ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Item!',
         );
@@ -161,7 +161,7 @@ sub XMLExportValuePrepare {
 
     # load backend
     my $BackendObject = $Kernel::OM->Get(
-        'Kernel::System::ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
+        'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
     );
 
     return if !$BackendObject;
@@ -188,7 +188,7 @@ sub XMLImportSearchValuePrepare {
 
     # check needed stuff
     if ( !$Param{Item} || ( $Param{Item} && ref $Param{Item} ne 'HASH' ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Item!',
         );
@@ -197,7 +197,7 @@ sub XMLImportSearchValuePrepare {
 
     # load backend
     my $BackendObject = $Kernel::OM->Get(
-        'Kernel::System::ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
+        'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
     );
 
     return if !$BackendObject;
@@ -224,7 +224,7 @@ sub XMLImportValuePrepare {
 
     # check needed stuff
     if ( !$Param{Item} || ref $Param{Item} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Item!',
         );
@@ -233,7 +233,7 @@ sub XMLImportValuePrepare {
 
     # load backend
     my $BackendObject = $Kernel::OM->Get(
-        'Kernel::System::ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
+        'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
     );
 
     return if !$BackendObject;
@@ -298,7 +298,7 @@ sub _XMLVersionSearch {
 
     # check needed stuff
     if ( !$Param{What} || ref $Param{What} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need What as array reference!",
         );
@@ -308,7 +308,7 @@ sub _XMLVersionSearch {
     if ( !$Param{ClassIDs} || ref $Param{ClassIDs} ne 'ARRAY' || !@{ $Param{ClassIDs} } ) {
 
         # get class list
-        my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class => 'ITSM::ConfigItem::Class',
         );
 
@@ -368,7 +368,7 @@ sub _XMLVersionGet {
     # check needed stuff
     for my $Argument (qw(ClassID VersionID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -377,7 +377,7 @@ sub _XMLVersionGet {
     }
 
     # get version
-    my @XML = $Kernel::OM->Get('Kernel::System::XML')->XMLHashGet(
+    my @XML = $Kernel::OM->Get('XML')->XMLHashGet(
         Type => "ITSM::ConfigItem::$Param{ClassID}",
         Key  => $Param{VersionID},
     );
@@ -385,7 +385,7 @@ sub _XMLVersionGet {
     return \@XML if @XML;
 
     # get version from archiv
-    @XML = $Kernel::OM->Get('Kernel::System::XML')->XMLHashGet(
+    @XML = $Kernel::OM->Get('XML')->XMLHashGet(
         Type => "ITSM::ConfigItem::Archiv::$Param{ClassID}",
         Key  => $Param{VersionID},
     );
@@ -412,7 +412,7 @@ sub _XMLVersionAdd {
     # check needed stuff
     for my $Argument (qw(ClassID ConfigItemID VersionID XMLData)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -421,7 +421,7 @@ sub _XMLVersionAdd {
     }
 
     # add xml version
-    my $XMLID = $Kernel::OM->Get('Kernel::System::XML')->XMLHashAdd(
+    my $XMLID = $Kernel::OM->Get('XML')->XMLHashAdd(
         Type    => "ITSM::ConfigItem::$Param{ClassID}",
         Key     => $Param{VersionID},
         XMLHash => $Param{XMLData},
@@ -442,14 +442,14 @@ sub _XMLVersionAdd {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     return $XMLID if !$MoveVersion;
 
     # move old version in archiv
-    $Kernel::OM->Get('Kernel::System::XML')->XMLHashMove(
+    $Kernel::OM->Get('XML')->XMLHashMove(
         OldType => "ITSM::ConfigItem::$Param{ClassID}",
         OldKey  => $MoveVersion,
         NewType => "ITSM::ConfigItem::Archiv::$Param{ClassID}",
@@ -476,7 +476,7 @@ sub _XMLVersionDelete {
     # check needed stuff
     for my $Argument (qw(VersionID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!"
             );
@@ -492,19 +492,19 @@ sub _XMLVersionDelete {
     return if !$Version;
 
     # delete xml data from a version
-    $Kernel::OM->Get('Kernel::System::XML')->XMLHashDelete(
+    $Kernel::OM->Get('XML')->XMLHashDelete(
         Type => "ITSM::ConfigItem::$Version->{ClassID}",
         Key  => $Param{VersionID},
     );
 
     # delete xml data from archiv
-    $Kernel::OM->Get('Kernel::System::XML')->XMLHashDelete(
+    $Kernel::OM->Get('XML')->XMLHashDelete(
         Type => "ITSM::ConfigItem::Archiv::$Version->{ClassID}",
         Key  => $Param{VersionID},
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -556,7 +556,7 @@ sub _XMLHashSearch {
 
     # check needed stuff
     if ( !$Param{Type} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Type!',
         );
@@ -564,17 +564,17 @@ sub _XMLHashSearch {
     }
 
     # get like escape string needed for some databases (e.g. oracle)
-    my $LikeEscapeString = $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('LikeEscapeString');
+    my $LikeEscapeString = $Kernel::OM->Get('DB')->GetDatabaseFunction('LikeEscapeString');
 
     # get all entries if we have no restriction
     if ( !$Param{What} || ref $Param{What} ne 'ARRAY' ) {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        return if !$Kernel::OM->Get('DB')->Prepare(
             SQL  => 'SELECT DISTINCT(xml_key) FROM xml_storage WHERE xml_type = ?',
             Bind => [ \$Param{Type} ],
         );
 
         my @Keys;
-        while ( my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             push @Keys, $Data[0];
         }
 
@@ -623,7 +623,7 @@ sub _XMLHashSearch {
                 # As a workaround we cast the CLOB to a VARCHAR2 with TO_CHAR().
                 my $XMLContentValueColumn = 'xml_content_value';
                 if (
-                    $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('Type') eq
+                    $Kernel::OM->Get('DB')->GetDatabaseFunction('Type') eq
                     'oracle'
                     )
                 {
@@ -633,21 +633,21 @@ sub _XMLHashSearch {
                 my ($Op) = keys %{$Value};
                 my $Element = $Value->{$Op};
                 if ( $Op && $Op eq '-between' && ref $Element eq 'ARRAY' ) {
-                    my $LowerBound = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Element->[0] );
-                    my $UpperBound = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Element->[1] );
+                    my $LowerBound = $Kernel::OM->Get('DB')->Quote( $Element->[0] );
+                    my $UpperBound = $Kernel::OM->Get('DB')->Quote( $Element->[1] );
                     push @OrConditions,
                         " ( xml_content_key LIKE '$Key' $LikeEscapeString "
                         . "AND $XMLContentValueColumn >= '$LowerBound' "
                         . "AND $XMLContentValueColumn <= '$UpperBound' )";
                 }
                 elsif ( $Op && $OpIsSupported{$Op} && !ref $Element ) {
-                    $Element = $Kernel::OM->Get('Kernel::System::DB')->Quote($Element) // '';
+                    $Element = $Kernel::OM->Get('DB')->Quote($Element) // '';
                     push @OrConditions,
                         " ( xml_content_key LIKE '$Key' $LikeEscapeString "
                         . "AND $XMLContentValueColumn $Op '$Element' )";
                 }
                 else {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => 'Got unexpected data in search!',
                     );
@@ -673,7 +673,7 @@ sub _XMLHashSearch {
         }
 
         # execute
-        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        $Kernel::OM->Get('DB')->Prepare(
             SQL  => $SQL,
             Bind => [ \$Param{Type} ],
         );
@@ -681,7 +681,7 @@ sub _XMLHashSearch {
         # intersection between the current key set, and the keys from the last 'SELECT'
         # only the keys which are in all results survive
         my %HashNew;
-        while ( my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             if ( !$Intersect || $Hash{ $Data[0] } ) {
                 $HashNew{ $Data[0] } = 1;
             }

@@ -16,10 +16,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Valid'
+    'Cache',
+    'DB',
+    'Log',
+    'Valid'
 );
 
 =head1 NAME
@@ -60,7 +60,7 @@ sub CategoryAdd {
     # check needed stuff
     for my $Argument (qw(Name UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -71,7 +71,7 @@ sub CategoryAdd {
 
     # check needed stuff
     if ( !defined $Param{ParentID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ParentID!",
         );
@@ -81,7 +81,7 @@ sub CategoryAdd {
 
     # check that ParentID is not an empty string but number 0 is allowed
     if ( $Param{ParentID} eq '' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ParentID cannot be empty!",
         );
@@ -90,7 +90,7 @@ sub CategoryAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert record
     return if !$DBObject->Do(
@@ -120,19 +120,19 @@ sub CategoryAdd {
     }
 
     # log notice
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "FAQCategory: '$Param{Name}' CategoryID: '$CategoryID' "
             . "created successfully ($Param{UserID})!",
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Category',
         ObjectID  => $CategoryID,
@@ -161,7 +161,7 @@ sub CategoryCount {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -171,7 +171,7 @@ sub CategoryCount {
 
     # check needed stuff
     if ( !defined $Param{ParentIDs} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ParentIDs!',
         );
@@ -184,11 +184,11 @@ sub CategoryCount {
         SELECT COUNT(*)
         FROM faq_category
         WHERE valid_id IN ('
-        . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
+        . join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet()
         . ')';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # parent ids are given
     if ( defined $Param{ParentIDs} ) {
@@ -241,7 +241,7 @@ sub CategoryDelete {
     # check needed stuff
     for my $Attribute (qw(CategoryID UserID)) {
         if ( !$Param{$Attribute} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Attribute!",
             );
@@ -251,7 +251,7 @@ sub CategoryDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete the category
     return if !$DBObject->Do(
@@ -262,7 +262,7 @@ sub CategoryDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Category',
         ObjectID  => $Param{CategoryID},
@@ -294,7 +294,7 @@ sub CategoryDuplicateCheck {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -310,7 +310,7 @@ sub CategoryDuplicateCheck {
     push @Values, \$Param{ParentID};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # db quote
     $Param{ParentID} = $DBObject->Quote( $Param{ParentID}, 'Integer' );
@@ -374,7 +374,7 @@ sub CategoryGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -384,7 +384,7 @@ sub CategoryGet {
 
     # check needed stuff
     if ( !defined $Param{CategoryID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need CategoryID!',
         );
@@ -396,7 +396,7 @@ sub CategoryGet {
     my $CacheKey = 'CategoryGet::' . $Param{CategoryID};
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Cache = $CacheObject->Get(
         Type => $Self->{CacheType},
@@ -406,7 +406,7 @@ sub CategoryGet {
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     return if !$DBObject->Prepare(
@@ -485,7 +485,7 @@ sub CategoryList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -507,12 +507,12 @@ sub CategoryList {
 
         # get the valid ids
         $SQL .= ' WHERE valid_id IN ('
-            . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
+            . join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet()
             . ')';
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # prepare SQL statement
     return if !$DBObject->Prepare( SQL => $SQL );
@@ -544,7 +544,7 @@ sub CategoryLookup {
 
     # check needed stuff
     if ( !$Param{Name} && !$Param{CategoryID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Name or CategoryID!',
         );
@@ -575,7 +575,7 @@ sub CategoryLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No $Key for $Value found!",
         );
@@ -614,7 +614,7 @@ sub CategorySearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -630,7 +630,7 @@ sub CategorySearch {
     my $Ext = '';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # search for name
     if ( defined $Param{Name} ) {
@@ -766,7 +766,7 @@ sub CategorySubCategoryIDList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -776,7 +776,7 @@ sub CategorySubCategoryIDList {
 
     # check needed stuff
     if ( !defined $Param{ParentID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ParentID!',
         );
@@ -861,7 +861,7 @@ sub CategoryTreeList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -883,12 +883,12 @@ sub CategoryTreeList {
     # add where clause for valid categories
     if ($Valid) {
         $SQL .= ' WHERE valid_id IN ('
-            . join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet()
+            . join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet()
             . ')';
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # prepare SQL
     return if !$DBObject->Prepare(
@@ -959,7 +959,7 @@ sub CategoryUpdate {
     # check needed stuff
     for my $Argument (qw(Name UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -971,7 +971,7 @@ sub CategoryUpdate {
     # check needed stuff
     for my $Argument (qw(CategoryID ParentID)) {
         if ( !defined $Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -982,7 +982,7 @@ sub CategoryUpdate {
 
     # check that ParentID is not an empty string but number 0 is allowed
     if ( $Param{ParentID} eq '' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ParentID cannot be empty!",
         );
@@ -991,7 +991,7 @@ sub CategoryUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     return if !$DBObject->Do(
@@ -1008,19 +1008,19 @@ sub CategoryUpdate {
     );
 
     # log notice
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "FAQCategory: '$Param{Name}' "
             . "ID: '$Param{CategoryID}' updated successfully ($Param{UserID})!",
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'FAQ.Category',
         ObjectID  => $Param{CategoryID},
@@ -1052,7 +1052,7 @@ sub AgentCategorySearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -1101,7 +1101,7 @@ sub CustomerCategorySearch {
     # check needed stuff
     for my $Argument (qw(Contact Mode UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1135,7 +1135,7 @@ sub CustomerCategorySearch {
     else {
 
         # build valid id string
-        my $ValidIDsString = join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        my $ValidIDsString = join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet();
 
         my $SQL = "
             SELECT faq_item.id, faq_item.category_id
@@ -1147,7 +1147,7 @@ sub CustomerCategorySearch {
                 AND faq_item.approved = 1";
 
         # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('DB');
 
         return if !$DBObject->Prepare(
             SQL => $SQL,
@@ -1207,7 +1207,7 @@ sub PublicCategorySearch {
     # check needed stuff
     for my $Argument (qw(Mode UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1232,10 +1232,10 @@ sub PublicCategorySearch {
     my @AllowedCategoryIDs;
 
     # build valid id string
-    my $ValidIDsString = join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+    my $ValidIDsString = join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet();
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     for my $CategoryID (@CategoryIDs) {
 
@@ -1313,7 +1313,7 @@ sub GetPublicCategoriesLongNames {
     # check needed stuff
     for my $Argument (qw(Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1401,7 +1401,7 @@ sub CheckCategoryUserPermission {
     # check needed stuff
     for my $Argument (qw(CategoryID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1452,7 +1452,7 @@ sub CheckCategoryCustomerPermission {
     # check needed stuff
     for my $Argument (qw(Contact CategoryID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );

@@ -24,7 +24,7 @@ use Kernel::System::VariableCheck qw(:all);
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'db-update-build-1143.pl',
     },
 );
@@ -40,9 +40,9 @@ exit 0;
 sub _ReconfigureNotificationCreateArticle {
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
-    my %Notification = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet(
+    my %Notification = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
         Name => 'Customer - New Ticket Receipt'
     );
 
@@ -51,7 +51,7 @@ sub _ReconfigureNotificationCreateArticle {
         # prevent article create for notification
         if ( IsArrayRefWithData( $Notification{Data}->{CreateArticle} ) ) {
             $Notification{Data}->{CreateArticle} = ['0'];
-            $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationUpdate(
+            $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
                 ID => $Notification{ID},
                 %Notification,
                 UserID => 1

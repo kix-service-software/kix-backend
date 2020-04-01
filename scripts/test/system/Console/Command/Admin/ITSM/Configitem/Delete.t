@@ -14,15 +14,15 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::ITSM::Configitem::Delete');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::ITSM::Configitem::Delete');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -52,7 +52,7 @@ $Self->Is(
 );
 
 # get general catalog object
-my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
 # add test general catalog item
 my $GeneralCatalogItemID = $GeneralCatalogObject->ItemAdd(
@@ -75,7 +75,7 @@ $Self->True(
 );
 
 # get ConfigItem object
-my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+my $ConfigItemObject = $Kernel::OM->Get('ITSMConfigItem');
 
 # get 'Planned' deployment state IDs
 my $PlannedDeplStateDataRef = $GeneralCatalogObject->ItemGet(
@@ -91,7 +91,7 @@ for ( 1 .. 10 ) {
 
     # create ConfigItem number
     my $ConfigItemNumber = $ConfigItemObject->ConfigItemNumberCreate(
-        Type    => $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::NumberGenerator'),
+        Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
         ClassID => $GeneralCatalogItemID,
     );
 
@@ -128,7 +128,7 @@ for ( 1 .. 10 ) {
         next COUNT if $Count > 10;
 
         # insert new version
-        my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+        my $Success = $Kernel::OM->Get('DB')->Do(
             SQL => 'UPDATE configitem_version
                 SET create_time = \'2010-01-01 00:00:00\'
                 WHERE id = ?',

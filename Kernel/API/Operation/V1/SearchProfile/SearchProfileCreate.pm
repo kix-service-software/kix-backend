@@ -158,7 +158,7 @@ sub Run {
     }
 
     # check if SearchProfile exists
-    my @ExistingProfileIDs = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+    my @ExistingProfileIDs = $Kernel::OM->Get('SearchProfile')->SearchProfileList(
         Type        => $SearchProfile->{Type},
         Name        => $SearchProfile->{Name},
         UserType    => $SearchProfile->{UserType},
@@ -173,7 +173,7 @@ sub Run {
     }
     
     # create SearchProfile
-    my $SearchProfileID = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileAdd(
+    my $SearchProfileID = $Kernel::OM->Get('SearchProfile')->SearchProfileAdd(
         Type              => $SearchProfile->{Type},
         Name                => $SearchProfile->{Name},
         UserType            => $SearchProfile->{UserType},

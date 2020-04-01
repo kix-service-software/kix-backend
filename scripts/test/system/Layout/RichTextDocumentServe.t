@@ -18,19 +18,19 @@ local $ENV{SCRIPT_NAME} = 'index.pl';
 
 # get needed objects
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Output::HTML::Layout' => {
+    'Output::HTML::Layout' => {
         Lang      => 'de',
         SessionID => 123,
     },
 );
-my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
 my @Tests = (
     {

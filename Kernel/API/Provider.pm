@@ -13,17 +13,11 @@ use warnings;
 
 use URI::Escape;
 
-use Kernel::API::Debugger;
-use Kernel::API::Transport;
-use Kernel::API::Mapping;
-use Kernel::API::Operation;
-use Kernel::API::Validator;
-use Kernel::System::API::Webservice;
 use Kernel::System::VariableCheck (qw(IsHashRefWithData));
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::API::Webservice',
+    'Log',
+    'API::Webservice',
 );
 
 use base qw(
@@ -49,7 +43,7 @@ create an object
     use Kernel::System::ObjectManager;
 
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ProviderObject = $Kernel::OM->Get('Kernel::API::Provider');
+    my $ProviderObject = $Kernel::OM->Get('API::Provider');
 
 =cut
 
@@ -87,7 +81,7 @@ sub Run {
     $ENV{REQUEST_URI} = '/'.$RequestURI;
 
     if ( !$WebserviceName ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not determine WebserviceName from query string $RequestURI",
         );
@@ -97,29 +91,29 @@ sub Run {
 
     $WebserviceName = URI::Escape::uri_unescape($WebserviceName);
 
-    $Webservice = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
+    $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
         Name => $WebserviceName,
     );
 
     if ( !IsHashRefWithData($Webservice) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Could not load web service configuration for web service at $RequestURI",
         );
 
-        return;    # bail out without Transport, plack will generate 500 Error
+        return;    # bail out, this will generate 500 Error
     }
 
     # Check if web service has valid state.
-    if ( $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $Webservice->{ValidID} ) ne 'valid' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+    if ( $Kernel::OM->Get('Valid')->ValidLookup( ValidID => $Webservice->{ValidID} ) ne 'valid' ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Web service '$Webservice->{Name}' is not valid and can not be loaded",
         );
 
-        return;    # bail out without Transport, Apache will generate 500 Error
+        return;    # bail out, this will generate 500 Error
     }
 
     my $WebserviceID = $Webservice->{ID};
@@ -129,14 +123,22 @@ sub Run {
     #   communication entry.
     #
 
-    $Self->{DebuggerObject} = Kernel::API::Debugger->new(
+    my $DebuggerModule = $Kernel::OM->GetModuleFor('API::Debugger');
+    if ( !$Kernel::OM->Get('Main')->Require($DebuggerModule) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message => "Can't load module $DebuggerModule",
+        );
+        return;    # bail out, this will generate 500 Error
+    }    
+    $Self->{DebuggerObject} = $DebuggerModule->new(
         DebuggerConfig    => $Webservice->{Config}->{Debugger},
         WebserviceID      => $WebserviceID,
         CommunicationType => 'Provider',
         RemoteIP          => $ENV{REMOTE_ADDR},
     );
 
-    if ( ref $Self->{DebuggerObject} ne 'Kernel::API::Debugger' ) {
+    if ( ref $Self->{DebuggerObject} ne $DebuggerModule ) {
 
         return;    # bail out without Transport, plack will generate 500 Error
     }
@@ -152,13 +154,23 @@ sub Run {
 
     my $ProviderConfig = $Webservice->{Config}->{Provider};
 
-    $Self->{TransportObject} = Kernel::API::Transport->new(
+print STDERR "here!!\n";
+
+    my $TransportModule = $Kernel::OM->GetModuleFor('API::Transport');
+    if ( !$Kernel::OM->Get('Main')->Require($TransportModule) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message => "Can't load module $TransportModule",
+        );
+        return;    # bail out, this will generate 500 Error
+    }    
+    $Self->{TransportObject} = $TransportModule->new(
         DebuggerObject  => $Self->{DebuggerObject},
         TransportConfig => $ProviderConfig->{Transport},
     );
 
     # bail out if transport init failed
-    if ( ref $Self->{TransportObject} ne 'Kernel::API::Transport' ) {
+    if ( ref $Self->{TransportObject} ne $TransportModule ) {
 
         return $Self->Error(
             Code    => 'Provider.InternalError',
@@ -166,6 +178,7 @@ sub Run {
             Data    => $Self->{TransportObject},
         );
     }
+print STDERR "here2!!\n";
 
     # read request content
     my $FunctionResult = $Self->{TransportObject}->ProviderProcessRequest();
@@ -215,7 +228,16 @@ sub Run {
             # create an operation object for each allowed method and ask it for options
             my $Operation = $ProcessRequestResult{AvailableMethods}->{$Method}->{Operation}; 
 
-            my $OperationObject = Kernel::API::Operation->new(
+            my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
+            if ( !$Kernel::OM->Get('Main')->Require($OperationModule) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message => "Can't load module $OperationModule",
+                );
+                return;    # bail out, this will generate 500 Error
+            }    
+
+            my $OperationObject = $OperationModule->new(
                 DebuggerObject          => $Self->{DebuggerObject},
                 APIVersion              => $Webservice->{Config}->{APIVersion},
                 Operation               => $Operation,
@@ -230,7 +252,7 @@ sub Run {
             );
 
             # if operation init failed, bail out
-            if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
+            if ( ref $OperationObject ne $OperationModule ) {
                 # only bail out if it's not a 403
                 if ( $OperationObject->{Code} ne 'Forbidden' ) {
                     return $Self->_GenerateErrorResponse(
@@ -294,7 +316,15 @@ sub Run {
         $Operation && IsHashRefWithData( $ProviderConfig->{Operation}->{$Operation}->{MappingInbound} )
         )
     {
-        my $MappingInObject = Kernel::API::Mapping->new(
+        my $MappingModule = $Kernel::OM->GetModuleFor('API::Mapping');
+        if ( !$Kernel::OM->Get('Main')->Require($MappingModule) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Can't load module $MappingModule",
+            );
+            return;    # bail out, this will generate 500 Error
+        }    
+        my $MappingInObject = $MappingModule->new(
             DebuggerObject => $Self->{DebuggerObject},
             Operation      => $Operation,
             OperationType  => $ProviderConfig->{Operation}->{$Operation}->{Type},
@@ -303,7 +333,7 @@ sub Run {
         );
 
         # if mapping init failed, bail out
-        if ( ref $MappingInObject ne 'Kernel::API::Mapping' ) {
+        if ( ref $MappingInObject ne $MappingModule ) {
             my $ErrorResponse = $Self->_Error(
                 Code    => 'Provider.InternalError',
                 Message => 'MappingIn could not be initialized',
@@ -337,8 +367,16 @@ sub Run {
     #
     # Execute actual operation.
     #
+    my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
+    if ( !$Kernel::OM->Get('Main')->Require($OperationModule) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message => "Can't load module $OperationModule",
+        );
+        return;    # bail out, this will generate 500 Error
+    }    
 
-    my $OperationObject = Kernel::API::Operation->new(
+    my $OperationObject = $OperationModule->new(
         DebuggerObject          => $Self->{DebuggerObject},
         APIVersion              => $Webservice->{Config}->{APIVersion},
         Operation               => $Operation,
@@ -354,7 +392,7 @@ sub Run {
     );
 
     # if operation init failed, bail out
-    if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
+    if ( ref $OperationObject ne $OperationModule ) {
         return $Self->_GenerateErrorResponse(
             %{$OperationObject},
         );
@@ -390,7 +428,15 @@ sub Run {
         )
         )
     {
-        my $MappingOutObject = Kernel::API::Mapping->new(
+        my $MappingModule = $Kernel::OM->GetModuleFor('API::Mapping');
+        if ( !$Kernel::OM->Get('Main')->Require($MappingModule) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Can't load module $MappingModule",
+            );
+            return;    # bail out, this will generate 500 Error
+        }    
+        my $MappingOutObject = $MappingModule->new(
             DebuggerObject => $Self->{DebuggerObject},
             Operation      => $Operation,
             OperationType  => $ProviderConfig->{Operation}->{$Operation}->{Type},
@@ -399,7 +445,7 @@ sub Run {
         );
 
         # if mapping init failed, bail out
-        if ( ref $MappingOutObject ne 'Kernel::API::Mapping' ) {
+        if ( ref $MappingOutObject ne $MappingModule ) {
             my $ErrorResponse = $Self->_Error(
                 Code    => 'Provider.InternalError',
                 Message => 'MappingOut could not be initialized',

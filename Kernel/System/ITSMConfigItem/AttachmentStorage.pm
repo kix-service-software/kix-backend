@@ -16,11 +16,11 @@ use Digest::MD5 qw(md5_hex);
 use Encode qw(encode_utf8);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main'
+    'Config',
+    'DB',
+    'Encode',
+    'Log',
+    'Main'
 );
 
 =head1 NAME
@@ -53,7 +53,7 @@ sub AttachmentStorageGetDirectory {
 
     #check required stuff...
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message => "Need ID!"
         );
@@ -65,7 +65,7 @@ sub AttachmentStorageGetDirectory {
     #--------------------------
     #db quoting...
     foreach (qw(ID)) {
-        $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_}, 'Integer' );
+        $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_}, 'Integer' );
     }
 
     #build sql...
@@ -74,12 +74,12 @@ sub AttachmentStorageGetDirectory {
         "FROM attachment_directory " .
         "WHERE id = ?";
 
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => [ \$Param{ID} ]
     );
 
-    while ( my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Data = (
             AttDirID       => $Data[0],
             StorageBackend => $Data[1],
@@ -97,14 +97,14 @@ sub AttachmentStorageGetDirectory {
         "FROM attachment_dir_preferences " .
         "WHERE attachment_directory_id = ?";
 
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => [ \$Param{ID} ]
     );
 
     my %Preferences;
 
-    while ( my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Preferences{ $Data[0] } = $Data[1];
     }
 
@@ -130,7 +130,7 @@ sub AttachmentStorageGet {
 
     #check required stuff...
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message => "Need ID!"
         );
@@ -141,7 +141,7 @@ sub AttachmentStorageGet {
     %Data = $Self->AttachmentStorageGetDirectory( ID => $Param{ID} );
 
     if ( !defined( $Data{AttDirID} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message => "No attachment with this ID exists!"
         );
@@ -189,7 +189,7 @@ sub AttachmentStorageGetRealProperties {
 
     # check required stuff...
     if ( !$Param{AttDirID} && !$Param{StorageBackend} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need AttDirID and StorageBackend!"
         );
@@ -198,7 +198,7 @@ sub AttachmentStorageGetRealProperties {
 
     if ( !( $Param{StorageBackend} ) ) {
         $Param{StorageBackend} =
-            $Kernel::OM->Get('Kernel::Config')->Get('AttachmentStorage::DefaultStorageBackendModule');
+            $Kernel::OM->Get('Config')->Get('AttachmentStorage::DefaultStorageBackendModule');
     }
 
     # get the actual attachment properties...
@@ -235,7 +235,7 @@ sub AttachmentStorageAdd {
     #check required stuff...
     foreach (qw(DataRef Filename UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message => "Need $_!"
             );
@@ -245,7 +245,7 @@ sub AttachmentStorageAdd {
 
     if ( !( $Param{StorageBackend} ) ) {
         $Param{StorageBackend} =
-            $Kernel::OM->Get('Kernel::Config')->Get('AttachmentStorage::DefaultStorageBackendModule');
+            $Kernel::OM->Get('Config')->Get('AttachmentStorage::DefaultStorageBackendModule');
     }
 
     #-----------------------------------------------------------------
@@ -253,10 +253,10 @@ sub AttachmentStorageAdd {
     #-----------------------------------------------------------------
     #db quoting...
     foreach (qw( StorageBackend Filename)) {
-        $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_} );
+        $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_} );
     }
     foreach (qw( UserID )) {
-        $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_}, 'Integer' );
+        $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_}, 'Integer' );
     }
 
     #build sql...
@@ -270,26 +270,26 @@ sub AttachmentStorageAdd {
         " current_timestamp, ?, current_timestamp, ?)";
 
     #run SQL...
-    if ( $Kernel::OM->Get('Kernel::System::DB')->Do( 
+    if ( $Kernel::OM->Get('DB')->Do( 
             SQL  => $SQL,
             Bind => [ \$Param{StorageBackend}, \$Param{Filename}, \$Param{UserID}, \$Param{UserID} ]
         ) ) {
 
         #...and get the ID...
-        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        $Kernel::OM->Get('DB')->Prepare(
             SQL => "SELECT max(id) FROM attachment_directory WHERE " .
                 "file_name = ? AND " .
                 "storage_backend = ? AND " .
                 "create_by = ?",
             Bind => [ \$Param{Filename}, \$Param{StorageBackend}, \$Param{UserID} ]
         );
-        while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $ID = $Row[0];            
         }
 
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could NOT insert attachment in attachment directory!",
         );
@@ -301,7 +301,7 @@ sub AttachmentStorageAdd {
     #-----------------------------------------------------------------
 
     # md5sum calculation
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( ${ $Param{DataRef} } );
+    $Kernel::OM->Get('Encode')->EncodeOutput( ${ $Param{DataRef} } );
     $Param{Preferences}->{MD5Sum} = md5_hex( ${ $Param{DataRef} } );
 
     # size calculation
@@ -321,7 +321,7 @@ sub AttachmentStorageAdd {
 
     # insert preferences
     for my $Key ( sort keys %{ $Param{Preferences} } ) {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO attachment_dir_preferences '
                 . '(attachment_directory_id, preferences_key, preferences_value) VALUES ( ?, ?, ?)',
             Bind => [ \$ID, \$Key, \$Param{Preferences}->{$Key} ],
@@ -339,7 +339,7 @@ sub AttachmentStorageAdd {
     );
 
     if ( !$AttID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could NOT store attachment in storage ($Param{StorageBackend})!",
         );
@@ -350,18 +350,18 @@ sub AttachmentStorageAdd {
     # (4) update attachment directory (i.e. file path)...
     #-----------------------------------------------------------------
 
-    $AttID = $Kernel::OM->Get('Kernel::System::DB')->Quote($AttID);
+    $AttID = $Kernel::OM->Get('DB')->Quote($AttID);
     $SQL   = "UPDATE attachment_directory SET " .
         " file_path = ? " .
         " WHERE id = ?";
 
-    if ( $Kernel::OM->Get('Kernel::System::DB')->Do( 
+    if ( $Kernel::OM->Get('DB')->Do( 
             SQL  => $SQL,
             Bind => [ \$AttID, \$ID ]
         ) ) {
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'CMDB.ConfigItem.Attachment',
             ObjectID  => $ID,
@@ -370,7 +370,7 @@ sub AttachmentStorageAdd {
         return $ID;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could NOT update attachment directory (ID=$ID, file_path=$AttID)!",
         );
@@ -397,7 +397,7 @@ sub AttachmentStorageSearch {
 
     #check required stuff...
     if ( !$Param{Filename} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Filename!"
         );
@@ -407,7 +407,7 @@ sub AttachmentStorageSearch {
     #db quoting...
     foreach (qw( Filename )) {
         if ( defined( $Param{$_} ) && ( $Param{$_} ) ) {
-            $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_} );
+            $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_} );
         }
     }
 
@@ -425,12 +425,12 @@ sub AttachmentStorageSearch {
     my $SQL = "SELECT id FROM attachment_directory " .
         "WHERE " . $WHERE;
 
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => \@BindObjects
     );
 
-    while ( my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push( @Result, $Data[0] );
     }
 

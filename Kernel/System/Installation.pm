@@ -15,11 +15,7 @@ use File::Basename;
 use Kernel::Language qw(Translatable);
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-);
+our @ObjectDependencies = ();
 
 =head1 NAME
 
@@ -27,7 +23,7 @@ Kernel::System::Installation - handling of current installation
 
 =head1 SYNOPSIS
 
-All installatin related functions.
+All installation related functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -41,7 +37,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TokenObject = $Kernel::OM->Get('Kernel::System::Token');
+    my $InstallationObject = $Kernel::OM->Get('Installation');
 
 =cut
 
@@ -69,13 +65,23 @@ get the list of available plugins
 sub PluginList {
     my ( $Self, %Param ) = @_;
     my @Plugins;
+    my @DirectoryList;
+
+    my $Home = $ENV{KIX_HOME};
+    if ( !$Home ) {
+        use FindBin qw($Bin);
+        $Home = $Bin.'/..';
+    }
+    my $PluginDirectory = $Home.'/plugins';
 
     # get all directories in the plugins folder
-    my @DirectoryList = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/plugins',
-        Filter    => '*',
-        Recursive => 0,
-    );
+    # don't do that using the Main object, since we are called by the OM constructor 
+    opendir(HANDLE, $PluginDirectory) || die "Can't open $PluginDirectory: $!";
+    while (readdir HANDLE) {
+        next if $_ =~ /^\./;
+        push @DirectoryList, $PluginDirectory.'/'.$_;
+    }
+    closedir(HANDLE); 
 
     # get RELEASE information of each plugin
     DIRECTORY:
@@ -84,6 +90,23 @@ sub PluginList {
             Directory => $Directory
         );
         $Plugin{Directory} = $Directory;
+        $Plugin{Exports} = {};
+
+        # read EXPORTS file
+        if ( open(HANDLE, '<', $Directory.'/EXPORTS') ) {
+            while (<HANDLE>) {
+                # ignore comments and empty lines
+                next if $_ =~ /^#/;
+
+                chomp;
+                my ($Object, $Module) = split(/\s+=\s+/, $_);
+                
+                next if !$Object && !$Module;
+
+                $Plugin{Exports}->{$Object} = $Module;
+            }
+            close(HANDLE);
+        }        
 
         # add to list of plugins
         push @Plugins, \%Plugin;
@@ -106,6 +129,34 @@ sub PluginList {
     return @Plugins;
 }
 
+=item GetPluginExports()
+
+get the list of plugin exports (object map) in order of initialization
+
+    my @PluginExports = $InstallationObject->GetPluginExports()
+
+=cut
+
+sub GetPluginExports {
+    my ( $Self, %Param ) = @_;
+    my %Exports;
+
+    # get all plugins in the order of initialization
+    my @Plugins = $Self->PluginList(
+        Valid     => 1,
+        InitOrder => 1
+    );
+
+    foreach my $Plugin ( @Plugins ) {
+        %Exports = (
+            %Exports,
+            %{$Plugin->{Exports}},
+        );
+    }
+
+    return %Exports;
+}
+
 =item Update()
 
 update the current installation to a new build number
@@ -124,7 +175,7 @@ sub Update {
     # check needed stuff
     for (qw(SourceBuild TargetBuild)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -132,7 +183,7 @@ sub Update {
         }
     }
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my @Plugins = $Self->PluginList(
         InitOrder => 1
@@ -148,7 +199,7 @@ sub Update {
         my $Directory = $PluginList{$Param{Plugin}}->{Directory};
     
         if ( ! -d $Directory ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Plugin $Param{Plugin} doesn't exist!"
             );
@@ -160,7 +211,7 @@ sub Update {
     elsif ( $Param{Plugin} && $Param{Plugin} eq 'ALL' ) {
         foreach my $Plugin ( @Plugins ) {
             if ( ! -d $Plugin->{Directory} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Plugin $Plugin->{Name} doesn't exist!"
                 );
@@ -174,7 +225,7 @@ sub Update {
     DIRECTORY:
     foreach my $UpdateItem ( @UpdateItems ) {
         # get all relevant versions between source and target
-        my @FileList = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        my @FileList = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $UpdateItem->{Directory}.'/update',
             Filter    => 'build-*',
         );
@@ -199,7 +250,7 @@ sub Update {
             );
 
             if ( !$Result ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Error while updating $UpdateItem->{Name}. Ignoring further updates for $UpdateItem->{Name}."
                 );
@@ -214,7 +265,7 @@ sub Update {
 sub _DoUpdate {
     my ($Self, %Param) = @_;
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message  => "updating $Param{Name} to $Param{Build}!"
     );
@@ -266,14 +317,14 @@ sub _ExecUpdateScript {
         return 1;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => "info",
         Message  => "    executing $OrgType update script",
     );
 
     my $ExitCode = system($ScriptFile);    
     if ($ExitCode) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => "error",
             Message  => "Unable to execute $OrgType update script!",
         );
@@ -293,38 +344,38 @@ sub _ExecUpdateSQL {
         return 1;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => "info",
         Message  => "    executing $Param{Type} SQL",
     );
 
-    my $XML = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $XML = $Kernel::OM->Get('Main')->FileRead(
         Location => $XMLFile,
     );
     if (!$XML) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => "error",
             Message  => "Unable to read file \"$XMLFile\"!",
         );
         return;
     }
 
-    my @XMLArray = $Kernel::OM->Get('Kernel::System::XML')->XMLParse(
+    my @XMLArray = $Kernel::OM->Get('XML')->XMLParse(
         String => $XML,
     );
     if (!@XMLArray) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => "error",
             Message  => "Unable to parse file \"$XMLFile\"!",
         );
         return;
     }
 
-    my @SQL = $Kernel::OM->Get('Kernel::System::DB')->SQLProcessor(
+    my @SQL = $Kernel::OM->Get('DB')->SQLProcessor(
         Database => \@XMLArray,
     );
     if (!@SQL) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => "error",
             Message  => "Unable to generate SQL from file \"$XMLFile\"!",
         );
@@ -332,11 +383,11 @@ sub _ExecUpdateSQL {
     }
 
     for my $SQL (@SQL) {
-        my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do( 
+        my $Result = $Kernel::OM->Get('DB')->Do( 
             SQL => $SQL 
         );
         if (!$Result) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Unable to execute SQL from file \"$XMLFile\"!",
             );
@@ -344,13 +395,13 @@ sub _ExecUpdateSQL {
     }
 
     # execute post SQL statements (indexes, constraints)
-    my @SQLPost = $Kernel::OM->Get('Kernel::System::DB')->SQLProcessorPost();
+    my @SQLPost = $Kernel::OM->Get('DB')->SQLProcessorPost();
     for my $SQL (@SQLPost) {
-        my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do( 
+        my $Result = $Kernel::OM->Get('DB')->Do( 
             SQL => $SQL 
         );
         if (!$Result) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Unable to execute POST SQL from file \"$XMLFile\"!",
             );
@@ -358,7 +409,7 @@ sub _ExecUpdateSQL {
     }
 
     # delete whole cache to make sure any new data is available in the following scripts
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     return 1;
 }
@@ -370,7 +421,7 @@ sub _ReadReleaseFile {
     # check needed stuff
     for (qw(Directory)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -378,22 +429,11 @@ sub _ReadReleaseFile {
         }
     }
 
-    my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-        Directory => $Param{Directory},
-        Filename  => 'RELEASE',
-        Result    => 'ARRAY',
-    );
-    if ( !IsArrayRefWithData($Content) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "Can't read file $Param{Directory}/RELEASE!"
-        );        
-        return;
-    }
-
-    foreach my $Line ( @{$Content} ) {
-        chomp $Line;
-
+    open(HANDLE, '<', $Param{Directory}.'/RELEASE') || return;
+    while (<HANDLE>) {
+        chomp;
+        my $Line = $_;
+   
         # ignore comment lines
         next if ( $Line =~ /^#/ );
 
@@ -405,6 +445,7 @@ sub _ReadReleaseFile {
             }
         }                
     }
+    close(HANDLE);
 
     if ( $Release{Requires} ) {
         my @RequiresList = split(/\s*,\s*/, $Release{Requires});

@@ -135,7 +135,7 @@ sub Run {
     );
 
     # check if SLA exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+    my $Exists = $Kernel::OM->Get('SLA')->SLALookup(
         Name => $SLA->{Name},
     );
     
@@ -147,7 +147,7 @@ sub Run {
     }
 
     # create sla
-    my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLAAdd(
+    my $SLAID = $Kernel::OM->Get('SLA')->SLAAdd(
         Name                    => $SLA->{Name},
         Comment                 => $SLA->{Comment} || '',
         ValidID                 => $SLA->{ValidID} || 1,

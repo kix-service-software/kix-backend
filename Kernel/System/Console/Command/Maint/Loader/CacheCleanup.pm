@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Loader',
+    'Loader',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
 
     $Self->Print("<yellow>Cleaning up the loader cache files...</yellow>\n");
 
-    my @DeletedFiles = $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
+    my @DeletedFiles = $Kernel::OM->Get('Loader')->CacheDelete();
     $Self->Print("<green>Done.</green>\n");
 
     return $Self->ExitCodeOk();

@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Automation::MacroActionTypeGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Automation::MacroActionTypeGet');
 
     return $Self;
 }
@@ -129,13 +129,13 @@ sub Run {
 
     my @MacroActionTypeList;
 
-    my $MacroActionTypes = $Kernel::OM->Get('Kernel::Config')->Get('Automation::MacroActionType::'.$Param{Data}->{MacroType});
+    my $MacroActionTypes = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{Data}->{MacroType});
 
     # start loop
     foreach my $MacroActionType ( @{$Param{Data}->{MacroActionType}} ) {
 
 	    # get the MacroActionType data
-	    my %MacroActionTypeData = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionTypeGet(
+	    my %MacroActionTypeData = $Kernel::OM->Get('Automation')->MacroActionTypeGet(
             MacroType => $Param{Data}->{MacroType},
 	        Name      => $MacroActionType,
 	    );

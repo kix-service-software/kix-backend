@@ -58,7 +58,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticleCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQArticleCreate');
 
     return $Self;
 }
@@ -83,7 +83,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     # get system LanguageIDs
-    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
+    my $Languages = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');
     my @LanguageIDs = sort keys %{$Languages};
 
     return {
@@ -175,7 +175,7 @@ sub Run {
     );
     
     # everything is ok, let's create the FAQArticle
-    my $FAQArticleID = $Kernel::OM->Get('Kernel::System::FAQ')->FAQAdd(
+    my $FAQArticleID = $Kernel::OM->Get('FAQ')->FAQAdd(
         Title       => $FAQArticle->{Title},
         CategoryID  => $FAQArticle->{CategoryID},
         Visibility  => exists $FAQArticle->{CustomerVisible} && $FAQArticle->{CustomerVisible} ? 'external' : 'internal',

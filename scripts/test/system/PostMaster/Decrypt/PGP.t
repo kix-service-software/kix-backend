@@ -18,14 +18,14 @@ use Kernel::System::PostMaster;
 
 # Get helper object.
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # Get config object.
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # Set config.
 $ConfigObject->Set(
@@ -44,7 +44,7 @@ $ConfigObject->Set(
 
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # Check if GPG is located there.
@@ -67,7 +67,7 @@ if ( !-e $ConfigObject->Get('PGP::Bin') ) {
 }
 
 # Create local crypt object.
-my $PGPObject = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+my $PGPObject = $Kernel::OM->Get('Crypt::PGP');
 
 if ( !$PGPObject ) {
     print STDERR "NOTICE: No PGP support!\n";
@@ -106,7 +106,7 @@ my %Check = (
 );
 
 # Get main object.
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
 # Add PGP keys and perform sanity check.
 for my $Count ( 1 .. 2 ) {
@@ -166,7 +166,7 @@ for my $Count ( 1 .. 2 ) {
     );
 }
 
-my $PostMasterFilter = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
+my $PostMasterFilter = $Kernel::OM->Get('PostMaster::Filter');
 my $FilterRand1      = 'filter' . $Helper->GetRandomID();
 
 $PostMasterFilter->FilterAdd(
@@ -205,11 +205,11 @@ $ConfigObject->Set(
     Key   => 'PostMaster::PreFilterModule',
     Value => {
         '000-DecryptBody' => {
-            'Module'             => 'Kernel::System::PostMaster::Filter::Decrypt',
+            'Module'             => 'PostMaster::Filter::Decrypt',
             'StoreDecryptedBody' => '1',
         },
         '000-MatchDBSource' => {
-            'Module' => 'Kernel::System::PostMaster::Filter::MatchDBSource',
+            'Module' => 'PostMaster::Filter::MatchDBSource',
             }
         }
 );
@@ -223,7 +223,7 @@ $Self->Is(
 );
 
 # Get ticket object.
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 $Self->True(
     $Return[1] || 0,
@@ -277,11 +277,11 @@ $ConfigObject->Set(
     Key   => 'PostMaster::PreFilterModule',
     Value => {
         '000-DecryptBody' => {
-            'Module'             => 'Kernel::System::PostMaster::Filter::Decrypt',
+            'Module'             => 'PostMaster::Filter::Decrypt',
             'StoreDecryptedBody' => '0',
         },
         '000-MatchDBSource' => {
-            'Module' => 'Kernel::System::PostMaster::Filter::MatchDBSource',
+            'Module' => 'PostMaster::Filter::MatchDBSource',
             }
         }
 );

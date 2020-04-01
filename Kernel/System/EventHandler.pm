@@ -158,7 +158,7 @@ sub EventHandler {
     # check needed stuff
     for (qw(Data Event UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -167,7 +167,7 @@ sub EventHandler {
     }
 
     # get configured modules
-    my $Modules = $Kernel::OM->Get('Kernel::Config')->Get( $Self->{EventHandlerInit}->{Config} );
+    my $Modules = $Kernel::OM->Get('Config')->Get( $Self->{EventHandlerInit}->{Config} );
 
     # return if there is no one
     return 1 if !$Modules;
@@ -178,7 +178,7 @@ sub EventHandler {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # load modules and execute
     MODULE:

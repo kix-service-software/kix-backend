@@ -18,7 +18,7 @@ use base qw(
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -90,7 +90,7 @@ Encode the data to JSON
 sub Encode {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+    return $Kernel::OM->Get('JSON')->Encode(
         Data => $Param{Data}
     );
 }
@@ -108,7 +108,7 @@ Decodes the JSON data
 sub Decode {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+    return $Kernel::OM->Get('JSON')->Decode(
         Data => $Param{Data}
     );
 }

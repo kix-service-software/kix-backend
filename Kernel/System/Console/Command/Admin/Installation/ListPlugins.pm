@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Installation',
+    'Installation',
 );
 
 sub Configure {
@@ -38,7 +38,7 @@ sub Run {
     $Self->Print("<yellow>Listing plugins...</yellow>\n");
 
     # get all plugins
-    my @PluginList = $Kernel::OM->Get('Kernel::System::Installation')->PluginList(
+    my @PluginList = $Kernel::OM->Get('Installation')->PluginList(
         Valid     => 0,
         InitOrder =>  $Self->GetOption('init-order'), 
     );

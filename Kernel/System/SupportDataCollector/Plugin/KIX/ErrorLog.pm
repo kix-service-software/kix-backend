@@ -16,7 +16,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 sub GetDisplayPath {
@@ -28,7 +28,7 @@ sub Run {
 
     my @ErrorLines;
 
-    for my $Line ( split( /\n/, $Kernel::OM->Get('Kernel::System::Log')->GetLog() ) ) {
+    for my $Line ( split( /\n/, $Kernel::OM->Get('Log')->GetLog() ) ) {
         my @Row = split( /;;/, $Line );
         if ( $Row[3] && $Row[1] =~ /error/i ) {
             push @ErrorLines, $Row[3];

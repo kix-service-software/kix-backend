@@ -15,20 +15,20 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-my $QueueObject  = $Kernel::OM->Get('Kernel::System::Queue');
-my $TypeObject   = $Kernel::OM->Get('Kernel::System::Type');
-my $StateObject  = $Kernel::OM->Get('Kernel::System::State');
+my $TicketObject = $Kernel::OM->Get('Ticket');
+my $QueueObject  = $Kernel::OM->Get('Queue');
+my $TypeObject   = $Kernel::OM->Get('Type');
+my $StateObject  = $Kernel::OM->Get('State');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 my @Tests = (
     {

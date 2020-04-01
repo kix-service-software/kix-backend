@@ -14,9 +14,9 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -62,7 +62,7 @@ sub ChannelGet {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -72,20 +72,20 @@ sub ChannelGet {
 
     # check cache
     my $CacheKey = "ChannelGet::$Param{ID}";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM channel WHERE id = ?',
         Bind => [ \$Param{ID} ] 
     );
 
     # fetch the result
     my %Channel;
-    while (my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
+    while (my @Row = $Kernel::OM->Get('DB')->FetchrowArray()) {
         $Channel{ID}         = $Row[0];
         $Channel{Name}       = $Row[1];
         $Channel{Comment}    = $Row[2];
@@ -97,7 +97,7 @@ sub ChannelGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -120,24 +120,24 @@ sub ChannelList {
 
     # check cache
     my $CacheKey = "ChannelList";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id, name FROM channel'
     );
 
     # fetch the result
     my %ChannelList;
-    while (my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
+    while (my @Row = $Kernel::OM->Get('DB')->FetchrowArray()) {
         $ChannelList{ $Row[0] } = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -162,7 +162,7 @@ sub ChannelLookup {
 
     # check needed stuff
     if ( !$Param{Name} && !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Name or ID!',
         );
@@ -191,7 +191,7 @@ sub ChannelLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No $Key for $Value found!",
         );

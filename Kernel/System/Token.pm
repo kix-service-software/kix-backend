@@ -17,9 +17,9 @@ use Kernel::Language qw(Translatable);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TokenObject = $Kernel::OM->Get('Kernel::System::Token');
+    my $TokenObject = $Kernel::OM->Get('Token');
 
 =cut
 
@@ -71,7 +71,7 @@ sub ValidateToken {
 
     # check session id
     if ( !$Param{Token} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no token!!'
         );
@@ -80,21 +80,21 @@ sub ValidateToken {
     my $RemoteAddr = $ENV{REMOTE_ADDR} || 'none';
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check whitelist
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "SELECT token, last_request_time FROM token WHERE token = ?",
         Bind => [ \$Param{Token} ],
     );
 
     my $TokenFound = 0;
     my $LastRequestTimeUnix;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $TokenFound = $Row[0];
 
         if ( $Row[1] ) {
-            $LastRequestTimeUnix = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            $LastRequestTimeUnix = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                 String => $Row[1],
             );
         }
@@ -123,7 +123,7 @@ sub ValidateToken {
         $Payload->{RemoteIP} ne $RemoteAddr
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "RemoteIP ($Payload->{RemoteIP}) of request is "
                 . "different from registered IP ($RemoteAddr). Invalidating token! "
@@ -136,11 +136,11 @@ sub ValidateToken {
     }
 
     # check time validity
-    my $TimeNow = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $TimeNow = $Kernel::OM->Get('Time')->SystemTime();
 
     if ( $TimeNow > $Payload->{ValidUntilTimeUnix} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Token valid time exceeded!",
         );
@@ -156,7 +156,7 @@ sub ValidateToken {
 
         if ( ( $TimeNow - $TokenMaxIdleTime ) >= $LastRequestTimeUnix ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message =>
                     "Token maximum idle time exceeded!",
@@ -169,8 +169,8 @@ sub ValidateToken {
     }
 
     # update last request time
-    $TimeNow = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $TimeNow = $Kernel::OM->Get('Time')->CurrentTimestamp();
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "UPDATE token SET last_request_time = ? WHERE token = ?",
         Bind =>  [
             \$TimeNow,
@@ -205,7 +205,7 @@ sub CreateToken {
     my ( $Self, %Param ) = @_;
 
     if ( !IsHashRefWithData($Param{Payload}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Payload!'
         );
@@ -213,7 +213,7 @@ sub CreateToken {
     }
 
     if ( !$Param{Payload}->{UserType} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no UserType!'
         );
@@ -221,7 +221,7 @@ sub CreateToken {
     }
 
     if ( $Param{Payload}->{UserType} ne 'Agent' && $Param{Payload}->{UserType} ne 'Customer' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got wrong UserType!'
         );
@@ -229,7 +229,7 @@ sub CreateToken {
     }
 
     if ( !$Param{Payload}->{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no UserID!'
         );
@@ -237,7 +237,7 @@ sub CreateToken {
     }
 
     # enrich payload and create token
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $ValidUntilTimeUnix;
     if ( $Param{Payload}->{ValidUntil} ) {
@@ -247,7 +247,7 @@ sub CreateToken {
     }
 
     if ( !$ValidUntilTimeUnix ) {
-        $ValidUntilTimeUnix = $TimeObject->SystemTime() + $Kernel::OM->Get('Kernel::Config')->Get('TokenMaxTime');
+        $ValidUntilTimeUnix = $TimeObject->SystemTime() + $Kernel::OM->Get('Config')->Get('TokenMaxTime');
     } 
     
     my %Payload = %{$Param{Payload}};
@@ -263,12 +263,12 @@ sub CreateToken {
 
     my $Token = encode_jwt(
         \%Payload, 
-        $Kernel::OM->Get('Kernel::Config')->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
+        $Kernel::OM->Get('Config')->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
         'HS256', 
     );
 
     # store token in whitelist
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL  => "INSERT INTO token (token) values (?)",
         Bind => [
             \$Token,
@@ -292,7 +292,7 @@ sub RemoveToken {
 
     # check session id
     if ( !$Param{Token} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Token!!'
         );
@@ -300,13 +300,13 @@ sub RemoveToken {
     }
 
     # delete token from the database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM token WHERE token = ?",
         Bind => [ \$Param{Token} ],
     );
 
     # log event
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "Removed token $Param{Token}."
     );
@@ -330,7 +330,7 @@ sub ExtractToken {
 
     # check session id
     if ( !$Param{Token} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no token!!'
         );
@@ -338,28 +338,28 @@ sub ExtractToken {
     }
  
      # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get time of last request
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "SELECT token, last_request_time FROM token WHERE token = ?",
         Bind => [ \$Param{Token} ],
     );
 
     my $TokenFound = 0;
     my $LastRequestTimeUnix;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $TokenFound = $Row[0];
 
         if ( $Row[1] ) {
-            $LastRequestTimeUnix = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+            $LastRequestTimeUnix = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                 String => $Row[1],
             );
         }
     }
 
     if ( !$TokenFound ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => 'Token not found in database!'
         );
@@ -380,14 +380,14 @@ sub ExtractToken {
     $Payload->{LastRequestTimeUnix} = $LastRequestTimeUnix || undef;
     $Payload->{LastRequestTime} = undef;
     if ( $LastRequestTimeUnix ) {
-        $Payload->{LastRequestTime} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        $Payload->{LastRequestTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $LastRequestTimeUnix,
         );
     }
-    $Payload->{CreateTime} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+    $Payload->{CreateTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $Payload->{CreateTimeUnix},
     );
-    $Payload->{ValidUntilTime} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+    $Payload->{ValidUntilTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $Payload->{ValidUntilTimeUnix},
     );
 
@@ -406,7 +406,7 @@ sub GetAllTokens {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get all session ids from the database
     return if !$DBObject->Prepare(

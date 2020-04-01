@@ -106,7 +106,7 @@ sub Validate {
     if ( $Param{Attribute} eq 'Attachments' ) {
         # check if array ref
         if ( IsArrayRefWithData($Param{Data}->{$Param{Attribute}}) ) {
-            my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+            my $ConfigObject = $Kernel::OM->Get('Config');
 
             my $ForbiddenExtensions   = $ConfigObject->Get('FileUpload::ForbiddenExtensions');
             my $ForbiddenContentTypes = $ConfigObject->Get('FileUpload::ForbiddenContentTypes');

@@ -83,7 +83,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get category list
-    my $CategoryList = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleCategoryList();
+    my $CategoryList = $Kernel::OM->Get('TextModule')->TextModuleCategoryList();
 
     if ( IsArrayRefWithData($CategoryList) ) {
         return $Self->_Success(

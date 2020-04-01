@@ -18,8 +18,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -80,7 +80,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -101,7 +101,7 @@ sub Search {
         'ENDSWITH'   => 'EndsWith'
     );
     if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
@@ -111,7 +111,7 @@ sub Search {
     if ( !$Self->{DynamicFields} ) {
 
         # get dynamic field object
-        my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+        my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
         # get all configured dynamic fields
         my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet();
@@ -123,7 +123,7 @@ sub Search {
     }
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     my $DFName = $Param{Search}->{Field};
     $DFName =~ s/DynamicField_//g;
@@ -131,7 +131,7 @@ sub Search {
     my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
 
     if ( !IsHashRefWithData($DynamicFieldConfig) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unknown DynamicField '$DFName'!",
         );
@@ -190,7 +190,7 @@ sub Search {
             UserID             => 1,
         );
         if ( !$ValidateSuccess ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  =>
                     "Search not executed due to invalid value '"
@@ -246,7 +246,7 @@ sub Sort {
     my @SQLJoin;
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     my $DFName = $Param{Attribute};
     $DFName =~ s/DynamicField_//g;

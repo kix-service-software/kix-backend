@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -53,7 +53,7 @@ sub MacroActionTypeGet {
     # check needed stuff
     for my $Needed (qw(MacroType Name)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -100,7 +100,7 @@ sub MacroActionGet {
     # check needed stuff
     for my $Needed (qw(ID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -110,13 +110,13 @@ sub MacroActionGet {
 
     # check cache
     my $CacheKey = 'MacroActionGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => "SELECT id, macro_id, type, parameters, comments, valid_id, create_time, create_by, change_time, change_by FROM macro_action WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -124,7 +124,7 @@ sub MacroActionGet {
     my %Result;
     
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
             ID         => $Row[0],
             MacroID    => $Row[1],
@@ -140,7 +140,7 @@ sub MacroActionGet {
 
         if ( $Result{Parameters} ) {
             # decode JSON
-            $Result{Parameters} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            $Result{Parameters} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Parameters}
             );
         }
@@ -148,7 +148,7 @@ sub MacroActionGet {
     
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Macro action with ID $Param{ID} not found!",
         );
@@ -156,7 +156,7 @@ sub MacroActionGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -187,7 +187,7 @@ sub MacroActionAdd {
     # check needed stuff
     for my $Needed (qw(MacroID Type UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -204,7 +204,7 @@ sub MacroActionAdd {
         ID => $Param{MacroID}
     );
     if ( !%Macro ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Macro with ID $Param{MacroID} doesn't exist!"
         );
@@ -224,7 +224,7 @@ sub MacroActionAdd {
     );
 
     if ( !$IsValid ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "MacroAction config is invalid!"
         );
@@ -234,13 +234,13 @@ sub MacroActionAdd {
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
-        $Parameters = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Parameters = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Parameters}
         );
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert
     return if !$DBObject->Do(
@@ -266,10 +266,10 @@ sub MacroActionAdd {
     }
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Macro.MacroAction',
         ObjectID  => $Param{MacroID}.'::'.$ID,
@@ -300,7 +300,7 @@ sub MacroActionUpdate {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -320,7 +320,7 @@ sub MacroActionUpdate {
             ID => $Param{MacroID} || $Data{MacroID}
         );
         if ( !%Macro ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Macro with ID $Data{MacroID} doesn't exist!"
             );
@@ -339,7 +339,7 @@ sub MacroActionUpdate {
         );
 
         if ( !$IsValid ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "MacroAction config is invalid!"
             );
@@ -370,13 +370,13 @@ sub MacroActionUpdate {
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
-        $Parameters = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Parameters = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Parameters}
         );
     }
 
     # update MacroAction in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE macro_action SET macro_id = ?, type = ?, parameters = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
             \$Param{MacroID}, \$Param{Type}, \$Parameters, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
@@ -384,10 +384,10 @@ sub MacroActionUpdate {
     );
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'MacroAction',
         ObjectID  => $Param{ID},
@@ -421,7 +421,7 @@ sub MacroActionList {
     # check needed stuff
     for (qw(MacroID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -436,7 +436,7 @@ sub MacroActionList {
     my $CacheKey = 'MacroActionList::' . $Param{MacroID} . '::' . $Valid;
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -448,7 +448,7 @@ sub MacroActionList {
         $SQL .= ' AND valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => $SQL,
         Bind => [
             \$Param{MacroID}
@@ -456,12 +456,12 @@ sub MacroActionList {
     );
 
     my %Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{$Row[0]} = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
@@ -487,7 +487,7 @@ sub MacroActionDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -500,7 +500,7 @@ sub MacroActionDelete {
         ID => $Param{ID},
     );
     if ( !$Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An macro action with the ID $Param{ID} does not exist.",
         );
@@ -508,16 +508,16 @@ sub MacroActionDelete {
     }
 
     # get database object
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM macro_action WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
    
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'MacroAction',
         ObjectID  => $Param{ID},
@@ -545,7 +545,7 @@ sub MacroActionExecute {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -562,7 +562,7 @@ sub MacroActionExecute {
     );
 
     if ( !%MacroAction ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such macro action with ID $Param{ID}!"
         );
@@ -584,7 +584,7 @@ sub MacroActionExecute {
     );
 
     if ( !%Macro ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such macro with ID $MacroAction{MacroID}!"
         );
@@ -610,7 +610,7 @@ sub MacroActionExecute {
 
     if ( !$BackendResult ) {
         # get last error message from system log
-        my $Message = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'error',
             What => 'Message',
         );            
@@ -632,7 +632,7 @@ sub _LoadMacroActionTypeBackend {
     # check needed stuff
     for (qw(MacroType Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -643,10 +643,10 @@ sub _LoadMacroActionTypeBackend {
     $Self->{MacroActionTypeModules} //= {};
 
     if ( !$Self->{MacroActionTypeModules}->{$Param{MacroType}} || !$Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} ) {
-        my $Backend = 'Kernel::System::Automation::MacroAction::' . $Param{MacroType} . '::' . $Param{Name};
+        my $Backend = 'Automation::MacroAction::' . $Param{MacroType} . '::' . $Param{Name};
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
             );     
@@ -655,7 +655,7 @@ sub _LoadMacroActionTypeBackend {
 
         my $BackendObject = $Backend->new( %{$Self} );
         if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
             );        

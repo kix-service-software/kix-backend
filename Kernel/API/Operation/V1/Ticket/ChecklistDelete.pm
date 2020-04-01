@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ChecklistDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ChecklistDelete');
 
     return $Self;
 }
@@ -117,7 +117,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if checklist item exists
-    my $Checklist = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistGet(
+    my $Checklist = $Kernel::OM->Get('Ticket')->TicketChecklistGet(
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Self->{Authorization}->{UserID},
     );
@@ -128,7 +128,7 @@ sub Run {
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistItemDelete(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketChecklistItemDelete(
         ItemID => $Param{Data}->{ChecklistItemID}
     );
 

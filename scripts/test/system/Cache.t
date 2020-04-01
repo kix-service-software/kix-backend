@@ -15,9 +15,9 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-my $Helper       = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
+my $Helper       = $Kernel::OM->Get('UnitTest::Helper');
 
 # get home directory
 my $HomeDir = $ConfigObject->Get('Home');
@@ -52,7 +52,7 @@ for my $ModuleFile (@BackendModuleFiles) {
     for my $SubdirLevels ( 0 .. 3 ) {
 
         # make sure that the CacheObject gets recreated for each loop.
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Cache'] );
+        $Kernel::OM->ObjectsDiscard( Objects => ['Cache'] );
 
         $ConfigObject->Set(
             Key   => 'Cache::SubdirLevels',
@@ -60,7 +60,7 @@ for my $ModuleFile (@BackendModuleFiles) {
         );
 
         # get a new cache object
-        my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        my $CacheObject = $Kernel::OM->Get('Cache');
 
         next MODULEFILE if !$CacheObject;
 
@@ -74,7 +74,7 @@ for my $ModuleFile (@BackendModuleFiles) {
 
         # initiate redis mock server
         if ( $Module eq 'Redis' ) {
-            my $MockObject = $Kernel::OM->Get('Kernel::System::UnitTest::RedisMock');
+            my $MockObject = $Kernel::OM->Get('UnitTest::RedisMock');
             $CacheObject->{CacheObject}->{RedisObject} = $MockObject;
         }
 

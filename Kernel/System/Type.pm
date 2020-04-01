@@ -14,12 +14,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Valid',
+    'Config',
+    'SysConfig',
+    'Cache',
+    'DB',
+    'Log',
+    'Valid',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
+    my $TypeObject = $Kernel::OM->Get('Type');
 
 =cut
 
@@ -78,7 +78,7 @@ sub TypeAdd {
     # check needed stuff
     for (qw(Name ValidID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -88,7 +88,7 @@ sub TypeAdd {
 
     # check if a type with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A type with name '$Param{Name}' already exists!"
         );
@@ -96,7 +96,7 @@ sub TypeAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Do(
         SQL => 'INSERT INTO ticket_type (name, valid_id, comments, '
@@ -120,12 +120,12 @@ sub TypeAdd {
     return if !$ID;
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Type',
         ObjectID  => $ID,
@@ -166,7 +166,7 @@ sub TypeGet {
 
     # either ID or Name must be passed
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID or Name!',
         );
@@ -175,7 +175,7 @@ sub TypeGet {
 
     # check that not both ID and Name are given
     if ( $Param{ID} && $Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need either ID OR Name - not both!',
         );
@@ -188,7 +188,7 @@ sub TypeGet {
             Type => $Param{Name},
         );
         if ( !$Param{ID} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "TypeID for Type '$Param{Name}' not found!",
             );
@@ -198,14 +198,14 @@ sub TypeGet {
 
     # check cache
     my $CacheKey = 'TypeGet::ID::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return if !$DBObject->Prepare(
@@ -230,7 +230,7 @@ sub TypeGet {
 
     # no data found
     if ( !%Type ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "TypeID '$Param{ID}' not found!",
         );
@@ -238,7 +238,7 @@ sub TypeGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -268,7 +268,7 @@ sub TypeUpdate {
     # check needed stuff
     for (qw(ID Name ValidID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -284,7 +284,7 @@ sub TypeUpdate {
         )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A type with name '$Param{Name}' already exists!"
         );
@@ -297,11 +297,11 @@ sub TypeUpdate {
 
     # check if the type is set as a default ticket type
     if (
-        $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type::Default') eq $Type{Name}
+        $Kernel::OM->Get('Config')->Get('Ticket::Type::Default') eq $Type{Name}
         && $Param{ValidID} != 1
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The ticket type is set as a default ticket type, so it cannot be set to invalid!"
         );
@@ -309,7 +309,7 @@ sub TypeUpdate {
     }
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE ticket_type SET name = ?, valid_id = ?, comments = ?, '
             . ' change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
@@ -319,13 +319,13 @@ sub TypeUpdate {
 
     # check if the name of the default ticket type is updated
     if (
-        $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type::Default') eq $Type{Name}
+        $Kernel::OM->Get('Config')->Get('Ticket::Type::Default') eq $Type{Name}
         && $Type{Name} ne $Param{Name}
         )
     {
 
         # update default ticket type SySConfig item
-        $Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemUpdate(
+        $Kernel::OM->Get('SysConfig')->ConfigItemUpdate(
             Valid => 1,
             Key   => 'Ticket::Type::Default',
             Value => $Param{Name}
@@ -334,12 +334,12 @@ sub TypeUpdate {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Type',
         ObjectID  => $Param{ID},
@@ -373,14 +373,14 @@ sub TypeList {
 
     # check cache
     my $CacheKey = "TypeList::Valid::$Valid";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # create the valid list
-    my $ValidIDs = join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+    my $ValidIDs = join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet();
 
     # build SQL
     my $SQL = 'SELECT id, name FROM ticket_type';
@@ -391,7 +391,7 @@ sub TypeList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     return if !$DBObject->Prepare(
@@ -405,7 +405,7 @@ sub TypeList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -430,7 +430,7 @@ sub TypeLookup {
 
     # check needed stuff
     if ( !$Param{Type} && !$Param{TypeID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Type or TypeID!',
         );
@@ -459,7 +459,7 @@ sub TypeLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No $Key for $Value found!",
         );
@@ -484,7 +484,7 @@ sub NameExistsCheck {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM ticket_type WHERE name = ?',
         Bind => [ \$Param{Name} ],
@@ -509,7 +509,7 @@ sub TypeDelete {
     # check needed stuff
     for (qw(TypeID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -518,19 +518,19 @@ sub TypeDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM ticket_type WHERE id = ?',
         Bind => [ \$Param{TypeID} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Type',
         ObjectID  => $Param{ID},

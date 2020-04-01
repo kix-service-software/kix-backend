@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Role::PermissionGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Role::PermissionGet');
 
     return $Self;
 }
@@ -135,7 +135,7 @@ sub Run {
     foreach my $PermissionID ( @{$Param{Data}->{PermissionID}} ) {
 
         # get the Permission data
-        my %PermissionData = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet(
+        my %PermissionData = $Kernel::OM->Get('Role')->PermissionGet(
             ID => $PermissionID,
         );
 

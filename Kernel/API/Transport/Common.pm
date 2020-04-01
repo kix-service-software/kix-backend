@@ -84,7 +84,7 @@ sub _MapReturnCode {
     }
 
     # get mapping
-    my $Mapping = $Kernel::OM->Get('Kernel::Config')->Get('API::Transport::ReturnCodeMapping');
+    my $Mapping = $Kernel::OM->Get('Config')->Get('API::Transport::ReturnCodeMapping');
     if ( !IsHashRefWithData($Mapping) ) {
         return $Self->_Error(
             Code    => 'Transport.InternalError',

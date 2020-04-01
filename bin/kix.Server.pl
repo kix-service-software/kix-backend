@@ -16,12 +16,12 @@ use File::Basename;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . '/Kernel/cpan-lib';
-use lib dirname($RealBin) . '/Custom';
+use lib dirname($RealBin) . '/plugins';
 
 use Kernel::System::ObjectManager;
 
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'kix.Server.pl',
     },
 );
@@ -29,13 +29,13 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 print STDOUT "kix.Server.pl - starting/stopping the KIX backend server\n";
 
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'kix.Server.pl',
     },
 );
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get pid directory
 my $PIDFile  = $ConfigObject->Get('Home') . '/var/run/server.pid';
@@ -91,8 +91,8 @@ sub Start {
 	my $ServiceProcess;
 	my $Port = $ConfigObject->Get('ServicePort') || 8080;
 	my $Server = $ConfigObject->Get('PlackServer') || 'Starman';
-	my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
-    my $PlackOptions = $Kernel::OM->Get('Kernel::Config')->Get('PlackOptions') || '';
+	my $Home = $Kernel::OM->Get('Config')->Get('Home');
+    my $PlackOptions = $Kernel::OM->Get('Config')->Get('PlackOptions') || '';
 
     if ($PlackOptions) {
         print STDOUT "using additional startup options: $PlackOptions\n"; 

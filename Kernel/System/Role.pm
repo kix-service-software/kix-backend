@@ -17,12 +17,12 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 # define usage context bit values
@@ -51,7 +51,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+    my $RoleObject = $Kernel::OM->Get('Role');
 
 =cut
 
@@ -87,7 +87,7 @@ sub RoleLookup {
 
     # check needed stuff
     if ( !$Param{Role} && !$Param{RoleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Role or RoleID!',
         );
@@ -136,7 +136,7 @@ sub RoleGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -145,13 +145,13 @@ sub RoleGet {
 
     # check cache
     my $CacheKey = 'RoleGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL =>
             "SELECT id, name, comments, valid_id, usage_context, create_time, create_by, change_time, change_by FROM roles WHERE id = ?",
         Bind => [ \$Param{ID} ],
@@ -160,7 +160,7 @@ sub RoleGet {
     my %Role;
 
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Role = (
             ID           => $Row[0],
             Name         => $Row[1],
@@ -183,7 +183,7 @@ sub RoleGet {
 
     # no data found...
     if ( !%Role ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Role with ID $Param{ID} not found!",
         );
@@ -191,7 +191,7 @@ sub RoleGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -221,7 +221,7 @@ sub RoleAdd {
     # check needed stuff
     for my $Needed (qw(Name ValidID UserID UsageContext)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -231,7 +231,7 @@ sub RoleAdd {
 
     my %ExistingRoles = reverse $Self->RoleList( Valid => 0 );
     if ( defined $ExistingRoles{ $Param{Name} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A Role with the name $Param{Name} already exists.",
         );
@@ -239,7 +239,7 @@ sub RoleAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert
     return if !$DBObject->Do(
@@ -265,12 +265,12 @@ sub RoleAdd {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Role',
         ObjectID  => $RoleID,
@@ -300,7 +300,7 @@ sub RoleUpdate {
     # check needed stuff
     for (qw(ID Name ValidID UsageContext UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -310,7 +310,7 @@ sub RoleUpdate {
 
     my %ExistingRoles = reverse $Self->RoleList( Valid => 0 );
     if ( defined $ExistingRoles{ $Param{Name} } && $ExistingRoles{ $Param{Name} } != $Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A Role with the name $Param{Name} already exists.",
         );
@@ -340,7 +340,7 @@ sub RoleUpdate {
     return 1 if !$ChangeRequired;
 
     # update role in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE roles SET name = ?, comments = ?, valid_id = ?, usage_context = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
@@ -349,12 +349,12 @@ sub RoleUpdate {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Role',
         ObjectID  => $Param{ID},
@@ -393,7 +393,7 @@ sub RoleList {
     my $CacheKey = 'RoleList::' . $Valid . '::' . ($Param{UsageContext} || '');
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -412,17 +412,17 @@ sub RoleList {
         $SQL .= ' WHERE usage_context = ' . Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => $SQL,
     );
 
     my %Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{ $Row[0] } = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
@@ -448,7 +448,7 @@ sub RoleDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -457,18 +457,18 @@ sub RoleDelete {
     }
 
     # get database object
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM roles WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Role',
         ObjectID  => $Param{ID},

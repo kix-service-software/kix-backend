@@ -18,9 +18,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::Time',
+    'GeneralCatalog',
+    'ITSMConfigItem',
+    'Time',
 );
 
 sub Configure {
@@ -137,7 +137,7 @@ sub Run {
     if ($All) {
 
         # get all config items ids
-        my @ConfigItemIDs = @{ $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch() };
+        my @ConfigItemIDs = @{ $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch() };
 
         # get number of config items
         my $CICount = scalar @ConfigItemIDs;
@@ -175,7 +175,7 @@ sub Run {
         for my $ConfigItemNumber (@ConfigItemNumbers) {
 
             # checks the validity of the config item id
-            my $ID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemLookup(
+            my $ID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
                 ConfigItemNumber => $ConfigItemNumber,
             );
 
@@ -200,7 +200,7 @@ sub Run {
         my @ConfigItemIDs;
 
         # get class list
-        my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class => 'ITSM::ConfigItem::Class',
             Valid => 0,
         );
@@ -220,7 +220,7 @@ sub Run {
             if ($DeploymentState) {
 
                 # get deployment state list
-                my $DeploymentStateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+                my $DeploymentStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
                     Class => 'ITSM::ConfigItem::DeploymentState',
                 );
 
@@ -244,7 +244,7 @@ sub Run {
 
             # get ids of this class (and maybe deployment state) config items
             @ConfigItemIDs = @{
-                $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(%SearchParam)
+                $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(%SearchParam)
             };
         }
         else {
@@ -265,13 +265,13 @@ sub Run {
     # delete versions older than xx days from all config items
     elsif ($AllOlderThanDays) {
 
-        my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+        my $SystemTime = $Kernel::OM->Get('Time')->SystemTime();
         my $OlderDate = $SystemTime - ( 60 * 60 * 24 * $AllOlderThanDays );
-        $OlderDate = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        $OlderDate = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $OlderDate,
         );
 
-        my $VersionsOlderDate = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionListAll(
+        my $VersionsOlderDate = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll(
             OlderDate => $OlderDate,
         );
 
@@ -280,7 +280,7 @@ sub Run {
         #    we can delete all Versions received by the "OlderDate" query
         # -> if no version is younger than the amount of days
         #    we have to keep one version of the "OlderDate" query result
-        my $VersionsAll = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionListAll();
+        my $VersionsAll = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll();
 
         my @VersionsToDelete;
 
@@ -330,7 +330,7 @@ sub Run {
     # delete all config item versions except the newest version
     elsif ($AllOldVersions) {
 
-        my $VersionsAll = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionListAll();
+        my $VersionsAll = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll();
 
         my @VersionsToDelete;
         if ( IsHashRefWithData($VersionsAll) ) {
@@ -359,7 +359,7 @@ sub Run {
     # delete all config item versions but keep the last XX versions
     elsif ($AllButKeepLast) {
 
-        my $VersionsAll = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionListAll();
+        my $VersionsAll = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll();
 
         my @VersionsToDelete;
 
@@ -402,7 +402,7 @@ sub DeleteConfigItems {
 
     # delete specified config items
     for my $ConfigItemID ( @{ $Param{ConfigItemIDs} } ) {
-        my $True = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemDelete(
+        my $True = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemDelete(
             ConfigItemID => $ConfigItemID,
             UserID       => 1,
         );
@@ -427,7 +427,7 @@ sub DeleteConfigItemVersions {
 
     $Self->Print("<green>Deleting config item versions.</green>\n\n");
 
-    $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionDelete(
+    $Kernel::OM->Get('ITSMConfigItem')->VersionDelete(
         VersionIDs => $Param{VersionIDs},
         UserID     => 1,
     );

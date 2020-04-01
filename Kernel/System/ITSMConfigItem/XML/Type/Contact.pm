@@ -14,8 +14,8 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
+    'Contact',
+    'Log',
 );
 
 =head1 NAME
@@ -36,7 +36,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeCustomerBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::Contact');
+    my $XMLTypeCustomerBackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::Contact');
 
 =cut
 
@@ -65,7 +65,7 @@ sub ValueLookup {
 
     return '' if !$Param{Value};
 
-    my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Param{Value}
     );
 
@@ -93,7 +93,7 @@ sub StatsAttributeCreate {
     # check needed stuff
     for my $Argument (qw(Key Name Item)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -202,7 +202,7 @@ sub ValidateValue {
 
     return if !$Value;
 
-    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Param{Value},
     );
 
@@ -215,7 +215,7 @@ sub ValidateValue {
     if ( defined $ContactData{ValidID} ) {
 
         # return false if customer is not valid
-        if ( $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $ContactData{ValidID} ) ne 'valid' ) {
+        if ( $Kernel::OM->Get('Valid')->ValidLookup( ValidID => $ContactData{ValidID} ) ne 'valid' ) {
             return 'invalid contact';
         }
     }

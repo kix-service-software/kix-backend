@@ -16,11 +16,11 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my %NewSessionData = (
     UserLogin => 'root',
@@ -29,7 +29,7 @@ my %NewSessionData = (
 );
 
 # get session object
-my $SessionObject = $Kernel::OM->Get('Kernel::System::AuthSession');
+my $SessionObject = $Kernel::OM->Get('AuthSession');
 
 my $SessionID = $SessionObject->CreateSessionID(%NewSessionData);
 
@@ -41,7 +41,7 @@ $Self->True(
 my ( $Result, $ExitCode );
 
 # get ListAll command object
-my $ListAllCommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Session::ListAll');
+my $ListAllCommandObject = $Kernel::OM->Get('Console::Command::Maint::Session::ListAll');
 {
     local *STDOUT;
     open STDOUT, '>:utf8', \$Result;    ## no critic
@@ -60,7 +60,7 @@ $Self->True(
 );
 
 # get DeleteAll command object
-my $DeleteAllCommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Session::DeleteAll');
+my $DeleteAllCommandObject = $Kernel::OM->Get('Console::Command::Maint::Session::DeleteAll');
 
 $ExitCode = $DeleteAllCommandObject->Execute();
 
@@ -98,9 +98,9 @@ $Self->True(
 $SessionID = $SessionObject->CreateSessionID(%NewSessionData);
 
 # get DeleteExpired command object
-my $DeleteExpiredCommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Session::DeleteExpired');
+my $DeleteExpiredCommandObject = $Kernel::OM->Get('Console::Command::Maint::Session::DeleteExpired');
 
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SessionMaxTime',
     Value => 10000
 );
@@ -122,7 +122,7 @@ $Self->Is(
 undef $Result;
 
 # get ListExpired command object
-my $ListExpiredCommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Session::ListExpired');
+my $ListExpiredCommandObject = $Kernel::OM->Get('Console::Command::Maint::Session::ListExpired');
 {
     local *STDOUT;
     open STDOUT, '>:utf8', \$Result;    ## no critic
@@ -140,7 +140,7 @@ $Self->True(
     "SessionID is not listed as expired",
 );
 
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SessionMaxTime',
     Value => -1
 );

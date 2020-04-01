@@ -16,16 +16,16 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Ticket::PendingCheck');
-my $TimeObject    = $Kernel::OM->Get('Kernel::System::Time');
-my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::PendingCheck');
+my $TimeObject    = $Kernel::OM->Get('Time');
+my $TicketObject  = $Kernel::OM->Get('Ticket');
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'My ticket created by Agent A',

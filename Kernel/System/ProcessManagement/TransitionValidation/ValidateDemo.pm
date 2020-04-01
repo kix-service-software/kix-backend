@@ -16,7 +16,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ValidateDemoObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionValidation::ValidateDemo');
+    my $ValidateDemoObject = $Kernel::OM->Get('ProcessManagement::TransitionValidation::ValidateDemo');
 
 =cut
 
@@ -77,7 +77,7 @@ sub Validate {
 
     for my $Needed (qw(Data)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -87,7 +87,7 @@ sub Validate {
 
     # Check if we have Data to check against transitions conditions
     if ( !IsHashRefWithData( $Param{Data} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Data has no values!",
         );

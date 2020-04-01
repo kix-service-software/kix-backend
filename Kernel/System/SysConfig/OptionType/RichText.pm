@@ -16,7 +16,7 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME

@@ -139,7 +139,7 @@ sub Run {
                         $SearchParam{Search} = $Value;
                     }
 
-                    %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+                    %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                         %SearchParam,
                         Valid => 0
                     );
@@ -179,7 +179,7 @@ sub Run {
     }
     else {
         # get contact list
-        %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactList(
+        %ContactList = $Kernel::OM->Get('Contact')->ContactList(
             Valid => 0
         );
     }
@@ -230,11 +230,11 @@ sub _DoFulltextSearch {
             for my $AndSearchString (@AndCombinedGroups) {
 
                 $AndSearchString = '*' . $AndSearchString . '*';
-                my %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+                my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                     Search => $AndSearchString,
                     Valid  => 0
                 );
-                my %LoginResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+                my %LoginResult = $Kernel::OM->Get('Contact')->ContactSearch(
                     Login => $AndSearchString,
                     Valid  => 0
                 );

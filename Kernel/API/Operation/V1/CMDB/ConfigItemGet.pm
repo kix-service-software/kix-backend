@@ -128,7 +128,7 @@ sub Run {
     my @ConfigItemList;
     foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {                 
 
-        my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
             ConfigItemID => $ConfigItemID,
         );
 

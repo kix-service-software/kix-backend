@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQCategory::FAQArticleAttachmentGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQCategory::FAQArticleAttachmentGet');
 
     return $Self;
 }
@@ -125,7 +125,7 @@ sub Run {
     foreach my $AttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
         # get the FAQCategory data
-        my %Attachment = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentGet(
+        my %Attachment = $Kernel::OM->Get('FAQ')->AttachmentGet(
             FileID => $AttachmentID,
             ItemID => $Param{Data}->{FAQArticleID},
             UserID => $Self->{Authorization}->{UserID},

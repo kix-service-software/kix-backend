@@ -71,7 +71,7 @@ sub new {
     }
 
     # init all validators
-    my $ValidatorList = $Kernel::OM->Get('Kernel::Config')->Get('API::Validator::Module');
+    my $ValidatorList = $Kernel::OM->Get('Config')->Get('API::Validator::Module');
     
     foreach my $Validator (sort keys %{$ValidatorList}) {
         if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/ ) {
@@ -83,18 +83,16 @@ sub new {
             next;
         }
 
-        my $Backend = 'Kernel::API::Validator::' . $ValidatorList->{$Validator}->{Module};
-
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
+        if ( !$Kernel::OM->Get('Main')->Require($ValidatorList->{$Validator}->{Module}) ) {
             return $Self->_Error( 
                 Code    => 'Validator.InternalError',
-                Message => "Validator $Backend not found." 
+                Message => "Validator $ValidatorList->{$Validator}->{Module} not found." 
             );
         }
-        my $BackendObject = $Backend->new( %{$Self} );
+        my $BackendObject = $ValidatorList->{$Validator}->{Module}->new( %{$Self} );
 
         # if the backend constructor failed, it returns an error hash, pass it on in this case
-        if ( ref $BackendObject ne $Backend ) {
+        if ( ref $BackendObject ne $ValidatorList->{$Validator}->{Module} ) {
             return $BackendObject;
         }
 

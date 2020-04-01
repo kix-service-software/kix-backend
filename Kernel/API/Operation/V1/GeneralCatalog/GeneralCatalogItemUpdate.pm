@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalogItemUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::GeneralCatalogItemUpdate');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     );
 
     # check if GeneralCatalog exists 
-    my $GeneralCatalogData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+    my $GeneralCatalogData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID => $Param{Data}->{GeneralCatalogItemID},
     );
 
@@ -140,7 +140,7 @@ sub Run {
     }
 
     # update GeneralCatalog
-    my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemUpdate(
+    my $Success = $Kernel::OM->Get('GeneralCatalog')->ItemUpdate(
         ItemID   => $Param{Data}->{GeneralCatalogItemID},    
         Class    => $GeneralCatalogItem->{Class} || $GeneralCatalogData->{Class},
         Name     => $GeneralCatalogItem->{Name} || $GeneralCatalogData->{Name},

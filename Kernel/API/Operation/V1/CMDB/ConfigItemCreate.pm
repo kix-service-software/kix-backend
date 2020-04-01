@@ -79,7 +79,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     # get valid ClassIDs
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
         Valid => 1,
     );
@@ -153,7 +153,7 @@ sub Run {
     }
 
     # create new config item
-    my $ConfigItemID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemAdd(
+    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
         Number  => $ConfigItem->{Number},
         ClassID => $ConfigItem->{ClassID},
         UserID  => $Self->{Authorization}->{UserID},

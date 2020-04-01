@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CheckItem',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'CheckItem',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -36,7 +36,7 @@ sub Run {
     # check needed stuff
     for (qw(TicketID UserID Type)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -45,7 +45,7 @@ sub Run {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket data without dynamic fields
     my %Ticket = $TicketObject->TicketGet(
@@ -56,7 +56,7 @@ sub Run {
     return if !%Ticket;
 
     # get queue config
-    my $Queues = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Permission::InvolvedCheck::Queues');
+    my $Queues = $Kernel::OM->Get('Config')->Get('Ticket::Permission::InvolvedCheck::Queues');
 
     # check queues
     if ( $Queues && ref $Queues eq 'HASH' && %{$Queues} && $Ticket{Queue} ) {
@@ -64,7 +64,7 @@ sub Run {
         return if !$Queues->{ $Ticket{Queue} };
 
         # get check item object
-        my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+        my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
         # extract permission list
         my @PermissionList = split ',', $Queues->{ $Ticket{Queue} };

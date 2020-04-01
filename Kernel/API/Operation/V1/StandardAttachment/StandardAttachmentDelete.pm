@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
-        my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(
+        my %Result = $Kernel::OM->Get('StdAttachment')->StdAttachmentStandardTemplateMemberList(
             AttachmentID => $AttachmentID,
         );
 
@@ -121,7 +121,7 @@ sub Run {
         }
 
         # delete StandardAttachment	    
-        my $Success = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentDelete(
+        my $Success = $Kernel::OM->Get('StdAttachment')->StdAttachmentDelete(
             ID     => $AttachmentID,
             UserID => $Self->{Authorization}->{UserID},
         );

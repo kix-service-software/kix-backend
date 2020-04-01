@@ -18,14 +18,14 @@ use File::Path qw(rmtree);
 use Kernel::System::SysConfig;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Cache',
-    'Kernel::System::Contact',
-    'Kernel::System::Role',
-    'Kernel::System::Main',
-    'Kernel::System::UnitTest',
-    'Kernel::System::User',
+    'Config',
+    'DB',
+    'Cache',
+    'Contact',
+    'Role',
+    'Main',
+    'UnitTest',
+    'User',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ construct a helper object.
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::UnitTest::Helper' => {
+        'UnitTest::Helper' => {
             RestoreDatabase            => 1,        # runs the test in a transaction,
                                                     # and roll it back in the destructor
                                                     #
@@ -53,7 +53,7 @@ construct a helper object.
                                                     # yourself.
         },
     );
-    my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+    my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 =cut
 
@@ -66,7 +66,7 @@ sub new {
 
     $Self->{Debug} = $Param{Debug} || 0;
 
-    $Self->{UnitTestObject} = $Kernel::OM->Get('Kernel::System::UnitTest');
+    $Self->{UnitTestObject} = $Kernel::OM->Get('UnitTest');
 
     # remove any leftover configuration changes from aborted previous runs
     $Self->ConfigSettingCleanup();
@@ -98,7 +98,7 @@ sub new {
 
     # disable debugging
     foreach my $Type ( qw(Permission Cache) ) {
-        my $Success = $Kernel::OM->Get('Kernel::Config')->Set(
+        my $Success = $Kernel::OM->Get('Config')->Set(
             Key   => $Type."::Debug",
             Value => 0,
         );
@@ -171,7 +171,7 @@ sub TestUserCreate {
     my ( $Self, %Param ) = @_;
 
     # disable email checks to create new user
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     local $ConfigObject->{CheckEmailAddresses} = 0;
 
     # create test user
@@ -183,7 +183,7 @@ sub TestUserCreate {
 
         $TestUserLogin = $Self->GetRandomID();
 
-        $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+        $TestUserID = $Kernel::OM->Get('User')->UserAdd(
             UserLogin    => $TestUserLogin,
             UserPw       => $TestUserLogin,
             ValidID      => 1,
@@ -191,7 +191,7 @@ sub TestUserCreate {
             IsAgent      => 1,
         );
 
-        $TestUserContactID =  $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+        $TestUserContactID =  $Kernel::OM->Get('Contact')->ContactAdd(
             AssignedUserID        => $TestUserID,
             Firstname             => $TestUserLogin,
             Lastname              => $TestUserLogin,
@@ -221,7 +221,7 @@ sub TestUserCreate {
     for my $RoleName ( @{ $Param{Roles} || [] } ) {
 
         # get role object
-        my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+        my $RoleObject = $Kernel::OM->Get('Role');
 
         my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
         die "Cannot find role $RoleName" if ( !$RoleID );
@@ -237,7 +237,7 @@ sub TestUserCreate {
 
     # set user language
     my $UserLanguage = $Param{Language} || 'en';
-    $Kernel::OM->Get('Kernel::System::User')->SetPreferences(
+    $Kernel::OM->Get('User')->SetPreferences(
         UserID => $TestUserID,
         Key    => 'UserLanguage',
         Value  => $UserLanguage,
@@ -263,7 +263,7 @@ sub TestContactCreate {
     my ( $Self, %Param ) = @_;
 
     # disable email checks to create new user
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     local $ConfigObject->{CheckEmailAddresses} = 0;
 
     # create test user
@@ -276,7 +276,7 @@ sub TestContactCreate {
 
         $TestContactLogin = $Self->GetRandomID();
 
-        $TestContactUserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+        $TestContactUserID = $Kernel::OM->Get('User')->UserAdd(
             UserLogin    => $TestContactLogin,
             UserPw       => $TestContactLogin,
             ValidID      => 1,
@@ -284,14 +284,14 @@ sub TestContactCreate {
             IsCustomer   => 1,
         );
 
-        $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+        $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
             Number  => $TestContactLogin,
             Name    => $TestContactLogin,
             ValidID => 1,
             UserID  => 1,
         );
 
-        $TestContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+        $TestContactID = $Kernel::OM->Get('Contact')->ContactAdd(
             Firstname             => $TestContactLogin,
             Lastname              => $TestContactLogin,
             PrimaryOrganisationID => $OrgID,
@@ -320,7 +320,7 @@ sub TestContactCreate {
 
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
-    $Kernel::OM->Get('Kernel::System::Contact')->SetPreferences(
+    $Kernel::OM->Get('Contact')->SetPreferences(
         ContactID => $TestContactID,
         Key       => 'UserLanguage',
         Value     => $UserLanguage,
@@ -353,7 +353,7 @@ Returns the ID and Name of the new role
 sub TestRoleCreate {
     my ( $Self, %Param ) = @_;
 
-    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+    my $RoleObject = $Kernel::OM->Get('Role');
 
     # add ticket_read role
     my $RoleID = $RoleObject->RoleAdd(
@@ -403,7 +403,7 @@ Starts a database transaction (in order to isolate the test from the static data
 
 sub BeginWork {
     my ( $Self, %Param ) = @_;
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     $DBObject->Connect();
     return $DBObject->{dbh}->begin_work();
 }
@@ -418,7 +418,7 @@ Rolls back the current database transaction.
 
 sub Rollback {
     my ( $Self, %Param ) = @_;
-    my $DatabaseHandle = $Kernel::OM->Get('Kernel::System::DB')->{dbh};
+    my $DatabaseHandle = $Kernel::OM->Get('DB')->{dbh};
 
     # if there is no database handle, there's nothing to rollback
     if ($DatabaseHandle) {
@@ -436,10 +436,10 @@ returns a hostname for HTTP based tests, possibly including the port.
 sub GetTestHTTPHostname {
     my ( $Self, %Param ) = @_;
 
-    my $Host = $Kernel::OM->Get('Kernel::Config')->Get('TestHTTPHostname');
+    my $Host = $Kernel::OM->Get('Config')->Get('TestHTTPHostname');
     return $Host if $Host;
 
-    my $FQDN = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
 
     # try to resolve fqdn host
     if ( $FQDN ne 'yourhost.example.com' && gethostbyname($FQDN) ) {
@@ -481,9 +481,9 @@ sub FixedTimeSet {
     # This is needed to reload objects that directly use the time functions
     #   to get a hold of the overrides.
     my @Objects = (
-        'Kernel::System::Time',
-        'Kernel::System::Cache::FileStorable',
-        'Kernel::System::PID',
+        'Time',
+        'Cache::FileStorable',
+        'PID',
     );
 
     for my $Object (@Objects) {
@@ -493,7 +493,7 @@ sub FixedTimeSet {
         if ( $INC{$FilePath} ) {
             no warnings 'redefine';
             delete $INC{$FilePath};
-            $Kernel::OM->Get('Kernel::System::Main')->Require($Object);
+            $Kernel::OM->Get('Main')->Require($Object);
         }
     }
 
@@ -578,12 +578,12 @@ sub DESTROY {
     # restore database, clean caches
     if ( $Self->{RestoreDatabase} ) {
         my $RollbackSuccess = $Self->Rollback();
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+        $Kernel::OM->Get('Cache')->CleanUp();
         $Self->{UnitTestObject}->True( $RollbackSuccess, 'Rolled back all database changes and cleaned up the cache.' );
     }
 
     # disable email checks to create new user
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     local $ConfigObject->{Config}->{CheckEmailAddresses} = 0;
 
     # cleanup temporary article directory
@@ -596,11 +596,11 @@ sub DESTROY {
         TESTUSERS:
         for my $TestUser ( @{ $Self->{TestUsers} } ) {
 
-            my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            my %User = $Kernel::OM->Get('User')->GetUserData(
                 UserID => $TestUser,
             );
 
-            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                 UserID => $TestUser,
             );
 
@@ -613,7 +613,7 @@ sub DESTROY {
             }
 
             # make test user invalid
-            my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
+            my $Success = $Kernel::OM->Get('User')->UserUpdate(
                 %User,
                 ValidID      => 2,
                 ChangeUserID => 1,
@@ -621,7 +621,7 @@ sub DESTROY {
 
             $Self->{UnitTestObject}->True( $Success, "Set test user $TestUser to invalid" );
 
-            $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+            $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
                 %Contact,
                 ValidID      => 2,
                 ChangeUserID => 1,
@@ -630,10 +630,10 @@ sub DESTROY {
             $Self->{UnitTestObject}->True( $Success, "Set test contact $Contact{ID} for user $TestUser to invalid" );
 
             # disable assigned organisation
-            my %Organisation = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $Contact{PrimaryOrganisationID}
             );
-            $Success = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationUpdate(
+            $Success = $Kernel::OM->Get('Organisation')->OrganisationUpdate(
                 %Organisation,
                 ID      => $Contact{PrimaryOrganisationID},
                 ValidID => 2,
@@ -651,7 +651,7 @@ sub DESTROY {
         TESTROLES:
         for my $TestRole ( @{ $Self->{TestRoles} } ) {
 
-            my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+            my %Role = $Kernel::OM->Get('Role')->RoleGet(
                 ID => $TestRole,
             );
 
@@ -664,7 +664,7 @@ sub DESTROY {
             }
 
             # make test role invalid
-            my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUpdate(
+            my $Success = $Kernel::OM->Get('Role')->RoleUpdate(
                 %Role,
                 ValidID      => 2,
                 ChangeUserID => 1,
@@ -702,7 +702,7 @@ sub ConfigSettingChange {
     die "Need 'Key'" if !defined $Key;
 
     # Also set at runtime in the ConfigObject. This will be destroyed at the end of the unit test.
-    $Kernel::OM->Get('Kernel::Config')->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => $Key,
         Value => $Valid ? $Value : undef,
     );
@@ -731,7 +731,7 @@ switch the article storage directory to a temporary one to prevent collisions;
 sub UseTmpArticleDir {
     my ( $Self, %Param ) = @_;
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my $TmpArticleDir;
     TRY:

@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand Kernel::System::Console::Command::Admin::Package::List);
 
 our @ObjectDependencies = (
-    'Kernel::System::Package',
+    'Package',
 );
 
 sub Configure {
@@ -49,7 +49,7 @@ sub Run {
     return $Self->ExitCodeError() if !$FileString;
 
     # parse package
-    my %Structure = $Kernel::OM->Get('Kernel::System::Package')->PackageParse(
+    my %Structure = $Kernel::OM->Get('Package')->PackageParse(
         String => $FileString,
     );
 
@@ -70,7 +70,7 @@ sub Run {
     }
 
     # upgrade
-    my $Success = $Kernel::OM->Get('Kernel::System::Package')->PackageUpgrade(
+    my $Success = $Kernel::OM->Get('Package')->PackageUpgrade(
         String => $FileString,
         Force  => $Self->GetOption('force'),
     );

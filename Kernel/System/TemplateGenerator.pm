@@ -18,23 +18,23 @@ use Kernel::Language;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::AutoResponse',
-    'Kernel::System::Contact',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Encode',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::Log',
-    'Kernel::System::Queue',
-    'Kernel::System::Salutation',
-    'Kernel::System::Signature',
-    'Kernel::System::StandardTemplate',
-    'Kernel::System::SystemAddress',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
-    'Kernel::Output::HTML::Layout',
-    'Kernel::System::JSON',
+    'Config',
+    'AutoResponse',
+    'Contact',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Encode',
+    'HTMLUtils',
+    'Log',
+    'Queue',
+    'Salutation',
+    'Signature',
+    'StandardTemplate',
+    'SystemAddress',
+    'Ticket',
+    'User',
+    'Output::HTML::Layout',
+    'JSON',
 
 );
 
@@ -58,7 +58,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
+    my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
 =cut
 
@@ -69,7 +69,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{RichText} = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::RichText');
+    $Self->{RichText} = $Kernel::OM->Get('Config')->Get('Frontend::RichText');
 
     # KIX4OTRS-capeIT
     $Self->{UserLanguage} = $Param{UserLanguage};
@@ -103,7 +103,7 @@ sub Sender {
     # check needed stuff
     for (qw( UserID QueueID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -112,12 +112,12 @@ sub Sender {
     }
 
     # get sender attributes
-    my %Address = $Kernel::OM->Get('Kernel::System::Queue')->GetSystemAddress(
+    my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress(
         QueueID => $Param{QueueID},
     );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check config for agent real name
     my $UseAgentRealName = $ConfigObject->Get('Ticket::DefineEmailFrom');
@@ -189,7 +189,7 @@ sub Template {
     # check needed stuff
     for (qw(TemplateID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -197,7 +197,7 @@ sub Template {
         }
     }
 
-    my %Template = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateGet(
+    my %Template = $Kernel::OM->Get('StandardTemplate')->StandardTemplateGet(
         ID => $Param{TemplateID},
     );
 
@@ -209,7 +209,7 @@ sub Template {
         )
     {
         $Template{ContentType} = 'text/html';
-        $Template{Template}    = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+        $Template{Template}    = $Kernel::OM->Get('HTMLUtils')->ToHTML(
             String => $Template{Template},
         );
     }
@@ -222,7 +222,7 @@ sub Template {
         )
     {
         $Template{ContentType} = 'text/plain';
-        $Template{Template}    = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+        $Template{Template}    = $Kernel::OM->Get('HTMLUtils')->ToAscii(
             String => $Template{Template},
         );
     }
@@ -232,19 +232,19 @@ sub Template {
     if ( defined $Param{TicketID} ) {
 
         # get ticket data
-        my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID => $Param{TicketID},
         );
 
         # get recipient
-        my %User = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %User = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $Ticket{ContactID},
         );
         $Language = $User{UserLanguage};
     }
 
     # if customer language is not defined, set default language
-    $Language //= $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
+    $Language //= $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
 
     # replace place holder stuff
     my @ListOfUnSupportedTag = qw/KIX_AGENT_SUBJECT KIX_AGENT_BODY KIX_CUSTOMER_BODY KIX_CUSTOMER_SUBJECT/;
@@ -292,7 +292,7 @@ sub Attributes {
     # check needed stuff
     for (qw(TicketID Data UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -301,7 +301,7 @@ sub Attributes {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get queue
     my %Ticket = $TicketObject->TicketGet(
@@ -361,7 +361,7 @@ sub AutoResponse {
     # check needed stuff
     for (qw(TicketID AutoResponseType OrigHeader UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -370,7 +370,7 @@ sub AutoResponse {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket
     my %Ticket = $TicketObject->TicketGet(
@@ -379,7 +379,7 @@ sub AutoResponse {
     );
 
     # get auto default responses
-    my %AutoResponse = $Kernel::OM->Get('Kernel::System::AutoResponse')->AutoResponseGetByTypeQueueID(
+    my %AutoResponse = $Kernel::OM->Get('AutoResponse')->AutoResponseGetByTypeQueueID(
         QueueID => $Ticket{QueueID},
         Type    => $Param{AutoResponseType},
     );
@@ -427,17 +427,17 @@ sub AutoResponse {
     }
 
     # get recipient
-    my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Ticket{ContactID},
     );
 
     # get user language
-    my $Language = $Contact{Language} || $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
+    my $Language = $Contact{Language} || $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
 
     # do text/plain to text/html convert
     if ( $Self->{RichText} && $AutoResponse{ContentType} =~ /text\/plain/i ) {
         $AutoResponse{ContentType} = 'text/html';
-        $AutoResponse{Text}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+        $AutoResponse{Text}        = $Kernel::OM->Get('HTMLUtils')->ToHTML(
             String => $AutoResponse{Text},
         );
     }
@@ -445,7 +445,7 @@ sub AutoResponse {
     # do text/html to text/plain convert
     if ( !$Self->{RichText} && $AutoResponse{ContentType} =~ /text\/html/i ) {
         $AutoResponse{ContentType} = 'text/plain';
-        $AutoResponse{Text}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+        $AutoResponse{Text}        = $Kernel::OM->Get('HTMLUtils')->ToAscii(
             String => $AutoResponse{Text},
         );
     }
@@ -486,7 +486,7 @@ sub AutoResponse {
     # get sender attributes based on auto response type
     if ( $AutoResponse{SystemAddressID} ) {
 
-        my %Address = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
+        my %Address = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
             ID => $AutoResponse{SystemAddressID},
         );
 
@@ -497,7 +497,7 @@ sub AutoResponse {
     # get sender attributes based on queue
     else {
 
-        my %Address = $Kernel::OM->Get('Kernel::System::Queue')->GetSystemAddress(
+        my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress(
             QueueID => $Ticket{QueueID},
         );
 
@@ -508,11 +508,11 @@ sub AutoResponse {
     # add urls and verify to be full html document
     if ( $Self->{RichText} ) {
 
-        $AutoResponse{Text} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
+        $AutoResponse{Text} = $Kernel::OM->Get('HTMLUtils')->LinkQuote(
             String => $AutoResponse{Text},
         );
 
-        $AutoResponse{Text} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentComplete(
+        $AutoResponse{Text} = $Kernel::OM->Get('HTMLUtils')->DocumentComplete(
             Charset => 'utf-8',
             String  => $AutoResponse{Text},
         );
@@ -541,7 +541,7 @@ sub NotificationEvent {
     # check needed stuff
     for my $Needed (qw(TicketID Notification Recipient UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -550,7 +550,7 @@ sub NotificationEvent {
     }
 
     if ( !IsHashRefWithData( $Param{Notification} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Notification is invalid!",
         );
@@ -566,7 +566,7 @@ sub NotificationEvent {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket
     my %Ticket = $TicketObject->TicketGet(
@@ -600,7 +600,7 @@ sub NotificationEvent {
     }
 
     # get  HTMLUtils object
-    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
     # set the accounted time as part of the articles information
     ARTICLE:
@@ -617,7 +617,7 @@ sub NotificationEvent {
     }
 
     # get system default language
-    my $DefaultLanguage = $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
+    my $DefaultLanguage = $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
 
     my $Languages = [ $Param{Recipient}->{UserLanguage}, $DefaultLanguage, 'en' ];
 
@@ -712,7 +712,7 @@ sub NotificationEvent {
     # do text/plain to text/html convert
     if ( $Self->{RichText} && $Notification{ContentType} =~ /text\/plain/i ) {
         $Notification{ContentType} = 'text/html';
-        $Notification{Body}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+        $Notification{Body}        = $Kernel::OM->Get('HTMLUtils')->ToHTML(
             String => $Notification{Body},
         );
     }
@@ -720,7 +720,7 @@ sub NotificationEvent {
     # do text/html to text/plain convert
     if ( !$Self->{RichText} && $Notification{ContentType} =~ /text\/html/i ) {
         $Notification{ContentType} = 'text/plain';
-        $Notification{Body}        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+        $Notification{Body}        = $Kernel::OM->Get('HTMLUtils')->ToAscii(
             String => $Notification{Body},
         );
     }
@@ -773,7 +773,7 @@ sub NotificationEvent {
     # add URLs and verify to be full HTML document
     if ( $Self->{RichText} ) {
 
-        $Notification{Body} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
+        $Notification{Body} = $Kernel::OM->Get('HTMLUtils')->LinkQuote(
             String => $Notification{Body},
         );
     }
@@ -793,13 +793,13 @@ sub ReplacePlaceHolder {
     # check needed stuff
     for (qw(Text Data UserID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
     if ( !defined $Param{Language} || !$Param{Language}) {
-        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+        my $ConfigObject = $Kernel::OM->Get('Config');
         $Param{Language}
             = $Self->{UserLanguage}
             || $ConfigObject->Get('DefaultLanguage')
@@ -823,7 +823,7 @@ sub _Replace {
     # check needed stuff
     for (qw(Text RichText Data UserID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -876,7 +876,7 @@ sub _Replace {
 
     my %Ticket;
     if ( $Param{TicketID} ) {
-        %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+        %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID      => $Param{TicketID},
             DynamicFields => 1,
         );
@@ -912,12 +912,12 @@ sub _Replace {
 
     my %Queue;
     if ( $Param{QueueID} ) {
-        %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+        %Queue = $Kernel::OM->Get('Queue')->QueueGet(
             ID => $Param{QueueID},
         );
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     #rbo - T2016121190001552 - added KIX placeholders
     # replace config options
@@ -940,7 +940,7 @@ sub _Replace {
     my %Recipient = %{ $Param{Recipient} || {} };
 
     # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     if ( !%Recipient && $Param{RecipientID} ) {
 
@@ -978,7 +978,7 @@ sub _Replace {
             ATTRIBUTE:
             for my $Attribute ( sort keys %Recipient ) {
                 next ATTRIBUTE if !$Recipient{$Attribute};
-                $Recipient{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Recipient{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Recipient{$Attribute},
                 );
             }
@@ -1009,7 +1009,7 @@ sub _Replace {
             ATTRIBUTE:
             for my $Attribute ( sort keys %Owner ) {
                 next ATTRIBUTE if !$Owner{$Attribute};
-                $Owner{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Owner{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Owner{$Attribute},
                 );
             }
@@ -1040,7 +1040,7 @@ sub _Replace {
             ATTRIBUTE:
             for my $Attribute ( sort keys %Responsible ) {
                 next ATTRIBUTE if !$Responsible{$Attribute};
-                $Responsible{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Responsible{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Responsible{$Attribute},
                 );
             }
@@ -1068,7 +1068,7 @@ sub _Replace {
 
         # EO KIX4OTRS-capeIT
 
-        my %CurrentContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %CurrentContact = $Kernel::OM->Get('Contact')->ContactGet(
             UserID        => $Param{UserID},
         );
 
@@ -1078,7 +1078,7 @@ sub _Replace {
             ATTRIBUTE:
             for my $Attribute ( sort keys %CurrentContact ) {
                 next ATTRIBUTE if !$CurrentContact{$Attribute};
-                $CurrentContact{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $CurrentContact{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $CurrentContact{$Attribute},
                 );
             }
@@ -1107,7 +1107,7 @@ sub _Replace {
         ATTRIBUTE:
         for my $Attribute ( sort keys %Ticket ) {
             next ATTRIBUTE if !$Ticket{$Attribute};
-            $Ticket{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+            $Ticket{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                 String => $Ticket{$Attribute},
             );
         }
@@ -1136,8 +1136,8 @@ sub _Replace {
     my %DynamicFieldShortDisplayValues;
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # get the dynamic fields for ticket object
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
@@ -1272,7 +1272,7 @@ sub _Replace {
             for my $Attribute ( sort keys %Data ) {
                 next ATTRIBUTE if !$Data{$Attribute};
 
-                $Data{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Data{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Data{$Attribute},
                 );
             }
@@ -1289,12 +1289,12 @@ sub _Replace {
                     # remove spaces
                     $Data{Body} =~ s/\n/ /gms;
 
-                    my $Body = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+                    my $Body = $Kernel::OM->Get('JSON')->Decode(
                         Data => $Data{Body},
                     );
 
                     # replace body with HTML text
-                    $Data{Body} = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->Output(
+                    $Data{Body} = $Kernel::OM->Get('Output::HTML::Layout')->Output(
                         TemplateFile => "ChatDisplay",
                         Data         => {
                             ChatMessages => $Body,
@@ -1356,7 +1356,7 @@ sub _Replace {
 
                     # add quote
                     $NewOldBody = "<blockquote type=\"cite\">$NewOldBody</blockquote>";
-                    $NewOldBody = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentCleanup(
+                    $NewOldBody = $Kernel::OM->Get('HTMLUtils')->DocumentCleanup(
                         String => $NewOldBody,
                     );
                 }
@@ -1371,7 +1371,7 @@ sub _Replace {
             if ( $Param{Text} =~ /$Tag\[(.+?)\]$End/g ) {
 
                 my $SubjectChar = $1;
-                my $Subject     = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSubjectClean(
+                my $Subject     = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
                     TicketNumber => $Ticket{TicketNumber},
                     Subject      => $Data{Subject},
                 );
@@ -1417,7 +1417,7 @@ sub _Replace {
 
                 if ( $Ticket{ContactID} ) {
 
-                    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')
+                    my %ContactData = $Kernel::OM->Get('Contact')
                         ->ContactGet( ID => $Ticket{ContactID} );
 
                     if (
@@ -1433,7 +1433,7 @@ sub _Replace {
                         || $Param{AutoResponse}
                         )
                     {
-                        $From = $Kernel::OM->Get('Kernel::System::Contact')->_ContactFullname(
+                        $From = $Kernel::OM->Get('Contact')->_ContactFullname(
                             Firstname => $ContactData{Firstname},
                             Lastname => $ContactData{Lastname},
                             UserLogin => $Ticket{ContactID}
@@ -1489,7 +1489,7 @@ sub _Replace {
 
         my $ContactID = $Param{Data}->{ContactID} || $Ticket{ContactID};
 
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $ContactID,
         );
 
@@ -1499,7 +1499,7 @@ sub _Replace {
             ATTRIBUTE:
             for my $Attribute ( sort keys %Contact ) {
                 next ATTRIBUTE if !$Contact{$Attribute};
-                $Contact{$Attribute} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Contact{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Contact{$Attribute},
                 );
             }
@@ -1518,7 +1518,7 @@ sub _Replace {
 
     # KIX4OTRS-capeIT
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get article data and replace it with <KIX_ARTICLE_DATA_...
     $Tag  = $Start . 'KIX_ARTICLE_';
@@ -1532,7 +1532,7 @@ sub _Replace {
         if ( $Param{RichText} ) {
             for ( keys %Article ) {
                 next if !$Article{$_};
-                $Article{$_} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Article{$_} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Article{$_},
                 );
             }
@@ -1599,7 +1599,7 @@ sub _Replace {
                     # add quote
                     $NewOldBody = "<blockquote type=\"cite\">$NewOldBody</blockquote>";
                     $NewOldBody
-                        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentStyleCleanup(
+                        = $Kernel::OM->Get('HTMLUtils')->DocumentStyleCleanup(
                         String => $NewOldBody,
                         );
                 }
@@ -1650,7 +1650,7 @@ sub _Replace {
                 # add quote
                 $NewOldBody = "<blockquote type=\"cite\">$NewOldBody</blockquote>";
                 $NewOldBody
-                    = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentStyleCleanup(
+                    = $Kernel::OM->Get('HTMLUtils')->DocumentStyleCleanup(
                     String => $NewOldBody,
                     );
             }
@@ -1675,7 +1675,7 @@ sub _Replace {
         if ( $Param{RichText} ) {
             for ( keys %Article ) {
                 next if !$Article{$_};
-                $Article{$_} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Article{$_} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Article{$_},
                 );
             }
@@ -1714,7 +1714,7 @@ sub _RemoveUnSupportedTag {
     # check needed stuff
     for my $Item (qw(Text ListOfUnSupportedTag)) {
         if ( !defined $Param{$Item} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Item!"
             );

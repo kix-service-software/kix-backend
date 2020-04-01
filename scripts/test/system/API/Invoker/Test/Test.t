@@ -34,7 +34,7 @@ my $InvokerObject = Kernel::API::Invoker->new(
 );
 $Self->Is(
     ref $InvokerObject,
-    'Kernel::API::Invoker',
+    'API::Invoker',
     'InvokerObject was correctly instantiated',
 );
 
@@ -139,7 +139,7 @@ for my $Test (@InvokerPrepareRequestTests) {
     else {
         $Self->Is(
             ref $InvokerObject,
-            'Kernel::API::Invoker',
+            'API::Invoker',
             $Test->{Name} . ' (Not Error Message).',
         );
     }

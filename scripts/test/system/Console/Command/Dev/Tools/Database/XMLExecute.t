@@ -16,18 +16,18 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Dev::Tools::Database::XMLExecute');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Dev::Tools::Database::XMLExecute');
 
 my ( $Result, $ExitCode );
 
-my $Home           = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home           = $Kernel::OM->Get('Config')->Get('Home');
 my $TableCreateXML = "$Home/scripts/test/system/Console/Command/Dev/Tools/Database/XMLExecute/TableCreate.xml";
 my $TableDropXML   = "$Home/scripts/test/system/Console/Command/Dev/Tools/Database/XMLExecute/TableDrop.xml";
 
@@ -46,14 +46,14 @@ $Self->Is(
     "Table created",
 );
 
-my $Success = $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+my $Success = $Kernel::OM->Get('DB')->Prepare(
     SQL => "SELECT * FROM test_xml_execute",
 );
 $Self->True(
     $Success,
     "SELECT after table create",
 );
-while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) { }
+while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) { }
 
 $ExitCode = $CommandObject->Execute($TableDropXML);
 $Self->Is(
@@ -62,7 +62,7 @@ $Self->Is(
     "Table dropped",
 );
 
-$Success = $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+$Success = $Kernel::OM->Get('DB')->Prepare(
     SQL => "SELECT * FROM test_xml_execute",
 );
 $Self->False(

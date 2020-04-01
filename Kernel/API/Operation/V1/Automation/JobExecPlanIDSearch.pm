@@ -110,7 +110,7 @@ perform JobExecPlanIDSearch Operation. This will return a ID list of ExecPlans w
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @ExecPlanIDs = $Kernel::OM->Get('Kernel::System::Automation')->JobExecPlanList(
+    my @ExecPlanIDs = $Kernel::OM->Get('Automation')->JobExecPlanList(
         JobID => $Param{Data}->{JobID},
     );
 

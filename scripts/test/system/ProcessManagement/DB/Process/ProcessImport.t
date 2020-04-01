@@ -17,25 +17,25 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $DynamicFieldObject     = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $ActivityObject         = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
-my $ActivityDialogObject   = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
-my $ProcessObject          = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
-my $TransitionObject       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
-my $TransitionActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
-my $YAMLObject             = $Kernel::OM->Get('Kernel::System::YAML');
+my $DynamicFieldObject     = $Kernel::OM->Get('DynamicField');
+my $ActivityObject         = $Kernel::OM->Get('ProcessManagement::DB::Activity');
+my $ActivityDialogObject   = $Kernel::OM->Get('ProcessManagement::DB::ActivityDialog');
+my $ProcessObject          = $Kernel::OM->Get('ProcessManagement::DB::Process');
+my $TransitionObject       = $Kernel::OM->Get('ProcessManagement::DB::Transition');
+my $TransitionActionObject = $Kernel::OM->Get('ProcessManagement::DB::TransitionAction');
+my $YAMLObject             = $Kernel::OM->Get('YAML');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define needed variables
 my $RandomID = $Helper->GetRandomID();
-my $Home     = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home     = $Kernel::OM->Get('Config')->Get('Home');
 my $UserID   = 1;
 
 # get a list of current processes and it parts
@@ -488,7 +488,7 @@ for my $Test (@Tests) {
     # read process for YAML file if needed
     my $FileRef;
     if ( $Test->{ProcessFile} ) {
-        $FileRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        $FileRef = $Kernel::OM->Get('Main')->FileRead(
             Location => $Home . '/scripts/test/system/sample/ProcessManagement/' . $Test->{ProcessFile},
         );
         my $RandomID = $Helper->GetRandomID();

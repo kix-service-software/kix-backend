@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::ClientRegistration',
+    'ClientRegistration',
 );
 
 sub Configure {
@@ -39,7 +39,7 @@ sub Run {
 
     my $ClientID = $Self->GetOption('client-id') || '';
 
-    my $ClientList = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationList(
+    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList(
         Notifiable => 1
     );
     if ( !$ClientList ) {
@@ -66,14 +66,14 @@ sub Run {
             next;
         }
 
-        my $Result = $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotificationSend(
+        my $Result = $Kernel::OM->Get('ClientRegistration')->NotificationSend(
             ClientID => $ClientID
         );
         if ( !$Result ) {
             $Self->PrintError("Unable to send notifications.\n");
         }
         else {
-            my $Message = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'info',
                 What => 'Message',
             );

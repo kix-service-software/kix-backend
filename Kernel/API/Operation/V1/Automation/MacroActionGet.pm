@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Automation::MacroActionGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Automation::MacroActionGet');
 
     return $Self;
 }
@@ -131,7 +131,7 @@ sub Run {
     my @MacroActionList;
 
     # check if macro exists
-    my %Macro = $Kernel::OM->Get('Kernel::System::Automation')->MacroGet(
+    my %Macro = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
     );
 
@@ -145,7 +145,7 @@ sub Run {
     foreach my $MacroActionID ( @{$Param{Data}->{MacroActionID}} ) {
 
 	    # get the MacroAction data
-	    my %MacroActionData = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionGet(
+	    my %MacroActionData = $Kernel::OM->Get('Automation')->MacroActionGet(
 	        ID => $MacroActionID,
 	    );
 

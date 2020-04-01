@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform SLA search
-    my %SLAList = $Kernel::OM->Get('Kernel::System::SLA')->SLAList(
+    my %SLAList = $Kernel::OM->Get('SLA')->SLAList(
         UserID  => $Self->{Authorization}->{UserID},
     );
 

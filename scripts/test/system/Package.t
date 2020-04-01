@@ -17,19 +17,19 @@ use vars (qw($Self));
 use File::Copy;
 
 # get needed objects
-my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
-my $CacheObject   = $Kernel::OM->Get('Kernel::System::Cache');
-my $DBObject      = $Kernel::OM->Get('Kernel::System::DB');
-my $MainObject    = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject  = $Kernel::OM->Get('Config');
+my $PackageObject = $Kernel::OM->Get('Package');
+my $CacheObject   = $Kernel::OM->Get('Cache');
+my $DBObject      = $Kernel::OM->Get('DB');
+my $MainObject    = $Kernel::OM->Get('Main');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Home = $ConfigObject->Get('Home');
 
@@ -731,35 +731,35 @@ my $String3b = '<?xml version="1.0" encoding="utf-8" ?>
   <BuildHost>yourhost.example.com</BuildHost>
   <CodeUpgrade Type="pre" Version="0.0.4">
         my $Content = "test";
-        $Kernel::OM-&gt;Get(\'Kernel::System::Main\')-&gt;FileWrite(
+        $Kernel::OM-&gt;Get(\'Main\')-&gt;FileWrite(
             Location  =&gt; "' . $TmpDir . '/test1",
             Content   =&gt; \$Content,
         );
   </CodeUpgrade>
   <CodeUpgrade Type="pre" Version="0.0.3">
         my $Content = "test";
-        $Kernel::OM-&gt;Get(\'Kernel::System::Main\')-&gt;FileWrite(
+        $Kernel::OM-&gt;Get(\'Main\')-&gt;FileWrite(
             Location  =&gt; "' . $TmpDir . '/test2",
             Content   =&gt; \$Content,
         );
   </CodeUpgrade>
   <CodeUpgrade Type="pre" Version="0.0.2">
         my $Content = "test";
-        $Kernel::OM-&gt;Get(\'Kernel::System::Main\')-&gt;FileWrite(
+        $Kernel::OM-&gt;Get(\'Main\')-&gt;FileWrite(
             Location  =&gt; "' . $TmpDir . '/test3",
             Content   =&gt; \$Content,
         );
   </CodeUpgrade>
   <CodeUpgrade Type="pre" Version="0.0.1">
         my $Content = "test";
-        $Kernel::OM-&gt;Get(\'Kernel::System::Main\')-&gt;FileWrite(
+        $Kernel::OM-&gt;Get(\'Main\')-&gt;FileWrite(
             Location  =&gt; "' . $TmpDir . '/test3b",
             Content   =&gt; \$Content,
         );
   </CodeUpgrade>
   <CodeUpgrade Type="pre">
         my $Content = "test";
-        $Kernel::OM-&gt;Get(\'Kernel::System::Main\')-&gt;FileWrite(
+        $Kernel::OM-&gt;Get(\'Main\')-&gt;FileWrite(
             Location  =&gt; "' . $TmpDir . '/test4",
             Content   =&gt; \$Content,
         );

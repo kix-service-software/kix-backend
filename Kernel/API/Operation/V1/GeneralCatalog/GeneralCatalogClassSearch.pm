@@ -77,7 +77,7 @@ perform GeneralCatalogClassSearch Operation. This will return a GeneralCatalogCl
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $GeneralCatalogClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassList();
+    my $GeneralCatalogClassList = $Kernel::OM->Get('GeneralCatalog')->ClassList();
 
     if ( $GeneralCatalogClassList ) {
         return $Self->_Success(

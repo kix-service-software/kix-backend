@@ -121,7 +121,7 @@ sub Run {
     );        
    
     # check if Address exists
-    my %AddressList = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
+    my %AddressList = $Kernel::OM->Get('AddressBook')->AddressList(
         Search => $Address->{EmailAddress},
     );
 
@@ -133,7 +133,7 @@ sub Run {
     }
 
     # create AddressBook
-    my $AddressID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressAdd(
+    my $AddressID = $Kernel::OM->Get('AddressBook')->AddressAdd(
         EmailAddress => $Address->{EmailAddress},
     );
 

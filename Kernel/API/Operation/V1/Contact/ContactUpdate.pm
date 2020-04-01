@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Contact::ContactUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Contact::ContactUpdate');
 
     return $Self;
 }
@@ -134,7 +134,7 @@ sub Run {
     );
 
     # check if Contact exists
-    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Param{Data}->{ContactID},
     );
     if ( !%ContactData ) {
@@ -144,7 +144,7 @@ sub Run {
     }
 
     if ($Contact->{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
             UserID => $Contact->{AssignedUserID},
             Silent => 1,
         );
@@ -155,7 +155,7 @@ sub Run {
             );
         }
         else {
-            my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+            my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Contact->{AssignedUserID},
                 Silent => 1,
             );
@@ -171,7 +171,7 @@ sub Run {
 
     # check ContactEmail exists
     if ( IsStringWithData( $Contact->{Email} ) ) {
-        my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+        my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
             Email  => $Contact->{Email},
             Silent => 1,
         );
@@ -185,7 +185,7 @@ sub Run {
 
     # check if primary OrganisationID exists
     if ( $Contact->{PrimaryOrganisationID} ) {
-        my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $Contact->{PrimaryOrganisationID},
         );
 
@@ -210,7 +210,7 @@ sub Run {
 
         # check each assigned customer
         foreach my $OrgID (@OrgIDs) {
-            my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
             if ( !%OrgData || $OrgData{ValidID} != 1 ) {
@@ -223,7 +223,7 @@ sub Run {
     }
 
     # update Contact
-    my $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+    my $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
         %ContactData,
         %{$Contact},
         ID     => $Param{Data}->{ContactID},

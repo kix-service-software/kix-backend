@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Crypt::SMIME',
+    'Config',
+    'Crypt::SMIME',
 );
 
 sub Configure {
@@ -45,7 +45,7 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     if ( $Self->GetOption('force') ) {
         $ConfigObject->Set(
             Key   => 'SMIME',
@@ -90,7 +90,7 @@ sub PreRun {
 
     my $CryptObject;
     eval {
-        $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+        $CryptObject = $Kernel::OM->Get('Crypt::SMIME');
     };
     if ( !$CryptObject ) {
         die "No SMIME support!.\n"
@@ -108,7 +108,7 @@ sub Run {
         $Self->Print("<yellow>Refreshing SMIME Keys...</yellow>\n");
     }
 
-    my $CheckCertPathResult = $Kernel::OM->Get('Kernel::System::Crypt::SMIME')->CheckCertPath();
+    my $CheckCertPathResult = $Kernel::OM->Get('Crypt::SMIME')->CheckCertPath();
 
     if ( $CheckCertPathResult->{$DetailLevel} ) {
         $Self->Print( $CheckCertPathResult->{$DetailLevel} );

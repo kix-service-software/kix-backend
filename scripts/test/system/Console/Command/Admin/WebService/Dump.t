@@ -16,16 +16,16 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $WebService = 'webservice' . $Helper->GetRandomID();
 
 # get web service object
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('GenericInterface::Webservice');
 
 # create a base web service
 my $WebServiceID = $WebserviceObject->WebserviceAdd(
@@ -44,7 +44,7 @@ my $WebServiceID = $WebserviceObject->WebserviceAdd(
     UserID  => 1,
 );
 
-my $Home       = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home       = $Kernel::OM->Get('Config')->Get('Home');
 my $TargetPath = "$Home/var/tmp/$WebService.yaml";
 
 # test cases
@@ -82,9 +82,9 @@ my @Tests = (
 );
 
 # get needed objects
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::WebService::Dump');
-my $MainObject    = $Kernel::OM->Get('Kernel::System::Main');
-my $YAMLObject    = $Kernel::OM->Get('Kernel::System::YAML');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::WebService::Dump');
+my $MainObject    = $Kernel::OM->Get('Main');
+my $YAMLObject    = $Kernel::OM->Get('YAML');
 
 for my $Test (@Tests) {
 

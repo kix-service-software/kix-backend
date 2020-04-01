@@ -11,7 +11,7 @@ package Kernel::API::Mapping;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsHashRefWithData IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
@@ -125,18 +125,32 @@ sub new {
     }
 
     # load backend module
-    my $GenericModule = 'Kernel::API::Mapping::' . $Param{MappingConfig}->{Type};
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
+    my $BackendReg = $Kernel::OM->Get('Config')->Get('API::Mapping::Module');
+    if ( !IsHashRefWithData($BackendReg) ) {
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',            
+            Message => "No backends found." 
+        );
+    }
+    if ( !IsHashRefWithData($BackendReg->{$Self->{MappingConfig}->{Type}}) ) {
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',            
+            Message => "Backend $Self->{MappingConfig}->{Type} not found." 
+        );
+    }
+
+    my $Backend = $BackendReg->{$Self->{MappingConfig}->{Type}}->{Module};    
+    if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
 
         return $Self->_Error(
             Code    => 'Mapping.InternalError',
-            Message => "Can't load mapping backend module!" 
+            Message => "Can't load module $Backend." 
         );
     }
-    $Self->{BackendObject} = $GenericModule->new( %{$Self} );
+    $Self->{BackendObject} = $Backend->new( %{$Self} );
 
     # pass back error message from backend if backend module could not be executed
-    return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
+    return $Self->{BackendObject} if ref $Self->{BackendObject} ne $Backend;
 
     return $Self;
 }

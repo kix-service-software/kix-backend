@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get dynamic field backend object
-my $DFBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 # theres is not really needed to add the dynamic fields for this test, we can define a static
 # set of configurations

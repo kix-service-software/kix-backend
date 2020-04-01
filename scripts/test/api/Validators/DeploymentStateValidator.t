@@ -32,13 +32,13 @@ my $ValidatorObject = Kernel::API::Validator::DeploymentStateValidator->new(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class => 'ITSM::ConfigItem::DeploymentState',
     Name  => 'Production',
 );

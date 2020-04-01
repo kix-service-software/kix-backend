@@ -15,28 +15,28 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
-my $ServiceObject      = $Kernel::OM->Get('Kernel::System::Service');
-my $QueueObject        = $Kernel::OM->Get('Kernel::System::Queue');
-my $TypeObject         = $Kernel::OM->Get('Kernel::System::Type');
-my $PriorityObject     = $Kernel::OM->Get('Kernel::System::Priority');
-my $SLAObject          = $Kernel::OM->Get('Kernel::System::SLA');
-my $StateObject        = $Kernel::OM->Get('Kernel::System::State');
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $StorableObject     = $Kernel::OM->Get('Kernel::System::Storable');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $UserObject         = $Kernel::OM->Get('User');
+my $ContactObject = $Kernel::OM->Get('Contact');
+my $ServiceObject      = $Kernel::OM->Get('Service');
+my $QueueObject        = $Kernel::OM->Get('Queue');
+my $TypeObject         = $Kernel::OM->Get('Type');
+my $PriorityObject     = $Kernel::OM->Get('Priority');
+my $SLAObject          = $Kernel::OM->Get('SLA');
+my $StateObject        = $Kernel::OM->Get('State');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $StorableObject     = $Kernel::OM->Get('Storable');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set valid options
-my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
 %ValidList = reverse %ValidList;
 
 # set user options
@@ -440,7 +440,7 @@ $Self->IsDeeply(
     "ACLs Set and Get from sysconfig",
 );
 
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # set ticket options
 my $TicketID = $TicketObject->TicketCreate(
@@ -466,7 +466,7 @@ $Self->True(
 );
 
 # set the dynamic field value
-my $DynamicFieldValueSetSuccess = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueSet(
+my $DynamicFieldValueSetSuccess = $Kernel::OM->Get('DynamicFieldValue')->ValueSet(
     FieldID  => $DynamicFieldID,
     ObjectID => $TicketID,
     Value    => [
@@ -2769,7 +2769,7 @@ $Self->True(
 );
 
 # Get role object.
-my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+my $GroupObject = $Kernel::OM->Get('Group');
 
 # Add some roles
 my $RoleID1 = $GroupObject->RoleAdd(

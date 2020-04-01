@@ -115,7 +115,7 @@ sub Run {
     foreach my $VoteID ( @{$Param{Data}->{FAQVoteID}} ) {
 
         # delete Vote
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->VoteDelete(
+        my $Success = $Kernel::OM->Get('FAQ')->VoteDelete(
             VoteID => $VoteID,
             UserID => $Self->{Authorization}->{UserID},
         );

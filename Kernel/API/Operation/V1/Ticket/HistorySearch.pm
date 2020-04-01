@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get history list
-    my @HistoryList = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryGet(
+    my @HistoryList = $Kernel::OM->Get('Ticket')->HistoryGet(
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Self->{Authorization}->{UserID},
     );

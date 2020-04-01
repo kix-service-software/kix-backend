@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
-    'Kernel::System::Package',
+    'Config',
+    'Main',
+    'Package',
 );
 
 sub Configure {
@@ -34,7 +34,7 @@ sub Run {
 
     $Self->Print("<yellow>Listing all installed package files...</yellow>\n");
 
-    my @Packages = $Kernel::OM->Get('Kernel::System::Package')->RepositoryList();
+    my @Packages = $Kernel::OM->Get('Package')->RepositoryList();
 
     PACKAGE:
     for my $Package (@Packages) {

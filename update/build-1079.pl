@@ -22,7 +22,7 @@ use Kernel::System::ObjectManager;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'db-update-build-1079.pl',
     },
 );
@@ -37,7 +37,7 @@ exit 0;
 
 sub _RemovePermissionTypeObject {
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get all ticket watchers
     return if !$DBObject->Do(

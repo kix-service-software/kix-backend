@@ -110,7 +110,7 @@ sub Run {
     foreach my $ExecPlanID ( @{$Param{Data}->{ExecPlanID}} ) {
    
         # delete ExecPlan 
-        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanDelete(
+        my $Success = $Kernel::OM->Get('Automation')->ExecPlanDelete(
             ID      => $ExecPlanID,
             UserID  => $Self->{Authorization}->{UserID},
         );

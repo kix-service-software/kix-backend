@@ -14,17 +14,17 @@ use File::Basename;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . '/Kernel/cpan-lib';
-use lib dirname($RealBin) . '/Custom';
+use lib dirname($RealBin) . '/plugins';
 
 use Kernel::System::ObjectManager;
 
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'kix.Console.pl',
     },
 );
 
-exit $Kernel::OM->Get('Kernel::System::Console')->Run(@ARGV);
+exit $Kernel::OM->Get('Console')->Run(@ARGV);
 
 
 

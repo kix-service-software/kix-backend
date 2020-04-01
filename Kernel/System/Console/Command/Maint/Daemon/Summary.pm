@@ -18,7 +18,7 @@ use Kernel::System::VariableCheck qw(IsArrayRefWithData);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub Configure {
@@ -52,7 +52,7 @@ sub PreRun {
     # do checks only if a particular daemon module is specified
     if ($DaemonName) {
 
-        my $DaemonModuleConfig = $Kernel::OM->Get('Kernel::Config')->Get('DaemonModules') || {};
+        my $DaemonModuleConfig = $Kernel::OM->Get('Config')->Get('DaemonModules') || {};
 
         # check if configuration of the daemon is valid
         if (
@@ -93,7 +93,7 @@ sub Run {
     }
 
     # get daemon modules from SysConfig
-    my $DaemonModuleConfig = $Kernel::OM->Get('Kernel::Config')->Get('DaemonModules') || {};
+    my $DaemonModuleConfig = $Kernel::OM->Get('Config')->Get('DaemonModules') || {};
 
     my @DaemonSummary;
 

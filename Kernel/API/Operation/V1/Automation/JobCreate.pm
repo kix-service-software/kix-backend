@@ -80,8 +80,8 @@ sub ParameterDefinition {
 
     my @JobTypes;
     
-    if ( IsHashRefWithData($Kernel::OM->Get('Kernel::Config')->Get('Automation::JobType')) ) {
-        @JobTypes = sort keys %{ $Kernel::OM->Get('Kernel::Config')->Get('Automation::JobType') };
+    if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Automation::JobType')) ) {
+        @JobTypes = sort keys %{ $Kernel::OM->Get('Config')->Get('Automation::JobType') };
     }
 
     return {
@@ -140,7 +140,7 @@ sub Run {
         Data => $Param{Data}->{Job}
     );
 
-    my $JobID = $Kernel::OM->Get('Kernel::System::Automation')->JobLookup(
+    my $JobID = $Kernel::OM->Get('Automation')->JobLookup(
         Name => $Job->{Name},
     );
 
@@ -152,7 +152,7 @@ sub Run {
     }
 
     # create job
-    $JobID = $Kernel::OM->Get('Kernel::System::Automation')->JobAdd(
+    $JobID = $Kernel::OM->Get('Automation')->JobAdd(
         Name     => $Job->{Name},
         Type     => $Job->{Type},
         Filter   => $Job->{Filter},

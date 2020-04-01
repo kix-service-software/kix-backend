@@ -24,19 +24,19 @@ use Kernel::System::VariableCheck qw(:all);
 use Kernel::Output::HTML::Statistics::View;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Language',
-    'Kernel::Output::HTML::Statistics::View',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::User',
-    'Kernel::System::XML',
+    'Config',
+    'Language',
+    'Output::HTML::Statistics::View',
+    'Cache',
+    'DB',
+    'Encode',
+    'Log',
+    'Main',
+    'Time',
+    'User',
+    'XML',
     # KIXCore-capeIT
-    'Kernel::System::KIXUtils',
+    'KIXUtils',
     # EO KIXCore-capeIT
 );
 
@@ -75,7 +75,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $StatsObject = $Kernel::OM->Get('Kernel::System::Stats');
+    my $StatsObject = $Kernel::OM->Get('Stats');
 
 =cut
 
@@ -87,7 +87,7 @@ sub new {
     bless( $Self, $Type );
 
     # temporary directory
-    $Self->{StatsTempDir} = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/stats/';
+    $Self->{StatsTempDir} = $Kernel::OM->Get('Config')->Get('Home') . '/var/stats/';
 
     return $Self;
 }
@@ -107,7 +107,7 @@ sub StatsAdd {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Need $Needed.",
             );
@@ -116,8 +116,8 @@ sub StatsAdd {
     }
 
     # get needed objects
-    my $XMLObject  = $Kernel::OM->Get('Kernel::System::XML');
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $XMLObject  = $Kernel::OM->Get('XML');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get new StatID
     my $StatID = 1;
@@ -135,7 +135,7 @@ sub StatsAdd {
     );
 
     # meta tags
-    my $StatNumber = $StatID + $Kernel::OM->Get('Kernel::Config')->Get('Stats::StatsStartNumber');
+    my $StatNumber = $StatID + $Kernel::OM->Get('Config')->Get('Stats::StatsStartNumber');
 
     my %MetaData = (
         Created => [
@@ -168,14 +168,14 @@ sub StatsAdd {
         XMLHash => \@XMLHash,
     );
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Can not add a new Stat!',
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Stats',
     );
 
@@ -198,7 +198,7 @@ sub StatsGet {
 
     # check necessary data
     if ( !$Param{StatID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need StatID!'
         );
@@ -207,7 +207,7 @@ sub StatsGet {
     $Param{NoObjectAttributes} = $Param{NoObjectAttributes} ? 1 : 0;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey = "StatsGet::StatID::$Param{StatID}::NoObjectAttributes::$Param{NoObjectAttributes}";
 
@@ -221,13 +221,13 @@ sub StatsGet {
     return $Cache if ref $Cache eq 'HASH';
 
     # get hash from storage
-    my @XMLHash = $Kernel::OM->Get('Kernel::System::XML')->XMLHashGet(
+    my @XMLHash = $Kernel::OM->Get('XML')->XMLHashGet(
         Type => 'Stats',
         Key  => $Param{StatID},
     );
 
     if ( !$XMLHash[0] ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't get StatsID $Param{StatID}!",
         );
@@ -253,8 +253,8 @@ sub StatsGet {
 
   # provide the time zone field only, if the system use not UTC as system time or the TimeZoneUser feature is not active
     if (
-        !$Kernel::OM->Get('Kernel::System::Time')->ServerLocalTimeOffsetSeconds()
-        && $Kernel::OM->Get('Kernel::Config')->Get('TimeZoneUser')
+        !$Kernel::OM->Get('Time')->ServerLocalTimeOffsetSeconds()
+        && $Kernel::OM->Get('Config')->Get('TimeZoneUser')
         )
     {
         if ( defined $StatsXML->{TimeZone}->[1]->{Content} ) {
@@ -283,7 +283,7 @@ sub StatsGet {
     # %Allowed is used to avoid double selection in different forms
     my %Allowed;
     my %TimeAllowed;
-    my $TimeElement = $Kernel::OM->Get('Kernel::Config')->Get('Stats::TimeElement') || 'Time';
+    my $TimeElement = $Kernel::OM->Get('Config')->Get('Stats::TimeElement') || 'Time';
 
     return \%Stat if !$Stat{Object};
 
@@ -432,7 +432,7 @@ sub StatsUpdate {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Need $Needed.",
             );
@@ -445,7 +445,7 @@ sub StatsUpdate {
 
     # check necessary data
     if ( !$Param{StatID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need StatID!'
         );
@@ -454,7 +454,7 @@ sub StatsUpdate {
     # requesting stats reference
     my $StatOld = $Self->StatsGet( StatID => $Param{StatID} );
     if ( !$StatOld ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Can't get stats, perhaps you have an invalid stats id! (StatsID => $Param{StatID})"
@@ -522,7 +522,7 @@ sub StatsUpdate {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # meta tags
     my $TimeStamp = $TimeObject->SystemTime2TimeStamp(
@@ -532,7 +532,7 @@ sub StatsUpdate {
     $StatXML{ChangedBy}->[1]->{Content} = $Param{UserID};
 
     # get xml object
-    my $XMLObject = $Kernel::OM->Get('Kernel::System::XML');
+    my $XMLObject = $Kernel::OM->Get('XML');
 
     # please don't change the functionality of XMLHashDelete and XMLHashAdd
     # into the new function XMLHashUpdate, there is an incompatibility.
@@ -544,7 +544,7 @@ sub StatsUpdate {
         Key  => $Param{StatID},
     );
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't delete XMLHash!"
         );
@@ -567,14 +567,14 @@ sub StatsUpdate {
         XMLHash => \@Array
     );
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't add XMLHash!"
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Stats',
     );
 
@@ -594,21 +594,21 @@ sub StatsDelete {
 
     # check necessary data
     if ( !$Param{StatID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need StatID!'
         );
     }
 
     # delete the record
-    my $Success = $Kernel::OM->Get('Kernel::System::XML')->XMLHashDelete(
+    my $Success = $Kernel::OM->Get('XML')->XMLHashDelete(
         Type => 'Stats',
         Key  => $Param{StatID},
     );
 
     # error handling
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't delete XMLHash!",
         );
@@ -619,7 +619,7 @@ sub StatsDelete {
     $Self->_DeleteCache( StatID => $Param{StatID} );
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # get list of installed stats files
     my @StatsFileList = $MainObject->DirectoryRead(
@@ -649,12 +649,12 @@ sub StatsDelete {
     }
 
     # add log message
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "Delete stats (StatsID = $Param{StatID})",
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Stats',
     );
 
@@ -686,7 +686,7 @@ sub StatsListGet {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Need $Needed.",
             );
@@ -697,7 +697,7 @@ sub StatsListGet {
     my @SearchResult;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # Only cache the XML search as we need to filter based on user permissions later
     my $CacheKey = 'StatsListGet::XMLSearch';
@@ -716,7 +716,7 @@ sub StatsListGet {
     else {
 
         # get xml object
-        my $XMLObject = $Kernel::OM->Get('Kernel::System::XML');
+        my $XMLObject = $Kernel::OM->Get('XML');
 
         # No cache. Is there stats data yet?
         if ( !( @SearchResult = $XMLObject->XMLHashSearch( Type => 'Stats' ) ) ) {
@@ -762,7 +762,7 @@ sub GetStatsList {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Need $Needed.",
             );
@@ -892,7 +892,7 @@ sub GetStatsObjectAttributes {
     # check needed params
     for (qw(ObjectModule Use)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -902,7 +902,7 @@ sub GetStatsObjectAttributes {
 
     # load module
     my $ObjectModule = $Param{ObjectModule};
-    return if !$Kernel::OM->Get('Kernel::System::Main')->Require($ObjectModule);
+    return if !$Kernel::OM->Get('Main')->Require($ObjectModule);
     my $StatObject = $ObjectModule->new( %{$Self} );
     return if !$StatObject;
 
@@ -940,7 +940,7 @@ sub GetStaticFiles {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Need $Needed.",
             );
@@ -948,14 +948,14 @@ sub GetStaticFiles {
         }
     }
 
-    my $Directory = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Directory = $Kernel::OM->Get('Config')->Get('Home');
     if ( $Directory !~ m{^.*\/$}x ) {
         $Directory .= '/';
     }
     $Directory .= 'Kernel/System/Stats/Static/';
 
     if ( !opendir( DIR, $Directory ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can not open Directory: $Directory",
         );
@@ -1002,11 +1002,11 @@ sub GetStaticFiles {
     closedir(DIR);
 
     # KIXCore-capeIT
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
     if ( $Home !~ m{^.*\/$}x ) {
         $Home .= '/';
     }
-    my @KIXPackages = $Kernel::OM->Get('Kernel::System::KIXUtils')->GetRegisteredCustomPackages( Result => 'ARRAY' );
+    my @KIXPackages = $Kernel::OM->Get('KIXUtils')->GetRegisteredCustomPackages( Result => 'ARRAY' );
     for my $CurrPrefix (@KIXPackages) {
         $Directory = $Home . $CurrPrefix . '/Kernel/System/Stats/Static/';
         next if !opendir( DIR, $Directory );
@@ -1040,7 +1040,7 @@ sub GetDynamicFiles {
     my $Self = shift;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my %Filelist = %{ $ConfigObject->Get('Stats::DynamicObjectRegistration') };
     OBJECT:
@@ -1063,7 +1063,7 @@ sub GetDynamicFiles {
 Get the name of a dynamic object
 
     my $ObjectName = $StatsObject->GetObjectName(
-        ObjectModule => 'Kernel::System::Stats::Dynamic::TicketList',
+        ObjectModule => 'Stats::Dynamic::TicketList',
     );
 
 =cut
@@ -1077,7 +1077,7 @@ sub GetObjectName {
 
     # load module, return if module does not exist
     # (this is important when stats are uninstalled, see also bug# 4269)
-    return if !$Kernel::OM->Get('Kernel::System::Main')->Require($Module);
+    return if !$Kernel::OM->Get('Main')->Require($Module);
 
     # get name
     my $StatObject = $Module->new( %{$Self} );
@@ -1095,7 +1095,7 @@ sub GetObjectName {
 get behaviours that a statistic supports
 
     my $Behaviours = $StatsObject->GetObjectBehaviours(
-        ObjectModule => 'Kernel::System::Stats::Dynamic::TicketList',
+        ObjectModule => 'Stats::Dynamic::TicketList',
     );
 
     returns
@@ -1118,7 +1118,7 @@ sub GetObjectBehaviours {
 
     # load module, return if module does not exist
     # (this is important when stats are uninstalled, see also bug# 4269)
-    return if !$Kernel::OM->Get('Kernel::System::Main')->Require($Module);
+    return if !$Kernel::OM->Get('Main')->Require($Module);
 
     my $StatObject = $Module->new( %{$Self} );
     return if !$StatObject;
@@ -1146,7 +1146,7 @@ check readable object file
 sub ObjectFileCheck {
     my ( $Self, %Param ) = @_;
 
-    my $Directory = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Directory = $Kernel::OM->Get('Config')->Get('Home');
     if ( $Directory !~ m{^.*\/$}x ) {
         $Directory .= '/';
     }
@@ -1176,7 +1176,7 @@ sub Export {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{StatID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Export: Need StatID!'
         );
@@ -1184,7 +1184,7 @@ sub Export {
     }
 
     # get xml object
-    my $XMLObject = $Kernel::OM->Get('Kernel::System::XML');
+    my $XMLObject = $Kernel::OM->Get('XML');
 
     my @XMLHash = $XMLObject->XMLHashGet(
         Type => 'Stats',
@@ -1209,17 +1209,17 @@ sub Export {
         my $FileLocation = $StatsXML->{ObjectModule}->[1]->{Content};
         $FileLocation =~ s{::}{\/}xg;
         $FileLocation .= '.pm';
-        my $File        = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/$FileLocation";
+        my $File        = $Kernel::OM->Get('Config')->Get('Home') . "/$FileLocation";
 
         # KIXCore-capeIT
-        # my $File        = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/$FileLocation";
+        # my $File        = $Kernel::OM->Get('Config')->Get('Home') . "/$FileLocation";
         # my $File = '';
         my $KIXFile = '';
-        my $Home    = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+        my $Home    = $Kernel::OM->Get('Config')->Get('Home');
         if ( $Home !~ m{^.*\/$}x ) {
             $Home .= '/';
         }
-        my @KIXPackages = $Kernel::OM->Get('Kernel::System::KIXUtils')->GetRegisteredCustomPackages( Result => 'ARRAY' );
+        my @KIXPackages = $Kernel::OM->Get('KIXUtils')->GetRegisteredCustomPackages( Result => 'ARRAY' );
         for my $CurrPrefix (@KIXPackages) {
 
             # $File = $Home . $CurrPrefix . '/' . $FileLocation;
@@ -1245,7 +1245,7 @@ sub Export {
         }
         close $Filehandle;
 
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$FileContent );
+        $Kernel::OM->Get('Encode')->EncodeInput( \$FileContent );
         $StatsXML->{File}->[1]->{File}       = $StatsXML->{File}->[1]->{Content};
         $StatsXML->{File}->[1]->{Content}    = encode_base64( $FileContent, '' );
         $StatsXML->{File}->[1]->{Location}   = $FileLocation;
@@ -1266,7 +1266,7 @@ sub Export {
 
         # load module
         my $ObjectModule = $StatsXML->{ObjectModule}->[1]->{Content};
-        return if !$Kernel::OM->Get('Kernel::System::Main')->Require($ObjectModule);
+        return if !$Kernel::OM->Get('Main')->Require($ObjectModule);
         my $StatObject = $ObjectModule->new( %{$Self} );
         return if !$StatObject;
 
@@ -1305,7 +1305,7 @@ sub Import {
 
     for my $Needed (qw(UserID Content)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Need $Needed.",
             );
@@ -1314,7 +1314,7 @@ sub Import {
     }
 
     # get xml object
-    my $XMLObject = $Kernel::OM->Get('Kernel::System::XML');
+    my $XMLObject = $Kernel::OM->Get('XML');
 
     my @XMLHash = $XMLObject->XMLParse2XMLHash( String => $Param{Content} );
 
@@ -1334,7 +1334,7 @@ sub Import {
         )
     {
         if ( !defined $StatsXML->{$Element}->[1]->{Content} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Can't import Stat, because the required element $Element is not available!"
@@ -1344,7 +1344,7 @@ sub Import {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # if-clause if a stat-xml includes a StatNumber
     my $StatID = 1;
@@ -1353,7 +1353,7 @@ sub Import {
             - $ConfigObject->Get('Stats::StatsStartNumber');
         for my $Key (@Keys) {
             if ( $Key eq $XMLStatsID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "Can't import StatNumber $Key, because this StatNumber is already used!"
@@ -1373,7 +1373,7 @@ sub Import {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get time
     my $TimeStamp = $TimeObject->SystemTime2TimeStamp(
@@ -1399,7 +1399,7 @@ sub Import {
         && !$DynamicFiles->{ $StatsXML->{Object}->[1]->{Content} }
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Object $StatsXML->{Object}->[1]->{Content} doesn't exist!"
         );
@@ -1435,7 +1435,7 @@ sub Import {
             if ( $StatsXML->{File}->[1]->{Encode} && $StatsXML->{File}->[1]->{Encode} eq 'Base64' )
             {
                 $StatsXML->{File}->[1]->{Content} = decode_base64( $StatsXML->{File}->[1]->{Content} );
-                $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput(
+                $Kernel::OM->Get('Encode')->EncodeOutput(
                     \$StatsXML->{File}->[1]->{Content}
                 );
             }
@@ -1469,7 +1469,7 @@ sub Import {
 
         # load module
         my $ObjectModule = $StatsXML->{ObjectModule}->[1]->{Content};
-        return if !$Kernel::OM->Get('Kernel::System::Main')->Require($ObjectModule);
+        return if !$Kernel::OM->Get('Main')->Require($ObjectModule);
         my $StatObject = $ObjectModule->new( %{$Self} );
         return if !$StatObject;
 
@@ -1491,7 +1491,7 @@ sub Import {
         ],
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Stats',
     );
 
@@ -1510,7 +1510,7 @@ sub GetParams {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{StatID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need StatID!'
         );
@@ -1526,7 +1526,7 @@ sub GetParams {
 
         # load static modul
         my $ObjectModule = $Stat->{ObjectModule};
-        return if !$Kernel::OM->Get('Kernel::System::Main')->Require($ObjectModule);
+        return if !$Kernel::OM->Get('Main')->Require($ObjectModule);
         my $StatObject = $ObjectModule->new( %{$Self} );
         return if !$StatObject;
 
@@ -1556,7 +1556,7 @@ sub StatsRun {
     # check needed params
     for my $Needed (qw(StatID GetParam UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1633,7 +1633,7 @@ sub StatsResultCacheCompute {
 
     for my $Needed (qw(StatID UserGetParam UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1645,7 +1645,7 @@ sub StatsResultCacheCompute {
         StatID => $Param{StatID},
     );
 
-    my $StatsViewObject = $Kernel::OM->Get('Kernel::Output::HTML::Statistics::View');
+    my $StatsViewObject = $Kernel::OM->Get('Output::HTML::Statistics::View');
 
     my $StatConfigurationValid = $StatsViewObject->StatsConfigurationValidate(
         Stat   => $Stat,
@@ -1653,7 +1653,7 @@ sub StatsResultCacheCompute {
         UserID => $Param{UserID},
     );
     if ( !$StatConfigurationValid ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "This statistic contains configuration errors, skipping.",
         );
@@ -1669,7 +1669,7 @@ sub StatsResultCacheCompute {
 
     if ( $@ || !%GetParam ) {
         my $Errors = ref $@ ? join( "\n", @{$@} ) : $@;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The dashboard widget configuration for this user contains errors, skipping: $Errors"
         );
@@ -1677,7 +1677,7 @@ sub StatsResultCacheCompute {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my $DumpString = $MainObject->Dump( \%GetParam );
 
@@ -1695,7 +1695,7 @@ sub StatsResultCacheCompute {
 
     # Only set/update the cache after computing it, otherwise no cache data
     #   would be available in between.
-    return $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    return $Kernel::OM->Get('Cache')->Set(
         Type  => 'StatsRun',
         Key   => $CacheKey,
         Value => $Result,
@@ -1724,7 +1724,7 @@ sub StatsResultCacheGet {
 
     for my $Needed (qw(StatID UserGetParam UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1736,7 +1736,7 @@ sub StatsResultCacheGet {
         StatID => $Param{StatID},
     );
 
-    my $StatsViewObject = $Kernel::OM->Get('Kernel::Output::HTML::Statistics::View');
+    my $StatsViewObject = $Kernel::OM->Get('Output::HTML::Statistics::View');
 
     my $StatConfigurationValid = $StatsViewObject->StatsConfigurationValidate(
         Stat   => $Stat,
@@ -1744,7 +1744,7 @@ sub StatsResultCacheGet {
         UserID => $Param{UserID},
     );
     if ( !$StatConfigurationValid ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "This statistic contains configuration errors, skipping.",
         );
@@ -1761,7 +1761,7 @@ sub StatsResultCacheGet {
 
     if ( $@ || !%GetParam ) {
         my $Errors = ref $@ ? join( "\n", @{$@} ) : $@;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The dashboard widget configuration for this user contains errors, skipping: $Errors"
         );
@@ -1769,7 +1769,7 @@ sub StatsResultCacheGet {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my $DumpString = $MainObject->Dump( \%GetParam );
 
@@ -1779,7 +1779,7 @@ sub StatsResultCacheGet {
 
     my $CacheKey = "StatsRunCached::$Param{UserID}::$Param{StatID}::$MD5Sum";
 
-    return $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    return $Kernel::OM->Get('Cache')->Get(
         Type => 'StatsRun',
         Key  => $CacheKey,
 
@@ -1804,7 +1804,7 @@ sub StringAndTimestamp2Filename {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need String!'
         );
@@ -1812,7 +1812,7 @@ sub StringAndTimestamp2Filename {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my ( $s, $m, $h, $D, $M, $Y ) = $TimeObject->SystemTime2Date(
         SystemTime => $TimeObject->SystemTime(),
@@ -1822,7 +1822,7 @@ sub StringAndTimestamp2Filename {
     $h = sprintf( "%02d", $h );
     $m = sprintf( "%02d", $m );
 
-    $Param{String} = $Kernel::OM->Get('Kernel::System::Main')->FilenameCleanUp(
+    $Param{String} = $Kernel::OM->Get('Main')->FilenameCleanUp(
         Filename => $Param{String},
         Type     => 'Attachment',
     );
@@ -1850,14 +1850,14 @@ sub StatNumber2StatID {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{StatNumber} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need StatNumber!',
         );
         return;
     }
 
-    my @Key = $Kernel::OM->Get('Kernel::System::XML')->XMLHashSearch(
+    my @Key = $Kernel::OM->Get('XML')->XMLHashSearch(
         Type => 'Stats',
         What => [ { "[%]{'otrs_stats'}[%]{'StatNumber'}[%]{'Content'}" => $Param{StatNumber} } ],
     );
@@ -1865,7 +1865,7 @@ sub StatNumber2StatID {
         return $Key[0];
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => 'StatNumber invalid!',
     );
@@ -1888,7 +1888,7 @@ sub StatsInstall {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1910,7 +1910,7 @@ sub StatsInstall {
     );
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # get list of stats files
     my @StatsFileList = $MainObject->DirectoryRead(
@@ -1965,7 +1965,7 @@ sub StatsUninstall {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1977,7 +1977,7 @@ sub StatsUninstall {
     $Param{FilePrefix} = $Param{FilePrefix} ? $Param{FilePrefix} . '-' : '';
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # get list of installed stats files
     my @StatsFileList = $MainObject->DirectoryRead(
@@ -2021,7 +2021,7 @@ sub StatsCleanUp {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -2038,7 +2038,7 @@ sub StatsCleanUp {
     return if ref $ListRef ne 'ARRAY';
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     STATSID:
     for my $StatsID ( @{$ListRef} ) {
@@ -2088,7 +2088,7 @@ sub _GenerateStaticStats {
     NEED:
     for my $Need (qw(ObjectModule GetParam Title StatID UserID)) {
         next NEED if $Param{$Need};
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need $Need!"
         );
@@ -2097,7 +2097,7 @@ sub _GenerateStaticStats {
 
     # load static module
     my $ObjectModule = $Param{ObjectModule};
-    return if !$Kernel::OM->Get('Kernel::System::Main')->Require($ObjectModule);
+    return if !$Kernel::OM->Get('Main')->Require($ObjectModule);
     my $StatObject = $ObjectModule->new( %{$Self} );
     return if !$StatObject;
 
@@ -2118,7 +2118,7 @@ sub _GenerateStaticStats {
     }
 
     # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     my %User = $UserObject->GetUserData(
         UserID => $Param{UserID},
@@ -2153,7 +2153,7 @@ sub _GenerateStaticStats {
     take the stat configuration and get the stat table
 
     my @StatArray = $StatsObject->_GenerateDynamicStats(
-        ObjectModule     => 'Kernel::System::Stats::Dynamic::Ticket',
+        ObjectModule     => 'Stats::Dynamic::Ticket',
         Object           => 'Ticket',
         UseAsXvalue      => \UseAsXvalueElements,
         UseAsValueSeries => \UseAsValueSeriesElements,
@@ -2183,7 +2183,7 @@ sub _GenerateDynamicStats {
     NEED:
     for my $Need (qw(ObjectModule UseAsXvalue UseAsValueSeries Title Object StatID UserID)) {
         next NEED if $Param{$Need};
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need $Need!"
         );
@@ -2192,12 +2192,12 @@ sub _GenerateDynamicStats {
 
     # include the needed dynamic object
     my $ObjectModule = $Param{ObjectModule};
-    return if !$Kernel::OM->Get('Kernel::System::Main')->Require($ObjectModule);
+    return if !$Kernel::OM->Get('Main')->Require($ObjectModule);
     my $StatObject = $ObjectModule->new( %{$Self} );
     return if !$StatObject;
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get the selected values
     # perhaps i can split the StatGet function to make this needless
@@ -2415,8 +2415,8 @@ sub _GenerateDynamicStats {
     }
 
     # get needed objects
-    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
-    my $UserObject     = $Kernel::OM->Get('Kernel::System::User');
+    my $LanguageObject = $Kernel::OM->Get('Language');
+    my $UserObject     = $Kernel::OM->Get('User');
 
     my %User = $UserObject->GetUserData(
         UserID => $UserID,
@@ -3306,7 +3306,7 @@ sub _GenerateDynamicStats {
 
     # check if we should cache this result
     if ( !$TitleTimeStart || !$TitleTimeStop ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Can't cache: StatID $Param{StatID} has no time period, so you can't cache the stat!",
@@ -3321,7 +3321,7 @@ sub _GenerateDynamicStats {
     );
 
     if ( $TimeObject->TimeStamp2SystemTime( String => $CheckTimeStop ) > $TimeObject->SystemTime() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Can't cache StatID $Param{StatID}: The selected end time is in the future!",
@@ -3343,7 +3343,7 @@ sub _WriteResultCache {
     my %GetParam = %{ $Param{GetParam} };
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # check if we should cache this result
     # get the current time
@@ -3397,7 +3397,7 @@ sub _CreateStaticResultCacheFilename {
     # check needed params
     for my $NeededParam (qw( StatID GetParam )) {
         if ( !$Param{$NeededParam} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $NeededParam!"
             );
@@ -3425,7 +3425,7 @@ sub _CreateStaticResultCacheFilename {
         $Key .= "-$GetParamRef->{Day}";
     }
 
-    my $MD5Key = $Kernel::OM->Get('Kernel::System::Main')->FilenameCleanUp(
+    my $MD5Key = $Kernel::OM->Get('Main')->FilenameCleanUp(
         Filename => $Key,
         Type     => 'md5',
     );
@@ -3433,7 +3433,7 @@ sub _CreateStaticResultCacheFilename {
     return
         'Stats'
         . $Param{StatID} . '-'
-        . $Kernel::OM->Get('Kernel::Language')->{UserLanguage} . '-'
+        . $Kernel::OM->Get('Language')->{UserLanguage} . '-'
         . $MD5Key
         . '.cache';
 }
@@ -3455,7 +3455,7 @@ sub _SetResultCache {
     # check needed params
     for my $Needed (qw(Filename Result)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -3463,7 +3463,7 @@ sub _SetResultCache {
         }
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => 'StatsRun',
         Key   => $Param{Filename},
         Value => $Param{Result},
@@ -3491,14 +3491,14 @@ sub _GetResultCache {
 
     # check needed params
     if ( !$Param{Filename} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => '_GetResultCache: Need Filename!',
         );
         return;
     }
 
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'StatsRun',
         Key  => $Param{Filename},
 
@@ -3522,7 +3522,7 @@ clean up stats result cache.
 sub _DeleteCache {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    return $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Stats',
     );
 }
@@ -3540,7 +3540,7 @@ sub _AutomaticSampleImport {
 
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -3548,11 +3548,11 @@ sub _AutomaticSampleImport {
         }
     }
 
-    my $Language  = $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage');
+    my $Language  = $Kernel::OM->Get('Config')->Get('DefaultLanguage');
     my $Directory = $Self->{StatsTempDir};
 
     if ( !opendir( DIRE, $Directory ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can not open Directory: $Directory",
         );
@@ -3577,7 +3577,7 @@ sub _AutomaticSampleImport {
 
             my $Filehandle;
             if ( !open $Filehandle, '<', $Directory . $Filename ) {    ## no critic
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can not open File: " . $Directory . $Filename,
                 );
@@ -3622,7 +3622,7 @@ sub _AddTimeZone {
 
     # check needed params
     if ( !$Param{TimeStamp} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TimeStamp!',
         );
@@ -3632,7 +3632,7 @@ sub _AddTimeZone {
     return $Param{TimeStamp} if !$Param{TimeZone};
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $SystemTime = $TimeObject->TimeStamp2SystemTime(
         String => $Param{TimeStamp},
@@ -3668,7 +3668,7 @@ sub _SubtractTimeZone {
 
     # check needed params
     if ( !$Param{TimeStamp} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TimeStamp!',
         );
@@ -3678,7 +3678,7 @@ sub _SubtractTimeZone {
     return $Param{TimeStamp} if !$Param{TimeZone};
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $SystemTime = $TimeObject->TimeStamp2SystemTime(
         String => $Param{TimeStamp},
@@ -3711,7 +3711,7 @@ sub _GetCacheString {
     my ( $Self, %Param ) = @_;
 
     # add the Language to the cache key
-    my $Result = 'Language:' . $Kernel::OM->Get('Kernel::Language')->{UserLanguage};
+    my $Result = 'Language:' . $Kernel::OM->Get('Language')->{UserLanguage};
 
     if ( $Param{TimeZone} ) {
         $Result .= 'TimeZone:' . $Param{TimeZone};
@@ -3738,7 +3738,7 @@ sub _GetCacheString {
     }
 
     # Convert to MD5 (not sure if this is needed any more).
-    $Result = $Kernel::OM->Get('Kernel::System::Main')->FilenameCleanUp(
+    $Result = $Kernel::OM->Get('Main')->FilenameCleanUp(
         Filename => $Result,
         Type     => 'md5',
     );

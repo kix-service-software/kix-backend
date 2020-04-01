@@ -5,7 +5,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">ArticleValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::ArticleValidator</Item>
                 <Item Key="Validates">ArticleID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(ArticleGet|NotificationCreate|NotificationUpdate)</Item>
@@ -16,7 +16,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">AutoResponseTypeValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::AutoResponseTypeValidator</Item>
                 <Item Key="Validates">AutoResponseType</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(NotificationCreate|NotificationUpdate)</Item>
@@ -27,7 +27,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">AttachmentsValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::AttachmentsValidator</Item>
                 <Item Key="Validates">Attachments</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -38,7 +38,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">ChannelValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::ChannelValidator</Item>
                 <Item Key="Validates">Channel,ChannelID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(ChannelGet|NotificationCreate|NotificationUpdate)</Item>
@@ -49,7 +49,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">CharsetValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::CharsetValidator</Item>
                 <Item Key="Validates">Charset</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -60,7 +60,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">ContactValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::ContactValidator</Item>
                 <Item Key="Validates">ContactID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(ContactGet|ContactCreate|ContactUpdate|NotificationCreate|NotificationUpdate)</Item>
@@ -71,7 +71,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">DeploymentStateValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::DeploymentStateValidator</Item>
                 <Item Key="Validates">DeplStateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -82,7 +82,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">DynamicFieldsValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::DynamicFieldsValidator</Item>
                 <Item Key="Validates">DynamicFields</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -93,7 +93,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">EmailAddressValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::EmailAddressValidator</Item>
                 <Item Key="Validates">From,Cc,Bcc,To,Email</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -104,7 +104,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">ExecPlanValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::ExecPlanValidator</Item>
                 <Item Key="Validates">ExecPlanID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">ExecPlanGet|ExecPlanDelete|JobExecPlanIDCreate|JobExecPlanIDDelete</Item>
@@ -115,7 +115,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">HistoryTypeValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::HistoryTypeValidator</Item>
                 <Item Key="Validates">HistoryType,HistoryTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -126,7 +126,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">IncidentStateValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::IncidentStateValidator</Item>
                 <Item Key="Validates">InciStateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -137,7 +137,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">JobValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::JobValidator</Item>
                 <Item Key="Validates">JobID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">JobGet|JobDelete|JobMacroIDSearch|JobExecPlanIDSearch</Item>
@@ -148,7 +148,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">JobRunValidator</Item>
+                <Item Key="Module">Kernel::JobRunValidator</Item>
                 <Item Key="Validates">JobRunID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">JobRunGet</Item>
@@ -159,7 +159,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">LockValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::LockValidator</Item>
                 <Item Key="Validates">Lock,LockID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(LockGet|NotificationCreate|NotificationUpdate)</Item>
@@ -170,7 +170,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">MacroValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::MacroValidator</Item>
                 <Item Key="Validates">MacroID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">JobGet|JobDelete|JobMacroIDSearch|JobExecPlanIDSearch|JobExecPlanIDCreate|JobExecPlanIDDelete|JobMacroIDCreate|JobMacroIDDelete|MacroActionCreate|MacroActionUpdate</Item>
@@ -181,7 +181,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">MimeTypeValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::MimeTypeValidator</Item>
                 <Item Key="Validates">MimeType</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -192,7 +192,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">PriorityValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(PriorityGet|PriorityCreate|PriorityUpdate|NotificationCreate|NotificationUpdate)</Item>
@@ -203,7 +203,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">QueueValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::QueueValidator</Item>
                 <Item Key="Validates">Queue,QueueID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(QueueGet|QueueCreate|QueueUpdate|NotificationCreate|NotificationUpdate)</Item>
@@ -214,7 +214,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">RoleValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::RoleValidator</Item>
                 <Item Key="Validates">Role,RoleID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(RoleGet|RoleCreate|RoleUpdate)</Item>
@@ -225,7 +225,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">ServiceValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::ServiceValidator</Item>
                 <Item Key="Validates">Service,ServiceID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(ServiceGet|ServiceCreate|ServiceUpdate|NotificationCreate|NotificationUpdate)</Item>
@@ -236,7 +236,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">SenderTypeValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::SenderTypeValidator</Item>
                 <Item Key="Validates">SenderType,SenderTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(SenderTypeGet|SenderTypeSearch|NotificationCreate|NotificationUpdate)</Item>
@@ -247,7 +247,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">SLAValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::SLAValidator</Item>
                 <Item Key="Validates">SLA,SLAID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(SLAGet|SLACreate|SLAUpdate|NotificationCreate|NotificationUpdate)</Item>
@@ -258,7 +258,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">StateValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::StateValidator</Item>
                 <Item Key="Validates">State,StateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(TicketStateGet|ChecklistCreate|ChecklistUpdate|NotificationCreate|NotificationUpdate)</Item>
@@ -269,7 +269,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">StateTypeValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::StateTypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx">(TicketStateCreate|TicketStateUpdate)</Item>
                 <Item Key="IgnoreOperationRegEx">(PermissionCreate|PermissionUpdate)</Item>
@@ -280,7 +280,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">TimeUnitValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::TimeUnitValidator</Item>
                 <Item Key="Validates">TimeUnit</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
@@ -291,7 +291,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">TicketValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::TicketValidator</Item>
                 <Item Key="Validates">TicketID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">TicketGet</Item>
@@ -302,7 +302,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">TypeValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::TypeValidator</Item>
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx">(TicketCreate|TicketUpdate)</Item>
                 <Item Key="IgnoreOperationRegEx">(NotificationCreate|NotificationUpdate)</Item>
@@ -313,7 +313,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">UserValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::UserValidator</Item>
                 <Item Key="Validates">Owner,OwnerID,Responsible,ResponsibleID,UserID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">(UserGet|NotificationCreate|NotificationUpdate)</Item>
@@ -324,7 +324,7 @@
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">ValidValidator</Item>
+                <Item Key="Module">Kernel::API::Validator::ValidValidator</Item>
                 <Item Key="Validates">Valid,ValidID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">ValidGet</Item>

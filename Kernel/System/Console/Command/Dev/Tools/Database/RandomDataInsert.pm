@@ -18,16 +18,16 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::Organisation',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Role',
-    'Kernel::System::Queue',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
+    'Config',
+    'Contact',
+    'Organisation',
+    'DB',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Role',
+    'Queue',
+    'Ticket',
+    'User',
 );
 
 sub Configure {
@@ -99,11 +99,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # set dummy sendmail module to avoid notifications
-    $Kernel::OM->Get('Kernel::Config')->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'SendmailModule',
-        Value => 'Kernel::System::Email::DoNotSendEmail',
+        Value => 'Email::DoNotSendEmail',
     );
-    $Kernel::OM->Get('Kernel::Config')->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'CheckEmailAddresses',
         Value => 0,
     );
@@ -113,12 +113,12 @@ sub Run {
     my $CommonObjectRefresh = 50;
 
     # get dynamic fields
-    my $TicketDynamicField = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $TicketDynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => ['Ticket'],
     );
 
-    my $ArticleDynamicField = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $ArticleDynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => ['Article'],
     );
@@ -167,7 +167,7 @@ sub Run {
     for ( 1 .. $Self->GetOption('generate-tickets') ) {
         my $TicketUserID =
 
-            my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
+            my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
             Title        => RandomSubject(),
             QueueID      => $QueueIDs[ int( rand($#QueueIDs) ) ],
             Lock         => 'unlock',
@@ -188,7 +188,7 @@ sub Run {
                 push @Values, "($TicketID, 'Seen', 1, current_timestamp, $UserID)";
             }
             while ( my @ValuesPart = splice( @Values, 0, 50 ) ) {
-                $Kernel::OM->Get('Kernel::System::DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
+                $Kernel::OM->Get('DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
             }
         }
 
@@ -197,7 +197,7 @@ sub Run {
             print "Ticket with ID '$TicketID' created.\n";
 
             for ( 1 .. $Self->GetOption('articles-per-ticket') // 10 ) {
-                my $ArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
+                my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
                     TicketID       => $TicketID,
                     Channel        => 'note',
                     CustomerVisible => 1,
@@ -224,7 +224,7 @@ sub Run {
                         push @Values, "($ArticleID, 'Seen', 1, current_timestamp, $UserID)";
                     }
                     while ( my @ValuesPart = splice( @Values, 0, 50 ) ) {
-                        $Kernel::OM->Get('Kernel::System::DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
+                        $Kernel::OM->Get('DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
                     }
                 }
 
@@ -235,7 +235,7 @@ sub Run {
                     next DYNAMICFIELD if $DynamicFieldConfig->{InternalField};
 
                     # set a random value
-                    my $Result = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->RandomValueSet(
+                    my $Result = $Kernel::OM->Get('DynamicField::Backend')->RandomValueSet(
                         DynamicFieldConfig => $DynamicFieldConfig,
                         ObjectID           => $ArticleID,
                         UserID             => $UserIDs[ int( rand($#UserIDs) ) ],
@@ -257,7 +257,7 @@ sub Run {
                 next DYNAMICFIELD if $DynamicFieldConfig->{InternalField};
 
                 # set a random value
-                my $Result = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->RandomValueSet(
+                my $Result = $Kernel::OM->Get('DynamicField::Backend')->RandomValueSet(
                     DynamicFieldConfig => $DynamicFieldConfig,
                     ObjectID           => $TicketID,
                     UserID             => $UserIDs[ int( rand($#UserIDs) ) ],
@@ -273,7 +273,7 @@ sub Run {
 
             if ( $Counter++ % $CommonObjectRefresh == 0 ) {
                 $Kernel::OM->ObjectsDiscard(
-                    Objects => ['Kernel::System::Ticket'],
+                    Objects => ['Ticket'],
                 );
             }
         }
@@ -384,7 +384,7 @@ sub RandomBody {
 
 sub QueueGet {
     my @QueueIDs;
-    my %Queues = $Kernel::OM->Get('Kernel::System::Queue')->GetAllQueues();
+    my %Queues = $Kernel::OM->Get('Queue')->GetAllQueues();
     for ( sort keys %Queues ) {
         push @QueueIDs, $_;
     }
@@ -397,7 +397,7 @@ sub QueueCreate {
     my @QueueIDs;
     for ( 1 .. $Count ) {
         my $Name = 'fill-up-queue' . int( rand(100_000_000) );
-        my $ID   = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
+        my $ID   = $Kernel::OM->Get('Queue')->QueueAdd(
             Name              => $Name,
             ValidID           => 1,
             SystemAddressID   => 1,
@@ -418,7 +418,7 @@ sub QueueCreate {
 
 sub RoleGet {
     my @RoleIDs;
-    my %Roles = $Kernel::OM->Get('Kernel::System::Role')->RoleList( Valid => 1 );
+    my %Roles = $Kernel::OM->Get('Role')->RoleList( Valid => 1 );
     for ( sort keys %Roles ) {
         push @RoleIDs, $_;
     }
@@ -431,7 +431,7 @@ sub RoleCreate {
     my @RoleIDs;
     for ( 1 .. $Count ) {
         my $Name = 'fill-up-role' . int( rand(100_000_000) );
-        my $ID   = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
+        my $ID   = $Kernel::OM->Get('Role')->RoleAdd(
             Name    => $Name,
             ValidID => 1,
             UserID  => 1,
@@ -441,7 +441,7 @@ sub RoleCreate {
             push( @RoleIDs, $ID );
 
             # add root to every role
-            $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+            $Kernel::OM->Get('Role')->RoleUserAdd(
                 AssignUserID => 1,
                 RoleID       => $ID,
                 UserID       => 1,
@@ -453,7 +453,7 @@ sub RoleCreate {
 
 sub UserGet {
     my @UserIDs;
-    my %Users = $Kernel::OM->Get('Kernel::System::User')->UserList(
+    my %Users = $Kernel::OM->Get('User')->UserList(
         Type  => 'Short',    # Short|Long
         Valid => 1,          # not required
     );
@@ -470,14 +470,14 @@ sub UserCreate {
     my @UserIDs;
     for ( 1 .. $Count ) {
         my $Name = 'fill-up-agent' . int( rand(100_000_000) );
-        my $UserID   = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+        my $UserID   = $Kernel::OM->Get('User')->UserAdd(
             UserLogin    => $Name,
             ValidID      => 1,
             ChangeUserID => 1,
             IsAgent      => 1,
         );
         if ($UserID) {
-            my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
                 AssignedUserID => $UserID,
                 Firstname      => $Name,
                 LastName       => $Name,
@@ -490,7 +490,7 @@ sub UserCreate {
             push( @UserIDs, $UserID );
             for my $RoleID (@RoleIDs) {
                 my $RoleAdd = int( rand(3) );
-                $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                $Kernel::OM->Get('Role')->RoleUserAdd(
                     AssignUserID => $UserID,
                     RoleID       => $RoleID,
                     UserID       => 1,
@@ -506,13 +506,13 @@ sub CustomerCreate {
 
     for ( 1 .. $Count ) {
         my $Name      = 'fill-up-customer' . int( rand(100_000_000) );
-        my $UserID   = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+        my $UserID   = $Kernel::OM->Get('User')->UserAdd(
             UserLogin    => $Name,
             ValidID      => 1,
             ChangeUserID => 1,
             IsCustomer   => 1,
         );
-        my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+        my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
             AssignedUserID => $UserID,
             Firstname      => $Name,
             LastName       => $Name,
@@ -531,7 +531,7 @@ sub OrganisationCreate {
     for ( 1 .. $Count ) {
 
         my $Name       = 'fill-up-organisation' . int( rand(100_000_000) );
-        my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+        my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
             Number   => $Name . '_CustomerID',
             Name     => $Name,
             Street   => '5201 Blue Lagoon Drive',

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ExecPlanUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ExecPlanUpdate');
 
     return $Self;
 }
@@ -134,7 +134,7 @@ sub Run {
     );
 
     # check if ExecPlan exists 
-    my %ExecPlanData = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanGet(
+    my %ExecPlanData = $Kernel::OM->Get('Automation')->ExecPlanGet(
         ID => $Param{Data}->{ExecPlanID},
     );
 
@@ -146,7 +146,7 @@ sub Run {
 
     # check if ExecPlan with the same name already exists
     if ( $ExecPlan->{Name} ) {
-        my $ExecPlanID = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanLookup(
+        my $ExecPlanID = $Kernel::OM->Get('Automation')->ExecPlanLookup(
             Name => $ExecPlan->{Name},
         );
         if ( $ExecPlanID && $ExecPlanID != $Param{Data}->{ExecPlanID} ) {
@@ -158,7 +158,7 @@ sub Run {
     }
 
     # update ExecPlan
-    my $Success = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanUpdate(
+    my $Success = $Kernel::OM->Get('Automation')->ExecPlanUpdate(
         ID          => $Param{Data}->{ExecPlanID},    
         Type        => $ExecPlan->{Type} || $ExecPlanData{Type},
         Name        => $ExecPlan->{Name} || $ExecPlanData{Name},

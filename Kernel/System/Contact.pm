@@ -21,13 +21,13 @@ use Data::UUID;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Organisation',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'Organisation',
+    'DB',
+    'Log',
+    'Main',
+    'Time',
+    'User',
 );
 
 =head1 NAME
@@ -50,7 +50,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my $ContactObject = $Kernel::OM->Get('Contact');
 
 =cut
 
@@ -62,12 +62,12 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $MainObject   = $Kernel::OM->Get('Main');
 
     # load generator contact preferences module
     my $GeneratorModule = $ConfigObject->Get('ContactPreferences')->{Module}
-        || 'Kernel::System::Contact::Preferences::DB';
+        || 'Contact::Preferences::DB';
 
     if ( $MainObject->Require($GeneratorModule) ) {
         $Self->{PreferencesObject} = $GeneratorModule->new();
@@ -82,7 +82,7 @@ sub new {
     );
 
     $Self->{Lower} = '';
-    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -124,7 +124,7 @@ sub ContactAdd {
     # check needed stuff
     for (qw(Firstname Lastname)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -144,7 +144,7 @@ sub ContactAdd {
             Valid            => 0
         );
         if (IsHashRefWithData(\%Existing)) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot add contact. Email \"$Param{Email}\" already exists.",
             );
@@ -154,12 +154,12 @@ sub ContactAdd {
 
     # check if primary OrganisationID exists
     if ($Param{PrimaryOrganisationID}) {
-        my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $Param{PrimaryOrganisationID},
         );
 
         if (!%OrgData || $OrgData{ValidID} != 1) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'No valid organisation found for primary organisation ID "' . $Param{PrimaryOrganisationID} . '".',
             );
@@ -171,18 +171,18 @@ sub ContactAdd {
         # check if primary OrganisationID is contained in assigned OrganisationIDs
         my @OrgIDs = @{$Param{OrganisationIDs}};
         if (!grep /$Param{PrimaryOrganisationID}/, @OrgIDs) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Primary organisation ID "' . $Param{PrimaryOrganisationID} . '" is not available in assigned organisation IDs "' . (join(", ", @OrgIDs)) . '".',
             );
             return;
         }
         foreach my $OrgID (@OrgIDs) {
-            my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
             if (!%OrgData || $OrgData{ValidID} != 1) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => 'No valid organisation found for assigned organisation ID "' . $OrgID . '".',
                 );
@@ -196,24 +196,24 @@ sub ContactAdd {
 
     #if assigned user ist given, check associated user exists
     if ($Param{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
             UserID => $Param{AssignedUserID},
             Silent => 1,
         );
         if (!$ExistingUser) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot create contact. No user with ID $Param{AssignedUserID} exists.",
             );
             return;
         }
         else {
-            my $ExistingContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+            my $ExistingContact = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Param{AssignedUserID},
                 Silent => 1,
             );
             if ($ExistingContact) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Cannot create contact. User '$Param{AssignedUserID}' already has a contact.",
                 );
@@ -222,7 +222,7 @@ sub ContactAdd {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO contact (firstname, lastname, email, title, phone, fax,
                      mobile, street, zip, city, country, comments, valid_id,
                      create_time, create_by, change_time, change_by, user_id)
@@ -237,7 +237,7 @@ sub ContactAdd {
     );
 
     # find ID of new item
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id FROM contact WHERE LOWER(email) LIKE LOWER(?)',
         Bind  => [
             \$Param{Email}
@@ -247,14 +247,14 @@ sub ContactAdd {
 
     # fetch the result
     my $ContactID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ContactID = $Row[0];
     }
 
     if ($ContactID) {
         if ($Param{OrganisationIDs}) {
             for my $orgID (@{$Param{OrganisationIDs}}) {
-                return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+                return if !$Kernel::OM->Get('DB')->Do(
                     SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,?)',
                     Bind => [ \$ContactID, \$orgID, \($orgID eq $Param{PrimaryOrganisationID} ? 1 : 0) ],
                 );
@@ -262,13 +262,13 @@ sub ContactAdd {
         }
 
         # log notice
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  =>
                 "Contact: $ContactID ('$Param{Firstname}/$Param{Lastname}') created successfully (created by user id $Param{UserID})!",
         );
         # reset cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
         );
 
@@ -283,14 +283,14 @@ sub ContactAdd {
         );
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Contact',
             ObjectID  => $ContactID,
         );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot find new contact with email $Param{Email}!",
         );
@@ -319,7 +319,7 @@ sub ContactGet {
 
     # check needed stuff
     if (!$Param{ID} && !$Param{UserID}) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID or UserID!"
         );
@@ -336,7 +336,7 @@ sub ContactGet {
 
         # check cache
         $CacheKey = "ContactGet::ContactID::$Param{ID}";
-        my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Data = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -351,7 +351,7 @@ sub ContactGet {
         return if $Param{UserID} !~ /^\d+$/;
 
         $CacheKey = "ContactGet::UserID::$Param{UserID}";
-        my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Data = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -363,7 +363,7 @@ sub ContactGet {
     }
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT id, firstname, lastname, email, title, phone, fax, mobile, street, zip, city, country, comments,'
                 . 'valid_id, create_time, create_by, change_time, change_by, user_id FROM contact ' . $SQLWhere,
         Bind  => \@BindVars,
@@ -372,7 +372,7 @@ sub ContactGet {
 
     # fetch the result
     my %Contact;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
 
         $Contact{ID}                    = $Row[0];
         $Contact{UserID}                = $Row[0]; # for backward compatibility (e.g. NotifcationEvent)
@@ -397,12 +397,12 @@ sub ContactGet {
         last;
     }
     # get organisations
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT org_id, is_primary FROM contact_organisation WHERE contact_id = ?',
         Bind  => [ \$Contact{ID} ],
     );
     my @OrganisationIDs;
-    while (my @Row =$Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
+    while (my @Row =$Kernel::OM->Get('DB')->FetchrowArray()) {
         push(@OrganisationIDs,$Row[0]);
         $Contact{PrimaryOrganisationID} = $Row[0] if ($Row[1]);
 
@@ -411,7 +411,7 @@ sub ContactGet {
 
     # check item
     if ( $Param{ID} && !$Contact{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Contact with ID $Param{ID} not found in database!",
         );
@@ -420,7 +420,7 @@ sub ContactGet {
 
     # check item
     if ( $Param{UserID} && !$Contact{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "No contact assigned to user id $Param{UserID}!",
         );
@@ -430,13 +430,13 @@ sub ContactGet {
     $Contact{Fullname} = $Self->_ContactFullname(
         Firstname => $Contact{Firstname},
         Lastname  => $Contact{Lastname},
-        UserLogin => ($Contact{AssignedUserID}) ? $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        UserLogin => ($Contact{AssignedUserID}) ? $Kernel::OM->Get('User')->UserLookup(
             UserID => $Contact{AssignedUserID},
         ) : '',
-        NameOrder => $Kernel::OM->Get('Kernel::Config')->Get('FirstnameLastnameOrder') || 0,
+        NameOrder => $Kernel::OM->Get('Config')->Get('FirstnameLastnameOrder') || 0,
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -472,7 +472,7 @@ sub ContactLookup {
 
     # check needed stuff
     if (!$Param{Email} && !$Param{ID} && !$Param{UserID}) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Email, contact ID or user ID!'
         );
@@ -480,13 +480,13 @@ sub ContactLookup {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{Email}) {
 
         # check cache
         my $CacheKey = 'ContactLookup::Email::' . $Param{Email};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -509,7 +509,7 @@ sub ContactLookup {
 
         if ( !$ID ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No ID found for contact email '$Param{Email}'!",
                 );
@@ -518,7 +518,7 @@ sub ContactLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -534,7 +534,7 @@ sub ContactLookup {
 
         # check cache
         my $CacheKey = 'ContactLookup::ID::' . $Param{ID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -555,7 +555,7 @@ sub ContactLookup {
 
         if ( !$Email ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No contact email found for ID '$Param{ID}'!",
                 );
@@ -564,7 +564,7 @@ sub ContactLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -580,7 +580,7 @@ sub ContactLookup {
 
         # check cache
         my $CacheKey = 'ContactLookup::UserID::' . $Param{UserID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -600,7 +600,7 @@ sub ContactLookup {
 
         if ( !$ID ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No ID found for assigned user id '$Param{UserID}'!",
                 );
@@ -609,7 +609,7 @@ sub ContactLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -656,7 +656,7 @@ sub ContactUpdate {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -669,7 +669,7 @@ sub ContactUpdate {
         ID => $Param{ID}
     );
     if ( !%Contact ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such contact with ID $Param{ID}!",
         );
@@ -683,7 +683,7 @@ sub ContactUpdate {
             Silent => 1,
         );
         if ($ExistingContactID && $ExistingContactID != $Param{ID}) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot update contact. Email \"$Param{Email}\" already in use by a contact.",
             );
@@ -693,12 +693,12 @@ sub ContactUpdate {
 
     # check if primary OrganisationID exists
     if ($Param{PrimaryOrganisationID}) {
-        my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $Param{PrimaryOrganisationID},
         );
 
         if (!%OrgData || $OrgData{ValidID} != 1) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'No valid organisation found for primary organisation ID "' . $Param{PrimaryOrganisationID} . '".',
             );
@@ -710,18 +710,18 @@ sub ContactUpdate {
         # check if primary OrganisationID is contained in assigned OrganisationIDs
         my @OrgIDs = @{$Param{OrganisationIDs}};
         if (!grep /$Param{PrimaryOrganisationID}/, @OrgIDs) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Primary organisation ID "' . $Param{PrimaryOrganisationID} . '" is not available in assigned organisation IDs "' . (join(", ", @OrgIDs)) . '".',
             );
             return;
         }
         foreach my $OrgID (@OrgIDs) {
-            my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
             if (!%OrgData || $OrgData{ValidID} != 1) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => 'No valid organisation found for assigned organisation ID "' . $OrgID . '".',
                 );
@@ -732,24 +732,24 @@ sub ContactUpdate {
 
     #if assigned user ist given, check associated user exists
     if ($Param{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
             UserID => $Param{AssignedUserID},
             Silent => 1,
         );
         if (!$ExistingUser) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot update contact. No user with ID $Param{AssignedUserID} exists.",
             );
             return;
         }
         else {
-            my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+            my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Param{AssignedUserID},
                 Silent => 1,
             );
             if ($ExistingContactID && $ExistingContactID != $Param{ID}) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Cannot update contact. User '$Param{AssignedUserID}' is already assigned to contact '$ExistingContactID'.",
                 );
@@ -790,7 +790,7 @@ sub ContactUpdate {
     return 1 if !$ChangeRequired;
 
     # update contact in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE contact SET firstname = ?, lastname = ?, '
             . 'email = ?, title = ?, phone = ?, fax = ?, mobile = ?, street = ?, '
             . 'zip = ?, city = ?, country = ?, comments = ?, valid_id = ?, '
@@ -805,14 +805,14 @@ sub ContactUpdate {
 
     #update organisation IDs
     if (@deleteOrgIDs) {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'DELETE FROM contact_organisation WHERE contact_id = ? AND org_id IN (?)',
             Bind => [ \$Param{ID}, \${\(join ', ', @deleteOrgIDs)} ],
         );
     }
 
     for my $orgID (@insertOrgIDs) {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'INSERT INTO contact_organisation (contact_id, org_id) VALUES (?,?)',
             Bind => [ \$Param{ID}, \$orgID ],
         );
@@ -820,17 +820,17 @@ sub ContactUpdate {
 
     #update Primary Org ID
     if ($Param{PrimaryOrganisationID} ne $Contact{PrimaryOrganisationID}) {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE contact_organisation SET is_primary = 0 WHERE org_id = ? AND contact_id = ?',
             Bind => [ \$Contact{PrimaryOrganisationID}, \$Param{ID} ],
         );
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE contact_organisation SET is_primary = 1 WHERE org_id = ? AND contact_id = ?',
             Bind => [ \$Param{PrimaryOrganisationID}, \$Param{ID} ],
         );
     }
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -845,7 +845,7 @@ sub ContactUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
@@ -911,7 +911,7 @@ sub ContactSearch {
     foreach my $Key ( qw(OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals) ) {
         $CacheKey .= '::'.($Param{$Key} || '');
     }
-    my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Data = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -925,7 +925,7 @@ sub ContactSearch {
     if ($Valid) {
 
         # get valid object
-        my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+        my $ValidObject = $Kernel::OM->Get('Valid');
 
         $SQL .= "c.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
     }
@@ -1041,7 +1041,7 @@ sub ContactSearch {
     }
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT DISTINCT c.id, c.email FROM contact c $Join "
             . ($SQL ? "WHERE $SQL" : ''),
         Bind  => \@Bind,
@@ -1050,12 +1050,12 @@ sub ContactSearch {
 
     # fetch the result
     my %List;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $List{$Row[0]} = $Row[1];
     }
 
     # cache request
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%List,
@@ -1081,7 +1081,7 @@ sub ContactDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1095,24 +1095,24 @@ sub ContactDelete {
     );
 
     #delete assignment to organinasations
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM contact_organisation WHERE contact_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete contact
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM contact WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
@@ -1139,7 +1139,7 @@ sub SetPreferences {
 
     # check needed stuff
     if ( !$Param{ContactID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ContactID!'
         );
@@ -1149,7 +1149,7 @@ sub SetPreferences {
     # check if contact exists
     my %Contact = $Self->ContactGet( ID => $Param{ContactID} );
     if ( !%Contact ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such contact '$Param{ContactID}'!",
         );
@@ -1172,7 +1172,7 @@ sub SetPreferences {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Contact.Preference',
         ObjectID  => $Param{ContactID}.'::'.$Param{Key},
@@ -1196,7 +1196,7 @@ sub GetPreferences {
 
     # check needed stuff
     if ( !$Param{ContactID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ContactID!'
         );
@@ -1206,7 +1206,7 @@ sub GetPreferences {
     # check if contact exists
     my %Contact = $Self->ContactGet( ID => $Param{ContactID} );
     if ( !%Contact ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such contact '$Param{ContactID}'!",
         );
@@ -1248,14 +1248,14 @@ sub TokenGenerate {
 
     # check needed stuff
     if ( !$Param{ContactID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ContactID!"
         );
         return;
     }
 
-    my $Token = $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString(
+    my $Token = $Kernel::OM->Get('Main')->GenerateRandomString(
         Length => 14,
     );
 
@@ -1285,7 +1285,7 @@ sub TokenCheck {
 
     # check needed stuff
     if ( !$Param{Token} || !$Param{ContactID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Token and ContactID!"
         );
@@ -1328,11 +1328,11 @@ sub ContactList {
     my $Valid = $Param{Valid} // 1;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check cache
     my $CacheKey = join '::', 'ContactList', $Valid;
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -1343,11 +1343,11 @@ sub ContactList {
     # sql query
     if ($Valid) {
         $SQL
-            .= " WHERE c.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )";
+            .= " WHERE c.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )";
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(SQL => $SQL);
 
@@ -1363,7 +1363,7 @@ sub ContactList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1393,7 +1393,7 @@ sub _ContactFullname {
 
     for my $Needed (qw(Firstname Lastname)) {
         if (!$Param{$Needed}) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );

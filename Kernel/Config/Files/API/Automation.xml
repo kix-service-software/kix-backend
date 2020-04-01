@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobTypeCollectionResponse</Item>
             </Hash>
@@ -17,6 +18,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">JobID</Item>
                 <Item Key="ResponseSchema">JobResponse</Item>
@@ -28,6 +30,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobCollectionResponse</Item>
             </Hash>
@@ -38,6 +41,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">JobPostRequest</Item>
                 <Item Key="ResponseSchema">JobPostPatchResponse</Item>
@@ -49,6 +53,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">JobPatchRequest</Item>
                 <Item Key="ResponseSchema">JobPostPatchResponse</Item>
@@ -60,6 +65,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -70,6 +76,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobExecPlanIDSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobExecPlanIDCollectionResponse</Item>
             </Hash>
@@ -80,6 +87,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobExecPlanIDCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">JobExecPlanIDPostRequest</Item>
                 <Item Key="ResponseSchema">JobExecPlanIDPostResponse</Item>
@@ -91,6 +99,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobExecPlanIDDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobExecPlanIDDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -101,6 +110,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobMacroIDSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobMacroIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">JobMacroIDCollectionResponse</Item>
             </Hash>
@@ -111,6 +121,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobMacroIDCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobMacroIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">JobMacroIDPostRequest</Item>
                 <Item Key="ResponseSchema">JobMacroIDPostResponse</Item>
@@ -122,6 +133,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">JobMacroIDDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobMacroIDDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -132,6 +144,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::ExecPlanTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ExecPlanTypeCollectionResponse</Item>
             </Hash>
@@ -142,6 +155,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ExecPlanTypeGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Automation::JobTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ExecPlanTypeResponse</Item>
             </Hash>

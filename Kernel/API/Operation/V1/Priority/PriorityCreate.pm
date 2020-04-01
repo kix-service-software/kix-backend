@@ -125,7 +125,7 @@ sub Run {
     my $PriorityID;
      	
     # check if Priority exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+    my $Exists = $Kernel::OM->Get('Priority')->PriorityLookup(
         Priority => $Priority->{Name},
     );
     
@@ -137,7 +137,7 @@ sub Run {
     }
 
     # create Priority
-    $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityAdd(
+    $PriorityID = $Kernel::OM->Get('Priority')->PriorityAdd(
         Name    => $Priority->{Name},
         Comment => $Priority->{Comment},
         ValidID => $Priority->{ValidID} || 1,

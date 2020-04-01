@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform LogFile search
-    my %LogFileList = $Kernel::OM->Get('Kernel::System::LogFile')->LogFileList();
+    my %LogFileList = $Kernel::OM->Get('LogFile')->LogFileList();
 
 	# get already prepared LogFile data from LogFileGet operation
     if ( IsHashRefWithData(\%LogFileList) ) {  	

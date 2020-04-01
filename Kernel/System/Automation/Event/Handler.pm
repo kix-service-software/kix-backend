@@ -18,9 +18,9 @@ use List::Util qw(first);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Automation',
+    'Config',
+    'Log',
+    'Automation',
 );
 
 sub new {
@@ -39,7 +39,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -47,7 +47,7 @@ sub Run {
         }
     }
 
-    return $Kernel::OM->Get('Kernel::System::Automation')->ExecuteJobsForEvent(
+    return $Kernel::OM->Get('Automation')->ExecuteJobsForEvent(
         %Param,
         Type => $Param{Config}->{Type},
     );

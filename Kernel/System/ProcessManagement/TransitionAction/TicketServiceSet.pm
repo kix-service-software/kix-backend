@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Service',
-    'Kernel::System::Ticket',
+    'Log',
+    'Service',
+    'Ticket',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketServiceSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketServiceSet');
+    my $TicketServiceSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketServiceSet');
 
 =cut
 
@@ -106,7 +106,7 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{ServiceID} && !$Param{Config}->{Service} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No Service or ServiceID configured!",
         );
@@ -114,7 +114,7 @@ sub Run {
     }
 
     if ( !$Param{Ticket}->{ContactID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "To set a service the ticket requires a customer!",
         );
@@ -153,7 +153,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'ServiceID '
@@ -166,14 +166,14 @@ sub Run {
         }
 
         # set ticket service
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketServiceSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketServiceSet(
             TicketID  => $Param{Ticket}->{TicketID},
             ServiceID => $Param{Config}->{ServiceID},
             UserID    => $Param{UserID},
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket ServiceID '
@@ -208,12 +208,12 @@ sub Run {
         )
     {
 
-        my $ServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+        my $ServiceID = $Kernel::OM->Get('Service')->ServiceLookup(
             Name => $Param{Config}->{Service},
         );
 
         if ( !$ServiceID ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Service '
@@ -230,7 +230,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Service '
@@ -243,14 +243,14 @@ sub Run {
         }
 
         # set ticket service
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketServiceSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketServiceSet(
             TicketID => $Param{Ticket}->{TicketID},
             Service  => $Param{Config}->{Service},
             UserID   => $Param{UserID},
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket Service '
@@ -261,7 +261,7 @@ sub Run {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . "Couldn't update Ticket Service - can't find valid Service parameter!",
@@ -291,7 +291,7 @@ sub _CheckService {
     my ( $Self, %Param ) = @_;
 
     # get a list of assigned services to the customer user
-    my %Services = $Kernel::OM->Get('Kernel::System::Service')->ContactServiceMemberList(
+    my %Services = $Kernel::OM->Get('Service')->ContactServiceMemberList(
         ContactLogin => $Param{UserLogin},
         Result            => 'HASH',
         DefaultServices   => 1,

@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform template search
-    my $TemplateListRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateList(
+    my $TemplateListRef = $Kernel::OM->Get('ImportExport')->TemplateList(
         UserID => $Self->{Authorization}->{UserID}
     );
 

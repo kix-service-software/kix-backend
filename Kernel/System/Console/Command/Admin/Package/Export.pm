@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::Package',
+    'Main',
+    'Package',
 );
 
 sub Configure {
@@ -65,7 +65,7 @@ sub Run {
     my $SourcePath = $Self->GetArgument('source-path');
 
     my $FileString;
-    my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
         Location => $SourcePath,
         Mode     => 'utf8',        # optional - binmode|utf8
         Result   => 'SCALAR',      # optional - SCALAR|ARRAY
@@ -76,7 +76,7 @@ sub Run {
     }
     $FileString = ${$ContentRef};
 
-    my %Structure = $Kernel::OM->Get('Kernel::System::Package')->PackageParse(
+    my %Structure = $Kernel::OM->Get('Package')->PackageParse(
         String => $FileString,
     );
 
@@ -91,7 +91,7 @@ sub Run {
     }
 
     my $TargetDirectory = $Self->GetOption('target-directory');
-    my $Success         = $Kernel::OM->Get('Kernel::System::Package')->PackageExport(
+    my $Success         = $Kernel::OM->Get('Package')->PackageExport(
         String => $FileString,
         Home   => $TargetDirectory,
     );

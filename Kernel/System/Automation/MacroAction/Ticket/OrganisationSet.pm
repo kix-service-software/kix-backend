@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Organisation'
+    'Log',
+    'Ticket',
+    'Organisation'
 );
 
 =head1 NAME
@@ -79,7 +79,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
@@ -89,7 +89,7 @@ sub Run {
         return;
     }
 
-    my $Organisation = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    my $Organisation = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{Organisation},
         TicketID => $Param{TicketID},
@@ -97,7 +97,7 @@ sub Run {
         UserID   => $Param{UserID},
     );
 
-    my $OrganisationID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationLookup(
+    my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
         Number => $Organisation,
         Silent => 1
     );
@@ -118,7 +118,7 @@ sub Run {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the organisation \"$Param{Config}->{Organisation}\" failed!",
             UserID   => $Param{UserID}

@@ -84,7 +84,7 @@ perform DynamicFieldTypeSearch Operation. This will return a list of DynamicFiel
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $FieldTypeConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Driver');
+    my $FieldTypeConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::Driver');
 
     if ( !IsHashRefWithData($FieldTypeConfig) ) {
         return $Self->_Error(

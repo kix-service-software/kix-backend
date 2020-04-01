@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Ticket::Dump');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::Dump');
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -34,7 +34,7 @@ $Self->Is(
 );
 
 # create a new ticket
-my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
     Title        => 'My ticket created by Agent A',
     Queue        => 'Junk',
     Lock         => 'unlock',

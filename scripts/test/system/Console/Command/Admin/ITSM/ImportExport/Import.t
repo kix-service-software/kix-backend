@@ -16,16 +16,16 @@ use vars (qw($Self));
 use File::Path qw(rmtree);
 
 # get needed objects
-my $CommandObject      = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::ITSM::ImportExport::Import');
-my $ImportExportObject = $Kernel::OM->Get('Kernel::System::ImportExport');
+my $CommandObject      = $Kernel::OM->Get('Console::Command::Admin::ITSM::ImportExport::Import');
+my $ImportExportObject = $Kernel::OM->Get('ImportExport');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # test command without --template-number option
 my $ExitCode = $CommandObject->Execute();
@@ -52,7 +52,7 @@ $Self->True(
 );
 
 # get 'Hardware' catalog class ID
-my $ConfigItemDataRef = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+my $ConfigItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class => 'ITSM::ConfigItem::Class',
     Name  => 'Hardware',
 );
@@ -124,7 +124,7 @@ for my $ObjectDataValue (qw( Name DeplState InciState )) {
 
 # make directory for export file
 my $SourcePath
-    = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/scripts/test/system/sample/ImportExport/TemplateExport.csv";
+    = $Kernel::OM->Get('Config')->Get('Home') . "/scripts/test/system/sample/ImportExport/TemplateExport.csv";
 
 # test command with wrong template number
 $ExitCode = $CommandObject->Execute( '--template-number', $Helper->GetRandomID(), $SourcePath . 'TemplateExport.csv' );
@@ -154,7 +154,7 @@ $Self->Is(
 );
 
 # get config item IDs
-my $ConfigItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
     Name => 'TestConfigItem*'
 );
 my $NumConfigItemImported = scalar @{$ConfigItemIDs};

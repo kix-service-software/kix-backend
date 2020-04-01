@@ -15,19 +15,19 @@ use utf8;
 use vars qw($Self);
 
 # get needed objects
-my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-my $ConfigItemObject     = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-my $ImportExportObject   = $Kernel::OM->Get('Kernel::System::ImportExport');
-my $ObjectBackendObject  = $Kernel::OM->Get('Kernel::System::ImportExport::ObjectBackend::ITSMConfigItem');
-my $XMLObject            = $Kernel::OM->Get('Kernel::System::XML');
+my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
+my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
+my $ImportExportObject   = $Kernel::OM->Get('ImportExport');
+my $ObjectBackendObject  = $Kernel::OM->Get('ImportExport::ObjectBackend::ITSMConfigItem');
+my $XMLObject            = $Kernel::OM->Get('XML');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();

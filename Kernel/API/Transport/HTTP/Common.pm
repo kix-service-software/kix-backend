@@ -71,7 +71,7 @@ sub ProviderCheckAuthorization {
         );
     }
 
-    my $ValidatedToken = $Kernel::OM->Get('Kernel::System::Token')->ValidateToken(
+    my $ValidatedToken = $Kernel::OM->Get('Token')->ValidateToken(
         Token => $Authorization{Token},
     );
 

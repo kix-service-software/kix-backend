@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $PIDObject = $Kernel::OM->Get('Kernel::System::PID');
+    my $PIDObject = $Kernel::OM->Get('PID');
 
 =cut
 
@@ -51,7 +51,7 @@ sub new {
     bless( $Self, $Type );
 
     # get fqdn
-    $Self->{Host} = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    $Self->{Host} = $Kernel::OM->Get('Config')->Get('FQDN');
 
     return $Self;
 }
@@ -86,7 +86,7 @@ sub PIDCreate {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name'
         );
@@ -100,7 +100,7 @@ sub PIDCreate {
 
         my $TTL = $Param{TTL} || 3600;
         if ( $ProcessID{Created} > ( time() - $TTL ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Can't create PID $ProcessID{Name}, because it's already running "
                     . "($ProcessID{Host}/$ProcessID{PID})!",
@@ -108,7 +108,7 @@ sub PIDCreate {
             return;
         }
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Removed PID ($ProcessID{Name}/$ProcessID{Host}/$ProcessID{PID}, "
                 . "because 1 hour old!",
@@ -124,7 +124,7 @@ sub PIDCreate {
 
     # add new entry
     my $Time = time();
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             INSERT INTO process_id
             (process_name, process_id, process_host, process_create, process_change)
@@ -150,7 +150,7 @@ sub PIDGet {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name'
         );
@@ -158,7 +158,7 @@ sub PIDGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -206,7 +206,7 @@ sub PIDDelete {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name'
         );
@@ -229,7 +229,7 @@ sub PIDDelete {
     }
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => \@Bind,
     );
@@ -253,7 +253,7 @@ sub PIDUpdate {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name'
         );
@@ -263,7 +263,7 @@ sub PIDUpdate {
     my %PID = $Self->PIDGet( Name => $Param{Name} );
 
     if ( !%PID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Can not get PID'
         );
@@ -272,7 +272,7 @@ sub PIDUpdate {
 
     # sql
     my $Time = time();
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE process_id
             SET process_change = ?

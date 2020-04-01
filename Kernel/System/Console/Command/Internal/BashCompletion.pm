@@ -18,8 +18,8 @@ use Kernel::System::Console;
 use base qw(Kernel::System::Console::BaseCommand Kernel::System::Console::Command::List);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
+    'Config',
+    'Main',
 );
 
 sub Configure {
@@ -78,8 +78,8 @@ sub Run {
 
         # Try to create the command object to get its options
         my $CommandName = $Elements[0];
-        my $CommandPath = 'Kernel::System::Console::Command::' . $CommandName;
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( $CommandPath, Silent => 1 ) ) {
+        my $CommandPath = 'Console::Command::' . $CommandName;
+        if ( !$Kernel::OM->Get('Main')->Require( $CommandPath, Silent => 1 ) ) {
             return $Self->ExitCodeOk();
         }
         my $Command = $Kernel::OM->Get($CommandPath);

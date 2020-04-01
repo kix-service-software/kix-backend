@@ -84,18 +84,18 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Type search
-    my %TypeList = $Kernel::OM->Get('Kernel::System::LinkObject')->PossibleLinkList();
+    my %TypeList = $Kernel::OM->Get('LinkObject')->PossibleLinkList();
 
 	# get already prepared Type data from LinkTypeGet operation
     if ( IsHashRefWithData(\%TypeList) ) {  	
 
         my @Result;
         foreach my $LinkType ( sort keys %TypeList ) {
-            my $TypeID = $Kernel::OM->Get('Kernel::System::LinkObject')->TypeLookup(
+            my $TypeID = $Kernel::OM->Get('LinkObject')->TypeLookup(
                 Name   => $TypeList{$LinkType}->{Type},
                 UserID => $Self->{Authorization}->{UserID},
             );
-            my %TypeData = $Kernel::OM->Get('Kernel::System::LinkObject')->TypeGet(
+            my %TypeData = $Kernel::OM->Get('LinkObject')->TypeGet(
                 TypeID => $TypeID,
             );
 

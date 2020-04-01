@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::MailAccount::MailAccountGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::MailAccount::MailAccountGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $MailAccountID ( @{ $Param{Data}->{MailAccountID} } ) {
 
         # get the MailAccount data
-        my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
+        my %MailAccountData = $Kernel::OM->Get('MailAccount')->MailAccountGet(
             ID => $MailAccountID,
         );
 

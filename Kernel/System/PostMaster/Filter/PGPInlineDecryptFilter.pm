@@ -12,8 +12,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Crypt::PGP',
+    'Log',
+    'Crypt::PGP',
 );
 
 sub new {
@@ -24,10 +24,10 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{LogObject} = $Kernel::OM->Get('Log');
 
     if ( !$Self->{CryptObject} ) {
-        $Self->{CryptObject} = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+        $Self->{CryptObject} = $Kernel::OM->Get('Crypt::PGP');
     }
 
     $Self->{Debug} = $Param{Debug} || 0;

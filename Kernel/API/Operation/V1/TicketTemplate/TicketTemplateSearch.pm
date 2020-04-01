@@ -58,7 +58,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
     # get config for this screen
-    # $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketTemplate::TicketTemplateSearch');
+    # $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketTemplate::TicketTemplateSearch');
 
     return $Self;
 }
@@ -79,7 +79,7 @@ one or more ticket templates in one call.
 sub Run {
     my ($Self, %Param) = @_;
 
-    my @TicketTemplateList = $Kernel::OM->Get('Kernel::System::TicketTemplate')->TicketTemplateList();
+    my @TicketTemplateList = $Kernel::OM->Get('TicketTemplate')->TicketTemplateList();
 
     # get already prepared template data from TicketTemplateGet operation
     if ( IsArrayRefWithData(\@TicketTemplateList) ) {

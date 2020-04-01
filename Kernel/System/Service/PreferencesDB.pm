@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
 );
 
 sub new {
@@ -52,7 +52,7 @@ sub ServicePreferencesSet {
     # check needed stuff
     for (qw(ServiceID Key Value)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -60,7 +60,7 @@ sub ServicePreferencesSet {
         }
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete old data
     return if !$DBObject->Do(
@@ -78,7 +78,7 @@ sub ServicePreferencesSet {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => $Self->{CacheType},
         Key  => $Self->{CachePrefix} . $Param{ServiceID},
     );
@@ -92,7 +92,7 @@ sub ServicePreferencesGet {
     # check needed stuff
     for (qw(ServiceID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -104,17 +104,17 @@ sub ServicePreferencesGet {
 # ---
 #
 #    # check if service preferences are available
-#    return if !$Kernel::OM->Get('Kernel::Config')->Get('ServicePreferences');
+#    return if !$Kernel::OM->Get('Config')->Get('ServicePreferences');
 # ---
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $Self->{CachePrefix} . $Param{ServiceID},
     );
     return %{$Cache} if $Cache;
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get preferences
     return if !$DBObject->Prepare(
@@ -129,7 +129,7 @@ sub ServicePreferencesGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $Self->{CachePrefix} . $Param{ServiceID},

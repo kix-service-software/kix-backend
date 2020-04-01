@@ -25,19 +25,19 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Encode',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::Type',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Encode',
+    'LinkObject',
+    'Log',
+    'Ticket',
+    'Time',
+    'Type',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -60,7 +60,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
+    my $FAQObject = $Kernel::OM->Get('FAQ');
 
 =cut
 
@@ -72,10 +72,10 @@ sub new {
     bless( $Self, $Type );
 
     # get like escape string needed for some databases (e.g. oracle)
-    $Self->{LikeEscapeString} = $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('LikeEscapeString');
+    $Self->{LikeEscapeString} = $Kernel::OM->Get('DB')->GetDatabaseFunction('LikeEscapeString');
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get default options
     $Self->{Voting} = $ConfigObject->Get('FAQ::Voting');
@@ -138,7 +138,7 @@ sub FAQGet {
     # check needed stuff
     for my $Argument (qw(UserID ItemID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -153,7 +153,7 @@ sub FAQGet {
     my $CacheKey = 'FAQGet::ItemID::' . $Param{ItemID} . '::ItemFields::' . $FetchItemFields;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Cache = $CacheObject->Get(
         Type => $Self->{CacheType},
@@ -161,10 +161,10 @@ sub FAQGet {
     );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # set %Data from cache if any
     my %Data;
@@ -211,7 +211,7 @@ sub FAQGet {
 
         # check error
         if ( !%Data ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such ItemID $Param{ItemID}!",
             );
@@ -261,7 +261,7 @@ sub FAQGet {
     if ( $Param{DynamicFields} ) {
 
         # get all dynamic fields for the object type FAQ
-        my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             ObjectType => 'FAQ'
         );
 
@@ -275,7 +275,7 @@ sub FAQGet {
             next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
 
             # get the current value for each dynamic field
-            my $Value = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueGet(
+            my $Value = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
                 DynamicFieldConfig => $DynamicFieldConfig,
                 ObjectID           => $Param{ItemID},
             );
@@ -294,7 +294,7 @@ sub ItemFieldGet {
     # check needed stuff
     for my $Argument (qw(UserID ItemID Field)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -305,7 +305,7 @@ sub ItemFieldGet {
 
     # check for valid field name
     if ( $Param{Field} !~ m{ \A Field [1-6] \z }msxi ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Field '$Param{Field}' is invalid!",
         );
@@ -317,7 +317,7 @@ sub ItemFieldGet {
     my $CacheKey = 'ItemFieldGet::ItemID::' . $Param{ItemID};
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Cache = $CacheObject->Get(
         Type => $Self->{CacheType},
@@ -341,7 +341,7 @@ sub ItemFieldGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => 'SELECT ' . $FieldLookup{ $Param{Field} } . '
@@ -413,7 +413,7 @@ sub FAQAdd {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(CategoryID Visibility Language Title UserID ContentType)) {
@@ -431,7 +431,7 @@ sub FAQAdd {
     if ( !defined $Param{ValidID} ) {
 
         # get the valid ids
-        my @ValidIDs = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        my @ValidIDs = $Kernel::OM->Get('Valid')->ValidIDsGet();
 
         $Param{ValidID} = $ValidIDs[0];
     }
@@ -442,7 +442,7 @@ sub FAQAdd {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check number
     if ( !$Param{Number} ) {
@@ -454,7 +454,7 @@ sub FAQAdd {
 
         # TODO!!! rbo-190327
         # # check permission
-        # my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
+        # my %Groups = reverse $Kernel::OM->Get('Group')->GroupMemberList(
         #     UserID => $Param{UserID},
         #     Type   => 'ro',
         #     Result => 'HASH',
@@ -478,13 +478,13 @@ sub FAQAdd {
     # check for base64 encoded images in fields and store them
     my @AttachmentConvert;
     foreach my $Field ( qw(Field1 Field2 Field3 Field4 Field5 Field6) ) {
-        $Kernel::OM->Get('Kernel::System::HTMLUtils')->EmbeddedImagesExtract(
+        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
             DocumentRef    => \$Param{$Field},
             AttachmentsRef => \@AttachmentConvert,
         );
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             INSERT INTO faq_item
                 (f_number, f_name, language, f_subject,
@@ -546,7 +546,7 @@ sub FAQAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get id
     return if !$DBObject->Prepare(
@@ -597,7 +597,7 @@ sub FAQAdd {
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
@@ -625,7 +625,7 @@ sub FAQAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $ID,
@@ -672,7 +672,7 @@ sub FAQUpdate {
     # check needed stuff
     for my $Argument (qw(ItemID CategoryID Visibility Language Title ValidID UserID ContentType)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -684,13 +684,13 @@ sub FAQUpdate {
     # check for base64 encoded images in fields and store them
     my @AttachmentConvert;
     foreach my $Field ( qw(Field1 Field2 Field3 Field4 Field5 Field6) ) {
-        $Kernel::OM->Get('Kernel::System::HTMLUtils')->EmbeddedImagesExtract(
+        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
             DocumentRef    => \$Param{$Field},
             AttachmentsRef => \@AttachmentConvert,
         );
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE faq_item SET
                 f_name = ?, language = ?, f_subject = ?, category_id = ?,
@@ -727,19 +727,19 @@ sub FAQUpdate {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # update approval
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{ApprovalOff} ) {
 
         # TODO!!! rbo-190327
         # # check permission
-        # my %Groups = reverse $Kernel::OM->Get('Kernel::System::Group')->GroupMemberList(
+        # my %Groups = reverse $Kernel::OM->Get('Group')->GroupMemberList(
         #     UserID => $Param{UserID},
         #     Type   => 'ro',
         #     Result => 'HASH',
@@ -762,7 +762,7 @@ sub FAQUpdate {
 
         # check error
         if ( !$UpdateSuccess ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not update approval for ItemID $Param{ItemID}!",
             );
@@ -771,7 +771,7 @@ sub FAQUpdate {
         }
 
         # clear cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
     }
@@ -787,7 +787,7 @@ sub FAQUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
@@ -822,7 +822,7 @@ sub AttachmentAdd {
     # check needed stuff
     for my $Argument (qw(ItemID Content ContentType Filename UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -890,12 +890,12 @@ sub AttachmentAdd {
     $Param{Filename} = $NewFileName;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # encode attachment if it's a postgresql backend!!!
     if ( !$DBObject->GetDatabaseFunction('DirectBlob') ) {
 
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Param{Content} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{Content} );
 
         $Param{Content} = MIME::Base64::encode_base64( $Param{Content} );
     }
@@ -933,7 +933,7 @@ sub AttachmentAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Attachment',
         ObjectID  => $Param{ItemID}.'::'.$AttachmentID,
@@ -971,7 +971,7 @@ sub AttachmentGet {
     # check needed stuff
     for my $Argument (qw(ItemID FileID UserID)) {
         if ( !defined $Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -981,7 +981,7 @@ sub AttachmentGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => 'SELECT filename, content_type, content_size, content, content_id, disposition, '
@@ -1048,7 +1048,7 @@ sub AttachmentDelete {
     # check needed stuff
     for my $Argument (qw(ItemID FileID UserID)) {
         if ( !defined $Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1057,13 +1057,13 @@ sub AttachmentDelete {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM faq_attachment WHERE id = ? AND faq_id = ? ',
         Bind => [ \$Param{FileID}, \$Param{ItemID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Attachment',
         ObjectID  => $Param{ItemID}.'::'.$Param{FileID},
@@ -1093,7 +1093,7 @@ sub AttachmentInlineDelete {
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
         if ( !defined $Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1102,13 +1102,13 @@ sub AttachmentInlineDelete {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM faq_attachment WHERE disposition = \'inline\' AND faq_id = ? ',
         Bind => [ \$Param{ItemID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.InlineAttachment',
         ObjectID  => $Param{ItemID},
@@ -1166,7 +1166,7 @@ sub AttachmentIndex {
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1175,7 +1175,7 @@ sub AttachmentIndex {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => 'SELECT id, filename, content_type, content_size, content_id, disposition '
@@ -1253,7 +1253,7 @@ sub FAQCount {
     # check needed stuff
     for my $Argument (qw(CategoryIDs ItemStates UserID)) {
         if ( !defined $Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1266,7 +1266,7 @@ sub FAQCount {
     my $Valid = $Param{Valid} ? 1 : 0;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $CategoryIDString = '';
     if ( $Param{CategoryIDs} && ref $Param{CategoryIDs} eq 'ARRAY' && @{ $Param{CategoryIDs} } ) {
@@ -1299,10 +1299,10 @@ sub FAQCount {
     # build valid id string
     my $ValidIDsString;
     if ($Valid) {
-        $ValidIDsString = join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        $ValidIDsString = join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet();
     }
     else {
-        my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+        my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
         $ValidIDsString = join ', ', keys %ValidList;
     }
 
@@ -1359,7 +1359,7 @@ sub FAQDelete {
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1398,7 +1398,7 @@ sub FAQDelete {
     }
 
     # delete all FAQ links of this FAQ article
-    $Kernel::OM->Get('Kernel::System::LinkObject')->LinkDeleteAll(
+    $Kernel::OM->Get('LinkObject')->LinkDeleteAll(
         Object => 'FAQ',
         Key    => $Param{ItemID},
         UserID => $Param{UserID},
@@ -1411,18 +1411,18 @@ sub FAQDelete {
     );
 
     # delete article
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM faq_item WHERE id = ?',
         Bind => [ \$Param{ItemID} ],
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
@@ -1453,7 +1453,7 @@ sub FAQHistoryAdd {
     # check needed stuff
     for my $Argument (qw(ItemID Name UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1462,7 +1462,7 @@ sub FAQHistoryAdd {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO faq_history (name, item_id, ' .
             ' created, created_by, changed, changed_by)' .
             ' VALUES ( ?, ?, current_timestamp, ?, current_timestamp, ?)',
@@ -1472,7 +1472,7 @@ sub FAQHistoryAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.History',
         ObjectID  => $Param{ItemID},
@@ -1506,7 +1506,7 @@ sub FAQHistoryGet {
     # check needed stuff
     for my $Argument (qw(ID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1516,7 +1516,7 @@ sub FAQHistoryGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => '
@@ -1572,7 +1572,7 @@ sub FAQHistoryList {
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1582,7 +1582,7 @@ sub FAQHistoryList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => '
@@ -1622,7 +1622,7 @@ sub FAQHistoryDelete {
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1630,13 +1630,13 @@ sub FAQHistoryDelete {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM faq_history WHERE item_id = ?',
         Bind => [ \$Param{ItemID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.History',
         ObjectID  => $Param{ItemID},
@@ -1683,7 +1683,7 @@ sub HistoryGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -1707,7 +1707,7 @@ sub HistoryGet {
     $SQL .= 'ORDER BY h.created DESC';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get the data from db
     return if !$DBObject->Prepare(
@@ -1758,7 +1758,7 @@ sub KeywordList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -1773,7 +1773,7 @@ sub KeywordList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get keywords from db
     return if !$DBObject->Prepare(
@@ -1829,7 +1829,7 @@ sub FAQPathListGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -1878,7 +1878,7 @@ sub FAQLogAdd {
     # check needed stuff
     for my $Argument (qw(ItemID Interface UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1892,7 +1892,7 @@ sub FAQLogAdd {
     my $UserAgent = $ENV{'HTTP_USER_AGENT'} || 'NONE';
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get current system time
     my $SystemTime = $TimeObject->SystemTime();
@@ -1909,7 +1909,7 @@ sub FAQLogAdd {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if a log entry exists newer than the ReloadBlockTime
     return if !$DBObject->Prepare(
@@ -1939,7 +1939,7 @@ sub FAQLogAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Log',
         ObjectID  => $Param{ItemID},
@@ -2022,7 +2022,7 @@ sub FAQTop10Get {
     # check needed stuff
     for my $Argument (qw(Interface UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2032,7 +2032,7 @@ sub FAQTop10Get {
     }
 
     # build valid id string
-    my $ValidIDsString = join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+    my $ValidIDsString = join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet();
 
     # prepare SQL
     my @Bind;
@@ -2044,7 +2044,7 @@ sub FAQTop10Get {
         . 'AND faq_state.type_id = faq_state_type.id ';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # filter just categories with at least ro permission
     if ( $Param{CategoryIDs} && ref $Param{CategoryIDs} eq 'ARRAY' && @{ $Param{CategoryIDs} } ) {
@@ -2139,7 +2139,7 @@ sub FAQArticleTitleClean {
     # get config options
     my $TitleSize = $Param{Size};
     if ( !defined $TitleSize ) {
-        $TitleSize = $Kernel::OM->Get('Kernel::Config')->Get('FAQ::TitleSize') || 100;
+        $TitleSize = $Kernel::OM->Get('Config')->Get('FAQ::TitleSize') || 100;
     }
 
     # trim white space at the beginning or end
@@ -2169,7 +2169,7 @@ sub FAQContentTypeSet {
     my ( $Self, %Param ) = @_;
 
     if ( $Param{FAQItemIDs} && !IsArrayRefWithData( $Param{FAQItemIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid FAQItemIDs format!",
         );
@@ -2178,7 +2178,7 @@ sub FAQContentTypeSet {
     }
 
     # Get config object.
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $ContentType = $Param{ContentType} || '';
 
@@ -2209,7 +2209,7 @@ sub FAQContentTypeSet {
     }
 
     # Get DB object.
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # Set the content type either by the given param or according to the system settings.
     return if !$DBObject->Do(
@@ -2223,7 +2223,7 @@ sub FAQContentTypeSet {
     if ( $Param{ContentType} ) {
 
         # Delete cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'FAQ',
         );
 
@@ -2289,7 +2289,7 @@ sub FAQContentTypeSet {
         );
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'FAQ.Article',
             ObjectID  => $ItemID,
@@ -2297,7 +2297,7 @@ sub FAQContentTypeSet {
     }
 
     # Delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'FAQ',
     );
 
@@ -2322,7 +2322,7 @@ sub _FAQApprovalUpdate {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
@@ -2346,7 +2346,7 @@ sub _FAQApprovalUpdate {
     }
 
     # update database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE faq_item SET '
             . 'approved = ?, '
             . 'changed = current_timestamp, '
@@ -2360,7 +2360,7 @@ sub _FAQApprovalUpdate {
     );
 
     # approval feature is activated and FAQ article is not approved yet
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('FAQ::ApprovalRequired') && !$Param{Approved} ) {
+    if ( $Kernel::OM->Get('Config')->Get('FAQ::ApprovalRequired') && !$Param{Approved} ) {
 
         # get FAQ data
         my %FAQData = $Self->FAQGet(
@@ -2390,7 +2390,7 @@ sub _FAQApprovalUpdate {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
@@ -2421,7 +2421,7 @@ sub _FAQApprovalTicketCreate {
     # check needed stuff
     for my $Argument (qw(ItemID CategoryID FAQNumber Title Visibility UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2431,10 +2431,10 @@ sub _FAQApprovalTicketCreate {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
 #rbo - T2016121190001552 - added KIX placeholders
     # get subject
@@ -2460,7 +2460,7 @@ sub _FAQApprovalTicketCreate {
     if ($TicketType) {
 
         # get a ticket type lookup table
-        my %TypeList   = $Kernel::OM->Get('Kernel::System::Type')->TypeList();
+        my %TypeList   = $Kernel::OM->Get('Type')->TypeList();
         my %TypeLookup = reverse %TypeList;
 
         # set $TicketType to empty if TickeyType does not appear in the lookup table. If set to
@@ -2483,7 +2483,7 @@ sub _FAQApprovalTicketCreate {
     if ($TicketID) {
 
         # get user object
-        my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+        my $UserObject = $Kernel::OM->Get('User');
 
         # get UserName
         my $UserName = $UserObject->UserName(

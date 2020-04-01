@@ -17,15 +17,15 @@ use Kernel::System::VariableCheck qw(:all);
 use vars (qw($Self));
 
 # get SysConfigLanguage object
-my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
+my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 ########################################################################################################################################
 # OptionType handling

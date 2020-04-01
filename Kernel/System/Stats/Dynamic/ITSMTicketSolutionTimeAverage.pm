@@ -16,19 +16,19 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Priority',
-    'Kernel::System::Queue',
-    'Kernel::System::SLA',
-    'Kernel::System::Service',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::Type',
-    'Kernel::System::User',
+    'Config',
+    'DB',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Priority',
+    'Queue',
+    'SLA',
+    'Service',
+    'State',
+    'Ticket',
+    'Time',
+    'Type',
+    'User',
 );
 
 sub new {
@@ -38,10 +38,10 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{DBSlaveObject} = $Param{DBSlaveObject} || $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBSlaveObject} = $Param{DBSlaveObject} || $Kernel::OM->Get('DB');
 
     # get the dynamic fields for ticket object
-    $Self->{DynamicField} = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    $Self->{DynamicField} = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => ['Ticket'],
     );
@@ -59,28 +59,28 @@ sub GetObjectAttributes {
     my ( $Self, %Param ) = @_;
 
     # get user list
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+    my %UserList = $Kernel::OM->Get('User')->UserList(
         Type  => 'Long',
         Valid => 0,
     );
 
     # get state list
-    my %StateList = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+    my %StateList = $Kernel::OM->Get('State')->StateGetStatesByType(
         StateType => ['closed'],
         Result    => 'HASH',
         UserID    => 1,
     );
 
     # get queue list
-    my %QueueList = $Kernel::OM->Get('Kernel::System::Queue')->GetAllQueues();
+    my %QueueList = $Kernel::OM->Get('Queue')->GetAllQueues();
 
     # get priority list
-    my %PriorityList = $Kernel::OM->Get('Kernel::System::Priority')->PriorityList(
+    my %PriorityList = $Kernel::OM->Get('Priority')->PriorityList(
         UserID => 1,
     );
 
     # get current time to fix bug#3830
-    my $TimeStamp = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+    my $TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
     my ($Date) = split /\s+/, $TimeStamp;
     my $Today = sprintf "%s 23:59:59", $Date;
 
@@ -213,15 +213,15 @@ sub GetObjectAttributes {
         },
     );
 
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Service') ) {
+    if ( $Kernel::OM->Get('Config')->Get('Ticket::Service') ) {
 
         # get service list
-        my %Service = $Kernel::OM->Get('Kernel::System::Service')->ServiceList(
+        my %Service = $Kernel::OM->Get('Service')->ServiceList(
             UserID => 1,
         );
 
         # get sla list
-        my %SLA = $Kernel::OM->Get('Kernel::System::SLA')->SLAList(
+        my %SLA = $Kernel::OM->Get('SLA')->SLAList(
             UserID => 1,
         );
 
@@ -251,10 +251,10 @@ sub GetObjectAttributes {
         unshift @ObjectAttributes, @ObjectAttributeAdd;
     }
 
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type') ) {
+    if ( $Kernel::OM->Get('Config')->Get('Ticket::Type') ) {
 
         # get ticket type list
-        my %Type = $Kernel::OM->Get('Kernel::System::Type')->TypeList(
+        my %Type = $Kernel::OM->Get('Type')->TypeList(
             UserID => 1,
         );
 
@@ -272,7 +272,7 @@ sub GetObjectAttributes {
         unshift @ObjectAttributes, \%ObjectAttribute1;
     }
 
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Stats::UseAgentElementInStats') ) {
+    if ( $Kernel::OM->Get('Config')->Get('Stats::UseAgentElementInStats') ) {
 
         my @ObjectAttributeAdd = (
             {
@@ -310,7 +310,7 @@ sub GetObjectAttributes {
         push @ObjectAttributes, @ObjectAttributeAdd;
     }
 
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Stats::CustomerIDAsMultiSelect') ) {
+    if ( $Kernel::OM->Get('Config')->Get('Stats::CustomerIDAsMultiSelect') ) {
 
         # Get CustomerID
         # (This way also can be the solution for the ContactID)
@@ -360,7 +360,7 @@ sub GetObjectAttributes {
         my $PossibleValuesFilter;
 
         # set possible values filter from ACLs
-        my $ACL = $Kernel::OM->Get('Kernel::System::Ticket')->TicketAcl(
+        my $ACL = $Kernel::OM->Get('Ticket')->TicketAcl(
             Action        => 'AgentStats',
             Type          => 'DynamicField_' . $DynamicFieldConfig->{Name},
             ReturnType    => 'Ticket',
@@ -369,13 +369,13 @@ sub GetObjectAttributes {
             UserID        => 1,
         );
         if ($ACL) {
-            my %Filter = $Kernel::OM->Get('Kernel::System::Ticket')->TicketAclData();
+            my %Filter = $Kernel::OM->Get('Ticket')->TicketAclData();
             $PossibleValuesFilter = \%Filter;
         }
 
         # get field html
         my $DynamicFieldStatsParameter
-            = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->StatsFieldParameterBuild(
+            = $Kernel::OM->Get('DynamicField::Backend')->StatsFieldParameterBuild(
             DynamicFieldConfig   => $DynamicFieldConfig,
             PossibleValuesFilter => $PossibleValuesFilter,
             );
@@ -426,7 +426,7 @@ sub GetStatElement {
     }
 
     # start ticket search
-    my @TicketSearchIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @TicketSearchIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         %Param,
         Result     => 'ARRAY',
         Limit      => 100_000_000,
@@ -472,7 +472,7 @@ sub GetStatElement {
                 next ENTRY if $Entry->{Viewable};
 
                 # set stop time
-                $Timespans{$Counter}->{StopTime} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                $Timespans{$Counter}->{StopTime} = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                     String => $Entry->{CreateTime},
                 );
 
@@ -483,7 +483,7 @@ sub GetStatElement {
                 next ENTRY if !$Entry->{Viewable};
 
                 # set start time
-                $Timespans{$Counter}->{StartTime} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                $Timespans{$Counter}->{StartTime} = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                     String => $Entry->{CreateTime},
                 );
             }
@@ -502,7 +502,7 @@ sub GetStatElement {
             $Timespan->{StopTime} ||= $Timespan->{StartTime} + ( 3 * 60 );
 
             # calculate working time
-            my $WorkingTimePart = $Kernel::OM->Get('Kernel::System::Time')->WorkingTime(
+            my $WorkingTimePart = $Kernel::OM->Get('Time')->WorkingTime(
                 %{$Timespan},
                 Calendar => $Calendar,
             );
@@ -550,18 +550,18 @@ sub _CalendarGet {
     my ( $Self, %Param ) = @_;
 
     # get config option
-    $Self->{TicketServiceFeature} ||= $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Service');
+    $Self->{TicketServiceFeature} ||= $Kernel::OM->Get('Config')->Get('Ticket::Service');
 
     my %EscalationData;
     if ( $Self->{TicketServiceFeature} && $Param{TicketData}->{SLAID} ) {
-        %EscalationData = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
+        %EscalationData = $Kernel::OM->Get('SLA')->SLAGet(
             SLAID  => $Param{TicketData}->{SLAID},
             UserID => 1,
             Cache  => 1,
         );
     }
     else {
-        %EscalationData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+        %EscalationData = $Kernel::OM->Get('Queue')->QueueGet(
             ID     => $Param{TicketData}->{QueueID},
             UserID => 1,
             Cache  => 1,
@@ -578,21 +578,21 @@ sub _TicketHistoryDataGet {
 
     # get id of histoy type StateUpdate
     if ( !$Self->{StateUpdateID} ) {
-        $Self->{StateUpdateID} = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup(
+        $Self->{StateUpdateID} = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
             Type => 'StateUpdate',
         );
     }
 
     # get id of histoy type NewTicket
     if ( !$Self->{NewTicketID} ) {
-        $Self->{NewTicketID} = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup(
+        $Self->{NewTicketID} = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
             Type => 'NewTicket',
         );
     }
 
     # get viewable state ids
     if ( !$Self->{ViewableStateIDs} ) {
-        my @ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+        my @ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
             Type   => 'Viewable',
             Result => 'ID',
         );

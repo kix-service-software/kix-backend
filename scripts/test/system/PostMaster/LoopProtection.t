@@ -15,11 +15,11 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject         = $Kernel::OM->Get('Kernel::Config');
-my $LoopProtectionObject = $Kernel::OM->Get('Kernel::System::PostMaster::LoopProtection');
+my $ConfigObject         = $Kernel::OM->Get('Config');
+my $LoopProtectionObject = $Kernel::OM->Get('PostMaster::LoopProtection');
 
 # define needed variable
-my $RandomID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->GetRandomID();
+my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
 for my $Module (qw(DB FS)) {
 

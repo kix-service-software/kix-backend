@@ -20,10 +20,10 @@ use LWP::UserAgent;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Encode',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -61,7 +61,7 @@ sub new {
     bless( $Self, $Type );
 
     # get database object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     $Self->{Timeout} = $Param{Timeout} || $ConfigObject->Get('WebUserAgent::Timeout') || 15;
     $Self->{Proxy}   = $Param{Proxy}   || $ConfigObject->Get('WebUserAgent::Proxy')   || '';
@@ -153,7 +153,7 @@ sub Request {
     #   SSL certificate validation.
     if (
         $Param{SkipSSLVerification}
-        || $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgent::DisableSSLVerification')
+        || $Kernel::OM->Get('Config')->Get('WebUserAgent::DisableSSLVerification')
         )
     {
         $UserAgent->ssl_opts(
@@ -185,7 +185,7 @@ sub Request {
     $UserAgent->timeout( $Self->{Timeout} );
 
     # get database object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # set user agent
     $UserAgent->agent(
@@ -207,7 +207,7 @@ sub Request {
 
         # check for Data param
         if ( !IsArrayRefWithData( $Param{Data} ) && !IsHashRefWithData( $Param{Data} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     'WebUserAgent POST: Need Data param containing a hashref or arrayref with data.',
@@ -220,7 +220,7 @@ sub Request {
     }
 
     if ( !$Response->is_success() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
         );
@@ -231,7 +231,7 @@ sub Request {
 
     # get the content to convert internal used charset
     my $ResponseContent = $Response->decoded_content();
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$ResponseContent );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$ResponseContent );
 
     if ( $Param{Return} && $Param{Return} eq 'REQUEST' ) {
         return (

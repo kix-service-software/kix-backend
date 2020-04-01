@@ -17,22 +17,22 @@ use vars (qw($Self));
 use CGI;
 
 use Kernel::Output::HTML::Layout;
-use Kernel::System::Web::Request;
+use Kernel::System::WebRequest;
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-my $ParamObject        = $Kernel::OM->Get('Kernel::System::Web::Request');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
+my $ParamObject        = $Kernel::OM->Get('WebRequest');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -511,7 +511,7 @@ for my $Test (@Tests) {
             # create a new CGI object to simulate a web request
             my $WebRequest = CGI->new( $Test->{Config}->{EditFieldRender}->{$Type}->{CGIParam} );
 
-            my $LocalParamObject = Kernel::System::Web::Request->new(
+            my $LocalParamObject = Kernel::System::WebRequest->new(
                 WebRequest => $WebRequest,
             );
 
@@ -577,7 +577,7 @@ for my $Test (@Tests) {
     # create a new CGI object to simulate a web request
     my $WebRequest = CGI->new( $Test->{Config}->{EditFieldValueGet}->{CGIParam} );
 
-    my $LocalParamObject = Kernel::System::Web::Request->new(
+    my $LocalParamObject = Kernel::System::WebRequest->new(
         WebRequest => $WebRequest,
     );
 

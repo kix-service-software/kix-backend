@@ -86,7 +86,7 @@ sub DefinitionList {
 
     # check needed stuff
     if ( !$Param{ClassID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ClassID!',
         );
@@ -94,21 +94,21 @@ sub DefinitionList {
     }
 
     my $CacheKey = 'DefinitionList::'.$Param{ClassID};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id, configitem_definition, version, create_time, create_by '
             . 'FROM configitem_definition WHERE class_id = ? ORDER BY version',
         Bind => [ \$Param{ClassID} ],
     );
 
     my @DefinitionList;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         my %Definition;
         $Definition{DefinitionID} = $Row[0];
         $Definition{Definition}   = $Row[1];
@@ -120,7 +120,7 @@ sub DefinitionList {
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -161,7 +161,7 @@ sub DefinitionGet {
 
     # check needed stuff
     if ( !$Param{DefinitionID} && !$Param{ClassID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need DefinitionID or ClassID!',
         );
@@ -169,7 +169,7 @@ sub DefinitionGet {
     }
 
     my $CacheKey = 'DefinitionGet::'.($Param{DefinitionID}||'').'::'.($Param{ClassID}||'');
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -178,7 +178,7 @@ sub DefinitionGet {
     if ( $Param{DefinitionID} ) {
 
         # ask database
-        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        $Kernel::OM->Get('DB')->Prepare(
             SQL => 'SELECT id, class_id, configitem_definition, version, create_time, create_by '
                 . 'FROM configitem_definition WHERE id = ?',
             Bind  => [ \$Param{DefinitionID} ],
@@ -188,7 +188,7 @@ sub DefinitionGet {
     else {
 
         # ask database
-        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        $Kernel::OM->Get('DB')->Prepare(
             SQL => 'SELECT id, class_id, configitem_definition, version, create_time, create_by '
                 . 'FROM configitem_definition '
                 . 'WHERE class_id = ? ORDER BY version DESC',
@@ -199,7 +199,7 @@ sub DefinitionGet {
 
     # fetch the result
     my %Definition;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Definition{DefinitionID} = $Row[0];
         $Definition{ClassID}      = $Row[1];
         $Definition{Definition}   = $Row[2];
@@ -223,7 +223,7 @@ sub DefinitionGet {
     }
 
     # get class list
-    my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     );
 
@@ -231,7 +231,7 @@ sub DefinitionGet {
     $Definition{Class} = $ClassList->{ $Definition{ClassID} };
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -259,7 +259,7 @@ sub DefinitionAdd {
     # check needed stuff
     for my $Argument (qw(ClassID Definition UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -281,7 +281,7 @@ sub DefinitionAdd {
 
     # stop add, if definition was not changed
     if ( $LastDefinition->{DefinitionID} && $LastDefinition->{Definition} eq $Param{Definition} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't add new definition! The definition was not changed.",
         );
@@ -302,7 +302,7 @@ sub DefinitionAdd {
         UserID => $Param{UserID},
     );
     if ( ( ref($Result) eq 'HASH' ) && ( $Result->{Error} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Pre-DefinitionCreate refused DefinitionAdd.",
         );
@@ -325,7 +325,7 @@ sub DefinitionAdd {
     }
 
     # insert new definition
-    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Success = $Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO configitem_definition '
             . '(class_id, configitem_definition, version, create_time, create_by) VALUES '
             . '(?, ?, ?, current_timestamp, ?)',
@@ -335,7 +335,7 @@ sub DefinitionAdd {
     return if !$Success;
 
     # get id of new definition
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id FROM configitem_definition WHERE '
             . 'class_id = ? AND version = ? '
             . 'ORDER BY version DESC',
@@ -345,12 +345,12 @@ sub DefinitionAdd {
 
     # fetch the result
     my $DefinitionID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $DefinitionID = $Row[0];
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -365,7 +365,7 @@ sub DefinitionAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'CMDB.Class.Definition',
         ObjectID  => $Param{ClassID}.'::'.$DefinitionID,
@@ -390,7 +390,7 @@ sub DefinitionCheck {
 
     # check needed stuff
     if ( !$Param{Definition} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Definition!',
         );
@@ -407,7 +407,7 @@ sub DefinitionCheck {
         $Definition = eval $Param{Definition};    ## no critic
         my $EvalFault = $@ || '';
         if ( $EvalFault ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Invalid Definition! You have an syntax error in the definition (' . $EvalFault. ').',
             );
@@ -417,7 +417,7 @@ sub DefinitionCheck {
 
     # check if definition exists at all
     if ( !$Definition ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Invalid Definition! You have an syntax error in the definition.',
         );
@@ -426,7 +426,7 @@ sub DefinitionCheck {
 
     # definition must be an array
     if ( ref $Definition ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Invalid Definition! Definition is not an array reference.',
         );
@@ -438,7 +438,7 @@ sub DefinitionCheck {
 
         # each definition attribute must be a hash reference with data
         if ( !$Attribute || ref $Attribute ne 'HASH' || !%{$Attribute} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Invalid Definition! At least one definition attribute is not a hash reference.',
             );
@@ -447,7 +447,7 @@ sub DefinitionCheck {
 
         # check if the key contains no spaces
         if ( $Attribute->{Key} && $Attribute->{Key} =~ m{ \s }xms ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid Definition! Key '$Attribute->{Key}' must not contain whitespace!",
             );
@@ -457,7 +457,7 @@ sub DefinitionCheck {
         # check if the key contains non-ascii characters
         if ( $Attribute->{Key} && $Attribute->{Key} =~ m{ ([^\x{00}-\x{7f}]) }xms ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid Definition! Key '$Attribute->{Key}' must not contain non ASCII characters '$1'!",
             );
@@ -478,7 +478,7 @@ sub DefinitionCheck {
                 );
 
                 if ( !$Check ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message =>
                             "Invalid Sub-Definition of element with the key '$Attribute->{Key}'.",
@@ -507,7 +507,7 @@ sub _DefinitionPrepare {
 
     # check definition
     if ( !$Param{DefinitionRef} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need DefinitionRef!',
         );
@@ -569,7 +569,7 @@ sub DefinitionDelete {
 
     # check needed stuff
     if ( !$Param{DefinitionID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need DefinitionID!',
         );
@@ -581,19 +581,19 @@ sub DefinitionDelete {
     );
 
     # delete in database
-    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Success = $Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM configitem_definition WHERE id = ?',
         Bind  => [ \$Param{DefinitionID} ],
     );
     return if !$Success;
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.Class.Definition',
         ObjectID  => $Definition->{ClassID}.'::'.$Param{DefinitionID},

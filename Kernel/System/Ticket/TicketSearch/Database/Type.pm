@@ -18,8 +18,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -80,7 +80,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -94,11 +94,11 @@ sub Search {
             @TypeList = @{$Param{Search}->{Value}}
         }
         foreach my $Type ( @TypeList ) {
-            my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+            my $TypeID = $Kernel::OM->Get('Type')->TypeLookup(
                 Type => $Type,
             );
             if ( !$TypeID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unknown Type $Type!",
                 );
@@ -122,7 +122,7 @@ sub Search {
         push( @SQLWhere, 'st.type_id IN ('.(join(',', @TypeIDs)).')' );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

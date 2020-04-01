@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform SystemAddress search
-    my %SystemAddressList = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressList(
+    my %SystemAddressList = $Kernel::OM->Get('SystemAddress')->SystemAddressList(
         Valid => 0,
     );
 

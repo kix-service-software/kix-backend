@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::API::Webservice',
+    'API::Webservice',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
 
     $Self->Print("<yellow>Listing all web services...</yellow>\n");
 
-    my $List = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceList();
+    my $List = $Kernel::OM->Get('API::Webservice')->WebserviceList();
     for my $ID ( sort keys %{$List} ) {
         print "  $List->{$ID} ($ID)\n";
     }

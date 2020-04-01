@@ -17,8 +17,8 @@ use utf8;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Language',
-    'Kernel::System::SysConfig',
+    'Language',
+    'SysConfig',
 );
 
 sub Configure {
@@ -41,11 +41,11 @@ sub Run {
 
     my $UserLanguage = $Self->GetOption('language');
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::Language' => {
+        'Language' => {
             UserLanguage => $UserLanguage,
         },
     );
-    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+    my $LanguageObject = $Kernel::OM->Get('Language');
 
     print <<'EOF';
 <?xml version="1.0" encoding="utf-8"?>
@@ -59,7 +59,7 @@ EOF
     my $AppendixTitle = $LanguageObject->Translate('Configuration Options Reference');
     print "<appendix id=\"ConfigReference\"><title>$AppendixTitle</title>\n";
 
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
     my %List            = $SysConfigObject->ConfigGroupList();
 
     for my $Group ( sort { $a cmp $b } keys %List ) {

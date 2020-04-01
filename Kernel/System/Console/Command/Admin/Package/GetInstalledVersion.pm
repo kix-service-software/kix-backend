@@ -14,10 +14,10 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Main',
-    'Kernel::System::Package',
+    'Config',
+    'Cache',
+    'Main',
+    'Package',
 );
 
 sub Configure {
@@ -39,12 +39,12 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @Packages = $Kernel::OM->Get('Kernel::System::Package')->RepositoryList();
+    my @Packages = $Kernel::OM->Get('Package')->RepositoryList();
 
     my $PackageNameOption = $Self->GetOption('package-name');
 
     # Get package object
-    my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+    my $PackageObject = $Kernel::OM->Get('Package');
 
     PACKAGE:
     for my $Package (sort {$a->{Name}->{Content} cmp $b->{Name}->{Content}} @Packages) {
@@ -159,7 +159,7 @@ sub _PackageContentGet {
     my $FileString;
 
     if ( -e $Param{Location} ) {
-        my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
             Location => $Param{Location},
             Mode     => 'utf8',             # optional - binmode|utf8
             Result   => 'SCALAR',           # optional - SCALAR|ARRAY
@@ -176,10 +176,10 @@ sub _PackageContentGet {
         my $URL         = $1;
         my $PackageName = $2;
         if ( $URL eq 'online' ) {
-            my %List = %{ $Kernel::OM->Get('Kernel::Config')->Get('Package::RepositoryList') };
+            my %List = %{ $Kernel::OM->Get('Config')->Get('Package::RepositoryList') };
             %List = (
                 %List,
-                $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineRepositories()
+                $Kernel::OM->Get('Package')->PackageOnlineRepositories()
             );
             for ( sort keys %List ) {
                 if ( $List{$_} =~ /^\[-Master-\]/ ) {
@@ -188,9 +188,9 @@ sub _PackageContentGet {
             }
         }
         if ( $PackageName !~ /^.+?.kpm$/ ) {
-            my @Packages = $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineList(
+            my @Packages = $Kernel::OM->Get('Package')->PackageOnlineList(
                 URL  => $URL,
-                Lang => $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage'),
+                Lang => $Kernel::OM->Get('Config')->Get('DefaultLanguage'),
             );
             PACKAGE:
             for my $Package (@Packages) {
@@ -200,7 +200,7 @@ sub _PackageContentGet {
                 }
             }
         }
-        $FileString = $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineGet(
+        $FileString = $Kernel::OM->Get('Package')->PackageOnlineGet(
             Source => $URL,
             File   => $PackageName,
         );
@@ -211,16 +211,16 @@ sub _PackageContentGet {
     }
     else {
         if ( $Param{Location} =~ /^(.*)\-(\d{1,4}\.\d{1,4}\.\d{1,4})$/ ) {
-            $FileString = $Kernel::OM->Get('Kernel::System::Package')->RepositoryGet(
+            $FileString = $Kernel::OM->Get('Package')->RepositoryGet(
                 Name    => $1,
                 Version => $2,
             );
         }
         else {
             PACKAGE:
-            for my $Package ( $Kernel::OM->Get('Kernel::System::Package')->RepositoryList() ) {
+            for my $Package ( $Kernel::OM->Get('Package')->RepositoryList() ) {
                 if ( $Param{Location} eq $Package->{Name}->{Content} ) {
-                    $FileString = $Kernel::OM->Get('Kernel::System::Package')->RepositoryGet(
+                    $FileString = $Kernel::OM->Get('Package')->RepositoryGet(
                         Name    => $Package->{Name}->{Content},
                         Version => $Package->{Version}->{Content},
                     );

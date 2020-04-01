@@ -14,10 +14,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsHashRefWithData);
 
 our @ObjectDependencies = (
-    'Kernel::API::Requester',
-    'Kernel::System::Scheduler',
-    'Kernel::System::API::Webservice',
-    'Kernel::System::Log',
+    'API::Requester',
+    'Scheduler',
+    'API::Webservice',
+    'Log',
 );
 
 =head1 NAME
@@ -47,7 +47,7 @@ sub Run {
     # check needed stuff
     for (qw(Data Event Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -56,7 +56,7 @@ sub Run {
     }
 
     # get web service objects
-    my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
+    my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
 
     my $WebserviceListRef = $WebserviceObject->WebserviceList(
         Valid => 1,
@@ -94,7 +94,7 @@ sub Run {
                     # create a scheduler task
                     if ( $Event->{Asynchronous} ) {
 
-                        my $TaskID = $Kernel::OM->Get('Kernel::System::Scheduler')->TaskAdd(
+                        my $TaskID = $Kernel::OM->Get('Scheduler')->TaskAdd(
                             Type     => 'API',
                             Name     => 'Invoker-' . $Invoker,
                             Attempts => 10,
@@ -108,7 +108,7 @@ sub Run {
                     }
                     else {    # or execute Event directly
 
-                        $Kernel::OM->Get('Kernel::API::Requester')->Run(
+                        $Kernel::OM->Get('API::Requester')->Run(
                             WebserviceID => $WebserviceID,
                             Invoker      => $Invoker,
                             Data         => $Param{Data},

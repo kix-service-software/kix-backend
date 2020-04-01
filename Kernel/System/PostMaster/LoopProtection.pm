@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
+    'Config',
+    'Main',
 );
 
 sub new {
@@ -32,8 +32,8 @@ sub SendEmail {
     my ( $Self, %Param ) = @_;
 
     # get configured backend module
-    my $BackendModule = $Kernel::OM->Get('Kernel::Config')->Get('LoopProtectionModule')
-        || 'Kernel::System::PostMaster::LoopProtection::DB';
+    my $BackendModule = $Kernel::OM->Get('Config')->Get('LoopProtectionModule')
+        || 'PostMaster::LoopProtection::DB';
 
     # get backend object
     my $BackendObject = $Kernel::OM->Get($BackendModule);
@@ -41,7 +41,7 @@ sub SendEmail {
     if ( !$BackendObject ) {
 
         # get main object
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         $MainObject->Die("Can't load loop protection backend module $BackendModule!");
     }
@@ -53,8 +53,8 @@ sub Check {
     my ( $Self, %Param ) = @_;
 
     # get configured backend module
-    my $BackendModule = $Kernel::OM->Get('Kernel::Config')->Get('LoopProtectionModule')
-        || 'Kernel::System::PostMaster::LoopProtection::DB';
+    my $BackendModule = $Kernel::OM->Get('Config')->Get('LoopProtectionModule')
+        || 'PostMaster::LoopProtection::DB';
 
     # get backend object
     my $BackendObject = $Kernel::OM->Get($BackendModule);
@@ -62,7 +62,7 @@ sub Check {
     if ( !$BackendObject ) {
 
         # get main object
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         $MainObject->Die("Can't load loop protection backend module $BackendModule!");
     }

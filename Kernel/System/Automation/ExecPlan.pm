@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -51,7 +51,7 @@ sub ExecPlanTypeGet {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Name!',
         );
@@ -88,7 +88,7 @@ sub ExecPlanLookup {
 
     # check needed stuff
     if ( !$Param{Name} && !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Name or ID!',
         );
@@ -142,7 +142,7 @@ sub ExecPlanGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -151,13 +151,13 @@ sub ExecPlanGet {
 
     # check cache
     my $CacheKey = 'ExecPlanGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => "SELECT id, name, type, parameters, comments, valid_id, create_time, create_by, change_time, change_by FROM exec_plan WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -165,7 +165,7 @@ sub ExecPlanGet {
     my %Result;
     
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
             ID         => $Row[0],
             Name       => $Row[1],
@@ -181,7 +181,7 @@ sub ExecPlanGet {
 
         if ( $Result{Parameters} ) {
             # decode JSON
-            $Result{Parameters} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            $Result{Parameters} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Parameters}
             );
         }
@@ -189,7 +189,7 @@ sub ExecPlanGet {
     
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ExecPlan with ID $Param{ID} not found!",
         );
@@ -197,7 +197,7 @@ sub ExecPlanGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -232,7 +232,7 @@ sub ExecPlanAdd {
     # check needed stuff
     for my $Needed (qw(Name Type UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -249,7 +249,7 @@ sub ExecPlanAdd {
         Name => $Param{Name},
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An ExecPlan with the same name already exists.",
         );
@@ -267,7 +267,7 @@ sub ExecPlanAdd {
     );
 
     if ( !$IsValid ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ExecPlan config is invalid!"
         );
@@ -277,13 +277,13 @@ sub ExecPlanAdd {
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
-        $Parameters = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Parameters = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Parameters}
         );
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert
     return if !$DBObject->Do(
@@ -308,10 +308,10 @@ sub ExecPlanAdd {
     }
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'ExecPlan',
         ObjectID  => $ID,
@@ -346,7 +346,7 @@ sub ExecPlanUpdate {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -364,7 +364,7 @@ sub ExecPlanUpdate {
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A ExecPlan with the same name already exists.",
         );
@@ -384,7 +384,7 @@ sub ExecPlanUpdate {
         );
 
         if ( !$IsValid ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ExecPlan config is invalid!"
             );
@@ -414,13 +414,13 @@ sub ExecPlanUpdate {
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
-        $Parameters = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Parameters = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Parameters}
         );
     }
 
     # update ExecPlan in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE exec_plan SET name = ?, type = ?, parameters = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
             \$Param{Name}, \$Param{Type}, \$Parameters, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
@@ -428,10 +428,10 @@ sub ExecPlanUpdate {
     );
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'ExecPlan',
         ObjectID  => $Param{ID},
@@ -468,7 +468,7 @@ sub ExecPlanList {
     my $CacheKey = 'ExecPlanList::' . $Valid;
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -480,17 +480,17 @@ sub ExecPlanList {
         $SQL .= ' WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL => $SQL
     );
 
     my %Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{$Row[0]} = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
@@ -516,7 +516,7 @@ sub ExecPlanDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -529,7 +529,7 @@ sub ExecPlanDelete {
         ID => $Param{ID},
     );
     if ( !$ID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An ExecPlan with the ID $Param{ID} does not exist.",
         );
@@ -537,22 +537,22 @@ sub ExecPlanDelete {
     }
 
     # delete relations with Jobs
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_exec_plan WHERE exec_plan_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # remove from database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM exec_plan WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
    
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'ExecPlan',
         ObjectID  => $Param{ID},
@@ -582,7 +582,7 @@ sub ExecPlanCheck {
     # check needed stuff
     for (qw(ID JobID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -596,7 +596,7 @@ sub ExecPlanCheck {
     );
 
     if ( !%ExecPlan ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such ExecPlan with ID $Param{ID}!"
         );
@@ -612,7 +612,7 @@ sub ExecPlanCheck {
     );
 
     if ( !%Job ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such job with ID $Param{JobID}!"
         );
@@ -640,7 +640,7 @@ sub _LoadExecPlanTypeBackend {
     # check needed stuff
     for (qw(Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -651,10 +651,10 @@ sub _LoadExecPlanTypeBackend {
     $Self->{ExecPlanTypeModules} //= {};
 
     if ( !$Self->{ExecPlanTypeModules}->{$Param{Name}} ) {
-        my $Backend = 'Kernel::System::Automation::ExecPlan::' . $Param{Name};
+        my $Backend = 'Automation::ExecPlan::' . $Param{Name};
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
             );        
@@ -662,7 +662,7 @@ sub _LoadExecPlanTypeBackend {
 
         my $BackendObject = $Backend->new( %{$Self} );
         if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
             );        

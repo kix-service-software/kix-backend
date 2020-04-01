@@ -17,7 +17,7 @@ use Text::CSV;
 use Excel::Writer::XLSX;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $CSVObject = $Kernel::OM->Get('Kernel::System::CSV');
+    my $CSVObject = $Kernel::OM->Get('CSV');
 
 =cut
 
@@ -78,7 +78,7 @@ sub Array2CSV {
     # check required params
     for (qw(Data)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Got no $_ param!"
             );
@@ -108,7 +108,7 @@ sub Array2CSV {
 
         open my $FileHandle, '>', \$Output;    ## no critic
         if ( !$FileHandle ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Failed to open FileHandle: $!",
             );
@@ -216,7 +216,7 @@ sub Array2CSV {
                 $Output .= $CSV->string() . "\n";
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => 'Failed to build line: ' . $CSV->error_input(),
                 );
@@ -276,7 +276,7 @@ sub CSV2Array {
 
     # log error if occurred and exit
     if ( !$CSV->eof() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Failed to parse CSV line ' . $LineCounter
                 . ' (input: ' . $CSV->error_input()

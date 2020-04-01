@@ -15,13 +15,13 @@ use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
+    'Config',
+    'DynamicField',
+    'LinkObject',
+    'Log',
+    'Main',
+    'Ticket',
+    'Time',
 );
 
 # the base name for dynamic fields
@@ -37,7 +37,7 @@ sub new {
     bless( $Self, $Type );
 
     $Self->{Debug} = $Param{Debug} || 0;
-    $Self->{MainObject} = $Kernel::OM->Get('Kernel::System::Main');
+    $Self->{MainObject} = $Kernel::OM->Get('Main');
 
     # parser-object needs to bei instantiated in OTRS V4-style - no workaround found yet
     $Self->{ParserObject} = Kernel::System::EmailParser->new(
@@ -45,19 +45,19 @@ sub new {
     );
 
     # check if it is nesessary to update CIs - load related objects
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('SystemMonitoringX::SetIncidentState') ) {
-        if ( $Self->{MainObject}->Require('Kernel::System::GeneralCatalog') ) {
-            $Self->{GeneralCatalogObject} = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+    if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState') ) {
+        if ( $Self->{MainObject}->Require('GeneralCatalog') ) {
+            $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
         }
-        if ( $Self->{MainObject}->Require('Kernel::System::ITSMConfigItem') ) {
-            $Self->{ConfigItemObject} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+        if ( $Self->{MainObject}->Require('ITSMConfigItem') ) {
+            $Self->{ConfigItemObject} = $Kernel::OM->Get('ITSMConfigItem');
         }
     }
 
 # Default (FALLBACK) Settings
 # if new keys are updated or to be added in Kernel/Config/Files/SystemMonitoringX.xml, do the same right here
     $Self->{Config} = {
-        Module                         => 'Kernel::System::PostMaster::Filter::SystemMonitoringX',
+        Module                         => 'PostMaster::Filter::SystemMonitoringX',
         'DynamicFieldContent::Ticket'  => 'Host,Service,Address,Alias',
         'DynamicFieldContent::Article' => 'State',
 
@@ -153,7 +153,7 @@ sub Run {
 
     # we need State and Host to proceed
     if ( !$Self->{State} || !$Self->{Host} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => 'SystemMonitoring Mail: '
                 . 'SystemMonitoring: Could not find host address '
@@ -190,7 +190,7 @@ sub _GetDynamicFieldDefinition {
     my ( $Self, %Param ) = @_;
     for my $Argument (qw(Config Key Default Base Name ObjectType)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -210,7 +210,7 @@ sub _GetDynamicFieldDefinition {
 
     if ( !$ConfigDynamicField ) {
         $ConfigDynamicField = $Default;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Missing CI Config $Key, using value $Default!"
         );
@@ -220,7 +220,7 @@ sub _GetDynamicFieldDefinition {
 
     if ( $ConfigDynamicField =~ /^\d+$/ ) {
         if ( ( $ConfigDynamicField < 1 ) || ( $ConfigDynamicField > 16 ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Bad value $ConfigDynamicField for CI Config $Key, must be between 1 and 16!"
@@ -310,7 +310,7 @@ sub _MailParse {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{GetParam} || !$Param{GetParam}->{Subject} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Subject!",
         );
@@ -379,7 +379,7 @@ sub _LogMessage {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{MessageText} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need MessageText!",
         );
@@ -405,7 +405,7 @@ sub _LogMessage {
 
         . "Service: $Self->{Service}";
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => 'SystemMonitoring Mail: ' . $LogMessage,
     );
@@ -440,7 +440,7 @@ sub _TicketSearch {
     }
 
     # get dynamic field object
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
     # Check if dynamic fields really exists.
     # If dynamic fields don't exists, TicketSearch will return all tickets
@@ -465,7 +465,7 @@ sub _TicketSearch {
 
         if ( !IsHashRefWithData($DynamicField) ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "DynamicField "
 
@@ -482,7 +482,7 @@ sub _TicketSearch {
     my $TicketID;
 
     if ( !$Errors ) {
-        my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(%Query);
+        my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(%Query);
 
         if (@TicketIDs) {
 
@@ -499,7 +499,7 @@ sub _TicketUpdate {
 
     for my $Needed (qw(TicketID Param)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -511,7 +511,7 @@ sub _TicketUpdate {
     my $Param    = $Param{Param};
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket number
     my $TicketNumber = $TicketObject->TicketNumberLookup(
@@ -558,7 +558,7 @@ sub _TicketUpdate {
             $Param->{GetParam}->{'X-KIX-FollowUp-State'} = $Self->{Config}->{CloseActionState};
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             my $TimeStamp = $TimeObject->SystemTime2TimeStamp(
                 SystemTime => $TimeObject->SystemTime()
@@ -571,7 +571,7 @@ sub _TicketUpdate {
         $Self->_LogMessage( MessageText => 'Recovered' );
 
         # if the CI incident state should be set
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('SystemMonitoringX::SetIncidentState') ) {
+        if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState') ) {
             $Self->_IncidentStateOperational();
         }
     }
@@ -583,7 +583,7 @@ sub _TicketUpdate {
 
     # link ticket with CI, this is only possible if the ticket already exists,
     # e.g. in a subsequent email request, because we need a ticket id
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('SystemMonitoringX::LinkTicketWithCI') ) {
+    if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::LinkTicketWithCI') ) {
 
         # link ticket with CI
         $Self->_LinkTicketWithCI(
@@ -600,7 +600,7 @@ sub _TicketCreate {
 
     # get Dynamic Field list
     my $DynamicFieldsTickets
-        = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList(
+        = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
         Valid      => 1,
         ObjectType => 'Ticket',
         ResultType => 'HASH',
@@ -621,11 +621,11 @@ sub _TicketCreate {
         if ( $TicketDFNumber =~ /^\d+$/ ) {
             $TicketDFNumber = $DynamicFieldTicketTextPrefix . $TicketDFNumber
         }
-        my $DynamicField = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+        my $DynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
             'Name' => $TicketDFNumber,
         );
         if ( !IsHashRefWithData($DynamicField) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "DynamicField " . $TicketDFNumber
                     . " does not exists or missnamed.",
@@ -669,18 +669,18 @@ sub _TicketCreate {
     # AcknowledgeNameField
     if ( $Self->{Config}->{AcknowledgeName} ) {
         my $AcknowledgeNameField
-            = $Kernel::OM->Get('Kernel::Config')
+            = $Kernel::OM->Get('Config')
             ->Get('Tool::Acknowledge::RegistrationAllocation');
         if ($AcknowledgeNameField) {
             if ( $AcknowledgeNameField =~ /^\d+$/ ) {
                 $AcknowledgeNameField = $DynamicFieldTicketTextPrefix . $AcknowledgeNameField
             }
             my $DynamicField
-                = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+                = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                 'Name' => $AcknowledgeNameField,
                 );
             if ( !IsHashRefWithData($DynamicField) ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "DynamicField " . $AcknowledgeNameField
                         . " does not exists or missnamed.",
@@ -695,10 +695,10 @@ sub _TicketCreate {
 
     # set log message
     $Self->_LogMessage( MessageText => 'New Ticket' );
-      $Kernel::OM->Get('Kernel::Config')->Get('SystemMonitoringX::SetIncidentState');
+      $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState');
 
     # if the CI incident state should be set
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('SystemMonitoringX::SetIncidentState') ) {
+    if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState') ) {
         $Self->_IncidentStateIncident();
     }
 
@@ -724,7 +724,7 @@ sub _SetIncidentState {
     # check needed stuff
     for my $Argument (qw(Name IncidentState )) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -745,7 +745,7 @@ sub _SetIncidentState {
     if ( !$ConfigItemIDs || ref $ConfigItemIDs ne 'ARRAY' || !@{$ConfigItemIDs} ) {
 
         # log error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not find any CI with the name '$Param{Name}'. ",
         );
@@ -757,7 +757,7 @@ sub _SetIncidentState {
     if ( scalar @{$ConfigItemIDs} > 1 ) {
 
         # log error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can not set incident state for CI with the name '$Param{Name}'. "
                 . "More than one CI with this name was found!",
@@ -795,7 +795,7 @@ sub _SetIncidentState {
     if ( !$ReverseInciStateList{ $Param{IncidentState} } ) {
 
         # log error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid incident state '$Param{IncidentState}'!",
         );
@@ -818,7 +818,7 @@ sub _LinkTicketWithCI {
     # check needed stuff
     for my $Argument (qw(Name TicketID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -839,7 +839,7 @@ sub _LinkTicketWithCI {
     if ( !$ConfigItemIDs || ref $ConfigItemIDs ne 'ARRAY' || !@{$ConfigItemIDs} ) {
 
         # log error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not find any CI with the name '$Param{Name}'. ",
         );
@@ -851,7 +851,7 @@ sub _LinkTicketWithCI {
     if ( scalar @{$ConfigItemIDs} > 1 ) {
 
         # log error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can not set incident state for CI with the name '$Param{Name}'. "
                 . "More than one CI with this name was found!",
@@ -864,7 +864,7 @@ sub _LinkTicketWithCI {
     my $ConfigItemID = shift @{$ConfigItemIDs};
 
     # link the ticket with the CI
-    my $LinkResult = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkAdd(
+    my $LinkResult = $Kernel::OM->Get('LinkObject')->LinkAdd(
         SourceObject => 'Ticket',
         SourceKey    => $Param{TicketID},
         TargetObject => 'ConfigItem',

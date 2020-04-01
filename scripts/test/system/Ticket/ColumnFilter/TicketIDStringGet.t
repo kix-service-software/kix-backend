@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get ticket object
-my $ColumnFilterObject = $Kernel::OM->Get('Kernel::System::Ticket::ColumnFilter');
+my $ColumnFilterObject = $Kernel::OM->Get('Ticket::ColumnFilter');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Tests = (
     {

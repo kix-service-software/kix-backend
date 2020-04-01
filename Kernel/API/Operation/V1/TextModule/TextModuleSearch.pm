@@ -97,7 +97,7 @@ sub Run {
     }
 
     # perform TextModule search
-    my $TextModuleList = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleList(
+    my $TextModuleList = $Kernel::OM->Get('TextModule')->TextModuleList(
         %SearchParam
     );
 

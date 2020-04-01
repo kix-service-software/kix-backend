@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::CMDB::ClassUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::CMDB::ClassUpdate');
 
     return $Self;
 }
@@ -128,7 +128,7 @@ sub Run {
     );
 
     # check if class exists 
-    my $GeneralCatalogData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+    my $GeneralCatalogData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID => $Param{Data}->{ClassID},
     );
 
@@ -138,7 +138,7 @@ sub Run {
         );
     }
 
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     );
 
@@ -152,7 +152,7 @@ sub Run {
     }
 
     # update GeneralCatalog
-    my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemUpdate(
+    my $Success = $Kernel::OM->Get('GeneralCatalog')->ItemUpdate(
         ItemID   => $Param{Data}->{ClassID},    
         Class    => 'ITSM::ConfigItem::Class',
         Name     => $ConfigItemClass->{Name} || $GeneralCatalogData->{Name},

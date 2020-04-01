@@ -17,17 +17,17 @@ use vars (qw($Self));
 use File::Path();
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $DBObject     = $Kernel::OM->Get('DB');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get configuration
 my $HomeDir = $ConfigObject->Get('Home');
@@ -86,7 +86,7 @@ if ( !-e $ConfigObject->Get('SMIME::Bin') ) {
 }
 
 # create crypt object
-my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
 if ( !$SMIMEObject ) {
     print STDERR "NOTICE: No SMIME support!\n";
@@ -2553,7 +2553,7 @@ for my $Count ( 1 .. 3 ) {
 
     # get attributes from OpenSSL
     # check cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'SMIME_Cert',
         Key  => $CertCacheKey,
     );
@@ -2575,7 +2575,7 @@ for my $Count ( 1 .. 3 ) {
 
     # at this point the attributes should be cached, read them again
     # check cache
-    $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'SMIME_Cert',
         Key  => $CertCacheKey,
     );
@@ -2631,7 +2631,7 @@ for my $Count ( 1 .. 3 ) {
 
     # read private attributes from OpenSSL
     # check cache
-    $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'SMIME_Private',
         Key  => $PrivateCacheKey,
     );
@@ -2654,7 +2654,7 @@ for my $Count ( 1 .. 3 ) {
 
     # at this point the attributes should be already cached
     # check cache
-    $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'SMIME_Private',
         Key  => $PrivateCacheKey,
     );
@@ -2684,7 +2684,7 @@ for my $Count ( 1 .. 3 ) {
 
     # after private add all cache for certs must be cleaned, get certificate attributes from OpenSSL
     # check cache
-    $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'SMIME_Cert',
         Key  => $CertCacheKey,
     );
@@ -2706,7 +2706,7 @@ for my $Count ( 1 .. 3 ) {
 
     # cache must be set right now, read attributes again
     # check cache
-    $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'SMIME_Cert',
         Key  => $CertCacheKey,
     );

@@ -16,7 +16,7 @@ use Kernel::System::Console;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::ImportExport'
+    'ImportExport'
 );
 
 sub Configure {
@@ -28,7 +28,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TemplateListRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateList(
+    my $TemplateListRef = $Kernel::OM->Get('ImportExport')->TemplateList(
         UserID => 1,
     );
 
@@ -43,9 +43,9 @@ sub Run {
     );
 
     if ( $TemplateListRef && ref($TemplateListRef) eq 'ARRAY' ) {
-        my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+        my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
         for my $CurrTemplateID ( @{$TemplateListRef} ) {
-            my $TemplateDataRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateGet(
+            my $TemplateDataRef = $Kernel::OM->Get('ImportExport')->TemplateGet(
                 TemplateID => $CurrTemplateID,
                 UserID     => 1,
             );

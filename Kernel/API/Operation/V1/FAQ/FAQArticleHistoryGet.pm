@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticle::FAQArticleHistoryGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQArticle::FAQArticleHistoryGet');
 
     return $Self;
 }
@@ -133,7 +133,7 @@ sub Run {
     foreach my $HistoryID ( @{$Param{Data}->{FAQHistoryID}} ) {
 
         # get the FAQHistory data
-        my %History = $Kernel::OM->Get('Kernel::System::FAQ')->FAQHistoryGet(
+        my %History = $Kernel::OM->Get('FAQ')->FAQHistoryGet(
             ID     => $HistoryID,
             UserID => $Self->{Authorization}->{UserID},
         );

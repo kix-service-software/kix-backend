@@ -133,7 +133,7 @@ sub Run {
     );        
    
     # check if ObjectIcon exists
-    my $ObjectIconList = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconList(
+    my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
         Object   => $ObjectIcon->{Object},
         ObjectID => $ObjectIcon->{ObjectID},        
     );
@@ -146,7 +146,7 @@ sub Run {
     }
 
     # create ObjectIcon
-    my $ObjectIconID = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconAdd(
+    my $ObjectIconID = $Kernel::OM->Get('ObjectIcon')->ObjectIconAdd(
         Object      => $ObjectIcon->{Object},
         ObjectID    => $ObjectIcon->{ObjectID},
         ContentType => $ObjectIcon->{ContentType},

@@ -17,19 +17,19 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ActivityObject         = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
-my $ActivityDialogObject   = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
-my $ProcessObject          = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
-my $TransitionObject       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
-my $TransitionActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
+my $ActivityObject         = $Kernel::OM->Get('ProcessManagement::DB::Activity');
+my $ActivityDialogObject   = $Kernel::OM->Get('ProcessManagement::DB::ActivityDialog');
+my $ProcessObject          = $Kernel::OM->Get('ProcessManagement::DB::Process');
+my $TransitionObject       = $Kernel::OM->Get('ProcessManagement::DB::Transition');
+my $TransitionActionObject = $Kernel::OM->Get('ProcessManagement::DB::TransitionAction');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define needed variables
 my $UserID = 1;
@@ -219,7 +219,7 @@ my $TransitionActionID = $TransitionActionObject->TransitionActionAdd(
     EntityID => 'TA-Test1',
     Name     => 'Queue Move',
     Config   => {
-        Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+        Module => 'Process::Transition::Action::QueueMove',
         Config => {
             TargetQueue => 'Junk',
             NewOwner    => 'root@localhost',

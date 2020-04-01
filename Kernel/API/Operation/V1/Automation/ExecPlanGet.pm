@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Automation::ExecPlanGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Automation::ExecPlanGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $ExecPlanID ( @{$Param{Data}->{ExecPlanID}} ) {
 
 	    # get the ExecPlan data
-	    my %ExecPlanData = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanGet(
+	    my %ExecPlanData = $Kernel::OM->Get('Automation')->ExecPlanGet(
 	        ID => $ExecPlanID,
 	    );
 

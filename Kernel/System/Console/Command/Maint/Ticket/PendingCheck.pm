@@ -16,11 +16,11 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'State',
+    'Ticket',
+    'Time',
+    'User',
 );
 
 sub Configure {
@@ -37,8 +37,8 @@ sub Run {
     $Self->Print("<yellow>Process pending tickets...</yellow>\n");
 
     # get needed objects
-    my $StateObject  = $Kernel::OM->Get('Kernel::System::State');
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $StateObject  = $Kernel::OM->Get('State');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @TicketIDs;
 
@@ -56,7 +56,7 @@ sub Run {
             UserID   => 1,
         );
 
-        my %States = %{ $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StateAfterPending') };
+        my %States = %{ $Kernel::OM->Get('Config')->Get('Ticket::StateAfterPending') };
 
         TICKETID:
         for my $TicketID (@TicketIDs) {
@@ -144,7 +144,7 @@ sub Run {
         );
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         # check if it is during business hours, then send reminder
         my $CountedTime = $TimeObject->WorkingTime(

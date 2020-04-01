@@ -18,8 +18,8 @@ use Time::HiRes();
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Ticket',
+    'Config',
+    'Ticket',
 );
 
 sub Configure {
@@ -43,16 +43,16 @@ sub Run {
     $Self->Print("<yellow>Restoring tickets from ticket archive...</yellow>\n");
 
     # disable ticket events
-    $Kernel::OM->Get('Kernel::Config')->{'Ticket::EventModulePost'} = {};
+    $Kernel::OM->Get('Config')->{'Ticket::EventModulePost'} = {};
 
     # check if archive system is activated
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::ArchiveSystem') ) {
+    if ( !$Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         $Self->Print("<green>No action required. The archive system is disabled at the moment.</green>\n");
         return $Self->ExitCodeOk();
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get all tickets with an archive flag and an open statetype
     my @TicketIDs = $TicketObject->TicketSearch(

@@ -97,7 +97,7 @@ sub Run {
     }
 
     # perform SearchProfile search
-    my @SearchProfileList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+    my @SearchProfileList = $Kernel::OM->Get('SearchProfile')->SearchProfileList(
         %SearchParam
     );
 

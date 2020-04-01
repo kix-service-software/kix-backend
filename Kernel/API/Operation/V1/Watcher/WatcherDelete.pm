@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::WatcherDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::WatcherDelete');
 
     return $Self;
 }
@@ -108,7 +108,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if Watcher exists
-    my %WatcherData = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherGet(
+    my %WatcherData = $Kernel::OM->Get('Watcher')->WatcherGet(
         ID => $Param{Data}->{WatcherID}
     );
     
@@ -118,7 +118,7 @@ sub Run {
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherDelete(
+    my $Success = $Kernel::OM->Get('Watcher')->WatcherDelete(
         ID     => $Param{Data}->{WatcherID},
         UserID => $Self->{Authorization}->{UserID},
     );

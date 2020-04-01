@@ -98,11 +98,11 @@ sub TicketSearch {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{SearchBackendObject} ) {
-        my $Backend = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchBackend');
+        my $Backend = $Kernel::OM->Get('Config')->Get('Ticket::SearchBackend');
 
         # if the backend require failed we will exit
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require search backend!",
             );
@@ -112,7 +112,7 @@ sub TicketSearch {
 
         # if the backend constructor failed we will exit
         if ( ref $BackendObject ne $Backend ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create search backend object!",
             );

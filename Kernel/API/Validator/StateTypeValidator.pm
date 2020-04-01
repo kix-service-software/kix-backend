@@ -100,7 +100,7 @@ sub Validate {
         );
     }
 
-    my %StateTypeList = $Kernel::OM->Get('Kernel::System::State')->StateTypeList(
+    my %StateTypeList = $Kernel::OM->Get('State')->StateTypeList(
         UserID => 1,
     );
 

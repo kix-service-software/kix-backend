@@ -16,8 +16,8 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::System::Auth',
-    'Kernel::System::User',
+    'Auth',
+    'User',
 );
 
 sub GetDisplayPath {
@@ -28,7 +28,7 @@ sub Run {
     my $Self = shift;
 
     # get needed objects
-    my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject  = $Kernel::OM->Get('User');
 
     my %UserList = $UserObject->UserList(
         Type  => 'Short',
@@ -48,7 +48,7 @@ sub Run {
 
     if ($SuperUserID) {
 
-        $DefaultPassword = $Kernel::OM->Get('Kernel::System::Auth')->Auth(
+        $DefaultPassword = $Kernel::OM->Get('Auth')->Auth(
             User => 'root@localhost',
             Pw   => 'root',
         );

@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
-my $PDFObject  = $Kernel::OM->Get('Kernel::System::PDF');
+my $MainObject = $Kernel::OM->Get('Main');
+my $PDFObject  = $Kernel::OM->Get('PDF');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create a pdf document
 my $DocumentNew1 = $PDFObject->DocumentNew(
@@ -2698,8 +2698,8 @@ for ( sort keys %TableCellOnCount ) {
 }
 
 # charset font test 1 (iso-8859-1)
-$Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::PDF'] );
-$PDFObject = $Kernel::OM->Get('Kernel::System::PDF');
+$Kernel::OM->ObjectsDiscard( Objects => ['PDF'] );
+$PDFObject = $Kernel::OM->Get('PDF');
 
 # create a pdf document
 my $DocumentNew2 = $PDFObject->DocumentNew(
@@ -2729,7 +2729,7 @@ $Self->True(
 );
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $Home = $ConfigObject->Get('Home');
 
@@ -2787,8 +2787,8 @@ $Self->True(
 );
 
 # charset font test 2 (utf-8)
-$Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::PDF'] );
-$PDFObject = $Kernel::OM->Get('Kernel::System::PDF');
+$Kernel::OM->ObjectsDiscard( Objects => ['PDF'] );
+$PDFObject = $Kernel::OM->Get('PDF');
 
 # create a pdf document
 my $DocumentNew3 = $PDFObject->DocumentNew(
@@ -2871,8 +2871,8 @@ $Self->True(
 );
 
 # charset font test 3 (utf-8)
-$Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::PDF'] );
-$PDFObject = $Kernel::OM->Get('Kernel::System::PDF');
+$Kernel::OM->ObjectsDiscard( Objects => ['PDF'] );
+$PDFObject = $Kernel::OM->Get('PDF');
 
 # create a pdf document
 my $DocumentNew4 = $PDFObject->DocumentNew(

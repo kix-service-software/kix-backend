@@ -50,7 +50,7 @@ sub ConfigItemNumberLookup {
 
     # check needed stuff
     if ( !$Param{ConfigItemID} && !$Param{ConfigItemNumber} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ConfigItemID or ConfigItemNumber!',
         );
@@ -64,7 +64,7 @@ sub ConfigItemNumberLookup {
             if $Self->{Cache}->{ConfigItemNumberLookup}->{ID}->{ $Param{ConfigItemID} };
 
         # ask database
-        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        $Kernel::OM->Get('DB')->Prepare(
             SQL   => 'SELECT configitem_number FROM configitem WHERE id = ?',
             Bind  => [ \$Param{ConfigItemID} ],
             Limit => 1,
@@ -72,7 +72,7 @@ sub ConfigItemNumberLookup {
 
         # fetch the result
         my $ConfigItemNumber;
-        while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $ConfigItemNumber = $Row[0];
         }
 
@@ -87,7 +87,7 @@ sub ConfigItemNumberLookup {
         if $Self->{Cache}->{ConfigItemNumberLookup}->{Number}->{ $Param{ConfigItemNumber} };
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT id FROM configitem WHERE configitem_number = ?',
         Bind  => [ \$Param{ConfigItemNumber} ],
         Limit => 1,
@@ -95,7 +95,7 @@ sub ConfigItemNumberLookup {
 
     # fetch the result
     my $ConfigItemID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ConfigItemID = $Row[0];
     }
 
@@ -122,7 +122,7 @@ sub ConfigItemNumberCreate {
     # check needed stuff
     for my $Argument (qw(Type ClassID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -131,8 +131,8 @@ sub ConfigItemNumberCreate {
     }
 
     # load backend
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( $Param{Type} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+    if ( !$Kernel::OM->Get('Main')->Require( $Param{Type} ) ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't load config item number generator backend module $Param{Type}! $@",
         );
@@ -140,7 +140,7 @@ sub ConfigItemNumberCreate {
     }
 
     # load backend
-    return if !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Param{Type} );
+    return if !$Kernel::OM->Get('Main')->RequireBaseClass( $Param{Type} );
 
     # create number
     my $Number = $Self->_ConfigItemNumberCreate(%Param);
@@ -165,7 +165,7 @@ sub CurrentCounterGet {
     # check needed stuff
     for my $Argument (qw(ClassID Type)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -174,7 +174,7 @@ sub CurrentCounterGet {
     }
 
     # ask the database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT counter FROM configitem_counter WHERE '
             . 'class_id = ? AND counter_type = ?',
         Bind  => [ \$Param{ClassID}, \$Param{Type} ],
@@ -183,7 +183,7 @@ sub CurrentCounterGet {
 
     # fetch the result
     my $Number;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Number = $Row[0];
     }
 
@@ -208,7 +208,7 @@ sub CurrentCounterSet {
     # check needed stuff
     for my $Argument (qw(ClassID Type Counter)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -217,13 +217,13 @@ sub CurrentCounterSet {
     }
 
     # delete old counter
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM configitem_counter WHERE class_id = ?',
         Bind => [ \$Param{ClassID} ],
     );
 
     # set new counter
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO configitem_counter '
             . '(class_id, counter_type, counter) VALUES (?, ?, ?)',
         Bind => [ \$Param{ClassID}, \$Param{Type}, \$Param{Counter} ],

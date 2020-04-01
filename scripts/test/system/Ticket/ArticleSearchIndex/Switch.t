@@ -20,28 +20,28 @@ use vars (qw($Self));
 #
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 $ConfigObject->Set(
     Key   => 'Ticket::SearchIndexModule',
-    Value => 'Kernel::System::Ticket::ArticleSearchIndex::StaticDB',
+    Value => 'Ticket::ArticleSearchIndex::StaticDB',
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 $Self->True(
-    $TicketObject->isa('Kernel::System::Ticket::ArticleSearchIndex::StaticDB'),
+    $TicketObject->isa('Ticket::ArticleSearchIndex::StaticDB'),
     "TicketObject loaded the correct backend",
 );
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create some content
 my $TicketID = $TicketObject->TicketCreate(
@@ -90,14 +90,14 @@ $Self->True(
 );
 
 # Make sure that the TicketObject gets recreated for each loop.
-$Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+$Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
 $ConfigObject->Set(
     Key   => 'Ticket::SearchIndexModule',
-    Value => 'Kernel::System::Ticket::ArticleSearchIndex::RuntimeDB',
+    Value => 'Ticket::ArticleSearchIndex::RuntimeDB',
 );
 
-$TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+$TicketObject = $Kernel::OM->Get('Ticket');
 
 my $Delete = $TicketObject->TicketDelete(
     TicketID => $TicketID,

@@ -33,7 +33,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SearchBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::TicketSearch::Database');
+    my $SearchBackendObject = $Kernel::OM->Get('Ticket::TicketSearch::Database');
 
 =cut
 
@@ -48,9 +48,9 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     # get needed objects
-    my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject    = $Kernel::OM->Get('Kernel::System::Main');
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    my $ConfigObject  = $Kernel::OM->Get('Config');
+    my $MainObject    = $Kernel::OM->Get('Main');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
     
     my $Home = $ConfigObject->Get('Home');
 
@@ -58,7 +58,7 @@ sub new {
     my @Modules;
 
     # load configs from registered custom packages
-    my @CustomPackages = $Kernel::OM->Get('Kernel::System::KIXUtils')->GetRegisteredCustomPackages(
+    my @CustomPackages = $Kernel::OM->Get('KIXUtils')->GetRegisteredCustomPackages(
         Result => 'ARRAY',
     );
 
@@ -87,11 +87,11 @@ sub new {
     foreach my $Module ( sort @Modules ) {
         next if ( $Module =~ /^Common$/g);
         
-        $Module = 'Kernel::System::Ticket::TicketSearch::Database::'.$Module;
+        $Module = 'Ticket::TicketSearch::Database::'.$Module;
 
         my $Object = $Kernel::OM->Get($Module);
         if ( !$Object ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create database search backend object $Module !",
             );
@@ -101,7 +101,7 @@ sub new {
         # register module for each supported attribute
         my $SupportedAttributes = $Object->GetSupportedAttributes();
         if ( !IsHashRefWithData($SupportedAttributes) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "SupportedAttributes return by module $Module are not a HashRef!",
             );
@@ -110,7 +110,7 @@ sub new {
 
         foreach my $Type ( qw(Search Sort) ) {
             if ( ref($SupportedAttributes->{$Type}) ne 'ARRAY' ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "SupportedAttributes->{$Type} return by module $Module is not an ArrayRef!",
                 );
@@ -247,7 +247,7 @@ sub TicketSearch {
 
     # check required params
     if ( !$Param{UserID} && !$Param{UserType} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID and UserType params for permission check!',
         );
@@ -319,7 +319,7 @@ sub TicketSearch {
     # check cache
     my $CacheObject;
     if ( $Param{CacheTTL} ) {
-        $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        $CacheObject = $Kernel::OM->Get('Cache');
         my $CacheData = $CacheObject->Get(
             Type => 'TicketSearch',
             Key  => $SQL . $Result . $Param{Limit},
@@ -335,7 +335,7 @@ sub TicketSearch {
             elsif ( ref $CacheData eq '' ) {
                 return $CacheData;
             }
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Invalid ref ' . ref($CacheData) . '!'
             );
@@ -423,7 +423,7 @@ sub _CreatePermissionSQL {
     my $SQLWhere = '1=1';
 
     if ( !$Param{UserID} && !$Param{UserType} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No user information for permission check!',
         );
@@ -436,7 +436,7 @@ sub _CreatePermissionSQL {
     # if ( $Param{UserID} && $Param{UserID} != 1 && $Param{UserType} eq 'Agent' ) {
 
     #     # get users groups
-    #     %GroupList = $Kernel::OM->Get('Kernel::System::Group')->PermissionUserGet(
+    #     %GroupList = $Kernel::OM->Get('Group')->PermissionUserGet(
     #         UserID => $Param{UserID},
     #         Type   => $Param{Permission} || 'ro',
     #     );
@@ -446,10 +446,10 @@ sub _CreatePermissionSQL {
     # }
     # if ( $Param{UserID} && $Param{UserType} eq 'Customer' ) {
 
-    #     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    #     my $DBObject = $Kernel::OM->Get('DB');
 
     #     # get customer groups
-    #     %GroupList = $Kernel::OM->Get('Kernel::System::CustomerGroup')->GroupMemberList(
+    #     %GroupList = $Kernel::OM->Get('CustomerGroup')->GroupMemberList(
     #         UserID => $Param{UserID},
     #         Type   => $Param{Permission} || 'ro',
     #         Result => 'HASH',
@@ -460,7 +460,7 @@ sub _CreatePermissionSQL {
 
     #     # get all customer ids
     #     $SQLWhere = '(';
-    #     my @CustomerIDs = $Kernel::OM->Get('Kernel::System::Contact')->CustomerIDs(
+    #     my @CustomerIDs = $Kernel::OM->Get('Contact')->CustomerIDs(
     #         User => $Param{UserID},
     #     );
 
@@ -518,7 +518,7 @@ sub _CreateAttributeSQL {
     my %SQLDef;
 
     if ( !IsArrayRefWithData($Param{SQLPartsDef}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQLPartsDef!',
         );
@@ -526,7 +526,7 @@ sub _CreateAttributeSQL {
     }
 
     if ( !IsHashRefWithData($Param{Search}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No Search definition given!',
         );
@@ -534,7 +534,7 @@ sub _CreateAttributeSQL {
     }
 
     if ( !$Param{UserID} && !$Param{UserType} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No user information for attribute search!',
         );
@@ -544,7 +544,7 @@ sub _CreateAttributeSQL {
     # generate SQL from attribute modules
     foreach my $BoolOperator ( keys %{$Param{Search}} ) {
         if ( !IsArrayRefWithData($Param{Search}->{$BoolOperator}) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid Search for $BoolOperator!",
             );
@@ -571,7 +571,7 @@ sub _CreateAttributeSQL {
 
             # ignore this attribute if we don't have a module for it
             if ( !$AttributeModule ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to search for attribute $Search->{Field}. Don't know how to handle it!",
                 );
@@ -587,7 +587,7 @@ sub _CreateAttributeSQL {
             );
 
             if ( !IsHashRefWithData($Result) ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Attribute module for $Search->{Field} returned an error!",
                 );
@@ -642,7 +642,7 @@ sub _CreateOrderBySQL {
     my ( $Self, %Param ) = @_;
 
     if ( !IsArrayRefWithData($Param{Sort}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No Sort definition given!',
         );
@@ -672,7 +672,7 @@ sub _CreateOrderBySQL {
 
         # ignore this attribute if we don't have a module for it
         if ( !$AttributeModule ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to sort attribute $SortDef. Don't know how to handle it!",
             );
@@ -685,7 +685,7 @@ sub _CreateOrderBySQL {
         );
 
         if ( !IsHashRefWithData($Result) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Attribute module for sort $SortDef returned an error!",
             );

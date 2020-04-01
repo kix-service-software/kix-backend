@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::StandardTemplateUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::StandardTemplateUpdate');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     );
     
     # check if StandardTemplate exists 
-    my %StandardTemplateData = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateGet(
+    my %StandardTemplateData = $Kernel::OM->Get('StandardTemplate')->StandardTemplateGet(
         ID => $Param{Data}->{StandardTemplateID},
     );
 
@@ -141,7 +141,7 @@ sub Run {
 
     # check if name already exists
     if ( $StandardTemplate->{Name} ) {
-        my $Exist = $Kernel::OM->Get('Kernel::System::StandardTemplate')->NameExistsCheck(
+        my $Exist = $Kernel::OM->Get('StandardTemplate')->NameExistsCheck(
             Name => $StandardTemplate->{Name},
             ID   => $Param{Data}->{StandardTemplateID}
         );
@@ -154,7 +154,7 @@ sub Run {
     }
 
     # update StandardTemplate
-    my $Success = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateUpdate(
+    my $Success = $Kernel::OM->Get('StandardTemplate')->StandardTemplateUpdate(
         ID           => $Param{Data}->{StandardTemplateID},
         Name         => $StandardTemplate->{Name} || $StandardTemplateData{Name},
         Template     => $StandardTemplate->{Template} || $StandardTemplateData{Template},

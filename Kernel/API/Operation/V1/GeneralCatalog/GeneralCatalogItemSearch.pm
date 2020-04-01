@@ -86,11 +86,11 @@ sub Run {
     
     my @GeneralCatalogDataList;
 
-    my $GeneralCatalogClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassList();
+    my $GeneralCatalogClassList = $Kernel::OM->Get('GeneralCatalog')->ClassList();
     
     foreach my $Class ( @$GeneralCatalogClassList ){
      	
-	    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+	    my $GeneralCatalogItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
 	        Class => $Class,
             Valid => 0,
 	    );

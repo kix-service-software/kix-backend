@@ -17,21 +17,21 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Output::HTML::Layout' => {
+    'Output::HTML::Layout' => {
         UserID => 1,
     },
 );
-my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
 # here everyone can insert example data for the tests
 my %Data = (
@@ -101,7 +101,7 @@ $Self->True(
 );
 
 # check all dtl files
-my $HomeDirectory = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $HomeDirectory = $Kernel::OM->Get('Config')->Get('Home');
 my $DTLDirectory  = $HomeDirectory . '/Kernel/Output/HTML/Templates/Standard/';
 my $DIR;
 if ( !opendir $DIR, $DTLDirectory ) {

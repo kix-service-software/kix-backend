@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Type',
+    'Config',
+    'Log',
+    'Ticket',
+    'Type',
 );
 
 sub new {
@@ -26,10 +26,10 @@ sub new {
     bless( $Self, $Type );
 
     # create required objects
-    $Self->{ConfigObject}  = $Kernel::OM->Get('Kernel::Config');
-    $Self->{LogObject}     = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject}  = $Kernel::OM->Get('Kernel::System::Ticket');
-    $Self->{TypeObject}  = $Kernel::OM->Get('Kernel::System::Type');
+    $Self->{ConfigObject}  = $Kernel::OM->Get('Config');
+    $Self->{LogObject}     = $Kernel::OM->Get('Log');
+    $Self->{TicketObject}  = $Kernel::OM->Get('Ticket');
+    $Self->{TypeObject}  = $Kernel::OM->Get('Type');
 
     return $Self;
 }

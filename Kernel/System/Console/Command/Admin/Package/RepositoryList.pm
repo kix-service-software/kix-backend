@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Package',
+    'Config',
+    'Package',
 );
 
 sub Configure {
@@ -35,10 +35,10 @@ sub Run {
 
     my $Count = 0;
     my %List;
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Package::RepositoryList') ) {
-        %List = %{ $Kernel::OM->Get('Kernel::Config')->Get('Package::RepositoryList') };
+    if ( $Kernel::OM->Get('Config')->Get('Package::RepositoryList') ) {
+        %List = %{ $Kernel::OM->Get('Config')->Get('Package::RepositoryList') };
     }
-    %List = ( %List, $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineRepositories() );
+    %List = ( %List, $Kernel::OM->Get('Package')->PackageOnlineRepositories() );
 
     if ( !%List ) {
         $Self->PrintError("No package repositories configured.");
@@ -60,9 +60,9 @@ sub Run {
         print
             "+----------------------------------------------------------------------------+\n";
         print "| Package Overview for Repository $List{$URL}:\n";
-        my @Packages = $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineList(
+        my @Packages = $Kernel::OM->Get('Package')->PackageOnlineList(
             URL  => $URL,
-            Lang => $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage'),
+            Lang => $Kernel::OM->Get('Config')->Get('DefaultLanguage'),
         );
         my $PackageCount = 0;
         PACKAGE:

@@ -135,7 +135,7 @@ sub Run {
     );
     
     # check if name already exists
-    my $ID = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentLookup(
+    my $ID = $Kernel::OM->Get('StdAttachment')->StdAttachmentLookup(
         StdAttachment => $StandardAttachment->{Name},
     );
     
@@ -147,7 +147,7 @@ sub Run {
     }
     
     # create StandardAttachment
-    my $StandardAttachmentID = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentAdd(
+    my $StandardAttachmentID = $Kernel::OM->Get('StdAttachment')->StdAttachmentAdd(
         Name        => $StandardAttachment->{Name},
         Content     => $StandardAttachment->{Content},
         ContentType => $StandardAttachment->{ContentType},

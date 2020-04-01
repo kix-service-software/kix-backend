@@ -134,7 +134,7 @@ sub Run {
     );
     
     # check if name already exists
-    my $Exist = $Kernel::OM->Get('Kernel::System::StandardTemplate')->NameExistsCheck(
+    my $Exist = $Kernel::OM->Get('StandardTemplate')->NameExistsCheck(
         Name => $StandardTemplate->{Name},
     );
     
@@ -146,7 +146,7 @@ sub Run {
     }
     
     # create StandardTemplate
-    my $StandardTemplateID = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateAdd(
+    my $StandardTemplateID = $Kernel::OM->Get('StandardTemplate')->StandardTemplateAdd(
         Name         => $StandardTemplate->{Name},
         Template     => $StandardTemplate->{Template},
         ContentType  => $StandardTemplate->{ContentType},

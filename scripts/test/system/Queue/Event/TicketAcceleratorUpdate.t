@@ -15,16 +15,16 @@ use vars (qw($Self));
 use utf8;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 my $Module       = 'StaticDB';
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $ConfigObject->Set(
     Key   => 'Ticket::ArchiveSystem',
@@ -36,14 +36,14 @@ $ConfigObject->Set(
     Value => "Kernel::System::Ticket::IndexAccelerator::$Module",
 );
 
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 $Self->True(
     $TicketObject->isa("Kernel::System::Ticket::IndexAccelerator::$Module"),
     "TicketObject loaded the correct backend",
 );
 
-my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
-my $DBObject    = $Kernel::OM->Get('Kernel::System::DB');
+my $QueueObject = $Kernel::OM->Get('Queue');
+my $DBObject    = $Kernel::OM->Get('DB');
 
 # test scenarios for Tickets
 my @Tests = (

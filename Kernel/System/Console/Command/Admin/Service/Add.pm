@@ -21,12 +21,12 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Service',
+    'Service',
 # ---
 # GeneralCatalog
 # ---
-    'Kernel::System::DynamicField',
-    'Kernel::System::GeneralCatalog',
+    'DynamicField',
+    'GeneralCatalog',
 # ---
 );
 
@@ -82,7 +82,7 @@ sub PreRun {
 
     # check if service already exists
     $Self->{Name} = $Self->GetOption('name');
-    my %ServiceList = $Kernel::OM->Get('Kernel::System::Service')->ServiceList(
+    my %ServiceList = $Kernel::OM->Get('Service')->ServiceList(
         Valid  => 0,
         UserID => 1,
     );
@@ -94,7 +94,7 @@ sub PreRun {
     # check if parent exists (if given)
     $Self->{ParentName} = $Self->GetOption('parent-name');
     if ( $Self->{ParentName} ) {
-        $Self->{ParentID} = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+        $Self->{ParentID} = $Kernel::OM->Get('Service')->ServiceLookup(
             Name   => $Self->{ParentName},
             UserID => 1,
         );
@@ -107,7 +107,7 @@ sub PreRun {
 # ---
 
     # get the dynamic field config for ITSMCriticality
-    my $DynamicFieldConfigArrayRef = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $DynamicFieldConfigArrayRef = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid       => 1,
         ObjectType  => [ 'Ticket' ],
         FieldFilter => {
@@ -134,7 +134,7 @@ sub PreRun {
     }
 
     # get service type list
-    my $ServiceTypeList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ServiceTypeList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::Service::Type',
     );
 
@@ -157,7 +157,7 @@ sub Run {
 
     # add service
     if (
-        !$Kernel::OM->Get('Kernel::System::Service')->ServiceAdd(
+        !$Kernel::OM->Get('Service')->ServiceAdd(
             UserID   => 1,
             ValidID  => 1,
             Name     => $Self->{Name},

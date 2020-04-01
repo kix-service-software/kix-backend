@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 sub new {
@@ -46,7 +46,7 @@ sub Run {
 
     # check CMD config param
     if ( !$Config{CMD} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need CMD config option in PostMaster::PreFilterModule job!',
         );
@@ -54,7 +54,7 @@ sub Run {
     }
 
     # execute prog
-    my $TmpFile = $Kernel::OM->Get('Kernel::Config')->Get('TempDir') . "/PostMaster.Filter.CMD.$$";
+    my $TmpFile = $Kernel::OM->Get('Config')->Get('TempDir') . "/PostMaster.Filter.CMD.$$";
 
     ## no critic
     if ( open my $Prog, '|-', "$Config{CMD} > $TmpFile" ) {
@@ -71,7 +71,7 @@ sub Run {
         # set new params
         for ( sort keys %Set ) {
             $Param{GetParam}->{$_} = $Set{$_};
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message =>
                     "Set param '$_' to '$Set{$_}' because of '$Ret' (Message-ID: $Param{GetParam}->{'Message-ID'}) ",

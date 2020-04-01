@@ -110,7 +110,7 @@ sub Run {
     foreach my $TemplateID ( @{$Param{Data}->{StandardTemplateID}} ) {
 
         # delete StandardTemplate	    
-        my $Success = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateDelete(
+        my $Success = $Kernel::OM->Get('StandardTemplate')->StandardTemplateDelete(
             ID     => $TemplateID,
             UserID => $Self->{Authorization}->{UserID},
         );

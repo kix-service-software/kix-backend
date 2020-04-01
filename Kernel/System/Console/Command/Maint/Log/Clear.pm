@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
 
     $Self->Print("<yellow>Clearing the KIX log...</yellow>\n");
 
-    $Kernel::OM->Get('Kernel::System::Log')->CleanUp();
+    $Kernel::OM->Get('Log')->CleanUp();
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

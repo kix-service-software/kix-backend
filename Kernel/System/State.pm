@@ -14,12 +14,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'SysConfig',
+    'Valid',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+    my $StateObject = $Kernel::OM->Get('State');
 
 =cut
 
@@ -58,7 +58,7 @@ sub new {
 
     # check needed config options
     for (qw(Ticket::ViewableStateType Ticket::UnlockStateType)) {
-        $Kernel::OM->Get('Kernel::Config')->Get($_) || die "Need $_ in Kernel/Config.pm!\n";
+        $Kernel::OM->Get('Config')->Get($_) || die "Need $_ in Kernel/Config.pm!\n";
     }
 
     return $Self;
@@ -84,7 +84,7 @@ sub StateAdd {
     # check needed stuff
     for (qw(Name ValidID TypeID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -93,7 +93,7 @@ sub StateAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # store data
     return if !$DBObject->Do(
@@ -122,12 +122,12 @@ sub StateAdd {
     return if !$ID;
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'State',
         ObjectID  => $ID,
@@ -170,7 +170,7 @@ sub StateGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID or Name!"
         );
@@ -185,14 +185,14 @@ sub StateGet {
     else {
         $CacheKey = 'StateGet::ID::' . $Param{ID};
     }
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     my @Bind;
@@ -232,7 +232,7 @@ sub StateGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -241,7 +241,7 @@ sub StateGet {
 
     # no data found...
     if ( !%Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "State '$Param{Name}' not found!",
         );
@@ -273,7 +273,7 @@ sub StateUpdate {
     # check needed stuff
     for (qw(ID Name ValidID TypeID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -285,7 +285,7 @@ sub StateUpdate {
     $Param{CheckSysConfig} //= 1;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Do(
@@ -299,12 +299,12 @@ sub StateUpdate {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'State',
         ObjectID  => $Param{ID},
@@ -314,7 +314,7 @@ sub StateUpdate {
     #return 1 if !$Param{CheckSysConfig};
 
     # check all sysconfig options and correct them automatically if neccessary
-    #$Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
+    #$Kernel::OM->Get('SysConfig')->ConfigItemCheckAll();
 
     return 1;
 }
@@ -346,7 +346,7 @@ sub StateGetStatesByType {
 
     # check needed stuff
     if ( !$Param{Result} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Result!'
         );
@@ -354,7 +354,7 @@ sub StateGetStatesByType {
     }
 
     if ( !$Param{Type} && !$Param{StateType} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Type or StateType!'
         );
@@ -379,7 +379,7 @@ sub StateGetStatesByType {
     }
 
     # check cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -401,13 +401,13 @@ sub StateGetStatesByType {
     if ( $Param{Type} ) {
 
         # get config object
-        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+        my $ConfigObject = $Kernel::OM->Get('Config');
 
         if ( $ConfigObject->Get( 'Ticket::' . $Param{Type} . 'StateType' ) ) {
             @StateType = @{ $ConfigObject->Get( 'Ticket::' . $Param{Type} . 'StateType' ) };
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Type 'Ticket::$Param{Type}StateType' not found in Kernel/Config.pm!",
             );
@@ -424,7 +424,7 @@ sub StateGetStatesByType {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     @StateType = map { $DBObject->Quote($_) } @StateType;
 
@@ -433,7 +433,7 @@ sub StateGetStatesByType {
         . ' FROM ticket_state ts, ticket_state_type tst'
         . ' WHERE tst.id = ts.type_id'
         . " AND tst.name IN ('${\(join '\', \'', sort @StateType)}' )"
-        . " AND ts.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )";
+        . " AND ts.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )";
 
     return if !$DBObject->Prepare( SQL => $SQL );
 
@@ -452,7 +452,7 @@ sub StateGetStatesByType {
     };
 
     # set permanent cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -506,7 +506,7 @@ sub StateList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'UserID!'
         );
@@ -520,7 +520,7 @@ sub StateList {
 
     # check cache
     my $CacheKey = 'StateList::' . $Valid;
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -530,11 +530,11 @@ sub StateList {
     my $SQL = 'SELECT id, name FROM ticket_state';
     if ($Valid) {
         $SQL
-            .= " WHERE valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )";
+            .= " WHERE valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )";
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare( SQL => $SQL );
 
@@ -545,7 +545,7 @@ sub StateList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -574,7 +574,7 @@ sub StateLookup {
 
     # check needed stuff
     if ( !$Param{State} && !$Param{StateID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             State   => 'error',
             Message => 'Need State or StateID!'
         );
@@ -604,7 +604,7 @@ sub StateLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No $Key for $Value found!",
         );
@@ -641,7 +641,7 @@ sub StateTypeList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'UserID!'
         );
@@ -650,14 +650,14 @@ sub StateTypeList {
 
     # check cache
     my $CacheKey = 'StateTypeList';
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -671,7 +671,7 @@ sub StateTypeList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -702,7 +702,7 @@ sub StateTypeLookup {
 
     # check needed stuff
     if ( !$Param{StateType} && !$Param{StateTypeID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             StateType => 'error',
             Message   => 'Need StateType or StateTypeID!',
         );
@@ -731,7 +731,7 @@ sub StateTypeLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No $Key for $Value found!",
         );
@@ -747,7 +747,7 @@ sub StateDelete {
     # check needed stuff
     for (qw(StateID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -756,19 +756,19 @@ sub StateDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM ticket_state WHERE id = ?',
         Bind => [ \$Param{StateID} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'State',
         ObjectID  => $Param{ID},

@@ -143,7 +143,7 @@ sub Run {
                 }
 
                 # perform User search
-                my %SearchResult = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+                my %SearchResult = $Kernel::OM->Get('User')->UserSearch(
                     %SearchParam,
                     Valid => 0
                 );
@@ -182,7 +182,7 @@ sub Run {
     }
     else {
         # perform User search without any search params
-        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+        %UserList = $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
             Valid => 0
         );
@@ -201,7 +201,7 @@ sub Run {
                 my @AllowedUserIDs;
                 for my $UserID (@GetUserIDs) {
 
-                    my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
+                    my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                         UserID              => $UserID,
                         Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
                         RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission},

@@ -17,8 +17,8 @@ use IPC::Open3;
 use Symbol;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::Config',
+    'Log',
+    'Config',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create a FetchMail object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $FetchMailObject = $Kernel::OM->Get('Kernel::System::FetchMail');
+    my $FetchMailObject = $Kernel::OM->Get('FetchMail');
 
 =cut
 
@@ -148,7 +148,7 @@ sub Fetch {
     );
 
     # get SysConfig setting as a fall-back
-    my $ConfigLocation = $Kernel::OM->Get('Kernel::Config')->Get('Fetchmail::Bin') || '';
+    my $ConfigLocation = $Kernel::OM->Get('Config')->Get('Fetchmail::Bin') || '';
 
     # check if setting is defined and valid
     if ( $ConfigLocation && $ConfigLocation =~ m{[/|\w]+ fetchmail\z}msx ) {
@@ -167,7 +167,7 @@ sub Fetch {
     }
 
     if ( !$FetchMailBin ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "FetchMail bin was not found",
         );
@@ -310,7 +310,7 @@ sub Fetch {
 
     # fetchmail ExitCode 13 means early termination due to limit (this is OK)
     elsif ( $ExitCode == 13 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "fetchmail: Poll terminated by a fetch limit",
         );
@@ -343,7 +343,7 @@ sub Fetch {
             $ErrorMessage = $ErrorMessageLookup{$ExitCode} || 'Unknown';
         }
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "There was an error executing $Command: $ErrorMessage",
         );

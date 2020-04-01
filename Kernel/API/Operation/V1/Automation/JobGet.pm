@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Automation::JobGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Automation::JobGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $JobID ( @{$Param{Data}->{JobID}} ) {
 
         # get the Job data
-        my %JobData = $Kernel::OM->Get('Kernel::System::Automation')->JobGet(
+        my %JobData = $Kernel::OM->Get('Automation')->JobGet(
             ID => $JobID,
         );
 
@@ -173,7 +173,7 @@ sub _GetExecPlans {
 
     my @ExecPlans;
     if ( $Param{JobID}) {
-        my @ExecPlanIDs = $Kernel::OM->Get('Kernel::System::Automation')->JobExecPlanList(
+        my @ExecPlanIDs = $Kernel::OM->Get('Automation')->JobExecPlanList(
             JobID => $Param{JobID},
         );
 
@@ -200,7 +200,7 @@ sub _GetMacros {
 
     my @Macros;
     if ( $Param{JobID}) {
-        my @MacroIDs = $Kernel::OM->Get('Kernel::System::Automation')->JobMacroList(
+        my @MacroIDs = $Kernel::OM->Get('Automation')->JobMacroList(
             JobID => $Param{JobID},
         );
 

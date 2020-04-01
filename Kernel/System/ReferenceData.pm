@@ -16,8 +16,8 @@ use warnings;
 use Locale::Country qw(all_country_names);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ReferenceDataObject = $Kernel::OM->Get('Kernel::System::ReferenceData');
+    my $ReferenceDataObject = $Kernel::OM->Get('ReferenceData');
 
 =cut
 
@@ -74,7 +74,7 @@ sub CountryList {
         $Param{Result} = undef;
     }
 
-    my $Countries = $Kernel::OM->Get('Kernel::Config')->Get('ReferenceData::OwnCountryList');
+    my $Countries = $Kernel::OM->Get('Config')->Get('ReferenceData::OwnCountryList');
 
     if ( $Param{Result} && $Countries ) {
 
@@ -91,7 +91,7 @@ sub CountryList {
     my @CountryNames = all_country_names();
 
     if ( !@CountryNames ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Country name list is empty!',
         );

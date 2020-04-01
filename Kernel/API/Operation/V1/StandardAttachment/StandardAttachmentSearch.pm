@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform StandardAttachment search
-    my %StandardAttachmentList = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentList();
+    my %StandardAttachmentList = $Kernel::OM->Get('StdAttachment')->StdAttachmentList();
 
 	# get already prepared StandardAttachment data from StandardAttachmentGet operation
     if ( IsHashRefWithData(\%StandardAttachmentList) ) {  	

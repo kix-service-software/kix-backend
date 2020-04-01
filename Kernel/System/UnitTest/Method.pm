@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 =head1 NAME
@@ -57,7 +57,7 @@ sub True {
     $True = 0 if ($True < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name! E. g. True(\$A, \'Test Name\')!'
         );
@@ -90,7 +90,7 @@ sub False {
     $False = 0 if ($False < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name! E. g. False(\$A, \'Test Name\')!'
         );
@@ -134,7 +134,7 @@ sub Is {
     $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name! E. g. Is(\$A, \$B, \'Test Name\')!'
         );
@@ -179,7 +179,7 @@ sub IsNot {
     $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name! E. g. IsNot(\$A, \$B, \'Test Name\')!'
         );
@@ -237,7 +237,7 @@ sub IsDeeply {
     $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name! E. g. Is(\$A, \$B, \'Test Name\')!'
         );
@@ -267,8 +267,8 @@ sub IsDeeply {
         return 1;
     }
     else {
-        my $ShouldBeDump = $Kernel::OM->Get('Kernel::System::Main')->Dump($ShouldBe);
-        my $TestDump     = $Kernel::OM->Get('Kernel::System::Main')->Dump($Test);
+        my $ShouldBeDump = $Kernel::OM->Get('Main')->Dump($ShouldBe);
+        my $TestDump     = $Kernel::OM->Get('Main')->Dump($Test);
         $Self->_Print( 0, "$Name (is '$TestDump' should be '$ShouldBeDump')" );
         return;
     }
@@ -289,7 +289,7 @@ sub IsNotDeeply {
     $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name! E. g. IsNot(\$A, \$B, \'Test Name\')!'
         );
@@ -322,7 +322,7 @@ sub IsNotDeeply {
     else {
 
         #        $Self->_Print( 0, "$Name (matches the expected value)" );
-        my $TestDump = $Kernel::OM->Get('Kernel::System::Main')->Dump($Test);
+        my $TestDump = $Kernel::OM->Get('Main')->Dump($Test);
         $Self->_Print( 0, "$Name (The structures are equal: '$TestDump')" );
 
         return;
@@ -354,7 +354,7 @@ sub _DataDiff {
     # check needed stuff
     for (qw(Data1 Data2)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );

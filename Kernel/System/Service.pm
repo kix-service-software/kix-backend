@@ -16,20 +16,20 @@ use warnings;
 use Kernel::System::VariableCheck (qw(:all));
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::CheckItem',
-    'Kernel::System::DB',
+    'Config',
+    'Cache',
+    'CheckItem',
+    'DB',
 # ---
 # GeneralCatalog
 # ---
-    'Kernel::System::DynamicField',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::LinkObject',
+    'DynamicField',
+    'GeneralCatalog',
+    'LinkObject',
 # ---
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Valid',
+    'Log',
+    'Main',
+    'Valid',
 );
 
 =head1 NAME
@@ -52,7 +52,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
+    my $ServiceObject = $Kernel::OM->Get('Service');
 
 =cut
 
@@ -63,7 +63,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
 
     $Self->{CacheType} = 'Service';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
@@ -72,7 +72,7 @@ sub new {
 # ---
 
     # get the dynamic field for ITSMCriticality
-    my $DynamicFieldConfigArrayRef = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $DynamicFieldConfigArrayRef = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid       => 1,
         ObjectType  => [ 'Ticket' ],
         FieldFilter => {
@@ -95,15 +95,15 @@ sub new {
 # ---
 
     # load generator preferences module
-    my $GeneratorModule = $Kernel::OM->Get('Kernel::Config')->Get('Service::PreferencesModule')
+    my $GeneratorModule = $Kernel::OM->Get('Config')->Get('Service::PreferencesModule')
         || 'Kernel::System::Service::PreferencesDB';
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require($GeneratorModule) ) {
+    if ( $Kernel::OM->Get('Main')->Require($GeneratorModule) ) {
         $Self->{PreferencesObject} = $GeneratorModule->new( %{$Self} );
     }
 
     # KIX4OTRS-capeIT
     # load service extension modules
-    my $CustomModule = $Kernel::OM->Get('Kernel::Config')->Get('Service::CustomModule');
+    my $CustomModule = $Kernel::OM->Get('Config')->Get('Service::CustomModule');
     if ($CustomModule) {
         my %ModuleList;
         if ( ref $CustomModule eq 'HASH' ) {
@@ -116,7 +116,7 @@ sub new {
         for my $ModuleKey ( sort keys %ModuleList ) {
             my $Module = $ModuleList{$ModuleKey};
             next MODULEKEY if !$Module;
-            next MODULEKEY if !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass($Module);
+            next MODULEKEY if !$Kernel::OM->Get('Main')->RequireBaseClass($Module);
         }
     }
 
@@ -141,7 +141,7 @@ sub ServiceList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -160,7 +160,7 @@ sub ServiceList {
         $CacheKey .= '::KeepChildren::' . $Param{KeepChildren};
     }
 
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -180,7 +180,7 @@ sub ServiceList {
     }
 
     if ( !$Param{Valid} ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -190,7 +190,7 @@ sub ServiceList {
     }
 
     # get valid ids
-    my @ValidIDs = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+    my @ValidIDs = $Kernel::OM->Get('Valid')->ValidIDsGet();
 
     # duplicate service list
     my %ServiceListTmp = %ServiceList;
@@ -229,7 +229,7 @@ sub ServiceList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -305,7 +305,7 @@ sub ServiceListGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -319,7 +319,7 @@ sub ServiceListGet {
 
     # check cached results
     my $CacheKey = 'Cache::ServiceListGet::Valid::' . $Param{Valid};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -336,7 +336,7 @@ sub ServiceListGet {
 
     if ( $Param{Valid} ) {
         $SQL .= ' WHERE valid_id IN (' . join ', ',
-            $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet() . ')';
+            $Kernel::OM->Get('Valid')->ValidIDsGet() . ')';
     }
 
     $SQL .= ' ORDER BY name';
@@ -408,7 +408,7 @@ sub ServiceListGet {
     if (@ServiceList) {
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -468,7 +468,7 @@ sub ServiceGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -477,7 +477,7 @@ sub ServiceGet {
 
     # either ServiceID or Name must be passed
     if ( !$Param{ServiceID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ServiceID or Name!',
         );
@@ -486,7 +486,7 @@ sub ServiceGet {
 
     # check that not both ServiceID and Name are given
     if ( $Param{ServiceID} && $Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need either ServiceID OR Name - not both!',
         );
@@ -509,7 +509,7 @@ sub ServiceGet {
     $Param{IncidentState} ||= 0;
     $CacheKey .= '::IncidentState::' . $Param{IncidentState};
 # ---
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -550,7 +550,7 @@ sub ServiceGet {
 
     # check service
     if ( !$ServiceData{ServiceID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such ServiceID ($Param{ServiceID})!",
         );
@@ -592,7 +592,7 @@ sub ServiceGet {
 # ---
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -623,7 +623,7 @@ sub ServiceLookup {
 
     # check needed stuff
     if ( !$Param{ServiceID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ServiceID or Name!',
         );
@@ -634,7 +634,7 @@ sub ServiceLookup {
 
         # check cache
         my $CacheKey = 'Cache::ServiceLookup::ID::' . $Param{ServiceID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -652,7 +652,7 @@ sub ServiceLookup {
             $Result = $Row[0];
         }
 
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -665,7 +665,7 @@ sub ServiceLookup {
 
         # check cache
         my $CacheKey = 'Cache::ServiceLookup::Name::' . $Param{Name};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -683,7 +683,7 @@ sub ServiceLookup {
             $Result = $Row[0];
         }
 
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -725,7 +725,7 @@ sub ServiceAdd {
     for my $Argument (qw(Name ValidID UserID TypeID Criticality)) {
 # ---
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -738,7 +738,7 @@ sub ServiceAdd {
 
     # cleanup given params
     for my $Argument (qw(Name Comment)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -747,7 +747,7 @@ sub ServiceAdd {
 
     # check service name
     if ( $Param{Name} =~ m{ :: }xms ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't add service! Invalid Service name '$Param{Name}'!",
         );
@@ -780,7 +780,7 @@ sub ServiceAdd {
 
     # add service to database
     if ($Exists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Can\'t add service! Service with same name and parent already exists.'
         );
@@ -821,12 +821,12 @@ sub ServiceAdd {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Service',
         ObjectID  => $ServiceID,
@@ -867,7 +867,7 @@ sub ServiceUpdate {
     for my $Argument (qw(ServiceID Name ValidID UserID TypeID Criticality)) {
 # ---
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -880,7 +880,7 @@ sub ServiceUpdate {
 
     # cleanup given params
     for my $Argument (qw(Name Comment)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -889,7 +889,7 @@ sub ServiceUpdate {
 
     # check service name
     if ( $Param{Name} =~ m{ :: }xms ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't update service! Invalid Service name '$Param{Name}'!",
         );
@@ -902,7 +902,7 @@ sub ServiceUpdate {
     );
 
     if ( !$OldServiceName ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't update service! Service '$Param{ServiceID}' does not exist.",
         );
@@ -926,7 +926,7 @@ sub ServiceUpdate {
 
         # check, if selected parent was a child of this service
         if ( $Param{FullName} =~ m{ \A ( \Q$OldServiceName\E ) :: }xms ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Can\'t update service! Invalid parent was selected.'
             );
@@ -949,7 +949,7 @@ sub ServiceUpdate {
 
     # update service
     if ($Exists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Can\'t update service! Service with same name and parent already exists.'
         );
@@ -1004,12 +1004,12 @@ sub ServiceUpdate {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Service',
         ObjectID  => $Param{ServiceID},
@@ -1041,7 +1041,7 @@ sub ServiceSearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -1053,7 +1053,7 @@ sub ServiceSearch {
 
     # create sql query
     my $SQL
-        = "SELECT id FROM service WHERE valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )";
+        = "SELECT id FROM service WHERE valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )";
 
     my @Bind;
 
@@ -1146,7 +1146,7 @@ sub ContactServiceMemberList {
 
     # check needed stuff
     if ( !$Param{Result} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Result!',
         );
@@ -1163,7 +1163,7 @@ sub ContactServiceMemberList {
 
     # get options for default services for unknown customers
     my $DefaultServiceUnknownCustomer
-        = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Service::Default::UnknownCustomer');
+        = $Kernel::OM->Get('Config')->Get('Ticket::Service::Default::UnknownCustomer');
     if (
         $DefaultServiceUnknownCustomer
         && $Param{DefaultServices}
@@ -1176,7 +1176,7 @@ sub ContactServiceMemberList {
 
     # check more needed stuff
     if ( !$Param{ServiceID} && !$Param{ContactLogin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ServiceID or ContactLogin!',
         );
@@ -1194,7 +1194,7 @@ sub ContactServiceMemberList {
     }
 
     # check cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -1220,7 +1220,7 @@ sub ContactServiceMemberList {
         . ' FROM '
         . ' service_customer_user scu, service s'
         . ' WHERE '
-        . " s.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) AND "
+        . " s.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) AND "
         . ' s.id = scu.service_id AND ';
 
     if ( $Param{ServiceID} ) {
@@ -1260,7 +1260,7 @@ sub ContactServiceMemberList {
     # KIX4OTRS-capeIT
     # offers subsumption of individual and default services for given customers
     elsif (
-        $Kernel::OM->Get('Kernel::Config')->Get('Service::DefaultServices::ForceShow')
+        $Kernel::OM->Get('Config')->Get('Service::DefaultServices::ForceShow')
         && $Param{DefaultServices}
         )
     {
@@ -1279,7 +1279,7 @@ sub ContactServiceMemberList {
 
     # return result
     if ( $Param{Result} eq 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -1293,7 +1293,7 @@ sub ContactServiceMemberList {
     else {
         @Data = keys %Data;
     }
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1323,7 +1323,7 @@ sub ContactServiceMemberAdd {
     # check needed stuff
     for my $Argument (qw(ContactLogin ServiceID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1339,7 +1339,7 @@ sub ContactServiceMemberAdd {
 
     # return if relation is not active
     if ( !$Param{Active} ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
         );
         return;
@@ -1353,7 +1353,7 @@ sub ContactServiceMemberAdd {
         Bind => [ \$Param{ContactLogin}, \$Param{ServiceID}, \$Param{UserID} ]
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
     return $Success;
@@ -1377,12 +1377,12 @@ sub ServicePreferencesSet {
 
     $Self->{PreferencesObject}->ServicePreferencesSet(%Param);
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Service.Preference',
         ObjectID  => $Param{ServiceID}.'::'.$Param{Key},
@@ -1430,7 +1430,7 @@ sub ServiceParentsGet {
     # check needed stuff
     for my $Needed (qw(UserID ServiceID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need $Needed!',
             );
@@ -1440,7 +1440,7 @@ sub ServiceParentsGet {
 
     # read cache
     my $CacheKey = 'ServiceParentsGet::' . $Param{ServiceID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -1487,7 +1487,7 @@ sub ServiceParentsGet {
     my @Data = reverse @ServiceParents;
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1510,7 +1510,7 @@ sub GetAllSubServices {
 
     # check needed stuff
     if ( !$Param{ServiceID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ServiceID!'
         );
@@ -1519,14 +1519,14 @@ sub GetAllSubServices {
 
     # check cache
     my $CacheKey = 'GetAllSubServices::' . $Param{ServiceID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # search all custom Services
     return if !$DBObject->Prepare(
@@ -1541,7 +1541,7 @@ sub GetAllSubServices {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1575,7 +1575,7 @@ sub _ServiceGetCurrentIncidentState {
     # check needed stuff
     for my $Argument (qw(ServiceData Preferences UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1586,7 +1586,7 @@ sub _ServiceGetCurrentIncidentState {
     # check needed stuff
     for my $Argument (qw(ServiceData Preferences)) {
         if ( ref $Param{$Argument} ne 'HASH' ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Argument must be a hash reference!",
             );
@@ -1599,7 +1599,7 @@ sub _ServiceGetCurrentIncidentState {
     my %Preferences = %{ $Param{Preferences} };
 
     # get service type list
-    my $ServiceTypeList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ServiceTypeList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::Service::Type',
     );
     $ServiceData{Type} = $ServiceTypeList->{ $ServiceData{TypeID} } || '';
@@ -1608,7 +1608,7 @@ sub _ServiceGetCurrentIncidentState {
     $ServiceData{CurInciStateType} = 'operational';
 
     # get ITSM module directory
-    my $ConfigItemModule = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/Kernel/System/ITSMConfigItem.pm';
+    my $ConfigItemModule = $Kernel::OM->Get('Config')->Get('Home') . '/Kernel/System/ITSMConfigItem.pm';
 
     # check if ITSMConfigurationManagement package is installed
     if ( -e $ConfigItemModule ) {
@@ -1624,7 +1624,7 @@ sub _ServiceGetCurrentIncidentState {
         else {
 
             # get incident link types and directions from config
-            my $IncidentLinkTypeDirection = $Kernel::OM->Get('Kernel::Config')->Get('ITSM::Core::IncidentLinkTypeDirection');
+            my $IncidentLinkTypeDirection = $Kernel::OM->Get('Config')->Get('ITSM::Core::IncidentLinkTypeDirection');
 
             # to store all linked config item ids of this service (for all configured link types)
             my %AllLinkedConfigItemIDs;
@@ -1645,7 +1645,7 @@ sub _ServiceGetCurrentIncidentState {
                 }
 
                 # find all linked config items with this linktype and direction
-                my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyListWithData(
+                my %LinkedConfigItemIDs = $Kernel::OM->Get('LinkObject')->LinkKeyListWithData(
                     Object1   => 'Service',
                     Key1      => $ServiceData{ServiceID},
                     Object2   => 'ConfigItem',
@@ -1699,7 +1699,7 @@ sub _ServiceGetCurrentIncidentState {
     if ( $ServiceData{CurInciStateType} eq 'operational' ) {
 
         # create the valid string
-        my $ValidIDString = join q{, }, $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        my $ValidIDString = join q{, }, $Kernel::OM->Get('Valid')->ValidIDsGet();
 
         # prepare name
         my $Name = $ServiceData{Name};
@@ -1753,7 +1753,7 @@ sub _ServiceGetCurrentIncidentState {
     );
 
     # get the incident state list of this type
-    my $InciStateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $InciStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class         => 'ITSM::Core::IncidentState',
         Preferences   => {
             Functionality => $ServiceData{CurInciStateType},
@@ -1771,7 +1771,7 @@ sub _ServiceGetCurrentIncidentState {
     }
 
     # get incident state functionality
-    my $InciState = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+    my $InciState = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID => $ServiceData{CurInciStateID},
     );
 
@@ -1791,7 +1791,7 @@ sub ServiceDelete {
     # check needed stuff
     for (qw(ServiceID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1800,19 +1800,19 @@ sub ServiceDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM service WHERE id = ?',
         Bind => [ \$Param{ServiceID} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Service',
         ObjectID  => $Param{ServiceID},

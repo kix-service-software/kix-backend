@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Ticket',
+    'Ticket',
 );
 
 sub Configure {
@@ -43,7 +43,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Self->GetArgument('ticket-id'),
         DynamicFields => 0,
     );
@@ -68,7 +68,7 @@ sub Run {
     $Self->Print( "<green>" . ( '-' x 69 ) . "</green>\n" );
 
     # get article index
-    my @Index = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleIndex(
+    my @Index = $Kernel::OM->Get('Ticket')->ArticleIndex(
         TicketID => $Self->GetArgument('ticket-id'),
     );
 
@@ -81,7 +81,7 @@ sub Run {
         next ARTICLEID if !$ArticleID;
 
         # get article data
-        my %Article = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleGet(
+        my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
             ArticleID     => $ArticleID,
             DynamicFields => 0,
         );

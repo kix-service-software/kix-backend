@@ -23,13 +23,13 @@ use Fcntl qw(:flock);
 use FindBin qw($Bin);
 use lib "$Bin/../..";
 use lib "$Bin/../../Kernel/cpan-lib";
-use lib "$Bin/../../Custom";
+use lib "$Bin/../../plugins";
 
 use Kernel::API::Provider;
 use Kernel::System::ObjectManager;
 
 $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'API',
     },
 );
@@ -83,7 +83,7 @@ my $App = CGI::Emulate::PSGI->handler(
 
 sub _LockPID {
 	# create ConfigObject
-	my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+	my $ConfigObject = $Kernel::OM->Get('Config');
 
 	my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
 	my $PIDFile = $PIDDir . "service.pid";
@@ -111,7 +111,7 @@ sub _LockPID {
 }
 
 sub _Autostart {
-    my $Result = $Kernel::OM->Get('Kernel::System::Autostart')->Run();
+    my $Result = $Kernel::OM->Get('Autostart')->Run();
  	if ( $Result ) {
 		print STDERR "At least one autostart module failed. Please see the KIX log for details.\n";
 		exit $Result;

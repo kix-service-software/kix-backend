@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Priority',
+    'Log',
+    'Ticket',
+    'Priority',
 );
 
 =head1 NAME
@@ -79,7 +79,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
@@ -89,7 +89,7 @@ sub Run {
         return;
     }
 
-    my $Priority = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    my $Priority = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{Priority},
         TicketID => $Param{TicketID},
@@ -98,12 +98,12 @@ sub Run {
     );
 
     # set the new priority
-    my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+    my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
         Priority => $Priority
     );
 
     if ( !$PriorityID ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - can't find ticket priority \"$Param{Config}->{Priority}\"!",
             UserID   => $Param{UserID}
@@ -124,7 +124,7 @@ sub Run {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the priority \"$Param{Config}->{Priority}\" failed!",
             UserID   => $Param{UserID}

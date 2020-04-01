@@ -4255,6 +4255,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Ticket</Item>
+                <Item Key="Module">Kernel::System::Automation::Job::Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4265,6 +4266,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Ticket</Item>
+                <Item Key="Module">Kernel::System::Automation::Macro::Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4275,6 +4277,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Create Article</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::ArticleCreate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4284,6 +4287,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Contact</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::ContactSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4293,6 +4297,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Dynamic Field</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::DynamicFieldSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4302,6 +4307,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Lock</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::LockSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4311,6 +4317,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Organisation</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::OrganisationSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4320,6 +4327,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Owner</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::OwnerSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4329,6 +4337,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Priority</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::PrioritySet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4338,6 +4347,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Responsible</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::ResponsibleSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4347,6 +4357,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set State</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::StateSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4356,6 +4367,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Team</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::TeamSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4365,6 +4377,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Create Ticket</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::TicketCreate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4374,6 +4387,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Delete Ticket</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::TicketDelete</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4383,6 +4397,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Title</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::TitleSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -4392,6 +4407,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Set Type</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::TypeSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -102,7 +102,7 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'RunID' ) {
-        my %JobRun = $Kernel::OM->Get('Kernel::System::Automation')->JobRunGet(
+        my %JobRun = $Kernel::OM->Get('Automation')->JobRunGet(
             ID => $Param{Data}->{$Param{Attribute}},
         );        
         $Found = %JobRun;

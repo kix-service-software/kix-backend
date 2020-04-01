@@ -16,18 +16,18 @@ use Kernel::API::Mapping;
 use Kernel::API::Debugger;
 
 # get needed objects
-my $ConfigObject     = $Kernel::OM->Get('Kernel::Config');
-my $MainObject       = $Kernel::OM->Get('Kernel::System::Main');
-my $TimeObject       = $Kernel::OM->Get('Kernel::System::Time');
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
+my $ConfigObject     = $Kernel::OM->Get('Config');
+my $MainObject       = $Kernel::OM->Get('Main');
+my $TimeObject       = $Kernel::OM->Get('Time');
+my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -701,15 +701,15 @@ for my $Test (@MappingTests) {
     if ( $Test->{ConfigSuccess} ) {
         $Self->Is(
             ref $MappingObject,
-            'Kernel::API::Mapping',
+            'API::Mapping',
             $Test->{Name} . ' MappingObject was correctly instantiated',
         );
-        next TEST if ref $MappingObject ne 'Kernel::API::Mapping';
+        next TEST if ref $MappingObject ne 'API::Mapping';
     }
     else {
         $Self->IsNot(
             ref $MappingObject,
-            'Kernel::API::Mapping',
+            'API::Mapping',
             $Test->{Name} . ' MappingObject was not correctly instantiated',
         );
         next TEST;
@@ -766,7 +766,7 @@ for my $Test (@MappingTests) {
 
     $Self->Is(
         ref $SecondMappingObject,
-        'Kernel::API::Mapping',
+        'API::Mapping',
         $Test->{Name} . ' SecondMappingObject was correctly instantiated',
     );
 }    # end tests

@@ -16,8 +16,8 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ActivityObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity');
+    my $ActivityObject = $Kernel::OM->Get('ProcessManagement::Activity');
 
 =cut
 
@@ -86,7 +86,7 @@ sub ActivityGet {
 
     for my $Needed (qw(ActivityEntityID Interface)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -95,12 +95,12 @@ sub ActivityGet {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $Activity = $ConfigObject->Get('Process::Activity');
 
     if ( !IsHashRefWithData($Activity) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Activity config!'
         );
@@ -110,7 +110,7 @@ sub ActivityGet {
     my $ActivityEntity = $Activity->{ $Param{ActivityEntityID} };
 
     if ( !IsHashRefWithData($ActivityEntity) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No data for Activity '$Param{ActivityEntityID}' found!"
         );
@@ -173,10 +173,10 @@ sub ActivityGet {
 sub ActivityList {
     my ( $Self, %Param ) = @_;
 
-    my $Activities = $Kernel::OM->Get('Kernel::Config')->Get('Process::Activity');
+    my $Activities = $Kernel::OM->Get('Config')->Get('Process::Activity');
 
     if ( !IsHashRefWithData($Activities) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Activity config!'
         );

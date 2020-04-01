@@ -18,9 +18,9 @@ use File::Path;
 use Unicode::Normalize;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $EncodeObject = $Kernel::OM->Get('Encode');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 # FilenameCleanUp - tests
 my @Tests = (

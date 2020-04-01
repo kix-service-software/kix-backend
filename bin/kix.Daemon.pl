@@ -15,7 +15,7 @@ use File::Basename;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . '/Kernel/cpan-lib';
-use lib dirname($RealBin) . '/Custom';
+use lib dirname($RealBin) . '/plugins';
 
 use File::Path qw();
 use Time::HiRes qw(sleep);
@@ -35,7 +35,7 @@ use Kernel::System::ObjectManager;
 print STDOUT "kix.Daemon.pl - the KIX daemon\n";
 
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'kix.Daemon.pl',
     },
 );
@@ -51,7 +51,7 @@ if ( !$IsWin32 ) {
 }
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get the NodeID from the SysConfig settings, this is used on High Availability systems.
 my $NodeID = $ConfigObject->Get('NodeID') || 1;
@@ -199,7 +199,7 @@ sub Start {
     }
     else {
         my $ChildProcess;
-        my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+        my $Home = $Kernel::OM->Get('Config')->Get('Home');
         my $Debug = join(' ', keys %DebugDaemons);
         
         Win32::Process::Create(
@@ -309,7 +309,7 @@ sub _Run {
     }
 
     # get daemon modules from SysConfig
-    my $DaemonModuleConfig = $Kernel::OM->Get('Kernel::Config')->Get('DaemonModules') || {};
+    my $DaemonModuleConfig = $Kernel::OM->Get('Config')->Get('DaemonModules') || {};
 
     # create daemon module hash
     my %DaemonModules;
@@ -368,7 +368,7 @@ sub _Run {
             }
             else {
                 my $ChildProcess;
-                my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+                my $Home = $Kernel::OM->Get('Config')->Get('Home');
                 my $Debug = join(' ', keys %DebugDaemons);
                                 
                 Win32::Process::Create(
@@ -519,13 +519,13 @@ sub _RunModule {
     }
 
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::Log' => {
+        'Log' => {
             LogPrefix => "kix.Daemon.pl - Daemon $Param{Module}",
         },
     );
 
     # disable in memory cache because many processes runs at the same time
-    $Kernel::OM->Get('Kernel::System::Cache')->Configure(
+    $Kernel::OM->Get('Cache')->Configure(
         CacheInMemory  => 0,
         CacheInBackend => 1,
     );
@@ -586,7 +586,7 @@ sub _PIDLock {
 
         if ( !-e $PIDDir ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't create directory '$PIDDir': $!",
             );
@@ -596,7 +596,7 @@ sub _PIDLock {
     }
     if ( !-w $PIDDir ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Don't have write permissions in directory '$PIDDir': $!",
         );
@@ -666,7 +666,7 @@ sub _LogFilesSet {
     my $FileStdOut = "$LogDir/$Param{Module}OUT";
     my $FileStdErr = "$LogDir/$Param{Module}ERR";
 
-    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $SystemTime = $Kernel::OM->Get('Time')->SystemTime();
 
     # backup old log files
     use File::Copy qw(move);
@@ -678,7 +678,7 @@ sub _LogFilesSet {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $RedirectSTDOUT = $ConfigObject->Get('Daemon::Log::STDOUT') || 0;
     my $RedirectSTDERR = $ConfigObject->Get('Daemon::Log::STDERR') || 0;
@@ -710,7 +710,7 @@ sub _LogFilesSet {
         if ( !unlink $LogFile ) {
 
             # log old backup file cannot be deleted
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Daemon: $Param{Module} could not delete old log file $LogFile! $!",
             );
@@ -738,7 +738,7 @@ sub _LogFilesCleanup {
         if ( !unlink $LogFile ) {
 
             # log old backup file cannot be deleted
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Daemon: could not delete empty log file $LogFile! $!",
             );

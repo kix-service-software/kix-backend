@@ -17,14 +17,14 @@ use utf8;
 use base qw(Kernel::System::Daemon::BaseDaemon);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::CronEvent',
-    'Kernel::System::DB',
-    'Kernel::System::Daemon::SchedulerDB',
-    'Kernel::System::Automation',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'Cache',
+    'CronEvent',
+    'DB',
+    'Daemon::SchedulerDB',
+    'Automation',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -55,10 +55,10 @@ sub new {
     bless $Self, $Type;
 
     # Get objects in constructor to save performance.
-    $Self->{CacheObject}        = $Kernel::OM->Get('Kernel::System::Cache');
-    $Self->{AutomationObject}   = $Kernel::OM->Get('Kernel::System::Automation');
-    $Self->{DBObject}           = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{SchedulerDBObject}  = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+    $Self->{CacheObject}        = $Kernel::OM->Get('Cache');
+    $Self->{AutomationObject}   = $Kernel::OM->Get('Automation');
+    $Self->{DBObject}           = $Kernel::OM->Get('DB');
+    $Self->{SchedulerDBObject}  = $Kernel::OM->Get('Daemon::SchedulerDB');
 
     # Disable in memory cache to be clusterable.
     $Self->{CacheObject}->Configure(
@@ -67,11 +67,11 @@ sub new {
     );
 
     # Get the NodeID from the SysConfig settings, this is used on High Availability systems.
-    $Self->{NodeID} = $Kernel::OM->Get('Kernel::Config')->Get('NodeID') || 1;
+    $Self->{NodeID} = $Kernel::OM->Get('Config')->Get('NodeID') || 1;
 
     # Check NodeID, if does not match is impossible to continue.
     if ( $Self->{NodeID} !~ m{ \A \d+ \z }xms && $Self->{NodeID} > 0 && $Self->{NodeID} < 1000 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "NodeID '$Self->{NodeID}' is invalid!",
         );

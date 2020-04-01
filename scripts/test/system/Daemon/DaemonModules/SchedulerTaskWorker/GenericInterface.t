@@ -15,18 +15,18 @@ use utf8;
 use vars (qw($Self));
 
 # prevent mails send
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper   = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper   = $Kernel::OM->Get('UnitTest::Helper');
 my $RandomID = $Helper->GetRandomID();
 
 # freeze time
@@ -54,7 +54,7 @@ my $WebserviceConfig = {
 };
 
 # get web service object
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('GenericInterface::Webservice');
 
 # add web service config
 my $WebserviceID = $WebserviceObject->WebserviceAdd(
@@ -267,9 +267,9 @@ my @Test = (
 
 # get needed objects
 my $TaskHandlerObject
-    = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface');
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
-my $TimeObject        = $Kernel::OM->Get('Kernel::System::Time');
+    = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
+my $TimeObject        = $Kernel::OM->Get('Time');
 
 TEST:
 for my $Test (@Test) {

@@ -19,15 +19,15 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'DynamicField',
+    'DynamicField::Backend',
+    'LinkObject',
+    'Log',
+    'State',
+    'Ticket',
+    'Time',
+    'User',
 );
 
 =head1 NAME
@@ -50,7 +50,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketCreateObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketCreate');
+    my $TicketCreateObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketCreate');
 
 =cut
 
@@ -195,19 +195,19 @@ sub Run {
     for my $Attribute (qw(Queue State Lock Priority)) {
 
         if ( !$TicketParam{$Attribute} && !$TicketParam{ $Attribute . "ID" } ) {
-            $TicketParam{$Attribute} = $Kernel::OM->Get('Kernel::Config')->Get("Process::Default$Attribute") || '';
+            $TicketParam{$Attribute} = $Kernel::OM->Get('Config')->Get("Process::Default$Attribute") || '';
         }
     }
 
     # Get OwnerID from Owner
     if ( $TicketParam{Owner} && !$TicketParam{OwnerID} ) {
-        $TicketParam{OwnerID} = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        $TicketParam{OwnerID} = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $TicketParam{Owner},
         );
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # create ticket
     my $TicketID = $TicketObject->TicketCreate(
@@ -215,7 +215,7 @@ sub Run {
         UserID => $Param{UserID},
     );
     if ( !$TicketID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . "Couldn't create New Ticket from Ticket: "
@@ -227,12 +227,12 @@ sub Run {
     # get state information
     my %StateData;
     if ( $TicketParam{StateID} ) {
-        %StateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        %StateData = $Kernel::OM->Get('State')->StateGet(
             ID => $TicketParam{StateID},
         );
     }
     else {
-        %StateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        %StateData = $Kernel::OM->Get('State')->StateGet(
             Name => $TicketParam{State},
         );
     }
@@ -254,7 +254,7 @@ sub Run {
         if ( $Param{Config}->{PendingTime} ) {
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             # convert pending time to system time
             my $SystemTime = $TimeObject->TimeStamp2SystemTime(
@@ -315,7 +315,7 @@ sub Run {
 
         # check Channel
         if ( $ArticleParam{Channel} =~ m{\A email }msxi ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . "Channel $Param{Config}->{Channel} is not supported",
@@ -333,7 +333,7 @@ sub Run {
             );
 
             if ( !$ArticleID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $CommonMessage
                         . "Couldn't create Article on Ticket: $TicketID from Ticket: "
@@ -366,8 +366,8 @@ sub Run {
     }
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # get the dynamic fields for ticket
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
@@ -399,7 +399,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . "Couldn't set DynamicField Value on $DynamicFieldConfig->{ObjectType}:"
@@ -414,7 +414,7 @@ sub Run {
     if ( $Param{Config}->{LinkAs} ) {
 
         # get link object
-        my $LinkObject = $Kernel::OM->Get('Kernel::System::LinkObject');
+        my $LinkObject = $Kernel::OM->Get('LinkObject');
 
         # get config of all types
         my %ConfiguredTypes = $LinkObject->TypeList(
@@ -442,7 +442,7 @@ sub Run {
         }
 
         if ( !$SelectedType ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . "LinkAs $Param{LinkAs} is invalid!"
@@ -467,7 +467,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . "Couldn't Link Tickets $SourceObjectID with $TargetObjectID as $Param{LinkAs}!",

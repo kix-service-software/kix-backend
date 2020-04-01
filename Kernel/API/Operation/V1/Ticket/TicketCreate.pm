@@ -57,7 +57,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketCreate');
 
     return $Self;
 }
@@ -281,13 +281,13 @@ sub _TicketCreate {
         }
 
         my @NameChunks = split(' ', $ContactEmailRealname);
-        my $ExistingContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+        my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
             Email  => $ContactEmail,
             Silent => 1,
         );
 
         if (!$ExistingContactID) {
-            $Ticket->{ContactID} = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+            $Ticket->{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
                 Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
                 Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
                 Email                 => $ContactEmail,
@@ -305,7 +305,7 @@ sub _TicketCreate {
     # get contact information
     # with information will be used to create the ticket if contact is not defined in the
     # database, contact ticket information need to be empty strings
-    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Ticket->{ContactID},
     );
 
@@ -317,7 +317,7 @@ sub _TicketCreate {
     }
 
     # get database object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     my $OwnerID;
     if ( $Ticket->{Owner} && !$Ticket->{OwnerID} ) {
@@ -342,7 +342,7 @@ sub _TicketCreate {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # create new ticket
     my $TicketID = $TicketObject->TicketCreate(
@@ -425,7 +425,7 @@ sub _TicketCreate {
     my $StateID;
 
     # get state object
-    my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+    my $StateObject = $Kernel::OM->Get('State');
 
     if ( $Ticket->{StateID} ) {
         $StateID = $Ticket->{StateID};

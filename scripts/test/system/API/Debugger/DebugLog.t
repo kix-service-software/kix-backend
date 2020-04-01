@@ -13,15 +13,15 @@ use utf8;
 use vars (qw($Self));
 
 # get webservice object
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -51,15 +51,15 @@ $Self->True(
 my $DebugLogObject;
 
 # with just objects
-$DebugLogObject = $Kernel::OM->Get('Kernel::System::API::DebugLog');
+$DebugLogObject = $Kernel::OM->Get('API::DebugLog');
 $Self->Is(
     ref $DebugLogObject,
-    'Kernel::System::API::DebugLog',
+    'API::DebugLog',
     'DebugLog::new() constructor failure, just objects.',
 );
 
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $MainObject = $Kernel::OM->Get('Main');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 my @Tests = (
 

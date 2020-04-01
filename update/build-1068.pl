@@ -22,7 +22,7 @@ use Kernel::System::ObjectManager;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'db-update-17.3.0.pl',
     },
 );
@@ -37,7 +37,7 @@ exit 0;
 
 sub _MigrateWatcherObjectID {
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get all ticket watchers
     return if !$DBObject->Prepare(
@@ -55,7 +55,7 @@ sub _MigrateWatcherObjectID {
             Bind => [ \$Row->{ObjectID}, \$Row->{ID} ],
         );
         if (!$Success) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to migrate watcher table!"
             );

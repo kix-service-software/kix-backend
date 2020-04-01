@@ -60,7 +60,7 @@ sub Permission {
     # check needed stuff
     for my $Needed (qw(Type Scope UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -75,7 +75,7 @@ sub Permission {
         || ( $Param{Scope} eq 'Item' && !$Param{ItemID} )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ClassID if Scope is 'Class' or ItemID if Scope is 'Item'!",
         );
@@ -84,18 +84,18 @@ sub Permission {
 
     # run all ITSMConfigItem Permission modules
     if (
-        ref $Kernel::OM->Get('Kernel::Config')->Get( 'ITSMConfigItem::Permission::' . $Param{Scope} ) eq 'HASH'
+        ref $Kernel::OM->Get('Config')->Get( 'ITSMConfigItem::Permission::' . $Param{Scope} ) eq 'HASH'
         )
     {
         my %Modules = %{
-            $Kernel::OM->Get('Kernel::Config')->Get( 'ITSMConfigItem::Permission::' . $Param{Scope} )
+            $Kernel::OM->Get('Config')->Get( 'ITSMConfigItem::Permission::' . $Param{Scope} )
         };
         MODULE:
         for my $Module ( sort keys %Modules ) {
 
             # load module
             next MODULE
-                if !$Kernel::OM->Get('Kernel::System::Main')->Require( $Modules{$Module}->{Module} );
+                if !$Kernel::OM->Get('Main')->Require( $Modules{$Module}->{Module} );
 
             # create object
             my $ModuleObject = $Modules{$Module}->{Module}->new();
@@ -113,7 +113,7 @@ sub Permission {
             # return because access is false but it's required
             if ( !$AccessOk && $Modules{$Module}->{Required} ) {
                 if ( !$Param{LogNo} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message  => "Permission denied because module "
                             . "($Modules{$Module}->{Module}) is required "
@@ -130,7 +130,7 @@ sub Permission {
 
     # don't grant access
     if ( !$Param{LogNo} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Permission denied (UserID: $Param{UserID} '$Param{Type}' "
                 . "on $Param{Scope}: " . $Param{ $Param{Scope} . 'ID' } . ")!",

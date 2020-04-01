@@ -75,7 +75,7 @@ sub _CheckDynamicField {
     if ( $DynamicField->{FieldType} ) {
         
         # get FieldTypes
-        my $FieldTypeConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Driver');
+        my $FieldTypeConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::Driver');
 
         if ( !IsHashRefWithData($FieldTypeConfig) ) {
             return $Self->_Error(
@@ -96,7 +96,7 @@ sub _CheckDynamicField {
     if ( $DynamicField->{ObjectType} ) {
         
         # get FieldTypes
-        my $ObjectTypeConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::ObjectType');
+        my $ObjectTypeConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::ObjectType');
 
         if ( !IsHashRefWithData($ObjectTypeConfig) ) {
             return $Self->_Error(

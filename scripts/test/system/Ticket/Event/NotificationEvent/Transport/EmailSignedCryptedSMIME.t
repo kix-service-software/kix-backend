@@ -18,18 +18,18 @@ use File::Path qw(mkpath rmtree);
 use Kernel::Output::HTML::ArticleCheck::SMIME;
 
 # get needed objects
-my $ConfigObject    = $Kernel::OM->Get('Kernel::Config');
-my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
-my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+my $ConfigObject    = $Kernel::OM->Get('Config');
+my $MainObject      = $Kernel::OM->Get('Main');
+my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase            => 1,
         RestoreSystemConfiguration => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $HomeDir = $ConfigObject->Get('Home');
 
@@ -78,7 +78,7 @@ my $RandomID = $Helper->GetRandomNumber();
 # use Test email backend
 my $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 $Self->True(
@@ -95,7 +95,7 @@ $Success = $ConfigObject->Set(
 my $UserID = 1;
 
 # get dynamic field object
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 # create a dynamic field
 my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
@@ -112,7 +112,7 @@ my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
     UserID  => $UserID,
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 $Success = $TestEmailObject->CleanUp();
 $Self->True(
@@ -144,7 +144,7 @@ if ( !-e $ConfigObject->Get('SMIME::Bin') ) {
 }
 
 # create crypt object
-my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
 if ( !$SMIMEObject ) {
     print STDERR "NOTICE: No SMIME support!\n";
@@ -311,7 +311,7 @@ for my $Certificate (@Certificates) {
 }
 
 # add system address
-my $SystemAddressID = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
+my $SystemAddressID = $Kernel::OM->Get('SystemAddress')->SystemAddressAdd(
     Name     => 'unittest3@example.org',
     Realname => 'unit test',
     ValidID  => 1,
@@ -324,7 +324,7 @@ $Self->True(
     'SystemAddressAdd()',
 );
 
-my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+my $QueueObject = $Kernel::OM->Get('Queue');
 
 # set the escalation into the future
 my %Queue = $QueueObject->QueueGet(
@@ -340,7 +340,7 @@ my $QueueUpdate = $QueueObject->QueueUpdate(
 $Self->True( $QueueUpdate, "QueueUpdate() $Queue{Name}" );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -402,8 +402,8 @@ $Self->True(
     "TicketCreate() successful for Ticket ID $TicketID2",
 );
 
-my $NotificationEventObject      = $Kernel::OM->Get('Kernel::System::NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
+my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
 
 my @Tests = (
     {

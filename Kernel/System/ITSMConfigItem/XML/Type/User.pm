@@ -12,8 +12,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::User'
+    'Log',
+    'User'
 );
 
 =head1 NAME
@@ -34,7 +34,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::User');
+    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::User');
 
 =cut
 
@@ -45,9 +45,9 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{LogObject}  = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{UserObject} = $Kernel::OM->Get('Kernel::System::User');
-    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
+    $Self->{LogObject}  = $Kernel::OM->Get('Log');
+    $Self->{UserObject} = $Kernel::OM->Get('User');
+    $Self->{ContactObject} = $Kernel::OM->Get('Contact');
 
     return $Self;
 }

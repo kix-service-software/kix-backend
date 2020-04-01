@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Cache',
+    'DB',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AgentOverlayObject = $Kernel::OM->Get('Kernel::System::AgentOverlay');
+    my $AgentOverlayObject = $Kernel::OM->Get('AgentOverlay');
 
 =cut
 
@@ -50,7 +50,7 @@ sub new {
     bless( $Self, $Type );
 
     # setup cache
-    $Self->{CacheObject} = $Kernel::OM->Get('Kernel::System::Cache');
+    $Self->{CacheObject} = $Kernel::OM->Get('Cache');
     $Self->{CacheTTL}    = 60 * 60 * 24;
     $Self->{CacheType}   = 'AgentOverlay';
 
@@ -73,7 +73,7 @@ sub AgentOverlayList {
     # check needed stuff
     for (qw(UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -93,7 +93,7 @@ sub AgentOverlayList {
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -142,7 +142,7 @@ sub AgentOverlayAdd {
     # check needed stuff
     for (qw(Subject Message Decay UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -155,7 +155,7 @@ sub AgentOverlayAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Do(
@@ -194,7 +194,7 @@ sub AgentOverlaySeen {
     # check needed stuff
     for (qw(OverlayID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -203,7 +203,7 @@ sub AgentOverlaySeen {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Do(
@@ -240,7 +240,7 @@ sub AgentOverlayGet {
 
     # check needed stuff
     if ( !$Param{OverlayID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need OverlayID!',
         );
@@ -256,7 +256,7 @@ sub AgentOverlayGet {
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -293,10 +293,10 @@ sub _AgentOverlayCleanup {
     my ( $Self, %Param ) = @_;
 
     # get time
-    my $Time = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $Time = $Kernel::OM->Get('Time')->SystemTime();
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(

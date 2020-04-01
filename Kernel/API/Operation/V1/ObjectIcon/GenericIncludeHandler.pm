@@ -77,7 +77,7 @@ sub Run {
     # check required parameters
     foreach my $Key ( qw(Object ObjectID UserID) ) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -86,7 +86,7 @@ sub Run {
     }
 
     # perform ObjectIcon search
-    my $IconIDs = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconList(
+    my $IconIDs = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
         Object   => $Param{Object},
         ObjectID => $Param{ObjectID},
         UserID   => $Param{UserID},

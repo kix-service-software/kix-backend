@@ -15,10 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $HomeDir            = $ConfigObject->Get('Home');
-my @BackendModuleFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+my @BackendModuleFiles = $Kernel::OM->Get('Main')->DirectoryRead(
     Directory => $HomeDir . '/Kernel/System/Cache/',
     Filter    => '*.pm',
     Silent    => 1,
@@ -40,7 +40,7 @@ for my $ModuleFile (@BackendModuleFiles) {
     );
 
     # create a local cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     die "Could not setup $Module" if !$CacheObject;
 

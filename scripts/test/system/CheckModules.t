@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $Home = $ConfigObject->Get('Home');
 my $TmpSumString;

@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::ClientRegistration',
+    'ClientRegistration',
 );
 
 sub Configure {
@@ -39,7 +39,7 @@ sub Run {
 
     my $ClientID = $Self->GetOption('client-id') || '';
 
-    my $ClientList = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationList();
+    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
     if ( !$ClientList ) {
         $Self->PrintError("Unable to determine client registrations.\n");
         return $Self->ExitCodeError();
@@ -64,7 +64,7 @@ sub Run {
             return $Self->ExitCodeError();
         }
 
-        my $Result = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationDelete(
+        my $Result = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationDelete(
             ClientID => $ClientID
         );
         if ( !$Result ) {

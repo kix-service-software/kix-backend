@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform ticket search
-    my @TicketList = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @TicketList = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => [
                 {

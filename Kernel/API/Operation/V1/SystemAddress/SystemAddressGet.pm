@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SystemAddress::SystemAddressGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SystemAddress::SystemAddressGet');
 
     return $Self;
 }
@@ -128,7 +128,7 @@ sub Run {
     foreach my $SystemAddressID ( @{$Param{Data}->{SystemAddressID}} ) {
 
         # get the SystemAddress data
-        my %SystemAddressData = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
+        my %SystemAddressData = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
             ID => $SystemAddressID,
         );
 

@@ -18,12 +18,12 @@ use File::Basename;
 use File::Copy;
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my ( $Filename, $FilenameSuffix, $TempDir, $FH, $FHSuffix );
 
 {
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     ( $FH, $Filename ) = $FileTempObject->TempFile();
 
@@ -88,7 +88,7 @@ my ( $Filename, $FilenameSuffix, $TempDir, $FH, $FHSuffix );
     );
 
     # destroy the file temp object
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::FileTemp'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['FileTemp'] );
 }
 
 $Self->False(

@@ -25,18 +25,18 @@ use Kernel::System::EmailParser;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'db-update-build-1163.pl',
     },
 );
-my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
 sub _MigrateMobileProcessingChecklistDynamicFields {
     my ( $Self, %Param ) = @_;
 
-    $Self->{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
+    $Self->{DynamicFieldObject} = $Kernel::OM->Get('DynamicField');
 
     # get all current dynamic fields
     my $DynamicFieldList = $Self->{DynamicFieldObject}->DynamicFieldListGet();

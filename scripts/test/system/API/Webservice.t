@@ -13,10 +13,10 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $WebserviceObject        = $Kernel::OM->Get('Kernel::System::API::Webservice');
-my $WebserviceHistoryObject = $Kernel::OM->Get('Kernel::System::API::WebserviceHistory');
+my $WebserviceObject        = $Kernel::OM->Get('API::Webservice');
+my $WebserviceHistoryObject = $Kernel::OM->Get('API::WebserviceHistory');
 
-my $RandomID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->GetRandomID();
+my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
 my @Tests = (
     {
@@ -1118,7 +1118,7 @@ for my $WebserviceID (@WebserviceIDs) {
 }
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

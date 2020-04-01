@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SearchProfile::SearchProfileGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SearchProfile::SearchProfileGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $SearchProfileID ( @{$Param{Data}->{SearchProfileID}} ) {
 
         # get the SearchProfile data
-        my %SearchProfileData = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileGet(
+        my %SearchProfileData = $Kernel::OM->Get('SearchProfile')->SearchProfileGet(
             ID                  => $SearchProfileID,
             WithData            => $Param{Data}->{include}->{Data} ? 1 : 0,
             WithCategories      => $Param{Data}->{include}->{Categories} ? 1 : 0,

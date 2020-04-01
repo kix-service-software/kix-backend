@@ -16,8 +16,8 @@ use warnings;
 use Email::Valid;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
 =cut
 
@@ -98,7 +98,7 @@ sub CheckEmail {
 
     # check needed stuff
     if ( !$Param{Address} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Address!'
         );
@@ -106,7 +106,7 @@ sub CheckEmail {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check if it's to do
     return 1 if !$ConfigObject->Get('CheckEmailAddresses');
@@ -164,7 +164,7 @@ sub CheckEmail {
             if ( !$Packet ) {
                 $Self->{ErrorType} = 'InvalidDNS';
                 $Error = "DNS problem: " . $Resolver->errorstring();
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $Error,
                 );
@@ -177,7 +177,7 @@ sub CheckEmail {
 
                 if ( !@MXRecords ) {
 
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message =>
                             "$Host has no mail exchanger (MX) defined, trying A resource record instead.",
@@ -189,7 +189,7 @@ sub CheckEmail {
                         $Self->{ErrorType} = 'InvalidMX';
                         $Error = "$Host has no mail exchanger (MX) or A resource record defined.";
 
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => $Error,
                         );
@@ -200,7 +200,7 @@ sub CheckEmail {
     }
     elsif ( $ConfigObject->Get('CheckMXRecord') ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't load Net::DNS, no mx lookups possible",
         );
@@ -245,7 +245,7 @@ sub StringClean {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{StringRef} || ref $Param{StringRef} ne 'SCALAR' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need a scalar reference!'
         );
@@ -257,7 +257,7 @@ sub StringClean {
 
     # check for invalid utf8 characters and remove invalid strings
     if ( !utf8::valid( ${ $Param{StringRef} } ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Removed string containing invalid utf8: '${ $Param{StringRef} }'!",
         );
@@ -301,7 +301,7 @@ sub CreditCardClean {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{StringRef} || ref $Param{StringRef} ne 'SCALAR' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need a scalar reference!'
         );

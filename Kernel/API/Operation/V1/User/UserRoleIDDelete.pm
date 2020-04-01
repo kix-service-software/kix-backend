@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # delete RoleUser	    
-    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserDelete(
+    my $Success = $Kernel::OM->Get('Role')->RoleUserDelete(
         RoleID => $Param{Data}->{RoleID},
         UserID => $Param{Data}->{UserID},
     );

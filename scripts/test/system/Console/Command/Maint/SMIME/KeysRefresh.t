@@ -19,14 +19,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # set config
 $ConfigObject->Set(
@@ -35,7 +35,7 @@ $ConfigObject->Set(
 );
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # check if OpenSSL is located there
@@ -293,8 +293,8 @@ my @Tests = (
 );
 
 # get needed objects
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::SMIME::KeysRefresh');
-my $MainObject    = $Kernel::OM->Get('Kernel::System::Main');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::SMIME::KeysRefresh');
+my $MainObject    = $Kernel::OM->Get('Main');
 
 # helper function to check files
 my $FileCheck = sub {

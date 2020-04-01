@@ -19,11 +19,11 @@ use Kernel::Language;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Main',
+    'SysConfig',
+    'Time',
 );
 
 sub Configure {
@@ -39,7 +39,7 @@ sub Run {
 
     $Self->Print("<yellow>Cleaning up translation database...</yellow>\n\n");
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Translation')->CleanUp(
+    my $Result = $Kernel::OM->Get('Translation')->CleanUp(
         UserID => 1,
     );
 

@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Tests = (
     {
@@ -113,15 +113,15 @@ my @Tests = (
 
 for my $Backend (qw( FS DB )) {
 
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::VirtualFS'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['VirtualFS'] );
 
     $ConfigObject->Set(
         Key   => 'VirtualFS::Backend',
-        Value => 'Kernel::System::VirtualFS::' . $Backend,
+        Value => 'VirtualFS::' . $Backend,
     );
 
     # get a new virtual fs object
-    my $VirtualFSObject = $Kernel::OM->Get('Kernel::System::VirtualFS');
+    my $VirtualFSObject = $Kernel::OM->Get('VirtualFS');
 
     for my $Test (@Tests) {
 

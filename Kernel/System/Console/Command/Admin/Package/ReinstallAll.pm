@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Package',
+    'Package',
 );
 
 sub Configure {
@@ -41,10 +41,10 @@ sub Run {
     my @ReinstalledPackages;
 
     # loop all locally installed packages
-    for my $Package ( $Kernel::OM->Get('Kernel::System::Package')->RepositoryList() ) {
+    for my $Package ( $Kernel::OM->Get('Package')->RepositoryList() ) {
 
         # do a deploy check to see if reinstallation is needed
-        my $CorrectlyDeployed = $Kernel::OM->Get('Kernel::System::Package')->DeployCheck(
+        my $CorrectlyDeployed = $Kernel::OM->Get('Package')->DeployCheck(
             Name    => $Package->{Name}->{Content},
             Version => $Package->{Version}->{Content},
         );
@@ -53,12 +53,12 @@ sub Run {
 
             push @ReinstalledPackages, $Package->{Name}->{Content};
 
-            my $FileString = $Kernel::OM->Get('Kernel::System::Package')->RepositoryGet(
+            my $FileString = $Kernel::OM->Get('Package')->RepositoryGet(
                 Name    => $Package->{Name}->{Content},
                 Version => $Package->{Version}->{Content},
             );
 
-            my $Success = $Kernel::OM->Get('Kernel::System::Package')->PackageReinstall(
+            my $Success = $Kernel::OM->Get('Package')->PackageReinstall(
                 String => $FileString,
                 Force  => $Self->GetOption('force'),
             );

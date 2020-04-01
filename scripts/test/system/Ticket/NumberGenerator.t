@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get needed object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # check all number generators
 for my $Backend (qw(AutoIncrement Date DateChecksum Random)) {
@@ -24,21 +24,21 @@ for my $Backend (qw(AutoIncrement Date DateChecksum Random)) {
     for my $TicketSubjectFormat (qw(Left Right)) {
 
         # Make sure that the TicketObject gets recreated for each loop.
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
         $ConfigObject->Set(
             Key   => 'Ticket::NumberGenerator',
-            Value => 'Kernel::System::Ticket::Number::' . $Backend,
+            Value => 'Ticket::Number::' . $Backend,
         );
         $ConfigObject->Set(
             Key   => 'Ticket::SubjectFormat',
             Value => $TicketSubjectFormat,
         );
 
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $Self->True(
-            $TicketObject->isa( 'Kernel::System::Ticket::Number::' . $Backend ),
+            $TicketObject->isa( 'Ticket::Number::' . $Backend ),
             "TicketObject loaded the correct backend",
         );
 

@@ -132,7 +132,7 @@ sub Run {
     );
 
     # check if ClientRegistration exists
-    my %ClientRegistration = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationGet(
+    my %ClientRegistration = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
         ClientID => $ClientRegistration->{ClientID},
         Silent   => 1
     );
@@ -145,7 +145,7 @@ sub Run {
     }
 
     # create ClientRegistration
-    my $ClientID = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationAdd(
+    my $ClientID = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationAdd(
         ClientID             => $ClientRegistration->{ClientID},
         NotificationURL      => $ClientRegistration->{NotificationURL},
         NotificationInterval => $ClientRegistration->{NotificationInterval},
@@ -165,7 +165,7 @@ sub Run {
             my $Content = MIME::Base64::decode_base64($Item->{Content});
                         
             # fire & forget, not result handling at the moment
-            my $Result = $Kernel::OM->Get('Kernel::System::Translation')->ImportPO(
+            my $Result = $Kernel::OM->Get('Translation')->ImportPO(
                 Language => $Item->{Language},
                 Content  => $Content,
                 UserID   => $Self->{Authorization}->{UserID},
@@ -175,12 +175,12 @@ sub Run {
 
     # import SysConfig definitions if given
     if ( IsArrayRefWithData($ClientRegistration->{SysConfigOptionDefinitions}) ) {
-        my %SysConfigOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
+        my %SysConfigOptions = $Kernel::OM->Get('SysConfig')->OptionGetAll();
 
         foreach my $Item ( @{$ClientRegistration->{SysConfigOptionDefinitions}} ) {
             if ( !exists $SysConfigOptions{$Item->{Name}} ) {
                 # create new option
-                my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionAdd(
+                my $Success = $Kernel::OM->Get('SysConfig')->OptionAdd(
                     Name            => $Item->{Name},
                     AccessLevel     => $Item->{AccessLevel},
                     Type            => $Item->{Type},
@@ -206,7 +206,7 @@ sub Run {
             }
             else {
                 # update existing option
-                my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
+                my $Success = $Kernel::OM->Get('SysConfig')->OptionUpdate(
                     %{ $SysConfigOptions{ $Item->{Name} } },
                     %{$Item},
                     Value  => $SysConfigOptions{ $Item->{Name} }->{IsModified} ? $SysConfigOptions{ $Item->{Name} }->{Value} : undef,
@@ -225,7 +225,7 @@ sub Run {
 
     my %SystemInfo;
     foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
-        $SystemInfo{$Key} = $Kernel::OM->Get('Kernel::Config')->Get($Key);
+        $SystemInfo{$Key} = $Kernel::OM->Get('Config')->Get($Key);
     }
 
     # return result

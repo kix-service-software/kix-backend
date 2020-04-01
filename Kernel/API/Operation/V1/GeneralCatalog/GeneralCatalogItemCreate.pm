@@ -126,7 +126,7 @@ sub Run {
         Data => $Param{Data}->{GeneralCatalogItem}
     );
 
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogItem->{Class},
     );
 
@@ -140,7 +140,7 @@ sub Run {
     }
 
     # create GeneralCatalog
-    my $GeneralCatalogItemID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
+    my $GeneralCatalogItemID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
         Class    => $GeneralCatalogItem->{Class},
         Name     => $GeneralCatalogItem->{Name},
         Comment  => $GeneralCatalogItem->{Comment} || '',

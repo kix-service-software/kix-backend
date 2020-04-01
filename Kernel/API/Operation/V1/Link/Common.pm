@@ -62,7 +62,7 @@ sub _CheckLink {
 
     my $Link = $Param{Link};
 
-    my $LinkObject = $Kernel::OM->Get('Kernel::System::LinkObject');
+    my $LinkObject = $Kernel::OM->Get('LinkObject');
 
     # check if this link type is allowed
     my %PossibleTypesList = $LinkObject->PossibleTypesList(

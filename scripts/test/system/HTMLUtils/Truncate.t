@@ -327,7 +327,7 @@ my @Tests = (
 );
 
 # get HTMLUtils object
-my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
 TEST:
 for my $Test (@Tests) {

@@ -125,7 +125,7 @@ sub Run {
     );
 
     # check if ticketState exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+    my $Exists = $Kernel::OM->Get('State')->StateLookup(
         State => $TicketState->{Name},
     );
     
@@ -137,7 +137,7 @@ sub Run {
     }
 
     # create ticketstate
-    my $TicketStateID = $Kernel::OM->Get('Kernel::System::State')->StateAdd(
+    my $TicketStateID = $Kernel::OM->Get('State')->StateAdd(
         %{$TicketState},
         ValidID => $TicketState->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},

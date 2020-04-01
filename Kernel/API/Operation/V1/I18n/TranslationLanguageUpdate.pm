@@ -129,7 +129,7 @@ sub Run {
     );
 
     # check if pattern already exists
-    my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+    my %PatternData = $Kernel::OM->Get('Translation')->PatternGet(
         ID => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
@@ -139,7 +139,7 @@ sub Run {
     }
 
     # get the Translation data
-    my %TranslationData = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageGet(
+    my %TranslationData = $Kernel::OM->Get('Translation')->TranslationLanguageGet(
         PatternID => $Param{Data}->{PatternID},
         Language  => $Param{Data}->{Language},
         UserID    => $Self->{Authorization}->{UserID}
@@ -153,7 +153,7 @@ sub Run {
     }
 
     # update language
-    my $Success = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageUpdate(
+    my $Success = $Kernel::OM->Get('Translation')->TranslationLanguageUpdate(
         PatternID => $Param{Data}->{PatternID},
         Language  => $Param{Data}->{Language},
         Value     => $Language->{Value},

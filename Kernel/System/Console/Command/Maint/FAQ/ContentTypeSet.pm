@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::FAQ',
+    'FAQ',
 );
 
 sub Configure {
@@ -61,7 +61,7 @@ sub Run {
         $FunctionParams{ContentType} = $ContentType;
     }
 
-    my $Succes = $Kernel::OM->Get('Kernel::System::FAQ')->FAQContentTypeSet(%FunctionParams);
+    my $Succes = $Kernel::OM->Get('FAQ')->FAQContentTypeSet(%FunctionParams);
 
     if ( !$Succes ) {
         $Self->Print("<red>Fail.</red>\n");

@@ -19,8 +19,8 @@ use Time::HiRes qw(time);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -48,7 +48,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
 =cut
 
@@ -63,13 +63,13 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     # cache backend
-    my $CacheModule = $Kernel::OM->Get('Kernel::Config')->Get('Cache::Module')
-        || 'Kernel::System::Cache::FileStorable';
+    my $CacheModule = $Kernel::OM->Get('Config')->Get('Cache::Module')
+        || 'Cache::FileStorable';
 
     # Store backend in $Self for fastest access.
     $Self->{CacheObject}    = $Kernel::OM->Get($CacheModule);
-    $Self->{CacheInMemory}  = $Kernel::OM->Get('Kernel::Config')->Get('Cache::InMemory') // 1;
-    $Self->{CacheInBackend} = $Kernel::OM->Get('Kernel::Config')->Get('Cache::InBackend') // 1;
+    $Self->{CacheInMemory}  = $Kernel::OM->Get('Config')->Get('Cache::InMemory') // 1;
+    $Self->{CacheInBackend} = $Kernel::OM->Get('Config')->Get('Cache::InBackend') // 1;
 
     return $Self;
 }
@@ -142,7 +142,7 @@ sub Set {
 
     for my $Needed (qw(Type Key Value)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -155,7 +155,7 @@ sub Set {
 
     # Enforce cache type restriction to make sure it works properly on all file systems.
     if ( $Param{Type} !~ m{ \A [a-zA-Z0-9_]+ \z}smx ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Cache Type '$Param{Type}' contains invalid characters, use [a-zA-Z0-9_] only!",
@@ -165,7 +165,7 @@ sub Set {
 
     # debug
     if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Set Key:$Param{Key} TTL:$Param{TTL}!",
         );
@@ -267,7 +267,7 @@ sub Get {
 
     for my $Needed (qw(Type Key)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -340,7 +340,7 @@ sub Delete {
 
     for my $Needed (qw(Type Key)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -455,7 +455,7 @@ sub CleanUp {
     }
     else {
         my @AdditionalKeepTypes;
-        my $AlwaysKeepTypes = $Kernel::OM->Get('Kernel::Config')->Get('Cache::AlwaysKeepTypesOnCompleteCleanUp');
+        my $AlwaysKeepTypes = $Kernel::OM->Get('Config')->Get('Cache::AlwaysKeepTypesOnCompleteCleanUp');
         if ( IsHashRefWithData($AlwaysKeepTypes) ) {
             # extend relevant param with the list of activated types
             @AdditionalKeepTypes = grep { defined $_ } map { $AlwaysKeepTypes->{$_} ? $_ : undef } keys %{$AlwaysKeepTypes};
@@ -505,12 +505,12 @@ sub GetCacheStats {
     my ( $Self, %Param ) = @_;
     my $Result;
 
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
+    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
+        Directory => $Kernel::OM->Get('Config')->Get('Home').'/var/tmp',
         Filter    => 'CacheStats.*',
     );
     foreach my $File (@Files) {
-        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
         );
         if ($Content && $$Content) {
@@ -545,12 +545,12 @@ delete the cache statistics
 sub DeleteCacheStats {
     my ( $Self, %Param ) = @_;
 
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
+    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
+        Directory => $Kernel::OM->Get('Config')->Get('Home').'/var/tmp',
         Filter    => 'CacheStats.*',
     );
     foreach my $File (@Files) {
-        my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
+        my $Result = $Kernel::OM->Get('Main')->FileDelete(
             Location => $File,
         );
         if (!$Result) {
@@ -622,12 +622,12 @@ sub _UpdateCacheStats {
     my ( $Self, %Param ) = @_;
 
     # do nothing if cache stats are not enabled
-    return if !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Stats');
+    return if !$Kernel::OM->Get('Config')->Get('Cache::Stats');
 
     # read stats from disk if empty
-    my $Filename = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp/CacheStats.'.$$;
+    my $Filename = $Kernel::OM->Get('Config')->Get('Home').'/var/tmp/CacheStats.'.$$;
     if ( !$Self->{CacheStats} && -f $Filename ) {
-        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location        => $Filename,
             DisableWarnings => 1,
         );
@@ -675,8 +675,8 @@ sub _UpdateCacheStats {
         $Content = Storable::nfreeze($Self->{CacheStats});
     }
 
-    $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/var/tmp',
+    $Kernel::OM->Get('Main')->FileWrite(
+        Directory => $Kernel::OM->Get('Config')->Get('Home').'/var/tmp',
         Filename  => 'CacheStats.'.$$,
         Content   => \$Content,
     );
@@ -687,7 +687,7 @@ sub _UpdateCacheStats {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Cache::Debug') );
+    return if ( !$Kernel::OM->Get('Config')->Get('Cache::Debug') );
     return if !$Message;
 
     $Indent ||= '';

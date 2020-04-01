@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand Kernel::System::Console::Command::Admin::Package::List);
 
 our @ObjectDependencies = (
-    'Kernel::System::Package',
+    'Package',
 );
 
 sub Configure {
@@ -50,7 +50,7 @@ sub Run {
 
     # get package file from db
     # parse package
-    my %Structure = $Kernel::OM->Get('Kernel::System::Package')->PackageParse(
+    my %Structure = $Kernel::OM->Get('Package')->PackageParse(
         String => $FileString,
     );
 
@@ -91,7 +91,7 @@ sub Run {
     }
 
     # Uninstall
-    my $Success = $Kernel::OM->Get('Kernel::System::Package')->PackageUninstall(
+    my $Success = $Kernel::OM->Get('Package')->PackageUninstall(
         String => $FileString,
         Force  => $Self->GetOption('force'),
     );

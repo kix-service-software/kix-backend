@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $SystemAddressID ( @{$Param{Data}->{SystemAddressID}} ) {
     	
-	    my %QueueIDs = $Kernel::OM->Get('Kernel::System::Queue')->GetQueuesForEmailAddress(
+	    my %QueueIDs = $Kernel::OM->Get('Queue')->GetQueuesForEmailAddress(
 	        AddressID  => $SystemAddressID,
 	    );
     		    	
@@ -121,7 +121,7 @@ sub Run {
         }	    
 	    
         # delete SystemAddress	    
-        my $Success = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressDelete(
+        my $Success = $Kernel::OM->Get('SystemAddress')->SystemAddressDelete(
             SystemAddressID  => $SystemAddressID,
             UserID  => $Self->{Authorization}->{UserID},
         );

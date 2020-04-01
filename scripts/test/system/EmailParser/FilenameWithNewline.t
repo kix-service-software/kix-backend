@@ -19,7 +19,7 @@ use Kernel::System::EmailParser;
 # Test that filenames with multiple newlines are properly cleaned up.
 # See http://bugs.otrs.org/show_bug.cgi?id=10394.
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 # test for bug#1970
 my @Array;

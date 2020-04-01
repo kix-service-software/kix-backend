@@ -127,7 +127,7 @@ sub Run {
     );
 
     # check if SystemAddress exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressLookup(
+    my $Exists = $Kernel::OM->Get('SystemAddress')->SystemAddressLookup(
         Name => $SystemAddress->{Name},
     );
 
@@ -139,7 +139,7 @@ sub Run {
     }
 
     # create SystemAddress
-    my $SystemAddressID = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
+    my $SystemAddressID = $Kernel::OM->Get('SystemAddress')->SystemAddressAdd(
         Name     => $SystemAddress->{Name},
         Comment  => $SystemAddress->{Comment} || '',
         ValidID  => $SystemAddress->{ValidID} || 1,

@@ -71,7 +71,7 @@ sub RunOperation {
     # check user permissions based on property values
     # UserID 1 has God Mode if SecureMode isn't active
     # also ignore all this if we have been told to ignore permissions
-    if ( !$Self->{IgnorePermissions} && $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Kernel::Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
+    if ( !$Self->{IgnorePermissions} && $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
 
         # we have to check the permission only for the current request method
         # all other permissions are irrelevant (except DENY)
@@ -80,7 +80,7 @@ sub RunOperation {
         my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
         # get all PropertyValue and Property permissions for this user
-        my %Permissions = $Kernel::OM->Get('Kernel::System::User')->PermissionList(
+        my %Permissions = $Kernel::OM->Get('User')->PermissionList(
             UserID       => $Self->{Authorization}->{UserID},
             UsageContext => $Self->{Authorization}->{UserType},
             Types        => [ 'PropertyValue', 'Property' ],
@@ -251,7 +251,7 @@ sub RunOperation {
 
                             $ResultingPermission |= $Permission->{Value};
 
-                            my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+                            my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                                 Value  => $ResultingPermission,
                                 Format => 'Short'
                             );
@@ -334,7 +334,7 @@ sub RunOperation {
 
             foreach my $Attribute ( sort keys %AttributePermissions ) {
 
-                my $ResultingPermissionShort = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+                my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                     Value  => $AttributePermissions{$Attribute},
                     Format => 'Short'
                 );
@@ -412,7 +412,7 @@ sub RunOperation {
     }
 
     # check cache if CacheType is set for this operation
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('API::Cache') && $Self->{OperationConfig}->{CacheType} ) {
+    if ( $Kernel::OM->Get('Config')->Get('API::Cache') && $Self->{OperationConfig}->{CacheType} ) {
 
         # add own cache dependencies, if available
         if ( $Self->{OperationConfig}->{CacheTypeDependency} ) {
@@ -421,7 +421,7 @@ sub RunOperation {
 
         my $CacheKey = $Self->_GetCacheKey();
 
-        my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $CacheResult = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{OperationConfig}->{CacheType},
             Key  => $CacheKey,
         );
@@ -515,16 +515,16 @@ sub Options {
     }
 
     # add the schema if available
-    my $SchemaLocation = $Kernel::OM->Get('Kernel::Config')->Get('API::JSONSchema::Location');
+    my $SchemaLocation = $Kernel::OM->Get('Config')->Get('API::JSONSchema::Location');
     if ( $SchemaLocation && -d $SchemaLocation ) {
         foreach my $Type (qw(Request Response)) {
             my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
-                my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                my $Content = $Kernel::OM->Get('Main')->FileRead(
                     Location => "$SchemaLocation/$Object.json",
                 );
                 if ($Content) {
-                    $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+                    $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('JSON')->Decode(
                         Data => $$Content
                     );
                 }
@@ -533,16 +533,16 @@ sub Options {
     }
 
     # add the example if available
-    my $ExampleLocation = $Kernel::OM->Get('Kernel::Config')->Get('API::Example::Location');
+    my $ExampleLocation = $Kernel::OM->Get('Config')->Get('API::Example::Location');
     if ( $ExampleLocation && -d $ExampleLocation ) {
         foreach my $Type (qw(Request Response)) {
             my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
             if ($Object) {
-                my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                my $Content = $Kernel::OM->Get('Main')->FileRead(
                     Location => "$ExampleLocation/$Object.json",
                 );
                 if ($Content) {
-                    $Data{$Type}->{Example} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+                    $Data{$Type}->{Example} = $Kernel::OM->Get('JSON')->Decode(
                         Data => $$Content
                     );
                 }
@@ -583,7 +583,7 @@ sub Init {
     }
 
     # get webservice configuration
-    my $Webservice = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
+    my $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
         ID => $Param{WebserviceID},
     );
 
@@ -1168,7 +1168,7 @@ sub _Success {
         }
 
         # cache request without offset and limit if CacheType is set for this operation
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('API::Cache') && !$Self->{'_CachedResponse'} && IsHashRefWithData( \%Param ) && $Self->{OperationConfig}->{CacheType} ) {
+        if ( $Kernel::OM->Get('Config')->Get('API::Cache') && !$Self->{'_CachedResponse'} && IsHashRefWithData( \%Param ) && $Self->{OperationConfig}->{CacheType} ) {
             $Self->_CacheRequest(
                 Data => \%Param,
             );
@@ -1251,11 +1251,11 @@ sub ExecOperation {
     }
 
     # get webservice config
-    my $Webservice = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
+    my $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
         ID => $Self->{WebserviceID},
     );
     if ( !IsHashRefWithData($Webservice) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Could not load web service configuration for web service with ID $Self->{WebserviceID}",
@@ -1308,7 +1308,7 @@ sub ExecOperation {
     );
 
     # if operation init failed, bail out
-    if ( ref $OperationObject ne 'Kernel::API::Operation' ) {
+    if ( ref $OperationObject ne 'API::Operation' ) {
         return $Self->_Error(
             %{$OperationObject},
         );
@@ -1342,7 +1342,7 @@ sub ExecOperation {
                 $Self->AddCacheDependency( Type => $CacheDep );
             }
         }
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('API::Debug') ) {
+        if ( $Kernel::OM->Get('Config')->Get('API::Debug') ) {
             $Self->_Debug( $Self->{LevelIndent}, "    cache type $Self->{OperationConfig}->{CacheType} now depends on: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
         }
     }
@@ -1387,7 +1387,7 @@ sub _ValidateFilter {
 
     # if we have a JSON string, we have to decode it
     if ( IsStringWithData($FilterDef) ) {
-        $FilterDef = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+        $FilterDef = $Kernel::OM->Get('JSON')->Decode(
             Data => $Param{Filter}
         );
     }
@@ -1606,11 +1606,11 @@ sub _ApplyFilter {
 
                                         # convert values to unixtime
                                         my ( $DatePart, $TimePart ) = split( /\s+/, $FieldValue );
-                                        $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                        $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                                             String => $DatePart . ' 12:00:00',
                                         );
                                         my ( $FilterDatePart, $FilterTimePart ) = split( /\s+/, $FilterValue );
-                                        $FilterValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                        $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                                             String => $FilterDatePart . ' 12:00:00',
                                         );
 
@@ -1622,10 +1622,10 @@ sub _ApplyFilter {
                                     elsif ( $Type eq 'DATETIME' ) {
 
                                         # convert values to unixtime
-                                        $FieldValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                        $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                                             String => $FieldValue,
                                         );
-                                        $FilterValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                                        $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                                             String => $FilterValue,
                                         );
 
@@ -1981,7 +1981,7 @@ sub _ApplySort {
                     # convert field values to unixtime
                     foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
                         my ( $DatePart, $TimePart ) = split( /\s+/, $ObjectItem->{ $Sort->{Field} } );
-                        $ObjectItem->{$SortField} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                        $ObjectItem->{$SortField} = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                             String => $DatePart . ' 12:00:00',
                         );
                     }
@@ -1995,7 +1995,7 @@ sub _ApplySort {
 
                     # convert field values to unixtime
                     foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
-                        $ObjectItem->{$SortField} = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                        $ObjectItem->{$SortField} = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                             String => $ObjectItem->{ $Sort->{Field} },
                         );
                     }
@@ -2102,17 +2102,17 @@ sub _ApplyInclude {
     }
 
     # handle generic includes
-    my $GenericIncludes = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::GenericInclude');
+    my $GenericIncludes = $Kernel::OM->Get('Config')->Get('API::Operation::GenericInclude');
     if ( IsHashRefWithData($GenericIncludes) ) {
         foreach my $Include ( keys %{ $Self->{Include} } ) {
             next if !$GenericIncludes->{$Include};
             next if $GenericIncludes->{$Include}->{IgnoreOperationRegEx} && $Self->{OperationType} =~ /$GenericIncludes->{$Include}->{IgnoreOperationRegEx}/;
 
             # we've found a requested generic include, now we have to handle it
-            my $IncludeHandler = 'Kernel::API::Operation::' . $GenericIncludes->{$Include}->{Module};
+            my $IncludeHandler = 'API::Operation::' . $GenericIncludes->{$Include}->{Module};
 
             if ( !$Self->{IncludeHandler}->{$IncludeHandler} ) {
-                if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($IncludeHandler) ) {
+                if ( !$Kernel::OM->Get('Main')->Require($IncludeHandler) ) {
 
                     return $Self->_Error(
                         Code    => 'Operation.InternalError',
@@ -2179,7 +2179,7 @@ sub _ApplyInclude {
                 }
             }
 
-            $Kernel::OM->Get('Kernel::System::Cache')
+            $Kernel::OM->Get('Cache')
                 ->_Debug( $Self->{LevelIndent}, "    type $Self->{OperationConfig}->{CacheType} has dependencies to: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
         }
     }
@@ -2202,7 +2202,7 @@ sub _ApplyExpand {
         return;
     }
 
-    my $GenericExpands = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::GenericExpand');
+    my $GenericExpands = $Kernel::OM->Get('Config')->Get('API::Operation::GenericExpand');
 
     if ( IsHashRefWithData($GenericExpands) ) {
         foreach my $Object ( keys %{ $Param{Data} } ) {
@@ -2281,7 +2281,7 @@ sub _ExpandObject {
     }
 
     # get primary key for get operation
-    my $OperationConfig = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::Module')->{ $Param{ExpanderConfig}->{Operation} };
+    my $OperationConfig = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{ $Param{ExpanderConfig}->{Operation} };
     if ( !IsHashRefWithData($OperationConfig) ) {
         return $Self->_Error(
             Code    => 'Operation.InternalError',
@@ -2433,7 +2433,7 @@ sub _GetCacheKey {
         $UserID = $Self->{Authorization}->{UserID};
     }
 
-    my $CacheKey = $UserID . '::' . $Self->{WebserviceID} . '::' . $Self->{OperationType} . '::' . $Kernel::OM->Get('Kernel::System::Main')->Dump(
+    my $CacheKey = $UserID . '::' . $Self->{WebserviceID} . '::' . $Self->{OperationType} . '::' . $Kernel::OM->Get('Main')->Dump(
         \%RequestData,
         'ascii+noindent'
     );
@@ -2450,7 +2450,7 @@ sub _CacheRequest {
         if ( IsHashRefWithData( $Self->{CacheDependencies} ) ) {
             @CacheDependencies = keys %{ $Self->{CacheDependencies} };
         }
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type     => $Self->{OperationConfig}->{CacheType},
             Depends  => \@CacheDependencies,
             Category => 'API',
@@ -2572,18 +2572,18 @@ sub _ReplaceVariablesInProperyValuePermission {
         my $Attribute = $1;
 
         # get user data
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %User = $Kernel::OM->Get('User')->GetUserData(
             UserID => $Self->{Authorization}->{UserID},
         );
         if ( %User ) {
             # get contact for user
-            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                 UserID => $Self->{Authorization}->{UserID},
             );
             if ( %Contact ) {
                 if ( $Contact{PrimaryOrganisationID} ) {
                     # get primary organisation of contact
-                    my %Organisation = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                    my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
                         ID => $Contact{PrimaryOrganisationID},
                     );
                     if ( %Organisation ) {
@@ -2614,7 +2614,7 @@ sub _ReplaceVariablesInProperyValuePermission {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('API::Debug') );
+    return if ( !$Kernel::OM->Get('Config')->Get('API::Debug') );
 
     $Indent ||= '';
 
@@ -2624,7 +2624,7 @@ sub _Debug {
 sub _PermissionDebug {
     my ( $Self, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Kernel::Config')->Get('Permission::Debug') );
+    return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
 
     printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
 }
@@ -2650,7 +2650,7 @@ sub _FilterCustomerUserVisibleConfigItems {
         IsHashRefWithData($Self->{Authorization}) &&
         $Self->{Authorization}->{UserType} eq 'Customer'
     ) {
-        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $Self->{Authorization}->{UserID},
         );
         if (!$ContactData{User} && $ContactData{AssignedUserID}) {
@@ -2666,7 +2666,7 @@ sub _FilterCustomerUserVisibleConfigItems {
 
         my $ItemIDs;
         if ( IsHashRefWithData(\%ContactData) ) {
-            $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+            $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
                 ObjectType => 'Contact',
                 Object     => \%ContactData
             );

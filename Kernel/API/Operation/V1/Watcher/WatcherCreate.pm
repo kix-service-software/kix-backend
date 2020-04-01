@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketWatcherCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketWatcherCreate');
 
     return $Self;
 }
@@ -127,7 +127,7 @@ sub Run {
     );
 
     # check if Watcher exists
-    my @WatcherList = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherList(
+    my @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
         Object   => $Watcher->{Object},
         ObjectID => $Watcher->{ObjectID},
     );
@@ -140,7 +140,7 @@ sub Run {
         );
     }
     
-    my $WatcherID = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherAdd(
+    my $WatcherID = $Kernel::OM->Get('Watcher')->WatcherAdd(
         Object      => $Watcher->{Object},
         ObjectID    => $Watcher->{ObjectID},
         WatchUserID => $Watcher->{UserID},

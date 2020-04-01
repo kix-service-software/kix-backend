@@ -17,17 +17,17 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $ACLObject    = $Kernel::OM->Get('Kernel::System::ACL::DB::ACL');
-my $YAMLObject   = $Kernel::OM->Get('Kernel::System::YAML');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $ACLObject    = $Kernel::OM->Get('ACL::DB::ACL');
+my $YAMLObject   = $Kernel::OM->Get('YAML');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define needed variables
 my $RandomID = $Helper->GetRandomID();
@@ -212,7 +212,7 @@ my @Tests = (
     },
 );
 
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
 my %ACLToDelete;
 for my $Test (@Tests) {

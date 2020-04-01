@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self %Param));
 
 # get needed objects
-my $Helper     = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $Helper     = $Kernel::OM->Get('UnitTest::Helper');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 # get language object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Language' => {
+    'Language' => {
         UserLanguage => 'de',
     },
 );
-my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+my $LanguageObject = $Kernel::OM->Get('Language');
 
 my @Tests = (
     {

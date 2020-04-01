@@ -20,11 +20,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Tests = (
     {
@@ -114,13 +114,13 @@ Test: B&B 4
 for my $Test (@Tests) {
 
     # cleanup the cache and run every test twice to also test the disk caching
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'TemplateProvider',
     );
 
     for ( 0 .. 1 ) {
 
-        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+        my $ConfigObject = $Kernel::OM->Get('Config');
 
         for my $Key ( sort keys %{ $Test->{Config} || {} } ) {
             $ConfigObject->Set(

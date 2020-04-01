@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
  
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
@@ -133,7 +133,7 @@ sub Run {
         }
          
         # delete Queue	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueDelete(
+        my $Success = $Kernel::OM->Get('Queue')->QueueDelete(
             QueueID  => $QueueID,
             UserID  => $Self->{Authorization}->{UserID},
         );

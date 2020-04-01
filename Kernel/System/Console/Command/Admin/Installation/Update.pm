@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Installation',
+    'Installation',
 );
 
 sub Configure {
@@ -57,7 +57,7 @@ sub Run {
     my $TargetBuild = $Self->GetOption('target-build');
     my $Plugin      = $Self->GetOption('plugin');
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Installation')->Update(
+    my $Result = $Kernel::OM->Get('Installation')->Update(
         SourceBuild => $SourceBuild,
         TargetBuild => $TargetBuild,
         Plugin      => $Plugin,

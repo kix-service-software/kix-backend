@@ -19,10 +19,10 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CacheInternal',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'CacheInternal',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create a ClientRegistration object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ClientRegistrationObject = $Kernel::OM->Get('Kernel::System::ClientRegistration');
+    my $ClientRegistrationObject = $Kernel::OM->Get('ClientRegistration');
 
 =cut
 
@@ -57,9 +57,9 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{DBObject}     = $Kernel::OM->Get('DB');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
 
     $Self->{CacheType} = 'ClientRegistration';
     
@@ -93,7 +93,7 @@ sub ClientRegistrationGet {
    
     # check cache
     my $CacheKey = 'ClientRegistrationGet::' . $Param{ClientID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -120,7 +120,7 @@ sub ClientRegistrationGet {
     # no data found...
     if ( !%Data ) {
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Registration for client '$Param{ClientID}' not found!",
             );
@@ -129,7 +129,7 @@ sub ClientRegistrationGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -191,13 +191,13 @@ sub ClientRegistrationAdd {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # schedule notification task if requested by client
     if ( $Param{NotificationURL} && $Param{NotificationInterval} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "Scheduling periodic notification task for client \"$Param{ClientID}\" with an interval of $Param{NotificationInterval} seconds.",
         );
@@ -227,7 +227,7 @@ sub ClientRegistrationList {
     # check cache
     my $CacheTTL = 60 * 60 * 24 * 30;   # 30 days
     my $CacheKey = 'ClientRegistrationList::'.($Param{Notifiable} || '');
-    my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $CacheResult = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey
     );
@@ -249,7 +249,7 @@ sub ClientRegistrationList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \@Result,
@@ -275,7 +275,7 @@ sub ClientRegistrationDelete {
     # check needed stuff
     for (qw(ClientID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -284,13 +284,13 @@ sub ClientRegistrationDelete {
     }
 
     # get database object
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM client_registration WHERE client_id = ?',
         Bind => [ \$Param{ClientID} ],
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
@@ -315,7 +315,7 @@ sub NotifyClients {
     # check needed stuff
     for (qw(Event Namespace)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -371,7 +371,7 @@ sub NotificationCleanup {
     # check needed stuff
     for (qw(MaxAge)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -467,22 +467,22 @@ sub NotificationSend {
 
         # set user agent
         $UserAgent->agent(
-            $Kernel::OM->Get('Kernel::Config')->Get('Product') . ' ' . $Kernel::OM->Get('Kernel::Config')->Get('Version')
+            $Kernel::OM->Get('Config')->Get('Product') . ' ' . $Kernel::OM->Get('Config')->Get('Version')
         );
     
         # set timeout
-        $UserAgent->timeout( $Kernel::OM->Get('Kernel::System::WebUserAgent')->{Timeout} );
+        $UserAgent->timeout( $Kernel::OM->Get('WebUserAgent')->{Timeout} );
 
         # disable SSL host verification
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('WebUserAgent::DisableSSLVerification') ) {
+        if ( $Kernel::OM->Get('Config')->Get('WebUserAgent::DisableSSLVerification') ) {
             $UserAgent->ssl_opts(
                 verify_hostname => 0,
             );
         }
 
         # set proxy
-        if ( $Kernel::OM->Get('Kernel::System::WebUserAgent')->{Proxy} ) {
-            $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Kernel::OM->Get('Kernel::System::WebUserAgent')->{Proxy} );
+        if ( $Kernel::OM->Get('WebUserAgent')->{Proxy} ) {
+            $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Kernel::OM->Get('WebUserAgent')->{Proxy} );
         }
 
         my $Request = HTTP::Request->new('POST', $ClientRegistration{NotificationURL});
@@ -490,21 +490,21 @@ sub NotificationSend {
         if ( $ClientRegistration{Authorization} ) {
             $Request->header('Authorization' => $ClientRegistration{Authorization});
         }
-        my $JSON = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        my $JSON = $Kernel::OM->Get('JSON')->Encode(
             Data => \@EventList,
         );
         $Request->content($JSON);
         my $Response = $UserAgent->request($Request);
 
         if ( !$Response->is_success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Client \"$Param{ClientID}\" responded with error ".$Response->status_line.".",
             );
             # don't return in case of an error, just re-schedule the job to try it again later
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'info',
                 Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
             );
@@ -522,7 +522,7 @@ sub NotificationSend {
 
     # schedule new task if the scheduler executed this method
     if ( $Param{IsScheduler} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "Rescheduling notification task for client \"$Param{ClientID}\".",
         );
@@ -532,7 +532,7 @@ sub NotificationSend {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
@@ -555,7 +555,7 @@ sub ScheduleNotificationTask {
     # check needed stuff
     for (qw(ClientID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -568,18 +568,18 @@ sub ScheduleNotificationTask {
     );
 
     # Calculate execution time in future.
-    my $ExecutionTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
-        SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime() + $ClientRegistration{NotificationInterval},
+    my $ExecutionTime = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $Kernel::OM->Get('Time')->SystemTime() + $ClientRegistration{NotificationInterval},
     );
 
     # Create a new future task.
-    my $TaskID = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskAdd(
+    my $TaskID = $Kernel::OM->Get('Daemon::SchedulerDB')->FutureTaskAdd(
         ExecutionTime => $ExecutionTime,
         Type          => 'AsynchronousExecutor',
         Name          => 'client notification for '.$Param{ClientID},
         Attempts      => 1,
         Data          => {
-            Object   => 'Kernel::System::ClientRegistration',
+            Object   => 'ClientRegistration',
             Function => 'NotificationSend',
             Params   => {
                 ClientID    => $Param{ClientID},
@@ -589,7 +589,7 @@ sub ScheduleNotificationTask {
     );
 
     if ( !$TaskID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not schedule a task for periodic notification of client \"$Param{ClientID}\".",
         );

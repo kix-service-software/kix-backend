@@ -16,21 +16,6 @@ use warnings;
 use Carp qw(carp confess);
 use Scalar::Util qw(weaken);
 
-# use the "standard" modules directly, so that persistent environments
-# like mod_perl and FastCGI pre-load them at startup
-
-use Kernel::Config;
-use Kernel::Output::HTML::Layout;
-use Kernel::System::Auth;
-use Kernel::System::Cache;
-use Kernel::System::DB;
-use Kernel::System::Encode;
-use Kernel::System::Log;
-use Kernel::System::Main;
-use Kernel::System::Time;
-use Kernel::System::Web::Request;
-use Kernel::System::User;
-
 use base qw(
     Kernel::System::PerfLog
 );
@@ -69,7 +54,7 @@ The ObjectManager must always be provided to KIX by the toplevel script like thi
 Then in the code any object can be retrieved that the ObjectManager can handle,
 like Kernel::System::DB:
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare('SELECT 1');
+    return if !$Kernel::OM->Get('DB')->Prepare('SELECT 1');
 
 
 =head2 Which objects can be loaded?
@@ -82,9 +67,9 @@ The ObjectManager can load every object that declares its dependencies like this
     use warnings;
 
     our @ObjectDependencies = (
-        'Kernel::System::Cache',
-        'Kernel::System::DB',
-        'Kernel::System::Log',
+        'Cache',
+        'DB',
+        'Log',
     );
 
 The C<@ObjectDependencies> is the list of objects that the current object will depend on. They will
@@ -140,10 +125,37 @@ sub new {
         $Self->{Param}->{$Parameter} = $Param{$Parameter};
     }
 
+    # init framework exports (object mapping)
+    my $Home = $ENV{KIX_HOME};
+    if ( !$Home ) {
+        use FindBin qw($Bin);
+        $Home = $Bin.'/..';
+    }
+    open(HANDLE, '<', $Home.'/EXPORTS') || die "ERROR: unable to read $Home/EXPORTS file!";
+    while (<HANDLE>) {
+        # ignore comments and empty lines
+        next if $_ =~ /^#/;
+
+        chomp;
+        my ($Object, $Module) = split(/\s+=\s+/, $_);
+        
+        next if !$Object && !$Module;
+
+        $Self->{ObjectMap}->{$Object} = $Module;
+    }
+    close(HANDLE);
+
+    # init plugins
+    my %PluginExports = $Self->Get('Installation')->GetPluginExports();
+    %{$Self->{ObjectMap}} = (
+        %{$Self->{ObjectMap}},
+        %PluginExports,
+    );
+
     # Kernel::System::Encode->new() initializes the environment, so we need to
     #   already create an instance here to make sure it is always done and done
     #   at the beginning of things.
-    $Self->Get('Kernel::System::Encode');
+    $Self->Get('Encode');
     
     return $Self;
 }
@@ -159,20 +171,20 @@ Returns the JSON definition of a given object
 sub GetObjectDefinition {
     my ( $Self, $Object ) = @_;
 
-    my $Result = $Self->Get('Kernel::System::Main')->FileRead(
-        Directory => $Self->Get('Kernel::Config')->Get('Home').'/Kernel/Config/ObjectDefinitions',
+    my $Result = $Self->Get('Main')->FileRead(
+        Directory => $Self->Get('Config')->Get('Home').'/Kernel/Config/ObjectDefinitions',
         Filename  => $Object.'.json',
     );
 
     if ( ref $Result ne 'SCALAR' ) {
-        $Self->Get('Kernel::System::Log')->Log(
+        $Self->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Unable to get object definition for object "'.$Object.'"',
         );
         return;
     }
 
-    return $Self->Get('Kernel::System::JSON')->Decode(Data => $$Result);
+    return $Self->Get('JSON')->Decode(Data => $$Result);
 }
 
 =item GetObjectDefinitionList()
@@ -186,8 +198,8 @@ Returns an array of object types for which a definition exists
 sub GetObjectDefinitionList {
     my ( $Self, %Param ) = @_;
 
-    my @Result = $Self->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => $Self->Get('Kernel::Config')->Get('Home').'/Kernel/Config/ObjectDefinitions',
+    my @Result = $Self->Get('Main')->DirectoryRead(
+        Directory => $Self->Get('Config')->Get('Home').'/Kernel/Config/ObjectDefinitions',
         Filter    => '*.json',
     );
 
@@ -203,12 +215,12 @@ sub GetObjectDefinitionList {
 
 Retrieves a singleton object, and if it not yet exists, implicitly creates one for you.
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
 DEPRECATED: For backwards compatibility reasons, object aliases can be defined in L<Kernel::Config::Defaults>.
 For example C<< ->Get('TicketObject') >> retrieves a L<Kernel::System::Ticket> object.
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config'); # returns the same ConfigObject as above
+    my $ConfigObject = $Kernel::OM->Get('Config'); # returns the same ConfigObject as above
 
 =cut
 
@@ -234,10 +246,24 @@ sub Get {
     return $_[0]->_ObjectBuild( Package => $_[1] );
 }
 
+=item GetModuleFor()
+
+Returns the mapped module name for the given alias.
+
+    my $Module = $Kernel::OM->GetModuleFor('Ticket');
+
+=cut
+
+sub GetModuleFor {
+    my ( $Self, $Alias ) = @_;
+
+    return $Self->{ObjectMap}->{$Alias};
+}
+
 sub _ObjectBuild {
     my ( $Self, %Param ) = @_;
 
-    my $Package  = $Param{Package};
+    my $Package  = $Self->{ObjectMap}->{$Param{Package}} || $Param{Package};
     my $FileName = $Package;
     $FileName =~ s{::}{/}g;
     $FileName .= '.pm';
@@ -257,23 +283,19 @@ sub _ObjectBuild {
         }
     }
 
-    # Kernel::Config does not declare its dependencies (they would have to be in
-    #   Kernel::Config::Defaults), so assume [] in this case.
+    # declaring the object deps is optional, so assume an empty array as default
     my $Dependencies = [];
 
-    if ( $Package ne 'Kernel::Config' ) {
-        no strict 'refs';    ## no critic
-        if ( !exists ${ $Package . '::' }{ObjectDependencies} ) {
-            $Self->_DieWithError( Error => "$Package does not declare its object dependencies!" );
-        }
+    no strict 'refs';    ## no critic
+    if ( exists ${ $Package . '::' }{ObjectDependencies} ) {
         $Dependencies = \@{ $Package . '::ObjectDependencies' };
-
-        if ( ${ $Package . '::ObjectManagerDisabled' } ) {
-            $Self->_DieWithError( Error => "$Package cannot be loaded via ObjectManager!" );
-        }
-
-        use strict 'refs';
     }
+
+    if ( ${ $Package . '::ObjectManagerDisabled' } ) {
+        $Self->_DieWithError( Error => "$Package cannot be loaded via ObjectManager!" );
+    }
+
+    use strict 'refs';
     $Self->{ObjectDependencies}->{$Package} = $Dependencies;
 
     my $NewObject = $Package->new(
@@ -294,12 +316,12 @@ sub _ObjectBuild {
         }
     }
 
-    $Self->{Objects}->{$Package} = $NewObject;
+    $Self->{Objects}->{$Param{Package}} = $NewObject;
 
     # TODO
     # # check if we have to wrap a method for performance logging
     # if ( !$Self->{StartUp} && !$Self->{PerfLogConfig} ) {
-    #     $Self->{PerfLogConfig} = $Self->Get('Kernel::Config')->Get('PerfLogConfig') || {};
+    #     $Self->{PerfLogConfig} = $Self->Get('Config')->Get('PerfLogConfig') || {};
 
     #     # init PerfLog
     #     if ($Self->{PerfLogConfig} && $Self->{PerfLogConfig}->{OutputTo}) {
@@ -340,10 +362,10 @@ sub _ObjectBuild {
 Adds an existing object instance to the ObjectManager so that it can be accessed by other objects.
 
 This should only be used on special circumstances, e. g. in the unit tests to pass $Self to the
-ObjectManager so that it is also available from there as 'Kernel::System::UnitTest'.
+ObjectManager so that it is also available from there as 'UnitTest'.
 
     $Kernel::OM->ObjectInstanceRegister(
-        Package      => 'Kernel::System::UnitTest',
+        Package      => 'UnitTest',
         Object       => $UnitTestObject,
         Dependencies => [],         # optional, specify OM-managed packages that the object might depend on
     );
@@ -374,7 +396,7 @@ when they are created, in the same format as the C<new()> method
 receives them.
 
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::Ticket' => {
+        'Ticket' => {
             Key => 'Value',
         },
     );
@@ -382,7 +404,7 @@ receives them.
 To remove a key again, send undef as a value:
 
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::Ticket' => {
+        'Ticket' => {
             Key => undef,               # this will remove the key from the hash
         },
     );
@@ -420,7 +442,7 @@ If no list of object names is passed, all stored objects are destroyed.
     $Kernel::OM->ObjectsDiscard();
 
     $Kernel::OM->ObjectsDiscard(
-        Objects            => ['Kernel::System::Ticket', 'Kernel::System::Queue'],
+        Objects            => ['Ticket', 'Queue'],
 
         # optional
         # forces the packages to be reloaded from the file system
@@ -619,8 +641,8 @@ sub ObjectRegisterEventHandler {
 sub _DieWithError {
     my ( $Self, %Param ) = @_;
 
-    if ( $Self->{Objects}->{'Kernel::System::Log'} ) {
-        $Self->{Objects}->{'Kernel::System::Log'}->Log(
+    if ( $Self->{Objects}->{'Log'} ) {
+        $Self->{Objects}->{'Log'}->Log(
             Priority => 'Error',
             Message  => $Param{Error},
         );
