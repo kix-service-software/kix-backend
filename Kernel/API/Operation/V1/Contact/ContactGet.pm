@@ -247,13 +247,16 @@ sub Run {
 
         #FIXME: workaround KIX2018-3308####################
         $Self->AddCacheDependency(Type => 'User');
-        my $UserData = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
-            Data          => {
-                UserID => $ContactData{AssignedUserID},
-            }
-        );
-        $ContactData{Login} = ($UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
+        my $UserData;
+        if ($ContactData{AssignedUserID}) {
+            $UserData = $Self->ExecOperation(
+                OperationType => 'V1::User::UserGet',
+                Data          => {
+                    UserID => $ContactData{AssignedUserID},
+                }
+            );
+        }
+        $ContactData{Login} = ($UserData && $UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
         #######################
 
         #comment back in when 3308 is resolved properly
