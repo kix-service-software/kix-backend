@@ -64,7 +64,7 @@ sub new {
 
     # cache backend
     my $CacheModule = $Kernel::OM->Get('Config')->Get('Cache::Module')
-        || 'Cache::FileStorable';
+        || 'Kernel::System::Cache::FileStorable';
 
     # Store backend in $Self for fastest access.
     $Self->{CacheObject}    = $Kernel::OM->Get($CacheModule);

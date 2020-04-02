@@ -481,9 +481,9 @@ sub FixedTimeSet {
     # This is needed to reload objects that directly use the time functions
     #   to get a hold of the overrides.
     my @Objects = (
-        'Time',
-        'Cache::FileStorable',
-        'PID',
+        'Kernel::System::Time',
+        'Kernel::System::Cache::FileStorable',
+        'Kernel::System::PID',
     );
 
     for my $Object (@Objects) {
