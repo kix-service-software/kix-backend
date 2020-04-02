@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "TicketState" : {
-         "$ref" : "#/definitions/_TicketState_json"
+         "$ref" : "#/definitions/TicketState_json-bf413a99fe"
       }
    },
    "required" : [
       "TicketState"
    ],
    "definitions" : {
-      "_TicketState_json" : {
+      "TicketState_json-bf413a99fe" : {
          "$id" : "#TicketState",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket state object.",

@@ -111,7 +111,7 @@ sub Run {
         foreach my $File ( @Files ) {
             $File = basename($File);
 
-            $Self->Print("    $File...");
+            $Self->Print("    expanding and validating schema $File...");
 
             my $Content = $MainObject->FileRead(
                 Location => $File
@@ -212,7 +212,7 @@ sub Run {
         foreach my $File ( @Files ) {
             $File = basename($File);
 
-            $Self->Print("    $File...");
+            $Self->Print("    validating example $File...");
 
             # read example file
             my $ExampleContent = $MainObject->FileRead(

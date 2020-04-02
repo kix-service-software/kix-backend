@@ -127,6 +127,39 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Automation::JobRunGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobRunGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">RunID</Item>
+                <Item Key="ResponseSchema">JobRunResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Automation::JobRunSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobRunSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">JobRunCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Automation::JobRunLogSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">JobRunLogSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">JobRunLogCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Automation::ExecPlanTypeSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>

@@ -1,0 +1,40 @@
+{
+    "JobRunLog": [
+        {
+            "CreateBy": 1,
+            "CreateTime": "2019-11-25 18:07:50",
+            "ID": 2090,
+            "JobID": 293,
+            "MacroActionID": null,
+            "MacroID": null,
+            "Message": "job execution finished successfully.",
+            "ObjectID": null,
+            "Priority": "info",
+            "RunID": 1000
+        },
+        {
+            "CreateBy": 1,
+            "CreateTime": "2019-11-25 18:07:50",
+            "ID": 2089,
+            "JobID": 293,
+            "MacroActionID": null,
+            "MacroID": 208,
+            "Message": "executing macro \"Macro for Job \"test\"\" with 1 macro actions on ObjectID 97.",
+            "ObjectID": 97,
+            "Priority": "info",
+            "RunID": 1000
+        },
+        {
+            "CreateBy": 1,
+            "CreateTime": "2019-11-25 18:07:50",
+            "ID": 2088,
+            "JobID": 293,
+            "MacroActionID": null,
+            "MacroID": 208,
+            "Message": "executing macro \"Macro for Job \"test\"\" with 1 macro actions on ObjectID 96.",
+            "ObjectID": 96,
+            "Priority": "info",
+            "RunID": 1000
+        }
+    ]
+}

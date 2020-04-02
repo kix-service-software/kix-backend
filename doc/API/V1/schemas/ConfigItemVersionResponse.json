@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ConfigItemVersion" : {
-         "$ref" : "#/definitions/_ConfigItemVersion_json"
+         "$ref" : "#/definitions/ConfigItemVersion_json-360702b3f7"
       }
    },
    "required" : [
       "ConfigItemVersion"
    ],
    "definitions" : {
-      "_ConfigItemClassDefinition_json" : {
+      "ConfigItemClassDefinition_json-fb2ac7494e" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -65,7 +65,7 @@
             "Version"
          ]
       },
-      "_ConfigItemVersion_json" : {
+      "ConfigItemVersion_json-360702b3f7" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
@@ -120,7 +120,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
             },
             "DeplState" : {
                "type" : "string",

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "SLA" : {
-         "$ref" : "#/definitions/_SLA_json"
+         "$ref" : "#/definitions/SLA_json-7604e1640f"
       }
    },
    "required" : [
       "SLA"
    ],
    "definitions" : {
-      "_SLA_json" : {
+      "SLA_json-7604e1640f" : {
          "$id" : "#SLA",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The SLA object.",

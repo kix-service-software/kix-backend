@@ -149,7 +149,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">JobRunValidator</Item>
-                <Item Key="Validates">JobRunID</Item>
+                <Item Key="Validates">RunID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx">JobRunGet</Item>
             </Hash>

@@ -7,7 +7,7 @@
       "ImportExportTemplateRun" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_ImportExportTemplateRun_json"
+            "$ref" : "#/definitions/ImportExportTemplateRun_json-fa3ab6a5f6"
          }
       }
    },
@@ -15,7 +15,7 @@
       "ImportExportTemplateRun"
    ],
    "definitions" : {
-      "_ImportExportTemplateRun_json" : {
+      "ImportExportTemplateRun_json-fa3ab6a5f6" : {
          "$id" : "#ImportExportTemplateRun",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The import export template run object.",

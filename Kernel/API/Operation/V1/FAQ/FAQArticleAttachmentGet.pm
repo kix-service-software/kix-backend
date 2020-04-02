@@ -138,7 +138,7 @@ sub Run {
         }
 
         # add ID to result
-        $Attachment{ID} = $AttachmentID;
+        $Attachment{ID} = 0 + $AttachmentID;
 
         if ( !$Param{Data}->{include}->{Content} ) {
             delete $Attachment{Content};
@@ -148,7 +148,7 @@ sub Run {
         }
 
         # rename ItemID to ArticleID
-        $Attachment{ArticleID} = $Attachment{ItemID};
+        $Attachment{ArticleID} = 0 + $Attachment{ItemID};
         delete $Attachment{ItemID};
 
         # rename Filesize to FilesizeRaw
