@@ -52,69 +52,39 @@ sub new {
     my $MainObject    = $Kernel::OM->Get('Main');
     $Self->{DBObject} = $Kernel::OM->Get('DB');
     
-    my $Home = $ConfigObject->Get('Home');
+    # load backend modules
+    my $Backends = $ConfigObject->Get('TicketSearch::Database::Module');
 
-    # load modules
-    my @Modules;
-
-    # load configs from registered custom packages
-    my @CustomPackages = $Kernel::OM->Get('KIXUtils')->GetRegisteredCustomPackages(
-        Result => 'ARRAY',
-    );
-
-    # add our home
-    push(@CustomPackages, '');
-
-    for my $Dir (@CustomPackages) {
-        my $Directory = $Home.'/'.$Dir.'/Kernel/System/Ticket/TicketSearch/Database';
-        $Directory =~ s'\s'\\s'g;
-        if ( -e "$Directory" ) {
-            my @Files = $MainObject->DirectoryRead(
-                Directory => $Directory,
-                Filter    => "*.pm",
-                Recursive => 1,
-            );
-            foreach my $File ( @Files ) {
-                $File =~ s/$Directory\///g;
-                $File =~ s/\//::/g;
-                $File =~ s/\.pm$//g;
-                push(@Modules, $File);
-            }
-        }
+    if ( !IsHashRefWithData($Backends) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No database search backend modules found!",
+        );
+        return;
     }
 
-    MODULE:
-    foreach my $Module ( sort @Modules ) {
-        next if ( $Module =~ /^Common$/g);
-        
-        $Module = 'Ticket::TicketSearch::Database::'.$Module;
+    BACKEND:
+    foreach my $Backend ( sort keys %{$Backends} ) {
 
-        my $Object = $Kernel::OM->Get($Module);
-        if ( !$Object ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create database search backend object $Module !",
-            );
-            return;
-        }
+        my $Object = $Kernel::OM->Get($Backends->{$Backend}->{Module});
 
         # register module for each supported attribute
         my $SupportedAttributes = $Object->GetSupportedAttributes();
         if ( !IsHashRefWithData($SupportedAttributes) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "SupportedAttributes return by module $Module are not a HashRef!",
+                Message  => "SupportedAttributes return by module $Backends->{$Backend}->{Module} are not a HashRef!",
             );
-            next MODULE;
+            next BACKEND;
         }
 
         foreach my $Type ( qw(Search Sort) ) {
             if ( ref($SupportedAttributes->{$Type}) ne 'ARRAY' ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "SupportedAttributes->{$Type} return by module $Module is not an ArrayRef!",
+                    Message  => "SupportedAttributes->{$Type} return by module $Backends->{$Backend}->{Module} is not an ArrayRef!",
                 );
-                next MODULE;
+                next BACKEND;
             }            
             foreach my $Attribute ( @{$SupportedAttributes->{$Type}} ) {
                 $Self->{AttributeModules}->{$Type}->{$Attribute} = $Object;
