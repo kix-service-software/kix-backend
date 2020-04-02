@@ -1,0 +1,24 @@
+{
+    "JobRun": [
+        {
+            "CreateBy": 1,
+            "EndTime": "2019-11-25 16:55:26",
+            "Filter": {},
+            "ID": 1,
+            "JobID": 293,
+            "Logs": [],
+            "StartTime": "2019-11-25 16:55:26",
+            "StateID": 3
+        },
+        {
+            "CreateBy": 1,
+            "EndTime": "2019-11-25 17:11:28",
+            "Filter": {},
+            "ID": 10,
+            "JobID": 293,
+            "Logs": [],
+            "StartTime": "2019-11-25 17:11:28",
+            "StateID": 2
+        }
+    ]    
+}

@@ -4,7 +4,7 @@
   "type": "object",
   "description": "A list of job types.",
   "properties": {
-    "MailAccountType": {
+    "JobType": {
       "type": "array",
       "items": {
         "type": "object",

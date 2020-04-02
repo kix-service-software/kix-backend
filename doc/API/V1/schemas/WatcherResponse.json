@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Watcher" : {
-         "$ref" : "#/definitions/_Watcher_json"
+         "$ref" : "#/definitions/Watcher_json-6ed30f83c4"
       }
    },
    "required" : [
       "Watcher"
    ],
    "definitions" : {
-      "_Watcher_json" : {
+      "Watcher_json-6ed30f83c4" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",

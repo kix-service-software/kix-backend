@@ -49,7 +49,7 @@ create an object.
         CommunicationType => Requester, # Requester or Provider
         RemoteIP          => 192.168.1.1, # optional
     );
-    my $ValidatorObject = Kernel::API::Validator::JobValidator->new(
+    my $ValidatorObject = Kernel::API::Validator::JobRunValidator->new(
         DebuggerObject => $DebuggerObject,
     );
 
@@ -110,7 +110,7 @@ sub Validate {
     else {
         return $Self->_Error(
             Code    => 'Validator.UnknownAttribute',
-            Message => "JobValidator: cannot validate attribute $Param{Attribute}!",
+            Message => "JobRunValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
 

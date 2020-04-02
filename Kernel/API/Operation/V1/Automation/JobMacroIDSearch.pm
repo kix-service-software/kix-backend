@@ -89,6 +89,7 @@ perform JobMacroIDSearch Operation. This will return a ID list of Macros which a
 
     my $Result = $OperationObject->Run(
         Data => {
+            JobID => 123
         }
     );
 

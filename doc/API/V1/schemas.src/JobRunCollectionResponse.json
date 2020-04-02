@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#JobRunCollectionResponse",
+  "type": "object",
+  "description": "A list of job runs.",
+  "properties": {
+    "JobRun": {
+      "type": "array",
+      "items": {
+        "$ref": "JobRun.json"
+      }
+    }
+  },
+  "required": [
+    "JobRun"
+  ]  
+}

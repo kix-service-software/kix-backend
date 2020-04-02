@@ -1,0 +1,89 @@
+{
+   "$id" : "#FAQAttachmentResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for execution FAQ attachment GET request.",
+   "type" : "object",
+   "properties" : {
+      "Attachment" : {
+         "$ref" : "#/definitions/FAQAttachment_json-3b05dedc31"
+      }
+   },
+   "required" : [
+      "Attachment"
+   ],
+   "definitions" : {
+      "FAQAttachment_json-3b05dedc31" : {
+         "$id" : "#FAQAttachment",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ attachment object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Changed" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Content" : {
+               "description" : "added via include \"Content\"",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Disposition" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Changed",
+            "ChangedBy",
+            "ContentType",
+            "Created",
+            "CreatedBy",
+            "Filename",
+            "Filesize",
+            "FilesizeRaw",
+            "ID"
+         ]
+      }
+   }
+}
