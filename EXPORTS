@@ -211,12 +211,6 @@ JSON                                                             = Kernel::Syste
 KIXUtils                                                         = Kernel::System::KIXUtils
 LinkGraph                                                        = Kernel::System::LinkGraph
 LinkObject                                                       = Kernel::System::LinkObject
-LinkObject::ConfigItem                                           = Kernel::System::LinkObject::ConfigItem
-LinkObject::Document                                             = Kernel::System::LinkObject::Document
-LinkObject::FAQArticle                                           = Kernel::System::LinkObject::FAQArticle
-LinkObject::Person                                               = Kernel::System::LinkObject::Person
-LinkObject::Service                                              = Kernel::System::LinkObject::Service
-LinkObject::Ticket                                               = Kernel::System::LinkObject::Ticket
 Lock                                                             = Kernel::System::Lock
 Log                                                              = Kernel::System::Log
 LogFile                                                          = Kernel::System::LogFile
@@ -273,3 +267,9 @@ WebRequest                                                       = Kernel::Syste
 WebUserAgent                                                     = Kernel::System::WebUserAgent
 XML                                                              = Kernel::System::XML
 YAML                                                             = Kernel::System::YAML
+
+# TODO: temporary added
+LinkObject::ConfigItem                                           = Kernel::System::LinkObject::ConfigItem
+LinkObject::FAQArticle                                           = Kernel::System::LinkObject::FAQArticle
+LinkObject::Service                                              = Kernel::System::LinkObject::Service
+LinkObject::Ticket                                               = Kernel::System::LinkObject::Ticket
