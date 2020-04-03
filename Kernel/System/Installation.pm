@@ -71,6 +71,10 @@ sub PluginList {
     if ( !$Home ) {
         use FindBin qw($Bin);
         $Home = $Bin.'/..';
+        if ( $Bin =~ /^(.*?\/plugins).*?$/ ) {
+            $Home = $1.'/..';
+        }
+        $ENV{KIX_HOME} = $Home;
     }
     my $PluginDirectory = $Home.'/plugins';
 
@@ -174,7 +178,7 @@ sub Update {
 
     # check needed stuff
     for (qw(SourceBuild TargetBuild)) {
-        if ( !$Param{$_} ) {
+        if ( !$Param{$_} && $Param{$_} != 0 ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"

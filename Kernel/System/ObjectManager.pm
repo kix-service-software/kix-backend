@@ -130,6 +130,10 @@ sub new {
     if ( !$Home ) {
         use FindBin qw($Bin);
         $Home = $Bin.'/..';
+        if ( $Bin =~ /^(.*?\/plugins).*?$/ ) {
+            $Home = $1.'/..';
+        }
+        $ENV{KIX_HOME} = $Home;
     }
     open(HANDLE, '<', $Home.'/EXPORTS') || die "ERROR: unable to read $Home/EXPORTS file!";
     while (<HANDLE>) {

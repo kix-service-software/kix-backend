@@ -24,7 +24,7 @@ sub Configure {
     $Self->AddOption(
         Name        => 'source-build',
         Description => "The build number to start from (usually the installed build).",
-        Required    => 1,
+        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
     );
@@ -32,7 +32,7 @@ sub Configure {
     $Self->AddOption(
         Name        => 'target-build',
         Description => "The build number to get to (usually the build that is being installed).",
-        Required    => 1,
+        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
     );
@@ -53,8 +53,8 @@ sub Run {
 
     $Self->Print("<yellow>Updating database...</yellow>\n");
 
-    my $SourceBuild = $Self->GetOption('source-build');
-    my $TargetBuild = $Self->GetOption('target-build');
+    my $SourceBuild = $Self->GetOption('source-build') || 0;
+    my $TargetBuild = $Self->GetOption('target-build') || 9999999999;
     my $Plugin      = $Self->GetOption('plugin');
 
     my $Result = $Kernel::OM->Get('Installation')->Update(
