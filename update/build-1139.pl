@@ -24,7 +24,7 @@ use Kernel::System::VariableCheck qw(:all);
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'db-update-build-1139.pl',
+        LogPrefix => 'framework_update-to-build-1139',
     },
 );
 

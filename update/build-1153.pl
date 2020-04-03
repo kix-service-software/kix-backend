@@ -26,7 +26,7 @@ use Kernel::System::EmailParser;
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'db-update-build-1153.pl',
+        LogPrefix => 'framework_update-to-build-1153',
     },
 );
 my $LogObject = $Kernel::OM->Get('Log');

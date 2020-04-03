@@ -19,7 +19,8 @@
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">TickeTypeSearch</Item>
+                <Item Key="Name">TicketTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TicketType::TicketTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketTypeCollectionResponse</Item>
                 <Item Key="CacheType">API_tickettypes</Item>                
