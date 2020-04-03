@@ -19,8 +19,8 @@ use 5.010_000;
 use File::Basename;
 use FindBin qw($Bin);
 use lib dirname($Bin);
-use lib dirname($Bin) . '/Kernel/cpan-lib';
-use lib dirname($Bin) . '/plugins';
+use lib dirname($Bin) . '/../Kernel/cpan-lib';
+use lib dirname($Bin) . '/../plugins';
 
 use Exporter qw(import);
 
