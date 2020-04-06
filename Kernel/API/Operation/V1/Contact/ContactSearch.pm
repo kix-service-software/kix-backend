@@ -88,9 +88,11 @@ sub Run {
         foreach my $SearchType ( keys %{ $Self->{Search}->{Contact} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
                 next if ( 
-                    !($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} =~ m/^(PrimaryOrganisationID|OrganisationID|AssignedUserID|UserID)$/)
-                    && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|Login)$/
+                    !($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} =~ m/^(PrimaryOrganisationID|AssignedUserID|UserID)$/)
+                    && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|Login|OrganisationIDs)$/
                 );
+                next if ($SearchItem->{Operator} eq 'IN' && $SearchItem->{Field} ne 'OrganisationIDs');
+
                 if (!$ContactSearch{$SearchType}) {
                     $ContactSearch{$SearchType} = [];
                 }
@@ -125,7 +127,7 @@ sub Run {
 
                     if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Login' ) {
                         $SearchParam{LoginEquals} = $Value;
-                    } elsif ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationID)$/ ) {
+                    } elsif ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationIDs)$/ ) {
                         $SearchParam{ $SearchItem->{Field} } = $Value;
                     } elsif ($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Email') {
                         $SearchParam{EmailEquals} = $Value;

@@ -908,7 +908,7 @@ sub ContactSearch {
 
     # check cache
     my $CacheKey = "ContactSearch::${Valid}::";
-    foreach my $Key ( qw(OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals) ) {
+    foreach my $Key ( qw(OrganisationIDs AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals) ) {
         $CacheKey .= '::'.($Param{$Key} || '');
     }
     my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
@@ -918,7 +918,7 @@ sub ContactSearch {
     return %{$Data} if ref $Data eq 'HASH';
 
     # add valid option if required
-    my $SQL;
+    my $Where;
     my @Bind;
     my $Join = '';
 
@@ -927,7 +927,7 @@ sub ContactSearch {
         # get valid object
         my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
 
-        $SQL .= "c.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
+        $Where .= "c.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
     }
 
     # where
@@ -939,30 +939,30 @@ sub ContactSearch {
             $Part =~ s/\*/%/g;
             $Part =~ s/%%/%/g;
 
-            if ( defined $SQL ) {
-                $SQL .= " AND ";
+            if ( defined $Where ) {
+                $Where .= " AND ";
             }
 
-            my @SQLParts;
+            my @WhereParts;
             for my $Field ( qw(firstname lastname email title phone fax mobile street zip city country) ) {
                 if ( $Self->{CaseSensitive} ) {
-                    push(@SQLParts, "c.$Field LIKE ?");
+                    push(@WhereParts, "c.$Field LIKE ?");
                     push(@Bind, \$Part);
                 }
                 else {
-                    push(@SQLParts, "LOWER(c.$Field) LIKE LOWER(?)");
+                    push(@WhereParts, "LOWER(c.$Field) LIKE LOWER(?)");
                     push(@Bind, \$Part);
                 }
             }
-            if (@SQLParts) {
-                $SQL .= '(' . join( ' OR ', @SQLParts ) . ')';
+            if (@WhereParts) {
+                $Where .= '(' . join( ' OR ', @WhereParts ) . ')';
             }
         }
     }
     elsif ( $Param{PostMasterSearch} ) {
 
-        if ( defined $SQL ) {
-            $SQL .= " AND ";
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
 
         my $Email = $Param{PostMasterSearch};
@@ -970,43 +970,47 @@ sub ContactSearch {
         $Email =~ s/%%/%/g;
 
         if ( $Self->{CaseSensitive} ) {
-            $SQL .= "c.email LIKE ?";
+            $Where .= "c.email LIKE ?";
             push(@Bind, \$Email);
         }
         else {
-            $SQL .= "LOWER(c.email) LIKE LOWER(?)";
+            $Where .= "LOWER(c.email) LIKE LOWER(?)";
             push(@Bind, \$Email);
         }
     }
-    elsif ( $Param{OrganisationID}) {
+    elsif ( $Param{OrganisationIDs} && IsArrayRefWithData($Param{OrganisationIDs}) ) {
         $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
-        if ( defined $SQL ) {
-            $SQL .= " AND ";
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
-        $SQL .= "(co.org_id IN (?) )";
-        push(@Bind, \$Param{OrganisationID});
+        my @BindVars;
+        foreach my $OrgID ( @{$Param{OrganisationIDs}} ) {
+            push(@BindVars, '?');
+            push(@Bind, \$OrgID);        
+        }
+        $Where .= "(co.org_id IN ( " . join(',', @BindVars) . " ))";
     }
     elsif ($Param{AssignedUserID}) {
-        if (defined $SQL) {
-            $SQL .= " AND ";
+        if (defined $Where) {
+            $Where .= " AND ";
         }
-        $SQL .= "c.user_id = ?";
+        $Where .= "c.user_id = ?";
         push(@Bind, \$Param{AssignedUserID}) if $Param{AssignedUserID};
     }
     elsif ($Param{UserID}) {
-        if (defined $SQL) {
-            $SQL .= " AND ";
+        if (defined $Where) {
+            $Where .= " AND ";
         }
-        $SQL .= "c.user_id = ?";
+        $Where .= "c.user_id = ?";
         push(@Bind, \$Param{UserID}) if $Param{UserID};
     }
     elsif ($Param{EmailEquals}) {
 
-        if ( defined $SQL ) {
-            $SQL .= " AND ";
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
 
-        $SQL .= "c.email = ?";
+        $Where .= "c.email = ?";
         push(@Bind, \$Param{EmailEquals});
     }
     elsif ($Param{Login}) {
@@ -1016,34 +1020,37 @@ sub ContactSearch {
         $Login =~ s/\*/%/g;
         $Login =~ s/%%/%/g;
 
-        if ( defined $SQL ) {
-            $SQL .= " AND ";
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
 
         if ( $Self->{CaseSensitive} ) {
-            $SQL .= "u.login LIKE ?";
+            $Where .= "u.login LIKE ?";
             push(@Bind, \$Login);
         }
         else {
-            $SQL .= "LOWER(u.login) LIKE LOWER(?)";
+            $Where .= "LOWER(u.login) LIKE LOWER(?)";
             push(@Bind, \$Login);
         }
     }
     elsif ($Param{LoginEquals}) {
         $Join = 'LEFT JOIN users u ON c.user_id = u.id';
 
-        if ( defined $SQL ) {
-            $SQL .= " AND ";
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
 
-        $SQL .= "u.login = ?";
+        $Where .= "u.login = ?";
         push(@Bind, \$Param{LoginEquals});
     }
 
+    my $SQL = "SELECT DISTINCT c.id, c.email FROM contact c $Join WHERE 1=1 AND $Where";
+
+    print STDERR "SQL: $SQL\n";
+
     # ask database
     $Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL   => "SELECT DISTINCT c.id, c.email FROM contact c $Join "
-            . ($SQL ? "WHERE $SQL" : ''),
+        SQL   => $SQL,
         Bind  => \@Bind,
         Limit => $Param{Limit},
     );
