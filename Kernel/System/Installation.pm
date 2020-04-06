@@ -243,7 +243,7 @@ sub Update {
             my $Content = $Kernel::OM->Get('Main')->FileRead(
                 Directory => $Home.'/config/installation',
                 Filename  => $UpdateItem->{Name},
-                Silent    => 1,
+                DisableWarnings => 1,
             );
 
             $Param{SourceBuild} = 0;
