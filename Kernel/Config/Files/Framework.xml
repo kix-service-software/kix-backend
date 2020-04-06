@@ -3049,7 +3049,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/Email/*.pm" SelectedID="Kernel::System::Email::Sendmail"></Option>
+            <Option Location="Kernel/System/Email/*.pm" SelectedID="Kernel::System::Email::SMTP"></Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailModule::CMD" Required="1" Valid="1" ConfigLevel="200">
