@@ -204,6 +204,7 @@
                 <Item Key="OK">200</Item>
                 <Item Key="Operation.InternalError">500</Item>
                 <Item Key="ParentObject.NotFound">404:The parent item(s) cannot be found.</Item>
+                <Item Key="PreconditionFailed">412</Item>                
                 <Item Key="PrepareData.InvalidFilter">400</Item>
                 <Item Key="PrepareData.InvalidSort">400</Item>
                 <Item Key="PrepareData.InvalidExpand">400</Item>

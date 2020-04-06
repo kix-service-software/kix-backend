@@ -189,7 +189,7 @@ sub Start {
         my $DaemonPID = fork;
 
         # check if fork was not possible
-        die "Can not create daemon process: $!" if !defined $DaemonPID || $DaemonPID < 0;
+        die "Cannot create daemon process: $!" if !defined $DaemonPID || $DaemonPID < 0;
     
         # close parent gracefully
         exit 0 if $DaemonPID;
@@ -213,7 +213,7 @@ sub Start {
         my $DaemonPID = $ChildProcess->GetProcessID();
         
         # check if fork was not possible
-        die "Can not create daemon process: $!" if !defined $DaemonPID || $DaemonPID < 0;
+        die "Cannot create daemon process: $!" if !defined $DaemonPID || $DaemonPID < 0;
     
         # close parent gracefully
         return 0;
@@ -630,13 +630,13 @@ sub _PIDLock {
     }
 
     # create new PID file (set exclusive lock while writing the PIDFile)
-    open my $FH, '>', $PIDFile || die "Can not create PID file: $PIDFile\n";    ## no critic
+    open my $FH, '>', $PIDFile || die "Cannot create PID file: $PIDFile\n";    ## no critic
     return if !flock( $FH, LOCK_EX | LOCK_NB );
     print $FH $$;
     close $FH;
 
     # keep PIDFile shared locked forever
-    open $PIDFH, '<', $PIDFile || die "Can not create PID file: $PIDFile\n";    ## no critic
+    open $PIDFH, '<', $PIDFile || die "Cannot create PID file: $PIDFile\n";    ## no critic
     return if !flock( $PIDFH, LOCK_SH | LOCK_NB );
 
     return 1;

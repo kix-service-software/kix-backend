@@ -116,7 +116,7 @@ sub Run {
         if ( $ConfigItemID->[0] ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete GeneralCatalogItem. A ConfigItem with this GeneralCatalogItem already exists.',
+                Message => 'Cannot delete GeneralCatalogItem. A ConfigItem with this GeneralCatalogItem already exists.',
             );
         } 
 
@@ -128,7 +128,7 @@ sub Run {
         if ( $ServiceList) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete GeneralCatalogItem. A Service with this GeneralCatalogItem already exists.',
+                Message => 'Cannot delete GeneralCatalogItem. A Service with this GeneralCatalogItem already exists.',
             );
         }
          	    
@@ -147,7 +147,7 @@ sub Run {
 
                 return $Self->_Error(
                     Code    => 'Object.DependingObjectExists',
-                    Message => 'Can not delete GeneralCatalogItem. A SLA with this GeneralCatalogItem already exists.',
+                    Message => 'Cannot delete GeneralCatalogItem. A SLA with this GeneralCatalogItem already exists.',
                 );
             }    	
         }

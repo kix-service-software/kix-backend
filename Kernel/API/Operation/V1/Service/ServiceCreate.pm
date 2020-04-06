@@ -148,7 +148,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Service. Service with the name '$Service->{Name}' already exists.",
+            Message => "Cannot create Service. Service with the name '$Service->{Name}' already exists.",
         );
     }
 

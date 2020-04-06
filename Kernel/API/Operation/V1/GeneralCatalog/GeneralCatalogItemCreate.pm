@@ -134,7 +134,7 @@ sub Run {
     	if ( $ItemList->{$Item} eq $GeneralCatalogItem->{Name} ) {
 	        return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => "Can not create GeneralCatalog item. GeneralCatalog item with the name '$GeneralCatalogItem->{Name}' already exists.",
+                Message => "Cannot create GeneralCatalog item. GeneralCatalog item with the name '$GeneralCatalogItem->{Name}' already exists.",
 	        );    		
     	}
     }

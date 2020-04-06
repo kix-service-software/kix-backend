@@ -36,7 +36,7 @@
          "description" : "assigned execution plans - added via include \"ExecPlans\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/_ExecPlan_json"
+            "$ref" : "#/definitions/ExecPlan_json-d9008c2c05"
          },
          "readOnly" : true
       },
@@ -60,7 +60,7 @@
          "description" : "assigned macros - added via include \"Macros\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/_Macro_json"
+            "$ref" : "#/definitions/Macro_json-c1dec42b17"
          },
          "readOnly" : true
       },
@@ -88,7 +88,7 @@
       "ValidID"
    ],
    "definitions" : {
-      "_ExecPlan_json" : {
+      "ExecPlan_json-d9008c2c05" : {
          "$id" : "#ExecPlan",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The execution plan object.",
@@ -170,7 +170,7 @@
             "ValidID"
          ]
       },
-      "_MacroAction_json" : {
+      "MacroAction_json-1c13e7e1ed" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
@@ -228,7 +228,7 @@
             "ValidID"
          ]
       },
-      "_Macro_json" : {
+      "Macro_json-c1dec42b17" : {
          "$id" : "#Macro",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
@@ -238,7 +238,7 @@
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/_MacroAction_json"
+                  "$ref" : "#/definitions/MacroAction_json-1c13e7e1ed"
                },
                "readOnly" : true
             },

@@ -116,7 +116,7 @@ sub Run {
         if ( IsHashRefWithData(\%Result) ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete StandardAttachment. The StandardAttachment has been assigned to at least one StandardTemplate.',
+                Message => 'Cannot delete StandardAttachment. The StandardAttachment has been assigned to at least one StandardTemplate.',
             );
         }
 

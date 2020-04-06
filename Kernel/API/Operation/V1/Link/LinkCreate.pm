@@ -156,7 +156,7 @@ sub Run {
     if ( IsArrayRefWithData($LinkList) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Link. A link with these parameters already exists.",
+            Message => "Cannot create Link. A link with these parameters already exists.",
         );
     }
 

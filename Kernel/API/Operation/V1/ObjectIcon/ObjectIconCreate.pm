@@ -141,7 +141,7 @@ sub Run {
     if ( IsArrayRefWithData($ObjectIconList) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create ObjectIcon. Another ObjectIcon with the same Object and ObjectID already exists.",
+            Message => "Cannot create ObjectIcon. Another ObjectIcon with the same Object and ObjectID already exists.",
         );
     }
 

@@ -105,7 +105,7 @@ my $HomeDirectory = $Kernel::OM->Get('Config')->Get('Home');
 my $DTLDirectory  = $HomeDirectory . '/Kernel/Output/HTML/Templates/Standard/';
 my $DIR;
 if ( !opendir $DIR, $DTLDirectory ) {
-    print "Can not open Directory: $DTLDirectory";
+    print "Cannot open Directory: $DTLDirectory";
     return;
 }
 

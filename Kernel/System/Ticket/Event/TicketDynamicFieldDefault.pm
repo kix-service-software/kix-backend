@@ -132,7 +132,7 @@ sub Run {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
-                        "Can not set value $Element->{Value} for dynamic field $Element->{Name}!"
+                        "Cannot set value $Element->{Value} for dynamic field $Element->{Name}!"
                 );
             }
         }

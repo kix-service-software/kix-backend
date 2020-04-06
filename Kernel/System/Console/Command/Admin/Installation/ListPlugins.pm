@@ -11,6 +11,8 @@ package Kernel::System::Console::Command::Admin::Installation::ListPlugins;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
@@ -43,12 +45,34 @@ sub Run {
         InitOrder =>  $Self->GetOption('init-order'), 
     );
 
+    $Self->Print("Backend:\n\n");
     $Self->Print("#  Name                           Build Requires                                           Description\n");
     $Self->Print("-- ------------------------------ ----- -------------------------------------------------- --------------------------------------------------------------------------------\n");
 
     my $Count = 0;
     foreach my $Plugin ( @PluginList ) {
         $Self->Print(sprintf("%02i %-30s %-5s %-50s %-80s\n", ++$Count, $Plugin->{Product}, $Plugin->{BuildNumber}, ($Plugin->{Requires} || ''), $Plugin->{Description}));
+    }
+
+    my $Clients = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
+    if ( IsArrayRefWithData($Clients) ) {
+        CLIENT:
+        foreach my $ClientID ( sort @{$Clients} ) {
+            my %ClientData = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
+                ClientID => $ClientID
+            );
+
+            next CLIENT if !IsArrayRefWithData($ClientData{Plugins});
+        
+            $Self->Print("\n\nClient $ClientID:\n\n");
+            $Self->Print("#  Name                           Build Requires                                           Description\n");
+            $Self->Print("-- ------------------------------ ----- -------------------------------------------------- --------------------------------------------------------------------------------\n");
+
+            my $Count = 0;
+            foreach my $Plugin ( @{$ClientData{Plugins}} ) {
+                $Self->Print(sprintf("%02i %-30s %-5s %-50s %-80s\n", ++$Count, $Plugin->{Product}, $Plugin->{BuildNumber}, ($Plugin->{Requires} || ''), ($Plugin->{Description} || '')));
+            }   
+        }
     }
 
     $Self->Print("<green>Done</green>\n");

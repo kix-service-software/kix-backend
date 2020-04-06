@@ -265,7 +265,7 @@ sub PIDUpdate {
     if ( !%PID ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Can not get PID'
+            Message  => 'Cannot get PID'
         );
         return;
     }

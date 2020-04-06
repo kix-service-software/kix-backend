@@ -144,7 +144,7 @@ sub Run {
     if ( %AddressList && (scalar(keys %AddressList) > 1 || !$AddressList{$AddressData{AddressID}})) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not update address book entry. Another address with same email address already exists.",
+            Message => "Cannot update address book entry. Another address with same email address already exists.",
         );
     }
 

@@ -132,7 +132,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create TicketState. TicketState already exists.",
+            Message => "Cannot create TicketState. TicketState already exists.",
         );
     }
 

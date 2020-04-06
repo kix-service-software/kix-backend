@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "MailAccount" : {
-         "$ref" : "#/definitions/_MailAccount_json"
+         "$ref" : "#/definitions/MailAccount_json-dcbaa55d9f"
       }
    },
    "required" : [
       "MailAccount"
    ],
    "definitions" : {
-      "_MailAccount_json" : {
+      "MailAccount_json-dcbaa55d9f" : {
          "$id" : "#MailAccount",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The mail account object.",

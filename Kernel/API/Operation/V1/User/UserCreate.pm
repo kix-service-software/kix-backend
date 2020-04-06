@@ -148,7 +148,7 @@ sub Run {
     if (%UserData) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create user. Another user with same login already exists.",
+            Message => "Cannot create user. Another user with same login already exists.",
         );
     }
 

@@ -170,7 +170,7 @@ sub StatsAdd {
     if ( !$Success ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Can not add a new Stat!',
+            Message  => 'Cannot add a new Stat!',
         );
         return;
     }
@@ -957,7 +957,7 @@ sub GetStaticFiles {
     if ( !opendir( DIR, $Directory ) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not open Directory: $Directory",
+            Message  => "Cannot open Directory: $Directory",
         );
         return ();
     }
@@ -3554,7 +3554,7 @@ sub _AutomaticSampleImport {
     if ( !opendir( DIRE, $Directory ) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not open Directory: $Directory",
+            Message  => "Cannot open Directory: $Directory",
         );
         return;
     }
@@ -3579,7 +3579,7 @@ sub _AutomaticSampleImport {
             if ( !open $Filehandle, '<', $Directory . $Filename ) {    ## no critic
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Can not open File: " . $Directory . $Filename,
+                    Message  => "Cannot open File: " . $Directory . $Filename,
                 );
                 closedir(DIRE);
                 return;

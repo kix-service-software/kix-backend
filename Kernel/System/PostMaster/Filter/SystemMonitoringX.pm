@@ -759,7 +759,7 @@ sub _SetIncidentState {
         # log error
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not set incident state for CI with the name '$Param{Name}'. "
+            Message  => "Cannot set incident state for CI with the name '$Param{Name}'. "
                 . "More than one CI with this name was found!",
         );
 
@@ -853,7 +853,7 @@ sub _LinkTicketWithCI {
         # log error
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not set incident state for CI with the name '$Param{Name}'. "
+            Message  => "Cannot set incident state for CI with the name '$Param{Name}'. "
                 . "More than one CI with this name was found!",
         );
 

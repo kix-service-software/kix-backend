@@ -104,7 +104,7 @@ sub _LockPID {
 	}
 
 	# create new PID file (set exclusive lock while writing the PIDFile)
-	open my $FH, '>', $PIDFile || die "Can not create PID file: $PIDFile\n";    ## no critic
+	open my $FH, '>', $PIDFile || die "Cannot create PID file: $PIDFile\n";    ## no critic
 	return if !flock( $FH, LOCK_EX | LOCK_NB );
 	print $FH $$;
 	close $FH;

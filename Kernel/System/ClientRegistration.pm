@@ -100,7 +100,7 @@ sub ClientRegistrationGet {
     return %{$Cache} if $Cache;
     
     return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT client_id, notification_url, notification_interval, notification_authorization, last_notification_timestamp FROM client_registration WHERE client_id = ?",
+        SQL   => "SELECT client_id, notification_url, notification_interval, notification_authorization, additional_data, last_notification_timestamp FROM client_registration WHERE client_id = ?",
         Bind => [ \$Param{ClientID} ],
     );
 
@@ -109,12 +109,22 @@ sub ClientRegistrationGet {
     # fetch the result
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         %Data = (
-            ClientID             => $Row[0],
-            NotificationURL      => $Row[1],
-            NotificationInterval => $Row[2],
-            Authorization       => $Row[3],
-            LastNotificationTimestamp => $Row[4],
+            ClientID                  => $Row[0],
+            NotificationURL           => $Row[1],
+            NotificationInterval      => $Row[2],
+            Authorization             => $Row[3],
+            LastNotificationTimestamp => $Row[5],
         );
+        if ( $Row[4] ) {
+            # prepare additional data
+            my $AdditionalData = $Kernel::OM->Get('JSON')->Decode(
+                Data => $Row[4]
+            );
+            if ( IsHashRefWithData($AdditionalData) ) {
+                $Data{Plugins}  = $AdditionalData->{Plugins};
+                $Data{Requires} = $AdditionalData->{Requires};
+            }
+        }
     }
     
     # no data found...
@@ -148,8 +158,10 @@ Adds a new client registration
         ClientID             => 'CLIENT1',
         NotificationURL      => '...',            # optional
         NotificationInterval => 123,              # optional, in seconds
-        Authorization       => '...',             # optional
+        Authorization        => '...',            # optional
         Translations         => '...',            # optional
+        Plugins              => [],               # optional
+        Requires             => []                # optional
     );
 
 =cut
@@ -168,14 +180,23 @@ sub ClientRegistrationAdd {
     # init the last notification timestamp to define a base to start from
     my $Now = ($Param{NotificationURL} && $Param{NotificationInterval}) ? gettimeofday() : undef;
 
+    # prepare additional data
+    my $AdditionalDataJSON = $Kernel::OM->Get('JSON')->Encode(
+        Data => {
+            Plugins  => $Param{Plugins},
+            Requires => $Param{Requires}
+        }
+    );
+
     # do the db insert...
     my $Result = $Self->{DBObject}->Do(
-        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_interval, notification_authorization, last_notification_timestamp) VALUES (?, ?, ?, ?, ?)",
+        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_interval, notification_authorization, additional_data, last_notification_timestamp) VALUES (?, ?, ?, ?, ?, ?)",
         Bind => [
             \$Param{ClientID},
             \$Param{NotificationURL},
             \$Param{NotificationInterval},
             \$Param{Authorization},
+            \$AdditionalDataJSON,
             \$Now,
         ],
     );

@@ -1,0 +1,122 @@
+{
+   "$id" : "#FAQArticlePostRequest",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The FAQ article request object for create.",
+   "type" : "object",
+   "properties" : {
+      "FAQArticle" : {
+         "type" : "object",
+         "properties" : {
+            "ApprovalOff" : {
+               "description" : "if set to 1 approval is ignored",
+               "type" : "integer"
+            },
+            "Approved" : {
+               "type" : "integer"
+            },
+            "Attachments" : {
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/FAQAttachmentPostRequest_json-8454d991be"
+               }
+            },
+            "CategoryID" : {
+               "type" : "integer"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "CustomerVisible" : {
+               "type" : "integer"
+            },
+            "Field1" : {
+               "description" : "symptom",
+               "type" : "string"
+            },
+            "Field2" : {
+               "description" : "problem",
+               "type" : "string"
+            },
+            "Field3" : {
+               "description" : "solution",
+               "type" : "string"
+            },
+            "Field4" : {
+               "type" : "string"
+            },
+            "Field5" : {
+               "type" : "string"
+            },
+            "Field6" : {
+               "description" : "comment",
+               "type" : "string"
+            },
+            "Keywords" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "string"
+               }
+            },
+            "Language" : {
+               "type" : "string"
+            },
+            "Number" : {
+               "type" : "string"
+            },
+            "Title" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "CategoryID",
+            "Title"
+         ]
+      }
+   },
+   "required" : [
+      "FAQArticle"
+   ],
+   "definitions" : {
+      "FAQAttachmentPostRequest_json-8454d991be" : {
+         "$id" : "#FAQAttachmentPostRequest",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ article request object for create.",
+         "type" : "object",
+         "properties" : {
+            "FAQAttachment" : {
+               "type" : "object",
+               "properties" : {
+                  "Content" : {
+                     "description" : "base64 encoded file ontent string",
+                     "type" : "string"
+                  },
+                  "ContentType" : {
+                     "type" : "integer"
+                  },
+                  "CustomerVisible" : {
+                     "type" : "integer"
+                  },
+                  "Filename" : {
+                     "type" : "string"
+                  },
+                  "Inline" : {
+                     "description" : " if attachment is an inline attachment of a text field property (e.g. \"Field1\") or 0 if not",
+                     "type" : "integer"
+                  }
+               },
+               "required" : [
+                  "Content",
+                  "ContentType",
+                  "Filename"
+               ]
+            }
+         },
+         "required" : [
+            "FAQAttachment"
+         ]
+      }
+   }
+}

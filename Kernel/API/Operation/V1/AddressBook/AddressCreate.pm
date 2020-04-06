@@ -128,7 +128,7 @@ sub Run {
     if ( IsHashRefWithData(\%AddressList) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create address book entry. Another address with same email address already exists.",
+            Message => "Cannot create address book entry. Another address with same email address already exists.",
         );
     }
 

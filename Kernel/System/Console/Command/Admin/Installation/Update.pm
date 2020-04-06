@@ -20,7 +20,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Update the database to a specific build');
+    $Self->Description('Update the current installation to a specific build');
     $Self->AddOption(
         Name        => 'source-build',
         Description => "The build number to start from (usually the installed build).",
@@ -51,10 +51,10 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Updating database...</yellow>\n");
+    $Self->Print("<yellow>Updating installation...</yellow>\n");
 
-    my $SourceBuild = $Self->GetOption('source-build') || 0;
-    my $TargetBuild = $Self->GetOption('target-build') || 9999999999;
+    my $SourceBuild = $Self->GetOption('source-build');
+    my $TargetBuild = $Self->GetOption('target-build');
     my $Plugin      = $Self->GetOption('plugin');
 
     my $Result = $Kernel::OM->Get('Installation')->Update(

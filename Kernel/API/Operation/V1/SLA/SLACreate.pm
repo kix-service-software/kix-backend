@@ -142,7 +142,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create SLA. SLA with the name '$SLA->{Name}' already exists.",
+            Message => "Cannot create SLA. SLA with the name '$SLA->{Name}' already exists.",
         );
     }
 

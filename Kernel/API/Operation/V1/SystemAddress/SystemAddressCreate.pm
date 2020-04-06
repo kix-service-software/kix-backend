@@ -134,7 +134,7 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create SystemAddress. SystemAddress with the name '$SystemAddress->{Name}' already exists.",
+            Message => "Cannot create SystemAddress. SystemAddress with the name '$SystemAddress->{Name}' already exists.",
         );
     }
 

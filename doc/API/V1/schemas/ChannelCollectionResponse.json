@@ -7,7 +7,7 @@
       "Channel" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Channel_json"
+            "$ref" : "#/definitions/Channel_json-fa412663f1"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Channel"
    ],
    "definitions" : {
-      "_Channel_json" : {
+      "Channel_json-fa412663f1" : {
          "$id" : "#Channel",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The channel object.",

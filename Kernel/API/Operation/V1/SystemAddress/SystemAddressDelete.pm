@@ -116,7 +116,7 @@ sub Run {
         if ( %QueueIDs ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete SystemAddress. A Queue with this SystemAddress already exists.',
+                Message => 'Cannot delete SystemAddress. A Queue with this SystemAddress already exists.',
             );
         }	    
 	    

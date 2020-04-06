@@ -136,7 +136,7 @@ sub Run {
     if ( $Watchers{$Watcher->{UserID}} ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Watcher. Watcher already exists.",
+            Message => "Cannot create Watcher. Watcher already exists.",
         );
     }
     

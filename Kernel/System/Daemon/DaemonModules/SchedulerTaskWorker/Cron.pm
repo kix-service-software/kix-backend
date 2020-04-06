@@ -106,7 +106,7 @@ sub Run {
     if ( !$ModuleObject ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not create a new Object for Module: '$Param{Data}->{Module}'! - Task: $Param{TaskName}",
+            Message  => "Cannot create a new Object for Module: '$Param{Data}->{Module}'! - Task: $Param{TaskName}",
         );
 
         return;

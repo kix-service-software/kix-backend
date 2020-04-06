@@ -93,7 +93,7 @@ sub DocumentNew {
     if ( $Self->{PDF} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Can not create new Document!',
+            Message  => 'Cannot create new Document!',
         );
         return;
     }
@@ -123,7 +123,7 @@ sub DocumentNew {
     if ( !$Self->{PDF} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Can not create new Document: $!',
+            Message  => 'Cannot create new Document: $!',
         );
         return;
     }
@@ -278,7 +278,7 @@ sub PageBlankNew {
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
-        Message  => "Can not create new blank Page!"
+        Message  => "Cannot create new blank Page!"
     );
 
     return;

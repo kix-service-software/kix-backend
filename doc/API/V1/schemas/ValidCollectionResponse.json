@@ -7,7 +7,7 @@
       "Valid" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Valid_json"
+            "$ref" : "#/definitions/Valid_json-ac696cc881"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Valid"
    ],
    "definitions" : {
-      "_Valid_json" : {
+      "Valid_json-ac696cc881" : {
          "$id" : "#Valid",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The valid object.",

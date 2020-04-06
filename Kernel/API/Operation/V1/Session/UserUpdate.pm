@@ -148,7 +148,7 @@ sub Run {
         if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Can not update user. Another user with same login already exists.',
+                Message => 'Cannot update user. Another user with same login already exists.',
             );
         }
     }

@@ -1241,7 +1241,7 @@ sub CertificateRead {
     if ( !-r $File ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not read certificate $File!"
+            Message  => "Cannot read certificate $File!"
         );
         return;
     }

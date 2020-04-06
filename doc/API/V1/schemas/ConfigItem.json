@@ -55,20 +55,20 @@
          "readOnly" : true
       },
       "CurrentVersion" : {
-         "$ref" : "#/definitions/_ConfigItemVersion_json"
+         "$ref" : "#/definitions/ConfigItemVersion_json-360702b3f7"
       },
       "History" : {
          "description" : "added via include \"History\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/_ConfigItemHistory_json"
+            "$ref" : "#/definitions/ConfigItemHistory_json-666c1c3cf3"
          }
       },
       "Images" : {
          "description" : "added via include \"Images\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/_ConfigItemImage_json"
+            "$ref" : "#/definitions/ConfigItemImage_json-c9452e1cd4"
          }
       },
       "LastVersionID" : {
@@ -86,7 +86,7 @@
          "description" : "added via include \"Versions\"",
          "type" : "array",
          "item" : {
-            "$ref" : "#/definitions/_ConfigItemVersion_json"
+            "$ref" : "#/definitions/ConfigItemVersion_json-360702b3f7"
          }
       }
    },
@@ -100,7 +100,7 @@
       "ConfigItemID"
    ],
    "definitions" : {
-      "_ConfigItemClassDefinition_json" : {
+      "ConfigItemClassDefinition_json-fb2ac7494e" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -153,7 +153,7 @@
             "Version"
          ]
       },
-      "_ConfigItemHistory_json" : {
+      "ConfigItemHistory_json-666c1c3cf3" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item history object.",
@@ -223,7 +223,7 @@
             "UserLogin"
          ]
       },
-      "_ConfigItemImage_json" : {
+      "ConfigItemImage_json-c9452e1cd4" : {
          "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
@@ -269,7 +269,7 @@
             "ID"
          ]
       },
-      "_ConfigItemVersion_json" : {
+      "ConfigItemVersion_json-360702b3f7" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
@@ -324,7 +324,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
             },
             "DeplState" : {
                "type" : "string",

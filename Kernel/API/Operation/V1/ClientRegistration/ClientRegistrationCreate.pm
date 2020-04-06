@@ -101,13 +101,33 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
                 ClientID         => '...',
                 CallbackURL      => '...',        # optional
                 CallbackInterval => '...',        # optional
-                Authorization   => '...',         # optional
+                Authorization    => '...',        # optional
                 Translations     => [             # optional
                     {
                         Language => 'de',
                         POFile   => '...'       # base64 encoded content of the PO file
                     }
-                ]
+                ],
+                Plugins          => [             # optional
+                    {
+                        "Name": "KIXPro",
+                        "Requires": "backend::KIXPro(>10), framework(>3349)",
+                        "Description": "KIXPro",
+                        "BuildNumber": 1,
+                        "Version": "1.0.0",
+                        "ExtendedData": {
+                            "BuildDate": "..."
+                        }
+                    }
+                ],
+                Requires         => [             # optional
+                    {
+                        "Name": "KIXPro",
+                        "Operator": ">",
+                        "BuildNumber": 1234
+                    }
+                ],
+
             }
         },
     );
@@ -131,6 +151,69 @@ sub Run {
         Data => $Param{Data}->{ClientRegistration},
     );
 
+    # check requirements
+    if ( IsArrayRefWithData($ClientRegistration->{Requires}) ) {
+        my @PluginList = $Kernel::OM->Get('Installation')->PluginList(Valid => 1);    
+        use Data::Dumper;
+        my %Plugins = map { $_->{Product} => $_ } @PluginList; 
+
+        # add framework as pseudo plugin
+        $Plugins{framework} = {
+            Name        => 'framework',
+            BuildNumber => $Kernel::OM->Get('Config')->Get('BuildNumber'),
+            Version     => $Kernel::OM->Get('Config')->Get('Version')
+        };
+
+        my $Reason = '';
+        my $Failed = 0;
+        foreach my $Requirement ( @{$ClientRegistration->{Requires}} ) {
+            # check if required plugin exists
+            if ( !$Plugins{$Requirement->{Product}} ) {
+                $Failed = 1;
+                $Reason = "Required plugin \"$Requirement->{Product}\" not found";
+                last;
+            }
+
+            # check buildnumber
+            if ( $Requirement->{Operator} && $Requirement->{BuildNumber} ) {
+                my $Plugin = $Plugins{$Requirement->{Product}};
+
+                if ( $Requirement->{Operator} eq '=' && $Plugin->{BuildNumber} != $Requirement->{BuildNumber} ) {
+                    $Failed = 1;
+                    $Reason = "$Requirement->{Product} has the wrong build number (required: =$Requirement->{BuildNumber}, installed: $Plugin->{BuildNumber})";
+                    last;
+                }
+                elsif ( $Requirement->{Operator} eq '!' && $Plugin->{BuildNumber} == $Requirement->{BuildNumber} ) {
+                    $Failed = 1;
+                    $Reason = "$Requirement->{Product} has the wrong build number (required: !$Requirement->{BuildNumber}, installed: $Plugin->{BuildNumber})";
+                    last;
+                }
+                elsif ( $Requirement->{Operator} eq '<' && $Plugin->{BuildNumber} >= $Requirement->{BuildNumber} ) {
+                    $Failed = 1;
+                    $Reason = "Requirement->{Product} has the wrong build number (required: <$Requirement->{BuildNumber}, installed: $Plugin->{BuildNumber})";
+                    last;
+                }
+                elsif ( $Requirement->{Operator} eq '>' && $Plugin->{BuildNumber} <= $Requirement->{BuildNumber} ) {
+                    $Failed = 1;
+                    $Reason = "$Requirement->{Product} has the wrong build number (required: >$Requirement->{BuildNumber}, installed: $Plugin->{BuildNumber})";
+                    last;
+                }
+                elsif ( $Requirement->{Operator} !~ /^(>|<|!|=)$/g ) {
+                    $Failed = 1;
+                    $Reason = "$Requirement->{Product} can't be validated. Unsupported requirement operator: $Requirement->{Operator}!";
+                    last;
+                }
+            }
+        }
+
+        if ( $Failed ) {
+            return $Self->_Error(
+                Code    => 'PreconditionFailed',
+                Message => "Cannot create client registration. A requirement failed! $Reason",
+            );
+        }
+    }
+
     # check if ClientRegistration exists
     my %ClientRegistration = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
         ClientID => $ClientRegistration->{ClientID},
@@ -140,7 +223,7 @@ sub Run {
     if ( IsHashRefWithData(\%ClientRegistration) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create client registration. A registration for the given ClientID already exists.",
+            Message => "Cannot create client registration. A registration for the given ClientID already exists.",
         );
     }
 
@@ -150,6 +233,8 @@ sub Run {
         NotificationURL      => $ClientRegistration->{NotificationURL},
         NotificationInterval => $ClientRegistration->{NotificationInterval},
         Authorization        => $ClientRegistration->{Authorization},
+        Plugins              => $ClientRegistration->{Plugins},
+        Requires             => $ClientRegistration->{Requires},
     );
 
     if ( !$ClientID ) {

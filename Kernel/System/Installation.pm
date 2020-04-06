@@ -118,18 +118,20 @@ sub PluginList {
         push @Plugins, \%Plugin;
     }
     
-    my %PluginList = map { $_->{Product} => $_ } @Plugins;
+    if ( IsArrayRefWithData(\@Plugins) ) {
+        my %PluginList = map { $_->{Product} => $_ } @Plugins;
 
-    # get order of initialization
-    foreach my $Plugin ( @Plugins ) {
-        $Plugin->{InitOrder} = $Self->_GetPluginDependencyCount(
-            Plugin     => $Plugin->{Product},
-            PluginList => \%PluginList,
-        ) || 0;
-    }
+        # get order of initialization
+        foreach my $Plugin ( @Plugins ) {
+            $Plugin->{InitOrder} = $Self->_GetPluginDependencyCount(
+                Plugin     => $Plugin->{Product},
+                PluginList => \%PluginList,
+            ) || 0;
+        }
 
-    if ( $Param{InitOrder} ) {
-        @Plugins = sort { $a->{InitOrder} <=> $b->{InitOrder} } @Plugins;
+        if ( $Param{InitOrder} ) {
+            @Plugins = sort { $a->{InitOrder} <=> $b->{InitOrder} } @Plugins;
+        }
     }
 
     return @Plugins;
@@ -168,8 +170,8 @@ sub GetPluginExports {
 update the current installation to a new build number
 
     my $Result = $InstallationObject->Update(
-        SourceBuild => 1234         # required
-        TargetBuild => 2345         # required
+        SourceBuild => 1234         # optional, if not given, the installed build number will be used
+        TargetBuild => 2345         # optional, if not given, the build number from the plugin directory will be used
         Plugin      => 'KIXPro'     # optional, if not given the framework itself will be updated
     );
 
@@ -178,22 +180,12 @@ update the current installation to a new build number
 sub Update {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    for (qw(SourceBuild TargetBuild)) {
-        if ( !$Param{$_} && $Param{$_} != 0 ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my $Home = $Kernel::OM->Get('Config')->Get('Home');
+    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
 
     my @Plugins = $Self->PluginList(
         InitOrder => 1
     );
+    my %PluginList = map { $_->{Product} => $_ } @Plugins;
 
     my @UpdateItems;
     if ( !$Param{Plugin} ) {
@@ -201,7 +193,6 @@ sub Update {
         push @UpdateItems, { Name => 'framework', Directory => $Home };
     }
     elsif ( $Param{Plugin} && $Param{Plugin} ne 'ALL' ) {
-        my %PluginList = map { $_->{Product} => $_ } @Plugins;
         my $Directory = $PluginList{$Param{Plugin}}->{Directory};
     
         if ( ! -d $Directory ) {
@@ -219,12 +210,12 @@ sub Update {
             if ( ! -d $Plugin->{Directory} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Plugin $Plugin->{Name} doesn't exist!"
+                    Message  => "Plugin $Plugin->{Product} doesn't exist!"
                 );
                 return;        
             }
             # add plugin
-            push @UpdateItems, { Name => $Plugin->{Name}, Directory => $Plugin->{Directory} };
+            push @UpdateItems, { Name => $Plugin->{Product}, Directory => $Plugin->{Directory} };
         }
     }
 
@@ -234,6 +225,7 @@ sub Update {
         my @FileList = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $UpdateItem->{Directory}.'/update',
             Filter    => 'build-*',
+            Silent    => 1,
         );
 
         my %BuildList;
@@ -245,6 +237,27 @@ sub Update {
             }
         }
 
+        # determine source and target builds
+        if ( !defined $Param{SourceBuild} ) {
+            # get current build number
+            my $Content = $Kernel::OM->Get('Main')->FileRead(
+                Directory => $Home.'/config/installation',
+                Filename  => $UpdateItem->{Name},
+                Silent    => 1,
+            );
+
+            $Param{SourceBuild} = 0;
+            if ( $Content ) {
+                $Param{SourceBuild} = $$Content;
+            }            
+        }
+        if ( !defined $Param{TargetBuild} ) {
+            $Param{TargetBuild} = $PluginList{$UpdateItem->{Name}}->{BuildNumber};
+        }
+
+        my $Failed = 0;
+        my $LastBuild = 0;
+        BUILDNUMBER:
         foreach my $NummericBuild (sort keys %BuildList) {
             next if $NummericBuild <= $Param{SourceBuild};
             last if $NummericBuild > $Param{TargetBuild};
@@ -260,8 +273,20 @@ sub Update {
                     Priority => 'error',
                     Message  => "Error while updating $UpdateItem->{Name}. Ignoring further updates for $UpdateItem->{Name}."
                 );
-                next DIRECTORY;
+                $Failed = 1;
+                last BUILDNUMBER;
             }
+
+            $LastBuild = $NummericBuild;
+        }
+
+        if ( !$Failed ) {
+            # store current build number
+            my $Result = $Kernel::OM->Get('Main')->FileWrite(
+                Directory => $Home.'/config/installation',
+                Filename  => $UpdateItem->{Name},
+                Content   => \($LastBuild || $PluginList{$UpdateItem->{Name}}->{BuildNumber})
+            );
         }
     }
 

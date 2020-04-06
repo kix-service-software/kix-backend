@@ -108,7 +108,7 @@ sub Generate {
     # get the list of installed packages
     ( $SupportFiles{PackageListContent}, $SupportFiles{PackageListFilename} ) = $Self->GeneratePackageList();
     if ( !$SupportFiles{PackageListFilename} ) {
-        my $Message = 'Can not generate the list of installed packages!';
+        my $Message = 'Cannot generate the list of installed packages!';
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
@@ -123,7 +123,7 @@ sub Generate {
     ( $SupportFiles{RegistrationInfoContent}, $SupportFiles{RegistrationInfoFilename} )
         = $Self->GenerateRegistrationInfo();
     if ( !$SupportFiles{RegistrationInfoFilename} ) {
-        my $Message = 'Can not get the registration information!';
+        my $Message = 'Cannot get the registration information!';
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
@@ -137,7 +137,7 @@ sub Generate {
     # get the support data
     ( $SupportFiles{SupportDataContent}, $SupportFiles{SupportDataFilename} ) = $Self->GenerateSupportData();
     if ( !$SupportFiles{SupportDataFilename} ) {
-        my $Message = 'Can not collect the support data!';
+        my $Message = 'Cannot collect the support data!';
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
@@ -152,7 +152,7 @@ sub Generate {
     ( $SupportFiles{CustomFilesArchiveContent}, $SupportFiles{CustomFilesArchiveFilename} )
         = $Self->GenerateCustomFilesArchive();
     if ( !$SupportFiles{CustomFilesArchiveFilename} ) {
-        my $Message = 'Can not generate the custom files archive!';
+        my $Message = 'Cannot generate the custom files archive!';
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
