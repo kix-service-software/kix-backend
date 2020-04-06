@@ -458,6 +458,13 @@ sub SetDynamicFieldValue {
     # get dynamic field config
     my $DynamicFieldConfig = $Self->{DynamicFieldLookup}->{ $Param{Name} };
 
+    if ( !$DynamicFieldConfig ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "SetDynamicFieldValue() no matching dynamic field found for \"$Param{Name}\"!"
+        );
+    }
+
     my $ObjectID;
     if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
         $ObjectID = $Param{TicketID} || '';
