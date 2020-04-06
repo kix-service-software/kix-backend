@@ -1096,7 +1096,18 @@ sub _LoadJobTypeBackend {
     $Self->{JobTypeModules} //= {};
 
     if ( !$Self->{JobTypeModules}->{$Param{Name}} ) {
-        my $Backend = 'Automation::Job::' . $Param{Name};
+        # load backend modules
+        my $Backends = $ConfigObject->Get('Automation::JobType');
+
+        if ( !IsHashRefWithData($Backends) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No job backend modules found!",
+            );
+            return;
+        }        
+
+        my $Backend = $Backends->{$Param{Name}}->{Module}; 
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(

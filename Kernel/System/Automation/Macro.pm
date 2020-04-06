@@ -614,7 +614,18 @@ sub _LoadMacroTypeBackend {
     $Self->{MacroTypeModules} //= {};
 
     if ( !$Self->{MacroTypeModules}->{$Param{Name}} ) {
-        my $Backend = 'Automation::Macro::' . $Param{Name};
+        # load backend modules
+        my $Backends = $ConfigObject->Get('Automation::MacroType');
+
+        if ( !IsHashRefWithData($Backends) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No macro backend modules found!",
+            );
+            return;
+        }        
+
+        my $Backend = $Backends->{$Param{Name}}->{Module}; 
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(

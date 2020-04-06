@@ -651,8 +651,19 @@ sub _LoadExecPlanTypeBackend {
     $Self->{ExecPlanTypeModules} //= {};
 
     if ( !$Self->{ExecPlanTypeModules}->{$Param{Name}} ) {
-        my $Backend = 'Automation::ExecPlan::' . $Param{Name};
+        # load backend modules
+        my $Backends = $ConfigObject->Get('Automation::ExecPlanType');
 
+        if ( !IsHashRefWithData($Backends) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No exec plan backend modules found!",
+            );
+            return;
+        }        
+
+        my $Backend = $Backends->{$Param{Name}}->{Module}; 
+        
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

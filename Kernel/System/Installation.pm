@@ -83,6 +83,8 @@ sub PluginList {
     opendir(HANDLE, $PluginDirectory) || die "Can't open $PluginDirectory: $!";
     while (readdir HANDLE) {
         next if $_ =~ /^\./;
+        next if !-d $PluginDirectory.'/'.$_;    # only directories
+
         push @DirectoryList, $PluginDirectory.'/'.$_;
     }
     closedir(HANDLE); 
@@ -123,7 +125,7 @@ sub PluginList {
         $Plugin->{InitOrder} = $Self->_GetPluginDependencyCount(
             Plugin     => $Plugin->{Product},
             PluginList => \%PluginList,
-        );
+        ) || 0;
     }
 
     if ( $Param{InitOrder} ) {
