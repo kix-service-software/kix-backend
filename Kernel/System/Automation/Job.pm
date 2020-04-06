@@ -1097,7 +1097,7 @@ sub _LoadJobTypeBackend {
 
     if ( !$Self->{JobTypeModules}->{$Param{Name}} ) {
         # load backend modules
-        my $Backends = $ConfigObject->Get('Automation::JobType');
+        my $Backends = $Kernel::OM->Get('Config')->Get('Automation::JobType');
 
         if ( !IsHashRefWithData($Backends) ) {
             $Kernel::OM->Get('Log')->Log(

@@ -652,7 +652,7 @@ sub _LoadExecPlanTypeBackend {
 
     if ( !$Self->{ExecPlanTypeModules}->{$Param{Name}} ) {
         # load backend modules
-        my $Backends = $ConfigObject->Get('Automation::ExecPlanType');
+        my $Backends = $Kernel::OM->Get('Config')->Get('Automation::ExecPlanType');
 
         if ( !IsHashRefWithData($Backends) ) {
             $Kernel::OM->Get('Log')->Log(

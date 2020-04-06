@@ -615,7 +615,7 @@ sub _LoadMacroTypeBackend {
 
     if ( !$Self->{MacroTypeModules}->{$Param{Name}} ) {
         # load backend modules
-        my $Backends = $ConfigObject->Get('Automation::MacroType');
+        my $Backends = $Kernel::OM->Get('Config')->Get('Automation::MacroType');
 
         if ( !IsHashRefWithData($Backends) ) {
             $Kernel::OM->Get('Log')->Log(
