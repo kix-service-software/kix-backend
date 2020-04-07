@@ -183,7 +183,7 @@ sub Run {
         # get roles list
         my @RoleList = $Kernel::OM->Get('User')->RoleList(
             UserID => $Self->{Authorization}->{UserID},
-        )
+        );
         my @RoleIDs;
         foreach my $RoleID (sort @RoleList) {
             push(@RoleIDs, 0 + $RoleID); # enforce nummeric ID
