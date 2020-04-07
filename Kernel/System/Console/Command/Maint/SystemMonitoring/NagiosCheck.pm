@@ -14,8 +14,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::Ticket',
+    'Main',
+    'Ticket',
 );
 
 sub Configure {
@@ -80,7 +80,7 @@ sub Run {
     my %Config = %{ $Self->{Config} || {} };
 
     # get Ticket Object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # search tickets
     my @TicketIDs = $TicketObject->TicketSearch(

@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create a new ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -211,7 +211,7 @@ for my $SearchTest (@SearchTests) {
 my @UserIDs;
 for ( 1 .. 2 ) {
     my $UserLogin = $Helper->TestUserCreate();
-    my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup( UserLogin => $UserLogin );
+    my $UserID = $Kernel::OM->Get('User')->UserLookup( UserLogin => $UserLogin );
     push @UserIDs, $UserID;
 }
 

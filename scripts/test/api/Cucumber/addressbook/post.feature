@@ -18,7 +18,7 @@ Feature: POST request /addressbook resource
     Then the response code is 409
     And the response object is Error
     And the error code is "Object.AlreadyExists"    
-    And the error message is "Can not create address book entry. Another address with same email address already exists."
+    And the error message is "Cannot create address book entry. Another address with same email address already exists."
     When delete all this addressbooks
     Then the response code is 204
 

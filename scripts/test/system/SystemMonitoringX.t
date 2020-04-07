@@ -14,7 +14,7 @@ use vars qw($Self);
 use Kernel::System::PostMaster;
 
 # add or update dynamic fields if needed
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 my @DynamicfieldIDs;
 my @DynamicFieldUpdate;
@@ -84,8 +84,8 @@ for my $FieldName ( sort keys %NeededDynamicfields ) {
 }
 
 # get needed objects
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $MainObject   = $Kernel::OM->Get('Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $FileArray = $MainObject->FileRead(
     Location => $ConfigObject->Get('Home') . '/scripts/test/system/sample/SystemMonitoring1X.box',
@@ -162,7 +162,7 @@ $Self->True(
     "Run() - NewTicket/TicketID",
 );
 # get ticket object
-$TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+$TicketObject = $Kernel::OM->Get('Ticket');
 %Ticket       = $TicketObject->TicketGet(
     TicketID => $Return[1],
     DynamicFields => 1,

@@ -110,7 +110,7 @@ sub Run {
     foreach my $LinkID ( @{$Param{Data}->{LinkID}} ) {
       
         # delete Link	    
-        my $Success = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkDelete(
+        my $Success = $Kernel::OM->Get('LinkObject')->LinkDelete(
             LinkID  => $LinkID,
             UserID  => $Self->{Authorization}->{UserID},
         );

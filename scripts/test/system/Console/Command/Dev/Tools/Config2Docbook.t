@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Dev::Tools::Config2Docbook');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Dev::Tools::Config2Docbook');
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -38,7 +38,7 @@ my $Result;
     local *STDOUT;
     open STDOUT, '>:encoding(UTF-8)', \$Result;
     $ExitCode = $CommandObject->Execute( '--language', 'en' );
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Result );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Result );
 }
 
 $Self->Is(

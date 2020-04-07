@@ -109,19 +109,19 @@ sub Run {
     # start loop
     foreach my $SystemAddressID ( @{$Param{Data}->{SystemAddressID}} ) {
     	
-	    my %QueueIDs = $Kernel::OM->Get('Kernel::System::Queue')->GetQueuesForEmailAddress(
+	    my %QueueIDs = $Kernel::OM->Get('Queue')->GetQueuesForEmailAddress(
 	        AddressID  => $SystemAddressID,
 	    );
     		    	
         if ( %QueueIDs ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete SystemAddress. A Queue with this SystemAddress already exists.',
+                Message => 'Cannot delete SystemAddress. A Queue with this SystemAddress already exists.',
             );
         }	    
 	    
         # delete SystemAddress	    
-        my $Success = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressDelete(
+        my $Success = $Kernel::OM->Get('SystemAddress')->SystemAddressDelete(
             SystemAddressID  => $SystemAddressID,
             UserID  => $Self->{Authorization}->{UserID},
         );

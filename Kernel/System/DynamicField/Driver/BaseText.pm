@@ -18,9 +18,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Log',
+    'DB',
+    'DynamicFieldValue',
+    'Log',
 );
 
 =head1 NAME
@@ -52,7 +52,7 @@ sub ValueSet {
     }
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     my $Success;
 
@@ -69,7 +69,7 @@ sub ValueSet {
             );
 
             if (!$Valid) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "The value for the field Text is invalid!"
                 );
@@ -101,7 +101,7 @@ sub ValueSet {
 sub ValueValidate {
     my ( $Self, %Param ) = @_;
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueValidate(
+    my $Success = $Kernel::OM->Get('DynamicFieldValue')->ValueValidate(
         Value => {
             ValueText => $Param{Value},
         },
@@ -121,7 +121,7 @@ sub ValueValidate {
         for my $RegEx (@RegExList) {
 
             if ( $Param{Value} !~ $RegEx->{Value} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "The value '$Param{Value}' is not matching /"
                         . $RegEx->{Value} . "/ ("
@@ -148,7 +148,7 @@ sub SearchSQLGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Operators{ $Param{Operator} } ) {
         my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
@@ -174,7 +174,7 @@ sub SearchSQLGet {
         return $SQL;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         'Priority' => 'error',
         'Message'  => "Unsupported Operator $Param{Operator}",
     );
@@ -303,7 +303,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         $Value = $Param{ParamObject}->GetParam( Param => $FieldName );
@@ -738,7 +738,7 @@ sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',
     );

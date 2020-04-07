@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Email',
-    'Kernel::System::Log',
+    'Config',
+    'Email',
+    'Log',
 );
 
 =head1 NAME
@@ -50,12 +50,12 @@ Creates a system error message and sends an email with the error messages form a
 sub _HandleError {
     my ( $Self, %Param ) = @_;
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => $Param{LogMessage},
     );
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $From = $ConfigObject->Get('NotificationSenderName') . ' <'
         . $ConfigObject->Get('NotificationSenderEmail') . '>';
@@ -64,7 +64,7 @@ sub _HandleError {
 
     if ( $From && $To ) {
 
-        my $Sent = $Kernel::OM->Get('Kernel::System::Email')->Send(
+        my $Sent = $Kernel::OM->Get('Email')->Send(
             From     => $From,
             To       => $To,
             Subject  => "KIX Scheduler Daemon $Param{TaskType}: $Param{TaskName}",
@@ -98,7 +98,7 @@ sub _CheckTaskParams {
 
     for my $Needed (qw(TaskID Data)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed! - Task: $Param{TaskName}",
             );
@@ -109,7 +109,7 @@ sub _CheckTaskParams {
 
     # Check data.
     if ( ref $Param{Data} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Got no valid Data! - Task: $Param{TaskName}",
         );
@@ -122,7 +122,7 @@ sub _CheckTaskParams {
 
         for my $Needed ( @{ $Param{NeededDataAttributes} } ) {
             if ( !$Param{Data}->{$Needed} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need Data->$Needed! - Task: $Param{TaskName}",
                 );
@@ -136,7 +136,7 @@ sub _CheckTaskParams {
     if ( $Param{DataParamsRef} ) {
 
         if ( $Param{Data}->{Params} && ref $Param{Data}->{Params} ne uc $Param{DataParamsRef} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Data->Params is invalid, reference is not $Param{DataParamsRef}! - Task: $Param{TaskName}",
             );

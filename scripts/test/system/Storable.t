@@ -83,7 +83,7 @@ my @Tests = (
     },
 );
 
-my $StorableObject = $Kernel::OM->Get('Kernel::System::Storable');
+my $StorableObject = $Kernel::OM->Get('Storable');
 
 for my $Test (@Tests) {
 

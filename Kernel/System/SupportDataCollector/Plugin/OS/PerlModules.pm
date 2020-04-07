@@ -18,7 +18,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub GetDisplayPath {
@@ -28,7 +28,7 @@ sub GetDisplayPath {
 sub Run {
     my $Self = shift;
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my $Output;
     open( my $FH, "-|", "perl $Home/bin/kix.CheckModules.pl nocolors --all" );

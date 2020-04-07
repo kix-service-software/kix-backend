@@ -22,14 +22,14 @@ use Kernel::System::PostMaster::Reject;
 use Kernel::System::VariableCheck qw(IsHashRefWithData);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Queue',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::SystemAddress',
+    'Config',
+    'DynamicField',
+    'Log',
+    'Main',
+    'Queue',
+    'State',
+    'Ticket',
+    'SystemAddress',
 );
 
 =head1 NAME
@@ -52,12 +52,12 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::PostMaster' => {
+        'PostMaster' => {
             Email        => \@ArrayOfEmailContent,
             Trusted      => 1, # 1|0 ignore X-KIX header if false
         },
     );
-    my $PostMasterObject = $Kernel::OM->Get('Kernel::System::PostMaster');
+    my $PostMasterObject = $Kernel::OM->Get('PostMaster');
 
 =cut
 
@@ -85,7 +85,7 @@ sub new {
     $Self->{RejectObject}    = Kernel::System::PostMaster::Reject->new( %{$Self} );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check needed config options
     for my $Option (qw(PostmasterUserID PostmasterX-Header)) {
@@ -99,7 +99,7 @@ sub new {
     if ( $Self->{Trusted} ) {
 
         # get dynamic field objects
-        my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+        my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
         # add Dynamic Field headers
         my $DynamicFields = $DynamicFieldObject->DynamicFieldList(
@@ -153,11 +153,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get needed object
-    my $ConfigObject        = $Kernel::OM->Get('Kernel::Config');
-    my $QueueObject         = $Kernel::OM->Get('Kernel::System::Queue');
-    my $StateObject         = $Kernel::OM->Get('Kernel::System::State');
-    my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
-    my $TicketObject        = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject        = $Kernel::OM->Get('Config');
+    my $QueueObject         = $Kernel::OM->Get('Queue');
+    my $StateObject         = $Kernel::OM->Get('State');
+    my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
+    my $TicketObject        = $Kernel::OM->Get('Ticket');
 
     my @Return;
 
@@ -182,7 +182,7 @@ sub Run {
         my %Jobs = %{ $ConfigObject->Get('PostMaster::PreFilterModule') };
 
         # get main objects
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         JOB:
         for my $Job ( sort keys %Jobs ) {
@@ -194,7 +194,7 @@ sub Run {
             );
 
             if ( !$FilterObject ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "new() of PreFilterModule $Jobs{$Job}->{Module} not successfully!",
                 );
@@ -212,7 +212,7 @@ sub Run {
                         TicketID  => $TicketID,
                     );
                     if ( !$Run ) {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message => "Execute Run() of PreFilterModule "
                                 . "$Jobs{$Job}->{Module} with TID $TicketID "
@@ -240,7 +240,7 @@ sub Run {
 
     # should I ignore the incoming mail?
     if ( $GetParam->{'X-KIX-Ignore'} && $GetParam->{'X-KIX-Ignore'} =~ /(yes|true)/i ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message =>
                 "Ignored Email (From: $GetParam->{'From'}, Message-ID: $GetParam->{'Message-ID'}) "
@@ -366,7 +366,7 @@ sub Run {
             if ( $Param{Queue} && !$Param{QueueID} ) {
 
                 # queue lookup if queue name is given
-                $Param{QueueID} = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                $Param{QueueID} = $Kernel::OM->Get('Queue')->QueueLookup(
                     Queue => $Param{Queue},
                 );
             }
@@ -419,7 +419,7 @@ sub Run {
             if ( $Param{Queue} && !$Param{QueueID} ) {
 
                 # queue lookup if queue name is given
-                $Param{QueueID} = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                $Param{QueueID} = $Kernel::OM->Get('Queue')->QueueLookup(
                     Queue => $Param{Queue},
                 );
             }
@@ -459,7 +459,7 @@ sub Run {
         my %Jobs = %{ $ConfigObject->Get('PostMaster::PostFilterModule') };
 
         # get main objects
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         JOB:
         for my $Job ( sort keys %Jobs ) {
@@ -471,7 +471,7 @@ sub Run {
             );
 
             if ( !$FilterObject ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "new() of PostFilterModule $Jobs{$Job}->{Module} not successfully!",
                 );
@@ -490,7 +490,7 @@ sub Run {
                 );
 
                 if ( !$Run ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message =>
                             "Execute Run() of PostFilterModule $Jobs{$Job}->{Module} not successfully!",
@@ -517,10 +517,10 @@ sub CheckFollowUp {
     my ( $Self, %Param ) = @_;
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get config objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # build Result hash with TicketNumber => TicketID pairs
     my %Result = ();
@@ -529,7 +529,7 @@ sub CheckFollowUp {
     my $Jobs = $ConfigObject->Get('PostMaster::CheckFollowUpModule');
 
     if ( IsHashRefWithData($Jobs) ) {
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
         JOB:
         for my $Job ( sort keys %$Jobs ) {
             my $Module = $Jobs->{$Job};
@@ -541,7 +541,7 @@ sub CheckFollowUp {
             );
 
             if ( !$CheckObject ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "new() of CheckFollowUp $Jobs->{$Job}->{Module} not successfully!",
                 );
@@ -600,7 +600,7 @@ sub GetEmailParams {
         # do not scan x-kix headers if mailbox is not marked as trusted
         next HEADER if ( !$Self->{Trusted} && $Param =~ /^x-kix/i );
         if ( $Self->{Debug} > 2 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => "$Param: " . $Self->{ParserObject}->GetParam( WHAT => $Param ),
             );
@@ -651,7 +651,7 @@ sub GetEmailParams {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
 #rbo - T2016121190001552 - renamed X-KIX headers
     # set sender type if not given
@@ -663,7 +663,7 @@ sub GetEmailParams {
 
         # check if X-KIX-SenderType exists, if not, set external
         if ( !$TicketObject->ArticleSenderTypeLookup( SenderType => $GetParam{$Key} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't find sender type '$GetParam{$Key}' in db, take 'external'",
             );
@@ -680,8 +680,8 @@ sub GetEmailParams {
         }
 
         # check if X-KIX-Channel exists, if not, set 'email'
-        if ( !$Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $GetParam{$Key} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Channel')->ChannelLookup( Name => $GetParam{$Key} ) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't find channel '$GetParam{$Key}' in db, take 'email' and set 'visible for customer'",
             );
@@ -708,16 +708,16 @@ sub _HandlePossibleFollowUp {
     my ( $Self, %Param ) = @_;
 
     # get needed object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $QueueObject  = $Kernel::OM->Get('Kernel::System::Queue');
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $QueueObject  = $Kernel::OM->Get('Queue');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # check if it's a follow up ...
     if ( ref $ConfigObject->Get('PostMaster::PreCreateFilterModule') eq 'HASH' ) {
 
         my %Jobs = %{ $ConfigObject->Get('PostMaster::PreCreateFilterModule') };
 
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         JOB:
         for my $Job ( sort keys %Jobs ) {
@@ -729,7 +729,7 @@ sub _HandlePossibleFollowUp {
             );
 
             if ( !$FilterObject ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "new() of PreCreateFilterModule $Jobs{$Job}->{Module} not successfully!",
                 );
@@ -743,7 +743,7 @@ sub _HandlePossibleFollowUp {
                 TicketID  => $Param{TicketID},
             );
             if ( !$Run ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "Execute Run() of PreCreateFilterModule $Jobs{$Job}->{Module} not successfully!",
@@ -786,14 +786,14 @@ sub _HandlePossibleFollowUp {
         );
 
         # get state details
-        my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        my %State = $Kernel::OM->Get('State')->StateGet(
             ID => $Ticket{StateID},
         );
 
         # create a new ticket
         if ( $FollowUpPossible =~ /new ticket/i && $State{TypeName} =~ /^(removed|close)/i ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'info',
                 Message  => "Follow up for [$Param{TicketNumber}] but follow up not possible ($Ticket{State})."
                     . " Create new ticket."
@@ -843,7 +843,7 @@ sub _HandlePossibleFollowUp {
         # reject follow up
         elsif ( $FollowUpPossible =~ /reject/i && $State{TypeName} =~ /^(removed|close)/i ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'info',
                 Message  => "Follow up for [$Param{TicketNumber}] but follow up not possible. Follow up rejected."
             );

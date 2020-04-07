@@ -16,14 +16,14 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseSelect);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Ticket::ColumnFilter',
+    'Config',
+    'DB',
+    'DynamicFieldValue',
+    'GeneralCatalog',
+    'ITSMConfigItem',
+    'Log',
+    'Main',
+    'Ticket::ColumnFilter',
 );
 
 =head1 NAME
@@ -49,10 +49,10 @@ sub new {
     bless( $Self, $Type );
 
     # create additional objects
-    $Self->{ConfigObject}            = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
-    $Self->{GeneralCatalogObject}    = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-    $Self->{ITSMConfigItemObject}    = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+    $Self->{ConfigObject}            = $Kernel::OM->Get('Config');
+    $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('DynamicFieldValue');
+    $Self->{GeneralCatalogObject}    = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{ITSMConfigItemObject}    = $Kernel::OM->Get('ITSMConfigItem');
 
     # get the fields config
     $Self->{FieldTypeConfig} = $Self->{ConfigObject}->Get('DynamicFields::Driver') || {};
@@ -84,7 +84,7 @@ sub new {
 
             # check if module can be loaded
             if (
-                !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Extension->{Module} )
+                !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
                 )
             {
                 die "Can't load dynamic fields backend module"
@@ -521,7 +521,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         my @Data = $Param{ParamObject}->GetArray( Param => $FieldName );
@@ -920,7 +920,7 @@ sub SearchSQLGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Operators{ $Param{Operator} } ) {
         my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
@@ -938,7 +938,7 @@ sub SearchSQLGet {
         return $SQL;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         'Priority' => 'error',
         'Message'  => "Unsupported Operator $Param{Operator}",
     );
@@ -1217,7 +1217,7 @@ sub ColumnFilterValuesGet {
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
 
     # get column filter values from database
-    my $ColumnFilterValues = $Kernel::OM->Get('Kernel::System::Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
+    my $ColumnFilterValues = $Kernel::OM->Get('Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
         TicketIDs => $Param{TicketIDs},
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',

@@ -20,9 +20,9 @@ use DateTime::TimeZone;
 use Kernel::System::VariableCheck qw( :all );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Log',
+    'Config',
+    'Cache',
+    'Log',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create a time object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
 =cut
 
@@ -60,13 +60,13 @@ sub new {
 
     $Self->{TimeZone} = $Param{TimeZone}
         || $Param{UserTimeZone}
-        || $Kernel::OM->Get('Kernel::Config')->Get('TimeZone')
+        || $Kernel::OM->Get('Config')->Get('TimeZone')
         || 'Etc/UTC';   # fallback
 
 	my $TimeZoneObject   = DateTime::TimeZone->new(name => $Self->{TimeZone});
     $Self->{TimeSecDiff} = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
 
-    $Self->{CacheObject} = $Kernel::OM->Get('Kernel::System::Cache');
+    $Self->{CacheObject} = $Kernel::OM->Get('Cache');
     $Self->{CacheType}   = 'Time';
 
     return $Self;
@@ -115,7 +115,7 @@ sub SystemTime2TimeStamp {
 
     # check needed stuff
     if ( !defined $Param{SystemTime} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SystemTime!',
         );
@@ -167,7 +167,7 @@ sub SystemTime2Date {
 
     # check needed stuff
     if ( !defined $Param{SystemTime} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SystemTime!',
         );
@@ -202,7 +202,7 @@ sub TimeStamp2SystemTime {
 
     # check needed stuff
     if ( !$Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need String!',
         );
@@ -313,7 +313,7 @@ sub TimeStamp2SystemTime {
 
     # return error
     if ( !defined $SystemTime ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid Date '$Param{String}'!",
         );
@@ -345,7 +345,7 @@ sub Date2SystemTime {
     # check needed stuff
     for (qw(Year Month Day Hour Minute Second)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -360,7 +360,7 @@ sub Date2SystemTime {
     };
 
     if ( !defined $SystemTime ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Invalid Date '$Param{Year}-$Param{Month}-$Param{Day} $Param{Hour}:$Param{Minute}:$Param{Second}'!",
@@ -475,7 +475,7 @@ sub WorkingTime {
     # check needed stuff
     for (qw(StartTime StopTime)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -484,7 +484,7 @@ sub WorkingTime {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
@@ -806,7 +806,7 @@ sub DestinationTime {
     # check needed stuff
     for (qw(StartTime Time)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -815,7 +815,7 @@ sub DestinationTime {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
@@ -1073,7 +1073,7 @@ sub VacationCheck {
     # check required params
     for (qw(Year Month Day)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "VacationCheck: Need $_!",
             );
@@ -1086,7 +1086,7 @@ sub VacationCheck {
     my $Day   = sprintf "%02d", $Param{Day};
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $TimeVacationDays        = $Self->GetVacationDays();
     my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
@@ -1133,10 +1133,10 @@ sub GetVacationDays {
     my ( $Self, %Param ) = @_;
     my $Result;
 
-    my $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get('TimeVacationDays');
+    my $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDays');
     if ( $Param{Calendar} ) {
-        if ( $Kernel::OM->Get('Kernel::Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get( 'TimeVacationDays::Calendar' . $Param{Calendar} );
+        if ( $Kernel::OM->Get('Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
+            $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDays::Calendar' . $Param{Calendar} );
         }
     }
 
@@ -1164,10 +1164,10 @@ sub GetVacationDaysOneTime {
     my ( $Self, %Param ) = @_;
     my $Result;
 
-    my $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get('TimeVacationDaysOneTime');
+    my $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDaysOneTime');
     if ( $Param{Calendar} ) {
-        if ( $Kernel::OM->Get('Kernel::Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays = $Kernel::OM->Get('Kernel::Config')->Get( 'TimeVacationDaysOneTime::Calendar' . $Param{Calendar} );
+        if ( $Kernel::OM->Get('Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
+            $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDaysOneTime::Calendar' . $Param{Calendar} );
         }
     }
 
@@ -1220,12 +1220,12 @@ sub _GetTimeWorking {
                 }
             } else {
                 if ( $Param{Calendar} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => 'Invalid entry in TimeWorkingHours::Calendar' . $Param{Calendar} . ' <' . $Entry . '>',
                     );
                 } else {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => 'Invalid entry in TimeWorkingHours <' . $Entry . '>',
                     );

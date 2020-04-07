@@ -17,19 +17,19 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
-my $OrgaObject = $Kernel::OM->Get('Kernel::System::Organisation');
+my $TicketObject = $Kernel::OM->Get('Ticket');
+my $ContactObject = $Kernel::OM->Get('Contact');
+my $OrgaObject = $Kernel::OM->Get('Organisation');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );

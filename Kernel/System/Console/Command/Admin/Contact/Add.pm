@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Contact',
+    'Contact',
 );
 
 sub Configure {
@@ -79,13 +79,13 @@ sub Run {
 
     my $AssignedUserID;
     if ($Self->GetOption('user-login')) {
-        $AssignedUserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        $AssignedUserID = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $Self->GetOption('user-login'),
             Silent    => 1,
         );
     }
     if (
-        !$Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+        !$Kernel::OM->Get('Contact')->ContactAdd(
             Source                => 'Contact',
             Firstname             => $Self->GetOption('first-name'),
             Lastname              => $Self->GetOption('last-name'),

@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Watcher::WatcherGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Watcher::WatcherGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $WatcherID ( @{$Param{Data}->{WatcherID}} ) {
 
         # get the Priority data
-        my %WatcherData = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherGet(
+        my %WatcherData = $Kernel::OM->Get('Watcher')->WatcherGet(
             ID     => $WatcherID,
             UserID => $Self->{Authorization}->{UserID},
         );

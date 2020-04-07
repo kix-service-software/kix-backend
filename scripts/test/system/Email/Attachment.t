@@ -53,9 +53,9 @@ my $AttachmentReference = [
 my $AttachmentNumber = scalar @{$AttachmentReference};
 
 # do not really send emails
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # test scenarios. added only one attachment.
@@ -197,7 +197,7 @@ my @Tests = (
 );
 
 # get email object
-my $EmailObject = $Kernel::OM->Get('Kernel::System::Email');
+my $EmailObject = $Kernel::OM->Get('Email');
 
 # testing loop
 my $Count = 0;

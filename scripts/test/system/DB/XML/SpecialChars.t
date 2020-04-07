@@ -17,17 +17,17 @@ use vars (qw($Self));
 use Encode;
 
 # get needed objects
-my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
-my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
-my $XMLObject    = $Kernel::OM->Get('Kernel::System::XML');
+my $DBObject     = $Kernel::OM->Get('DB');
+my $EncodeObject = $Kernel::OM->Get('Encode');
+my $XMLObject    = $Kernel::OM->Get('XML');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # ------------------------------------------------------------ #
 # XML test 5 - INSERT special characters test

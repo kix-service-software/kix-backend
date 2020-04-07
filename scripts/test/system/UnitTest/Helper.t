@@ -17,7 +17,7 @@ use vars (qw($Self));
 use Kernel::Config;
 
 # get helper object
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $Self->True(
     $Helper,
@@ -79,9 +79,9 @@ $Self->True(
 );
 
 $Helper->Rollback();
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
-my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+my %User = $Kernel::OM->Get('User')->GetUserData(
     User => $TestUserLogin,
 );
 
@@ -90,7 +90,7 @@ $Self->False(
     'Rollback worked',
 );
 
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 $Self->Is(
     scalar $ConfigObject->Get('nonexisting_dummy'),
     undef,

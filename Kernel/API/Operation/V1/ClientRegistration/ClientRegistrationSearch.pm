@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform ClientRegistration search
-    my $ClientList = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationList();
+    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
 
 	# get already prepared ClientRegistration data from ClientRegistrationGet operation
     if ( IsArrayRefWithData($ClientList) ) {  	

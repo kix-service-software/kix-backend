@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -57,7 +57,7 @@ sub JobLookup {
 
     # check needed stuff
     if ( !$Param{Name} && !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Name or ID!',
         );
@@ -108,7 +108,7 @@ sub JobGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -117,13 +117,13 @@ sub JobGet {
 
     # check cache
     my $CacheKey = 'JobGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => "SELECT id, name, type, filter, comments, valid_id, last_exec_time, create_time, create_by, change_time, change_by FROM job WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -131,7 +131,7 @@ sub JobGet {
     my %Result;
     
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
             ID                => $Row[0],
             Name              => $Row[1],
@@ -148,7 +148,7 @@ sub JobGet {
 
         if ( $Result{Filter} ) {
             # decode JSON
-            $Result{Filter} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            $Result{Filter} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Filter}
             );
         }
@@ -156,7 +156,7 @@ sub JobGet {
     
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Job with ID $Param{ID} not found!",
         );
@@ -164,7 +164,7 @@ sub JobGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -197,7 +197,7 @@ sub JobAdd {
     # check needed stuff
     for my $Needed (qw(Name Type UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -214,7 +214,7 @@ sub JobAdd {
         Name => $Param{Name},
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A job with the same name already exists.",
         );
@@ -222,12 +222,12 @@ sub JobAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # prepare filter as JSON
     my $Filter;
     if ( $Param{Filter} ) {
-        $Filter = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Filter = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Filter}
         );
     }
@@ -255,10 +255,10 @@ sub JobAdd {
     }
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Job',
         ObjectID  => $ID,
@@ -291,7 +291,7 @@ sub JobUpdate {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -309,7 +309,7 @@ sub JobUpdate {
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A job with the same name already exists.",
         );
@@ -338,13 +338,13 @@ sub JobUpdate {
     # prepare filter as JSON
     my $Filter;
     if ( $Param{Filter} ) {
-        $Filter = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Filter = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Filter}
         );
     }
 
     # update Job in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE job SET type = ?, name = ?, filter = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
             \$Param{Type}, \$Param{Name}, \$Filter, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
@@ -352,10 +352,10 @@ sub JobUpdate {
     );
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
@@ -392,7 +392,7 @@ sub JobList {
     my $CacheKey = 'JobList::' . $Valid;
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -404,17 +404,17 @@ sub JobList {
         $SQL .= ' WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL => $SQL
     );
 
     my %Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{$Row[0]} = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
@@ -440,7 +440,7 @@ sub JobDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -453,7 +453,7 @@ sub JobDelete {
         ID => $Param{ID},
     );
     if ( !$ID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A job with the ID $Param{ID} does not exist.",
         );
@@ -461,28 +461,28 @@ sub JobDelete {
     }
 
     # delete relations with ExecPlans
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_exec_plan WHERE job_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete relations with Macros
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_macro WHERE job_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # remove from database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
    
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
@@ -508,7 +508,7 @@ sub JobMacroList {
     # check needed stuff
     for (qw(JobID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -516,13 +516,13 @@ sub JobMacroList {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => 'SELECT macro_id FROM job_macro WHERE job_id = ?',
         Bind => [ \$Param{JobID} ],
     );
 
     my @Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Row[0]);
     }
 
@@ -547,7 +547,7 @@ sub JobMacroAdd {
     # check needed stuff
     for (qw(JobID MacroID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -559,7 +559,7 @@ sub JobMacroAdd {
         ID => $Param{JobID},
     );
     if ( !$JobName) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot assign Macro to Job. A Job with ID $Param{JobID} does not exists.",
         );
@@ -570,7 +570,7 @@ sub JobMacroAdd {
         ID => $Param{MacroID},
     );
     if ( !$MacroName) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot assign Macro to Job. A Macro with ID $Param{MacroID} does not exists.",
         );
@@ -585,7 +585,7 @@ sub JobMacroAdd {
     if ( !$MacroIDs{$Param{MacroID}} ) {
 
         # insert
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO job_macro (job_id, macro_id, create_time, create_by, change_time, change_by) '
                 . 'VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
             Bind => [
@@ -594,10 +594,10 @@ sub JobMacroAdd {
         );
 
         # delete whole cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+        $Kernel::OM->Get('Cache')->CleanUp();
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Job.Macro',
             ObjectID  => $Param{JobID}.'::'.$Param{MacroID},
@@ -624,7 +624,7 @@ sub JobMacroDelete {
     # check needed stuff
     for (qw(JobID MacroID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -633,16 +633,16 @@ sub JobMacroDelete {
     }
 
     # remove from database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_macro WHERE job_id = ? AND macro_id = ?',
         Bind => [ \$Param{JobID}, \$Param{MacroID} ],
     );
    
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job.Macro',
         ObjectID  => $Param{JobID}.'::'.$Param{MacroID},
@@ -668,7 +668,7 @@ sub JobExecPlanList {
     # check needed stuff
     for (qw(JobID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -676,13 +676,13 @@ sub JobExecPlanList {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => 'SELECT exec_plan_id FROM job_exec_plan WHERE job_id = ?',
         Bind => [ \$Param{JobID} ],
     );
 
     my @Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Row[0]);
     }
 
@@ -707,7 +707,7 @@ sub JobExecPlanAdd {
     # check needed stuff
     for (qw(JobID ExecPlanID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -719,7 +719,7 @@ sub JobExecPlanAdd {
         ID => $Param{JobID},
     );
     if ( !$JobName) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot assign ExecPlan to Job. A Job with ID $Param{JobID} does not exists.",
         );
@@ -730,7 +730,7 @@ sub JobExecPlanAdd {
         ID => $Param{ExecPlanID},
     );
     if ( !$ExecPlanName) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot assign ExecPlan to Job. A ExecPlan with ID $Param{ExecPlanID} does not exists.",
         );
@@ -745,7 +745,7 @@ sub JobExecPlanAdd {
     if ( !$ExecPlanIDs{$Param{ExecPlanID}} ) {
 
         # insert
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO job_exec_plan (job_id, exec_plan_id, create_time, create_by, change_time, change_by) '
                 . 'VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
             Bind => [
@@ -754,10 +754,10 @@ sub JobExecPlanAdd {
         );
 
         # delete whole cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+        $Kernel::OM->Get('Cache')->CleanUp();
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Job.ExecPlan',
             ObjectID  => $Param{JobID}.'::'.$Param{ExecPlanID},
@@ -784,7 +784,7 @@ sub JobExecPlanDelete {
     # check needed stuff
     for (qw(JobID ExecPlanID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -793,16 +793,16 @@ sub JobExecPlanDelete {
     }
 
     # remove from database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_exec_plan WHERE job_id = ? AND exec_plan_id = ?',
         Bind => [ \$Param{JobID}, \$Param{ExecPlanID} ],
     );
-   
+
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job.ExecPlan',
         ObjectID  => $Param{JobID}.'::'.$Param{ExecPlanID},
@@ -829,7 +829,7 @@ sub JobIsExecutable {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -872,7 +872,7 @@ sub JobExecute {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -889,11 +889,11 @@ sub JobExecute {
     );
 
     if ( !%Job ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such job with ID $Param{ID}!"
         );
-        return;        
+        return;
     }
 
     # create job run
@@ -903,11 +903,11 @@ sub JobExecute {
     );
 
     if ( !$RunID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to create a new run for job with ID $Param{ID}!"
         );
-        return;        
+        return;
     }
 
     # add RunID for log reference
@@ -919,52 +919,101 @@ sub JobExecute {
     );
 
     # return success if we have nothing to do
+    my $Warning = 0;
     if ( !IsArrayRefWithData(\@MacroIDs) ) {
         $Self->LogInfo(
             Message  => "Job \"$Job{Name}\" has no macros to execute.",
             UserID   => $Param{UserID},
         );
-        return 1;
-    }
+        $Warning = 1;
+    } else {
 
-    # check the macro if they are executable, return success if not
-    my $ExecutableMacroCount = 0;
-    foreach my $MacroID ( @MacroIDs ) {
-         $ExecutableMacroCount++ if $Self->MacroIsExecutable(
-            ID     => $MacroID,
-            UserID => $Param{UserID},
-        );
-    }
-    if ( !$ExecutableMacroCount ) {
-        $Self->LogInfo(
-            Message  => "Job \"$Job{Name}\" has assigned macros but non of them is executable. Aborting job execution.",
-            UserID   => $Param{UserID},
-        );
-    }
+        # check the macro if they are executable, return success if not
+        my $ExecutableMacroCount = 0;
+        foreach my $MacroID ( @MacroIDs ) {
+            $ExecutableMacroCount++ if $Self->MacroIsExecutable(
+                ID     => $MacroID,
+                UserID => $Param{UserID},
+            );
+        }
 
-    # load type backend module
-    my $BackendObject = $Self->_LoadJobTypeBackend(
-        Name => $Job{Type},
-    );
-    return if !$BackendObject;
+        if ( !$ExecutableMacroCount ) {
+            $Self->LogInfo(
+                Message  => "Job \"$Job{Name}\" has assigned macros but non of them is executable. Aborting job execution.",
+                UserID   => $Param{UserID},
+            );
+            $Warning = 1;
+        } else {
 
-    # add referrer data
-    $BackendObject->{JobID} = $Self->{JobID};
-    $BackendObject->{RunID} = $Self->{RunID};
+            # load type backend module
+            my $BackendObject = $Self->_LoadJobTypeBackend(
+                Name => $Job{Type},
+            );
 
-    # execute backend object for given type to get the (real) list of objects (search or filter)
-    my @ObjectIDs = $BackendObject->Run(
-        Data      => $Param{Data},
-        Filter    => $Job{Filter},
-        UserID    => $Param{UserID},
-    );
+            my @ObjectIDs;
+            if (!$BackendObject) {
+                $Self->LogInfo(
+                    Message  => "No backend object found for job type \"$Job{Type}\".",
+                    UserID   => $Param{UserID},
+                );
+                $Warning = 1;
+            } else {
 
-    if ( !@ObjectIDs ) {
-        $Self->LogInfo(
-            Message  => "No relevant objects. Aborting job execution.",
-            UserID   => $Param{UserID},
-        );
-        return;
+                # add referrer data
+                $BackendObject->{JobID} = $Self->{JobID};
+                $BackendObject->{RunID} = $Self->{RunID};
+
+                # execute backend object for given type to get the (real) list of objects (search or filter)
+                @ObjectIDs = $BackendObject->Run(
+                    Data      => $Param{Data},
+                    Filter    => $Job{Filter},
+                    UserID    => $Param{UserID},
+                );
+
+                if ( !@ObjectIDs ) {
+                    $Self->LogInfo(
+                        Message  => "No relevant objects. Aborting job execution.",
+                        UserID   => $Param{UserID},
+                    );
+                }
+            }
+
+            if (@ObjectIDs) {
+                $Self->LogInfo(
+                    Message  => "executing job \"$Job{Name}\" with $ExecutableMacroCount macros on ".(scalar(@ObjectIDs))." objects.",
+                    UserID   => $Param{UserID},
+                );
+
+                # execute any macro with the list of objects
+                foreach my $MacroID ( sort @MacroIDs ) {
+                    foreach my $ObjectID ( @ObjectIDs ) {
+                        my $Result = $Self->MacroExecute(
+                            ID        => $MacroID,
+                            ObjectID  => $ObjectID,
+                            UserID    => $Param{UserID},
+                        );
+
+                        if ( !$Result ) {
+                            my %Macro = $Self->MacroGet(
+                                ID        => $MacroID,
+                                UserID    => $Param{UserID},
+                            );
+
+                            $Self->LogError(
+                                Message  => "Macro $Macro{Name} returned execution error for ObjectID $ObjectID.",
+                                UserID   => $Param{UserID},
+                            );
+                            $Warning = 1;
+                        }
+                    }
+                }
+
+                $Self->LogInfo(
+                    Message  => "job execution finished successfully.",
+                    UserID   => $Param{UserID},
+                );
+            }
+        }
     }
 
     # update execution time of job
@@ -973,47 +1022,12 @@ sub JobExecute {
         UserID     => $Param{UserID},
     );
 
-    $Self->LogInfo(
-        Message  => "executing job \"$Job{Name}\" with $ExecutableMacroCount macros on ".(scalar(@ObjectIDs))." objects.",
-        UserID   => $Param{UserID},
-    );
-
-    # execute any macro with the list of objects
-    my $Warning = 0;
-    foreach my $MacroID ( sort @MacroIDs ) {
-        foreach my $ObjectID ( @ObjectIDs ) {
-            my $Result = $Self->MacroExecute(
-                ID        => $MacroID,
-                ObjectID  => $ObjectID,
-                UserID    => $Param{UserID},
-            );
-
-            if ( !$Result ) {
-                my %Macro = $Self->MacroGet(
-                    ID        => $MacroID,
-                    UserID    => $Param{UserID},
-                );
-
-                $Self->LogError(
-                    Message  => "Macro $Macro{Name} returned execution error for ObjectID $ObjectID.",
-                    UserID   => $Param{UserID},
-                );
-                $Warning = 1;
-            }
-        }
-    }
-
-    $Self->LogInfo(
-        Message  => "job execution finished successfully.",
-        UserID   => $Param{UserID},
-    );
-
     # update job run
     my $StateID = 2;        # finished 
     if ( $Warning ) {
         $StateID = 3        # finished with errors
     }
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE job_run SET end_time = current_timestamp, state_id = ? WHERE id = ?',
         Bind => [ \$StateID, \$RunID ],
     );
@@ -1022,7 +1036,284 @@ sub JobExecute {
     delete $Self->{JobID};
     delete $Self->{RunID};
 
+    # delete whole cache
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+
+    # push client callback event
+    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Job.JobRun',
+        ObjectID  => $Param{JobID}.'::'.$Param{RunID},
+    );
+
     return 1;
+}
+
+=item JobRunList()
+
+returns a hash of all runs (ID + StateID) for a given job
+
+    my %JobRunIDs = $AutomationObject->JobRunList(
+        JobID => 123
+    );
+
+=cut
+
+sub JobRunList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(JobID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # create cache key
+    my $CacheKey = 'JobRunList::' . $Param{JobID};
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+        SQL  => 'SELECT id, state_id FROM job_run WHERE job_id = ?',
+        Bind => [ \$Param{JobID} ]
+    );
+
+    my %Result;
+    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        $Result{$Row[0]} = $Row[1];
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \%Result,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return %Result;
+}
+
+=item JobRunGet()
+
+returns a hash with the run data
+
+    my %JobRunData = $AutomationObject->JobRunGet(
+        ID => 2,
+    );
+
+This returns something like:
+
+    %JobRunData = (
+        'ID'          => 123,
+        'JobID'       => 2,
+        'StateID'     => 1,
+        'Filter'      => {},
+        'StartTime'   => '2019-10-21 12:00:00',
+        'EndTime'     => '2019-10-21 12:30:00',
+        'CreateBy'    => 1,
+    );
+
+=cut
+
+sub JobRunGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{ID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need ID!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'JobRunGet::' . $Param{ID};
+    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+    
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+        SQL   => "SELECT id, job_id, filter, state_id, start_time, end_time, create_by FROM job_run WHERE id = ?",
+        Bind => [ \$Param{ID} ],
+    );
+
+    my %Result;
+
+    # fetch the result
+    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        %Result = (
+            ID          => $Row[0],
+            JobID       => $Row[1],
+            Filter      => $Row[2],
+            StateID     => $Row[3],
+            StartTime   => $Row[4],
+            EndTime     => $Row[5],
+            CreateBy    => $Row[6],
+        );
+
+        if ( $Result{Filter} ) {
+            # decode JSON
+            $Result{Filter} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+                Data => $Result{Filter}
+            );
+        }
+    }
+
+    # no data found...
+    if ( !%Result ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => "JobRun with ID $Param{ID} not found!",
+        );
+        return;
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Result,
+    ); 
+
+    return %Result;
+}
+
+=item JobRunLogList()
+
+returns a list of all logs items for a given run
+
+    my @Logs = $AutomationObject->JobRunLogList(
+        RunID => 123
+    );
+
+=cut
+
+sub JobRunLogList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(RunID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # create cache key
+    my $CacheKey = 'JobRunLogList::' . $Param{RunID};
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+        SQL  => 'SELECT id, job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by FROM automation_log WHERE run_id = ?',
+        Bind => [ \$Param{RunID} ]
+    );
+
+    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'ID', 'JobID', 'RunID', 'MacroID', 'MacroActionID', 'ObjectID', 'Priority', 'Message', 'CreateTime', 'CreateBy' ],
+    );
+
+    # data found...
+    my @Result;
+    if ( IsArrayRefWithData($Data) ) {
+        @Result = @{$Data};
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \@Result,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return @Result;
+}
+
+=item JobRunStateList()
+
+returns a hash of all run state items
+
+    my %States = $AutomationObject->JobRunStateList();
+
+This returns a list like:
+
+    %States = {
+        1 => {
+            'ID'          => 1,
+            'Name'        => 'running',
+            'Comment'     => 'The job is running',
+            'ValidID'     => 1,
+            'CreateTime'  => '2020-02-14 12:00:00',
+            'CreateBy'    => 1,
+            'ChangeTime'  => '2020-02-14 12:00:00',
+            'ChangeBy'    => 1
+        },
+        2 => { ... }
+    };
+
+=cut
+
+sub JobRunStateList {
+    my ( $Self, %Param ) = @_;
+
+
+    # create cache key
+    my $CacheKey = 'JobRunStateList';
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Cache} if $Cache;
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+        SQL  => 'SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM job_run_state'
+    );
+
+    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'ID', 'Name', 'Comment', 'ValidID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ],
+    );
+
+    # data found...
+    my %Result;
+    if ( IsArrayRefWithData($Data) ) {
+        %Result = map { $_->{ID} => $_ } @{$Data};
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \%Result,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return %Result;
 }
 
 =item _LastExecutionTimeSet()
@@ -1043,7 +1334,7 @@ sub _JobLastExecutionTimeSet {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -1053,23 +1344,23 @@ sub _JobLastExecutionTimeSet {
 
     # update ExecPlan in database
     if ( $Param{Time} ) {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'UPDATE job SET last_exec_time = ? WHERE id = ?',
             Bind => [ \$Param{Time}, \$Param{ID} ],
         );
     }
     else {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'UPDATE job SET last_exec_time = current_timestamp WHERE id = ?',
             Bind => [ \$Param{ID} ],
         );
     }
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
@@ -1084,7 +1375,7 @@ sub _LoadJobTypeBackend {
     # check needed stuff
     for (qw(Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1096,22 +1387,33 @@ sub _LoadJobTypeBackend {
     $Self->{JobTypeModules} //= {};
 
     if ( !$Self->{JobTypeModules}->{$Param{Name}} ) {
-        my $Backend = 'Kernel::System::Automation::Job::' . $Param{Name};
+        # load backend modules
+        my $Backends = $Kernel::OM->Get('Config')->Get('Automation::JobType');
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !IsHashRefWithData($Backends) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No job backend modules found!",
+            );
+            return;
+        }        
+
+        my $Backend = $Backends->{$Param{Name}}->{Module}; 
+
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
-            );   
+            );
             return;
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
         if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
             return;
         }
 
@@ -1121,13 +1423,13 @@ sub _LoadJobTypeBackend {
     return $Self->{JobTypeModules}->{$Param{Name}};
 }
 
-sub _JobRunAdd {    
+sub _JobRunAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
     for (qw(JobID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1141,7 +1443,7 @@ sub _JobRunAdd {
     );
 
     if ( !%Job ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such job with ID $Param{JobID}!"
         );
@@ -1149,12 +1451,12 @@ sub _JobRunAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # prepare filter as JSON
     my $Filter;
     if ( $Job{Filter} ) {
-        $Filter = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Filter = $Kernel::OM->Get('JSON')->Encode(
             Data => $Job{Filter}
         );
     }    
@@ -1180,7 +1482,7 @@ sub _JobRunAdd {
     my $ID;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $ID = $Row[0];
-    }    
+    }
 
     return $ID;
 }

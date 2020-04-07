@@ -15,31 +15,31 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # tests for article search index modules
 for my $Module (qw(StaticDB RuntimeDB)) {
 
     # make sure that the TicketObject gets recreated for each loop.
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
     $ConfigObject->Set(
         Key   => 'Ticket::SearchIndexModule',
-        Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module,
+        Value => 'Ticket::ArticleSearchIndex::' . $Module,
     );
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     $Self->True(
-        $TicketObject->isa( 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module ),
+        $TicketObject->isa( 'Ticket::ArticleSearchIndex::' . $Module ),
         "TicketObject loaded the correct backend",
     );
 
@@ -349,14 +349,14 @@ for my $Module (qw(StaticDB)) {
     for my $Test (@Tests) {
 
         # Make sure that the TicketObject gets recreated for each loop.
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
         $ConfigObject->Set(
             Key   => 'Ticket::SearchIndexModule',
-            Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module,
+            Value => 'Ticket::ArticleSearchIndex::' . $Module,
         );
 
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         my $ListOfWords = $TicketObject->_ArticleIndexStringToWord(
             String => \$Test->{String}

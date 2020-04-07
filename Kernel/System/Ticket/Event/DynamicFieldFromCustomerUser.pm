@@ -14,12 +14,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Contact',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -38,7 +38,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Data UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -47,7 +47,7 @@ sub Run {
     }
     for my $Needed (qw(TicketID)) {
         if ( !$Param{Data}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed! in Data",
             );
@@ -56,7 +56,7 @@ sub Run {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get mapping config,
     my %Mapping = %{ $ConfigObject->Get('DynamicFieldFromContact::Mapping') || {} };
@@ -65,15 +65,15 @@ sub Run {
     return 1 if !%Mapping;
 
     # get customer user data, so that values can be stored in dynamic fields
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{Data}->{TicketID},
     );
 
     return if !%Ticket;
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # get dynamic fields list
     my $DynamicFields = $DynamicFieldObject->DynamicFieldList(
@@ -84,7 +84,7 @@ sub Run {
 
     my $DynamicFieldsReverse = { reverse %{$DynamicFields} };
 
-    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Ticket{ContactID},
     );
 
@@ -95,7 +95,7 @@ sub Run {
 
         # check config for the particular mapping
         if ( !defined $DynamicFieldsReverse->{ $Mapping{$ContactVariableName} } ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "DynamicField $Mapping{$ContactVariableName} in DynamicFieldFromContact::Mapping must be set in system and valid.",

@@ -14,17 +14,17 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::Role::UserLink');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Role::UserLink');
 
 my ( $Result, $ExitCode );
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomName = $Helper->GetRandomID();
 my $UserRand   = 'user' . $RandomName;
@@ -47,7 +47,7 @@ $Self->Is(
 );
 
 # add users
-my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+my $UserID = $Kernel::OM->Get('User')->UserAdd(
     UserLogin    => $UserRand,
     ValidID      => 1,
     ChangeUserID => 1,
@@ -60,7 +60,7 @@ $Self->True(
 );
 
 # add role
-my $RoleID = $Kernel::OM->Get('Kernel::System::Group')->RoleAdd(
+my $RoleID = $Kernel::OM->Get('Group')->RoleAdd(
     Name    => $RoleRand,
     ValidID => 1,
     UserID  => 1,

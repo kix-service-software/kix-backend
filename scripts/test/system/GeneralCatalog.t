@@ -15,17 +15,17 @@ use utf8;
 use vars qw($Self);
 
 # create local objects
-my $ConfigObject         = $Kernel::OM->Get('Kernel::Config');
-my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-my $UserObject           = $Kernel::OM->Get('Kernel::System::User');
+my $ConfigObject         = $Kernel::OM->Get('Config');
+my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
+my $UserObject           = $Kernel::OM->Get('User');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();

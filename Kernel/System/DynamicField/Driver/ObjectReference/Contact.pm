@@ -16,9 +16,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseSelect);
 
 our @ObjectDependencies = (
-    'Kernel::System::Contact',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Ticket::ColumnFilter',
+    'Contact',
+    'DynamicFieldValue',
+    'Ticket::ColumnFilter',
 );
 
 =head1 NAME
@@ -51,8 +51,8 @@ sub new {
     bless( $Self, $Type );
 
     # KIX4OTRS-capeIT
-    $Self->{ContactObject}      = $Kernel::OM->Get('Kernel::System::Contact');
-    $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    $Self->{ContactObject}      = $Kernel::OM->Get('Contact');
+    $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('DynamicFieldValue');
 
     # EO KIX4OTRS-capeIT
 
@@ -68,7 +68,7 @@ sub new {
 
     # get the Dynamic Field Driver custmom extensions
     my $DynamicFieldDriverExtensions
-        = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Extension::Driver::Contact');
+        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::Contact');
 
     EXTENSION:
     for my $ExtensionKey ( sort keys %{$DynamicFieldDriverExtensions} ) {
@@ -84,7 +84,7 @@ sub new {
 
             # check if module can be loaded
             if (
-                !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Extension->{Module} )
+                !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
                 )
             {
                 die "Can't load dynamic fields backend module"
@@ -108,7 +108,7 @@ sub new {
 sub ValueGet {
     my ( $Self, %Param ) = @_;
 
-    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+    my $DFValue = $Kernel::OM->Get('DynamicFieldValue')->ValueGet(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
         ObjectID => $Param{ObjectID},
     );
@@ -152,7 +152,7 @@ sub ValueSet {
             $Self->{ContactObject}
             ->CustomerSearch( UserLogin => $Object, );
         if ( !%UserListCustomer ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "The value for the field Contact is invalid!\n"
                     . "No Customer with login "
@@ -166,7 +166,7 @@ sub ValueSet {
     # EO KIX4OTRS-capeIT
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     my $Success;
     if ( IsArrayRefWithData( \@Values ) ) {
@@ -218,7 +218,7 @@ sub ValueValidate {
             $Self->{ContactObject}
             ->CustomerSearch( UserLogin => $Object, );
         if ( !%UserListCustomer ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "The value for the field Contact is invalid!\n"
                     . "No Customer with login "
@@ -232,7 +232,7 @@ sub ValueValidate {
     # EO KIX4OTRS-capeIT
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     my $Success;
     for my $Item (@Values) {
@@ -471,7 +471,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         my @Data = $Param{ParamObject}->GetArray( Param => $FieldName );
@@ -675,7 +675,7 @@ sub DisplayValueRender {
 
     # get specific field settings
     my $FieldConfig
-        = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Driver')->{Multiselect} || {};
+        = $Kernel::OM->Get('Config')->Get('DynamicFields::Driver')->{Multiselect} || {};
 
     # set new line separator
     my $ItemSeparator = $FieldConfig->{ItemSeparator} || ', ';

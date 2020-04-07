@@ -110,7 +110,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if Template exists
-    my $TemplateDataRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateGet(
+    my $TemplateDataRef = $Kernel::OM->Get('ImportExport')->TemplateGet(
         TemplateID => $Param{Data}->{TemplateID},
         UserID     => $Self->{Authorization}->{UserID},
     );
@@ -122,7 +122,7 @@ sub Run {
     }
 
     # perform template run search
-    my @TemplateRunList = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateRunList(
+    my @TemplateRunList = $Kernel::OM->Get('ImportExport')->TemplateRunList(
         TemplateID => $Param{Data}->{TemplateID},
         UserID     => $Self->{Authorization}->{UserID}
     );

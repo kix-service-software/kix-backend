@@ -18,8 +18,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -83,7 +83,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -107,7 +107,7 @@ sub Search {
             
             if ( $StateType eq 'Open' ) {
                 # get all viewable states
-                my @ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+                my @ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
                     Type   => 'Viewable',
                     Result => 'ID',
                 );
@@ -115,10 +115,10 @@ sub Search {
             }
             elsif ( $StateType eq 'Closed' ) {
                 # get all non-viewable states
-                my %AllStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateList(
+                my %AllStateIDs = $Kernel::OM->Get('State')->StateList(
                     UserID => 1,
                 );
-                my %ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+                my %ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
                     Type   => 'Viewable',
                     Result => 'HASH',
                 );
@@ -128,12 +128,12 @@ sub Search {
                 }
             }
             else {
-                my @StateTypeStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+                my @StateTypeStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
                     StateType => $StateType,
                     Result    => 'ID',
                 );
                 if ( !@StateTypeStateIDs ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "No states found for StateType $StateType!",
                     );
@@ -160,17 +160,17 @@ sub Search {
         }
 
         foreach my $StateTypeID ( @StateTypeIDs ) {       
-            my $StateType = $Kernel::OM->Get('Kernel::System::State')->StateTypeLookup(
+            my $StateType = $Kernel::OM->Get('State')->StateTypeLookup(
                 StateTypeID => $StateTypeID,
             );
             if ( !$StateType ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No StateType with ID $StateTypeID!",
                 );
                 return;
             }
-            my @StateTypeStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+            my @StateTypeStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
                 StateType => $StateType,
                 Result    => 'ID',
             );
@@ -192,11 +192,11 @@ sub Search {
             @StateList = @{$Param{Search}->{Value}}
         }
         foreach my $State ( @StateList ) {
-            my $StateID = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+            my $StateID = $Kernel::OM->Get('State')->StateLookup(
                 State => $State,
             );
             if ( !$StateID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unknown state $State!",
                 );
@@ -220,7 +220,7 @@ sub Search {
         push( @SQLWhere, 'st.ticket_state_id IN ('.(join(',', @StateIDs)).')' );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

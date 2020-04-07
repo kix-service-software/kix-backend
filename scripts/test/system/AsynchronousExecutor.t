@@ -14,9 +14,9 @@ use utf8;
 
 use vars (qw($Self));
 
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 #rbo - T2016121190001552 - renamed otrs.Daemon.pl to kix.Daemon.pl
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
@@ -82,13 +82,13 @@ my @Tests = (
 );
 
 # get worker object
-my $WorkerObject = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker');
+my $WorkerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
 
 # make sure there is no other pending task to be executed
 my $Success = $WorkerObject->Run();
 
 # get scheduler db object
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 # Wait for slow systems
 $SleepTime = 120;
@@ -106,7 +106,7 @@ for my $Seconds ( 1 .. $SleepTime ) {
 my $AsynchronousExecutorObject
     = $Kernel::OM->Get('scripts::test::System::sample::AsynchronousExecutor::TestAsynchronousExecutor');
 
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
 my @FileRemember;
 for my $Test (@Tests) {

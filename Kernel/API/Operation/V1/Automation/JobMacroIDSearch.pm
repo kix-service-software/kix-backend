@@ -89,6 +89,7 @@ perform JobMacroIDSearch Operation. This will return a ID list of Macros which a
 
     my $Result = $OperationObject->Run(
         Data => {
+            JobID => 123
         }
     );
 
@@ -110,7 +111,7 @@ perform JobMacroIDSearch Operation. This will return a ID list of Macros which a
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @MacroIDs = $Kernel::OM->Get('Kernel::System::Automation')->JobMacroList(
+    my @MacroIDs = $Kernel::OM->Get('Automation')->JobMacroList(
         JobID => $Param{Data}->{JobID},
     );
 

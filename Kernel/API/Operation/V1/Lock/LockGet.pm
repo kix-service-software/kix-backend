@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Lock::LockGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Lock::LockGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $LockID ( @{$Param{Data}->{LockID}} ) {
 
         # get the Lock data
-        my %LockData = $Kernel::OM->Get('Kernel::System::Lock')->LockGet(
+        my %LockData = $Kernel::OM->Get('Lock')->LockGet(
             LockID => $LockID,
         );
 

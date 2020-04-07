@@ -18,7 +18,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Token',
+    'Token',
 );
 
 sub Configure {
@@ -41,7 +41,7 @@ sub Run {
 
     $Self->Print("<yellow>Inspecting token...</yellow>\n");
 
-    my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
+    my $Payload = $Kernel::OM->Get('Token')->ExtractToken(
         Token => $Self->GetOption('token'),
     );
 

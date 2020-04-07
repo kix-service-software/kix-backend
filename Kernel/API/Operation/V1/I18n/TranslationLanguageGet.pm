@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationLanguageGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::I18n::TranslationLanguageGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if pattern already exists
-    my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+    my %PatternData = $Kernel::OM->Get('Translation')->PatternGet(
         ID => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
@@ -144,7 +144,7 @@ sub Run {
     foreach my $Language ( @{$Param{Data}->{Language}} ) {
 
         # get the Translation data
-        my %TranslationData = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageGet(
+        my %TranslationData = $Kernel::OM->Get('Translation')->TranslationLanguageGet(
             PatternID => $Param{Data}->{PatternID},
             Language  => $Language,
             UserID    => $Self->{Authorization}->{UserID}

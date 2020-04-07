@@ -17,17 +17,17 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
-my $LinkObject         = $Kernel::OM->Get('Kernel::System::LinkObject');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
+my $LinkObject         = $Kernel::OM->Get('LinkObject');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define variables
 my $UserID     = 1;
@@ -36,14 +36,14 @@ my $RandomID   = $Helper->GetRandomID();
 
 # set user details
 my $TestUserLogin = $Helper->TestUserCreate();
-my $TestUserID    = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $TestUserID    = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
 # use Test email backend
-my $Success = $Kernel::OM->Get('Kernel::Config')->Set(
+my $Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 $Self->True(
@@ -83,7 +83,7 @@ $Self->True(
 
 my @AddedTickets = ($TicketID);
 
-my $UserLogin = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $UserLogin = $Kernel::OM->Get('User')->UserLookup(
     UserID => 1,
 );
 
@@ -161,7 +161,7 @@ for my $DynamicFieldID ( $DynamicFieldID1, $DynamicFieldID2, $DynamicFieldID3 ) 
 }
 
 # ----------------------------------------
-my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 # set a value for multiselect dynamic field
 my $DFSetSuccess = $DynamicFieldBackendObject->ValueSet(
@@ -194,7 +194,7 @@ $Self->True(
     DynamicFields => 1,
 );
 
-my @PendingStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+my @PendingStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
     StateType => ['pending reminder'],
     Result    => 'ID',
 );
@@ -843,7 +843,7 @@ for my $Test (@Tests) {
     # make a deep copy to avoid changing the definition
     my $OrigTest = Storable::dclone($Test);
 
-    my $Success = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketCreate')->Run(
+    my $Success = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketCreate')->Run(
         %{ $Test->{Config} },
         ProcessEntityID          => 'P1',
         ActivityEntityID         => 'A1',
@@ -978,7 +978,7 @@ for my $Test (@Tests) {
                 $ExpectedValue = 0;
             }
             elsif ( $Attribute eq 'PendingTime' && $OrigTest->{UpdatePendingTime} ) {
-                $ExpectedValue = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+                $ExpectedValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                     String => $ExpectedValue,
                 );
             }

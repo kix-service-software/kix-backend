@@ -18,8 +18,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -83,7 +83,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -97,11 +97,11 @@ sub Search {
             @QueueList = @{$Param{Search}->{Value}}
         }
         foreach my $Queue ( @QueueList ) {
-            my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
                 Queue => $Queue,
             );
             if ( !$QueueID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unknown queue $Queue!",
                 );
@@ -125,7 +125,7 @@ sub Search {
         push( @SQLWhere, 'st.queue_id IN ('.(join(',', @QueueIDs)).')' );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

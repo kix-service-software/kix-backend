@@ -26,7 +26,7 @@ use vars (qw($Self));
 #
 # Avoid this error by not reinstalling the installed packages in the UT scenarios so that mod_perl does not try to reload the packages.
 
-# my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::Package::ReinstallAll');
+# my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Package::ReinstallAll');
 
 # my $ExitCode = $CommandObject->Execute();
 

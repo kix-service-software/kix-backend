@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get MacroAction types for given macro type
-    my $MacroActionTypes = $Kernel::OM->Get('Kernel::Config')->Get('Automation::MacroActionType::'.$Param{Data}->{MacroType});
+    my $MacroActionTypes = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{Data}->{MacroType});
 
 	# get already prepared MacroActionType data from MacroActionTypeGet operation
     if ( IsHashRefWithData($MacroActionTypes) ) {  	

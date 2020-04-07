@@ -18,23 +18,23 @@ use Kernel::System::VariableCheck qw(:all);
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # check initial inserts
 
 # read schema file
-my $XMLFile = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/scripts/database/kix-schema.xml';
+my $XMLFile = $Kernel::OM->Get('Config')->Get('Home').'/scripts/database/kix-schema.xml';
 
 $Self->True(
     (-f $XMLFile),
     'Schema file exists',
 );
 
-my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+my $Content = $Kernel::OM->Get('Main')->FileRead(
     Location => $XMLFile,
 );
 
@@ -67,14 +67,14 @@ $Self->True(
 my %Tables = %{$XMLRef->{Table}};
 
 # read insert file
-$XMLFile = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/scripts/database/kix-initial_insert.xml';
+$XMLFile = $Kernel::OM->Get('Config')->Get('Home').'/scripts/database/kix-initial_insert.xml';
 
 $Self->True(
     (-f $XMLFile),
     'Initial insert file exists',
 );
 
-$Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+$Content = $Kernel::OM->Get('Main')->FileRead(
     Location => $XMLFile,
 );
 

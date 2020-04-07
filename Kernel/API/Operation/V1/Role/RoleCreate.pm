@@ -127,7 +127,7 @@ sub Run {
     );
 
     # check if Role exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+    my $Exists = $Kernel::OM->Get('Role')->RoleLookup(
         Role => $Role->{Name},
     );
 
@@ -139,7 +139,7 @@ sub Run {
     }
 
     # create Role
-    my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
+    my $RoleID = $Kernel::OM->Get('Role')->RoleAdd(
         Name         => $Role->{Name},
         Comment      => $Role->{Comment} || '',
         ValidID      => $Role->{ValidID} || 1,

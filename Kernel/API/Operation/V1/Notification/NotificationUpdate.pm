@@ -138,7 +138,7 @@ sub Run {
     my $Notification = $Self->_Trim( Data => $Param{Data}->{Notification} );
 
     # check if another Notification with name already exists
-    my %Exists = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet(
+    my %Exists = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
         Name => $Notification->{Name},
     );
     if ( IsHashRefWithData(\%Exists) && $Exists{ID} != $Param{Data}->{NotificationID} ) {
@@ -149,7 +149,7 @@ sub Run {
     }
 
     # check if Notification exists
-    my %NotificationData = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet(
+    my %NotificationData = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
         ID => $Param{Data}->{NotificationID},
     );
     if ( !IsHashRefWithData(\%NotificationData) ) {
@@ -167,7 +167,7 @@ sub Run {
     }
 
     # update Notification
-    my $Success = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationUpdate(
+    my $Success = $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
         ID             => $Param{Data}->{NotificationID},
         Name           => $Notification->{Name} || $NotificationData{Name},
         Comment        => exists $Notification->{Comment} ? $Notification->{Comment} : $NotificationData{Comment},

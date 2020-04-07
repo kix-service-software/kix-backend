@@ -20,8 +20,8 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Time',
+    'Config',
+    'Time',
 );
 
 sub GetDisplayPath {
@@ -41,7 +41,7 @@ sub Run {
     );
 
     # Check if local time and UTC time are different
-    my $ServerTimeDiff = $Kernel::OM->Get('Kernel::System::Time')->ServerLocalTimeOffsetSeconds();
+    my $ServerTimeDiff = $Kernel::OM->Get('Time')->ServerLocalTimeOffsetSeconds();
 
     # calculate offset - should be '+0200', '-0600', '+0545' or '+0000'
     my $Direction   = $ServerTimeDiff < 0 ? '-' : '+';
@@ -54,7 +54,7 @@ sub Run {
         Value      => sprintf( '%s%02d%02d', $Direction, $DiffHours, $DiffMinutes ),
     );
 
-    my $KIXTimeZone = $Kernel::OM->Get('Kernel::Config')->Get('TimeZone');
+    my $KIXTimeZone = $Kernel::OM->Get('Config')->Get('TimeZone');
 
     if ( $ServerTimeDiff && $KIXTimeZone && $KIXTimeZone ne '+0' ) {
         $Self->AddResultProblem(
@@ -72,7 +72,7 @@ sub Run {
         );
     }
 
-    my $KIXTimeZoneUser = $Kernel::OM->Get('Kernel::Config')->Get('TimeZoneUser');
+    my $KIXTimeZoneUser = $Kernel::OM->Get('Config')->Get('TimeZoneUser');
 
     if ( $KIXTimeZoneUser && ( $ServerTimeDiff || ( $KIXTimeZone && $KIXTimeZone ne '+0' ) ) ) {
         $Self->AddResultProblem(
@@ -93,7 +93,7 @@ sub Run {
     }
 
     for my $Counter ( 1 .. 9 ) {
-        my $CalendarTimeZone = $Kernel::OM->Get('Kernel::Config')->Get( 'TimeZone::Calendar' . $Counter );
+        my $CalendarTimeZone = $Kernel::OM->Get('Config')->Get( 'TimeZone::Calendar' . $Counter );
         if ( $ServerTimeDiff && $CalendarTimeZone && $CalendarTimeZone ne '+0' ) {
             $Self->AddResultProblem(
                 Identifier => "KIXTimeZone::Calendar$Counter",

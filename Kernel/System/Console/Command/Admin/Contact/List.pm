@@ -14,8 +14,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::User',
-    'Kernel::System::Contact',
+    'User',
+    'Contact',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
     $Self->Print("<yellow>Listing contacts...</yellow>\n");
 
     # get all users
-    my %Contacts = $Kernel::OM->Get('Kernel::System::Contact')->ContactList(
+    my %Contacts = $Kernel::OM->Get('Contact')->ContactList(
         Valid => 0,
     );
 
@@ -51,7 +51,7 @@ sub Run {
     $Self->Print("------ -------------------- -------------------- ------------------------------ ------\n");
 
     foreach my $ID ( sort { $Contacts{$a} cmp $Contacts{$b} } keys %Contacts ) {
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $ID
         );
 
@@ -84,8 +84,3 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
-package List;
-use strict;
-use warnings FATAL => 'all';
-
-1;

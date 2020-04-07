@@ -104,7 +104,7 @@ sub Validate {
     my $FailedMail = '';
     if ($Param{Attribute} =~ /^(From|Cc|Bcc|To|Email)$/g) {
         for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
-            if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Email->address() ) ) {
+            if ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Email->address() ) ) {
                 $FailedMail = $Email->address();
                 last;
             }

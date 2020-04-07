@@ -14,8 +14,8 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Log::Clear');
-my $LogObject     = $Kernel::OM->Get('Kernel::System::Log');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Log::Clear');
+my $LogObject     = $Kernel::OM->Get('Log');
 
 $LogObject->CleanUp();
 $LogObject->Log(
@@ -33,7 +33,7 @@ my ( $Result, $ExitCode );
     local *STDOUT;
     open STDOUT, '>:encoding(UTF-8)', \$Result;
     $ExitCode = $CommandObject->Execute();
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Result );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Result );
 }
 
 $Self->Is(

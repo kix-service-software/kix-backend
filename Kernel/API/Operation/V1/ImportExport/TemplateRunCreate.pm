@@ -58,7 +58,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ImportExport::TemplateRunCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ImportExport::TemplateRunCreate');
 
     return $Self;
 }
@@ -132,7 +132,7 @@ sub Run {
     );
 
     # check if Template exists
-    my $TemplateDataRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateGet(
+    my $TemplateDataRef = $Kernel::OM->Get('ImportExport')->TemplateGet(
         TemplateID => $Param{Data}->{TemplateID},
         UserID     => $Self->{Authorization}->{UserID},
     );
@@ -153,14 +153,14 @@ sub Run {
             );
         }
 
-        $TaskID = $Kernel::OM->Get('Kernel::System::ImportExport')->ImportTaskCreate(
+        $TaskID = $Kernel::OM->Get('ImportExport')->ImportTaskCreate(
             TemplateID    => $Param{Data}->{TemplateID},
             SourceContent => $TemplateRun->{ImportFileContent},
             UserID        => $Self->{Authorization}->{UserID}
         );
 
         if ( !$TaskID ) {
-            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error', 
                 What => 'Message',
             );
@@ -178,13 +178,13 @@ sub Run {
     }
 
     elsif ( $TemplateRun->{Type} =~ m/^export$/i ) {
-        my $Result = $Kernel::OM->Get('Kernel::System::ImportExport')->Export(
+        my $Result = $Kernel::OM->Get('ImportExport')->Export(
             TemplateID => $Param{Data}->{TemplateID},
             UserID     => 1,
         );
 
         if ( !$Result ) {
-            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error', 
                 What => 'Message',
             );

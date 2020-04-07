@@ -102,7 +102,7 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'JobID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Automation')->JobLookup(
+        $Found = $Kernel::OM->Get('Automation')->JobLookup(
             ID => $Param{Data}->{$Param{Attribute}},
         );        
     }

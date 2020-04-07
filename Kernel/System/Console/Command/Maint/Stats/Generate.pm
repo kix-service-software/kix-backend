@@ -16,17 +16,17 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Language',
-    'Kernel::Output::PDF::Statistics',
-    'Kernel::System::CSV',
-    'Kernel::System::CheckItem',
-    'Kernel::System::Email',
-    'Kernel::System::Main',
-    'Kernel::System::PDF',
-    'Kernel::System::Stats',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'Language',
+    'Output::PDF::Statistics',
+    'CSV',
+    'CheckItem',
+    'Email',
+    'Main',
+    'PDF',
+    'Stats',
+    'Time',
+    'User',
 );
 
 sub Configure {
@@ -134,7 +134,7 @@ sub PreRun {
 
     # check if the passed stat number exists
     $Self->{StatNumber} = $Self->GetOption('number');
-    $Self->{StatID} = $Kernel::OM->Get('Kernel::System::Stats')->StatNumber2StatID( StatNumber => $Self->{StatNumber} );
+    $Self->{StatID} = $Kernel::OM->Get('Stats')->StatNumber2StatID( StatNumber => $Self->{StatNumber} );
     if ( !$Self->{StatID} ) {
         die "There is no statistic with number '$Self->{StatNumber}'.\n";
     }
@@ -173,8 +173,8 @@ sub PreRun {
     if (
         $Self->GetOption('timezone')
         && (
-            $Kernel::OM->Get('Kernel::System::Time')->ServerLocalTimeOffsetSeconds()
-            || !$Kernel::OM->Get('Kernel::Config')->Get('TimeZoneUser')
+            $Kernel::OM->Get('Time')->ServerLocalTimeOffsetSeconds()
+            || !$Kernel::OM->Get('Config')->Get('TimeZoneUser')
         )
         )
     {
@@ -183,11 +183,11 @@ sub PreRun {
     }
 
     # set up used language
-    $Self->{Language} = $Kernel::OM->Get('Kernel::Config')->Get('DefaultLanguage') || 'en';
+    $Self->{Language} = $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
     if ( $Self->GetOption('language') ) {
         $Self->{Language} = $Self->GetOption('language');
         $Kernel::OM->ObjectParamAdd(
-            'Kernel::Language' => {
+            'Language' => {
                 UserLanguage => $Self->{Language},
             },
         );
@@ -206,12 +206,12 @@ sub Run {
     $Self->Print("<yellow>Generating statistic number $Self->{StatNumber}...</yellow>\n");
 
     my ( $s, $m, $h, $D, $M, $Y ) =
-        $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
-        SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
+        $Kernel::OM->Get('Time')->SystemTime2Date(
+        SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
         );
 
     my %GetParam;
-    my $Stat = $Kernel::OM->Get('Kernel::System::Stats')->StatsGet(
+    my $Stat = $Kernel::OM->Get('Stats')->StatsGet(
         StatID => $Self->{StatID},
         UserID => 1,
     );
@@ -223,7 +223,7 @@ sub Run {
 
         # get params from -p
         # only for static files
-        my $Params = $Kernel::OM->Get('Kernel::System::Stats')->GetParams(
+        my $Params = $Kernel::OM->Get('Stats')->GetParams(
             StatID => $Self->{StatID},
             UserID => 1,
         );
@@ -270,7 +270,7 @@ sub Run {
 
     # run stat...
     my @StatArray = @{
-        $Kernel::OM->Get('Kernel::System::Stats')->StatsRun(
+        $Kernel::OM->Get('Stats')->StatsRun(
             StatID   => $Self->{StatID},
             GetParam => \%GetParam,
             UserID   => 1,
@@ -294,7 +294,7 @@ sub Run {
 
     if ( $Self->{Format} eq 'Print' || $Self->{Format} eq 'PDF' ) {
 
-        my $PDFString = $Kernel::OM->Get('Kernel::Output::PDF::Statistics')->GeneratePDF(
+        my $PDFString = $Kernel::OM->Get('Output::PDF::Statistics')->GeneratePDF(
             Stat         => $Stat,
             Title        => $Title,
             HeadArrayRef => $HeadArrayRef,
@@ -308,7 +308,7 @@ sub Run {
             $Filename = $Self->GetOption('target-filename');
         }
         else {
-            $Filename = $Kernel::OM->Get('Kernel::System::Stats')->StringAndTimestamp2Filename(
+            $Filename = $Kernel::OM->Get('Stats')->StringAndTimestamp2Filename(
                 String   => $Stat->{Title} . " Created",
                 TimeZone => $GetParam{TimeZone},
             );
@@ -324,7 +324,7 @@ sub Run {
     elsif ( $Self->{Format} eq 'Excel' ) {
 
         # Create the Excel data
-        my $Output = $Kernel::OM->Get('Kernel::System::CSV')->Array2CSV(
+        my $Output = $Kernel::OM->Get('CSV')->Array2CSV(
             WithHeader => \@WithHeader,
             Head       => $HeadArrayRef,
             Data       => \@StatArray,
@@ -337,7 +337,7 @@ sub Run {
             $Filename = $Self->GetOption('target-filename');
         }
         else {
-            $Filename = $Kernel::OM->Get('Kernel::System::Stats')->StringAndTimestamp2Filename(
+            $Filename = $Kernel::OM->Get('Stats')->StringAndTimestamp2Filename(
                 String   => $Stat->{Title} . " Created",
                 TimeZone => $GetParam{TimeZone},
             );
@@ -354,7 +354,7 @@ sub Run {
     else {
 
         # Create the CSV data
-        my $Output = $Kernel::OM->Get('Kernel::System::CSV')->Array2CSV(
+        my $Output = $Kernel::OM->Get('CSV')->Array2CSV(
             WithHeader => \@WithHeader,
             Head       => $HeadArrayRef,
             Data       => \@StatArray,
@@ -367,7 +367,7 @@ sub Run {
             $Filename = $Self->GetOption('target-filename');
         }
         else {
-            $Filename = $Kernel::OM->Get('Kernel::System::Stats')->StringAndTimestamp2Filename(
+            $Filename = $Kernel::OM->Get('Stats')->StringAndTimestamp2Filename(
                 String   => $Stat->{Title} . " Created",
                 TimeZone => $GetParam{TimeZone},
             );
@@ -385,7 +385,7 @@ sub Run {
     # write output
     if ( $Self->{TargetDirectory} ) {
 
-        my $Success = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        my $Success = $Kernel::OM->Get('Main')->FileWrite(
             Location => "$Self->{TargetDirectory}/$Attachment{Filename}",
             Content  => \$Attachment{Content},
             Mode     => 'binmode',
@@ -407,20 +407,20 @@ sub Run {
     for my $Recipient ( @{ $Self->GetOption('mail-recipient') // [] } ) {
 
         # recipient check
-        if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Recipient ) ) {
+        if ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Recipient ) ) {
 
             $Self->PrintError(
                 "Email address $Recipient invalid, skipping address."
-                    . $Kernel::OM->Get('Kernel::System::CheckItem')->CheckError()
+                    . $Kernel::OM->Get('CheckItem')->CheckError()
             );
             next RECIPIENT;
         }
 
-        $Kernel::OM->Get('Kernel::System::Email')->Send(
+        $Kernel::OM->Get('Email')->Send(
             From       => $Self->GetOption('mail-sender'),
             To         => $Recipient,
             Subject    => "[Stats - $CountStatArray Records] $Title; Created: $Time",
-            Body       => $Kernel::OM->Get('Kernel::Language')->Translate( $Self->{MailBody} ),
+            Body       => $Kernel::OM->Get('Language')->Translate( $Self->{MailBody} ),
             Charset    => 'utf-8',
             Attachment => [ {%Attachment}, ],
         );

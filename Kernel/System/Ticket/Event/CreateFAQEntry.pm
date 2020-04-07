@@ -12,13 +12,13 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::FAQ',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::Output::HTML::Layout',
+    'Config',
+    'Encode',
+    'FAQ',
+    'LinkObject',
+    'Log',
+    'Ticket',
+    'Output::HTML::Layout',
 );
 
 sub new {
@@ -29,22 +29,22 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{EncodeObject} = $Kernel::OM->Get('Kernel::System::Encode');
-    $Self->{FAQObject}    = $Kernel::OM->Get('Kernel::System::FAQ');
-    $Self->{LinkObject}   = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
-    $Self->{LayoutObject} = $Kernel::OM->Get('Kernel::Output::HTML::Layout');   # necessary for translations
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{EncodeObject} = $Kernel::OM->Get('Encode');
+    $Self->{FAQObject}    = $Kernel::OM->Get('FAQ');
+    $Self->{LinkObject}   = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{TicketObject} = $Kernel::OM->Get('Ticket');
+    $Self->{LayoutObject} = $Kernel::OM->Get('Output::HTML::Layout');   # necessary for translations
 
     # create other objects if not available yet...
     if ( !$Self->{FAQObject} ) {
 
         # nothing to do if FAQ is not installed...
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require('Kernel::System::FAQ') ) {
+        if ( !$Kernel::OM->Get('Main')->Require('FAQ') ) {
             return 0;
         }
-        $Self->{FAQObject} = $Kernel::OM->Get('Kernel::System::FAQ');
+        $Self->{FAQObject} = $Kernel::OM->Get('FAQ');
     }
 
     return $Self;

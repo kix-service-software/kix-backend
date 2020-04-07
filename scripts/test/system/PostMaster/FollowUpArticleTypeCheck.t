@@ -17,21 +17,21 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
 
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->FixedTimeSet();
 
 my $AgentAddress    = 'agent@example.com';
@@ -148,7 +148,7 @@ Some Content in Body",
         },
         JobConfig => {
             Channel     => 'email',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
+            Module      => 'PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'external',
         },
     },
@@ -167,7 +167,7 @@ Some Content in Body",
         },
         JobConfig => {
             Channel     => 'email',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
+            Module      => 'PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'external',
         },
     },
@@ -187,7 +187,7 @@ Some Content in Body",
         },
         JobConfig => {
             Channel     => 'email',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
+            Module      => 'PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'external',
         },
     },
@@ -207,7 +207,7 @@ Some Content in Body",
         },
         JobConfig => {
             Channel     => 'email',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
+            Module      => 'PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'external',
         },
     },
@@ -230,7 +230,7 @@ Some Content in Body",
         },
         JobConfig => {
             Channel     => 'email',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
+            Module      => 'PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'external',
         },
     },
@@ -250,7 +250,7 @@ Some Content in Body",
         },
         JobConfig => {
             Channel     => 'email',
-            Module      => 'Kernel::System::PostMaster::Filter::FollowUpChannelCheck',
+            Module      => 'PostMaster::Filter::FollowUpChannelCheck',
             SenderType  => 'external',
         },
     },
@@ -335,7 +335,7 @@ for my $Test (@Tests) {
 
 # Now add the customer to the customer database and run the tests again.
 my $TestContactID = $Helper->TestContactCreate();
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $ContactObject = $Kernel::OM->Get('Contact');
 my %ContactData  = $ContactObject->ContactGet(
     ID => $TestContact{ID},
 );

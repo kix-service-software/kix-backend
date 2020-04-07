@@ -17,11 +17,11 @@ use Kernel::Language;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Main',
+    'SysConfig',
+    'Time',
 );
 
 sub Configure {
@@ -43,22 +43,22 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Home      = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home      = $Kernel::OM->Get('Config')->Get('Home');
 
     my $Language  = $Self->GetOption('language') || '';
 
     $Self->Print("<yellow>Listing existing translations...</yellow>\n\n");
 
-    my %PatternList = $Kernel::OM->Get('Kernel::System::Translation')->PatternList();
+    my %PatternList = $Kernel::OM->Get('Translation')->PatternList();
 
     foreach my $ID ( sort { $PatternList{$a} cmp $PatternList{$b} } keys %PatternList ) {
         # get pattern 
-        my %Pattern = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+        my %Pattern = $Kernel::OM->Get('Translation')->PatternGet(
             ID => $ID,
         );
 
         # get languages
-        my %LanguageList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageList(
+        my %LanguageList = $Kernel::OM->Get('Translation')->TranslationLanguageList(
             PatternID => $ID,
         );
 

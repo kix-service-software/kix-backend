@@ -1,6 +1,6 @@
 {
     "FAQVote": {
-        "CreatedBy": 1,
+        "CreatedBy": "max.mustermann@nomail.org",
         "IPAddress": "1.1.1.1",
         "Interface": "agent",
         "Rating": 2

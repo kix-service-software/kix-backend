@@ -16,15 +16,15 @@ use Kernel::System::Role::Permission qw(:all);
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
-my $UserObject  = $Kernel::OM->Get('Kernel::System::User');
+my $RoleObject = $Kernel::OM->Get('Role');
+my $UserObject  = $Kernel::OM->Get('User');
 
 # create test users
 my %UserIDByUserLogin;

@@ -14,11 +14,11 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'Valid',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LockObject = $Kernel::OM->Get('Kernel::System::Lock');
+    my $LockObject = $Kernel::OM->Get('Lock');
 
 =cut
 
@@ -58,7 +58,7 @@ sub new {
     $Self->{CacheType} = 'Lock';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
-    $Self->{ViewableLocks} = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::ViewableLocks')
+    $Self->{ViewableLocks} = $Kernel::OM->Get('Config')->Get('Ticket::ViewableLocks')
         || die 'No Config entry "Ticket::ViewableLocks"!';
 
     return $Self;
@@ -92,7 +92,7 @@ sub LockViewableLock {
     # check needed stuff
     for (qw(Type)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -102,7 +102,7 @@ sub LockViewableLock {
 
     # check cache
     my $CacheKey = 'LockViewableLock::' . $Param{Type};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         TTL  => $Self->{CacheTTL},
         Key  => $CacheKey,
@@ -110,29 +110,29 @@ sub LockViewableLock {
     return @{$Cache} if $Cache;
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => "
             SELECT id, name
             FROM ticket_lock_type
             WHERE name IN ( ${\(join ', ', @{$Self->{ViewableLocks}})} )
-                AND valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )",
+                AND valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )",
     );
 
     my @Name;
     my @ID;
-    while ( my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push @Name, $Data[1];
         push @ID,   $Data[0];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => 'LockViewableLock::Name',
         Value => \@Name,
     );
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => 'LockViewableLock::ID',
@@ -178,7 +178,7 @@ sub LockLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No $Key for $Value found!",
         );
@@ -211,7 +211,7 @@ sub LockList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'UserID!'
         );
@@ -220,7 +220,7 @@ sub LockList {
 
     # check cache
     my $CacheKey = 'LockList';
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         TTL  => $Self->{CacheTTL},
         Key  => $CacheKey,
@@ -228,18 +228,18 @@ sub LockList {
     return %{$Cache} if $Cache;
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id, name FROM ticket_lock_type',
     );
 
     # fetch the result
     my %Data;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Data{ $Row[0] } = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -276,7 +276,7 @@ sub LockGet {
 
     # check needed stuff
     if ( !$Param{LockID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'LockID!'
         );
@@ -284,7 +284,7 @@ sub LockGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -308,7 +308,7 @@ sub LockGet {
 
     # no data found...
     if ( !%Lock ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Lock '$Param{LockID}' not found!",
         );

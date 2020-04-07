@@ -16,7 +16,7 @@ use Kernel::System::Role::Permission;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::User'
+    'User'
 );
 
 sub Configure {
@@ -47,7 +47,7 @@ sub PreRun {
     $Self->{UserLogin} = $Self->GetOption('user');
 
     # check user
-    $Self->{UserID} = $Kernel::OM->Get('Kernel::System::User')->UserLookup( UserLogin => $Self->{UserLogin} );
+    $Self->{UserID} = $Kernel::OM->Get('User')->UserLookup( UserLogin => $Self->{UserLogin} );
     if ( !$Self->{UserID} ) {
         die "User $Self->{Userlogin} does not exist.\n";
     }
@@ -62,7 +62,7 @@ sub Run {
 
     $Self->Print("<yellow>Listing permissions of user $Self->{UserLogin}...</yellow>\n");
 
-    my %PermissionList = $Kernel::OM->Get('Kernel::System::User')->PermissionList(
+    my %PermissionList = $Kernel::OM->Get('User')->PermissionList(
         UserID => $Self->{UserID},
     );
 
@@ -74,14 +74,14 @@ sub Run {
                 my $Label = $Key;
                 my $Value = $Permission{$Key} || '-';
                 if ( $Key eq 'Value' ) {
-                    $Value = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+                    $Value = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                         Value  => $Permission{Value},
                         Format => 'Long'
                     );
                 }
                 elsif ( $Key eq 'TypeID' ) {
                     $Label = 'Type';
-                    my %PermissionType = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeGet(
+                    my %PermissionType = $Kernel::OM->Get('Role')->PermissionTypeGet(
                         ID     => $Value,
                         UserID => 1,
                     );
@@ -89,7 +89,7 @@ sub Run {
                 }
                 elsif ( $Key eq 'RoleID' ) {
                     $Label = 'Role';
-                    $Value = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+                    $Value = $Kernel::OM->Get('Role')->RoleLookup(
                         RoleID => $Value,
                     );
                 }
@@ -97,7 +97,7 @@ sub Run {
                     $Value = $Permission{$Key} ? 'yes' : 'no';
                 }
                 elsif ( $Key =~ /CreateBy|ChangeBy/ ) {
-                    $Value = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+                    $Value = $Kernel::OM->Get('User')->UserLookup(
                         UserID => $Value,
                         Silent => 1,
                     );
@@ -115,13 +115,13 @@ sub Run {
             my $Permission = $PermissionList{$ID};
 
             # prepare permission value
-            my $Value = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+            my $Value = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                 Value  => $Permission->{Value},
                 Format => 'Short'
             );            
 
             # prepare type
-            my %PermissionType = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeGet(
+            my %PermissionType = $Kernel::OM->Get('Role')->PermissionTypeGet(
                 ID     => $Permission->{TypeID},
                 UserID => 1,
             );
@@ -130,7 +130,7 @@ sub Run {
             my $IsRequired = $Permission->{IsRequired} ? 'yes' : '';
 
             # prepare role
-            my $Role = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+            my $Role = $Kernel::OM->Get('Role')->RoleLookup(
                 RoleID => $Permission->{RoleID},
             );
 

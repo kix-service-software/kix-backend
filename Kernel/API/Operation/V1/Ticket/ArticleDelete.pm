@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ArticleDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ArticleDelete');
 
     return $Self;
 }
@@ -117,7 +117,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Article = $TicketObject->ArticleGet(
         ArticleID     => $Param{Data}->{ArticleID},
@@ -138,7 +138,7 @@ sub Run {
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleDelete(
+    my $Success = $Kernel::OM->Get('Ticket')->ArticleDelete(
         ArticleID => $Param{Data}->{ArticleID},
         UserID    => $Self->{Authorization}->{UserID},
     );

@@ -32,14 +32,14 @@ my $ValidatorObject = Kernel::API::Validator::ContactValidator->new(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create organisation
-my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => 'ValidatorTestCustomer',
     Name    => 'ValidatorTestCustomer',
     ValidID => 1,
@@ -47,7 +47,7 @@ my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
 );
 
 # create contact
-my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname  => 'ValidatorTestContact',
     Lastname   => 'ValidatorTestContact',
     PrimaryOrganisationID => $OrgID,

@@ -17,18 +17,18 @@ use vars (qw($Self));
 use Unicode::Normalize;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase  => 1,
         UseTmpArticleDir => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
@@ -70,17 +70,17 @@ $Self->True(
 for my $Backend (qw(DB FS)) {
 
     # make sure that the TicketObject gets recreated for each loop.
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
     $ConfigObject->Set(
         Key   => 'Ticket::StorageModule',
-        Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
+        Value => 'Ticket::ArticleStorage' . $Backend,
     );
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     $Self->True(
-        $TicketObject->isa( 'Kernel::System::Ticket::ArticleStorage' . $Backend ),
+        $TicketObject->isa( 'Ticket::ArticleStorage' . $Backend ),
         "TicketObject loaded the correct backend",
     );
 
@@ -189,17 +189,17 @@ for my $Backend (qw(DB FS)) {
 for my $Backend (qw(DB FS)) {
 
     # Make sure that the TicketObject gets recreated for each loop.
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
     $ConfigObject->Set(
         Key   => 'Ticket::StorageModule',
-        Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
+        Value => 'Ticket::ArticleStorage' . $Backend,
     );
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     $Self->True(
-        $TicketObject->isa( 'Kernel::System::Ticket::ArticleStorage' . $Backend ),
+        $TicketObject->isa( 'Ticket::ArticleStorage' . $Backend ),
         "TicketObject loaded the correct backend",
     );
 

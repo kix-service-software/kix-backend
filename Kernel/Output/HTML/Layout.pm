@@ -25,19 +25,19 @@ use Kernel::System::VariableCheck qw(:all);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Language',
-    'Kernel::System::Chat',
-    'Kernel::System::Encode',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::JSON',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    # ddoerffel - T2016121190001552 - BusinessSolution code removed    'Kernel::System::SystemMaintenance',
-    'Kernel::System::Time',
-    'Kernel::System::User',
-    'Kernel::System::VideoChat',
-    'Kernel::System::Web::Request',
+    'Config',
+    'Language',
+    'Chat',
+    'Encode',
+    'HTMLUtils',
+    'JSON',
+    'Log',
+    'Main',
+    # ddoerffel - T2016121190001552 - BusinessSolution code removed    'SystemMaintenance',
+    'Time',
+    'User',
+    'VideoChat',
+    'WebRequest',
 );
 
 =head1 NAME
@@ -60,22 +60,22 @@ create a new object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::Output::HTML::Layout' => {
+        'Output::HTML::Layout' => {
             Lang    => 'de',
         },
     );
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
 From the web installer, a special Option C<InstallerOnly> is passed
 to indicate that a database connection is not yet available.
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::Output::HTML::Layout' => {
+        'Output::HTML::Layout' => {
             InstallerOnly => 1,
         },
     );
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
 =cut
 
@@ -95,10 +95,10 @@ sub new {
     # empty action if not defined
     $Self->{Action} = '' if !defined $Self->{Action};
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # We'll keep one default TimeObject and one for the user's time zone (if needed)
-    $Self->{TimeObject} = $Kernel::OM->Get('Kernel::System::Time');
+    $Self->{TimeObject} = $Kernel::OM->Get('Time');
 
     if ( $ConfigObject->Get('TimeZoneUser') && $Self->{UserTimeZone} ) {
         $Self->{UserTimeObject} = Kernel::System::Time->new( %{$Self} );
@@ -142,13 +142,13 @@ sub new {
     # create language object
     if ( !$Self->{LanguageObject} ) {
         $Kernel::OM->ObjectParamAdd(
-            'Kernel::Language' => {
+            'Language' => {
                 UserTimeZone => $Self->{UserTimeZone},
                 UserLanguage => $Self->{UserLanguage},
                 Action       => $Self->{Action},
             },
         );
-        $Self->{LanguageObject} = $Kernel::OM->Get('Kernel::Language');
+        $Self->{LanguageObject} = $Kernel::OM->Get('Language');
     }
 
     # set charset if there is no charset given
@@ -190,7 +190,7 @@ sub new {
 
         if ( !%TemplateList || $TemplateList{ALL} ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => <<EOF,
 $FilterConfig->{Module} will be ignored because it wants to operate on all templates or does not specify a template list.
@@ -390,7 +390,7 @@ EOF
     }
 
     # locate template files
-    $Self->{TemplateDir} = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/Kernel/Output/HTML/Templates';
+    $Self->{TemplateDir} = $Kernel::OM->Get('Config')->Get('Home') . '/Kernel/Output/HTML/Templates';
 
     # Check if TemplateDir exists
     if ( !-e $Self->{TemplateDir} ) {
@@ -416,7 +416,7 @@ EOF
     # if ( !-e ( $ThemeKIXDir || $Self->{TemplateDir} ) ) {
 
     #     # EO KIXCore-capeIT
-    #     $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #     $Kernel::OM->Get('Log')->Log(
     #         Priority => 'error',
     #         Message =>
     #             "No existing template directory found ('$Self->{TemplateDir}')!.
@@ -428,7 +428,7 @@ EOF
     # }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # load sub layout files
     # KIXCore-capeIT
@@ -478,7 +478,7 @@ sub SetEnv {
 
     for (qw(Key Value)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -506,7 +506,7 @@ sub Block {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name!'
         );
@@ -537,7 +537,7 @@ sub JSONEncode {
     return if !defined $Param{Data};
 
     # get JSON encoded data
-    my $JSON = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+    my $JSON = $Kernel::OM->Get('JSON')->Encode(
         Data => $Param{Data},
     ) || '""';
 
@@ -570,7 +570,7 @@ for the session cookie to be not yet set.
 sub Redirect {
     my ( $Self, %Param ) = @_;
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # add cookies if exists
     my $Cookies = '';
@@ -599,21 +599,21 @@ sub Redirect {
 
         # Filter out hazardous characters
         if ( $Param{OP} =~ s{\x00}{}smxg ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Someone tries to use a null bytes (\x00) character in redirect!',
             );
         }
 
         if ( $Param{OP} =~ s{\r}{}smxg ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Someone tries to use a carriage return character in redirect!',
             );
         }
 
         if ( $Param{OP} =~ s{\n}{}smxg ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Someone tries to use a newline character in redirect!',
             );
@@ -684,7 +684,7 @@ sub Login {
     $Self->{Action} = 'Login';
     $Param{IsLoginPage} = 1;
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $Output = '';
     if ( $ConfigObject->Get('SessionUseCookie') ) {
@@ -699,7 +699,7 @@ sub Login {
             $CookieSecureAttribute = 1;
         }
         # ddoerffel - T2016121190001552 - BusinessSolution code removed
-        $Self->{SetCookies}->{KIXBrowserHasCookie} = $Kernel::OM->Get('Kernel::System::Web::Request')->SetCookie(
+        $Self->{SetCookies}->{KIXBrowserHasCookie} = $Kernel::OM->Get('WebRequest')->SetCookie(
             Key      => 'KIXBrowserHasCookie',
             Value    => 1,
             Expires  => '1y',
@@ -778,7 +778,7 @@ sub Login {
     }
 
     # get system maintenance object
-    my $SystemMaintenanceObject = $Kernel::OM->Get('Kernel::System::SystemMaintenance');
+    my $SystemMaintenanceObject = $Kernel::OM->Get('SystemMaintenance');
 
     my $ActiveMaintenance = $SystemMaintenanceObject->SystemMaintenanceIsActive();
 
@@ -856,7 +856,7 @@ sub Login {
         # get lost password
         if (
             $ConfigObject->Get('LostPassword')
-            && $ConfigObject->Get('AuthModule') eq 'Kernel::System::Auth::DB'
+            && $ConfigObject->Get('AuthModule') eq 'Auth::DB'
             )
         {
             $Self->Block(
@@ -890,7 +890,7 @@ sub FatalError {
     return if ( $Self->{InFatalError}++ );
 
     if ( $Param{Message} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'error',
             Message  => $Param{Message},
@@ -925,7 +925,7 @@ sub FatalDie {
     my ( $Self, %Param ) = @_;
 
     if ( $Param{Message} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'error',
             Message  => $Param{Message},
@@ -935,7 +935,7 @@ sub FatalDie {
     # get backend error messages
     for (qw(Message Traceback)) {
         my $Backend = 'Backend' . $_;
-        $Param{$Backend} = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        $Param{$Backend} = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'Error',
             What => $_
         ) || '';
@@ -965,19 +965,19 @@ sub Error {
     # get backend error messages
     for (qw(Message Traceback)) {
         my $Backend = 'Backend' . $_;
-        $Param{$Backend} = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        $Param{$Backend} = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'Error',
             What => $_
         ) || '';
     }
     if ( !$Param{BackendMessage} && !$Param{BackendTraceback} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Param{Message} || '?',
         );
         for (qw(Message Traceback)) {
             my $Backend = 'Backend' . $_;
-            $Param{$Backend} = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            $Param{$Backend} = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'Error',
                 What => $_
             ) || '';
@@ -1008,11 +1008,11 @@ sub Warning {
     my ( $Self, %Param ) = @_;
 
     # get backend error messages
-    $Param{BackendMessage} = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+    $Param{BackendMessage} = $Kernel::OM->Get('Log')->GetLogEntry(
         Type => 'Notice',
         What => 'Message',
         )
-        || $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        || $Kernel::OM->Get('Log')->GetLogEntry(
         Type => 'Error',
         What => 'Message',
         ) || '';
@@ -1068,11 +1068,11 @@ sub Notify {
 
     # create & return output
     if ( !$Param{Info} && !$Param{Data} ) {
-        $Param{BackendMessage} = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        $Param{BackendMessage} = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'Notice',
             What => 'Message',
             )
-            || $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            || $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'Error',
             What => 'Message',
             ) || '';
@@ -1163,7 +1163,7 @@ sub Header {
         $Param{ShowPrefLink} = 1;
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # do not show preferences link if the preferences module is disabled
     my $Modules = $ConfigObject->Get('Frontend::Module');
@@ -1261,7 +1261,7 @@ sub Header {
     }
 
     if ( $Self->{Action} eq 'AgentTicketZoom') {
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
         my %Ticket       = $TicketObject->TicketGet(
             TicketID => $Self->{TicketID},
         );
@@ -1276,7 +1276,7 @@ sub Header {
         }
     }
 
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # run header meta modules
     my $HeaderMetaModule = $ConfigObject->Get('Frontend::HeaderMetaModule');
@@ -1336,7 +1336,7 @@ sub Footer {
         );
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # NewTicketInNewWindow
     if ( $ConfigObject->Get('NewTicketInNewWindow::Enabled') ) {
@@ -1398,9 +1398,9 @@ sub Footer {
     }
 
     # Check if video chat is enabled.
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require( 'Kernel::System::VideoChat', Silent => 1 ) ) {
-        $Param{VideoChatEnabled} = $Kernel::OM->Get('Kernel::System::VideoChat')->IsEnabled()
-            || $Kernel::OM->Get('Kernel::System::Web::Request')->GetParam( Param => 'UnitTestMode' ) // 0;
+    if ( $Kernel::OM->Get('Main')->Require( 'VideoChat', Silent => 1 ) ) {
+        $Param{VideoChatEnabled} = $Kernel::OM->Get('VideoChat')->IsEnabled()
+            || $Kernel::OM->Get('WebRequest')->GetParam( Param => 'UnitTestMode' ) // 0;
     }
 
     # create & return output
@@ -1419,7 +1419,7 @@ sub Print {
         # extract filter list
         my %FilterList = %{ $Self->{FilterContent} };
 
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         FILTER:
         for my $Filter ( sort keys %FilterList ) {
@@ -1436,7 +1436,7 @@ sub Print {
             # check template list
             if ( !$TemplateList || ref $TemplateList ne 'HASH' || !%{$TemplateList} ) {
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "Please add a template list to output filter $FilterConfig->{Module} "
@@ -1474,7 +1474,7 @@ sub Print {
     #   See also http://bugs.otrs.org/show_bug.cgi?id=6284 and
     #   http://bugs.otrs.org/show_bug.cgi?id=9802.
     if ( $INC{'CGI/Fast.pm'} || $ENV{FCGI_ROLE} || $ENV{FCGI_SOCKET_PATH} ) {    # are we on FCGI?
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( $Param{Output} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( $Param{Output} );
         binmode STDOUT, ':bytes';
     }
 
@@ -1523,7 +1523,7 @@ sub Ascii2Html {
         $Text = $Param{Text};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Invalid ref "' . ref( $Param{Text} ) . '" of Text param!',
         );
@@ -1537,7 +1537,7 @@ sub Ascii2Html {
         # extract filter list
         my %FilterList = %{ $Self->{FilterText} };
 
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         FILTER:
         for my $Filter ( sort keys %FilterList ) {
@@ -1554,7 +1554,7 @@ sub Ascii2Html {
             # check template list
             if ( !$TemplateList || ref $TemplateList ne 'HASH' || !%{$TemplateList} ) {
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "Please add a template list to output filter $FilterConfig->{Module} "
@@ -1700,7 +1700,7 @@ sub LinkQuote {
         # extract filter list
         my %FilterList = %{ $Self->{FilterText} };
 
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         FILTER:
         for my $Filter ( sort keys %FilterList ) {
@@ -1717,7 +1717,7 @@ sub LinkQuote {
             # check template list
             if ( !$TemplateList || ref $TemplateList ne 'HASH' || !%{$TemplateList} ) {
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "Please add a template list to output filter $FilterConfig->{Module} "
@@ -1792,7 +1792,7 @@ also string ref is possible
 sub HTMLLinkQuote {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
+    return $Kernel::OM->Get('HTMLUtils')->LinkQuote(
         String    => $Param{String},
         TargetAdd => 1,
         Target    => '_blank',
@@ -1827,7 +1827,7 @@ sub CustomerAgeInHours {
     my $AgeStrg   = '';
     my $HourDsc   = Translatable('h');
     my $MinuteDsc = Translatable('m');
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('TimeShowCompleteDescription') ) {
+    if ( $Kernel::OM->Get('Config')->Get('TimeShowCompleteDescription') ) {
         $HourDsc   = Translatable('hour(s)');
         $MinuteDsc = Translatable('minute(s)');
     }
@@ -1854,7 +1854,7 @@ sub CustomerAgeInHours {
 sub CustomerAge {
     my ( $Self, %Param ) = @_;
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $Age = defined( $Param{Age} ) ? $Param{Age} : return;
     my $Space     = $Param{Space} || '<br/>';
@@ -1988,7 +1988,7 @@ sub BuildSelection {
     # check needed stuff
     for (qw(Name Data)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1998,7 +1998,7 @@ sub BuildSelection {
 
     # The parameters 'Ajax' and 'OnChange' are exclusive
     if ( $Param{Ajax} && $Param{OnChange} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The parameters 'OnChange' and 'Ajax' exclude each other!"
         );
@@ -2008,14 +2008,14 @@ sub BuildSelection {
     # set OnChange if AJAX is used
     if ( $Param{Ajax} ) {
         if ( !$Param{Ajax}->{Depend} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need Depend Param Ajax option!',
             );
             $Self->FatalError();
         }
         if ( !$Param{Ajax}->{Update} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need Update Param Ajax option()!',
             );
@@ -2067,7 +2067,7 @@ sub BuildSelection {
                 }
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => 'Each Filter must provide Name and Values!',
                 );
@@ -2103,7 +2103,7 @@ sub NoPermission {
     }
 
     # get config option for possible next actions
-    my $PossibleNextActions = $Kernel::OM->Get('Kernel::Config')->Get('PossibleNextActions');
+    my $PossibleNextActions = $Kernel::OM->Get('Config')->Get('PossibleNextActions');
 
     POSSIBLE:
     if ( IsHashRefWithData($PossibleNextActions) ) {
@@ -2154,7 +2154,7 @@ sub Permission {
     # check needed params
     for (qw(Action Type)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Got no $_!",
             );
@@ -2172,7 +2172,7 @@ sub Permission {
     return if !$Permission;
 
     # get config option for frontend module
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::Module')->{ $Param{Action} };
+    my $Config = $Kernel::OM->Get('Config')->Get('Frontend::Module')->{ $Param{Action} };
     return if !$Config;
 
     my $Item = $Config->{$Permission};
@@ -2287,7 +2287,7 @@ sub Attachment {
     # check needed params
     for (qw(Content ContentType)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Got no $_!",
             );
@@ -2302,7 +2302,7 @@ sub Attachment {
         $Output .= '; ';
     }
     else {
-        $Output .= $Kernel::OM->Get('Kernel::Config')->Get('AttachmentDownloadType') || 'attachment';
+        $Output .= $Kernel::OM->Get('Config')->Get('AttachmentDownloadType') || 'attachment';
         $Output .= '; ';
     }
 
@@ -2326,11 +2326,11 @@ sub Attachment {
     $Output .= "Content-Length: $Param{Size}\n";
     $Output .= "X-UA-Compatible: IE=edge,chrome=1\n";
 
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('DisableIFrameOriginRestricted') ) {
+    if ( !$Kernel::OM->Get('Config')->Get('DisableIFrameOriginRestricted') ) {
         $Output .= "X-Frame-Options: SAMEORIGIN\n";
     }
 
-    if ( $Param{Sandbox} && !$Kernel::OM->Get('Kernel::Config')->Get('DisableContentSecurityPolicy') ) {
+    if ( $Param{Sandbox} && !$Kernel::OM->Get('Config')->Get('DisableContentSecurityPolicy') ) {
 
         # Disallow external and inline scripts, active content, frames, but keep allowing inline styles
         #   as this is a common use case in emails.
@@ -2353,7 +2353,7 @@ sub Attachment {
     }
 
     # disable utf8 flag, to write binary to output
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
     $EncodeObject->EncodeOutput( \$Output );
     $EncodeObject->EncodeOutput( \$Param{Content} );
 
@@ -2567,7 +2567,7 @@ sub NavigationBar {
         $Param{Type} = $Self->{ModuleReg}->{NavBarName} || 'Ticket';
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # create menu items
     my %NavBar;
@@ -2660,7 +2660,7 @@ sub NavigationBar {
         }
     }
 
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # run menu item modules
     if ( ref $ConfigObject->Get('Frontend::NavBarModule') eq 'HASH' ) {
@@ -2733,7 +2733,7 @@ sub NavigationBar {
     }
 
     # get user preferences for custom nav bar item ordering
-    my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->GetPreferences(
+    my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
         UserID => $Self->{UserID},
     );
 
@@ -2833,7 +2833,7 @@ sub TransformDateSelection {
     my $Prefix = $Param{Prefix} || '';
 
     # time zone translation if needed
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('TimeZoneUser') && $Self->{UserTimeZone} ) {
+    if ( $Kernel::OM->Get('Config')->Get('TimeZoneUser') && $Self->{UserTimeZone} ) {
         my $TimeStamp = $Self->{TimeObject}->TimeStamp2SystemTime(
             String => $Param{ $Prefix . 'Year' } . '-'
                 . $Param{ $Prefix . 'Month' } . '-'
@@ -2910,7 +2910,7 @@ Depending on the SysConfig settings the controls to set the date could be multip
 sub BuildDateSelection {
     my ( $Self, %Param ) = @_;
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $DateInputStyle = $ConfigObject->Get('TimeInputFormat');
     my $Prefix         = $Param{Prefix} || '';
@@ -3226,7 +3226,7 @@ sub CustomerLogin {
     $Param{IsLoginPage}    = 1;
     $Param{'XLoginHeader'} = 1;
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     if ( $ConfigObject->Get('SessionUseCookie') ) {
 
@@ -3240,7 +3240,7 @@ sub CustomerLogin {
             $CookieSecureAttribute = 1;
         }
         # ddoerffel - T2016121190001552 - BusinessSolution code removed
-        $Self->{SetCookies}->{KIXBrowserHasCookie} = $Kernel::OM->Get('Kernel::System::Web::Request')->SetCookie(
+        $Self->{SetCookies}->{KIXBrowserHasCookie} = $Kernel::OM->Get('WebRequest')->SetCookie(
             Key      => 'KIXBrowserHasCookie',
             Value    => 1,
             Expires  => '1y',
@@ -3298,7 +3298,7 @@ sub CustomerLogin {
     }
 
     # get system maintenance object
-    my $SystemMaintenanceObject = $Kernel::OM->Get('Kernel::System::SystemMaintenance');
+    my $SystemMaintenanceObject = $Kernel::OM->Get('SystemMaintenance');
 
     my $ActiveMaintenance = $SystemMaintenanceObject->SystemMaintenanceIsActive();
 
@@ -3355,7 +3355,7 @@ sub CustomerLogin {
         if (
             $ConfigObject->Get('CustomerPanelLostPassword')
             && $ConfigObject->Get('Contact::AuthModule') eq
-            'Kernel::System::ContactAuth::DB'
+            'ContactAuth::DB'
             )
         {
             $Self->Block(
@@ -3372,7 +3372,7 @@ sub CustomerLogin {
         if (
             $ConfigObject->Get('CustomerPanelCreateAccount')
             && $ConfigObject->Get('Contact::AuthModule') eq
-            'Kernel::System::ContactAuth::DB'
+            'ContactAuth::DB'
             )
 
         {
@@ -3404,7 +3404,7 @@ sub CustomerHeader {
 
     my $Type = $Param{Type} || '';
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # add cookies if exists
     my $Output = '';
@@ -3461,9 +3461,9 @@ sub CustomerHeader {
     if ( $Self->{Action} eq 'CustomerTicketZoom'
         || $Self->{Action} eq 'PublicTicketZoom'
     ) {
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-        my $TicketNumber = $Kernel::OM->Get('Kernel::System::Web::Request')->GetParam( Param => 'TicketNumber' ) || '';
-        my $TicketToken  = $Kernel::OM->Get('Kernel::System::Web::Request')->GetParam( Param => 'TicketToken' ) || '';
+        my $TicketObject = $Kernel::OM->Get('Ticket');
+        my $TicketNumber = $Kernel::OM->Get('WebRequest')->GetParam( Param => 'TicketNumber' ) || '';
+        my $TicketToken  = $Kernel::OM->Get('WebRequest')->GetParam( Param => 'TicketToken' ) || '';
 
         if ( !$Self->{TicketID} && $TicketNumber ) {
             $Self->{TicketID} = $TicketObject->TicketIDLookup(
@@ -3471,7 +3471,7 @@ sub CustomerHeader {
                 UserID       => $Self->{UserID},
             );
         } elsif ( !$Self->{TicketID} && $TicketToken ) {
-            my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+            my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
             my $TokenField         = $ConfigObject->Get("Ticket::PublicFrontend::TokenField");
             if ($TokenField) {
                 $Self->{TokenField} = $DynamicFieldObject->DynamicFieldGet(
@@ -3522,7 +3522,7 @@ sub CustomerHeader {
     if ( ref $HeaderMetaModule eq 'HASH' ) {
         my %Jobs = %{$HeaderMetaModule};
 
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         MODULE:
         for my $Job ( sort keys %Jobs ) {
@@ -3617,7 +3617,7 @@ sub CustomerFooter {
         );
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # Banner
     # ddoerffel - T2016121190001552 - added on code merge
@@ -3647,9 +3647,9 @@ sub CustomerFooter {
     );
 
     # Check if video chat is enabled.
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require( 'Kernel::System::VideoChat', Silent => 1 ) ) {
-        $Param{VideoChatEnabled} = $Kernel::OM->Get('Kernel::System::VideoChat')->IsEnabled()
-            || $Kernel::OM->Get('Kernel::System::Web::Request')->GetParam( Param => 'UnitTestMode' ) // 0;
+    if ( $Kernel::OM->Get('Main')->Require( 'VideoChat', Silent => 1 ) ) {
+        $Param{VideoChatEnabled} = $Kernel::OM->Get('VideoChat')->IsEnabled()
+            || $Kernel::OM->Get('WebRequest')->GetParam( Param => 'UnitTestMode' ) // 0;
     }
 
     # create & return output
@@ -3666,7 +3666,7 @@ sub CustomerFatalError {
     return if ( $Self->{InFatalError}++ );
 
     if ( $Param{Message} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'error',
             Message  => $Param{Message},
@@ -3687,18 +3687,18 @@ sub CustomerError {
 
     # get backend error messages
     for (qw(Message Traceback)) {
-        $Param{ 'Backend' . $_ } = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        $Param{ 'Backend' . $_ } = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'Error',
             What => $_
         ) || '';
     }
     if ( !$Param{BackendMessage} && !$Param{BackendTraceback} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Param{Message} || '?',
         );
         for (qw(Message Traceback)) {
-            $Param{ 'Backend' . $_ } = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            $Param{ 'Backend' . $_ } = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'Error',
                 What => $_
             ) || '';
@@ -3729,11 +3729,11 @@ sub CustomerWarning {
     my ( $Self, %Param ) = @_;
 
     # get backend error messages
-    $Param{BackendMessage} = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+    $Param{BackendMessage} = $Kernel::OM->Get('Log')->GetLogEntry(
         Type => 'Notice',
         What => 'Message',
         )
-        || $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        || $Kernel::OM->Get('Log')->GetLogEntry(
         Type => 'Error',
         What => 'Message',
         ) || '';
@@ -3784,7 +3784,7 @@ sub Ascii2RichText {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -3793,7 +3793,7 @@ sub Ascii2RichText {
     }
 
     # ascii 2 html
-    $Param{String} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+    $Param{String} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
         String => $Param{String},
     );
 
@@ -3816,7 +3816,7 @@ sub RichText2Ascii {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -3825,7 +3825,7 @@ sub RichText2Ascii {
     }
 
     # ascii 2 html
-    $Param{String} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+    $Param{String} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
         String => $Param{String},
     );
 
@@ -3849,7 +3849,7 @@ sub RichTextDocumentComplete {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -3863,7 +3863,7 @@ sub RichTextDocumentComplete {
     );
 
     # verify html document
-    $Param{String} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentComplete(
+    $Param{String} = $Kernel::OM->Get('HTMLUtils')->DocumentComplete(
         String  => ${$StringRef},
         Charset => $Self->{UserCharset},
     );
@@ -3899,7 +3899,7 @@ sub _RichTextReplaceLinkOfInlineContent {
     # check needed stuff
     for (qw(String)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -3954,7 +3954,7 @@ sub RichTextDocumentServe {
     # check needed stuff
     for (qw(Data URL Attachments)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -3975,7 +3975,7 @@ sub RichTextDocumentServe {
 
     # convert charset
     if ($Charset) {
-        $Param{Data}->{Content} = $Kernel::OM->Get('Kernel::System::Encode')->Convert(
+        $Param{Data}->{Content} = $Kernel::OM->Get('Encode')->Convert(
             Text  => $Param{Data}->{Content},
             From  => $Charset,
             To    => 'utf-8',
@@ -4001,7 +4001,7 @@ sub RichTextDocumentServe {
     if ( !$Param{LoadInlineContent} ) {
 
         # Strip out active content first, keeping external images.
-        my %SafetyCheckResult = $Kernel::OM->Get('Kernel::System::HTMLUtils')->Safety(
+        my %SafetyCheckResult = $Kernel::OM->Get('HTMLUtils')->Safety(
             String       => $Param{Data}->{Content},
             NoApplet     => 1,
             NoObject     => 1,
@@ -4019,7 +4019,7 @@ sub RichTextDocumentServe {
 
             # Strip out external images, but show a confirmation button to
             #   load them explicitly.
-            my %SafetyCheckResult = $Kernel::OM->Get('Kernel::System::HTMLUtils')->Safety(
+            my %SafetyCheckResult = $Kernel::OM->Get('HTMLUtils')->Safety(
                 String       => $Param{Data}->{Content},
                 NoApplet     => 1,
                 NoObject     => 1,
@@ -4138,7 +4138,7 @@ sub RichTextDocumentCleanup {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -4146,7 +4146,7 @@ sub RichTextDocumentCleanup {
         }
     }
 
-    $Param{String} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentCleanup(
+    $Param{String} = $Kernel::OM->Get('HTMLUtils')->DocumentCleanup(
         String => $Param{String},
     );
 
@@ -4822,7 +4822,7 @@ sub _BuildSelectionOutput {
                 },
                 NoQuotes => 1,
             );
-            my $JSONEscaped = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+            my $JSONEscaped = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                 String => $JSON,
             );
             $String .= " data-filters=\"$JSONEscaped\"";
@@ -4882,7 +4882,7 @@ sub _BuildSelectionOutput {
 sub _DisableBannerCheck {
     my ( $Self, %Param ) = @_;
 
-    return 1 if !$Kernel::OM->Get('Kernel::Config')->Get('Secure::DisableBanner');
+    return 1 if !$Kernel::OM->Get('Config')->Get('Secure::DisableBanner');
     return   if !$Param{OutputRef};
 
     # remove the version tag from the header
@@ -4962,7 +4962,7 @@ sub WrapPlainText {
     # Return if we did not get MaxCharacters
     # or MaxCharacters doesn't contain just an int
     if ( !IsPositiveInteger( $Param{MaxCharacters} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Got no or invalid MaxCharacters!",
         );
@@ -4976,7 +4976,7 @@ sub WrapPlainText {
 
     # Return if we got no Scalar
     if ( ref $Param{PlainText} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Had no string in PlainText!",
         );

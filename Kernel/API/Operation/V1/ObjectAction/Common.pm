@@ -20,7 +20,7 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config'
+    'Config'
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $MacroActionObject = $Kernel::OM->Get('Kernel::System::Automation::MacroAction::Common');
+    my $MacroActionObject = $Kernel::OM->Get('Automation::MacroAction::Common');
 
 =cut
 
@@ -65,7 +65,7 @@ sub ActionList {
     # check needed stuff
     for (qw(Object ObjectID) ) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -73,7 +73,7 @@ sub ActionList {
         }
     }
 
-    my @Result = $Kernel::OM->Get('Kernel::System::ObjectAction')->ObjectActionList(
+    my @Result = $Kernel::OM->Get('ObjectAction')->ObjectActionList(
         Object   => $Param{Object}
     );
 

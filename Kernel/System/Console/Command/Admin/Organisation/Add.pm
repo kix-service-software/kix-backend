@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Organisation',
+    'Organisation',
 );
 
 sub Configure {
@@ -88,7 +88,7 @@ sub Run {
 
     # add organisation
     if (
-        !$Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+        !$Kernel::OM->Get('Organisation')->OrganisationAdd(
             Number  => $Self->GetOption('number'),
             Name    => $Self->GetOption('name'),
             Street  => $Self->GetOption('street'),

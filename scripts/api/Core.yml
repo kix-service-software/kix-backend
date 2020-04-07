@@ -132,6 +132,27 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Automation::JobMacroIDDelete
+    V1::Automation::JobRunSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobRunSearch
+    V1::Automation::JobRunGet:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobRunGet
+    V1::Automation::JobRunLogSearch:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: V1::Automation::JobRunLogSearch
     V1::Automation::JobTypeSearch:
         Description: ''
         MappingInbound:
@@ -2241,6 +2262,18 @@ Provider:
           RequestMethod:
           - DELETE
           Route: /system/automation/jobs/:JobID/macroids/:MacroID
+        V1::Automation::JobRunSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs/:JobID/runs
+        V1::Automation::JobRunGet:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs/:JobID/runs/:RunID
+        V1::Automation::JobRunLogSearch:
+          RequestMethod:
+          - GET
+          Route: /system/automation/jobs/:JobID/runs/:RunID/logs
         V1::Automation::JobTypeSearch:
           RequestMethod:
           - GET

@@ -85,14 +85,14 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform search
-    my %FollowUpTypeList = $Kernel::OM->Get('Kernel::System::Queue')->FollowUpTypeList();
+    my %FollowUpTypeList = $Kernel::OM->Get('Queue')->FollowUpTypeList();
 
 	# get prepare 
     if ( IsHashRefWithData(\%FollowUpTypeList) ) {  	
 
         my @Result;
         foreach my $TypeID ( sort keys %FollowUpTypeList ) {
-            my %TypeData = $Kernel::OM->Get('Kernel::System::Queue')->FollowUpTypeGet(
+            my %TypeData = $Kernel::OM->Get('Queue')->FollowUpTypeGet(
                 ID => $TypeID,
             );
 

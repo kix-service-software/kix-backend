@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::MailAccountUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::MailAccountUpdate');
 
     return $Self;
 }
@@ -80,7 +80,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+    my %BackendList = $Kernel::OM->Get('MailAccount')->MailAccountBackendList();
 
     return {
         'MailAccountID' => {
@@ -159,7 +159,7 @@ sub Run {
     );
 
     # check if MailAccount exists
-    my %MailAccountData = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountGet(
+    my %MailAccountData = $Kernel::OM->Get('MailAccount')->MailAccountGet(
         ID     => $Param{Data}->{MailAccountID},
         UserID => $Self->{Authorization}->{UserID},
     );
@@ -178,7 +178,7 @@ sub Run {
     }
 
     # update MailAccount
-    my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountUpdate(
+    my $Success = $Kernel::OM->Get('MailAccount')->MailAccountUpdate(
         ID            => $Param{Data}->{MailAccountID},
         Login         => $MailAccount->{Login} || $MailAccountData{Login},
         Password      => $MailAccount->{Password} || $MailAccountData{Password},
@@ -200,13 +200,13 @@ sub Run {
     }
 
     if ( $MailAccount->{ExecFetch} ) {
-        my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountFetch(
+        my $Success = $Kernel::OM->Get('MailAccount')->MailAccountFetch(
             %MailAccountData,
             UserID => 1,
         );
 
         if ( !$Success ) {
-            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error', 
                 What => 'Message',
             );

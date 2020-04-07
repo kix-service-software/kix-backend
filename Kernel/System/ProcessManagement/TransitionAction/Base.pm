@@ -20,16 +20,16 @@ use Kernel::System::VariableCheck qw(:all);
 our @ObjectDependencies = (
 
     # BPMX-capeIT
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::Main',
-    'Kernel::System::Queue',
-    'Kernel::System::TemplateGenerator',
-    'Kernel::System::Ticket',
+    'Config',
+    'Encode',
+    'HTMLUtils',
+    'Main',
+    'Queue',
+    'TemplateGenerator',
+    'Ticket',
 
     # EO BPMX-capeIT
-    'Kernel::System::Log',
+    'Log',
 );
 
 # BPMX-capeIT
@@ -41,14 +41,14 @@ sub ArticleLastArticle {
 
     # check needed stuff
     if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error', Message => "Need TicketID!"
         );
         return;
     }
 
     # get article index
-    my @Index = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleIndex(
+    my @Index = $Kernel::OM->Get('Ticket')->ArticleIndex(
         TicketID => $Param{TicketID}
     );
 
@@ -57,7 +57,7 @@ sub ArticleLastArticle {
 
     my $LastArticleID = @Index - 1;
 
-    return $Kernel::OM->Get('Kernel::System::Ticket')->ArticleGet(
+    return $Kernel::OM->Get('Ticket')->ArticleGet(
         ArticleID     => $Index[$LastArticleID],
         Extended      => $Param{Extended},
         DynamicFields => $Param{DynamicFields},
@@ -83,7 +83,7 @@ sub ReplaceExtended {
     # check needed stuff
     for (qw(Text RichText Data UserID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error', Message => "Need $_!"
             );
             return;
@@ -100,7 +100,7 @@ sub ReplaceExtended {
 
     my %Ticket;
     if ( $Param{TicketID} ) {
-        %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+        %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID      => $Param{TicketID},
             DynamicFields => 1,
         );
@@ -109,10 +109,10 @@ sub ReplaceExtended {
     # translate ticket values if needed
     if ( $Param{Language} ) {
         my $LanguageObject = Kernel::Language->new(
-            MainObject   => $Kernel::OM->Get('Kernel::System::Main'),
-            ConfigObject => $Kernel::OM->Get('Kernel::Config'),
-            EncodeObject => $Kernel::OM->Get('Kernel::System::Encode'),
-            LogObject    => $Kernel::OM->Get('Kernel::System::Log'),
+            MainObject   => $Kernel::OM->Get('Main'),
+            ConfigObject => $Kernel::OM->Get('Config'),
+            EncodeObject => $Kernel::OM->Get('Encode'),
+            LogObject    => $Kernel::OM->Get('Log'),
             UserLanguage => $Param{Language},
         );
         for my $Field (qw(Type State StateType Lock Priority)) {
@@ -122,7 +122,7 @@ sub ReplaceExtended {
 
     my %Queue;
     if ( $Param{QueueID} ) {
-        %Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet( ID => $Param{QueueID} );
+        %Queue = $Kernel::OM->Get('Queue')->QueueGet( ID => $Param{QueueID} );
     }
 
     my $Tag = $Start . 'KIX_LAST_';
@@ -175,7 +175,7 @@ sub ReplaceExtended {
                     # add quote
                     $NewOldBody = "<blockquote type=\"cite\">$NewOldBody</blockquote>";
                     $NewOldBody
-                        = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentStyleCleanup(
+                        = $Kernel::OM->Get('HTMLUtils')->DocumentStyleCleanup(
                         String => $NewOldBody,
                         );
 
@@ -192,7 +192,7 @@ sub ReplaceExtended {
             my $SubjectChar = $2;
 
             # my $Subject     = $TicketObject->TicketSubjectClean(
-            my $Subject = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSubjectClean(
+            my $Subject = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
                 TicketNumber => $Ticket{TicketNumber},
                 Subject      => $Article{Subject},
             );
@@ -204,7 +204,7 @@ sub ReplaceExtended {
         if ( $Param{RichText} ) {
             for ( keys %Article ) {
                 next if !$Article{$_};
-                $Article{$_} = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToHTML(
+                $Article{$_} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
                     String => $Article{$_},
                 );
 
@@ -223,7 +223,7 @@ sub ReplaceExtended {
     }
     else
     {
-        $Param{Text} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        $Param{Text} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
             RichText => $Param{RichText},
             Text     => $Param{Text},
             TicketID => $Param{TicketID},
@@ -250,7 +250,7 @@ sub _CheckParams {
         )
     {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -260,7 +260,7 @@ sub _CheckParams {
 
     # Check if we have Ticket to deal with
     if ( !IsHashRefWithData( $Param{Ticket} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "Ticket has no values!",
         );
@@ -269,7 +269,7 @@ sub _CheckParams {
 
     # Check if we have a ConfigHash
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "Config has no values!",
         );

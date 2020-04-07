@@ -13,22 +13,22 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
-my $XMLObject    = $Kernel::OM->Get('Kernel::System::XML');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $DBObject     = $Kernel::OM->Get('DB');
+my $XMLObject    = $Kernel::OM->Get('XML');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Data         = $ConfigObject->Get('Organisation');
 my $DefaultValue = $Data->{Params}->{Table};
 
-my $OrganisationObject = $Kernel::OM->Get('Kernel::System::Organisation');
+my $OrganisationObject = $Kernel::OM->Get('Organisation');
 
 for my $Key ( 1 .. 3, 'ä', 'カス' ) {
 

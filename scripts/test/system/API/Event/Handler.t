@@ -15,7 +15,7 @@ use vars (qw($Self));
 use URI::Escape();
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # unregister other ticket handlers
 $ConfigObject->Set(
@@ -27,7 +27,7 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'Ticket::EventModulePost###999-API',
     Value => {
-        Module      => 'Kernel::API::Event::Handler',
+        Module      => 'API::Event::Handler',
         Event       => '.*',
         Transaction => 1,
     },
@@ -35,13 +35,13 @@ $ConfigObject->Set(
 
 $Self->Is(
     $ConfigObject->Get('Ticket::EventModulePost')->{'999-API'}->{Module},
-    'Kernel::API::Event::Handler',
+    'API::Event::Handler',
     "Event handler added to config",
 );
 
 # helper object
 
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Home = $ConfigObject->Get('Home');
 
@@ -283,10 +283,10 @@ my @Tests = (
 );
 
 # get needed objects
-my $WebserviceObject  = $Kernel::OM->Get('Kernel::System::API::Webservice');
-my $DebugLogObject    = $Kernel::OM->Get('Kernel::System::API::DebugLog');
-my $TaskWorkerObject  = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker');
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+my $WebserviceObject  = $Kernel::OM->Get('API::Webservice');
+my $DebugLogObject    = $Kernel::OM->Get('API::DebugLog');
+my $TaskWorkerObject  = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 my $RandomID = $HelperObject->GetRandomID();
 
@@ -314,7 +314,7 @@ for my $Test (@Tests) {
 
     # enclose in block because the events are executed in destructor of ticket object
     {
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $TicketID = $TicketObject->TicketCreate(
             Title        => 'Some Ticket Title',
@@ -333,7 +333,7 @@ for my $Test (@Tests) {
         );
 
         $Kernel::OM->ObjectsDiscard(
-            Objects => ['Kernel::System::Ticket'],
+            Objects => ['Ticket'],
         );
     }
 
@@ -446,7 +446,7 @@ for my $Test (@Tests) {
     );
 }
 
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # cleanup ticket database
 my @DeleteTicketList = $TicketObject->TicketSearch(

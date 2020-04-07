@@ -124,7 +124,7 @@ sub Run {
     );
 
     # check if exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDuplicateCheck(
+    my $Exists = $Kernel::OM->Get('FAQ')->CategoryDuplicateCheck(
         Name     => $FAQCategory->{Name},
         ParentID => $FAQCategory->{ParentID},
         UserID   => 1
@@ -137,7 +137,7 @@ sub Run {
     }
 
     # create FAQCategory
-    my $FAQCategoryID = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryAdd(
+    my $FAQCategoryID = $Kernel::OM->Get('FAQ')->CategoryAdd(
         Name     => $FAQCategory->{Name},
         Comment  => $FAQCategory->{Comment} || '',
         ParentID => $FAQCategory->{ParentID} || 0,

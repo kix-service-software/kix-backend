@@ -110,7 +110,7 @@ sub Run {
     foreach my $TextModuleID ( @{$Param{Data}->{TextModuleID}} ) {
 
         # delete TextModule	    
-        my $Success = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleDelete(
+        my $Success = $Kernel::OM->Get('TextModule')->TextModuleDelete(
             ID     => $TextModuleID,
             UserID => $Self->{Authorization}->{UserID},
         );

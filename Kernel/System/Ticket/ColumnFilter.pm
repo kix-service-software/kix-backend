@@ -16,10 +16,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsStringWithData);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::User',
+    'DB',
+    'Log',
+    'Main',
+    'User',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketColumnFilterObject = $Kernel::OM->Get('Kernel::System::Ticket::ColumnFilter');
+    my $TicketColumnFilterObject = $Kernel::OM->Get('Ticket::ColumnFilter');
 
 =cut
 
@@ -82,14 +82,14 @@ sub StateFilterValuesGet {
 
         # get state list
         return $Self->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::State',
+            ModuleName   => 'State',
             FunctionName => 'StateList',
             UserID       => $Param{UserID},
         );
     }
 
     if ( !IsArrayRefWithData( $Param{TicketIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TicketIDs must be an array ref!',
         );
@@ -101,7 +101,7 @@ sub StateFilterValuesGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT DISTINCT(t.ticket_state_id), ts.name"
@@ -149,14 +149,14 @@ sub QueueFilterValuesGet {
 
         # get queue list
         return $Self->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::Queue',
+            ModuleName   => 'Queue',
             FunctionName => 'QueueList',
             UserID       => $Param{UserID},
         );
     }
 
     if ( !IsArrayRefWithData( $Param{TicketIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TicketIDs must be an array ref!',
         );
@@ -168,7 +168,7 @@ sub QueueFilterValuesGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT DISTINCT(t.queue_id), q.name"
@@ -214,14 +214,14 @@ sub PriorityFilterValuesGet {
 
         # get priority list
         return $Self->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::Priority',
+            ModuleName   => 'Priority',
             FunctionName => 'PriorityList',
             UserID       => $Param{UserID},
         );
     }
 
     if ( !IsArrayRefWithData( $Param{TicketIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TicketIDs must be an array ref!',
         );
@@ -233,7 +233,7 @@ sub PriorityFilterValuesGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT DISTINCT(t.ticket_priority_id), tp.name"
@@ -279,14 +279,14 @@ sub TypeFilterValuesGet {
 
         # get type list
         return $Self->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::Type',
+            ModuleName   => 'Type',
             FunctionName => 'TypeList',
             UserID       => $Param{UserID},
         );
     }
 
     if ( !IsArrayRefWithData( $Param{TicketIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TicketIDs must be an array ref!',
         );
@@ -298,7 +298,7 @@ sub TypeFilterValuesGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT DISTINCT(t.type_id), tt.name"
@@ -345,14 +345,14 @@ sub LockFilterValuesGet {
 
         # get lock list
         return $Self->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::Lock',
+            ModuleName   => 'Lock',
             FunctionName => 'LockList',
             UserID       => $Param{UserID},
         );
     }
 
     if ( !IsArrayRefWithData( $Param{TicketIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TicketIDs must be an array ref!',
         );
@@ -364,7 +364,7 @@ sub LockFilterValuesGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT DISTINCT(t.ticket_lock_id), tlt.name"
@@ -410,14 +410,14 @@ sub ServiceFilterValuesGet {
 
         # get service list
         return $Self->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::Service',
+            ModuleName   => 'Service',
             FunctionName => 'ServiceList',
             UserID       => $Param{UserID},
         );
     }
 
     if ( !IsArrayRefWithData( $Param{TicketIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TicketIDs must be an array ref!',
         );
@@ -429,7 +429,7 @@ sub ServiceFilterValuesGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT DISTINCT(t.service_id), s.name"
@@ -475,14 +475,14 @@ sub SLAFilterValuesGet {
 
         # get sla list
         return $Self->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::SLA',
+            ModuleName   => 'SLA',
             FunctionName => 'SLAList',
             UserID       => $Param{UserID},
         );
     }
 
     if ( !IsArrayRefWithData( $Param{TicketIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TicketIDs must be an array ref!',
         );
@@ -494,7 +494,7 @@ sub SLAFilterValuesGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT DISTINCT(t.sla_id), s.name"
@@ -521,7 +521,7 @@ sub SLAFilterValuesGet {
 get data list
 
     my $Values = $ColumnFilterObject->_GeneralDataGet(
-            ModuleName   => 'Kernel::System::Object',
+            ModuleName   => 'Object',
             FunctionName => 'FunctionNameList',
             UserID       => $Param{UserID},
     );
@@ -542,7 +542,7 @@ sub _GeneralDataGet {
     # check needed stuff
     for my $Needed (qw(ModuleName FunctionName UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -556,8 +556,8 @@ sub _GeneralDataGet {
     my $BackendModule = $Param{ModuleName};
 
     # check if backend field exists
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($BackendModule) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+    if ( !$Kernel::OM->Get('Main')->Require($BackendModule) ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't load backend module $BackendModule!",
         );
@@ -568,7 +568,7 @@ sub _GeneralDataGet {
     my $BackendObject = $BackendModule->new( %{$Self} );
 
     if ( !$BackendObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Couldn't create a backend object for $BackendModule!",
         );
@@ -576,7 +576,7 @@ sub _GeneralDataGet {
     }
 
     if ( ref $BackendObject ne $BackendModule ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Backend object for $BackendModule was not created successfuly!",
         );
@@ -600,7 +600,7 @@ sub _TicketIDStringGet {
     my $ColumnName = $Param{ColumnName} || 't.id';
 
     if ( !$Param{TicketIDs} || ref $Param{TicketIDs} ne 'ARRAY' || !@{ $Param{TicketIDs} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TicketIDs.",
         );
@@ -611,7 +611,7 @@ sub _TicketIDStringGet {
     my @SortedIDs = sort { $a <=> $b } @{ $Param{TicketIDs} };
 
     # Error out if some values were not integers.
-    @SortedIDs = map { $Kernel::OM->Get('Kernel::System::DB')->Quote( $_, 'Integer' ) } @SortedIDs;
+    @SortedIDs = map { $Kernel::OM->Get('DB')->Quote( $_, 'Integer' ) } @SortedIDs;
     return if scalar @SortedIDs != scalar @{ $Param{TicketIDs} };
 
     my $TicketIDString = '';

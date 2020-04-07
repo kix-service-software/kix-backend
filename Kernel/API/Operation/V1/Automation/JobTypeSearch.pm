@@ -83,7 +83,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get job types
-    my $JobTypes = $Kernel::OM->Get('Kernel::Config')->Get('Automation::JobType');
+    my $JobTypes = $Kernel::OM->Get('Config')->Get('Automation::JobType');
 
     if ( IsHashRefWithData($JobTypes) ) {
         my @JobTypeList;

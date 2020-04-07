@@ -16,7 +16,7 @@ use vars (qw($Self));
 
 use Kernel::System::EmailParser;
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 # test for bug#1970
 my @Array;

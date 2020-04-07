@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
-    'Kernel::Output::HTML::Layout',
+    'Config',
+    'Main',
+    'Output::HTML::Layout',
 );
 
 sub Configure {
@@ -34,9 +34,9 @@ sub Run {
 
     $Self->Print("<yellow>Starting...</yellow>\n\n");
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
     # Call Output() once so that the TT objects are created.
     $LayoutObject->Output( Template => '' );
@@ -44,7 +44,7 @@ sub Run {
         ["$Home/scripts/auto_build/spec/templates"]
     );
 
-    my @SpecFileTemplates = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @SpecFileTemplates = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => "$Home/scripts/auto_build/spec/templates",
         Filter    => "*.spec.tt",
     );
@@ -54,11 +54,11 @@ sub Run {
         $SpecFileName =~ s{^.*/spec/templates/}{};
         $SpecFileName = substr( $SpecFileName, 0, -3 );    # cut off .tt
 
-        my $Output = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->Output(
+        my $Output = $Kernel::OM->Get('Output::HTML::Layout')->Output(
             TemplateFile => $SpecFileName,
         );
         my $TargetPath = "$Home/scripts/auto_build/spec/$SpecFileName";
-        my $Written    = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        my $Written    = $Kernel::OM->Get('Main')->FileWrite(
             Location => $TargetPath,
             Mode     => 'utf8',
             Content  => \$Output,

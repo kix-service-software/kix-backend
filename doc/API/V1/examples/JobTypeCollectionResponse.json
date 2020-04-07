@@ -1,6 +1,8 @@
 {
-    "JobType": {
-        "DisplayName": "Ticket",
-        "Name": "Ticket"
-    }
+    "JobType": [
+        {
+            "DisplayName": "Ticket",
+            "Name": "Ticket"
+        }
+    ]
 }

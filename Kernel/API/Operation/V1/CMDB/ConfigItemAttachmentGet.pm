@@ -147,7 +147,7 @@ sub Run {
     my @AttachmentList;
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
-        my $StoredAttachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
+        my $StoredAttachment = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGet(
             ID => $AttachmentID,
         );
 
@@ -229,7 +229,7 @@ sub _CheckAttachmentAttributeForCustomer {
             }
 
             if ( IsArrayRefWithData($Param{AttachmentIDs}) ) {
-                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
                     VersionID  => $Param{VersionID},
                     XMLDataGet => 1,
                 );

@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $MacroID ( @{$Param{Data}->{MacroID}} ) {
 
-        my $Found = $Kernel::OM->Get('Kernel::System::Automation')->MacroLookup(
+        my $Found = $Kernel::OM->Get('Automation')->MacroLookup(
             ID => $MacroID,
         );
 
@@ -121,7 +121,7 @@ sub Run {
         }
 
         # unassign Macro from Job 
-        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->JobMacroDelete(
+        my $Success = $Kernel::OM->Get('Automation')->JobMacroDelete(
             JobID   => $Param{Data}->{JobID},
             MacroID => $MacroID,
             UserID  => $Self->{Authorization}->{UserID},

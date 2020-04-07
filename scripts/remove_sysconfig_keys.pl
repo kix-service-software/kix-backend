@@ -23,8 +23,8 @@ use Kernel::System::ObjectManager;
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new();
 
-my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
-my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
+my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+my $MainObject      = $Kernel::OM->Get('Main');
 
 # read file with keys to remove
 my $ContentRef = $MainObject->FileRead(
@@ -41,7 +41,7 @@ my @KeyList = @{$ContentRef};
 
 # read all xml files
 my @FileList = $MainObject->DirectoryRead(
-    Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/Kernel/Config/Files',
+    Directory => $Kernel::OM->Get('Config')->Get('Home').'/Kernel/Config/Files',
     Filter    => [ '*.xml' ],
     Recursive => 1,
 );

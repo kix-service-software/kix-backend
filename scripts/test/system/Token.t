@@ -13,15 +13,15 @@ use utf8;
 use vars (qw($Self));
 
 # get token object
-my $TokenObject = $Kernel::OM->Get('Kernel::System::Token');
+my $TokenObject = $Kernel::OM->Get('Token');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Payload = {
     UserID     => 123,
@@ -47,7 +47,7 @@ $Self->True(
 );
 
 # create invalid token
-$Kernel::OM->Get('Kernel::Config')->Set(Key => 'TokenMaxTime', Value => -100);
+$Kernel::OM->Get('Config')->Set(Key => 'TokenMaxTime', Value => -100);
 my $InvalidToken = $TokenObject->CreateToken(
     Payload => $Payload
 );

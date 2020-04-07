@@ -18,8 +18,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -82,7 +82,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -96,11 +96,11 @@ sub Search {
             @SLAList = @{$Param{Search}->{Value}}
         }
         foreach my $SLA ( @SLAList ) {
-            my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+            my $SLAID = $Kernel::OM->Get('SLA')->SLALookup(
                 SLA => $SLA,
             );
             if ( !$SLAID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unknown SLA $SLA!",
                 );
@@ -124,7 +124,7 @@ sub Search {
         push( @SQLWhere, 'st.sla_id IN ('.(join(',', @SLAIDs)).')' );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

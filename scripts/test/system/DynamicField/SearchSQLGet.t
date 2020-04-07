@@ -17,8 +17,8 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $DBObject        = $Kernel::OM->Get('Kernel::System::DB');
-my $DFBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $DBObject        = $Kernel::OM->Get('DB');
+my $DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 my $UserID = 1;
 

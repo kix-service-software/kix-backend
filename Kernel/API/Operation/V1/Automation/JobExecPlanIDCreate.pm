@@ -115,7 +115,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # assign ExecPlan to Job
-    my $Result = $Kernel::OM->Get('Kernel::System::Automation')->JobExecPlanAdd(
+    my $Result = $Kernel::OM->Get('Automation')->JobExecPlanAdd(
         JobID      => $Param{Data}->{JobID},
         ExecPlanID => $Param{Data}->{ExecPlanID},
         UserID     => $Self->{Authorization}->{UserID}

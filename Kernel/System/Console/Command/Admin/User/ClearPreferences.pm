@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
+    'Main',
 );
 
 sub Configure {
@@ -88,7 +88,7 @@ sub Run {
         push( @BindObj, \$Options{UserID} );
     }
 
-    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Result = $Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => \@BindObj,
     );

@@ -15,15 +15,15 @@ use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::CheckItem',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'CheckItem',
+    'DB',
+    'Encode',
+    'Log',
+    'Main',
+    'Time',
+    'Valid',
 );
 
 sub new {
@@ -39,9 +39,9 @@ sub new {
     }
 
     # get database object
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
     # KIX4OTRS-capeIT
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
     # EO KIX4OTRS-capeIT
 
     # max shown user per search list
@@ -81,7 +81,7 @@ sub new {
 
     # create cache object, but only if CacheTTL is set in customer config
     if ( $Self->{ContactMap}->{CacheTTL} ) {
-        $Self->{CacheObject} = $Kernel::OM->Get('Kernel::System::Cache');
+        $Self->{CacheObject} = $Kernel::OM->Get('Cache');
     }
 
     # create new db connect if DSN is given
@@ -113,7 +113,7 @@ sub CustomerName {
 
     # check needed stuff
     if ( !$Param{UserLogin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserLogin!',
         );
@@ -220,7 +220,7 @@ sub CustomerSearch {
     $SQL .= " FROM $Self->{CustomerTable} ";
     if ( $Param{Search} ) {
         if ( !$Self->{ContactMap}->{ContactSearchFields} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Need ContactSearchFields in Contact config, unable to search for '$Param{Search}'!",
@@ -392,7 +392,7 @@ sub CustomerSearch {
     if ( $Self->{ContactMap}->{CustomerValid} && $Valid ) {
 
         # get valid object
-        my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+        my $ValidObject = $Kernel::OM->Get('Valid');
 
         if ($SQL !~ / WHERE /g) {
             $SQL .= " WHERE ";
@@ -500,7 +500,7 @@ sub CustomerIDList {
     if ( $Self->{ContactMap}->{CustomerValid} && $Valid ) {
 
         # get valid object
-        my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+        my $ValidObject = $Kernel::OM->Get('Valid');
 
         my $ValidIDs = join( ', ', $ValidObject->ValidIDsGet() );
         $SQL .= "
@@ -554,7 +554,7 @@ sub CustomerIDs {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need User!',
         );
@@ -636,7 +636,7 @@ sub ContactGet {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need User!',
         );
@@ -730,7 +730,7 @@ sub ContactGet {
 
     # add last login timestamp
     if ( $Preferences{UserLastLogin} ) {
-        $Preferences{UserLastLoginTimestamp} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        $Preferences{UserLastLoginTimestamp} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $Preferences{UserLastLogin},
         );
     }
@@ -753,7 +753,7 @@ sub ContactAdd {
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Customer backend is read only!',
         );
@@ -768,7 +768,7 @@ sub ContactAdd {
             # skip UserLogin, will be checked later
             next ENTRY if ( $Entry->{Attribute} eq 'UserLogin' );
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Entry->{Attribute}!",
             );
@@ -776,7 +776,7 @@ sub ContactAdd {
         }
     }
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -787,7 +787,7 @@ sub ContactAdd {
     if ( !$Param{UserLogin} && $Self->{ContactMap}->{AutoLoginCreation} ) {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $TimeObject->SystemTime2Date(
             SystemTime => $TimeObject->SystemTime(),
@@ -798,7 +798,7 @@ sub ContactAdd {
 
     # check if user login exists
     if ( !$Param{UserLogin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserLogin!',
         );
@@ -812,7 +812,7 @@ sub ContactAdd {
             PostMasterSearch => $Param{UserEmail},
         );
         if (%Result) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Email already exists!',
             );
@@ -821,7 +821,7 @@ sub ContactAdd {
     }
 
     # get check item object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # check email address mx
     if (
@@ -829,7 +829,7 @@ sub ContactAdd {
         && !$CheckItemObject->CheckEmail( Address => $Param{UserEmail} )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Email address ($Param{UserEmail}) not valid ("
                 . $CheckItemObject->CheckError() . ")!",
@@ -906,7 +906,7 @@ sub ContactAdd {
     );
 
     # log notice
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message  => "Contact: '$Param{UserLogin}' created successfully ($Param{UserID})!",
     );
@@ -929,7 +929,7 @@ sub ContactUpdate {
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Customer backend is read only!',
         );
@@ -939,7 +939,7 @@ sub ContactUpdate {
     # check needed stuff
     for my $Entry ( @{ $Self->{ContactMap}->{Map} } ) {
         if ( !$Param{ $Entry->{Attribute} } && $Entry->{Required} && $Entry->{Attribute} ne 'UserPassword' ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Entry->{Attribute}!",
             );
@@ -948,7 +948,7 @@ sub ContactUpdate {
     }
 
     # get check item object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # check email address
     if (
@@ -956,7 +956,7 @@ sub ContactUpdate {
         && !$CheckItemObject->CheckEmail( Address => $Param{UserEmail} )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Email address ($Param{UserEmail}) not valid ("
                 . $CheckItemObject->CheckError() . ")!",
@@ -979,7 +979,7 @@ sub ContactUpdate {
             PostMasterSearch => $Param{UserEmail},
         );
         if (%Result) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Email already exists!',
             );
@@ -1057,7 +1057,7 @@ sub ContactUpdate {
     }
 
     # log notice
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message  => "Contact: '$Param{UserLogin}' updated successfully ($Param{UserID})!",
     );
@@ -1083,7 +1083,7 @@ sub SetPreferences {
 
     # check needed params
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -1100,7 +1100,7 @@ sub GetPreferences {
 
     # check needed params
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -1122,7 +1122,7 @@ sub _ContactCacheClear {
     return if !$Self->{CacheObject};
 
     if ( !$Param{UserLogin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserLogin!',
         );

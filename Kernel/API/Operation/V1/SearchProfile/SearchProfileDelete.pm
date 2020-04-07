@@ -110,7 +110,7 @@ sub Run {
     foreach my $SearchProfileID ( @{$Param{Data}->{SearchProfileID}} ) {
 
         # delete SearchProfile	    
-        my $Success = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileDelete(
+        my $Success = $Kernel::OM->Get('SearchProfile')->SearchProfileDelete(
             ID     => $SearchProfileID,
             UserID => $Self->{Authorization}->{UserID},
         );

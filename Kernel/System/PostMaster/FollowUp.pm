@@ -14,16 +14,16 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
     # KIX4OTRS-capeIT
-    'Kernel::System::Contact',
+    'Contact',
     # EO KIX4OTRS-capeIT
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
+    'Ticket',
+    'Time',
+    'User',
 );
 
 sub new {
@@ -47,7 +47,7 @@ sub Run {
     # check needed stuff
     for (qw(TicketID InmailUserID GetParam Tn AutoResponseType)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -57,7 +57,7 @@ sub Run {
     my %GetParam = %{ $Param{GetParam} };
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket data
     my %Ticket = $TicketObject->TicketGet(
@@ -70,7 +70,7 @@ sub Run {
     my $AutoResponseType = $Param{AutoResponseType} || '';
 
     # Check if owner of ticket is still valid
-    my %UserInfo = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %UserInfo = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Ticket{OwnerID},
     );
 
@@ -81,7 +81,7 @@ sub Run {
             Lock     => 'unlock',
             UserID   => $Param{InmailUserID},
         );
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Ticket [$Param{Tn}] unlocked, current owner is out of office!",
         );
@@ -99,7 +99,7 @@ sub Run {
             );
             if ( $Self->{Debug} > 0 ) {
                 print "Lock: lock\n";
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => "Ticket [$Param{Tn}] still locked",
                 );
@@ -114,14 +114,14 @@ sub Run {
             Lock     => 'unlock',
             UserID   => $Param{InmailUserID},
         );
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Ticket [$Param{Tn}] unlocked, current owner is invalid!",
         );
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # set state
     # KIX4OTRS-capeIT
@@ -200,7 +200,7 @@ sub Run {
             $Seconds = $Seconds * $UnitMultiplier{$Unit};
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             $TargetTimeStamp = $TimeObject->SystemTime2TimeStamp(
                 SystemTime => $TimeObject->SystemTime() + $Seconds,
@@ -294,8 +294,8 @@ sub Run {
     }
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # dynamic fields
     my $DynamicFieldList =
@@ -377,7 +377,7 @@ sub Run {
         if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             my $SystemTime = $TimeObject->TimeStamp2SystemTime(
                 String => $GetParam{$Key},
@@ -412,7 +412,7 @@ sub Run {
     # check if email-from is a valid agent...
     if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
         for my $FromAddress (@SplitFrom) {
-            my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+            my $UserObject = $Kernel::OM->Get('User');
             my %UserData = $UserObject->UserSearch(
                 PostMasterSearch => $FromAddress,
                 ValidID          => 1,
@@ -434,7 +434,7 @@ sub Run {
     {
         $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
         for my $FromAddress (@SplitFrom) {
-            my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+            my $ContactObject = $Kernel::OM->Get('Contact');
             my %UserListCustomer = $ContactObject->ContactSearch(
                 PostMasterSearch => $FromAddress,
             );
@@ -596,7 +596,7 @@ sub Run {
     }
 
     # write log
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "FollowUp Article to Ticket [$Param{Tn}] created "
             . "(TicketID=$Param{TicketID}, ArticleID=$ArticleID). $Comment,"

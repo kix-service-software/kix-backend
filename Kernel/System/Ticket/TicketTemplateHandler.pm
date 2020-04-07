@@ -58,8 +58,8 @@ sub TicketTemplateList {
     my $SQL = 'SELECT id, name FROM kix_ticket_template';
 
     # get DB object
-    $Self->{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
+    $Self->{DBObject}     = $Kernel::OM->Get('DB');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
 
     if ( defined $Param{ValidID} && $Param{ValidID} ) {
         $Param{ValidID} = $Self->{DBObject}->Quote( $Param{ValidID}, 'Integer' );
@@ -131,13 +131,13 @@ sub TicketTemplateGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => "TicketTemplateGet: Need Name or ID!" );
         return;
     }
 
     # create YAML object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     # lookup ID if name given
     if ( !$Param{ID} ) {
@@ -220,13 +220,13 @@ sub TicketTemplateLookup {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => "TicketTemplateLookup: Need Name or ID!" );
         return;
     }
 
     # create DB object
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
 
     if ( $Param{ID} ) {
 
@@ -286,7 +286,7 @@ sub TicketTemplateCreate {
     # check needed stuff
     for my $Needed (qw(UserID Name Data)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketTemplateCreate: Need $Needed!" );
             return;
         }
@@ -296,7 +296,7 @@ sub TicketTemplateCreate {
     $Param{Data}->{CustomerPortalGroupID} ||= 0;
 
     # create YAML object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     my %Data = %{ $Param{Data} };
 
@@ -455,13 +455,13 @@ sub TicketTemplateUpdate {
     # check needed stuff
     for my $Needed (qw(UserID Data)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketTemplateUpdate: Need $Needed!" );
             return;
         }
     }
     if ( ref $Param{Data} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log(
             Priority => 'error',
             Message  => "TicketTemplateUpdate: Given data needs to be a hash element!"
@@ -469,7 +469,7 @@ sub TicketTemplateUpdate {
         return;
     }
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => "TicketTemplateUpdate: Need Name or ID!" );
         return;
     }
@@ -478,7 +478,7 @@ sub TicketTemplateUpdate {
     $Param{Data}->{CustomerPortalGroupID} ||= 0; 
 
     # create YAML object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     # get template content
     my %Template = $Self->TicketTemplateGet(
@@ -571,7 +571,7 @@ sub TicketTemplatePreferencesDelete {
     # check needed stuff
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log(
                 Priority => 'error',
                 Message  => "TicketTemplatePreferencesDelete: Need $Needed!"
@@ -580,7 +580,7 @@ sub TicketTemplatePreferencesDelete {
         }
     }
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log(
             Priority => 'error',
             Message  => "TicketTemplatePreferencesDelete: Need Name or ID!"
@@ -629,13 +629,13 @@ sub TicketTemplateDelete {
     # check needed stuff
     for my $Needed (qw(UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketTemplateDelete: Need $Needed!" );
             return;
         }
     }
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => "TicketTemplateDelete: Need Name or ID!" );
         return;
     }
@@ -715,7 +715,7 @@ sub _ImportTicketTemplateXML {
     my ( $Self, %Param ) = @_;
     my %Result = ();
 
-    $Self->{XMLObject} = $Kernel::OM->Get('Kernel::System::XML');
+    $Self->{XMLObject} = $Kernel::OM->Get('XML');
 
     #init counters...
     $Result{CountUploaded}     = 0;
@@ -726,7 +726,7 @@ sub _ImportTicketTemplateXML {
     # check required params...
     for (qw( XMLString UserID )) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -735,7 +735,7 @@ sub _ImportTicketTemplateXML {
         String => $Param{XMLString}
     );
 
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
     my @UpdateArray;
 
     if (
@@ -768,41 +768,41 @@ sub _ImportTicketTemplateXML {
 
                     if ( $Key eq 'Queue' ) {
                         $UpdateData{QueueID}
-                            = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                            = $Kernel::OM->Get('Queue')->QueueLookup(
                             Queue => $TMArrRef->{$Key}->[1]->{Content}
                             );
                     }
                     elsif ( $Key eq 'Type' ) {
-                        $UpdateData{TypeID} = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+                        $UpdateData{TypeID} = $Kernel::OM->Get('Type')->TypeLookup(
                             Type => $TMArrRef->{$Key}->[1]->{Content}
                         );
                     }
                     elsif ( $Key eq 'State' ) {
                         $UpdateData{StateID}
-                            = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+                            = $Kernel::OM->Get('State')->StateLookup(
                             State => $TMArrRef->{$Key}->[1]->{Content}
                             );
                     }
                     elsif ( $Key eq 'Priority' ) {
                         $UpdateData{PriorityID}
-                            = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+                            = $Kernel::OM->Get('Priority')->PriorityLookup(
                             Priority => $TMArrRef->{$Key}->[1]->{Content}
                             );
                     }
                     elsif ( ( $Key eq 'Owner' || $Key eq 'Responsible' ) ) {
                         $UpdateData{ $Key . 'ID' }
-                            = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+                            = $Kernel::OM->Get('User')->UserLookup(
                             UserLogin => $TMArrRef->{$Key}->[1]->{Content}
                             );
                     }
                     elsif ( $Key eq 'Service' ) {
                         $UpdateData{ServiceID}
-                            = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+                            = $Kernel::OM->Get('Service')->ServiceLookup(
                             Name => $TMArrRef->{$Key}->[1]->{Content}
                             );
                     }
                     elsif ( $Key eq 'SLA' ) {
-                        $UpdateData{SLAID} = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+                        $UpdateData{SLAID} = $Kernel::OM->Get('SLA')->SLALookup(
                             Name => $TMArrRef->{$Key}->[1]->{Content}
                         );
                     }
@@ -886,7 +886,7 @@ sub _CreateTicketTemplateExportXML {
     my ( $Self, %Param ) = @_;
     my $Result = "";
 
-    $Self->{XMLObject} = $Kernel::OM->Get('Kernel::System::XML');
+    $Self->{XMLObject} = $Kernel::OM->Get('XML');
 
     my %TicketTemplateData = $Self->TicketTemplateList(%Param);
     my @ExportDataArray;
@@ -905,43 +905,43 @@ sub _CreateTicketTemplateExportXML {
 
             if ( $CurrKey eq 'QueueID' && $TicketTemplate{$CurrKey} ne '-' ) {
                 $CurrTM{Queue}->[1]->{Content}
-                    = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                    = $Kernel::OM->Get('Queue')->QueueLookup(
                     QueueID => $TicketTemplate{$CurrKey}
                     );
             }
             elsif ( $CurrKey eq 'TypeID' ) {
                 $CurrTM{Type}->[1]->{Content}
-                    = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+                    = $Kernel::OM->Get('Type')->TypeLookup(
                     TypeID => $TicketTemplate{$CurrKey}
                     );
             }
             elsif ( $CurrKey eq 'StateID' ) {
                 $CurrTM{State}->[1]->{Content}
-                    = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+                    = $Kernel::OM->Get('State')->StateLookup(
                     StateID => $TicketTemplate{$CurrKey}
                     );
             }
             elsif ( $CurrKey eq 'PriorityID' ) {
                 $CurrTM{Priority}->[1]->{Content}
-                    = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+                    = $Kernel::OM->Get('Priority')->PriorityLookup(
                     PriorityID => $TicketTemplate{$CurrKey}
                     );
             }
             elsif ( $CurrKey eq 'OwnerID' || $CurrKey eq 'ResponsibleID' ) {
                 $CurrTM{ substr( $CurrKey, 0, -2 ) }->[1]->{Content}
-                    = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+                    = $Kernel::OM->Get('User')->UserLookup(
                     UserID => $TicketTemplate{$CurrKey}
                     );
             }
             elsif ( $CurrKey eq 'ServiceID' ) {
                 $CurrTM{Service}->[1]->{Content}
-                    = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+                    = $Kernel::OM->Get('Service')->ServiceLookup(
                     ServiceID => $TicketTemplate{$CurrKey}
                     );
             }
             elsif ( $CurrKey eq 'SLAID' ) {
                 $CurrTM{SLA}->[1]->{Content}
-                    = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+                    = $Kernel::OM->Get('SLA')->SLALookup(
                     SLAID => $TicketTemplate{$CurrKey}
                     );
             }

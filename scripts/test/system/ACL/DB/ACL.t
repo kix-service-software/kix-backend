@@ -17,15 +17,15 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $ACLObject    = $Kernel::OM->Get('Kernel::System::ACL::DB::ACL');
-my $CacheObject  = $Kernel::OM->Get('Kernel::System::Cache');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $ACLObject    = $Kernel::OM->Get('ACL::DB::ACL');
+my $CacheObject  = $Kernel::OM->Get('Cache');
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set fixed time
 $Helper->FixedTimeSet();

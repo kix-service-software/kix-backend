@@ -100,7 +100,7 @@ sub Validate {
         );
     }
 
-    my %AutoResponseTypeList = $Kernel::OM->Get('Kernel::System::AutoResponse')->AutoResponseTypeList();
+    my %AutoResponseTypeList = $Kernel::OM->Get('AutoResponse')->AutoResponseTypeList();
     my %AutoResponseTypeListReverse = reverse %AutoResponseTypeList;
 
     my $Found;

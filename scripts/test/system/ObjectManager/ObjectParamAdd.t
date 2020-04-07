@@ -17,13 +17,13 @@ use Kernel::System::ObjectManager;
 local $Kernel::OM = Kernel::System::ObjectManager->new();
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Config' => {
+    'Config' => {
         Data => 'Test payload',
     },
 );
 
 $Self->IsDeeply(
-    $Kernel::OM->{Param}->{'Kernel::Config'},
+    $Kernel::OM->{Param}->{'Config'},
     {
         Data => 'Test payload',
     },
@@ -31,13 +31,13 @@ $Self->IsDeeply(
 );
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Config' => {
+    'Config' => {
         Data2 => 'Test payload 2',
     },
 );
 
 $Self->IsDeeply(
-    $Kernel::OM->{Param}->{'Kernel::Config'},
+    $Kernel::OM->{Param}->{'Config'},
     {
         Data  => 'Test payload',
         Data2 => 'Test payload 2',
@@ -46,13 +46,13 @@ $Self->IsDeeply(
 );
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Config' => {
+    'Config' => {
         Data => undef,
     },
 );
 
 $Self->IsDeeply(
-    $Kernel::OM->{Param}->{'Kernel::Config'},
+    $Kernel::OM->{Param}->{'Config'},
     {
         Data2 => 'Test payload 2',
     },
@@ -60,13 +60,13 @@ $Self->IsDeeply(
 );
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Config' => {
+    'Config' => {
         Data2 => undef,
     },
 );
 
 $Self->IsDeeply(
-    $Kernel::OM->{Param}->{'Kernel::Config'},
+    $Kernel::OM->{Param}->{'Config'},
     {},
     'ObjectParamAdd removed key',
 );

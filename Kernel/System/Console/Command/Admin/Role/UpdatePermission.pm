@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
+    'Role',
 );
 
 sub Configure {
@@ -83,20 +83,20 @@ sub PreRun {
     $Self->{PermissionType} = $Self->GetOption('type');
 
     # check PermissionID
-    my %Permission = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet( ID => $Self->{PermissionID} );
+    my %Permission = $Kernel::OM->Get('Role')->PermissionGet( ID => $Self->{PermissionID} );
     if ( !%Permission ) {
         die "Permission with ID $Self->{PermissionID} does not exist.\n";
     }
     $Self->{Permission} = \%Permission;
 
     # check role
-    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
+    $Self->{RoleID} = $Kernel::OM->Get('Role')->RoleLookup( Role => $Self->{RoleName} );
     if ( !$Self->{RoleID} ) {
         die "Role $Self->{RoleName} does not exist.\n";
     }
 
     # check if given PermissionID belongs to given role
-    my %PermissionIDs = map {$_ => 1} $Kernel::OM->Get('Kernel::System::Role')->PermissionList(
+    my %PermissionIDs = map {$_ => 1} $Kernel::OM->Get('Role')->PermissionList(
         RoleID  => $Self->{RoleID},
         UserID  => 1,
     );
@@ -106,7 +106,7 @@ sub PreRun {
 
     # check permission type
     if ( $Self->{PermissionType} ) {
-        $Self->{PermissionTypeID} = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
+        $Self->{PermissionTypeID} = $Kernel::OM->Get('Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
         if ( !$Self->{PermissionTypeID} ) {
             die "Permission type $Self->{PermissionType} does not exist.\n";
         }
@@ -153,7 +153,7 @@ sub Run {
         $Value = 0 if $Value < 0;
     }
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Role')->PermissionUpdate(
+    my $Result = $Kernel::OM->Get('Role')->PermissionUpdate(
         ID         => $Self->{PermissionID},
         TypeID     => $Self->{PermissionTypeID} || $Self->{Permission}->{TypeID},
         Target     => $Self->GetOption('target') || $Self->{Permission}->{Target},

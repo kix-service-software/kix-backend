@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get environment object
-my $EnvironmentObject = $Kernel::OM->Get('Kernel::System::Environment');
+my $EnvironmentObject = $Kernel::OM->Get('Environment');
 
 my %OSInfo = $EnvironmentObject->OSInfoGet();
 

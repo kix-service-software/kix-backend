@@ -110,7 +110,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform RoleUser search
-    my @UserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
+    my @UserList = $Kernel::OM->Get('Role')->RoleUserList(
         RoleID => $Param{Data}->{RoleID},
     );
 

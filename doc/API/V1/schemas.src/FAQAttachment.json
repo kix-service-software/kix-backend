@@ -38,7 +38,7 @@
          "readOnly": true
       },
       "Disposition": {
-         "type": "integer",
+         "type": "string",
          "readOnly": true
       },
       "Filename": {
@@ -62,11 +62,9 @@
       "ArticleID",
       "Changed",
       "ChangedBy",
-      "ContentID",
       "ContentType",
       "Created",
       "CreatedBy",
-      "Dispostion",
       "Filename",
       "Filesize",
       "FilesizeRaw",

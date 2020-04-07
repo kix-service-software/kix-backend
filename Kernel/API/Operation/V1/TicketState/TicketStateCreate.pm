@@ -125,19 +125,19 @@ sub Run {
     );
 
     # check if ticketState exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+    my $Exists = $Kernel::OM->Get('State')->StateLookup(
         State => $TicketState->{Name},
     );
     
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create TicketState. TicketState already exists.",
+            Message => "Cannot create TicketState. TicketState already exists.",
         );
     }
 
     # create ticketstate
-    my $TicketStateID = $Kernel::OM->Get('Kernel::System::State')->StateAdd(
+    my $TicketStateID = $Kernel::OM->Get('State')->StateAdd(
         %{$TicketState},
         ValidID => $TicketState->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},

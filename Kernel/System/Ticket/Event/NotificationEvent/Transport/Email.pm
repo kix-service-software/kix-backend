@@ -19,21 +19,21 @@ use Kernel::Language qw(Translatable);
 use base qw(Kernel::System::Ticket::Event::NotificationEvent::Transport::Base);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Output::HTML::Layout',
-    'Kernel::System::Contact',
-    'Kernel::System::Email',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Queue',
-    'Kernel::System::SystemAddress',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
-    'Kernel::System::Web::Request',
-    'Kernel::System::Crypt::PGP',
-    'Kernel::System::Crypt::SMIME',
+    'Config',
+    'Output::HTML::Layout',
+    'Contact',
+    'Email',
+    'Log',
+    'Main',
+    'Queue',
+    'SystemAddress',
+    'Ticket',
+    'User',
+    'WebRequest',
+    'Crypt::PGP',
+    'Crypt::SMIME',
 # NotificationEventX-capeIT
-    'Kernel::System::DynamicField',
+    'DynamicField',
 # EO NotificationEventX-capeIT
 );
 
@@ -57,7 +57,7 @@ create a notification transport object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new('');
-    my $TransportObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent::Transport::Email');
+    my $TransportObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent::Transport::Email');
 
 =cut
 
@@ -77,7 +77,7 @@ sub SendNotification {
     # check needed stuff
     for my $Needed (qw(TicketID UserID Notification Recipient)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need $Needed!',
             );
@@ -89,9 +89,9 @@ sub SendNotification {
     $Self->{EventData} = undef;
 
     # get needed objects
-    my $ConfigObject        = $Kernel::OM->Get('Kernel::Config');
-    my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
-    my $LayoutObject        = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $ConfigObject        = $Kernel::OM->Get('Config');
+    my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
+    my $LayoutObject        = $Kernel::OM->Get('Output::HTML::Layout');
 
     # get recipient data
     my %Recipient = %{ $Param{Recipient} };
@@ -103,9 +103,9 @@ sub SendNotification {
         && $Recipient{DynamicFieldType}
     ) {
         # get objects
-        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
-        my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
-        my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
+        my $ContactObject = $Kernel::OM->Get('Contact');
+        my $TicketObject       = $Kernel::OM->Get('Ticket');
+        my $UserObject         = $Kernel::OM->Get('User');
 
         # get ticket
         my %Ticket = $TicketObject->TicketGet(
@@ -132,7 +132,7 @@ sub SendNotification {
             my $AddressLine = '';
             # handle dynamic field by type
             if ($Recipient{DynamicFieldType} eq 'User') {
-                my $ExistingUserID = $Kernel::OM->('Kernel::System::User')->UserLookup(
+                my $ExistingUserID = $Kernel::OM->('User')->UserLookup(
                     UserLogin => $FieldRecipient,
                 );
                 my %UserContactData = $ContactObject->ContactGet(
@@ -185,12 +185,12 @@ sub SendNotification {
     # Verify a customer have an email
     if ( $Recipient{Type} eq 'Customer' ) {
         if ( !$Recipient{Email} && $Recipient{ID} ) {
-            my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                 ID => $Recipient{ID},
             );
 
             if ( !$Contact{Email} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'info',
                     Message  => "Send no customer notification because of missing "
                         . "customer email (ContactID=$Contact{ContactID})!",
@@ -211,7 +211,7 @@ sub SendNotification {
 
     return if $Recipient{UserEmail} !~ /@/;
 
-    my $IsLocalAddress = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressIsLocalAddress(
+    my $IsLocalAddress = $Kernel::OM->Get('SystemAddress')->SystemAddressIsLocalAddress(
         Address => $Recipient{UserEmail},
     );
 
@@ -223,14 +223,14 @@ sub SendNotification {
     my %Notification = %{ $Param{Notification} };
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     if ( $Param{Notification}->{ContentType} && $Param{Notification}->{ContentType} eq 'text/html' ) {
 
         # Get configured template with fallback to Default.
         my $EmailTemplate = $Param{Notification}->{Data}->{TransportEmailTemplate}->[0] || 'Default';
 
-        my $Home        = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+        my $Home        = $Kernel::OM->Get('Config')->Get('Home');
         my $TemplateDir = "$Home/Kernel/Output/HTML/Templates/Notification/Email";
 
         if ( !-r "$TemplateDir/$EmailTemplate.tt" ) {
@@ -253,8 +253,8 @@ sub SendNotification {
         && ref($Notification{Data}->{RecipientAttachmentDF}) eq 'ARRAY'
     ) {
         # get objects
-        my $DFAttachmentObject = $Kernel::OM->Get('Kernel::System::DFAttachment');
-        my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+        my $DFAttachmentObject = $Kernel::OM->Get('DFAttachment');
+        my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
         # get ticket
         my %Ticket = $TicketObject->TicketGet(
@@ -277,7 +277,7 @@ sub SendNotification {
         ATTACHMENT:
         for my $Attachment ( @FieldAttachments ) {
             # read file from virtual fs
-            my %File = $Kernel::OM->Get('Kernel::System::DFAttachment')->Read(
+            my %File = $Kernel::OM->Get('DFAttachment')->Read(
                 Filename        => $Attachment,
                 Mode            => 'binary',
                 DisableWarnings => 1,
@@ -333,7 +333,7 @@ sub SendNotification {
         my $SecurityOptions = $Self->SecurityOptionsGet( %Param, FromEmail => $FromEmail );
         return if !$SecurityOptions;
 
-        my $Sent = $Kernel::OM->Get('Kernel::System::Email')->Send(
+        my $Sent = $Kernel::OM->Get('Email')->Send(
             From       => $From,
             To         => $Recipient{UserEmail},
             Subject    => $Notification{Subject},
@@ -347,7 +347,7 @@ sub SendNotification {
         );
 
         if ( !$Sent ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "'$Notification{Name}' notification could not be sent to agent '$Recipient{UserEmail} ",
             );
@@ -369,7 +369,7 @@ sub SendNotification {
         }
 
         # log event
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "Sent agent '$Notification{Name}' notification to '$Recipient{UserEmail}'.",
         );
@@ -393,7 +393,7 @@ sub SendNotification {
     }
     else {
         # get queue object
-        my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+        my $QueueObject = $Kernel::OM->Get('Queue');
 
         # get article
         my %Article = $TicketObject->ArticleLastCustomerArticle(
@@ -412,7 +412,7 @@ sub SendNotification {
             ID => $QueueID,
         );
 
-        my %Address = $Kernel::OM->Get('Kernel::System::Queue')->GetSystemAddress( 
+        my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress( 
             QueueID => $QueueID
         );
 
@@ -424,7 +424,7 @@ sub SendNotification {
         );
         return if !$SecurityOptions;
 
-        my $Sent = $Kernel::OM->Get('Kernel::System::Email')->Send(
+        my $Sent = $Kernel::OM->Get('Email')->Send(
             From       => $Address{Email},
             To         => $Recipient{UserEmail},
             Subject    => $Notification{Subject},
@@ -438,7 +438,7 @@ sub SendNotification {
         );
 
         if ( !$Sent ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "'$Notification{Name}' notification could not be sent to customer '$Recipient{UserEmail} ",
             );
@@ -458,7 +458,7 @@ sub SendNotification {
         }
 
         # log event
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "Sent customer '$Notification{Name}' notification to '$Recipient{UserEmail}'.",
         );
@@ -482,7 +482,7 @@ sub GetTransportRecipients {
 
     for my $Needed (qw(Notification)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed",
             );
@@ -501,7 +501,7 @@ sub GetTransportRecipients {
 
             # check if we have a specified channel
             if ( $Param{Notification}->{Data}->{ChannelID} ) {
-                $Recipient{NotificationChannel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+                $Recipient{NotificationChannel} = $Kernel::OM->Get('Channel')->ChannelLookup(
                     ID => $Param{Notification}->{Data}->{ChannelID}->[0]
                 ) || 'email';
             }
@@ -515,7 +515,7 @@ sub GetTransportRecipients {
 
 # NotificationEventX-capeIT
     # get object
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
     # get dynamic fields
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
@@ -609,7 +609,7 @@ sub SecurityOptionsGet {
 
     # Get private and public keys for the given backend (PGP or SMIME)
     if ( $SignEncryptNotification =~ /^PGP/i ) {
-        @SignKeys = $Kernel::OM->Get('Kernel::System::Crypt::PGP')->PrivateKeySearch(
+        @SignKeys = $Kernel::OM->Get('Crypt::PGP')->PrivateKeySearch(
             Search => $NotificationSenderEmail,
         );
 
@@ -617,23 +617,23 @@ sub SecurityOptionsGet {
         @SignKeys = grep { $_->{Status} eq 'good' } @SignKeys;
 
         # get public keys
-        @EncryptKeys = $Kernel::OM->Get('Kernel::System::Crypt::PGP')->PublicKeySearch(
+        @EncryptKeys = $Kernel::OM->Get('Crypt::PGP')->PublicKeySearch(
             Search => $Param{Recipient}->{UserEmail},
         );
 
         # Get PGP method (Detached or In-line).
-        if ( !$Kernel::OM->Get('Kernel::Output::HTML::Layout')->{BrowserRichText} ) {
-            $Subtype = $Kernel::OM->Get('Kernel::Config')->Get('PGP::Method') || 'Detached';
+        if ( !$Kernel::OM->Get('Output::HTML::Layout')->{BrowserRichText} ) {
+            $Subtype = $Kernel::OM->Get('Config')->Get('PGP::Method') || 'Detached';
         }
         $Method   = 'PGP';
         $KeyField = 'Key';
     }
     elsif ( $SignEncryptNotification =~ /^SMIME/i ) {
-        @SignKeys = $Kernel::OM->Get('Kernel::System::Crypt::SMIME')->PrivateSearch(
+        @SignKeys = $Kernel::OM->Get('Crypt::SMIME')->PrivateSearch(
             Search => $NotificationSenderEmail,
         );
 
-        @EncryptKeys = $Kernel::OM->Get('Kernel::System::Crypt::SMIME')->CertificateSearch(
+        @EncryptKeys = $Kernel::OM->Get('Crypt::SMIME')->CertificateSearch(
             Search => $Param{Recipient}->{UserEmail},
         );
 
@@ -697,7 +697,7 @@ sub SecurityOptionsGet {
             if ( $OnMissingSigningKeys eq 'Skip' ) {
 
                 # Log skipping notification (return nothing to stop email sending).
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => $Message . ', skipping notification distribution!',
                 );
@@ -706,7 +706,7 @@ sub SecurityOptionsGet {
             }
 
             # Log sending unsigned notification.
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => $Message . ', sending unsigned!',
             );
@@ -736,7 +736,7 @@ sub SecurityOptionsGet {
             if ( $OnMissingEncryptionKeys eq 'Skip' ) {
 
                 # Log skipping notification (return nothing to stop email sending).
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => $Message . ', skipping notification distribution!',
                 );
@@ -745,7 +745,7 @@ sub SecurityOptionsGet {
             }
 
             # Log sending unencrypted notification.
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => $Message . ', sending unencrypted!',
             );
@@ -770,14 +770,14 @@ sub CreateArticle {
 
     for my $Needed (qw(Address Notification Recipient TicketID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed",
             );
         }
     }
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my $Channel = 'note';
     if ( IsArrayRefWithData( $Param{Notification}->{Data}->{Channel} ) ) {
@@ -810,7 +810,7 @@ sub CreateArticle {
     );
 
     if ( !$ArticleID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "'$Param{Notification}->{Name}' notification could not be sent to customer '$Param{Recipient}->{UserEmail} ",
         );
@@ -820,7 +820,7 @@ sub CreateArticle {
 
     # if required mark new article as seen for all users
     if ( $Param{Notification}->{Data}->{MarkAsSeenForAgents} ) {
-        my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList();
+        my %UserList = $Kernel::OM->Get('User')->UserList();
         for my $UserID ( keys %UserList ) {
             $TicketObject->ArticleFlagSet(
                 ArticleID => $ArticleID,

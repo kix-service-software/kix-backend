@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TranslationCollectionResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
@@ -20,6 +21,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationPatternGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationPatternGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">PatternID</Item>
                 <Item Key="ResponseSchema">TranslationPatternResponse</Item>
@@ -34,6 +36,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationPatternSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationPatternSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TranslationPatternCollectionResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
@@ -47,6 +50,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationPatternCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationPatternCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TranslationPatternPostRequest</Item>
                 <Item Key="ResponseSchema">TranslationPatternPostPatchResponse</Item>
@@ -58,6 +62,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationPatternUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationPatternUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TranslationPatternPatchRequest</Item>
                 <Item Key="ResponseSchema">TranslationPatternPostPatchResponse</Item>
@@ -69,6 +74,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationPatternDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationPatternDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -79,6 +85,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationLanguageGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationLanguageGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TranslationID</Item>
                 <Item Key="ResponseSchema">TranslationLanguageResponse</Item>
@@ -93,6 +100,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationLanguageSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationLanguageSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TranslationLanguageCollectionResponse</Item>
                 <Item Key="CacheType">API_i18n_translations</Item>
@@ -106,6 +114,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationLanguageCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationLanguageCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TranslationLanguagePostRequest</Item>
                 <Item Key="ResponseSchema">TranslationLanguagePostPatchResponse</Item>
@@ -117,6 +126,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationLanguageUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationLanguageUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TranslationLanguagePatchRequest</Item>
                 <Item Key="ResponseSchema">TranslationLanguagePostPatchResponse</Item>
@@ -128,6 +138,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TranslationLanguageDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::I18n::TranslationLanguageDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

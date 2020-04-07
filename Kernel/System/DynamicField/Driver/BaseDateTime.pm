@@ -19,10 +19,10 @@ use Kernel::Language qw(Translatable);
 use base qw(Kernel::System::DynamicField::Driver::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'DB',
+    'DynamicFieldValue',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ Date common functions.
 sub ValueGet {
     my ( $Self, %Param ) = @_;
 
-    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+    my $DFValue = $Kernel::OM->Get('DynamicFieldValue')->ValueGet(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
         ObjectID => $Param{ObjectID},
     );
@@ -74,7 +74,7 @@ sub ValueSet {
     }
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     my $Success;
 
@@ -91,7 +91,7 @@ sub ValueSet {
             );
 
             if (!$Valid) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "The value for the field is invalid!"
                 );
@@ -126,7 +126,7 @@ sub ValueValidate {
     my $Prefix          = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
     my $DateRestriction = $Param{DynamicFieldConfig}->{Config}->{DateRestriction};
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueValidate(
+    my $Success = $Kernel::OM->Get('DynamicFieldValue')->ValueValidate(
         Value => {
             ValueDateTime => $Param{Value},
         },
@@ -136,7 +136,7 @@ sub ValueValidate {
     if (!$Param{SearchValidation} && IsStringWithData($Param{Value}) && $DateRestriction) {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         my $ValueSystemTime = $TimeObject->TimeStamp2SystemTime(
             String => $Param{Value},
@@ -144,7 +144,7 @@ sub ValueValidate {
         my $SystemTime = $TimeObject->SystemTime();
 
         if ( $DateRestriction eq 'DisableFutureDates' && $ValueSystemTime > $SystemTime ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "The value for the field Date is in the future! The date needs to be in the past!",
@@ -152,7 +152,7 @@ sub ValueValidate {
             return;
         }
         elsif ( $DateRestriction eq 'DisablePastDates' && $ValueSystemTime < $SystemTime ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "The value for the field Date is in the past! The date needs to be in the future!",
@@ -177,11 +177,11 @@ sub SearchSQLGet {
 
     if ( $Operators{ $Param{Operator} } ) {
         my $SQL = " $Param{TableAlias}.value_date $Operators{$Param{Operator}} '";
-        $SQL .= $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{SearchTerm} ) . "' ";
+        $SQL .= $Kernel::OM->Get('DB')->Quote( $Param{SearchTerm} ) . "' ";
         return $SQL;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         'Priority' => 'error',
         'Message'  => "Unsupported Operator $Param{Operator}",
     );
@@ -369,7 +369,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         for my $Type (qw(Used Year Month Day Hour Minute)) {
@@ -484,7 +484,7 @@ sub EditFieldValueValidate {
             . $Hour . ':' . $Minute . ':' . $Second;
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         my $ValueSystemTime = $TimeObject->TimeStamp2SystemTime(
             String => $ManualTimeStamp,
@@ -1022,7 +1022,7 @@ sub SearchFieldParameterBuild {
             }
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             # get the current time in epoch seconds and as time-stamp
             my $Now          = $TimeObject->SystemTime();
@@ -1260,7 +1260,7 @@ sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'DateTime',
     );

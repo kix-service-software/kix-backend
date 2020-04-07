@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Service search
-    my %ServiceList = $Kernel::OM->Get('Kernel::System::Service')->ServiceList(
+    my %ServiceList = $Kernel::OM->Get('Service')->ServiceList(
         UserID  => $Self->{Authorization}->{UserID},
     );
 

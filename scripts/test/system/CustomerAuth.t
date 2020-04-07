@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # configure ContactAuth backend to db
 $ConfigObject->Set('ContactAuthBackend', 'DB');
@@ -40,20 +40,20 @@ $ConfigObject->Set(
 );
 
 # add test user
-my $GlobalUserObject = $Kernel::OM->Get('Kernel::System::Contact');
-my $GlobalContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $GlobalUserObject = $Kernel::OM->Get('Contact');
+my $GlobalContactObject = $Kernel::OM->Get('Contact');
 
 my $OrgRand = 'example-organisation' . $Helper->GetRandomID();
 my $UserRand = 'example-user' . $Helper->GetRandomID();
 
-my $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+my $TestUserID = $Kernel::OM->Get('User')->UserAdd(
     UserLogin    => $UserRand,
     IsCustomer   => 1,
     ValidID      => 1,
     ChangeUserID => 1,
 );
 
-my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => $OrgRand,
     Name    => $OrgRand,
     ValidID => 1,
@@ -130,9 +130,9 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 bcrypt)) {
     # make sure that the customer user objects gets recreated for each loop.
     $Kernel::OM->ObjectsDiscard(
         Objects => [
-            'Kernel::System::Contact',
-            'Kernel::System::ContactAuth',
-            'Kernel::System::User',
+            'Contact',
+            'ContactAuth',
+            'User',
         ],
     );
 
@@ -141,9 +141,9 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 bcrypt)) {
         Value => $CryptType
     );
 
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
-    my $ContactAuthObject = $Kernel::OM->Get('Kernel::System::ContactAuth');
+    my $UserObject = $Kernel::OM->Get('User');
+    my $ContactObject = $Kernel::OM->Get('Contact');
+    my $ContactAuthObject = $Kernel::OM->Get('ContactAuth');
 
     for my $Test (@Tests) {
 

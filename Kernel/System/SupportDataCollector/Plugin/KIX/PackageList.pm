@@ -16,9 +16,9 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CSV',
-    'Kernel::System::Package',
+    'Config',
+    'CSV',
+    'Package',
 );
 
 sub GetDisplayPath {
@@ -28,11 +28,11 @@ sub GetDisplayPath {
 sub Run {
     my $Self = shift;
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     # get needed objects
-    my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
-    my $CSVObject     = $Kernel::OM->Get('Kernel::System::CSV');
+    my $PackageObject = $Kernel::OM->Get('Package');
+    my $CSVObject     = $Kernel::OM->Get('CSV');
 
     my @PackageList = $PackageObject->RepositoryList( Result => 'Short' );
 

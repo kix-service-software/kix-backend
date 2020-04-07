@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketStateUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketStateUpdate');
 
     return $Self;
 }
@@ -140,7 +140,7 @@ sub Run {
     my $StateID;
     
     # check if ticketState exists
-    my %TicketStateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+    my %TicketStateData = $Kernel::OM->Get('State')->StateGet(
         ID => $Param{Data}->{StateID},
     );
     
@@ -150,7 +150,7 @@ sub Run {
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::State')->StateUpdate(
+    my $Success = $Kernel::OM->Get('State')->StateUpdate(
         %{$TicketState},    
         ID      => $Param{Data}->{StateID},
         UserID  => $Self->{Authorization}->{UserID},

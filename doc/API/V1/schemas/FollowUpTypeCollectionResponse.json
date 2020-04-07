@@ -7,7 +7,7 @@
       "FollowUpType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_FollowUpType_json"
+            "$ref" : "#/definitions/FollowUpType_json-2dd1f47197"
          }
       }
    },
@@ -15,7 +15,7 @@
       "FollowUpType"
    ],
    "definitions" : {
-      "_FollowUpType_json" : {
+      "FollowUpType_json-2dd1f47197" : {
          "$id" : "#FollowUpType",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The followup type object.",

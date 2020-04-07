@@ -13,9 +13,9 @@ use utf8;
 use vars (qw($Self));
 
 my $CommandObject
-    = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::SystemMonitoring::NagiosCheckTicketCount');
+    = $Kernel::OM->Get('Console::Command::Maint::SystemMonitoring::NagiosCheckTicketCount');
 
-my $ConfigFile = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/scripts/test/system/sample/NagiosCheckTesting.pm';
+my $ConfigFile = $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/NagiosCheckTesting.pm';
 
 my $ExitCode = $CommandObject->Execute( '--config-file', $ConfigFile, '--as-checker', );
 

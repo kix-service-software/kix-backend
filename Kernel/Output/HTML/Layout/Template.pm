@@ -69,7 +69,7 @@ sub Output {
 
     # get and check param Data
     if ( ref $Param{Data} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need HashRef in Param Data! Got: '" . ref( $Param{Data} ) . "'!",
         );
@@ -99,7 +99,7 @@ sub Output {
     # if we use the HTML5 input type 'email' jQuery Validate will always validate
     # we do not want that if CheckEmailAddresses is set to 'no' in SysConfig
     $Self->{EnvRef}->{EmailFieldType}
-        = $Kernel::OM->Get('Kernel::Config')->Get('CheckEmailAddresses') ? 'email' : 'text';
+        = $Kernel::OM->Get('Config')->Get('CheckEmailAddresses') ? 'email' : 'text';
 
     # TODO new solution needed for extensions
     # my @TemplateFolders = (
@@ -137,7 +137,7 @@ sub Output {
         $TemplateString = $Param{Template};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Template or TemplateFile Param!',
         );
@@ -159,7 +159,7 @@ sub Output {
 
         my $Plugins = Template::Plugins->new(
             {
-                PLUGIN_BASE => 'Kernel::Output::Template::Plugin',
+                PLUGIN_BASE => 'Output::Template::Plugin',
             }
         );
 
@@ -186,7 +186,7 @@ sub Output {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Template::ERROR;",
             );
@@ -209,7 +209,7 @@ sub Output {
         \$Output,
     );
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Self->{TemplateObject}->error(),
         );
@@ -266,7 +266,7 @@ sub Output {
         # extract filter list
         my %FilterList = %{ $Self->{FilterElementPost} };
 
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $MainObject = $Kernel::OM->Get('Main');
 
         FILTER:
         for my $Filter ( sort keys %FilterList ) {
@@ -280,7 +280,7 @@ sub Output {
             next FILTER if !$Param{TemplateFile};
             next FILTER if !$TemplateList{ $Param{TemplateFile} };
 
-            next FILTER if !$Kernel::OM->Get('Kernel::System::Main')->Require( $FilterConfig->{Module} );
+            next FILTER if !$Kernel::OM->Get('Main')->Require( $FilterConfig->{Module} );
 
             # create new instance
             my $Object = $FilterConfig->{Module}->new(

@@ -14,14 +14,14 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::FAQ::ContentTypeSet');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::FAQ::ContentTypeSet');
 
 my ( $Result, $ExitCode );
 {
     local *STDOUT;
     open STDOUT, '>:encoding(UTF-8)', \$Result;
     $ExitCode = $CommandObject->Execute();
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Result );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Result );
 }
 
 $Self->Is(

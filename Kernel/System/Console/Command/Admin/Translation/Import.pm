@@ -19,11 +19,11 @@ use Kernel::Language;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Main',
+    'SysConfig',
+    'Time',
 );
 
 sub Configure {
@@ -61,7 +61,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Home      = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home      = $Kernel::OM->Get('Config')->Get('Home');
 
     my $Language  = $Self->GetOption('language') || '';
     my $LocaleDir = $Self->GetOption('locale-directory') || $Home.'/locale';
@@ -76,7 +76,7 @@ sub Run {
     }
     else {
         # get all relevant PO files in given directory
-        @POFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        @POFiles = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $LocaleDir,
             Filter    => $Language ? "$Language.po" : '*.po'
         );
@@ -88,7 +88,7 @@ sub Run {
 
         $Self->Print("    importing $LocaleDir/$Filename...");
 
-        my ($CountTotal, $CountOK) = $Kernel::OM->Get('Kernel::System::Translation')->ImportPO(
+        my ($CountTotal, $CountOK) = $Kernel::OM->Get('Translation')->ImportPO(
             Language => $Language,
             File     => $File,
             UserID   => 1

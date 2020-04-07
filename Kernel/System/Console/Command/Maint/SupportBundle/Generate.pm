@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
-    'Kernel::System::SupportBundleGenerator',
+    'Config',
+    'Main',
+    'SupportBundleGenerator',
 );
 
 sub Configure {
@@ -52,7 +52,7 @@ sub Run {
 
     $Self->Print("<yellow>Generating support bundle...</yellow>\n");
 
-    my $Response = $Kernel::OM->Get('Kernel::System::SupportBundleGenerator')->Generate();
+    my $Response = $Kernel::OM->Get('SupportBundleGenerator')->Generate();
 
     if ( !$Response->{Success} ) {
         $Self->PrintError("Could not generate support bundle.");
@@ -61,9 +61,9 @@ sub Run {
 
     my $FileData = $Response->{Data};
 
-    my $OutputDir = $Self->GetOption('target-directory') || $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $OutputDir = $Self->GetOption('target-directory') || $Kernel::OM->Get('Config')->Get('Home');
 
-    my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
         Location   => $OutputDir . '/' . $FileData->{Filename},
         Content    => $FileData->{Filecontent},
         Mode       => 'binmode',

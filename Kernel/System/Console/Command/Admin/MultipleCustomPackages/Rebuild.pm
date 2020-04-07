@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::KIXUtils',
+    'KIXUtils',
 );
 
 sub Configure {
@@ -28,7 +28,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
     $Self->Print("<yellow>NOTE: start to rebuild library paths\n\n</yellow>\n");
 
-    $Kernel::OM->Get('Kernel::System::KIXUtils')->RebuildConfig(%Param);
+    $Kernel::OM->Get('KIXUtils')->RebuildConfig(%Param);
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

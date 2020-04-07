@@ -15,18 +15,18 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $QueueObject  = $Kernel::OM->Get('Kernel::System::Queue');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $QueueObject  = $Kernel::OM->Get('Queue');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'Ticket::Acl::Module',
     Value => {
         DummyModule => {
@@ -39,7 +39,7 @@ $Kernel::OM->Get('Kernel::Config')->Set(
 );
 
 # set valid options
-my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
 %ValidList = reverse %ValidList;
 
 # set user options
@@ -47,7 +47,7 @@ my $UserLogin = $Helper->TestUserCreate(
     Groups => ['admin'],
 ) || die "Did not get test user";
 
-my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $UserID = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $UserLogin,
 );
 
@@ -72,7 +72,7 @@ $Self->True(
 
 # set state options
 my $StateName = 'State_' . $RandomID;
-my $StateID   = $Kernel::OM->Get('Kernel::System::State')->StateAdd(
+my $StateID   = $Kernel::OM->Get('State')->StateAdd(
     Name    => $StateName,
     ValidID => 1,
     TypeID  => 1,
@@ -87,7 +87,7 @@ $Self->True(
 
 # set priority options
 my $PriorityName = 'Priority_' . $RandomID;
-my $PriorityID   = $Kernel::OM->Get('Kernel::System::Priority')->PriorityAdd(
+my $PriorityID   = $Kernel::OM->Get('Priority')->PriorityAdd(
     Name    => $PriorityName,
     ValidID => $ValidList{'valid'},
     UserID  => 1,

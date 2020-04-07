@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
     # get config for this screen
-    # $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketTemplate::TicketTemplateGet');
+    # $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketTemplate::TicketTemplateGet');
 
     return $Self;
 }
@@ -110,7 +110,7 @@ sub Run {
 
     my @TicketTemplateList;
     foreach my $Name (@{$Param{Data}->{TemplateName}}) {
-        my %TemplateData = $Kernel::OM->Get('Kernel::System::TicketTemplate')->TicketTemplateGet(
+        my %TemplateData = $Kernel::OM->Get('TicketTemplate')->TicketTemplateGet(
             Name => $Name,
         );
         if (!IsHashRefWithData(\%TemplateData)) {

@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::Package',
+    'Main',
+    'Package',
 );
 
 sub Configure {
@@ -51,14 +51,14 @@ sub Run {
     my $Result = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n";
     $Result .= "<kix_package_list version=\"1.0\">\n";
     my $SourceDirectory = $Self->GetArgument('source-directory');
-    my @List            = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @List            = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $SourceDirectory,
         Filter    => '*.kpm',
         Recursive => 1,
     );
     for my $File (@List) {
         my $Content    = '';
-        my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
             Mode     => 'utf8',      # optional - binmode|utf8
             Result   => 'SCALAR',    # optional - SCALAR|ARRAY
@@ -67,8 +67,8 @@ sub Run {
             $Self->PrintError("Can't open $File: $!\n");
             return $Self->ExitCodeError();
         }
-        my %Structure = $Kernel::OM->Get('Kernel::System::Package')->PackageParse( String => ${$ContentRef} );
-        my $XML = $Kernel::OM->Get('Kernel::System::Package')->PackageBuild( %Structure, Type => 'Index' );
+        my %Structure = $Kernel::OM->Get('Package')->PackageParse( String => ${$ContentRef} );
+        my $XML = $Kernel::OM->Get('Package')->PackageBuild( %Structure, Type => 'Index' );
         if ( !$XML ) {
             $Self->PrintError("Cannot generate index entry for $File.\n");
             return $Self->ExitCodeError();

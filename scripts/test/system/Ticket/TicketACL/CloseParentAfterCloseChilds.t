@@ -17,15 +17,15 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @BlackListedStates = ( 'closed' );
 
@@ -33,7 +33,7 @@ my @BlackListedStates = ( 'closed' );
 $ConfigObject->Set(
     Key   => 'Ticket::Acl::Module###1-Ticket::Acl::Module',
     Value => {
-        Module => 'Kernel::System::Ticket::Acl::CloseParentAfterClosedChilds',
+        Module => 'Ticket::Acl::CloseParentAfterClosedChilds',
         State  => \@BlackListedStates,
     },
 );
@@ -47,12 +47,12 @@ $ConfigObject->Set(
 my $RandomID = $Helper->GetRandomID();
 
 my $TestUserLogin = $Helper->TestUserCreate();
-my $TestUserID    = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $TestUserID    = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 my @TitleData = (
     'Parent Ticket' . $RandomID,
@@ -81,7 +81,7 @@ for my $TitleDataItem (@TitleData) {
 }
 
 # get link object
-my $LinkObject = $Kernel::OM->Get('Kernel::System::LinkObject');
+my $LinkObject = $Kernel::OM->Get('LinkObject');
 
 # create link between tickets
 {
@@ -104,7 +104,7 @@ my $LinkObject = $Kernel::OM->Get('Kernel::System::LinkObject');
 my $CheckACLs = sub {
     my %Param = @_;
 
-    my %StateList = $Kernel::OM->Get('Kernel::System::State')->StateList(
+    my %StateList = $Kernel::OM->Get('State')->StateList(
         UserID => 1,
     );
 

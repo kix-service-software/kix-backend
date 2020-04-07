@@ -71,6 +71,10 @@
          ],
          "readOnly" : true
       },
+      "DefaultValidID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
       "Description" : {
          "type" : "string",
          "readOnly" : true

@@ -14,17 +14,17 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get customer user object
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $ContactObject = $Kernel::OM->Get('Contact');
 
 # add two users
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
@@ -33,7 +33,7 @@ my $RandomID = $Helper->GetRandomID();
 
 my $OrgRand  = 'example-organisation' . $Helper->GetRandomID();
 
-my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number => $OrgRand,
     Name   => $OrgRand,
     ValidID => 1,

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SLAUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SLAUpdate');
 
     return $Self;
 }
@@ -137,7 +137,7 @@ sub Run {
     );
 
     # check if SLA exists 
-    my %SLAData = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
+    my %SLAData = $Kernel::OM->Get('SLA')->SLAGet(
         SLAID => $Param{Data}->{SLAID},
         UserID      => $Self->{Authorization}->{UserID},        
     );
@@ -149,7 +149,7 @@ sub Run {
     }
 
     # update SLA
-    my $Success = $Kernel::OM->Get('Kernel::System::SLA')->SLAUpdate(
+    my $Success = $Kernel::OM->Get('SLA')->SLAUpdate(
         SLAID                   => $Param{Data}->{SLAID},    
         Name                    => $SLA->{Name} || $SLAData{Name},
         Comment                 => exists $SLA->{Comment} ? $SLA->{Comment} : $SLAData{Comment},

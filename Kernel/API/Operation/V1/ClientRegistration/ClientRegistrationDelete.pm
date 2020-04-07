@@ -109,7 +109,7 @@ sub Run {
     foreach my $ClientID ( @{$Param{Data}->{ClientID}} ) {
 
         # delete ClientRegistration	    
-        my $Success = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationDelete(
+        my $Success = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationDelete(
             ClientID  => $ClientID,
         );
 

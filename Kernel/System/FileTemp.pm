@@ -16,7 +16,7 @@ use warnings;
 use File::Temp qw( tempfile tempdir );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
 =cut
 
@@ -69,7 +69,7 @@ Please note that you need to close the file handle for other processes to write 
 sub TempFile {
     my ( $Self, %Param ) = @_;
 
-    my $TempDir = $Kernel::OM->Get('Kernel::Config')->Get('TempDir');
+    my $TempDir = $Kernel::OM->Get('Config')->Get('TempDir');
 
     my ( $FH, $Filename ) = tempfile(
         DIR    => $TempDir,
@@ -93,7 +93,7 @@ if the FileTemp object goes out of scope.
 sub TempDir {
     my $Self = shift;
 
-    my $TempDir = $Kernel::OM->Get('Kernel::Config')->Get('TempDir');
+    my $TempDir = $Kernel::OM->Get('Config')->Get('TempDir');
 
     my $DirName = tempdir(
         DIR     => $TempDir,

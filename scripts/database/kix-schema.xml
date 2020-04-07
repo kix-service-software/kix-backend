@@ -2824,6 +2824,7 @@
     <Column Name="notification_interval" Required="false" Type="SMALLINT"/>
     <Column Name="notification_authorization" Type="VARCHAR" Size="10000"/>
     <Column Name="last_notification_timestamp" Type="DECIMAL" Size="20,6"/>
+    <Column Name="additional_data" Type="VARCHAR" Size="10000000"/>
 </Table>
 
 <!-- client_notification - core events to notify the registered clients about -->

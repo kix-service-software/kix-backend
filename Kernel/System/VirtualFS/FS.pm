@@ -16,9 +16,9 @@ use warnings;
 use Time::HiRes qw();
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Log',
+    'Main',
 );
 
 sub new {
@@ -29,7 +29,7 @@ sub new {
     bless( $Self, $Type );
 
     # get data dir
-    $Self->{DataDir}    = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/virtualfs';
+    $Self->{DataDir}    = $Kernel::OM->Get('Config')->Get('Home') . '/var/virtualfs';
     $Self->{Permission} = '660';
 
     # create data dir
@@ -49,7 +49,7 @@ sub new {
     }
     else {
         my $Error = $!;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Can't create $Path: $Error!",
         );
@@ -69,7 +69,7 @@ sub Read {
     # check needed stuff
     for (qw(BackendKey Mode)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -79,7 +79,7 @@ sub Read {
 
     my $Attributes = $Self->_BackendKeyParse(%Param);
 
-    my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Directory => $Self->{DataDir} . $Attributes->{DataDir},
         Filename  => $Attributes->{Filename},
         Mode      => $Param{Mode},
@@ -107,7 +107,7 @@ sub Write {
     # check needed stuff
     for (qw(Content Filename Mode)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -128,7 +128,7 @@ sub Write {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my $MD5 = $MainObject->FilenameCleanUp(
         Filename => $Param{Filename},
@@ -143,7 +143,7 @@ sub Write {
         $DataDir .= '/' . $Dir;
         next DIRECTORY if -e $Self->{DataDir} . $DataDir;
         next DIRECTORY if mkdir $Self->{DataDir} . $DataDir;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't create $Self->{DataDir}$DataDir: $!",
         );
@@ -177,7 +177,7 @@ sub Delete {
     # check needed stuff
     for (qw(BackendKey)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -187,7 +187,7 @@ sub Delete {
 
     my $Attributes = $Self->_BackendKeyParse(%Param);
 
-    return $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
+    return $Kernel::OM->Get('Main')->FileDelete(
         Directory => $Self->{DataDir} . $Attributes->{DataDir},
         Filename  => $Attributes->{Filename},
     );
@@ -210,7 +210,7 @@ sub _BackendKeyParse {
     # check needed stuff
     for (qw(BackendKey)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -235,7 +235,7 @@ sub _SplitDir {
     # check needed stuff
     for (qw(Filename)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );

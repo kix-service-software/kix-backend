@@ -18,7 +18,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub GetDisplayPath {
@@ -38,7 +38,7 @@ sub Run {
     }
 
     # find KIX partition
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my $Partition = `df -P $Home | tail -1 | cut -d' ' -f 1`;
     chomp $Partition;

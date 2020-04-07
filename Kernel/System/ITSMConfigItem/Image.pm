@@ -60,7 +60,7 @@ sub ImageGet {
     # check needed stuff
     for my $Needed (qw(ConfigItemID ImageID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -69,7 +69,7 @@ sub ImageGet {
     }
 
     my $CacheKey = 'ImageGet::'.$Param{ConfigItemID}.'::'.$Param{ImageID};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -85,13 +85,13 @@ sub ImageGet {
         foreach my $File (@{$ImageFiles}) {
             next if ($File =~ /.*?\.(txt|content_type)$/g);
 
-            my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+            my $Content = $Kernel::OM->Get('Main')->FileRead(
                 Location => $File,
                 Mode     => 'binmode',
             );
 
             if (!$Content) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to read image file $File!",
                 );
@@ -107,7 +107,7 @@ sub ImageGet {
 
             if ( -e $Dir.$Filename.'.content_type') {
                 # read comment file
-                my $ContentType = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                my $ContentType = $Kernel::OM->Get('Main')->FileRead(
                     Directory => $Dir,
                     Filename  => $Filename . '.content_type',
                     Silent    => 1,
@@ -120,7 +120,7 @@ sub ImageGet {
 
             if ( -e $Dir.$Filename.'.txt') {
                 # read comment file
-                $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+                $Content = $Kernel::OM->Get('Main')->FileRead(
                     Directory => $Dir,
                     Filename  => $Filename . '.txt',
                     Silent    => 1,
@@ -136,7 +136,7 @@ sub ImageGet {
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -167,7 +167,7 @@ sub ImageAdd {
     # check needed stuff
     for my $Needed (qw(ConfigItemID Filename ContentType Content)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -184,7 +184,7 @@ sub ImageAdd {
         my $ImageTypes = $Self->_GetValidImageTypes();
 
         if ($Param{Filename} !~ m/\.($ImageTypes)$/i ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Image type not allowed!",
             );
@@ -197,28 +197,28 @@ sub ImageAdd {
 
         my $ImageContent = decode_base64($Param{Content});
 
-        my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
             Directory => $Directory,
             Filename  => $Filename . '.' . $FileType,
             Content   => \$ImageContent,
         );
 
         if (!$FileLocation) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to store image file $Directory/$Filename!",
             );
             return;            
         }
 
-        $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
             Directory => $Directory,
             Filename  => $Filename . '.content_type',
             Content   => \$Param{ContentType},
         );
 
         if (!$FileLocation) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to store content type file $Directory/$Filename.content_type!",
             );
@@ -226,14 +226,14 @@ sub ImageAdd {
         }    
 
         if ($Param{Comment}) {
-            my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+            my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
                 Directory => $Directory,
                 Filename  => $Filename . '.txt',
                 Content   => \$Param{Comment},
             );
 
             if (!$FileLocation) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to store comment file $Directory/$Filename.txt!",
                 );
@@ -243,12 +243,12 @@ sub ImageAdd {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'CMDB.ConfigItem.Image',
         ObjectID  => $Param{ConfigItemID}.'::'.$Filename,
@@ -274,7 +274,7 @@ sub ImageDelete {
     # check needed stuff
     for my $Needed (qw(ConfigItemID ImageID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -290,11 +290,11 @@ sub ImageDelete {
     if (IsArrayRefWithData($ImageFiles)) {
 
         foreach my $File (@{$ImageFiles}) {
-            my $OK = $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
+            my $OK = $Kernel::OM->Get('Main')->FileDelete(
                 Location  => $File,
             );
             if (!$OK) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to delete image file $File!",
                 );
@@ -304,12 +304,12 @@ sub ImageDelete {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.ConfigItem.Image',
         ObjectID  => $Param{ConfigItemID}.'::'.$Param{ImageID},
@@ -335,7 +335,7 @@ sub ImageList {
     # check needed stuff
     for my $Needed (qw(ConfigItemID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -344,7 +344,7 @@ sub ImageList {
     }
 
     my $CacheKey = 'ImageList::'.$Param{ConfigItemID};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -367,7 +367,7 @@ sub ImageList {
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -395,7 +395,7 @@ sub _GetDirectory {
     # check needed stuff
     for my $Needed (qw(ConfigItemID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -403,11 +403,11 @@ sub _GetDirectory {
         }
     }
 
-    my $Directory = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/ITSMConfigItem/' . $Param{ConfigItemID};
+    my $Directory = $Kernel::OM->Get('Config')->Get('Home') . '/var/ITSMConfigItem/' . $Param{ConfigItemID};
 
     if ( !( -e $Directory ) ) {
         if ( !mkpath( $Directory, 0, 0775 ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't create directory '$Directory'!",
             );
@@ -435,7 +435,7 @@ sub _GetImageFileList {
     # check needed stuff
     for my $Needed (qw(ConfigItemID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -452,7 +452,7 @@ sub _GetImageFileList {
         $Filter = $Param{ImageID} . '.*';
     }
 
-    my @ImageFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @ImageFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Directory,
         Filter    => $Filter,
     );    

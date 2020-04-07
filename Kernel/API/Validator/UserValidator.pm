@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} =~ /^(OwnerID|ResponsibleID|UserID)$/g ) {
-        $Found = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        $Found = $Kernel::OM->Get('User')->UserLookup(
             UserID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} =~ /^(Owner|Responsible)$/g ) {
-        $Found = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        $Found = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $Param{Data}->{$Param{Attribute}},
         );        
     }

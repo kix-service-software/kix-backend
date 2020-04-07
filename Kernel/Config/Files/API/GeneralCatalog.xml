@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogItemGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -20,6 +21,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogItemSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -33,6 +35,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogItemCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -44,6 +47,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogItemUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -55,6 +59,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogItemDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -67,6 +72,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogClassSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -78,6 +84,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">GeneralCatalogClassUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogClassUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">GeneralCatalog</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

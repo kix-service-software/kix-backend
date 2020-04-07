@@ -16,11 +16,11 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Lock',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
+    'DB',
+    'Lock',
+    'State',
+    'Ticket',
+    'Time',
 );
 
 sub Configure {
@@ -36,15 +36,15 @@ sub Run {
 
     $Self->Print("<yellow>Unlocking tickets that are past their unlock timeout...</yellow>\n");
 
-    my @UnlockStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+    my @UnlockStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Unlock',
         Result => 'ID',
     );
-    my @ViewableLockIDs = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock( Type => 'ID' );
+    my @ViewableLockIDs = $Kernel::OM->Get('Lock')->LockViewableLock( Type => 'ID' );
 
     my @Tickets;
 
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "
             SELECT st.tn, st.id, st.timeout, sq.unlock_timeout, st.sla_id, st.queue_id
             FROM ticket st, queue sq
@@ -54,7 +54,7 @@ sub Run {
                 AND st.ticket_lock_id NOT IN ( ${\(join ', ', @ViewableLockIDs)} ) ",
     );
 
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push @Tickets, \@Row;
     }
 
@@ -63,20 +63,20 @@ sub Run {
         my @Row = @{$_};
 
         # get used calendar
-        my $Calendar = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCalendarGet(
+        my $Calendar = $Kernel::OM->Get('Ticket')->TicketCalendarGet(
             QueueID => $Row[5],
             SLAID   => $Row[4],
         );
 
-        my $CountedTime = $Kernel::OM->Get('Kernel::System::Time')->WorkingTime(
+        my $CountedTime = $Kernel::OM->Get('Time')->WorkingTime(
             StartTime => $Row[2],
-            StopTime  => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
+            StopTime  => $Kernel::OM->Get('Time')->SystemTime(),
             Calendar  => $Calendar,
         );
         next TICKET if $CountedTime < $Row[3] * 60;
 
         $Self->Print(" Unlocking ticket id $Row[0]... ");
-        my $Unlock = $Kernel::OM->Get('Kernel::System::Ticket')->LockSet(
+        my $Unlock = $Kernel::OM->Get('Ticket')->LockSet(
             TicketID => $Row[1],
             Lock     => 'unlock',
             UserID   => 1,

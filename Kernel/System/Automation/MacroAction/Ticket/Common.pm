@@ -18,13 +18,13 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Common);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::Queue',
-    'Kernel::System::TemplateGenerator',
-    'Kernel::System::Ticket',
-    'Kernel::System::Log',
+    'Config',
+    'Encode',
+    'Main',
+    'Queue',
+    'TemplateGenerator',
+    'Ticket',
+    'Log',
 );
 
 =item _CheckParams()
@@ -47,7 +47,7 @@ sub _CheckParams {
     # check needed stuff
     for (qw(TicketID Config UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -55,12 +55,12 @@ sub _CheckParams {
         }
     }
 
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
     if (!%Ticket) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - ticket not found!",
             UserID   => $Param{UserID}
@@ -69,7 +69,7 @@ sub _CheckParams {
     }
 
     if (ref $Param{Config} ne 'HASH') {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config is no object!",
         );
@@ -81,7 +81,7 @@ sub _CheckParams {
     if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
         for my $Option ( values %{$Definition{Options}}) {
             if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $Option->{Name} in Config!",
                 );

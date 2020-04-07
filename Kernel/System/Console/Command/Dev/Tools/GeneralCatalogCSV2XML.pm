@@ -16,11 +16,11 @@ use base qw(Kernel::System::Console::BaseCommand);
 use Kernel::Language;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Main',
+    'SysConfig',
+    'Time',
 );
 
 sub Configure {
@@ -50,7 +50,7 @@ sub Run {
     $Self->Print("<yellow>generating XML...</yellow>\n\n");
 
     # read CSV file
-    my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Location => $CSVFile,
     );
     if ( !$Content ) {
@@ -58,7 +58,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $LinesRef = $Kernel::OM->Get('Kernel::System::CSV')->CSV2Array(
+    my $LinesRef = $Kernel::OM->Get('CSV')->CSV2Array(
         String => $$Content
     );
 

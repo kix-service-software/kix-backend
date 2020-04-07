@@ -85,7 +85,7 @@ sub Run {
     
     my @JobDataList;
          	
-    my %JobList = $Kernel::OM->Get('Kernel::System::Automation')->JobList(
+    my %JobList = $Kernel::OM->Get('Automation')->JobList(
         Valid => 0,
     );
    

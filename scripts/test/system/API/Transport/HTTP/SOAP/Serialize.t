@@ -22,11 +22,11 @@ use Kernel::System::VariableCheck qw(:all);
 # get helper object
 # skip SSL certificate verification
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         SkipSSLVerify => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create soap object to use the soap output recursion
 my $DebuggerObject = Kernel::API::Debugger->new(

@@ -16,7 +16,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub GetDisplayPath {
@@ -26,7 +26,7 @@ sub GetDisplayPath {
 sub Run {
     my $Self = shift;
 
-    my $FQDN = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
 
     # Do we have set our FQDN?
     if ( $FQDN eq 'yourhost.example.com' ) {

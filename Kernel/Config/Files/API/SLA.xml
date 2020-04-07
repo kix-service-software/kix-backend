@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SLAGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SLA::SLAGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">SLAResponse</Item>
                 <Item Key="ObjectID">SLAID</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SLASearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SLA::SLASearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">SLACollectionResponse</Item>
                 <Item Key="CacheType">API_slas</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SLACreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SLA::SLACreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">SLAPostRequest</Item>
                 <Item Key="ResponseSchema">SLAPostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SLAUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SLA::SLAUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">SLAPatchRequest</Item>
                 <Item Key="ResponseSchema">SLAPostPatchResponse</Item>
@@ -53,6 +57,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SLADelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SLA::SLADelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

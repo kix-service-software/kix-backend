@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::MacroUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::MacroUpdate');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     );
 
     # check if Macro exists 
-    my %MacroData = $Kernel::OM->Get('Kernel::System::Automation')->MacroGet(
+    my %MacroData = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
     );
 
@@ -142,7 +142,7 @@ sub Run {
 
     # check if job with the same name already exists
     if ( $Macro->{Name} ) {
-        my $MacroID = $Kernel::OM->Get('Kernel::System::Automation')->MacroLookup(
+        my $MacroID = $Kernel::OM->Get('Automation')->MacroLookup(
             Name => $Macro->{Name},
         );
         if ( $MacroID && $MacroID != $Param{Data}->{MacroID} ) {
@@ -154,7 +154,7 @@ sub Run {
     }
 
     # update Macro
-    my $Success = $Kernel::OM->Get('Kernel::System::Automation')->MacroUpdate(
+    my $Success = $Kernel::OM->Get('Automation')->MacroUpdate(
         ID        => $Param{Data}->{MacroID},    
         Type      => $Macro->{Type} || $MacroData{Type},
         Name      => $Macro->{Name} || $MacroData{Name},

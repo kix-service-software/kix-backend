@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQCategoryGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQCategoryGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -20,6 +21,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQCategorySearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQCategorySearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -33,6 +35,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQCategoryCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQCategoryCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -44,6 +47,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQCategoryUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQCategoryUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -55,6 +59,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQCategoryDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQCategoryDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -67,6 +72,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -81,6 +87,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -94,6 +101,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -105,6 +113,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -116,6 +125,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -128,6 +138,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleAttachmentGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -142,6 +153,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleAttachmentSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -155,6 +167,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleAttachmentCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -166,6 +179,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleAttachmentUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -177,6 +191,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleAttachmentDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -189,6 +204,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleVoteGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleVoteGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -203,6 +219,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleVoteSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleVoteSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -216,6 +233,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleVoteCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleVoteCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -227,6 +245,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleVoteDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleVoteDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -239,6 +258,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleHistoryGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleHistoryGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -253,6 +273,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleHistorySearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleHistorySearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">FAQ</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -267,6 +288,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FAQArticleKeywordSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::FAQ::FAQArticleKeywordSearch</Item>
                 <Item Key="ResponseSchema">FAQKeywordCollectionResponse</Item>                
                 <Item Key="CacheType">API_faq</Item>
                 <Item Key="CacheTypeDependency">FAQ</Item>

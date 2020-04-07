@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ClientRegistration" : {
-         "$ref" : "#/definitions/_ClientRegistration_json"
+         "$ref" : "#/definitions/ClientRegistration_json-15d7494e99"
       }
    },
    "required" : [
       "ClientRegistration"
    ],
    "definitions" : {
-      "_ClientRegistration_json" : {
+      "ClientRegistration_json-15d7494e99" : {
          "$id" : "#ClientRegistration",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The client registration object.",
@@ -65,6 +65,58 @@
                   }
                ],
                "readOnly" : true
+            },
+            "Plugins" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Description" : {
+                        "type" : "string"
+                     },
+                     "ExtendedData" : {
+                        "description" : "a key-value list of additional attributes",
+                        "type" : "object"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     },
+                     "Requires" : {
+                        "type" : "string"
+                     },
+                     "Version" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "BuildNumber",
+                     "Product"
+                  ]
+               }
+            },
+            "Requires" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Operator" : {
+                        "description" : "supported operators: <, >, =, !",
+                        "type" : "string"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Product"
+                  ]
+               }
             }
          },
          "required" : [

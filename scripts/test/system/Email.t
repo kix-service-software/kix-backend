@@ -17,20 +17,20 @@ use vars (qw($Self));
 use Kernel::System::EmailParser;
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # do not really send emails
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # test scenarios
@@ -99,8 +99,8 @@ for my $Encoding ( '', qw(base64 quoted-printable 8bit) ) {
             Value => $Encoding,
         );
 
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Email'] );
-        my $EmailObject = $Kernel::OM->Get('Kernel::System::Email');
+        $Kernel::OM->ObjectsDiscard( Objects => ['Email'] );
+        my $EmailObject = $Kernel::OM->Get('Email');
 
         my ( $Header, $Body ) = $EmailObject->Send(
             %{ $Test->{Data} },

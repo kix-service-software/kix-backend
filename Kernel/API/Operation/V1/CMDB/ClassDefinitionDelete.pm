@@ -81,7 +81,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     # get valid ClassIDs
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
         Valid => 1,
     );
@@ -123,7 +123,7 @@ sub Run {
 
     foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {
      
-        my $Definition = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
+        my $Definition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
             DefinitionID => $DefinitionID,
         );
 
@@ -133,7 +133,7 @@ sub Run {
             );
         }
         
-        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionDelete(
+        my $Success = $Kernel::OM->Get('ITSMConfigItem')->DefinitionDelete(
             DefinitionID => $DefinitionID,
             UserID       => $Self->{Authorization}->{UserID},
         );

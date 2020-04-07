@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'ServiceID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+        $Found = $Kernel::OM->Get('Service')->ServiceLookup(
             ServiceID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Service' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+        $Found = $Kernel::OM->Get('Service')->ServiceLookup(
             Name => $Param{Data}->{$Param{Attribute}},
         );        
     }

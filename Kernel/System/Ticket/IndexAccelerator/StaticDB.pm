@@ -14,12 +14,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Lock',
-    'Kernel::System::Log',
-    'Kernel::System::State',
-    'Kernel::System::Time',
+    'Config',
+    'DB',
+    'Lock',
+    'Log',
+    'State',
+    'Time',
 );
 
 sub TicketAcceleratorUpdate {
@@ -28,7 +28,7 @@ sub TicketAcceleratorUpdate {
     # check needed stuff
     for (qw(TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -64,7 +64,7 @@ sub TicketAcceleratorUpdate {
     }
 
     # check if this ticket is still viewable
-    my @ViewableStates = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+    my @ViewableStates = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Viewable',
         Result => 'Name',
     );
@@ -78,7 +78,7 @@ sub TicketAcceleratorUpdate {
         }
     }
 
-    my @ViewableLocks = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock(
+    my @ViewableLocks = $Kernel::OM->Get('Lock')->LockViewableLock(
         Type => 'Name',
     );
 
@@ -106,7 +106,7 @@ sub TicketAcceleratorUpdate {
 
             if ( $IndexTicketData{TicketID} ) {
 
-                $Kernel::OM->Get('Kernel::System::DB')->Do(
+                $Kernel::OM->Get('DB')->Do(
                     SQL => '
                         UPDATE ticket_index
                         SET queue_id = ?, queue = ?, s_lock = ?, s_state = ?
@@ -150,7 +150,7 @@ sub TicketAcceleratorUpdateOnQueueUpdate {
 
     for my $Needed (qw(NewQueueName OldQueueName)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -159,7 +159,7 @@ sub TicketAcceleratorUpdateOnQueueUpdate {
     }
 
     #update ticket_index for changed queue name
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE ticket_index
             SET queue = ?
@@ -179,7 +179,7 @@ sub TicketAcceleratorDelete {
     # check needed stuff
     for (qw(TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -189,7 +189,7 @@ sub TicketAcceleratorDelete {
 
     return if !$Self->TicketLockAcceleratorDelete(%Param);
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM ticket_index WHERE ticket_id = ?',
         Bind => [ \$Param{TicketID} ],
     );
@@ -203,7 +203,7 @@ sub TicketAcceleratorAdd {
     # check needed stuff
     for (qw(TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -218,7 +218,7 @@ sub TicketAcceleratorAdd {
     );
 
     # check if this ticket is still viewable
-    my @ViewableStates = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+    my @ViewableStates = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Viewable',
         Result => 'Name',
     );
@@ -241,7 +241,7 @@ sub TicketAcceleratorAdd {
         return 1;
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             INSERT INTO ticket_index
                 (ticket_id, queue_id, queue, s_lock, s_state, create_time_unix)
@@ -262,7 +262,7 @@ sub TicketLockAcceleratorDelete {
     # check needed stuff
     for (qw(TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -271,7 +271,7 @@ sub TicketLockAcceleratorDelete {
     }
 
     # db query
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM ticket_lock_index WHERE ticket_id = ?',
         Bind => [ \$Param{TicketID} ],
     );
@@ -285,7 +285,7 @@ sub TicketLockAcceleratorAdd {
     # check needed stuff
     for (qw(TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -299,7 +299,7 @@ sub TicketLockAcceleratorAdd {
         DynamicFields => 0,
     );
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'INSERT INTO ticket_lock_index (ticket_id) VALUES (?)',
         Bind => [ \$Param{TicketID} ],
     );
@@ -313,7 +313,7 @@ sub TicketAcceleratorIndex {
     # check needed stuff
     for (qw(UserID QueueID ShownQueueIDs)) {
         if ( !exists( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -329,18 +329,18 @@ sub TicketAcceleratorIndex {
     my @QueueIDs = @{ $Param{ShownQueueIDs} };
 
     # KIX4OTRS-capeIT
-    my @ViewableLockIDs = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock( Type => 'ID' );
-    my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->GetPreferences( UserID => $Param{UserID} );
+    my @ViewableLockIDs = $Kernel::OM->Get('Lock')->LockViewableLock( Type => 'ID' );
+    my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences( UserID => $Param{UserID} );
 
     # EO KIX4OTRS-capeIT
     # prepare "All tickets: ??" in Queue
-    my @ViewableLocks = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock(
+    my @ViewableLocks = $Kernel::OM->Get('Lock')->LockViewableLock(
         Type => 'Name',
     );
 
     my %ViewableLocks = ( map { $_ => 1 } @ViewableLocks );
 
-    my @ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+    my @ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Viewable',
         Result => 'ID',
     );
@@ -348,7 +348,7 @@ sub TicketAcceleratorIndex {
     if (@QueueIDs) {
 
         # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('DB');
 
         my $SQL = "
             SELECT count(*)
@@ -375,7 +375,7 @@ sub TicketAcceleratorIndex {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # CustomQueue add on
     # KIX4OTRS-capeIT
@@ -456,7 +456,7 @@ sub TicketAcceleratorIndex {
     # EO KIX4OTRS-capeIT
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my %QueuesSeen;
     while ( my @Row = $DBObject->FetchrowArray() ) {
@@ -507,15 +507,15 @@ sub TicketAcceleratorIndex {
 sub TicketAcceleratorRebuild {
     my ( $Self, %Param ) = @_;
 
-    my @ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+    my @ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Viewable',
         Result => 'ID',
     );
 
-    my @ViewableLockIDs = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock( Type => 'ID' );
+    my @ViewableLockIDs = $Kernel::OM->Get('Lock')->LockViewableLock( Type => 'ID' );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get all viewable tickets
     my $SQL = "
@@ -591,7 +591,7 @@ sub GetIndexTicket {
     # check needed stuff
     for (qw(TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -600,7 +600,7 @@ sub GetIndexTicket {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     return if !$DBObject->Prepare(
@@ -630,7 +630,7 @@ sub _GetIndexTicketLock {
     # check needed stuff
     for (qw(TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -639,7 +639,7 @@ sub _GetIndexTicketLock {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     return if !$DBObject->Prepare(

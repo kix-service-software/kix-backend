@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">OrganisationID</Item>
                 <Item Key="ResponseSchema">OrganisationResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">OrganisationCollectionResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">OrganisationPostRequest</Item>
                 <Item Key="ResponseSchema">OrganisationPostPatchResponse</Item>
@@ -44,6 +47,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">OrganisationPatchRequest</Item>
                 <Item Key="ResponseSchema">OrganisationPostPatchResponse</Item>
@@ -57,6 +61,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -67,6 +72,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationContactSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ContactCollectionResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>                
@@ -80,6 +86,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">OrganisationTicketSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_organisations</Item>                

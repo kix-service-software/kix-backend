@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get ExecPlan types
-    my $ExecPlanTypes = $Kernel::OM->Get('Kernel::Config')->Get('Automation::ExecPlanType');
+    my $ExecPlanTypes = $Kernel::OM->Get('Config')->Get('Automation::ExecPlanType');
 
 	# get already prepared ExecPlanType data from ExecPlanTypeGet operation
     if ( IsHashRefWithData($ExecPlanTypes) ) {

@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 sub Configure {
@@ -30,7 +30,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print( $Kernel::OM->Get('Kernel::System::Log')->GetLog() );
+    $Self->Print( $Kernel::OM->Get('Log')->GetLog() );
 
     return $Self->ExitCodeOk();
 }

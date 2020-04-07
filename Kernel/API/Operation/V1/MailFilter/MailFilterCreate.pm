@@ -150,7 +150,7 @@ sub Run {
     my $MailFilter = $Self->_Trim( Data => $Param{Data}->{MailFilter} );
 
     # check if filter exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->NameExistsCheck( Name => $MailFilter->{Name} );
+    my $Exists = $Kernel::OM->Get('PostMaster::Filter')->NameExistsCheck( Name => $MailFilter->{Name} );
     if ($Exists) {
         return $Self->_Error( Code => 'Object.AlreadyExists' );
     }
@@ -166,7 +166,7 @@ sub Run {
     $Self->_PrepareFilter( Filter => $MailFilter );
 
     # create MailFilter
-    my $MailFilterID = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->FilterAdd(
+    my $MailFilterID = $Kernel::OM->Get('PostMaster::Filter')->FilterAdd(
         Name           => $MailFilter->{Name},
         StopAfterMatch => $MailFilter->{StopAfterMatch} || 0,
         ValidID        => $MailFilter->{ValidID} || 1,

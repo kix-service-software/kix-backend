@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfig::SysConfigOptionGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SysConfig::SysConfigOptionGet');
 
     return $Self;
 }
@@ -126,7 +126,7 @@ sub Run {
     my @SysConfigList;
 
     # perform SysConfig search
-    my %AllOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
+    my %AllOptions = $Kernel::OM->Get('SysConfig')->OptionGetAll();
 
     # start loop 
     foreach my $Option ( @{$Param{Data}->{Option}} ) {
@@ -139,9 +139,9 @@ sub Run {
             $SubOption = $2;
         }
 
-        if ( !$Kernel::OM->Get('Kernel::Config')->Exists($Option) ) {
+        if ( !$Kernel::OM->Get('Config')->Exists($Option) ) {
             # the option is not contained in the config hash, check if it exists
-            if ( !$Kernel::OM->Get('Kernel::System::SysConfig')->Exists(Name => $OrgOption) ) {
+            if ( !$Kernel::OM->Get('SysConfig')->Exists(Name => $OrgOption) ) {
                 return $Self->_Error(
                     Code => 'Object.NotFound',
                     Message => "Config option \"$Option\" does not exist",
@@ -150,7 +150,7 @@ sub Run {
         }
 
         # get the SysConfig data
-        my $Value = $Kernel::OM->Get('Kernel::Config')->Get(
+        my $Value = $Kernel::OM->Get('Config')->Get(
             $Option,
         );
 

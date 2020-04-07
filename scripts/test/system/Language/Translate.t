@@ -16,11 +16,11 @@ use vars (qw($Self));
 
 # create language object which contains all translations
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Language' => {
+    'Language' => {
         UserLanguage => 'de',
     },
 );
-my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+my $LanguageObject = $Kernel::OM->Get('Language');
 
 # test cases
 my @Tests = (

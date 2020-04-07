@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::User',
+    'User',
 );
 
 sub Configure {
@@ -31,7 +31,7 @@ sub Run {
     $Self->Print("<yellow>Listing users...</yellow>\n");
 
     # get all users
-    my %Users = $Kernel::OM->Get('Kernel::System::User')->UserList(
+    my %Users = $Kernel::OM->Get('User')->UserList(
         Valid => 0,
     );
 
@@ -50,7 +50,7 @@ sub Run {
     $Self->Print("------ ------------------------------ -------- -------- --------\n");
 
     foreach my $ID ( sort { $Users{$a} cmp $Users{$b} } keys %Users ) {
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %User = $Kernel::OM->Get('User')->GetUserData(
             UserID => $ID
         );
 

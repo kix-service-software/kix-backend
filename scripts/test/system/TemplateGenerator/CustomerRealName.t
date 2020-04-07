@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $AutoResponseObject = $Kernel::OM->Get('Kernel::System::AutoResponse');
-my $CommandObject      = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::PostMaster::Read');
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
+my $AutoResponseObject = $Kernel::OM->Get('AutoResponse');
+my $CommandObject      = $Kernel::OM->Get('Console::Command::Maint::PostMaster::Read');
+my $ConfigObject       = $Kernel::OM->Get('Config');
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper   = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper   = $Kernel::OM->Get('UnitTest::Helper');
 my $RandomID = $Helper->GetRandomID();
 
 # do not check email addresses
@@ -36,12 +36,12 @@ $ConfigObject->Set(
 # do not really send emails
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # add system address
 my $SystemAddressNameRand = 'SystemAddress' . $RandomID;
-my $SystemAddressID       = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
+my $SystemAddressID       = $Kernel::OM->Get('SystemAddress')->SystemAddressAdd(
     Name     => $SystemAddressNameRand . '@example.com',
     Realname => $SystemAddressNameRand,
     ValidID  => 1,
@@ -56,7 +56,7 @@ $Self->True(
 
 # add queue
 my $QueueNameRand = 'Queue' . $RandomID;
-my $QueueID       = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
+my $QueueID       = $Kernel::OM->Get('Queue')->QueueAdd(
     Name            => $QueueNameRand,
     ValidID         => 1,
     GroupID         => 1,
@@ -99,14 +99,14 @@ $Self->True(
 );
 
 #add organisation
-my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Name   => $RandomID . "Company",
     Number => $RandomID,
 );
 
 # add customer user
 my $Contact   = $RandomID;
-my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
     Source         => 'Contact',
     Firstname  => $Contact,
     Lastname   => $Contact,
@@ -122,7 +122,7 @@ $Self->True(
 
 # add notificaiton with customer as recipient
 my $NotificationName = 'Notification' . $RandomID;
-my $NotificationID   = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationAdd(
+my $NotificationID   = $Kernel::OM->Get('NotificationEvent')->NotificationAdd(
     Name    => $NotificationName,
     Comment => 'Unit Test Notification <KIX_CUSTOMER_REALNAME> tag',
     Data    => {
@@ -222,12 +222,12 @@ for my $Test (@Tests) {
             "$Test->{Name} - Maint::PostMaster::Read exit code with email input",
         );
 
-        # discard Web::Request and Ticket object from OM to prevent duplicated entries
-        $Kernel::OM->ObjectsDiscard( Objects => [ 'Kernel::System::PostMaster', 'Kernel::System::Ticket' ] );
+        # discard WebRequest and Ticket object from OM to prevent duplicated entries
+        $Kernel::OM->ObjectsDiscard( Objects => [ 'PostMaster', 'Ticket' ] );
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get test ticket ID
     my ($TicketID) = $Result =~ m{TicketID:\s+(\d+)};

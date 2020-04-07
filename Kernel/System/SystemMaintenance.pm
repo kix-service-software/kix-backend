@@ -16,13 +16,13 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'Main',
+    'Time',
+    'Valid',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create a SystemMaintenance object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SystemMaintenanceObject = $Kernel::OM->Get('Kernel::System::SystemMaintenance');
+    my $SystemMaintenanceObject = $Kernel::OM->Get('SystemMaintenance');
 
 =cut
 
@@ -88,7 +88,7 @@ sub SystemMaintenanceAdd {
     # check needed stuff
     for my $Key (qw(StartDate StopDate Comment ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -100,7 +100,7 @@ sub SystemMaintenanceAdd {
     return if ( $Param{StartDate} > $Param{StopDate} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     return if !$DBObject->Do(
@@ -134,7 +134,7 @@ sub SystemMaintenanceAdd {
     return if !$ID;
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SystemMaintenance',
         ObjectID  => $ID,
@@ -162,7 +162,7 @@ sub SystemMaintenanceDelete {
     # check needed stuff
     for my $Key (qw(ID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -179,7 +179,7 @@ sub SystemMaintenanceDelete {
     return if !IsHashRefWithData($SystemMaintenance);
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete SystemMaintenance
     return if !$DBObject->Do(
@@ -188,7 +188,7 @@ sub SystemMaintenanceDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SystemMaintenance',
         ObjectID  => $Param{ID},
@@ -231,7 +231,7 @@ sub SystemMaintenanceGet {
     # check needed stuff
     for my $Needed (qw(ID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -240,7 +240,7 @@ sub SystemMaintenanceGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     return if !$DBObject->Prepare(
@@ -255,7 +255,7 @@ sub SystemMaintenanceGet {
     );
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my %Data;
     while ( my @Row = $DBObject->FetchrowArray() ) {
@@ -307,7 +307,7 @@ sub SystemMaintenanceUpdate {
     # check needed stuff
     for my $Key (qw(ID StartDate StopDate Comment ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -319,7 +319,7 @@ sub SystemMaintenanceUpdate {
     return if ( $Param{StartDate} > $Param{StopDate} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     return if !$DBObject->Do(
@@ -336,7 +336,7 @@ sub SystemMaintenanceUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SystemMaintenance',
         ObjectID  => $Param{ID},
@@ -367,7 +367,7 @@ sub SystemMaintenanceList {
 
     # check needed
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!"
         );
@@ -383,10 +383,10 @@ sub SystemMaintenanceList {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = '
             SELECT id
@@ -454,7 +454,7 @@ sub SystemMaintenanceListGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -495,10 +495,10 @@ get a SystemMaintenance active flag
 sub SystemMaintenanceIsActive {
     my ( $Self, %Param ) = @_;
 
-    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $SystemTime = $Kernel::OM->Get('Time')->SystemTime();
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = "
             SELECT id
@@ -506,7 +506,7 @@ sub SystemMaintenanceIsActive {
             WHERE start_date <= $SystemTime and stop_date >= $SystemTime
     ";
 
-    my @ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+    my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
     if ( scalar @ValidList ) {
 
         my $ValidIDsStrgDB = join ',', map { $DBObject->Quote( $_, 'Integer' ) } @ValidList;
@@ -544,14 +544,14 @@ get a SystemMaintenance flag
 sub SystemMaintenanceIsComming {
     my ( $Self, %Param ) = @_;
 
-    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $SystemTime = $Kernel::OM->Get('Time')->SystemTime();
     my $NotifiBeforeTime =
-        $Kernel::OM->Get('Kernel::Config')->Get('SystemMaintenance::TimeNotifyUpcomingMaintenance')
+        $Kernel::OM->Get('Config')->Get('SystemMaintenance::TimeNotifyUpcomingMaintenance')
         || 30;
     my $TargetTime = $SystemTime + ( $NotifiBeforeTime * 60 );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = "
             SELECT start_date
@@ -559,7 +559,7 @@ sub SystemMaintenanceIsComming {
             WHERE start_date > $SystemTime and start_date <= $TargetTime
     ";
 
-    my @ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+    my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
     if ( scalar @ValidList ) {
 
         my $ValidIDsStrgDB = join ',', map { $DBObject->Quote( $_, 'Integer' ) } @ValidList;

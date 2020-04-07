@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get DB object
-my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+my $DBObject = $Kernel::OM->Get('DB');
 
 # create database for tests
 my $XML = '
@@ -23,7 +23,7 @@ my $XML = '
     <Column Name="test_message" Required="true" Size="255" Type="VARCHAR"/>
 </Table>
 ';
-my @XMLARRAY = $Kernel::OM->Get('Kernel::System::XML')->XMLParse( String => $XML );
+my @XMLARRAY = $Kernel::OM->Get('XML')->XMLParse( String => $XML );
 my @SQL = $DBObject->SQLProcessor( Database => \@XMLARRAY );
 for my $SQL (@SQL) {
     $Self->True(

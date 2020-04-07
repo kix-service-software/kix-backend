@@ -78,7 +78,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my @SupportedTypes = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionTypeList();
+    my @SupportedTypes = $Kernel::OM->Get('SysConfig')->OptionTypeList();
 
     return {
         'SysConfigOptionDefinition' => {
@@ -138,7 +138,7 @@ sub Run {
     );
      	
     # check if SysConfigOptionDefinition exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::SysConfig')->Exists(
+    my $Exists = $Kernel::OM->Get('SysConfig')->Exists(
         Name => $SysConfigOptionDefinition->{Name},
     );
     
@@ -150,7 +150,7 @@ sub Run {
     }
 
     # create SysConfigOptionDefinition
-    my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionAdd(
+    my $Success = $Kernel::OM->Get('SysConfig')->OptionAdd(
         Name            => $SysConfigOptionDefinition->{Name},
         Type            => $SysConfigOptionDefinition->{Type},
         Context         => $SysConfigOptionDefinition->{Context},

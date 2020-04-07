@@ -20,16 +20,16 @@ use Devel::Peek;
 use Kernel::System::Crypt::SMIME;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $HomeDir = $ConfigObject->Get('Home');
 
@@ -73,7 +73,7 @@ if ( !-e $ConfigObject->Get('SMIME::Bin') ) {
     }
 }
 
-my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
 if ( !$SMIMEObject ) {
     print STDERR "NOTICE: No SMIME support!\n";
@@ -137,7 +137,7 @@ returns found certificates with attributes
     my $Result = $CertificateSearch->();
 
 Returns:
-    same return as $Kernel::OM->Get('Kernel::System::Crypt::SMIME')->CertificateSearch(
+    same return as $Kernel::OM->Get('Crypt::SMIME')->CertificateSearch(
         Search => 'SearchString'
     );
 
@@ -147,14 +147,14 @@ my $CertificateSearch = sub {
     my ( $Self, %Param ) = @_;
 
     my @Result;
-    my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+    my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
     for my $SearchString ( ( '@example.org', 'smimeuser1@test.com' ) ) {
         push @Result, $SMIMEObject->CertificateSearch(
             Search => $SearchString,
         );
     }
 
-    #$Kernel::OM->Get('Kernel::System::Log')->Dumper( 'search', \@Result );
+    #$Kernel::OM->Get('Log')->Dumper( 'search', \@Result );
     return @Result;
 };
 
@@ -244,8 +244,8 @@ my $CertificationConversionTest = sub {
     return if !$Format;
 
     # create objects
-    my $MainObject  = $Kernel::OM->Get('Kernel::System::Main');
-    my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+    my $MainObject  = $Kernel::OM->Get('Main');
+    my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
     # read
     my $CertString = $MainObject->FileRead(

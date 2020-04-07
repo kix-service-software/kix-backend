@@ -14,8 +14,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::Package',
+    'Main',
+    'Package',
 );
 
 sub Configure {
@@ -39,7 +39,7 @@ sub Run {
     my %Options;
     $Options{Directory} = $Self->GetOption('dir');
 
-    my @RepositoryList = $Kernel::OM->Get('Kernel::System::Package')->RepositoryList();
+    my @RepositoryList = $Kernel::OM->Get('Package')->RepositoryList();
 
     # get dependencies
     my %PackageDeps = ();
@@ -75,7 +75,7 @@ sub Run {
     }
 
     for my $Package (sort @RepositoryList) {
-        my $PackageContent = $Kernel::OM->Get('Kernel::System::Package')->RepositoryGet(
+        my $PackageContent = $Kernel::OM->Get('Package')->RepositoryGet(
             Name    => $Package->{Name}->{Content},
             Version => $Package->{Version}->{Content},
         );
@@ -85,7 +85,7 @@ sub Run {
 
         print ".";
 
-        my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        my $Result = $Kernel::OM->Get('Main')->FileWrite(
             Directory => $Options{Directory} || '.',
             Filename  => "$PackageList{$Package->{Name}->{Content}}-$Package->{Name}->{Content}-$Package->{Version}->{Content}.kpm",
             Content   => \$PackageContent,

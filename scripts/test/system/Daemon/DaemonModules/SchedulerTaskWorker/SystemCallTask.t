@@ -16,7 +16,7 @@ use File::Copy;
 
 use vars (qw($Self));
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
 
@@ -35,10 +35,10 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
     sleep $SleepTime;
 }
 
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
-my $TaskWorkerObject  = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
+my $TaskWorkerObject  = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
 
 my $RunTasks = sub {
 
@@ -79,7 +79,7 @@ $RunTasks->();
 
 my $RandomID = $Helper->GetRandomID();
 
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 my $GATicketID = $TicketObject->TicketCreate(
     Title    => $RandomID,
@@ -100,7 +100,7 @@ $Self->IsNot(
 #   In Daemon environment objects are forked and discarded, any transactional event will be
 #   repeated endlessly on each fork
 $Kernel::OM->ObjectsDiscard(
-    Objects => [ 'Kernel::System::Ticket', ]
+    Objects => [ 'Ticket', ]
 );
 
 # Execute tasks (ticket transactional events).
@@ -110,9 +110,9 @@ $Self->True(
 );
 $RunTasks->();
 
-$TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+$TicketObject = $Kernel::OM->Get('Ticket');
 
-my $GenericAgentObject = $Kernel::OM->Get('Kernel::System::GenericAgent');
+my $GenericAgentObject = $Kernel::OM->Get('GenericAgent');
 
 my $Success = $GenericAgentObject->JobAdd(
     Name => $RandomID,
@@ -155,7 +155,7 @@ my @Tests = (
             Attempts                 => 1,
             MaximumParallelInstances => 1,
             Data                     => {
-                Module   => 'Kernel::System::Console::Command::Maint::PostMaster::SpoolMailsReprocess',
+                Module   => 'Console::Command::Maint::PostMaster::SpoolMailsReprocess',
                 Function => 'Execute',
                 Params   => [],
             },
@@ -169,7 +169,7 @@ my @Tests = (
             Attempts                 => 1,
             MaximumParallelInstances => 1,
             Data                     => {
-                Object   => 'Kernel::System::Console::Command::Maint::PostMaster::SpoolMailsReprocess',
+                Object   => 'Console::Command::Maint::PostMaster::SpoolMailsReprocess',
                 Function => 'Execute',
                 Params   => {},
             },
@@ -196,7 +196,7 @@ for my $Test (@Tests) {
     # prevent mails send
     $Helper->ConfigSettingChange(
         Key   => 'SendmailModule',
-        Value => 'Kernel::System::Email::DoNotSendEmail',
+        Value => 'Email::DoNotSendEmail',
         Valid => 1,
     );
 
@@ -255,7 +255,7 @@ for my $TicketID ( @TicketIDs, $GATicketID ) {
 }
 
 $Kernel::OM->ObjectsDiscard(
-    Objects => [ 'Kernel::System::Ticket', ]
+    Objects => [ 'Ticket', ]
 );
 
 # Execute tasks (ticket transactional events).

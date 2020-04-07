@@ -21,7 +21,7 @@ use Kernel::System::ObjectManager;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'syncLDAP2DB',
     },
 );
@@ -65,7 +65,7 @@ if (
     )
     )
 {
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => "Bind failed!",
     );
@@ -73,7 +73,7 @@ if (
 }
 
 # split request of all accounts
-my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+my $DBObject = $Kernel::OM->Get('DB');
 for my $Prefix ( "0" .. "9", "a" .. "z" ) {
     my $Filter = "($UidLDAP=$Prefix*)";
     if ($LDAPFilter) {
@@ -161,7 +161,7 @@ sub _ConvertTo {
 
     return $Text if $DBCharset eq $LDAPCharset;
 
-    return $Kernel::OM->Get('Kernel::System::Encode')->Convert(
+    return $Kernel::OM->Get('Encode')->Convert(
         Text => $Text,
         To   => $DBCharset,
         From => $LDAPCharset,

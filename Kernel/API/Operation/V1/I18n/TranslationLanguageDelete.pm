@@ -115,7 +115,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if pattern already exists
-    my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+    my %PatternData = $Kernel::OM->Get('Translation')->PatternGet(
         ID => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
@@ -125,7 +125,7 @@ sub Run {
     }
 
     # check if language entry exists
-    my %TranslationList = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageList(
+    my %TranslationList = $Kernel::OM->Get('Translation')->TranslationLanguageList(
         PatternID => $Param{Data}->{PatternID},
     );
     if ( !IsHashRefWithData(\%TranslationList) || !$TranslationList{$Param{Data}->{Language}} ) {
@@ -135,7 +135,7 @@ sub Run {
     }
 
     # delete translation Language
-    my $Success = $Kernel::OM->Get('Kernel::System::Translation')->TranslationLanguageDelete(
+    my $Success = $Kernel::OM->Get('Translation')->TranslationLanguageDelete(
         PatternID => $Param{Data}->{PatternID},
         Language  => $Param{Data}->{Language},
     );

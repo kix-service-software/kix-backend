@@ -30,6 +30,18 @@
             macroId:
               displayName: MacroID
               type: integer
+      /runs:
+        description: !include ../../descriptions/resources/system/automation/jobs/runs.md
+        type: { collection-readonly: { typeName: JobRun } }
+        /{runId}:
+          type: { item-readonly: { typeName: RunID } }
+          uriParameters:
+            runId:
+              displayName: RunID
+              type: integer
+          /logs:
+            description: !include ../../descriptions/resources/system/automation/jobs/runs/logs.md
+            type: { collection-readonly: { typeName: JobRunLog } }
   /execplans:
     description: !include ../../descriptions/resources/system/automation/execplans.md
     type: { collection: { typeName: ExecPlan } }

@@ -78,6 +78,12 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
+    my @JobTypes;
+    
+    if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Automation::JobType')) ) {
+        @JobTypes = sort keys %{ $Kernel::OM->Get('Config')->Get('Automation::JobType') };
+    }
+
     return {
         'Job' => {
             Type     => 'HASH',
@@ -85,7 +91,7 @@ sub ParameterDefinition {
         },
         'Job::Type' => {
             Required => 1,
-            OneOf    => [ 'Ticket' ]
+            OneOf    => \@JobTypes
         },
         'Job::Name' => {
             Required => 1
@@ -134,7 +140,7 @@ sub Run {
         Data => $Param{Data}->{Job}
     );
 
-    my $JobID = $Kernel::OM->Get('Kernel::System::Automation')->JobLookup(
+    my $JobID = $Kernel::OM->Get('Automation')->JobLookup(
         Name => $Job->{Name},
     );
 
@@ -146,7 +152,7 @@ sub Run {
     }
 
     # create job
-    $JobID = $Kernel::OM->Get('Kernel::System::Automation')->JobAdd(
+    $JobID = $Kernel::OM->Get('Automation')->JobAdd(
         Name     => $Job->{Name},
         Type     => $Job->{Type},
         Filter   => $Job->{Filter},

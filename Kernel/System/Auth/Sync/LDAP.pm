@@ -17,10 +17,10 @@ use Net::LDAP;
 use Net::LDAP::Util qw(escape_filter_value);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::User',
+    'Config',
+    'Encode',
+    'Log',
+    'User',
 );
 
 sub new {
@@ -34,25 +34,25 @@ sub new {
     $Self->{Debug} = 0;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get ldap preferences
     if ( !$ConfigObject->Get( 'AuthSyncModule::LDAP::Host' . $Param{Count} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need AuthSyncModule::LDAP::Host$Param{Count} in Kernel/Config.pm",
         );
         return;
     }
     if ( !defined $ConfigObject->Get( 'AuthSyncModule::LDAP::BaseDN' . $Param{Count} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need AuthSyncModule::LDAP::BaseDN$Param{Count} in Kernel/Config.pm",
         );
         return;
     }
     if ( !$ConfigObject->Get( 'AuthSyncModule::LDAP::UID' . $Param{Count} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need AuthSyncModule::LDAP::UID$Param{Count} in Kernel/Config.pm",
         );
@@ -93,7 +93,7 @@ sub Sync {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need User!'
         );
@@ -108,7 +108,7 @@ sub Sync {
 
     # just in case for debug!
     if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: '$Param{User}' tried to sync (REMOTE_ADDR: $RemoteAddr)",
         );
@@ -121,7 +121,7 @@ sub Sync {
             die "Can't connect to $Self->{Host}: $@";
         }
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't connect to $Self->{Host}: $@",
         );
@@ -138,7 +138,7 @@ sub Sync {
         $Result = $LDAP->bind();
     }
     if ( $Result->code() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'First bind failed! ' . $Result->error(),
         );
@@ -159,7 +159,7 @@ sub Sync {
         filter => $Filter,
     );
     if ( $Result->code() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Search failed! ($Self->{BaseDN}) filter='$Filter' " . $Result->error(),
         );
@@ -176,7 +176,7 @@ sub Sync {
     if ( !$UserDN ) {
 
         # failed login note
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $Param{User} sync failed, no LDAP entry found!"
                 . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr).",
@@ -188,8 +188,8 @@ sub Sync {
     }
 
     # get needed objects
-    my $UserObject   = $Kernel::OM->Get('Kernel::System::User');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $UserObject   = $Kernel::OM->Get('User');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get current user id
     my $UserID = $UserObject->UserLookup(
@@ -202,7 +202,7 @@ sub Sync {
         map { $_ => 0 } @{ $ConfigObject->Get('System::Permission') };
 
     # get RoleObject
-    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
+    my $RoleObject = $Kernel::OM->Get('Role');
 
     # get system roles and create lookup
     my %SystemRoles = $RoleObject->RoleList( Valid => 1 );
@@ -220,7 +220,7 @@ sub Sync {
                 # detect old config setting
                 if ( $Key =~ m{ \A (?: Firstname | Lastname | Email ) }xms ) {
                     $Key = 'User' . $Key;
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => 'Old config setting detected, please use the new one '
                             . 'from Kernel/Config/Defaults.pm (User* has been added!).',
@@ -271,7 +271,7 @@ sub Sync {
                 ChangeUserID => 1,
             );
             if ( !$UserID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't create user '$Param{User}' ($UserDN) in RDBMS!",
                 );
@@ -281,7 +281,7 @@ sub Sync {
                 return;
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => "Initial data for '$Param{User}' ($UserDN) created in RDBMS.",
                 );
@@ -342,7 +342,7 @@ sub Sync {
                 filter => $Filter,
             );
             if ( $Result->code() ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Search failed! ($GroupDN) filter='$Filter' " . $Result->error(),
                 );
@@ -359,7 +359,7 @@ sub Sync {
             if ( !$Valid ) {
 
                 # failed login note
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => "User: $Param{User} not in "
                         . "GroupDN='$GroupDN', Filter='$Filter'! (REMOTE_ADDR: $RemoteAddr).",
@@ -374,7 +374,7 @@ sub Sync {
 
                 # only for valid roles
                 if ( !$SystemRolesByName{$SyncRole} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message =>
                             "Invalid role '$SyncRole' in "
@@ -406,7 +406,7 @@ sub Sync {
             filter => $Filter,
         );
         if ( $Result->code() ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Search failed! ($Self->{BaseDN}) filter='$Filter' " . $Result->error(),
             );
@@ -440,7 +440,7 @@ sub Sync {
 
                             # only for valid roles
                             if ( !$SystemRolesByName{$SyncRole} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => 'notice',
                                     Message =>
                                         "Invalid role '$SyncRole' in "
@@ -481,7 +481,7 @@ sub Sync {
                 next ROLEID;
             }
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "User: '$Param{User}' sync ldap role $SystemRoles{$RoleID}!",
             );
@@ -506,7 +506,7 @@ sub _ConvertTo {
     return if !defined $Text;
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     if ( !$Charset || !$Self->{DestCharset} ) {
         $EncodeObject->EncodeInput( \$Text );
@@ -527,7 +527,7 @@ sub _ConvertFrom {
     return if !defined $Text;
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     if ( !$Charset || !$Self->{DestCharset} ) {
         $EncodeObject->EncodeInput( \$Text );

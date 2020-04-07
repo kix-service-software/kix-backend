@@ -16,11 +16,11 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Valid',
-    'Kernel::System::YAML',
-    'Kernel::System::Cache'
+    'DB',
+    'Log',
+    'Valid',
+    'YAML',
+    'Cache'
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $NotificationEventObject = $Kernel::OM->Get('Kernel::System::NotificationEvent');
+    my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
 =cut
 
@@ -79,7 +79,7 @@ sub NotificationList {
     $Param{Details} = $Param{Details} ? 1 : 0;
     $Param{All}     = $Param{All}     ? 1 : 0;
 
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey    = $Self->{CacheType} . '::' . $Param{Type} . '::' . $Param{Details} . '::' . $Param{All};
     my $CacheResult = $CacheObject->Get(
@@ -92,7 +92,7 @@ sub NotificationList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     $DBObject->Prepare( SQL => 'SELECT id FROM notification_event' );
 
@@ -185,7 +185,7 @@ sub NotificationGet {
 
     # check needed stuff
     if ( !$Param{Name} && !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name or ID!',
         );
@@ -193,7 +193,7 @@ sub NotificationGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # general query structure
     my $SQL = '
@@ -302,7 +302,7 @@ sub NotificationAdd {
     # check needed stuff
     for my $Argument (qw(Name Data Message ValidID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -315,7 +315,7 @@ sub NotificationAdd {
         Name => $Param{Name},
     );
     if (%Check) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't add notification '$Param{Name}', notification already exists!",
         );
@@ -324,7 +324,7 @@ sub NotificationAdd {
 
     # check message parameter
     if ( !IsHashRefWithData( $Param{Message} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Message!",
         );
@@ -338,7 +338,7 @@ sub NotificationAdd {
 
             # error if message data is incomplete
             if ( !$Param{Message}->{$Language}->{$Argument} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need Message argument '$Argument' for language '$Language'!",
                 );
@@ -351,7 +351,7 @@ sub NotificationAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert data into db
     return if !$DBObject->Do(
@@ -378,7 +378,7 @@ sub NotificationAdd {
 
     # error handling
     if ( !$ID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not get ID for just added notification '$Param{Name}'!",
         );
@@ -424,7 +424,7 @@ sub NotificationAdd {
         );
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -468,7 +468,7 @@ sub NotificationUpdate {
     # check needed stuff
     for my $Argument (qw(ID Name Data Message ValidID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -478,7 +478,7 @@ sub NotificationUpdate {
 
     # check message parameter
     if ( !IsHashRefWithData( $Param{Message} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Message!",
         );
@@ -492,7 +492,7 @@ sub NotificationUpdate {
 
             # error if message data is incomplete
             if ( !$Param{Message}->{$Language}->{$Argument} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need Message argument '$Argument' for language '$Language'!",
                 );
@@ -505,7 +505,7 @@ sub NotificationUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # update data in db
     return if !$DBObject->Do(
@@ -575,7 +575,7 @@ sub NotificationUpdate {
         );
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -599,7 +599,7 @@ sub NotificationDelete {
     # check needed stuff
     for my $Argument (qw(ID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -612,7 +612,7 @@ sub NotificationDelete {
         ID => $Param{ID},
     );
     if ( !%Check ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't delete notification with ID '$Param{ID}'. Notification does not exist!",
         );
@@ -620,7 +620,7 @@ sub NotificationDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete notification event item
     my $DeleteOK = $DBObject->Do(
@@ -630,7 +630,7 @@ sub NotificationDelete {
 
     # error handling
     if ( !$DeleteOK ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't delete notification_event_item with ID '$Param{ID}'!",
         );
@@ -645,7 +645,7 @@ sub NotificationDelete {
 
     # error handling
     if ( !$DeleteOK ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't delete notification_event_message with ID '$Param{ID}'!",
         );
@@ -660,19 +660,19 @@ sub NotificationDelete {
 
     # error handling
     if ( !$DeleteOK ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't delete notification_event with ID '$Param{ID}'!",
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # success
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "NotificationEvent notification '$Check{Name}' deleted (UserID=$Param{UserID}).",
     );
@@ -695,7 +695,7 @@ sub NotificationEventCheck {
 
     # check needed stuff
     if ( !$Param{Event} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name!',
         );
@@ -703,8 +703,8 @@ sub NotificationEventCheck {
     }
 
     # get needed objects
-    my $DBObject    = $Kernel::OM->Get('Kernel::System::DB');
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+    my $DBObject    = $Kernel::OM->Get('DB');
+    my $ValidObject = $Kernel::OM->Get('Valid');
 
     my @ValidIDs = $ValidObject->ValidIDsGet();
     my $ValidIDString = join ', ', @ValidIDs;
@@ -759,7 +759,7 @@ sub NotificationImport {
 
         # check needed stuff
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -770,7 +770,7 @@ sub NotificationImport {
         }
     }
 
-    my $NotificationData = $Kernel::OM->Get('Kernel::System::YAML')->Load(
+    my $NotificationData = $Kernel::OM->Get('YAML')->Load(
         Data => $Param{Content},
     );
 

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "User" : {
-         "$ref" : "#/definitions/_User_json"
+         "$ref" : "#/definitions/User_json-1abdd7e922"
       }
    },
    "required" : [
       "User"
    ],
    "definitions" : {
-      "_UserPreference_json" : {
+      "UserPreference_json-7fdc063bfe" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",
@@ -37,7 +37,7 @@
             "Value"
          ]
       },
-      "_User_json" : {
+      "User_json-1abdd7e922" : {
          "$id" : "#User",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user object.",
@@ -63,7 +63,7 @@
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/_UserPreference_json"
+                  "$ref" : "#/definitions/UserPreference_json-7fdc063bfe"
                }
             },
             "RoleIDs" : {

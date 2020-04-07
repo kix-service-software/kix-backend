@@ -141,7 +141,7 @@ sub Run {
     );
 
     # get config item data
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID}
     );
 
@@ -165,7 +165,7 @@ sub Run {
     }
 
     # get current definition
-    my $DefinitionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
+    my $DefinitionData = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
         ClassID => $ConfigItem->{ClassID},
     );
 
@@ -185,7 +185,7 @@ sub Run {
     }
 
     # everything is ok, let's create the version
-    my $VersionID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionAdd(
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         %{$ConfigItem},
         DefinitionID => $DefinitionData->{DefinitionID},
         DeplStateID  => $Version->{DeplStateID},

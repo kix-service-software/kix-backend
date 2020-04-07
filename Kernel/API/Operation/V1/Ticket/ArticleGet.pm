@@ -175,7 +175,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @ArticleList;
 
@@ -237,12 +237,12 @@ sub Run {
             $ArticleData{Flags} = [ sort keys %ArticleFlags ];
         }
 
-        if ( $Kernel::OM->Get('Kernel::System::Queue')->NameExistsCheck(Name => $ArticleData{To}) ) {
-            my %QueueInfo = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+        if ( $Kernel::OM->Get('Queue')->NameExistsCheck(Name => $ArticleData{To}) ) {
+            my %QueueInfo = $Kernel::OM->Get('Queue')->QueueGet(
                 Name => $ArticleData{To},
             );
 
-            my %QueueSystemeMailAddress = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
+            my %QueueSystemeMailAddress = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
                 ID => $QueueInfo{SystemAddressID},
             );
 

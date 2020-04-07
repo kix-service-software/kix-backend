@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::ProcessManagement::Process',
-    'Kernel::System::Ticket',
+    'Config',
+    'Log',
+    'ProcessManagement::Process',
+    'Ticket',
 );
 
 sub new {
@@ -38,7 +38,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Data Event Config UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -48,7 +48,7 @@ sub Run {
 
     # listen to all kinds of events
     if ( !$Param{Data}->{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TicketID in Data!",
         );
@@ -56,7 +56,7 @@ sub Run {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my $CacheKey = '_TicketProcessTransitions::AlreadyProcessed';
 
@@ -82,7 +82,7 @@ sub Run {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $ProcessIDField  = $ConfigObject->Get("Process::DynamicFieldProcessManagementProcessID");
     my $ProcessEntityID = $Ticket{"DynamicField_$ProcessIDField"};
@@ -97,7 +97,7 @@ sub Run {
     # ok, now we know that we need to call the transition logic for this ticket.
 
     # get process object
-    my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Process');
+    my $ProcessObject = $Kernel::OM->Get('ProcessManagement::Process');
 
     # Remember that the event was executed for this ticket to avoid multiple executions.
     #   Store the information on the ticketobject, this needs to be done before the execution of the
@@ -113,7 +113,7 @@ sub Run {
     );
 
     if ( $Self->{Debug} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Transition for to TicketID: $Param{Data}->{TicketID}"

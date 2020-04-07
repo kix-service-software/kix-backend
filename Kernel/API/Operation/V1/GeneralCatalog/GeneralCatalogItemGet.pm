@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $GeneralCatalogItemID ( @{$Param{Data}->{GeneralCatalogItemID}} ) {
 
 	    # get the GeneralCatalogItem data
-	    my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+	    my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
 	        ItemID => $GeneralCatalogItemID,
 	    );
 

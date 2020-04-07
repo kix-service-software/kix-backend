@@ -6,9 +6,9 @@
         <Setting>
             <Hash>
                 <Item Key="Name">AddressGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressGet</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">AddressBook</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">AddressID</Item>
                 <Item Key="CacheType">API_addressbook</Item>
                 <Item Key="CacheTypeDependency">AddressBook</Item>
@@ -20,9 +20,9 @@
         <Setting>
             <Hash>
                 <Item Key="Name">AddressSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">AddressBook</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="CacheType">API_addressbook</Item>
                 <Item Key="CacheTypeDependency">AddressBook</Item>
             </Hash>
@@ -33,9 +33,8 @@
         <Setting>
             <Hash>
                 <Item Key="Name">AddressCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">AddressBook</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -44,9 +43,8 @@
         <Setting>
             <Hash>
                 <Item Key="Name">AddressUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">AddressBook</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -55,9 +53,8 @@
         <Setting>
             <Hash>
                 <Item Key="Name">AddressDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::AddressBook::AddressDelete</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="Controller">AddressBook</Item>
-                <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
             </Hash>
         </Setting>
     </ConfigItem>

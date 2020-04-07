@@ -14,7 +14,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Dev::Package::RepositoryIndex');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Dev::Package::RepositoryIndex');
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -24,7 +24,7 @@ $Self->Is(
     "Dev::Package::RepositoryIndex exit code without arguments",
 );
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 my $Result;
 {

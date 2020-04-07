@@ -16,16 +16,16 @@ use Kernel::API::Debugger;
 use Kernel::API::Transport;
 
 # get encode object
-my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+my $EncodeObject = $Kernel::OM->Get('Encode');
 
 # get helper object
 # skip SSL certificate verification
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         SkipSSLVerify => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $DebuggerObject = Kernel::API::Debugger->new(
     DebuggerConfig => {
@@ -82,7 +82,7 @@ for my $Fail ( 0 .. 1 ) {
 
     $Self->Is(
         ref $TransportObject,
-        'Kernel::API::Transport',
+        'API::Transport',
         "TransportObject instantiated with testing backend (Fail $Fail)",
     );
 
@@ -142,8 +142,8 @@ for my $Fail ( 0 .. 1 ) {
 
     for my $TestEntry (@RPRTestData) {
 
-        # discard Web::Request from OM to prevent errors
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Web::Request'] );
+        # discard WebRequest from OM to prevent errors
+        $Kernel::OM->ObjectsDiscard( Objects => ['WebRequest'] );
 
         my $Result = $TransportObject->RequesterPerformRequest(
             Operation => $TestEntry->{Operation},
@@ -237,8 +237,8 @@ for my $Fail ( 0 .. 1 ) {
             # reset CGI object from previous runs
             CGI::initialize_globals();
 
-            # discard Web::Request from OM to prevent errors
-            $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Web::Request'] );
+            # discard WebRequest from OM to prevent errors
+            $Kernel::OM->ObjectsDiscard( Objects => ['WebRequest'] );
 
             $Result = $TransportObject->ProviderProcessRequest();
         }
@@ -326,8 +326,8 @@ for my $Fail ( 0 .. 1 ) {
                 local *STDOUT;
                 open STDOUT, '>:utf8', \$ResultData;    ## no critic
 
-                # discard Web::Request from OM to prevent errors
-                $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Web::Request'] );
+                # discard WebRequest from OM to prevent errors
+                $Kernel::OM->ObjectsDiscard( Objects => ['WebRequest'] );
 
                 $Result = $TransportObject->ProviderGenerateResponse(
                     Success      => $OptionSuccess,

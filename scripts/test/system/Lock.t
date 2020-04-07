@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get lock object
-my $LockObject = $Kernel::OM->Get('Kernel::System::Lock');
+my $LockObject = $Kernel::OM->Get('Lock');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Names = sort $LockObject->LockViewableLock(
     Type => 'Name',

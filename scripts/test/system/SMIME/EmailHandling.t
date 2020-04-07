@@ -18,18 +18,18 @@ use File::Path qw(mkpath rmtree);
 use Kernel::Output::HTML::ArticleCheck::SMIME;
 
 # get needed objects
-my $ConfigObject    = $Kernel::OM->Get('Kernel::Config');
-my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
-my $TicketObject    = $Kernel::OM->Get('Kernel::System::Ticket');
-my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+my $ConfigObject    = $Kernel::OM->Get('Config');
+my $MainObject      = $Kernel::OM->Get('Main');
+my $TicketObject    = $Kernel::OM->Get('Ticket');
+my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $HomeDir = $ConfigObject->Get('Home');
 
@@ -74,7 +74,7 @@ $ConfigObject->Set(
 );
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # check if openssl is located there
@@ -90,7 +90,7 @@ if ( !-e $ConfigObject->Get('SMIME::Bin') ) {
 }
 
 # create crypt object
-my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
 if ( !$SMIMEObject ) {
     print STDERR "NOTICE: No SMIME support!\n";

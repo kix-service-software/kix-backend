@@ -12,8 +12,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -24,9 +24,9 @@ sub new {
     bless( $Self, $Type );
 
     # create required objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{TicketObject} = $Kernel::OM->Get('Ticket');
 
     return $Self;
 }
@@ -49,8 +49,8 @@ sub Run {
     }
 
     # get all dynamic fields
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get("Ticket::Frontend::$Param{Action}");
-    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $Config = $Kernel::OM->Get('Config')->Get("Ticket::Frontend::$Param{Action}");
+    my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid       => 1,
         ObjectType  => [ 'Ticket', 'Article' ],
         FieldFilter => $Config->{DynamicField} || {},
@@ -81,7 +81,7 @@ sub Run {
 
             # type
             if ( $Elements[1] eq 'Type' && $Param{TypeID} ) {
-                my %TypeList = $Kernel::OM->Get('Kernel::System::Type')->TypeList( UserID => 1, );
+                my %TypeList = $Kernel::OM->Get('Type')->TypeList( UserID => 1, );
                 $ConditionElement = $TypeList{ $Param{TypeID} } || '';
             }
             elsif ( $Elements[1] eq 'Type' && $Ticket{Type} ) {
@@ -90,7 +90,7 @@ sub Run {
 
             # queue
             elsif ( $Elements[1] eq 'Queue' && $Param{QueueID} ) {
-                my %QueueList = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
+                my %QueueList = $Kernel::OM->Get('Queue')->QueueList();
                 $ConditionElement = $QueueList{ $Param{QueueID} } || '';
             }
             elsif ( $Elements[1] eq 'Queue' && $Ticket{Queue} ) {
@@ -100,7 +100,7 @@ sub Run {
             # service
             elsif ( $Elements[1] eq 'Service' && $Param{ServiceID} ) {
                 my %ServiceList
-                    = $Kernel::OM->Get('Kernel::System::Service')->ServiceList( UserID => 1, );
+                    = $Kernel::OM->Get('Service')->ServiceList( UserID => 1, );
                 $ConditionElement = $ServiceList{ $Param{ServiceID} } || '';
             }
             elsif ( $Elements[1] eq 'Service' && $Ticket{Service} ) {
@@ -114,7 +114,7 @@ sub Run {
                 )
             {
                 my %StateList
-                    = $Kernel::OM->Get('Kernel::System::State')->StateList( UserID => 1, );
+                    = $Kernel::OM->Get('State')->StateList( UserID => 1, );
                 $ConditionElement = $StateList{ $Param{NextStateID} } || '';
             }
             elsif (
@@ -127,7 +127,7 @@ sub Run {
 
             # priority
             elsif ( $Elements[1] eq 'Priority' && defined $Param{PriorityID} ) {
-                my %PriorityList = $Kernel::OM->Get('Kernel::System::Priority')->PriorityList();
+                my %PriorityList = $Kernel::OM->Get('Priority')->PriorityList();
                 $ConditionElement = $PriorityList{ $Param{PriorityID} } || '';
             }
             elsif ( $Elements[1] eq 'Priority' && defined $Ticket{Priority} ) {

@@ -16,9 +16,9 @@ use warnings;
 use Kernel::System::VariableCheck (qw(:all));
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Cache',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SearchProfileObject = $Kernel::OM->Get('Kernel::System::SearchProfile');
+    my $SearchProfileObject = $Kernel::OM->Get('SearchProfile');
 
 =cut
 
@@ -52,7 +52,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
 
     $Self->{CacheType} = 'SearchProfile';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
@@ -64,7 +64,7 @@ sub new {
     }
 
     # KIX4OTRS-capeIT
-    $Self->{LanguageObject} = $Kernel::OM->Get('Kernel::Language');
+    $Self->{LanguageObject} = $Kernel::OM->Get('Language');
 
     # EO KIX4OTRS-capeIT
 
@@ -97,7 +97,7 @@ sub SearchProfileAdd {
     # check needed stuff
     for (qw(Type Name UserLogin UserType)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -106,7 +106,7 @@ sub SearchProfileAdd {
     }
 
     if ( !$Param{SubscribedProfileID} && !IsHashRefWithData($Param{Data}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Data if search profile is no subscription!"
         );
@@ -114,7 +114,7 @@ sub SearchProfileAdd {
     }
 
     if ( $Param{UserType} !~ /^(Agent|Customer)$/g ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "UserType must be 'Agent' or 'Customer'!"
         );
@@ -128,7 +128,7 @@ sub SearchProfileAdd {
         my %SubscribableProfiles = map { $_ => 1 } @SubscribableProfileIDs;
 
         if ( !$SubscribableProfiles{$Param{SubscribedProfileID}} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't subscribe to the given SubscribableProfileID."
             );
@@ -145,7 +145,7 @@ sub SearchProfileAdd {
 
     # add profile to database
     if (@ExistingProfiles) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Can\'t add search profile! A profile with same name already exists for this type and user.'
         );
@@ -221,7 +221,7 @@ sub SearchProfileAdd {
     }    
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -247,7 +247,7 @@ sub SearchProfileGet {
     # check needed stuff
     for (qw(ID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -261,7 +261,7 @@ sub SearchProfileGet {
                  . ($Param{WithData}||'') . '::' 
                  . ($Param{WithCategories}||'') . '::' 
                  . ($Param{WithSubscriptions}||''); 
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -285,7 +285,7 @@ sub SearchProfileGet {
 
     # check service
     if ( !$SearchProfile{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such search profile ($Param{ID})!",
         );
@@ -342,7 +342,7 @@ sub SearchProfileGet {
         $SearchProfile{Subscriptions} = \@Subscriptions;
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -375,7 +375,7 @@ sub SearchProfileUpdate {
     # check needed stuff
     for (qw(ID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -393,7 +393,7 @@ sub SearchProfileUpdate {
 
     # update name if necessary
     if ( $SearchProfile{SubscribableProfileID} && ( $Param{Data} || IsArrayRefWithData($Param{Categories}) ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No data or categories allowed, since profile is subscribed.'
         );
@@ -412,7 +412,7 @@ sub SearchProfileUpdate {
 
         # add profile to database
         if (@ExistingProfiles && $ExistingProfiles[0] != $Param{ID}) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Can\'t add search profile! Another profile with same name already exists for this type and user.'
             );
@@ -491,7 +491,7 @@ sub SearchProfileUpdate {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -514,7 +514,7 @@ sub SearchProfileDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -541,7 +541,7 @@ sub SearchProfileDelete {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -577,7 +577,7 @@ sub SearchProfileList {
                  . ($Param{SubscribedProfileID}||'') . '::' 
                  . ($Param{Category}||'') . '::' 
                  . ($Param{OnlySubscribable}||'');
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -618,7 +618,7 @@ sub SearchProfileList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = 'SELECT id FROM search_profile';
     if ( @SQLWhere ) {
@@ -638,7 +638,7 @@ sub SearchProfileList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -666,7 +666,7 @@ sub SearchProfileUpdateUserLogin {
     # check needed stuff
     for (qw(UserType OldUserLogin NewUserLogin)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -736,7 +736,7 @@ sub SearchProfileAutoSubscribe {
     # check needed stuff
     for (qw(Name UserLogin UserObject)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }

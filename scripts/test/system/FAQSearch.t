@@ -14,13 +14,13 @@ use warnings;
 use vars qw($Self);
 
 # set config options
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'FAQ::ApprovalRequired',
     Value => 0,
 );
 
 # get helper object
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 # generate a random string to help searches
 my $RandomID = $HelperObject->GetRandomID();
@@ -31,7 +31,7 @@ for my $Counter ( 1 .. 4 ) {
     my $TestUserLogin = $HelperObject->TestUserCreate(
         Groups => [ 'admin', 'users', 'faq', 'faq_admin', 'faq_approval' ],
     );
-    my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+    my $UserID = $Kernel::OM->Get('User')->UserLookup(
         UserLogin => $TestUserLogin,
     );
     push @AddedUsers, $UserID;
@@ -56,7 +56,7 @@ my %FAQAddTemplate = (
 $HelperObject->FixedTimeSet();
 
 # get FAQ object
-my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
+my $FAQObject = $Kernel::OM->Get('FAQ');
 
 for my $Counter ( 1 .. 2 ) {
     my $FAQID = $FAQObject->FAQAdd(
@@ -579,7 +579,7 @@ $Self->True(
 $HelperObject->FixedTimeAddSeconds(120);
 
 # get time object
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 my $SystemTime = $TimeObject->SystemTime();
 
@@ -824,7 +824,7 @@ for my $Test (@Tests) {
 
 # approval tests
 # update database to prevent generation of approval ticket
-return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+return if !$Kernel::OM->Get('DB')->Do(
     SQL => '
         UPDATE faq_item
         SET approved = ?

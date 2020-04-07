@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "SysConfigOptionDefinition" : {
-         "$ref" : "#/definitions/_SysConfigOptionDefinition_json"
+         "$ref" : "#/definitions/SysConfigOptionDefinition_json-48e00e12aa"
       }
    },
    "required" : [
       "SysConfigOptionDefinition"
    ],
    "definitions" : {
-      "_SysConfigOptionDefinition_json" : {
+      "SysConfigOptionDefinition_json-48e00e12aa" : {
          "$id" : "#SysConfigOptionDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The SysConfig option definition object.",
@@ -83,6 +83,10 @@
                      "type" : "null"
                   }
                ],
+               "readOnly" : true
+            },
+            "DefaultValidID" : {
+               "type" : "integer",
                "readOnly" : true
             },
             "Description" : {

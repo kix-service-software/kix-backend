@@ -18,11 +18,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define variables
 my $UserID     = 1;
@@ -33,7 +33,7 @@ my $DFName2    = 'Test2' . $RandomID;
 
 # set user details
 my $TestUserLogin = $Helper->TestUserCreate();
-my $TestUserID    = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $TestUserID    = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
@@ -72,7 +72,7 @@ my @AddedDynamicFields;
 for my $DynamicFieldConfig (@NewDynamicFieldConfig) {
 
     # add the new dynamic field
-    my $ID = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldAdd(
+    my $ID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
         %{$DynamicFieldConfig},
         FieldOrder => 99999,
         ValidID    => 1,
@@ -90,7 +90,7 @@ for my $DynamicFieldConfig (@NewDynamicFieldConfig) {
 }
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # ----------------------------------------
 # Create a test ticket
@@ -291,7 +291,7 @@ for my $Test (@Tests) {
     # make a deep copy to avoid changing the definition
     my $OrigTest = Storable::dclone($Test);
 
-    my $Success = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::DynamicFieldSet')->Run(
+    my $Success = $Kernel::OM->Get('ProcessManagement::TransitionAction::DynamicFieldSet')->Run(
         %{ $Test->{Config} },
         ProcessEntityID          => 'P1',
         ActivityEntityID         => 'A1',

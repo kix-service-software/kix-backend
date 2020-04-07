@@ -83,7 +83,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get category list
-    my %CategoryList = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileCategoryList();
+    my %CategoryList = $Kernel::OM->Get('SearchProfile')->SearchProfileCategoryList();
 
     if ( IsHashRefWithData(\%CategoryList) ) {
         my @Result = sort keys %CategoryList;

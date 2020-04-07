@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Contact::ContactDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Contact::ContactDelete');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
 
         # get the Contact data
-        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $ContactID,
         );
 
@@ -142,7 +142,7 @@ sub Run {
         }
 
         # delete contact
-        my $Success = $Kernel::OM->Get('Kernel::System::Contact')->ContactDelete(
+        my $Success = $Kernel::OM->Get('Contact')->ContactDelete(
             ID  => $ContactID,
         );
 

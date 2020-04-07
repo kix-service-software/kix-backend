@@ -15,10 +15,10 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CacheInternal',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'CacheInternal',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create a ObjectIcon object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ObjectIconObject = $Kernel::OM->Get('Kernel::System::ObjectIcon');
+    my $ObjectIconObject = $Kernel::OM->Get('ObjectIcon');
 
 =cut
 
@@ -75,7 +75,7 @@ sub ObjectIconGet {
 
     # check required params...
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log( 
+        $Kernel::OM->Get('Log')->Log( 
             Priority => 'error', 
             Message  => 'Need ClientID!' 
         );
@@ -84,13 +84,13 @@ sub ObjectIconGet {
    
     # check cache
     my $CacheKey = 'ObjectIconGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare( 
         SQL   => "SELECT id, object, object_id, content_type, content, create_by, create_time, change_by, change_time 
@@ -117,7 +117,7 @@ sub ObjectIconGet {
     
     # no data found...
     if ( !%Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No ObjectIcon with ID $Param{ID} found!",
         );
@@ -125,7 +125,7 @@ sub ObjectIconGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -162,7 +162,7 @@ sub ObjectIconAdd {
         }
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # do the db insert...
     my $DBInsert = $DBObject->Do(
@@ -182,7 +182,7 @@ sub ObjectIconAdd {
     if ($DBInsert) {
 
         # delete cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
 
@@ -201,7 +201,7 @@ sub ObjectIconAdd {
         }
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'ObjectIcon',
             ObjectID  => $ID,
@@ -210,7 +210,7 @@ sub ObjectIconAdd {
         return $ID;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "DB insert failed!",
         );
@@ -240,13 +240,13 @@ sub ObjectIconUpdate {
     # check needed stuff
     for (qw(ID Object ObjectID ContentType Content UserID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
     # do the db insert...
-    my $DBUpdate = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $DBUpdate = $Kernel::OM->Get('DB')->Do(
         SQL  => "UPDATE object_icon SET object = ?, object_id = ?, content_type = ?, content = ?, change_by = ? WHERE id = ?",
         Bind => [
             \$Param{Object},
@@ -262,12 +262,12 @@ sub ObjectIconUpdate {
     if ($DBUpdate) {
 
         # delete cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'ObjectIcon',
             ObjectID  => $Param{ID},
@@ -276,7 +276,7 @@ sub ObjectIconUpdate {
         return $Param{ID};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "DB update failed!",
         );
@@ -304,7 +304,7 @@ sub ObjectIconList {
 
     # check cache
     my $CacheKey = 'ObjectIconList::'.($Param{Object}||'').'::'.($Param{ObjectID}||'');
-    my $CacheResult = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $CacheResult = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey
     );
@@ -327,7 +327,7 @@ sub ObjectIconList {
         $SQL .= ' WHERE '.join(' AND ', @SQLWhere);
     }
    
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare( 
         SQL   => $SQL,
@@ -340,7 +340,7 @@ sub ObjectIconList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -366,7 +366,7 @@ sub ObjectIconDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -375,7 +375,7 @@ sub ObjectIconDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM object_icon WHERE id = ?',
@@ -383,12 +383,12 @@ sub ObjectIconDelete {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'ObjectIcon',
         ObjectID  => $Param{ID},

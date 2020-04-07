@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::ITSMCIAttributCollectionUtils',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::ImportExport',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::Log'
+    'Config',
+    'ITSMCIAttributCollectionUtils',
+    'ITSMConfigItem',
+    'ImportExport',
+    'GeneralCatalog',
+    'Log'
 );
 
 sub new {
@@ -27,12 +27,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{CIACUtilsObject}      = $Kernel::OM->Get('Kernel::System::ITSMCIAttributCollectionUtils');
-    $Self->{ITSMConfigItemObject} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-    $Self->{LogObject}            = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{ImportExportObject}   = $Kernel::OM->Get('Kernel::System::ImportExport');
-    $Self->{ConfigObject}         = $Kernel::OM->Get('Kernel::Config');
+    $Self->{CIACUtilsObject}      = $Kernel::OM->Get('ITSMCIAttributCollectionUtils');
+    $Self->{ITSMConfigItemObject} = $Kernel::OM->Get('ITSMConfigItem');
+    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{LogObject}            = $Kernel::OM->Get('Log');
+    $Self->{ImportExportObject}   = $Kernel::OM->Get('ImportExport');
+    $Self->{ConfigObject}         = $Kernel::OM->Get('Config');
 
     return $Self;
 }
@@ -59,7 +59,7 @@ sub Run {
         return;
     }
 
-    return $Kernel::OM->Get('Kernel::System::ImportExport::ITSMConfigItemCSVMappingAutoCreate')->CSVMappingAutoCreate(
+    return $Kernel::OM->Get('ImportExport::ITSMConfigItemCSVMappingAutoCreate')->CSVMappingAutoCreate(
         ClassID         => $Param{Data}->{ClassID},
         XMLDefinitionID => $Param{Data}->{Comment},
         TemplateComment => 'Definition create event'

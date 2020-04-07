@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ImportExportTemplate" : {
-         "$ref" : "#/definitions/_ImportExportTemplate_json"
+         "$ref" : "#/definitions/ImportExportTemplate_json-cf55d7d3e0"
       }
    },
    "required" : [
       "ImportExportTemplate"
    ],
    "definitions" : {
-      "_ImportExportTemplate_json" : {
+      "ImportExportTemplate_json-cf55d7d3e0" : {
          "$id" : "#ImportExportTemplate",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The import export template object.",

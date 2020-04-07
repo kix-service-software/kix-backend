@@ -16,17 +16,17 @@ use vars (qw($Self));
 use File::Path qw(mkpath rmtree);
 
 # get needed objects
-my $CommandObject        = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::ITSM::ImportExport::Export');
-my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-my $ConfigItemObject     = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+my $CommandObject        = $Kernel::OM->Get('Console::Command::Admin::ITSM::ImportExport::Export');
+my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
+my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # test command without --template-number option
 my $ExitCode = $CommandObject->Execute();
@@ -58,7 +58,7 @@ for ( 1 .. 10 ) {
 
     # create ConfigItem number
     my $ConfigItemNumber = $ConfigItemObject->ConfigItemNumberCreate(
-        Type    => $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::NumberGenerator'),
+        Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
         ClassID => $HardwareConfigItemID,
     );
 
@@ -93,7 +93,7 @@ for ( 1 .. 10 ) {
 }
 
 # get ImportExport object
-my $ImportExportObject = $Kernel::OM->Get('Kernel::System::ImportExport');
+my $ImportExportObject = $Kernel::OM->Get('ImportExport');
 
 # add test template
 my $TemplateID = $ImportExportObject->TemplateAdd(
@@ -175,7 +175,7 @@ for my $ObjectDataValue (qw( Name DeplState InciState )) {
 }
 
 # make directory for export file
-my $DestinationPath = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/var/tmp/ImportExport/";
+my $DestinationPath = $Kernel::OM->Get('Config')->Get('Home') . "/var/tmp/ImportExport/";
 mkpath( [$DestinationPath], 0, 0770 );    ## no critic
 
 # test command with wrong template number

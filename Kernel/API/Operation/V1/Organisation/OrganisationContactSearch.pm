@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform contact search
-    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+    my %ContactList = $Kernel::OM->Get('Contact')->ContactSearch(
         OrganisationID => $Param{Data}->{OrganisationID},
         Valid      => 0,
     );

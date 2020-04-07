@@ -16,8 +16,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -93,7 +93,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -113,7 +113,7 @@ sub Search {
     );
 
     # convert to unix time and check
-    $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+    $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Param{Search}->{Value},
     );
 
@@ -131,7 +131,7 @@ sub Search {
     );
 
     if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );
@@ -147,7 +147,7 @@ sub Search {
     }
     elsif ( $Param{Search}->{Field} =~ /^Pending/ ) {
         # in case of pending time search, restrict states to pending states
-        my @List = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+        my @List = $Kernel::OM->Get('State')->StateGetStatesByType(
             StateType => [ 'pending reminder', 'pending auto' ],
             Result    => 'ID',
         );

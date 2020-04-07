@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get priority object
-my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
+my $PriorityObject = $Kernel::OM->Get('Priority');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # add priority names
 my $PriorityRand = 'priority' . $Helper->GetRandomID();

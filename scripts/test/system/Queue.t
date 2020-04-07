@@ -17,17 +17,17 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject           = $Kernel::OM->Get('Kernel::Config');
-my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
-my $QueueObject            = $Kernel::OM->Get('Kernel::System::Queue');
+my $ConfigObject           = $Kernel::OM->Get('Config');
+my $StandardTemplateObject = $Kernel::OM->Get('StandardTemplate');
+my $QueueObject            = $Kernel::OM->Get('Queue');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $QueueRand = 'Some::Queue' . $Helper->GetRandomID();
 my $QueueID   = $QueueObject->QueueAdd(
@@ -392,7 +392,7 @@ $Self->True(
 
 # check cache
 my $CacheKey = "StandardTemplates::1::0";
-my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+my $Cache    = $Kernel::OM->Get('Cache')->Get(
     Type => 'Queue',
     Key  => $CacheKey,
 );
@@ -415,7 +415,7 @@ $Self->True(
 
 # check cache
 $CacheKey = "StandardTemplates::1::1";
-$Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+$Cache    = $Kernel::OM->Get('Cache')->Get(
     Type => 'Queue',
     Key  => $CacheKey,
 );

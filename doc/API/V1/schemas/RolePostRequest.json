@@ -16,7 +16,7 @@
             "Permissions" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/_PermissionPostItem_json"
+                  "$ref" : "#/definitions/PermissionPostItem_json-5776f2dc8e"
                }
             },
             "UserIDs" : {
@@ -39,7 +39,7 @@
       "Role"
    ],
    "definitions" : {
-      "_PermissionPostItem_json" : {
+      "PermissionPostItem_json-5776f2dc8e" : {
          "$id" : "#PermissionPostItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission item object for creation.",

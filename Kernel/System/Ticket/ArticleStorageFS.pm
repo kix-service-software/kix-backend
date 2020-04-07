@@ -26,11 +26,11 @@ sub ArticleStorageInit {
     my ( $Self, %Param ) = @_;
 
     # ArticleDataDir
-    $Self->{ArticleDataDir} = $Kernel::OM->Get('Kernel::Config')->Get('ArticleDir')
+    $Self->{ArticleDataDir} = $Kernel::OM->Get('Config')->Get('ArticleDir')
         || die 'Got no ArticleDir!';
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # create ArticleContentPath
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $TimeObject->SystemTime2Date(
@@ -49,7 +49,7 @@ sub ArticleStorageInit {
     }
     else {
         my $Error = $!;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Can't create $Path: $Error!",
         );
@@ -57,7 +57,7 @@ sub ArticleStorageInit {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get activated cache backend configuration
     my $CacheModule = $ConfigObject->Get('Cache::Module') || '';
@@ -76,7 +76,7 @@ sub ArticleDelete {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -89,13 +89,13 @@ sub ArticleDelete {
         ArticleID => $Param{ArticleID}
     );
 
-    my $DynamicFieldListArticle = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $DynamicFieldListArticle = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         ObjectType => 'Article',
         Valid      => 0,
     );
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # delete dynamicfield values for this article
     DYNAMICFIELD:
@@ -138,7 +138,7 @@ sub ArticleDelete {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete article flags
     return if !$DBObject->Do(
@@ -167,13 +167,13 @@ sub ArticleDelete {
     # delete cache
     if ( $Self->{ArticleStorageCache} ) {
 
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'ArticleStorageFS_' . $Param{ArticleID},
         );
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -188,7 +188,7 @@ sub ArticleDeletePlain {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -206,7 +206,7 @@ sub ArticleDeletePlain {
     my $File = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt";
     if ( -f $File ) {
         if ( !unlink $File ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't remove: $File: $!!",
             );
@@ -217,14 +217,14 @@ sub ArticleDeletePlain {
     # delete cache
     if ( $Self->{ArticleStorageCache} ) {
 
-        $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+        $Kernel::OM->Get('Cache')->Delete(
             Type => 'ArticleStorageFS_' . $Param{ArticleID},
             Key  => 'ArticlePlain',
         );
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Plain',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -234,7 +234,7 @@ sub ArticleDeletePlain {
     return 1 if $Param{OnlyMyBackend};
 
     # delete plain from db
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM article_plain WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
     );
@@ -248,7 +248,7 @@ sub ArticleDeleteAttachment {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -267,7 +267,7 @@ sub ArticleDeleteAttachment {
 
     if ( -e $Path ) {
 
-        my @List = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        my @List = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $Path,
             Filter    => "*",
         );
@@ -278,7 +278,7 @@ sub ArticleDeleteAttachment {
 
                 if ( !unlink "$File" ) {
 
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Can't remove: $File: $!!",
                     );
@@ -290,13 +290,13 @@ sub ArticleDeleteAttachment {
     # delete cache
     if ( $Self->{ArticleStorageCache} ) {
 
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'ArticleStorageFS_' . $Param{ArticleID},
         );
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -306,7 +306,7 @@ sub ArticleDeleteAttachment {
     return 1 if $Param{OnlyMyBackend};
 
     # delete attachments from db
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM article_attachment WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
     );
@@ -320,7 +320,7 @@ sub ArticleWritePlain {
     # check needed stuff
     for (qw(ArticleID Email UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -338,14 +338,14 @@ sub ArticleWritePlain {
 
     # debug
     if ( $Self->{Debug} > 1 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log( Message => "->WriteArticle: $Path" );
+        $Kernel::OM->Get('Log')->Log( Message => "->WriteArticle: $Path" );
     }
 
     # write article to fs 1:1
     File::Path::mkpath( [$Path], 0, 0770 );    ## no critic
 
     # write article to fs
-    my $Success = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $Success = $Kernel::OM->Get('Main')->FileWrite(
         Location   => "$Path/plain.txt",
         Mode       => 'binmode',
         Content    => \$Param{Email},
@@ -355,7 +355,7 @@ sub ArticleWritePlain {
     # set cache
     if ( $Self->{ArticleStorageCache} ) {
 
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type           => 'ArticleStorageFS_' . $Param{ArticleID},
             TTL            => $Self->{ArticleStorageCacheTTL},
             Key            => 'ArticlePlain',
@@ -375,7 +375,7 @@ sub ArticleWriteAttachment {
     # check needed stuff
     for (qw(Content Filename ContentType ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -403,7 +403,7 @@ sub ArticleWriteAttachment {
     $Param{Filename} =~ s/^\.//g;
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # Perform FilenameCleanup here already to check for
     #   conflicting existing attachment files correctly
@@ -441,7 +441,7 @@ sub ArticleWriteAttachment {
     # write attachment to backend
     if ( !-d $Param{Path} ) {
         if ( !File::Path::mkpath( [ $Param{Path} ], 0, 0770 ) ) {    ## no critic
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't create $Param{Path}: $!",
             );
@@ -514,13 +514,13 @@ sub ArticleWriteAttachment {
     # delete cache
     if ( $Self->{ArticleStorageCache} ) {
 
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'ArticleStorageFS_' . $Param{ArticleID},
         );
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
@@ -534,7 +534,7 @@ sub ArticlePlain {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID!',
         );
@@ -546,7 +546,7 @@ sub ArticlePlain {
     $Param{ArticleID} =~ s/\0//g;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # read cache
     if ( $Self->{ArticleStorageCache} ) {
@@ -568,7 +568,7 @@ sub ArticlePlain {
     if ( -f "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt" ) {
 
         # read whole article
-        my $Data = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $Data = $Kernel::OM->Get('Main')->FileRead(
             Directory => "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/",
             Filename  => 'plain.txt',
             Mode      => 'binmode',
@@ -599,7 +599,7 @@ sub ArticlePlain {
     return if $Param{OnlyMyBackend};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # can't open article, try database
     return if !$DBObject->Prepare(
@@ -613,7 +613,7 @@ sub ArticlePlain {
     }
 
     if ( !$Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Can't open $Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt: $!",
@@ -642,7 +642,7 @@ sub ArticleAttachmentIndexRaw {
 
     # check ArticleContentPath
     if ( !$Self->{ArticleContentPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleContentPath!',
         );
@@ -651,7 +651,7 @@ sub ArticleAttachmentIndexRaw {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID!',
         );
@@ -659,7 +659,7 @@ sub ArticleAttachmentIndexRaw {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # read cache
     if ( $Self->{ArticleStorageCache} ) {
@@ -679,7 +679,7 @@ sub ArticleAttachmentIndexRaw {
     my $Counter = 0;
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # try fs
     my @List = $MainObject->DirectoryRead(
@@ -822,7 +822,7 @@ sub ArticleAttachmentIndexRaw {
     return %Index if $Param{OnlyMyBackend};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # try database (if there is no index in fs)
     return if !$DBObject->Prepare(
@@ -906,7 +906,7 @@ sub ArticleAttachment {
     # check needed stuff
     for (qw(ArticleID FileID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -919,7 +919,7 @@ sub ArticleAttachment {
     $Param{ArticleID} =~ s/\0//g;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # read cache
     if ( $Self->{ArticleStorageCache} ) {
@@ -946,7 +946,7 @@ sub ArticleAttachment {
     my $Counter     = 0;
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my @List = $MainObject->DirectoryRead(
         Directory => "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}",
@@ -957,7 +957,7 @@ sub ArticleAttachment {
     if (@List) {
 
         # get encode object
-        my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+        my $EncodeObject = $Kernel::OM->Get('Encode');
 
         FILENAME:
         for my $Filename (@List) {
@@ -1087,7 +1087,7 @@ sub ArticleAttachment {
     return if $Param{OnlyMyBackend};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # try database, if no content is found
     return if !$DBObject->Prepare(
@@ -1150,7 +1150,7 @@ sub ArticleAttachment {
     }
 
     if ( !$Data{Content} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "$!: $Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/$Data{Filename}!",
@@ -1180,7 +1180,7 @@ sub _ArticleDeleteDirectory {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -1193,7 +1193,7 @@ sub _ArticleDeleteDirectory {
     my $Path = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}";
     if ( -d $Path ) {
         if ( !rmdir($Path) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't remove: $Path: $!!",
             );

@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Priority::PriorityGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Priority::PriorityGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $PriorityID ( @{$Param{Data}->{PriorityID}} ) {
 
         # get the Priority data
-        my %PriorityData = $Kernel::OM->Get('Kernel::System::Priority')->PriorityGet(
+        my %PriorityData = $Kernel::OM->Get('Priority')->PriorityGet(
             PriorityID => $PriorityID,
             UserID     => $Self->{Authorization}->{UserID},
         );

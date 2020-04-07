@@ -18,9 +18,9 @@ use Mail::IMAPClient;
 use Kernel::System::PostMaster;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Log',
+    'Main',
 );
 
 sub new {
@@ -39,7 +39,7 @@ sub Connect {
     # check needed stuff
     for (qw(Login Password Host Timeout Debug)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -91,7 +91,7 @@ sub _Fetch {
     # check needed stuff
     for (qw(Login Password Host Trusted QueueID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$_ not defined!"
             );
@@ -100,7 +100,7 @@ sub _Fetch {
     }
     for (qw(Login Password Host)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -113,7 +113,7 @@ sub _Fetch {
     my $CMD   = $Param{CMD}   || 0;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # MaxEmailSize is in kB in SysConfig
     my $MaxEmailSize = $ConfigObject->Get('PostMasterMaxEmailSize') || 1024 * 6;
@@ -136,7 +136,7 @@ sub _Fetch {
     );
 
     if ( !$Connect{Successful} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$Connect{Message}",
         );
@@ -184,7 +184,7 @@ sub _Fetch {
             # check message size
             my $MessageSize = int( $IMAPObject->size($Messageno) / 1024 );
             if ( $MessageSize > $MaxEmailSize ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "$AuthType: Can't fetch email $Messageno from $Param{Login}/$Param{Host}. "
@@ -204,7 +204,7 @@ sub _Fetch {
                 my $Message = $IMAPObject->message_string($Messageno);
 
                 if ( !$Message ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "$AuthType: Can't process mail, email no $Messageno is empty!",
                     );
@@ -220,7 +220,7 @@ sub _Fetch {
                     if ( !$Return[0] ) {
                         my $Lines = $IMAPObject->get($Messageno);
                         my $File = $Self->_ProcessFailed( Email => $Message );
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => "$AuthType: Can't process mail, see log sub system ("
                                 . "$File, report it on http://www.kixdesk.com/)!",
@@ -247,7 +247,7 @@ sub _Fetch {
 
     # log status
     if ( $Debug > 0 || $FetchCounter ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "$AuthType: Fetched $FetchCounter email(s) from $Param{Login}/$Param{Host}.",
         );
@@ -267,7 +267,7 @@ sub _ProcessFailed {
     # check needed stuff
     for (qw(Email)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$_ not defined!"
             );
@@ -276,9 +276,9 @@ sub _ProcessFailed {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/spool/';
+    my $Home = $Kernel::OM->Get('Config')->Get('Home') . '/var/spool/';
     my $MD5  = $MainObject->MD5sum(
         String => \$Param{Email},
     );

@@ -124,7 +124,7 @@ sub Run {
     );
 
     # check Number exists
-    my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+    my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
         Number => $Organisation->{Number},
     );
     if ( %OrganisationSearch ) {
@@ -135,7 +135,7 @@ sub Run {
     }
 
     # check Name exists
-    %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+    %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
         Name => $Organisation->{Name},
     );
     if ( %OrganisationSearch ) {
@@ -146,7 +146,7 @@ sub Run {
     }
     
     # create Organisation
-    my $OrganisationID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+    my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
         %{$Organisation},
         ValidID => $Organisation->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},

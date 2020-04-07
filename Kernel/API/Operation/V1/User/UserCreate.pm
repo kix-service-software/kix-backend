@@ -142,18 +142,18 @@ sub Run {
     );
 
     # check UserLogin exists
-    my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
         User => $User->{UserLogin},
     );
     if (%UserData) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create user. Another user with same login already exists.",
+            Message => "Cannot create user. Another user with same login already exists.",
         );
     }
 
     # create User
-    my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+    my $UserID = $Kernel::OM->Get('User')->UserAdd(
         ValidID => 1,
         %{$User},
         ChangeUserID => $Self->{Authorization}->{UserID},
@@ -209,7 +209,7 @@ sub Run {
     if ( $User->{IsCustomer} ) {
 
         # get RoleID from Role "Customer"
-        my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+        my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
             Role => "Customer",
         );
 

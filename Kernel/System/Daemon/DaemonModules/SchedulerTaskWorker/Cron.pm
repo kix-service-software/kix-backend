@@ -19,11 +19,11 @@ use Symbol;
 use base qw(Kernel::System::Daemon::DaemonModules::BaseTaskWorker);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Daemon::SchedulerDB',
-    'Kernel::System::Email',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'Daemon::SchedulerDB',
+    'Email',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ This task handler executes scheduler tasks based in cron notation.
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TaskHandlerObject = $Kernel::OM-Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::Cron');
+    my $TaskHandlerObject = $Kernel::OM-Get('Daemon::DaemonModules::SchedulerTaskWorker::Cron');
 
 =cut
 
@@ -68,7 +68,7 @@ Performs the selected Cron task.
         TaskID   => 123,
         TaskName => 'some name',                                        # optional
         Data     => {
-            Module   => 'Kernel::System:::Console:Command::Help',
+            Module   => ':Console:Command::Help',
             Function => 'Execute',
             Params   => [                                               # parameters array reference
              '--force',
@@ -97,16 +97,16 @@ sub Run {
     # Stop execution if an error in params is detected.
     return if !$CheckResult;
 
-    my $StartSystemTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $StartSystemTime = $Kernel::OM->Get('Time')->SystemTime();
 
     my $ModuleObject;
     eval {
         $ModuleObject = $Kernel::OM->Get( $Param{Data}->{Module} );
     };
     if ( !$ModuleObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not create a new Object for Module: '$Param{Data}->{Module}'! - Task: $Param{TaskName}",
+            Message  => "Cannot create a new Object for Module: '$Param{Data}->{Module}'! - Task: $Param{TaskName}",
         );
 
         return;
@@ -155,11 +155,11 @@ sub Run {
     };
 
     # Get current system time (as soon as the method has been called).
-    my $EndSystemTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $EndSystemTime = $Kernel::OM->Get('Time')->SystemTime();
 
     my $IsConsoleCommand;
     if (
-        substr( $Param{Data}->{Module}, 0, length 'Kernel::System::Console' ) eq 'Kernel::System::Console'
+        substr( $Param{Data}->{Module}, 0, length 'Console' ) eq 'Console'
         && $Function eq 'Execute'
         )
     {
@@ -191,7 +191,7 @@ sub Run {
     }
 
     # Update worker task.
-    $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->RecurrentTaskWorkerInfoSet(
+    $Kernel::OM->Get('Daemon::SchedulerDB')->RecurrentTaskWorkerInfoSet(
         LastWorkerTaskID      => $Param{TaskID},
         LastWorkerStatus      => $Success,
         LastWorkerRunningTime => $EndSystemTime - $StartSystemTime,

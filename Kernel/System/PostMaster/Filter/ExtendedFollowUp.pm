@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::Ticket',
+    'Config',
+    'DynamicField',
+    'Ticket',
 );
 
 sub new {
@@ -27,9 +27,9 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     # get needed objects
-    $Self->{ConfigObject}       = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
-    $Self->{TicketObject}       = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{ConfigObject}       = $Kernel::OM->Get('Config');
+    $Self->{DynamicFieldObject} = $Kernel::OM->Get('DynamicField');
+    $Self->{TicketObject}       = $Kernel::OM->Get('Ticket');
 
     # get our config
     $Self->{Config} = $Self->{ConfigObject}->Get('ExtendedFollowUp');

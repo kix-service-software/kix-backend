@@ -16,16 +16,16 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # prevent mails send
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 my @Tests = (
@@ -39,7 +39,7 @@ my @Tests = (
         Config => {
             TaskName => 'UnitTest',
             Data     => {
-                Module => 'Kernel::System::Console::Command::Maint::Ticket::Test',
+                Module => 'Console::Command::Maint::Ticket::Test',
                 Params => ['-h'],
             },
         },
@@ -88,7 +88,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Console::Command::Maint::Ticket::Test',
+                Module   => 'Console::Command::Maint::Ticket::Test',
                 Function => 'Execute',
                 Params   => ['-h'],
             },
@@ -101,7 +101,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Console::Command::Admin::Group::Add',
+                Module   => 'Console::Command::Admin::Group::Add',
                 Function => 'Test',
                 Params   => ['--no-ansi'],
             },
@@ -114,7 +114,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Console::Command::Admin::Group::Add',
+                Module   => 'Console::Command::Admin::Group::Add',
                 Function => 'Execute',
                 Params   => ['-h'],
             },
@@ -127,7 +127,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Priority',
+                Module   => 'Priority',
                 Function => 'Test',
                 Params   => [ 'PriorityID', '1' ],
             },
@@ -140,7 +140,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Priority',
+                Module   => 'Priority',
                 Function => 'PriorityLookup',
                 Params   => [ 'TicketID', '1' ],
             },
@@ -153,7 +153,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Console::Command::Maint::Ticket::Dump',
+                Module   => 'Console::Command::Maint::Ticket::Dump',
                 Function => 'Execute',
                 Params   => '--article-limit 2 1',
             },
@@ -166,7 +166,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Priority',
+                Module   => 'Priority',
                 Function => 'PriorityLookup',
                 Params   => 'PriorityID 1',
             },
@@ -179,7 +179,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Console::Command::Maint::Ticket::Dump',
+                Module   => 'Console::Command::Maint::Ticket::Dump',
                 Function => 'Execute',
                 Params   => [ '--article-limit', '2', '1' ],
             },
@@ -192,7 +192,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Kernel::System::Priority',
+                Module   => 'Priority',
                 Function => 'PriorityLookup',
                 Params   => [ 'PriorityID', '1' ],
             },
@@ -202,7 +202,7 @@ my @Tests = (
 );
 
 # get task handler object
-my $TaskHandlerObject = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::Cron');
+my $TaskHandlerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker::Cron');
 
 for my $Test (@Tests) {
 

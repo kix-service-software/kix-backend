@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "#FAQAttachmentCollectionResponse",
   "type": "object",
-  "description": "A list of all FAQ attachment of an FAQ article.",
+  "description": "A list of all FAQ attachments of an FAQ article.",
   "properties": {
     "Attachment": {
       "type": "array",

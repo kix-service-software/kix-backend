@@ -16,8 +16,8 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Type',
+    'Config',
+    'Type',
 );
 
 sub GetDisplayPath {
@@ -28,17 +28,17 @@ sub Run {
     my $Self = shift;
 
     # check, if Ticket::Type is enabled
-    my $TicketType = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type');
+    my $TicketType = $Kernel::OM->Get('Config')->Get('Ticket::Type');
 
     # if not enabled, stop here
     if ( !$TicketType ) {
         return $Self->GetResults();
     }
 
-    my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
+    my $TypeObject = $Kernel::OM->Get('Type');
 
     # get default ticket type from config
-    my $DefaultTicketType = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type::Default');
+    my $DefaultTicketType = $Kernel::OM->Get('Config')->Get('Ticket::Type::Default');
 
     # get list of all ticket types
     my %AllTicketTypes = reverse $TypeObject->TypeList();

@@ -12,13 +12,13 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DependingDynamicField',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Cache',
+    'DependingDynamicField',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
+    'Ticket',
 );
 
 use JSON::XS;
@@ -33,13 +33,13 @@ sub new {
 
     # create required objects
     $Self->{CacheObject}               = Kernel::System::Cache->new( %{$Self} );
-    $Self->{ConfigObject}              = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DynamicFieldObject}        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    $Self->{DynamicFieldBackendObject} = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    $Self->{ConfigObject}              = $Kernel::OM->Get('Config');
+    $Self->{DynamicFieldObject}        = $Kernel::OM->Get('DynamicField');
+    $Self->{DynamicFieldBackendObject} = $Kernel::OM->Get('DynamicField::Backend');
     $Self->{DependingDynamicFieldObject}
-        = $Kernel::OM->Get('Kernel::System::DependingDynamicField');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
+        = $Kernel::OM->Get('DependingDynamicField');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{TicketObject} = $Kernel::OM->Get('Ticket');
 
     $Self->{CacheType} = 'DependingDynamicFieldACL';
 

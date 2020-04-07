@@ -15,10 +15,10 @@ use warnings;
 use utf8;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::FileTemp',
-    'Kernel::System::Log',
+    'Config',
+    'Encode',
+    'FileTemp',
+    'Log',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SpellingObject = $Kernel::OM->Get('Kernel::System::Spelling');
+    my $SpellingObject = $Kernel::OM->Get('Spelling');
 
 =cut
 
@@ -83,7 +83,7 @@ sub Check {
 
     # check needed stuff
     if ( !defined $Param{Text} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Text!"
         );
@@ -97,7 +97,7 @@ sub Check {
     );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # spell checker config options
     my $SpellChecker = $ConfigObject->Get('SpellCheckerBin') || 'ispell';
@@ -130,7 +130,7 @@ sub Check {
     # check if spell checker exists in file system
     if ( !-e $ConfigObject->Get('SpellCheckerBin') ) {
         $Self->{Error} = 1;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't find spellchecker ("
                 . $ConfigObject->Get('SpellCheckerBin') . "): $!",
@@ -150,10 +150,10 @@ sub Check {
 
     # write text to file and read it with (i|a)spell
     # - can't use IPC::Open* because it's not working with mod_perl* :-/
-    my ( $FH, $TmpFile ) = $Kernel::OM->Get('Kernel::System::FileTemp')->TempFile();
+    my ( $FH, $TmpFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
     if ( !$FH ) {
         $Self->{Error} = 1;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't write spell tmp text to $TmpFile: $!",
         );
@@ -161,7 +161,7 @@ sub Check {
     }
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     $EncodeObject->EncodeOutput( \$Param{Text} );
     print $FH $Param{Text};
@@ -175,7 +175,7 @@ sub Check {
     my $Spell;
     if ( !open( $Spell, "-|", "$SpellChecker < $TmpFile" ) ) {    ## no critic
         $Self->{Error} = 1;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't open spellchecker: $!",
         );

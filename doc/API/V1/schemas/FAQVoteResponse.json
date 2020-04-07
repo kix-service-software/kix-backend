@@ -1,0 +1,63 @@
+{
+   "$id" : "#FAQVoteResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for execution FAQ vote GET request.",
+   "type" : "object",
+   "properties" : {
+      "FAQVote" : {
+         "$ref" : "#/definitions/FAQVote_json-481c5e8153"
+      }
+   },
+   "required" : [
+      "FAQVote"
+   ],
+   "definitions" : {
+      "FAQVote_json-481c5e8153" : {
+         "$id" : "#FAQVote",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ vote object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IPAddress" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Interface" : {
+               "description" : "if rating is from \"agent\" or \"customer\" interface",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Rating" : {
+               "description" : "an integer from 1 to 5",
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Created",
+            "CreatedBy",
+            "ID",
+            "IPAddress",
+            "Interface",
+            "Rating"
+         ]
+      }
+   }
+}

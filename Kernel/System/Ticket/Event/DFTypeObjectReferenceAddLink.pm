@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::DynamicField',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Contact',
+    'DynamicField',
+    'LinkObject',
+    'Log',
+    'Ticket',
 );
 
 =item new()
@@ -36,11 +36,11 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
-    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
-    $Self->{LinkObject}         = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject}       = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{DynamicFieldObject} = $Kernel::OM->Get('DynamicField');
+    $Self->{ContactObject} = $Kernel::OM->Get('Contact');
+    $Self->{LinkObject}         = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}          = $Kernel::OM->Get('Log');
+    $Self->{TicketObject}       = $Kernel::OM->Get('Ticket');
 
     return $Self;
 }

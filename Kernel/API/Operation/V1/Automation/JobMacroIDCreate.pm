@@ -115,7 +115,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # assign Macro to Job
-    my $Result = $Kernel::OM->Get('Kernel::System::Automation')->JobMacroAdd(
+    my $Result = $Kernel::OM->Get('Automation')->JobMacroAdd(
         JobID    => $Param{Data}->{JobID},
         MacroID  => $Param{Data}->{MacroID},
         UserID   => $Self->{Authorization}->{UserID}

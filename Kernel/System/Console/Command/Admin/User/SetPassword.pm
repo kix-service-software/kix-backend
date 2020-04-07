@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::User',
+    'Config',
+    'User',
 );
 
 sub Configure {
@@ -43,7 +43,7 @@ sub Run {
 
     my $Login = $Self->GetArgument('user');
 
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
     my %UserList   = $UserObject->UserSearch(
         UserLogin => $Login,
     );

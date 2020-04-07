@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailAccount::MailAccountGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">MailAccountID</Item>
                 <Item Key="ResponseSchema">MailAccountResponse</Item>
@@ -17,6 +18,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailAccount::MailAccountSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MailAccountCollectionResponse</Item>
             </Hash>
@@ -27,6 +29,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailAccount::MailAccountCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MailAccountPostRequest</Item>
                 <Item Key="ResponseSchema">MailAccountPostPatchResponse</Item>
@@ -38,6 +41,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailAccount::MailAccountUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MailAccountPatchRequest</Item>
                 <Item Key="ResponseSchema">MailAccountPostPatchResponse</Item>
@@ -49,6 +53,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailAccount::MailAccountDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -59,6 +64,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailAccountTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailAccount::MailAccountTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MailAccountTypeCollectionResponse</Item>
             </Hash>

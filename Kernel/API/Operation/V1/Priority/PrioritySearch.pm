@@ -87,7 +87,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Priority search
-    my %PriorityList = $Kernel::OM->Get('Kernel::System::Priority')->PriorityList(
+    my %PriorityList = $Kernel::OM->Get('Priority')->PriorityList(
         Valid => 0
     );
 

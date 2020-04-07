@@ -30,13 +30,13 @@ use Kernel::System::UnitTest::Helper;
 use Kernel::System::UnitTest::AllureAdapter;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Environment',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'DB',
+    'Encode',
+    'Environment',
+    'Log',
+    'Main',
+    'Time',
 );
 
 =head1 NAME
@@ -60,7 +60,7 @@ create unit test object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $UnitTestObject = $Kernel::OM->Get('Kernel::System::UnitTest');
+    my $UnitTestObject = $Kernel::OM->Get('UnitTest');
 
 =cut
 
@@ -77,7 +77,7 @@ sub new {
 
     $Self->{ANSI} = $Param{ANSI};
     if ($Self->{Output} eq 'ALLURE') {
-        $Self->{Adapter} = $Kernel::OM->Get('Kernel::System::UnitTest::AllureAdapter')->new();
+        $Self->{Adapter} = $Kernel::OM->Get('UnitTest::AllureAdapter')->new();
     }
 
     if ($Self->{Output} eq 'HTML') {
@@ -85,8 +85,8 @@ sub new {
 <html>
 <head>
     <title>"
-            . $Kernel::OM->Get('Kernel::Config')->Get('Product') . " "
-            . $Kernel::OM->Get('Kernel::Config')->Get('Version')
+            . $Kernel::OM->Get('Config')->Get('Product') . " "
+            . $Kernel::OM->Get('Config')->Get('Version')
             . " - Test Summary</title>
     <style>
        body, td {
@@ -147,7 +147,7 @@ sub Run {
     $Self->{Adapter}->IgnoreSkipped() if ($Param{AllureIgnoreSkipped});
 
     my %ResultSummary;
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my $Directory = "$Home/scripts/test";
 
@@ -160,17 +160,17 @@ sub Run {
     $Self->{Verbose} = $Param{Verbose};
     $Self->{Pretty} = $Param{Pretty};
 
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Directory,
         Filter    => '*.t',
         Recursive => 1,
     );
 
-    my $StartTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $StartTime = $Kernel::OM->Get('Time')->SystemTime();
     $Self->{Adapter}->SetContainerStartTime($Self->{runningContainerId}, int(time() * 1000)) if ($Self->{Output} eq 'ALLURE');
     my $Product = $Param{Product}
-        || $Kernel::OM->Get('Kernel::Config')->Get('Product') . " "
-        . $Kernel::OM->Get('Kernel::Config')->Get('Version');
+        || $Kernel::OM->Get('Config')->Get('Product') . " "
+        . $Kernel::OM->Get('Config')->Get('Version');
 
     $Self->{Product} = $Product; # we need this in the Selenium object
 
@@ -208,7 +208,7 @@ sub Run {
         }
 
         $Self->{TestCount} = 0;
-        my $UnitTestFile = $Kernel::OM->Get('Kernel::System::Main')->FileRead(Location => $File);
+        my $UnitTestFile = $Kernel::OM->Get('Main')->FileRead(Location => $File);
 
         if (!$UnitTestFile) {
             print STDERR "ERROR: $!: $File\n";
@@ -223,14 +223,14 @@ sub Run {
             {
                 # Make sure every UT uses its own clean environment.
                 local $Kernel::OM = Kernel::System::ObjectManager->new(
-                    'Kernel::System::Log' => {
+                    'Log' => {
                         LogPrefix => 'KIX.UnitTest',
                     },
                 );
 
-                # Provide $Self as 'Kernel::System::UnitTest' for convenience.
+                # Provide $Self as 'UnitTest' for convenience.
                 $Kernel::OM->ObjectInstanceRegister(
-                    Package      => 'Kernel::System::UnitTest',
+                    Package      => 'UnitTest',
                     Object       => $Self,
                     Dependencies => [],
                 );
@@ -262,18 +262,18 @@ sub Run {
             }
         }
     }
-    my $Time = $Kernel::OM->Get('Kernel::System::Time')->SystemTime() - $StartTime;
+    my $Time = $Kernel::OM->Get('Time')->SystemTime() - $StartTime;
     $ResultSummary{TimeTaken} = $Time;
-    $ResultSummary{Time} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
-        SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
+    $ResultSummary{Time} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
     );
-    my %OSInfo = $Kernel::OM->Get('Kernel::System::Environment')->OSInfoGet();
+    my %OSInfo = $Kernel::OM->Get('Environment')->OSInfoGet();
     $ResultSummary{Product} = $Product;
-    $ResultSummary{Host} = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    $ResultSummary{Host} = $Kernel::OM->Get('Config')->Get('FQDN');
     $ResultSummary{Perl} = sprintf "%vd", $^V;
     $ResultSummary{OS} = $OSInfo{OS};
     $ResultSummary{Vendor} = $OSInfo{OSName};
-    $ResultSummary{Database} = lc $Kernel::OM->Get('Kernel::System::DB')->Version();
+    $ResultSummary{Database} = lc $Kernel::OM->Get('DB')->Version();
     $ResultSummary{TestOk} = $Self->{TestCountOk};
     $ResultSummary{TestNotOk} = $Self->{TestCountNotOk};
 
@@ -321,7 +321,7 @@ sub Run {
     }
 
     if ($Param{SubmitURL}) {
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput(\$XML);
+        $Kernel::OM->Get('Encode')->EncodeOutput(\$XML);
 
         # my $RPC = SOAP::Lite->new(
         #     proxy => $Param{SubmitURL},
@@ -355,7 +355,7 @@ sub _PrintHeadlineStart {
     # set default name
     $Name ||= '->>No Name!<<-';
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
     $Name =~ s/^$Home\/scripts\/test\///;
 
     if ($Self->{Output} eq 'HTML') {
@@ -381,7 +381,7 @@ sub _PrintHeadlineEnd {
     # set default name
     $Name ||= '->>No Name!<<-';
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
     $Name =~ s/^$Home\/scripts\/test\///;
 
     # calculate duration time

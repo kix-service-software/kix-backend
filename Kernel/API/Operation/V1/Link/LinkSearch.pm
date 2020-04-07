@@ -97,7 +97,7 @@ sub Run {
     }
 
     # perform Link search
-    my $LinkList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
+    my $LinkList = $Kernel::OM->Get('LinkObject')->LinkSearch(
         UserID  => $Self->{Authorization}->{UserID},
         Limit   => IsHashRefWithData(\%SearchParam) ? undef : ($Self->{Limit}->{Link} || $Self->{Limit}->{'__COMMON'}),        # only apply DB side limit if no SearchParam exists
         %SearchParam,

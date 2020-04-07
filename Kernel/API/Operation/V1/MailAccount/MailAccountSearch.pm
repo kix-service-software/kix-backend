@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform MailAccount search
-    my %MailAccountList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountList();
+    my %MailAccountList = $Kernel::OM->Get('MailAccount')->MailAccountList();
 
     # get already prepared MailAccount data from MailAccountGet operation
     if ( IsHashRefWithData( \%MailAccountList ) ) {

@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "TranslationPattern" : {
-         "$ref" : "#/definitions/_TranslationPattern_json"
+         "$ref" : "#/definitions/TranslationPattern_json-4d3ace1ffb"
       }
    },
    "required" : [
       "TranslationPattern"
    ],
    "definitions" : {
-      "_TranslationLanguage_json" : {
+      "TranslationLanguage_json-b12b447f3f" : {
          "$id" : "#TranslationLanguage",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The translation language object.",
@@ -37,7 +37,7 @@
             "Value"
          ]
       },
-      "_TranslationPattern_json" : {
+      "TranslationPattern_json-4d3ace1ffb" : {
          "$id" : "#TranslationPattern",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The translation pattern object.",
@@ -74,7 +74,7 @@
                "description" : "added via include \"Languages\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/_TranslationLanguage_json"
+                  "$ref" : "#/definitions/TranslationLanguage_json-b12b447f3f"
                },
                "readOnly" : true
             },

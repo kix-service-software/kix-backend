@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
+    'Config',
+    'Encode',
+    'Log',
 );
 
 sub new {
@@ -38,7 +38,7 @@ sub Send {
     # check needed stuff
     for (qw(Header Body ToArray)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -65,7 +65,7 @@ sub Send {
     # check availability
     my %Result = $Self->Check();
     if ( !$Result{Successful} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Result{Message},
         );
@@ -84,14 +84,14 @@ sub Send {
     ## no critic
     if ( !open( $FH, '|-', "$Sendmail $Arg " ) ) {
         ## use critic
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't send message: $!!",
         );
         return;
     }
 
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # encode utf8 header strings (of course, there should only be 7 bit in there!)
     $EncodeObject->EncodeOutput( $Param{Header} );
@@ -106,7 +106,7 @@ sub Send {
     # Check if the filehandle was already closed because of an error
     #   (e. g. mail too large). See bug#9251.
     if ( !close($FH) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't send message: $!!",
         );
@@ -115,7 +115,7 @@ sub Send {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$ToString' from '$Param{From}'.",
         );
@@ -128,7 +128,7 @@ sub Check {
     my ( $Self, %Param ) = @_;
 
     # get config data
-    my $Sendmail = $Kernel::OM->Get('Kernel::Config')->Get('SendmailModule::CMD');
+    my $Sendmail = $Kernel::OM->Get('Config')->Get('SendmailModule::CMD');
 
     # check if sendmail binary is there (strip all args and check if file exists)
     my $SendmailBinary = $Sendmail;

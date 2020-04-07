@@ -17,10 +17,10 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CheckItem',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'CheckItem',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ImportExportObject = $Kernel::OM->Get('Kernel::System::ImportExport');
+    my $ImportExportObject = $Kernel::OM->Get('ImportExport');
 
 =cut
 
@@ -77,7 +77,7 @@ sub TemplateList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -101,7 +101,7 @@ sub TemplateList {
     $SQL .= 'ORDER BY id';
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -148,7 +148,7 @@ sub TemplateGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -159,14 +159,14 @@ sub TemplateGet {
     my $CacheKey = 'TemplateGet::TemplateID::' . $Param{TemplateID};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -194,7 +194,7 @@ sub TemplateGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%TemplateData,
@@ -223,7 +223,7 @@ sub TemplateAdd {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(Object Format Name ValidID UserID)) {
@@ -240,7 +240,7 @@ sub TemplateAdd {
     $Param{Comment} ||= '';
 
     # get CheckItem object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # cleanup given params
     for my $Argument (qw(Object Format)) {
@@ -260,7 +260,7 @@ sub TemplateAdd {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # find exiting template with same name
     $DBObject->Prepare(
@@ -311,12 +311,12 @@ sub TemplateAdd {
     }
 
     # cleanup cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'ImportExportTemplate',
         ObjectID  => $TemplateID,
@@ -343,7 +343,7 @@ sub TemplateUpdate {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID Name ValidID UserID)) {
@@ -361,7 +361,7 @@ sub TemplateUpdate {
 
     # cleanup given params
     for my $Argument (qw(Name Comment)) {
-        $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+        $Kernel::OM->Get('CheckItem')->StringClean(
             StringRef         => \$Param{$Argument},
             RemoveAllNewlines => 1,
             RemoveAllTabs     => 1,
@@ -369,7 +369,7 @@ sub TemplateUpdate {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get the object of this template id
     $DBObject->Prepare(
@@ -429,13 +429,13 @@ sub TemplateUpdate {
     );
 
     # cleanup cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
     if ($Success) {
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'ImportExportTemplate',
             ObjectID  => $Param{TemplateID},
@@ -467,7 +467,7 @@ sub TemplateDelete {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -530,12 +530,12 @@ sub TemplateDelete {
     my @BIND = map { \$_ } @{ $Param{TemplateID} };
 
     # cleanup cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # delete templates
-    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Success = $Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM imexport_template WHERE id IN ( $TemplateIDString )",
         Bind => \@BIND,
     );
@@ -543,7 +543,7 @@ sub TemplateDelete {
     # push client callback event
     if ($Success) {
         for my $TemplateID ( @{$Param{TemplateID}} ) {
-            $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
                 Event     => 'DELETE',
                 Namespace => 'ImportExportTemplate',
                 ObjectID  => $TemplateID
@@ -566,7 +566,7 @@ sub ObjectList {
     my ( $Self, %Param ) = @_;
 
     # get config
-    my $ModuleList = $Kernel::OM->Get('Kernel::Config')->Get('ImportExport::ObjectBackendRegistration');
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
 
     return if !$ModuleList;
     return if ref $ModuleList ne 'HASH';
@@ -595,7 +595,7 @@ sub ObjectAttributesGet {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -625,7 +625,7 @@ sub ObjectAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
     );
 
     return if !$Backend;
@@ -655,7 +655,7 @@ sub ObjectDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -664,7 +664,7 @@ sub ObjectDataGet {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -697,7 +697,7 @@ sub ObjectDataSave {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID ObjectData UserID)) {
@@ -733,7 +733,7 @@ sub ObjectDataSave {
         next DATAKEY if !defined $DataValue;
 
         # insert one row
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO imexport_object '
                 . '(template_id, data_key, data_value) VALUES '
                 . '(?, ?, ?)',
@@ -766,7 +766,7 @@ sub ObjectDataDelete {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -797,7 +797,7 @@ sub ObjectDataDelete {
     my @BIND = map { \$_ } @{ $Param{TemplateID} };
 
     # delete templates
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return $Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM imexport_object WHERE template_id IN ( $TemplateIDString )",
         Bind => \@BIND,
     );
@@ -815,7 +815,7 @@ sub FormatList {
     my ( $Self, %Param ) = @_;
 
     # get config
-    my $ModuleList = $Kernel::OM->Get('Kernel::Config')->Get('ImportExport::FormatBackendRegistration');
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
 
     return if !$ModuleList;
     return if ref $ModuleList ne 'HASH';
@@ -844,7 +844,7 @@ sub FormatAttributesGet {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -874,7 +874,7 @@ sub FormatAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::FormatBackend::' . $TemplateData->{Format}
+        'ImportExport::FormatBackend::' . $TemplateData->{Format}
     );
 
     return if !$Backend;
@@ -904,7 +904,7 @@ sub FormatDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -913,7 +913,7 @@ sub FormatDataGet {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -946,7 +946,7 @@ sub FormatDataSave {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID FormatData UserID)) {
@@ -982,7 +982,7 @@ sub FormatDataSave {
         next DATAKEY if !defined $DataValue;
 
         # insert one row
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO imexport_format '
                 . '(template_id, data_key, data_value) VALUES (?, ?, ?)',
             Bind => [ \$Param{TemplateID}, \$DataKey, \$DataValue ],
@@ -1014,7 +1014,7 @@ sub FormatDataDelete {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -1045,7 +1045,7 @@ sub FormatDataDelete {
     my @BIND = map { \$_ } @{ $Param{TemplateID} };
 
     # delete templates
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return $Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM imexport_format WHERE template_id IN ( $TemplateIDString )",
         Bind => \@BIND,
     );
@@ -1068,7 +1068,7 @@ sub MappingList {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1077,7 +1077,7 @@ sub MappingList {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -1111,7 +1111,7 @@ sub MappingAdd {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1120,7 +1120,7 @@ sub MappingAdd {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # find maximum position
     $DBObject->Prepare(
@@ -1186,7 +1186,7 @@ sub MappingDelete {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1195,7 +1195,7 @@ sub MappingDelete {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( defined $Param{MappingID} ) {
 
@@ -1274,7 +1274,7 @@ sub MappingUp {
     # check needed stuff
     for my $Argument (qw(MappingID TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1291,7 +1291,7 @@ sub MappingUp {
     return 1 if $Param{MappingID} == $MappingList->[0];
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -1340,7 +1340,7 @@ sub MappingDown {
     # check needed stuff
     for my $Argument (qw(MappingID TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1357,7 +1357,7 @@ sub MappingDown {
     return 1 if $Param{MappingID} == $MappingList->[-1];
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -1403,7 +1403,7 @@ sub MappingPositionRebuild {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1420,7 +1420,7 @@ sub MappingPositionRebuild {
     # update position
     my $Counter = 0;
     for my $MappingID ( @{$MappingList} ) {
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE imexport_mapping SET position = ? WHERE id = ?',
             Bind => [ \$Counter, \$MappingID ],
         );
@@ -1445,7 +1445,7 @@ sub MappingObjectAttributesGet {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -1475,7 +1475,7 @@ sub MappingObjectAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
     );
 
     return if !$Backend;
@@ -1511,7 +1511,7 @@ sub MappingObjectDataDelete {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(MappingID UserID)) {
@@ -1542,7 +1542,7 @@ sub MappingObjectDataDelete {
     my @BIND = map { \$_ } @{ $Param{MappingID} };
 
     # delete mapping object data
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return $Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM imexport_mapping_object WHERE mapping_id IN ( $MappingIDString )",
         Bind => \@BIND,
     );
@@ -1564,7 +1564,7 @@ sub MappingObjectDataSave {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(MappingID MappingObjectData UserID)) {
@@ -1600,7 +1600,7 @@ sub MappingObjectDataSave {
         next DATAKEY if !defined $DataValue;
 
         # insert one mapping object row
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO imexport_mapping_object '
                 . '(mapping_id, data_key, data_value) VALUES (?, ?, ?)',
             Bind => [ \$Param{MappingID}, \$DataKey, \$DataValue ],
@@ -1627,7 +1627,7 @@ sub MappingObjectDataGet {
     # check needed stuff
     for my $Argument (qw(MappingID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1636,7 +1636,7 @@ sub MappingObjectDataGet {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -1668,7 +1668,7 @@ sub MappingFormatAttributesGet {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -1698,7 +1698,7 @@ sub MappingFormatAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::FormatBackend::' . $TemplateData->{Format}
+        'ImportExport::FormatBackend::' . $TemplateData->{Format}
     );
 
     return if !$Backend;
@@ -1733,7 +1733,7 @@ sub MappingFormatDataDelete {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(MappingID UserID)) {
@@ -1764,7 +1764,7 @@ sub MappingFormatDataDelete {
     my @BIND = map { \$_ } @{ $Param{MappingID} };
 
     # delete mapping format data
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return $Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM imexport_mapping_format WHERE mapping_id IN ( $MappingIDString )",
         Bind => \@BIND,
     );
@@ -1786,7 +1786,7 @@ sub MappingFormatDataSave {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(MappingID MappingFormatData UserID)) {
@@ -1822,7 +1822,7 @@ sub MappingFormatDataSave {
         next DATAKEY if !defined $DataValue;
 
         # insert one mapping format row
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO imexport_mapping_format '
                 . '(mapping_id, data_key, data_value) VALUES (?, ?, ?)',
             Bind => [ \$Param{MappingID}, \$DataKey, \$DataValue ],
@@ -1849,7 +1849,7 @@ sub MappingFormatDataGet {
     # check needed stuff
     for my $Argument (qw(MappingID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1858,7 +1858,7 @@ sub MappingFormatDataGet {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -1890,7 +1890,7 @@ sub SearchAttributesGet {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -1920,7 +1920,7 @@ sub SearchAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
     );
 
     return if !$Backend;
@@ -1951,7 +1951,7 @@ sub SearchDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1960,7 +1960,7 @@ sub SearchDataGet {
     }
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
     $DBObject->Prepare(
@@ -1993,7 +1993,7 @@ sub SearchDataSave {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID SearchData UserID)) {
@@ -2030,7 +2030,7 @@ sub SearchDataSave {
         next DATAKEY if !$DataValue;
 
         # insert one row
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO imexport_search '
                 . '(template_id, data_key, data_value) VALUES (?, ?, ?)',
             Bind => [ \$Param{TemplateID}, \$DataKey, \$DataValue ],
@@ -2062,7 +2062,7 @@ sub SearchDataDelete {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -2093,7 +2093,7 @@ sub SearchDataDelete {
     my @BIND = map { \$_ } @{ $Param{TemplateID} };
 
     # delete templates
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return $Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM imexport_search WHERE template_id IN ( $TemplateIDString )",
         Bind => \@BIND,
     );
@@ -2125,7 +2125,7 @@ sub Export {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -2155,14 +2155,14 @@ sub Export {
 
     # load object backend
     my $ObjectBackend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
     );
 
     return if !$ObjectBackend;
 
     # load format backend
     my $FormatBackend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::FormatBackend::' . $TemplateData->{Format}
+        'ImportExport::FormatBackend::' . $TemplateData->{Format}
     );
 
     return if !$FormatBackend;
@@ -2287,7 +2287,7 @@ sub Import {
     my ( $Self, %Param ) = @_;
 
     # get log object
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
@@ -2317,14 +2317,14 @@ sub Import {
 
     # load object backend
     my $ObjectBackend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
     );
 
     return if !$ObjectBackend;
 
     # load format backend
     my $FormatBackend = $Kernel::OM->Get(
-        'Kernel::System::ImportExport::FormatBackend::' . $TemplateData->{Format}
+        'ImportExport::FormatBackend::' . $TemplateData->{Format}
     );
 
     return if !$FormatBackend;
@@ -2448,7 +2448,7 @@ sub ImportTaskCreate {
     # check needed stuff
     for my $Argument (qw(TemplateID SourceContent UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2463,27 +2463,27 @@ sub ImportTaskCreate {
     );
 
     if ( !IsHashRefWithData( $TemplateDataRef ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No Template with ID $Param{TemplateID} found.",
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Param{SourceContent} );
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{SourceContent} );
     my $FileContent = decode_base64( $Param{SourceContent} );
 
     # Get current time.
-    my $ExecutionTime = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+    my $ExecutionTime = $Kernel::OM->Get('Time')->CurrentTimestamp();
 
     # Create a new future task for import.
-    my $TaskID = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskAdd(
+    my $TaskID = $Kernel::OM->Get('Daemon::SchedulerDB')->FutureTaskAdd(
         ExecutionTime => $ExecutionTime,
         Type          => 'AsynchronousExecutor',
         Name          => 'Import for template "'.$TemplateDataRef->{Name}.'" ('.$Param{TemplateID}.')',
         Attempts      => 1,
         Data          => {
-            Object   => 'Kernel::System::ImportExport',
+            Object   => 'ImportExport',
             Function => 'Import',
             Params   => {
                 TemplateID    => $Param{TemplateID},
@@ -2494,7 +2494,7 @@ sub ImportTaskCreate {
     );
 
     if ( !$TaskID) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not create import execution task.",
         );
@@ -2541,7 +2541,7 @@ sub TemplateRunList {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2550,7 +2550,7 @@ sub TemplateRunList {
     }
 
     if ( $Param{Type} && $Param{Type} !~ m/(export|import)/i) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unknown Type!",
         );
@@ -2566,7 +2566,7 @@ sub TemplateRunList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get runs
     return if !$DBObject->Prepare(
@@ -2625,7 +2625,7 @@ sub _TemplateRunAdd {
     # check needed stuff
     for (qw(TemplateID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2641,7 +2641,7 @@ sub _TemplateRunAdd {
 
     # check template data
     if ( !$TemplateData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No Template with ID $Param{TemplateID}!",
         );
@@ -2649,7 +2649,7 @@ sub _TemplateRunAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $Type = $Param{Export} ? 'export' : 'import';
     return if !$DBObject->Do(
@@ -2689,7 +2689,7 @@ sub _TemplateRunUpdate {
     # check needed stuff
     for (qw(RunID TemplateID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2698,10 +2698,10 @@ sub _TemplateRunUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $StateID = 2;
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE imexport_template_run SET end_time = current_timestamp, state_id = ?, success_count = ?, fail_count = ? WHERE id = ?',
         Bind => [ \$StateID, \$Param{Success}, \$Param{Failed}, \$Param{RunID} ],
     );
@@ -2721,7 +2721,7 @@ sub _TemplateRunDelete {
     # check needed stuff
     for (qw(TemplateID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2732,7 +2732,7 @@ sub _TemplateRunDelete {
     if ( !ref $Param{TemplateID} ) {
         $Param{TemplateID} = [ $Param{TemplateID} ];
     } elsif ( ref $Param{TemplateID} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TemplateID must be an array reference or a string!',
         );
@@ -2745,7 +2745,7 @@ sub _TemplateRunDelete {
     # create and add bind parameters
     my @Bind = map { \$_ } @{ $Param{TemplateID} };
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM imexport_template_run WHERE template_id IN ( $TemplateIDString )",
         Bind => \@Bind,
     );
@@ -2757,12 +2757,12 @@ sub _ClearCacheAndNotify {
     my ( $Self, %Param ) = @_;
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => $Param{UPDATE} ? 'UPDATE' : 'CREATE',
         Namespace => 'ImportExportTemplate.ImportExportTemplateRun',
         ObjectID  => $Param{TemplateID}.'::'.$Param{RunID},

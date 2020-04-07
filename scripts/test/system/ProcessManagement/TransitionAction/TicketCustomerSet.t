@@ -17,16 +17,16 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-my $ModuleObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketCustomerSet');
+my $TicketObject = $Kernel::OM->Get('Ticket');
+my $ModuleObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketCustomerSet');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define variables
 my $UserID     = 1;
@@ -34,7 +34,7 @@ my $ModuleName = 'TicketCustomerSet';
 
 # set user details
 my $TestUserLogin = $Helper->TestUserCreate();
-my $TestUserID    = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $TestUserID    = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 

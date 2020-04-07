@@ -16,7 +16,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::System::Ticket',
+    'Ticket',
 );
 
 sub GetDisplayPath {
@@ -26,7 +26,7 @@ sub GetDisplayPath {
 sub Run {
     my $Self = shift;
 
-    my $OpenTickets = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my $OpenTickets = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'COUNT',
         StateType  => 'Open',
         UserID     => 1,

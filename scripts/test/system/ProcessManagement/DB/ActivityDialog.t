@@ -17,16 +17,16 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $CacheObject          = $Kernel::OM->Get('Kernel::System::Cache');
-my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+my $CacheObject          = $Kernel::OM->Get('Cache');
+my $ActivityDialogObject = $Kernel::OM->Get('ProcessManagement::DB::ActivityDialog');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set fixed time
 $Helper->FixedTimeSet();
@@ -35,7 +35,7 @@ $Helper->FixedTimeSet();
 my $RandomID = $Helper->GetRandomID();
 my $UserID   = 1;
 
-my $EntityID = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity')->EntityIDGenerate(
+my $EntityID = $Kernel::OM->Get('ProcessManagement::DB::Entity')->EntityIDGenerate(
     EntityType => 'ActivityDialog',
     UserID     => 1,
 );

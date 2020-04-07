@@ -14,15 +14,15 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 sub TicketCreateNumber {
     my $Self = shift;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get needed config options
     my $SystemID = $ConfigObject->Get('SystemID');
@@ -43,7 +43,7 @@ sub TicketCreateNumber {
         if ( $Self->{LoopProtectionCounter} >= 16000 ) {
 
             # loop protection
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "CounterLoopProtection is now $Self->{LoopProtectionCounter}!"
                     . " Stopped TicketCreateNumber()!",
@@ -52,7 +52,7 @@ sub TicketCreateNumber {
         }
 
         # create new ticket number again
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Tn ($Tn) exists! Creating a new one.",
         );
@@ -71,7 +71,7 @@ sub GetTNByString {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get needed config options
     my $CheckSystemID = $ConfigObject->Get('Ticket::NumberGenerator::CheckSystemID');
@@ -105,7 +105,7 @@ sub GetTNArrayByString {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get needed config options
     my $CheckSystemID = $ConfigObject->Get('Ticket::NumberGenerator::CheckSystemID');

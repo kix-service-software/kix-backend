@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Channel::ChannelGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Channel::ChannelGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $ChannelID ( @{$Param{Data}->{ChannelID}} ) {
 
         # get the Channel data
-        my %ChannelData = $Kernel::OM->Get('Kernel::System::Channel')->ChannelGet(
+        my %ChannelData = $Kernel::OM->Get('Channel')->ChannelGet(
             ID => $ChannelID,
         );
 

@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ITSMCIPAllocateObject = $Kernel::OM->Get('Kernel::System::ITSMCIPAllocate');
+    my $ITSMCIPAllocateObject = $Kernel::OM->Get('ITSMCIPAllocate');
 
 =cut
 
@@ -84,7 +84,7 @@ sub AllocateList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -92,13 +92,13 @@ sub AllocateList {
     }
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT criticality, impact, priority_id FROM cip_allocate',
     );
 
     # result list
     my %AllocateData;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $AllocateData{ $Row[1] }{ $Row[0] } = $Row[2];
     }
 
@@ -122,7 +122,7 @@ sub AllocateUpdate {
     # check needed stuff
     for my $Argument (qw(AllocateData UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -132,7 +132,7 @@ sub AllocateUpdate {
 
     # check if allocate data is a hash reference
     if ( ref $Param{AllocateData} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'AllocateData must be a 2D hash reference!',
         );
@@ -145,7 +145,7 @@ sub AllocateUpdate {
 
         next IMPACT if ref $Param{AllocateData}->{$Impact} eq 'HASH';
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'AllocateData must be a 2D hash reference!',
         );
@@ -153,7 +153,7 @@ sub AllocateUpdate {
     }
 
     # delete old allocations
-    $Kernel::OM->Get('Kernel::System::DB')->Do( SQL => 'DELETE FROM cip_allocate' );
+    $Kernel::OM->Get('DB')->Do( SQL => 'DELETE FROM cip_allocate' );
 
     # insert new allocations
     for my $Impact ( sort keys %{ $Param{AllocateData} } ) {
@@ -164,7 +164,7 @@ sub AllocateUpdate {
             my $PriorityID = $Param{AllocateData}->{$Impact}->{$Criticality};
 
             # insert new allocation
-            $Kernel::OM->Get('Kernel::System::DB')->Do(
+            $Kernel::OM->Get('DB')->Do(
                 SQL => 'INSERT INTO cip_allocate '
                     . '(criticality, impact, priority_id, '
                     . 'create_time, create_by, change_time, change_by) VALUES '
@@ -197,7 +197,7 @@ sub PriorityAllocationGet {
     # check needed stuff
     for my $Argument (qw(Criticality Impact)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -206,7 +206,7 @@ sub PriorityAllocationGet {
     }
 
     # get priority id from db
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT priority_id FROM cip_allocate '
             . 'WHERE criticality = ? AND impact = ?',
         Bind  => [ \$Param{Criticality}, \$Param{Impact} ],
@@ -215,7 +215,7 @@ sub PriorityAllocationGet {
 
     # fetch result
     my $PriorityID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $PriorityID = $Row[0];
     }
 

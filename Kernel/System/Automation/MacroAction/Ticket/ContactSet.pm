@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Contact'
+    'Log',
+    'Ticket',
+    'Contact'
 );
 
 =head1 NAME
@@ -79,7 +79,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
@@ -89,7 +89,7 @@ sub Run {
         return;
     }
 
-    my $Contact = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    my $Contact = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{Contact},
         TicketID => $Param{TicketID},
@@ -97,14 +97,14 @@ sub Run {
         UserID   => $Param{UserID},
     );
 
-    my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+    my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
         Login  => $Contact,
         Silent => 1
     );
 
     my $OrganisationID;
     if ($ContactID) {
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $ContactID
         );
         if ( %Contact ) {
@@ -128,7 +128,7 @@ sub Run {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the contact \"$Param{Config}->{Contact}\" failed!",
             UserID   => $Param{UserID}

@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::SysConfig',
+    'SysConfig',
 );
 
 sub Configure {
@@ -30,7 +30,7 @@ sub Run {
 
     $Self->Print("<yellow>Cleaning up the system configuration...</yellow>\n");
 
-    my $Result = $Kernel::OM->Get('Kernel::System::SysConfig')->CleanUp();
+    my $Result = $Kernel::OM->Get('SysConfig')->CleanUp();
 
     if ( !$Result ) {
         $Self->Print("<red>Error.</red>\n");

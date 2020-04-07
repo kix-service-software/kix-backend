@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Ticket',
+    'Ticket',
 );
 
 sub Configure {
@@ -40,7 +40,7 @@ sub Run {
 
     $Self->Print("<yellow>Unlocking ticket $TicketID...</yellow>\n");
 
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $TicketID,
         Silent   => 1,
     );
@@ -50,7 +50,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $Unlock = $Kernel::OM->Get('Kernel::System::Ticket')->LockSet(
+    my $Unlock = $Kernel::OM->Get('Ticket')->LockSet(
         TicketID => $TicketID,
         Lock     => 'unlock',
         UserID   => 1,

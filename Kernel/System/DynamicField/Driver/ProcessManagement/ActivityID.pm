@@ -18,11 +18,11 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseText);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Main',
-    'Kernel::System::ProcessManagement::Activity',
-    'Kernel::System::Ticket::ColumnFilter',
+    'Config',
+    'DynamicFieldValue',
+    'Main',
+    'ProcessManagement::Activity',
+    'Ticket::ColumnFilter',
 );
 
 =head1 NAME
@@ -66,7 +66,7 @@ sub new {
 
     # get the Dynamic Field Backend custom extensions
     my $DynamicFieldDriverExtensions
-        = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Extension::Driver::Text');
+        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::Text');
 
     EXTENSION:
     for my $ExtensionKey ( sort keys %{$DynamicFieldDriverExtensions} ) {
@@ -82,7 +82,7 @@ sub new {
 
             # check if module can be loaded
             if (
-                !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Extension->{Module} )
+                !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
                 )
             {
                 die "Can't load dynamic fields backend module"
@@ -115,7 +115,7 @@ sub DisplayValueRender {
     my $Value = defined $Param{Value} ? $Param{Value} : '';
 
     # convert the ActivityEntityID to the Activity name
-    my $Activity = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity')->ActivityGet(
+    my $Activity = $Kernel::OM->Get('ProcessManagement::Activity')->ActivityGet(
         ActivityEntityID => $Value,
         Interface        => 'all',
     );
@@ -164,10 +164,10 @@ sub ColumnFilterValuesGet {
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
 
     # set PossibleValues
-    my $SelectionData = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity')->ActivityList();
+    my $SelectionData = $Kernel::OM->Get('ProcessManagement::Activity')->ActivityList();
 
     # get column filter values from database
-    my $ColumnFilterValues = $Kernel::OM->Get('Kernel::System::Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
+    my $ColumnFilterValues = $Kernel::OM->Get('Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
         TicketIDs => $Param{TicketIDs},
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',

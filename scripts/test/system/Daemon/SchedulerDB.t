@@ -14,7 +14,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
 
@@ -35,18 +35,18 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get scheduler database object
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 $Self->Is(
     ref $SchedulerDBObject,
-    'Kernel::System::Daemon::SchedulerDB',
+    'Daemon::SchedulerDB',
     "Kernel::System::Daemon::SchedulerDB->new()",
 );
 
@@ -665,7 +665,7 @@ for my $Test (@Tests) {
 );
 
 # get time object
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 my $OriginalTimeStamp = $TimeObject->CurrentTimestamp();
 

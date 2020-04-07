@@ -16,9 +16,9 @@ use warnings;
 use MIME::Base64;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
+    'DB',
+    'Encode',
+    'Log',
 );
 
 sub new {
@@ -41,7 +41,7 @@ sub Read {
     # check needed stuff
     for (qw(BackendKey Mode)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -57,7 +57,7 @@ sub Read {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL    => 'SELECT content FROM virtual_fs_db WHERE id = ?',
@@ -66,7 +66,7 @@ sub Read {
     );
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     my $Content;
     while ( my @Row = $DBObject->FetchrowArray() ) {
@@ -106,7 +106,7 @@ sub Write {
     # check needed stuff
     for (qw(Content Filename Mode)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -131,12 +131,12 @@ sub Write {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # encode attachment if it's a postgresql backend!!!
     if ( !$DBObject->GetDatabaseFunction('DirectBlob') ) {
 
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( $Param{Content} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( $Param{Content} );
 
         my $Content = encode_base64( ${ $Param{Content} } );
         $Param{Content} = \$Content;
@@ -172,7 +172,7 @@ sub Delete {
     # check needed stuff
     for (qw(BackendKey)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -182,7 +182,7 @@ sub Delete {
 
     my $Attributes = $Self->_BackendKeyParse(%Param);
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM virtual_fs_db WHERE id = ?',
         Bind => [ \$Attributes->{FileID} ],
     );
@@ -194,7 +194,7 @@ sub _FileLookup {
     my ( $Self, $Filename ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # lookup
     return if !$DBObject->Prepare(
@@ -226,7 +226,7 @@ sub _BackendKeyParse {
     # check needed stuff
     for (qw(BackendKey)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );

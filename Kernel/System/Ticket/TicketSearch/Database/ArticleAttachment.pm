@@ -16,8 +16,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -78,7 +78,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -87,10 +87,10 @@ sub Search {
 
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
-        my $StorageModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::StorageModule');
+        my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule');
         if ( $StorageModule !~ /::StorageDB$/ ) {
             # we can only search article attachments if they are stored in the DB
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Attachments cannot be searched if articles are not stored in the database!",
             );
@@ -126,7 +126,7 @@ sub Search {
         $FieldValue =~ s/\*/%/g;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

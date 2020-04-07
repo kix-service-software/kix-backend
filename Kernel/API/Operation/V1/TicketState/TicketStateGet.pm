@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketState::TicketStateGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketState::TicketStateGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $StateID ( @{$Param{Data}->{StateID}} ) {
 
         # get the TicketState data
-        my %TicketStateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        my %TicketStateData = $Kernel::OM->Get('State')->StateGet(
             ID => $StateID,
         );
 

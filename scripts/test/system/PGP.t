@@ -14,8 +14,8 @@ use warnings;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 # set config
 $ConfigObject->Set(
@@ -44,7 +44,7 @@ if ( !-e $ConfigObject->Get('PGP::Bin') ) {
 }
 
 # create local crypt object
-my $PGPObject = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+my $PGPObject = $Kernel::OM->Get('Crypt::PGP');
 
 if ( !$PGPObject ) {
     print STDERR "NOTICE: No PGP support!\n";

@@ -15,24 +15,24 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $QueueObject        = $Kernel::OM->Get('Kernel::System::Queue');
-my $AutoResponseObject = $Kernel::OM->Get('Kernel::System::AutoResponse');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
-my $TestEmailObject    = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $QueueObject        = $Kernel::OM->Get('Queue');
+my $AutoResponseObject = $Kernel::OM->Get('AutoResponse');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
+my $TestEmailObject    = $Kernel::OM->Get('Email::Test');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # use test email backend
 my $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 $Self->True(
     $Success,

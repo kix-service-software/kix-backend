@@ -131,7 +131,7 @@ sub Run {
     # prepare full name for lookup
     my $FullName = $Service->{Name};
     if ( $Service->{ParentID} ) {
-        my $ParentName = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+        my $ParentName = $Kernel::OM->Get('Service')->ServiceLookup(
             ServiceID => $Service->{ParentID},
         );
         if ($ParentName) {
@@ -140,7 +140,7 @@ sub Run {
     }
 
     # check if Service exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+    my $Exists = $Kernel::OM->Get('Service')->ServiceLookup(
         Name    => $FullName,
         UserID  => 1,
     );
@@ -148,12 +148,12 @@ sub Run {
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Service. Service with the name '$Service->{Name}' already exists.",
+            Message => "Cannot create Service. Service with the name '$Service->{Name}' already exists.",
         );
     }
 
     # create Service
-    my $ServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceAdd(
+    my $ServiceID = $Kernel::OM->Get('Service')->ServiceAdd(
         Name        => $Service->{Name},
         Comment     => $Service->{Comment} || '',
         ValidID     => $Service->{ValidID} || 1,
