@@ -14,7 +14,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
 
@@ -34,27 +34,27 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
 }
 
 # get scheduler database object
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 $Self->Is(
     ref $SchedulerDBObject,
-    'Kernel::System::Daemon::SchedulerDB',
+    'Daemon::SchedulerDB',
     "Kernel::System::Daemon::SchedulerDB->new()",
 );
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # freeze time
 $Helper->FixedTimeSet();
 
 # get current time stamp
-my $TimeStamp = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+my $TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
 
 # FutureTaskAdd()
 my @Tests = (

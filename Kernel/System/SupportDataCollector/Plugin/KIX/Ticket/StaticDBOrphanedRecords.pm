@@ -16,8 +16,8 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
+    'Config',
+    'DB',
 );
 
 sub GetDisplayPath {
@@ -27,10 +27,10 @@ sub GetDisplayPath {
 sub Run {
     my $Self = shift;
 
-    my $Module = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::IndexModule');
+    my $Module = $Kernel::OM->Get('Config')->Get('Ticket::IndexModule');
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Module !~ /StaticDB/ ) {
 

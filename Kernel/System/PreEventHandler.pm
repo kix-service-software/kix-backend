@@ -29,7 +29,7 @@ All pre-event handler functions.
 
 use vars qw(@ISA);
 use Kernel::System::PreEventHandler;
-push @ISA, 'Kernel::System::PreEventHandler';
+push @ISA, 'PreEventHandler';
 
     $Self->PreEventHandlerInit(
 
@@ -107,7 +107,7 @@ sub PreEventHandler {
     # check needed stuff
     for (qw(Data Event UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -116,7 +116,7 @@ sub PreEventHandler {
     return 1 if ( $Param{Data} && ref( $Param{Data} ) eq 'HASH' && $Param{Data}->{SkipPreEvent} );
 
     # get configured modules
-    my $Modules = $Kernel::OM->Get('Kernel::Config')->Get( $Self->{PreEventHandlerInit}->{Config} );
+    my $Modules = $Kernel::OM->Get('Config')->Get( $Self->{PreEventHandlerInit}->{Config} );
 
     # return if there is no one
     return 1 if !$Modules;
@@ -129,7 +129,7 @@ sub PreEventHandler {
         if ( !$Modules->{$Module}->{Event} || $Param{Event} =~ /$Modules->{$Module}->{Event}/ ) {
 
             # load event module
-            next MODULE if !$Kernel::OM->Get('Kernel::System::Main')->Require( $Modules->{$Module}->{Module} );
+            next MODULE if !$Kernel::OM->Get('Main')->Require( $Modules->{$Module}->{Module} );
 
             # get all default objects if given
             my $ObjectRef = $Self->{PreEventHandlerInit}->{Objects};

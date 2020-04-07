@@ -19,10 +19,10 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
+    'Log',
+    'State',
+    'Ticket',
+    'Time',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketStateSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketStateSet');
+    my $TicketStateSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketStateSet');
 
 =cut
 
@@ -112,7 +112,7 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{StateID} && !$Param{Config}->{State} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No State or StateID configured!",
         );
@@ -139,17 +139,17 @@ sub Run {
         && $Param{Config}->{StateID} ne $Param{Ticket}->{StateID}
         )
     {
-        %StateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        %StateData = $Kernel::OM->Get('State')->StateGet(
             ID => $Param{Config}->{StateID},
         );
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketStateSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
             TicketID => $Param{Ticket}->{TicketID},
             StateID  => $Param{Config}->{StateID},
             UserID   => $Param{UserID},
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket StateID '
@@ -177,17 +177,17 @@ sub Run {
         && $Param{Config}->{State} ne $Param{Ticket}->{State}
         )
     {
-        %StateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        %StateData = $Kernel::OM->Get('State')->StateGet(
             Name => $Param{Config}->{State},
         );
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketStateSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
             TicketID => $Param{Ticket}->{TicketID},
             State    => $Param{Config}->{State},
             UserID   => $Param{UserID},
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket State '
@@ -198,7 +198,7 @@ sub Run {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . "Couldn't update Ticket State - can't find valid State parameter!",
@@ -216,7 +216,7 @@ sub Run {
     {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         # get current time
         my $PendingTime = $TimeObject->SystemTime();
@@ -230,7 +230,7 @@ sub Run {
         );
 
         # set pending time
-        $Kernel::OM->Get('Kernel::System::Ticket')->TicketPendingTimeSet(
+        $Kernel::OM->Get('Ticket')->TicketPendingTimeSet(
             UserID   => $Param{UserID},
             TicketID => $Param{Ticket}->{TicketID},
             String   => $PendingTimeString,

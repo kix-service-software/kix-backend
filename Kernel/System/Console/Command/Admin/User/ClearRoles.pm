@@ -14,8 +14,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::User',
-    'Kernel::System::Role',
+    'User',
+    'Role',
 );
 
 sub Configure {
@@ -40,7 +40,7 @@ sub PreRun {
     $Self->{UserLogin} = $Self->GetOption('user');
 
     # check user
-    $Self->{UserID} = $Kernel::OM->Get('Kernel::System::User')->UserLookup( UserLogin => $Self->{UserLogin} );
+    $Self->{UserID} = $Kernel::OM->Get('User')->UserLookup( UserLogin => $Self->{UserLogin} );
     if ( !$Self->{UserID} ) {
         die "User $Self->{Userlogin} does not exist.\n";
     }
@@ -53,15 +53,15 @@ sub Run {
 
     $Self->Print("<yellow>Removing all role assignments of the user $Self->{UserLogin}...</yellow>\n");
 
-    my @RoleIDs = $Kernel::OM->Get('Kernel::System::User')->RoleList(
+    my @RoleIDs = $Kernel::OM->Get('User')->RoleList(
         UserID  => $Self->{UserID},
     );
 
     foreach my $RoleID ( sort @RoleIDs ) {
-        my $RoleName = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+        my $RoleName = $Kernel::OM->Get('Role')->RoleLookup(
             RoleID => $RoleID
         );
-        my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserDelete(
+        my $Success = $Kernel::OM->Get('Role')->RoleUserDelete(
             RoleID => $RoleID,
             UserID => $Self->{UserID}
         );

@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketTypeSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketTypeSet');
+    my $TicketTypeSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketTypeSet');
 
 =cut
 
@@ -107,15 +107,15 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{TypeID} && !$Param{Config}->{Type} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No Type or TypeID configured!",
         );
         return;
     }
 
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::Type') ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+    if ( !$Kernel::OM->Get('Config')->Get('Ticket::Type') ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "Ticket::Type SysConfig setting is not enabled!",
         );
@@ -129,7 +129,7 @@ sub Run {
         && $Param{Config}->{Type} ne $Param{Ticket}->{Type}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketTypeSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketTypeSet(
             Type     => $Param{Config}->{Type},
             TicketID => $Param{Ticket}->{TicketID},
             UserID   => $Param{UserID},
@@ -140,7 +140,7 @@ sub Run {
         && $Param{Config}->{TypeID} ne $Param{Ticket}->{TypeID}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketTypeSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketTypeSet(
             TypeID   => $Param{Config}->{TypeID},
             TicketID => $Param{Ticket}->{TicketID},
             UserID   => $Param{UserID},
@@ -160,7 +160,7 @@ sub Run {
         else {
             $CustomMessage = "TypeID: $Param{Config}->{TypeID},";
         }
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . 'Ticket type could not be updated to '

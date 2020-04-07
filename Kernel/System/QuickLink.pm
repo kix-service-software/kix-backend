@@ -12,11 +12,11 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Language',
-    'Kernel::Output::HTML::Layout',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
+    'Config',
+    'Language',
+    'Output::HTML::Layout',
+    'Encode',
+    'Main',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create a QuickLink object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $QuickLinkObject = $Kernel::OM->Get('Kernel::System::QuickLinkField');
+    my $QuickLinkObject = $Kernel::OM->Get('QuickLinkField');
 
 =cut
 
@@ -51,11 +51,11 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{EncodeObject} = $Kernel::OM->Get('Kernel::System::Encode');
-    $Self->{LayoutObject} = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{MainObject}   = $Kernel::OM->Get('Kernel::System::Main');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{EncodeObject} = $Kernel::OM->Get('Encode');
+    $Self->{LayoutObject} = $Kernel::OM->Get('Output::HTML::Layout');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{MainObject}   = $Kernel::OM->Get('Main');
 
     # get config
     $Self->{Backends} = $Self->{ConfigObject}->Get('QuickLink::Backend');

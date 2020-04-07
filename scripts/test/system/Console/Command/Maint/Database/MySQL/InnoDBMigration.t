@@ -14,13 +14,13 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Database::MySQL::InnoDBMigration');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Database::MySQL::InnoDBMigration');
 
 my $ExitCode = $CommandObject->Execute();
 
 $Self->Is(
     $ExitCode,
-    ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('Type') eq 'mysql' ) ? 0 : 1,
+    ( $Kernel::OM->Get('DB')->GetDatabaseFunction('Type') eq 'mysql' ) ? 0 : 1,
     "Maint::Database::MySQL::InnoDBMigration exit code",
 );
 

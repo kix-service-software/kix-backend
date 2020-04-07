@@ -12,7 +12,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $RandomID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->GetRandomID();
+my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
 my @Tests = (
     {
@@ -161,8 +161,8 @@ my @Tests = (
 );
 
 # get objects
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
-my $RequesterObject  = $Kernel::OM->Get('Kernel::API::Requester');
+my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
+my $RequesterObject  = $Kernel::OM->Get('API::Requester');
 
 for my $Test (@Tests) {
 
@@ -249,7 +249,7 @@ $Self->False(
 );
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

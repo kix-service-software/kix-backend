@@ -23,11 +23,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1131_pre.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1131_pre',
     },
 );
-my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
@@ -36,7 +36,7 @@ _FreeOrgIDOneAndAddMyOrga();
 exit 0;
 
 sub _FreeOrgIDOneAndAddMyOrga {
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     my $OrgNumber;
     my $OrgName;
     my $NewOrgID;

@@ -18,8 +18,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -80,7 +80,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -88,7 +88,7 @@ sub Search {
     }
 
     if ( !IsArrayRefWithData($Param{Search}->{Value}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid Search value!",
         );
@@ -99,7 +99,7 @@ sub Search {
         my $Index = 1;
         foreach my $SearchValue ( sort @{ $Param{Search}->{Value} } ) {
             if ( !IsHashRefWithData($SearchValue) ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Invalid Search value!",
                 );
@@ -154,7 +154,7 @@ sub Search {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ArticleUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ArticleUpdate');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ perform ArticleFlagUpdate Operation. This will return the updated ArticleFlag
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Article = $TicketObject->ArticleGet(
         ArticleID     => $Param{Data}->{ArticleID},
@@ -151,7 +151,7 @@ sub Run {
     }
 
     # check if flag exists
-    my %ArticleFlags = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleFlagGet(
+    my %ArticleFlags = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
         ArticleID => $Param{Data}->{ArticleID},
         UserID    => $Self->{Authorization}->{UserID},
     );
@@ -162,7 +162,7 @@ sub Run {
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleFlagSet(
+    my $Success = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
         ArticleID => $Param{Data}->{ArticleID},
         Key       => $Param{Data}->{FlagName},
         Value     => $Param{Data}->{ArticleFlag}->{Value},

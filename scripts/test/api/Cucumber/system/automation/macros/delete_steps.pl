@@ -3,7 +3,7 @@ use warnings;
 use Cwd;
 use lib cwd();
 use lib cwd() . '/Kernel/cpan-lib';
-use lib cwd() . '/Custom';
+use lib cwd() . '/plugins';
 use lib cwd() . '/scripts/test/api/Cucumber';
 
 use LWP::UserAgent;

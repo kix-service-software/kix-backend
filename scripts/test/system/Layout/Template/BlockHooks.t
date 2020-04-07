@@ -18,11 +18,11 @@ use File::Basename qw();
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Tests = (
     {
@@ -95,19 +95,19 @@ for my $Test (@Tests) {
 
     $Kernel::OM->ObjectsDiscard();
 
-    $Kernel::OM->Get('Kernel::Config')->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Frontend::Template::GenerateBlockHooks',
         Value => $Test->{HookConfig},
     );
 
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
     # call Output() once so that the TT objects are created.
     $LayoutObject->Output( Template => '' );
 
     # now add this directory as include path to be able to use the test templates
     my $IncludePaths = $LayoutObject->{TemplateProviderObject}->include_path();
-    unshift @{$IncludePaths}, $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/scripts/test/system/Layout/Template';
+    unshift @{$IncludePaths}, $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/Layout/Template';
     $LayoutObject->{TemplateProviderObject}->include_path($IncludePaths);
 
     for my $Block ( @{ $Test->{Blocks} } ) {

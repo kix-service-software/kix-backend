@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Stats',
+    'Stats',
 );
 
 sub Configure {
@@ -46,7 +46,7 @@ sub Run {
 
     $Self->Print("<yellow>Install stats with file prefix $Self->{FilePrefix}...</yellow>\n");
 
-    $Kernel::OM->Get('Kernel::System::Stats')->StatsInstall(
+    $Kernel::OM->Get('Stats')->StatsInstall(
         FilePrefix => $Self->{FilePrefix},
         UserID     => 1,
     );

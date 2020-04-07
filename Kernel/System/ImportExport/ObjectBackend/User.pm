@@ -17,12 +17,12 @@ use vars qw($VERSION);
 $VERSION = qw($Revision$) [1];
 
 our @ObjectDependencies = (
-    'Kernel::System::ImportExport',
-    'Kernel::System::User',
-    'Kernel::System::Queue',
-    'Kernel::System::Role',
-    'Kernel::System::Log',
-    'Kernel::Config'
+    'ImportExport',
+    'User',
+    'Queue',
+    'Role',
+    'Log',
+    'Config'
 );
 
 =head1 NAME
@@ -95,12 +95,12 @@ sub ObjectAttributesGet {
 
     # check needed object
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => 'Need UserID!' );
         return;
     }
 
-    my %Validlist = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my %Validlist = $Kernel::OM->Get('Valid')->ValidList();
 
     my $Attributes = [
         {
@@ -111,7 +111,7 @@ sub ObjectAttributesGet {
                 Required     => 0,
                 Size         => 50,
                 MaxLength    => 250,
-                ValueDefault => $Kernel::OM->Get('Kernel::Config')->Get(
+                ValueDefault => $Kernel::OM->Get('Config')->Get(
                     'UserImport::DefaultEmailAddress',
                     )
             },
@@ -124,7 +124,7 @@ sub ObjectAttributesGet {
                 Required     => 0,
                 Size         => 50,
                 MaxLength    => 250,
-                ValueDefault => $Kernel::OM->Get('Kernel::Config')->Get(
+                ValueDefault => $Kernel::OM->Get('Config')->Get(
                     'UserImport::DefaultPassword',
                     )
             },
@@ -185,7 +185,7 @@ sub MappingObjectAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -194,7 +194,7 @@ sub MappingObjectAttributesGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -317,7 +317,7 @@ sub SearchAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -326,7 +326,7 @@ sub SearchAttributesGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -351,7 +351,7 @@ sub ExportDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -360,14 +360,14 @@ sub ExportDataGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -375,7 +375,7 @@ sub ExportDataGet {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -383,7 +383,7 @@ sub ExportDataGet {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -396,7 +396,7 @@ sub ExportDataGet {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -404,7 +404,7 @@ sub ExportDataGet {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for the template id $Param{TemplateID}",
             );
@@ -415,7 +415,7 @@ sub ExportDataGet {
     }
 
     # search the users...
-    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+    my %UserList = $Kernel::OM->Get('User')->UserSearch(
         Search => '*',
         Valid  => 0,
     );
@@ -423,14 +423,14 @@ sub ExportDataGet {
 
     # export user ...
     for my $CurrUser ( keys(%UserList) ) {
-        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %UserData = $Kernel::OM->Get('User')->GetUserData(
             UserID        => $CurrUser,
             NoOutOfOffice => 1,
         );
 
         # prepare validity...
         if ( $UserData{ValidID} ) {
-            $UserData{Valid} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+            $UserData{Valid} = $Kernel::OM->Get('Valid')->ValidLookup(
                 ValidID => $UserData{ValidID},
             );
         }
@@ -450,7 +450,7 @@ sub ExportDataGet {
         }
 
         # get roles
-        my %Roles = $Kernel::OM->Get('Kernel::System::User')->RolesList(
+        my %Roles = $Kernel::OM->Get('User')->RolesList(
             UserID => $CurrUser,
         );
         if (%Roles) {
@@ -458,7 +458,7 @@ sub ExportDataGet {
             my $NumberOfRoles = $ObjectData->{NumberOfRoles} || 10;
             for my $RoleID (sort keys %{$Roles}) {
                 if ( $CurrIndex < $NumberOfRoles ) {
-                    my $Role = $Kernel::OM->Get('Kernel::System::Role')
+                    my $Role = $Kernel::OM->Get('Role')
                         ->RoleLookup( RoleID => $RoleID );
                     $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) } = $Role;
                 }
@@ -500,7 +500,7 @@ sub ImportDataSave {
     # check needed stuff
     for my $Argument (qw(TemplateID ImportDataRow UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -510,7 +510,7 @@ sub ImportDataSave {
 
     # check import data row
     if ( ref $Param{ImportDataRow} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'ImportDataRow must be an array reference',
         );
@@ -518,14 +518,14 @@ sub ImportDataSave {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -533,7 +533,7 @@ sub ImportDataSave {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -541,7 +541,7 @@ sub ImportDataSave {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -562,7 +562,7 @@ sub ImportDataSave {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -570,7 +570,7 @@ sub ImportDataSave {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for template id $Param{TemplateID}",
             );
@@ -583,7 +583,7 @@ sub ImportDataSave {
             && $Identifier{ $MappingObjectData->{Key} }
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't import this entity. "
                     . "'$MappingObjectData->{Key}' has been used multiple "
@@ -606,7 +606,7 @@ sub ImportDataSave {
     # lookup Valid-ID...
 
     if ( !$NewUserData{ValidID} && $NewUserData{Valid} ) {
-        $NewUserData{ValidID} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        $NewUserData{ValidID} = $Kernel::OM->Get('Valid')->ValidLookup(
             Valid => $NewUserData{Valid}
         );
     }
@@ -621,7 +621,7 @@ sub ImportDataSave {
     }
 
     if ( $NewUserData{$UserKey} ) {
-        %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        %UserData = $Kernel::OM->Get('User')->GetUserData(
             User => $NewUserData{$UserKey}
         );
     }
@@ -649,7 +649,7 @@ sub ImportDataSave {
     #default UserEmail...
     if ( !$UserData{UserEmail} ) {
         $UserData{UserEmail} = $ObjectData->{DefaultUserEmail}
-            || $Kernel::OM->Get('Kernel::Config')->Get(
+            || $Kernel::OM->Get('Config')->Get(
             'UserImport::DefaultEmailAddress'
             );
     }
@@ -666,18 +666,18 @@ sub ImportDataSave {
         # default UserPw
         if ( !$UserData{UserPw} || $UserData{UserPw} eq '-' ) {
             $UserData{UserPw} = $UserData{UserLogin} . (
-                $ObjectData->{DefaultPassword} || $Kernel::OM->Get('Kernel::Config')->Get(
+                $ObjectData->{DefaultPassword} || $Kernel::OM->Get('Config')->Get(
                     'UserImport::DefaultPassword'
                     )
                 )
         }
-        $Result = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+        $Result = $Kernel::OM->Get('User')->UserAdd(
             %UserData,
             ChangeUserID => $Param{UserID},
         );
 
         if ( !$Result ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ImportDataSave: adding User ("
                     . "Login "
@@ -695,13 +695,13 @@ sub ImportDataSave {
         $UserData{ID} = $NewUserData{$UserKey};
 
         delete $UserData{UserPw};
-        $Result = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
+        $Result = $Kernel::OM->Get('User')->UserUpdate(
             %UserData,
             ChangeUserID => $Param{UserID},
         );
 
         if ( !$Result ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ImportDataSave: updating User ("
                     . "Login "
@@ -720,7 +720,7 @@ sub ImportDataSave {
         # get UserID
         my $UserID;
         if ($NewUser) {
-            $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+            $UserID = $Kernel::OM->Get('User')->UserLookup(
                 UserLogin => $UserData{UserLogin},
             );
         }
@@ -734,7 +734,7 @@ sub ImportDataSave {
             if ( $UserData{ 'CustomQueue' . sprintf( "%03d", $CurrIndex ) } ) {
 
                 # get QueueID
-                my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+                my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
                     Queue => $UserData{ 'CustomQueue' . sprintf( "%03d", $CurrIndex ) }
                 );
 
@@ -766,7 +766,7 @@ sub ImportDataSave {
                     $UserData{ 'OutOfOffice' . $_ . 'Month' } = '';
                     $UserData{ 'OutOfOffice' . $_ . 'Day' }   = '';
                     if ( $UserData{OutOfOffice} ne 'no' ) {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message =>
                                 'Import: Invalid OutOfOffice' . $_ . '-Date for User '
@@ -804,7 +804,7 @@ sub ImportDataSave {
                     }
                     else { $UserData{$Preference} = 1; }
                 }
-                $Kernel::OM->Get('Kernel::System::User')->SetPreferences(
+                $Kernel::OM->Get('User')->SetPreferences(
                     Key    => $Preference,
                     Value  => $UserData{$Preference},
                     UserID => $UserID,
@@ -819,7 +819,7 @@ UserConfigItemOverviewSmallPageShown UserChangeOverviewSmallPageShown UserRefres
 
         # set roles
         # delete existing entries
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL  => 'DELETE FROM role_user WHERE user_id = ?',
             Bind => [ \$UserID ],
         );
@@ -830,13 +830,13 @@ UserConfigItemOverviewSmallPageShown UserChangeOverviewSmallPageShown UserRefres
             if ( $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) } ) {
 
                 # get RoleID
-                my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+                my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
                     Role => $UserData{ 'Role' . sprintf( "%03d", $CurrIndex ) },
                 );
 
                 #create new entry
                 if ($RoleID) {
-                    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+                    my $Success = $Kernel::OM->Get('Role')->RoleUserAdd(
                         AssignUserID => $UserID,
                         RoleID       => $RoleID,
                         Active       => 1,

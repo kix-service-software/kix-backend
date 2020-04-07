@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Ticket',
+    'Ticket',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
 
     $Self->Print("<yellow>Rebuilding ticket index...</yellow>\n");
 
-    if ( $Kernel::OM->Get('Kernel::System::Ticket')->TicketAcceleratorRebuild() ) {
+    if ( $Kernel::OM->Get('Ticket')->TicketAcceleratorRebuild() ) {
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();
     }

@@ -58,7 +58,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ArticleCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ArticleCreate');
 
     return $Self;
 }
@@ -176,7 +176,7 @@ perform ArticleCreate Operation. This will return the created ArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket data
     my %Ticket = $TicketObject->TicketGet(
@@ -271,12 +271,12 @@ sub _ArticleCreate {
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
     # database, customer ticket information need to be empty strings
-    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Ticket->{ContactID},
     );
 
     # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     my $OwnerID;
     if ( $Ticket->{Owner} && !$Ticket->{OwnerID} ) {
@@ -301,7 +301,7 @@ sub _ArticleCreate {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     if ( !defined $Article->{NoAgentNotify} ) {
 
@@ -337,7 +337,7 @@ sub _ArticleCreate {
             $To = $Ticket->{Queue};
         }
         else {
-            $To = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            $To = $Kernel::OM->Get('Queue')->QueueLookup(
                 QueueID => $Ticket->{QueueID},
             );
         }
@@ -386,7 +386,7 @@ sub _ArticleCreate {
     );
 
     if ( !$ArticleID ) {
-        my $Error = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+        my $Error = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'error',
             What => 'Message',
         );

@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @TicketIDs;
 
@@ -73,7 +73,7 @@ $Self->True(
 
 $Helper->FixedTimeAddSeconds(60);
 
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 # the following tests should provoke a join in ticket_history table and the resulting SQL should be valid
 my @Tests = (

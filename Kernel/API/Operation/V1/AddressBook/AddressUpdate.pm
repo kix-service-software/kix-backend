@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::AddressBookUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::AddressBookUpdate');
 
     return $Self;
 }
@@ -126,7 +126,7 @@ sub Run {
     );   
 
     # check if AddressBook entry exists
-    my %AddressData = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
+    my %AddressData = $Kernel::OM->Get('AddressBook')->AddressGet(
         AddressID => $Param{Data}->{AddressID},
     );
   
@@ -137,19 +137,19 @@ sub Run {
     }
     
     # check if Address exists
-    my %AddressList = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
+    my %AddressList = $Kernel::OM->Get('AddressBook')->AddressList(
         Search => $Address->{EmailAddress},
     );
 
     if ( %AddressList && (scalar(keys %AddressList) > 1 || !$AddressList{$AddressData{AddressID}})) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not update address book entry. Another address with same email address already exists.",
+            Message => "Cannot update address book entry. Another address with same email address already exists.",
         );
     }
 
     # update AddressBook
-    my $Success = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressUpdate(
+    my $Success = $Kernel::OM->Get('AddressBook')->AddressUpdate(
         AddressID      => $Param{Data}->{AddressID},
         EmailAddress   => $Address->{EmailAddress} || $AddressData{EmailAddress},
     );

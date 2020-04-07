@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SLA::SLAGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SLA::SLAGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $SLAID ( @{$Param{Data}->{SLAID}} ) {
 
         # get the SLA data
-        my %SLAData = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
+        my %SLAData = $Kernel::OM->Get('SLA')->SLAGet(
             SLAID => $SLAID,
             UserID  => $Self->{Authorization}->{UserID},
         );

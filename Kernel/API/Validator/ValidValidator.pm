@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'ValidID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        $Found = $Kernel::OM->Get('Valid')->ValidLookup(
             ValidID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Valid' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        $Found = $Kernel::OM->Get('Valid')->ValidLookup(
             Valid => $Param{Data}->{$Param{Attribute}},
         );        
     }

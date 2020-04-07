@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketStateDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketStateDelete');
 
     return $Self;
 }
@@ -111,7 +111,7 @@ sub Run {
     # start loop
     foreach my $TicketStateID ( @{$Param{Data}->{StateID}} ) {
 	           
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
@@ -135,7 +135,7 @@ sub Run {
         }
 	    
         # delete ticketstate	    
-        my $Success = $Kernel::OM->Get('Kernel::System::State')->StateDelete(
+        my $Success = $Kernel::OM->Get('State')->StateDelete(
             StateID  => $TicketStateID,
             UserID  => $Self->{Authorization}->{UserID},
         );

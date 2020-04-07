@@ -17,10 +17,10 @@ use Digest::SHA qw(sha1);
 use Digest::HMAC qw(hmac_hex);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'Log',
+    'Time',
+    'User',
 );
 
 sub new {
@@ -41,7 +41,7 @@ sub Auth {
     # check needed stuff
     for my $Needed (qw(User UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -49,10 +49,10 @@ sub Auth {
         }
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     my $SecretPreferencesKey = $ConfigObject->Get("AuthTwoFactorModule$Self->{Count}::SecretPreferencesKey") || '';
     if ( !$SecretPreferencesKey ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no configuration for SecretPreferencesKey in AuthTwoFactorModule.",
         );
@@ -60,7 +60,7 @@ sub Auth {
     }
 
     # check if user has secret stored in preferences
-    my %UserPreferences = $Kernel::OM->Get('Kernel::System::User')->GetPreferences(
+    my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
         UserID => $Param{UserID},
     );
     if ( !$UserPreferences{$SecretPreferencesKey} ) {
@@ -71,7 +71,7 @@ sub Auth {
         }
 
         # otherwise login counts as failed
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no SecretPreferencesKey for user $Param{User}.",
         );
@@ -80,7 +80,7 @@ sub Auth {
 
     # if we get to here (user has preference), we need a passed token
     if ( !$Param{TwoFactorToken} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TwoFactorToken!"
         );
@@ -108,7 +108,7 @@ sub Auth {
         if ( $Param{TwoFactorToken} ne $OTP ) {
 
             # log failure
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "User: $Param{User} two factor authentication failed (non-matching otp).",
             );
@@ -117,7 +117,7 @@ sub Auth {
     }
 
     # log success
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "User: $Param{User} two factor authentication ok.",
     );
@@ -131,7 +131,7 @@ sub _GenerateOTP {
     # algorithm based on RfC 6238
 
     # get unix timestamp divided by 30
-    my $TimeStamp = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime();
     $TimeStamp = int( $TimeStamp / 30 );
 
     # on request use previous 30-second time period

@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::KIXUtils',
+    'KIXUtils',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
     );
 
     my $RegisteredPackages
-        = $Kernel::OM->Get('Kernel::System::KIXUtils')->GetRegisteredCustomPackages(%Param);
+        = $Kernel::OM->Get('KIXUtils')->GetRegisteredCustomPackages(%Param);
     for my $CurrPrioKey ( sort( keys( %{$RegisteredPackages} ) ) ) {
         print "\n\t " . $CurrPrioKey;
     }

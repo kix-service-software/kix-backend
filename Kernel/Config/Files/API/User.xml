@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">UserID</Item>
                 <Item Key="ResponseSchema">UserResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">UserCollectionResponse</Item>
                 <Item Key="CacheType">API_users</Item>
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserPostRequest</Item>
                 <Item Key="ResponseSchema">UserPostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserPatchRequest</Item>
                 <Item Key="ResponseSchema">UserPostPatchResponse</Item>
@@ -70,6 +74,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserPreferenceGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">UserPreferenceID</Item>
                 <Item Key="ResponseSchema">UserPreferenceResponse</Item>
@@ -83,6 +88,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserPreferenceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">UserPreferenceCollectionResponse</Item>
                 <Item Key="CacheType">API_users</Item>
@@ -95,6 +101,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserPreferenceCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserPreferencePostRequest</Item>
                 <Item Key="ResponseSchema">UserPreferencePostPatchResponse</Item>
@@ -106,6 +113,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserPreferenceUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserPreferencePatchRequest</Item>
                 <Item Key="ResponseSchema">UserPreferencePostPatchResponse</Item>
@@ -117,6 +125,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserPreferenceDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -127,6 +136,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserRoleIDSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserRoleIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">UserRoleIDCollectionResponse</Item>
             </Hash>
@@ -137,6 +147,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserRoleIDCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserRoleIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserRoleIDPostRequest</Item>
                 <Item Key="ResponseSchema">UserRoleIDPostResponse</Item>
@@ -148,6 +159,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserRoleIDDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::User::UserRoleIDDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

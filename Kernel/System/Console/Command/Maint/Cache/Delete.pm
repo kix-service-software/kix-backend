@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
+    'Cache',
 );
 
 sub Configure {
@@ -48,7 +48,7 @@ sub Run {
     $Options{Type}    = $Self->GetOption('type');
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     $Self->Print("<yellow>Deleting cache...</yellow>\n");
     if ( !$CacheObject->CleanUp(%Options) ) {

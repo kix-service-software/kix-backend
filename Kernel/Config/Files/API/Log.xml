@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LogFileGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Log::LogFileGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">LogFileID</Item>
                 <Item Key="ResponseSchema">LogFileResponse</Item>
@@ -17,6 +18,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LogFileSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Log::LogFileSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">LogFileCollectionResponse</Item>
             </Hash>

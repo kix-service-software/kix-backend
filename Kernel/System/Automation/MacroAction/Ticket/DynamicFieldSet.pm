@@ -19,10 +19,10 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend'
+    'Log',
+    'Ticket',
+    'DynamicField',
+    'DynamicField::Backend'
 );
 
 =head1 NAME
@@ -87,7 +87,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Param{TicketID},
@@ -99,13 +99,13 @@ sub Run {
     }
 
     # get required DynamicField config
-    my $DynamicFieldConfig = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
         Name => $Param{Config}->{DynamicFieldName},
     );
 
     # check if we have a valid DynamicField
     if ( !IsHashRefWithData($DynamicFieldConfig) ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Can't get DynamicField config for DynamicField: \"$Param{Config}->{DynamicFieldName}\"!",
             UserID   => $Param{UserID}
@@ -113,7 +113,7 @@ sub Run {
         return;
     }
 
-    my $DFValue = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    my $DFValue = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{DynamicFieldValue},
         TicketID => $Param{TicketID},
@@ -130,7 +130,7 @@ sub Run {
     }
 
     # set the new value
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueSet(
+    my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
         DynamicFieldConfig => $DynamicFieldConfig,
         ObjectID           => $Param{TicketID},
         Value              => $DFValue,
@@ -138,7 +138,7 @@ sub Run {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting dynamic field \"$Param{Config}->{DynamicFieldName}\" failed!",
             UserID   => $Param{UserID}

@@ -16,7 +16,7 @@ use warnings;
 use Storable qw();
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -37,7 +37,7 @@ create a Storable object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $StorableObject = $Kernel::OM->Get('Kernel::System::Storable');
+    my $StorableObject = $Kernel::OM->Get('Storable');
 
 =cut
 
@@ -67,7 +67,7 @@ sub Serialize {
 
     # check for needed data
     if ( !defined $Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Data!',
         );
@@ -75,7 +75,7 @@ sub Serialize {
     }
 
     if ( !ref $Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Data needs to be given as a reference!',
         );
@@ -91,7 +91,7 @@ sub Serialize {
 
     # error handling
     if ($@) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Error serializing data: $@",
         );
@@ -125,7 +125,7 @@ sub Deserialize {
 
     # error handling
     if ($@) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Error deserializing data: $@",
         );
@@ -150,7 +150,7 @@ sub Clone {
 
     # check for needed data
     if ( !defined $Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Data!',
         );
@@ -158,7 +158,7 @@ sub Clone {
     }
 
     if ( !ref $Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Data needs to be a reference!',
         );
@@ -172,7 +172,7 @@ sub Clone {
 
     # error handling
     if ($@) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Error cloning data: $@",
         );

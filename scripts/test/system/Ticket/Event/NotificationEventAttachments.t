@@ -16,15 +16,15 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Success = $ConfigObject->Set(
     Key   => 'Frontend::RichText',
@@ -39,7 +39,7 @@ $Self->True(
 # use Test email backend
 $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 $Self->True(
@@ -47,7 +47,7 @@ $Self->True(
     "Set Email Test backend with true",
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 $Success = $TestEmailObject->CleanUp();
 
@@ -63,7 +63,7 @@ $Self->IsDeeply(
 );
 
 # get user object
-my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+my $UserObject = $Kernel::OM->Get('User');
 
 my @UserIDs;
 
@@ -87,7 +87,7 @@ for ( 1 .. 4 ) {
 my $RandomID = $Helper->GetRandomID();
 
 # get group object
-my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+my $GroupObject = $Kernel::OM->Get('Group');
 
 # add group
 my $GID = $GroupObject->GroupAdd(
@@ -154,7 +154,7 @@ for my $UserID (@UserIDs) {
 }
 
 # get queue object
-my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+my $QueueObject = $Kernel::OM->Get('Queue');
 
 # get queue data
 my %Queue = $QueueObject->QueueGet(
@@ -175,7 +175,7 @@ $Self->True(
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -198,7 +198,7 @@ $Self->True(
 );
 
 # get dynamic field object
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 # create a dynamic field
 my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
@@ -251,8 +251,8 @@ my @Tests = (
 
 );
 
-my $NotificationEventObject      = $Kernel::OM->Get('Kernel::System::NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
+my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
 
 my $Count = 0;
 my $NotificationID;

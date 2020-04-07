@@ -18,7 +18,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::API::Operation::V1::ObjectAction::Common);
 
 our @ObjectDependencies = (
-    'Kernel::Config'
+    'Config'
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $MacroActionObject = $Kernel::OM->Get('Kernel::System::Automation::MacroAction::Common');
+    my $MacroActionObject = $Kernel::OM->Get('Automation::MacroAction::Common');
 
 =cut
 
@@ -61,7 +61,7 @@ sub ActionList {
     # check needed stuff
     for (qw(Object ObjectID) ) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -69,20 +69,20 @@ sub ActionList {
         }
     }    
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{ObjectID}
     );
 
     if(!%Ticket) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to require Ticket!"
         );  
         return;
     }
 
-    my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+    my $QueueObject = $Kernel::OM->Get('Queue');
     my %Queue = $QueueObject->QueueGet(
         ID => $Ticket{QueueID}
     );    
@@ -91,7 +91,7 @@ sub ActionList {
         $Ticket{Queue} = \%Queue;
     }
 
-    my @AllObjectActions = $Kernel::OM->Get('Kernel::System::ObjectAction')->ObjectActionList(
+    my @AllObjectActions = $Kernel::OM->Get('ObjectAction')->ObjectActionList(
         Object   => $Param{Object}
     );    
 

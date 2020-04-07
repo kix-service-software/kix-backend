@@ -19,7 +19,7 @@ use Scalar::Util qw();
 use Kernel::Output::HTML::Layout;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $LayoutObject = Kernel::Output::HTML::Layout->new(
     UserID => 1,

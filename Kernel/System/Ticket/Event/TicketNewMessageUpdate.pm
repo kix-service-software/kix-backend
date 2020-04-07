@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -35,7 +35,7 @@ sub Run {
     # check needed stuff
     for my $Parameter (qw(Data Event Config)) {
         if ( !$Param{$Parameter} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Parameter!"
             );
@@ -44,7 +44,7 @@ sub Run {
     }
     for my $DataParameter (qw(TicketID ArticleID)) {
         if ( !$Param{Data}->{$DataParameter} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $DataParameter in Data!",
             );
@@ -56,7 +56,7 @@ sub Run {
     if ( $Param{Event} eq 'ArticleCreate' ) {
 
         # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $TicketObject->TicketFlagDelete(
             TicketID => $Param{Data}->{TicketID},
@@ -79,13 +79,13 @@ sub Run {
     elsif ( $Param{Event} eq 'ArticleFlagSet' ) {
 
         # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         my @ArticleList;
         my @SenderTypes = (qw(customer agent system));
 
         # ignore system sender
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('Ticket::NewArticleIgnoreSystemSender') ) {
+        if ( $Kernel::OM->Get('Config')->Get('Ticket::NewArticleIgnoreSystemSender') ) {
             @SenderTypes = (qw(customer agent));
         }
 

@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::SysConfig',
+    'SysConfig',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
 
     $Self->Print("<yellow>Rebuilding the system configuration...</yellow>\n");
 
-    my $Result = $Kernel::OM->Get('Kernel::System::SysConfig')->Rebuild();
+    my $Result = $Kernel::OM->Get('SysConfig')->Rebuild();
 
     if ( !$Result ) {
         $Self->Print("<red>Error.</red>\n");

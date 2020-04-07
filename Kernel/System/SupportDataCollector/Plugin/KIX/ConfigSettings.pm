@@ -16,7 +16,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub GetDisplayPath {
@@ -43,7 +43,7 @@ sub Run {
     );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     for my $Setting (@Settings) {
 

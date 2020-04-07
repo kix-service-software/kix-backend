@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # prepare the environment
-my $Success = $Kernel::OM->Get('Kernel::Config')->Set(
+my $Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'DaemonModules###UnitTest1',
     Value => '1',
 );
@@ -31,7 +31,7 @@ $Self->True(
     $Success,
     "Added UnitTest1 daemon to the config",
 );
-$Success = $Kernel::OM->Get('Kernel::Config')->Set(
+$Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'DaemonModules###UnitTest2',
     Value => {
         AnyKey => 1,
@@ -41,10 +41,10 @@ $Self->True(
     $Success,
     "Added UnitTest2 daemon to the config",
 );
-$Success = $Kernel::OM->Get('Kernel::Config')->Set(
+$Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'DaemonModules###UnitTest3',
     Value => {
-        Module => 'Kernel::System::Daemon::DaemonModules::NotExistent',
+        Module => 'Daemon::DaemonModules::NotExistent',
     },
 );
 $Self->True(
@@ -85,7 +85,7 @@ my @Tests = (
     },
 );
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Daemon::Summary');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Daemon::Summary');
 
 for my $Test (@Tests) {
 

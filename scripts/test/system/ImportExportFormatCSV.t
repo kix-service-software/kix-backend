@@ -17,24 +17,24 @@ use vars qw($Self);
 use Data::Dumper;
 
 # get needed objects
-my $MainObject          = $Kernel::OM->Get('Kernel::System::Main');
-my $ImportExportObject  = $Kernel::OM->Get('Kernel::System::ImportExport');
-my $FormatBackendObject = $Kernel::OM->Get('Kernel::System::ImportExport::FormatBackend::CSV');
+my $MainObject          = $Kernel::OM->Get('Main');
+my $ImportExportObject  = $Kernel::OM->Get('ImportExport');
+my $FormatBackendObject = $Kernel::OM->Get('ImportExport::FormatBackend::CSV');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # ------------------------------------------------------------ #
 # make preparations
 # ------------------------------------------------------------ #
 
 # get home directory
-$Self->{Home} = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+$Self->{Home} = $Kernel::OM->Get('Config')->Get('Home');
 
 # add some test templates for later checks
 my @TemplateIDs;

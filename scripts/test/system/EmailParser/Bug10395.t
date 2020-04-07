@@ -18,7 +18,7 @@ use Kernel::System::EmailParser;
 
 # This test should verify that an email with an unknown encoding not cause a "die".
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 # test for bug#1970
 my @Array;

@@ -127,7 +127,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my $TicketNumber = $TicketObject->TicketNumberLookup(
         TicketID => $Param{Data}->{TicketID},

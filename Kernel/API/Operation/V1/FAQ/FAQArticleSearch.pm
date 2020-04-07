@@ -84,11 +84,11 @@ perform FAQArticleSearch Operation. This will return a FAQArticle ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
     my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
 
     # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
-    my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
+    my @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
         UserID   => $Self->{Authorization}->{UserID},
         ValidIDs => \@ValidIDs
     );

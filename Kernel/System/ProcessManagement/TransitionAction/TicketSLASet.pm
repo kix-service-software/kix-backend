@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::SLA',
-    'Kernel::System::Ticket',
+    'Log',
+    'SLA',
+    'Ticket',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketSLASetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketSLASet');
+    my $TicketSLASetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketSLASet');
 
 =cut
 
@@ -106,7 +106,7 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{SLAID} && !$Param{Config}->{SLA} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No SLA or SLAID configured!",
         );
@@ -114,7 +114,7 @@ sub Run {
     }
 
     if ( !$Param{Ticket}->{ServiceID} && !$Param{Ticket}->{Service} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "To set a SLA the ticket requires a service!",
         );
@@ -153,7 +153,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'SLAID '
@@ -165,14 +165,14 @@ sub Run {
         }
 
         # set ticket SLA
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSLASet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketSLASet(
             TicketID => $Param{Ticket}->{TicketID},
             SLAID    => $Param{Config}->{SLAID},
             UserID   => $Param{UserID},
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket SLAID '
@@ -206,12 +206,12 @@ sub Run {
         )
     {
 
-        my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+        my $SLAID = $Kernel::OM->Get('SLA')->SLALookup(
             Name => $Param{Config}->{SLA},
         );
 
         if ( !$SLAID ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'SLA '
@@ -228,7 +228,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'SLA '
@@ -240,14 +240,14 @@ sub Run {
         }
 
         # set ticket SLA
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSLASet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketSLASet(
             TicketID => $Param{Ticket}->{TicketID},
             SLA      => $Param{Config}->{SLA},
             UserID   => $Param{UserID},
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket SLA '
@@ -258,7 +258,7 @@ sub Run {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . "Couldn't update Ticket SLA - can't find valid SLA parameter!",
@@ -288,7 +288,7 @@ sub _CheckSLA {
     my ( $Self, %Param ) = @_;
 
     # get a list of assigned SLAs to the Service
-    my %SLAs = $Kernel::OM->Get('Kernel::System::SLA')->SLAList(
+    my %SLAs = $Kernel::OM->Get('SLA')->SLAList(
         ServiceID => $Param{ServiceID},
         UserID    => 1,
     );

@@ -15,10 +15,10 @@ use utf8;
 use vars qw($Self);
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $UserObject         = $Kernel::OM->Get('Kernel::System::User');
-my $ImportExportObject = $Kernel::OM->Get('Kernel::System::ImportExport');
-my $Helper             = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $UserObject         = $Kernel::OM->Get('User');
+my $ImportExportObject = $Kernel::OM->Get('ImportExport');
+my $Helper             = $Kernel::OM->Get('UnitTest::Helper');
 
 # ------------------------------------------------------------ #
 # make preparations
@@ -533,11 +533,11 @@ for my $TemplateID (@AddedTemplateIDs) {
 # define test list
 my $ObjectList1TestList = {
     UnitTest1 => {
-        Module => 'Kernel::System::ImportExport::ObjectBackend::UnitTest1',
+        Module => 'ImportExport::ObjectBackend::UnitTest1',
         Name   => 'Unit Test 1',
     },
     UnitTest2 => {
-        Module => 'Kernel::System::ImportExport::ObjectBackend::UnitTest2',
+        Module => 'ImportExport::ObjectBackend::UnitTest2',
         Name   => 'Unit Test 2',
     },
 };
@@ -594,11 +594,11 @@ $TestCount++;
 # define test list
 my $FormatList1TestList = {
     UnitTest1 => {
-        Module => 'Kernel::System::ImportExport::FormatBackend::UnitTest1',
+        Module => 'ImportExport::FormatBackend::UnitTest1',
         Name   => 'Unit Test 1',
     },
     UnitTest2 => {
-        Module => 'Kernel::System::ImportExport::FormatBackend::UnitTest2',
+        Module => 'ImportExport::FormatBackend::UnitTest2',
         Name   => 'Unit Test 2',
     },
 };

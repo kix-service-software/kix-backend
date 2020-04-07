@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Valid::ValidGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Valid::ValidGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $ValidID ( @{$Param{Data}->{ValidID}} ) {
 
         # get the Valid data
-        my $ValidName = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        my $ValidName = $Kernel::OM->Get('Valid')->ValidLookup(
             ValidID => $ValidID,
         );
 

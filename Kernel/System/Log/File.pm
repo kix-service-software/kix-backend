@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
+    'Config',
+    'Encode',
 );
 
 sub new {
@@ -26,7 +26,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get logfile location
     $Self->{LogFile} = $ConfigObject->Get('LogModule::LogFile')
@@ -71,7 +71,7 @@ sub Log {
     }
 
     # write log file
-    $Kernel::OM->Get('Kernel::System::Encode')->SetIO($FH);
+    $Kernel::OM->Get('Encode')->SetIO($FH);
 
     print $FH '[' . localtime() . ']';    ## no critic
 

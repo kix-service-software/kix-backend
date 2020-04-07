@@ -18,8 +18,8 @@ use Time::HiRes();
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Ticket',
+    'Config',
+    'Ticket',
 );
 
 sub Configure {
@@ -43,10 +43,10 @@ sub Run {
     $Self->Print("<yellow>Rebuilding ticket escalation index...</yellow>\n");
 
     # disable ticket events
-    $Kernel::OM->Get('Kernel::Config')->{'Ticket::EventModulePost'} = {};
+    $Kernel::OM->Get('Config')->{'Ticket::EventModulePost'} = {};
 
     # get all tickets
-    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'ARRAY',
         Limit      => 100_000_000,
         UserID     => 1,
@@ -61,7 +61,7 @@ sub Run {
 
         $Count++;
 
-        $Kernel::OM->Get('Kernel::System::Ticket')->TicketEscalationIndexBuild(
+        $Kernel::OM->Get('Ticket')->TicketEscalationIndexBuild(
             TicketID => $TicketID,
             UserID   => 1,
         );

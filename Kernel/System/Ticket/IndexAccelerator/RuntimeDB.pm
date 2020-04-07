@@ -14,12 +14,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Lock',
-    'Kernel::System::Log',
-    'Kernel::System::State',
-    'Kernel::System::Time',
+    'Config',
+    'DB',
+    'Lock',
+    'Log',
+    'State',
+    'Time',
 );
 
 sub TicketAcceleratorUpdate {
@@ -46,7 +46,7 @@ sub TicketAcceleratorIndex {
     # check needed stuff
     for (qw(UserID QueueID ShownQueueIDs)) {
         if ( !exists( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -55,7 +55,7 @@ sub TicketAcceleratorIndex {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # db quote
     for (qw(UserID)) {
@@ -70,7 +70,7 @@ sub TicketAcceleratorIndex {
 
     # prepare "All tickets: ??" in Queue
     # KIX4OTRS-capeIT
-    # my @ViewableLockIDs = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock(
+    # my @ViewableLockIDs = $Kernel::OM->Get('Lock')->LockViewableLock(
     #     Type => 'ID',
     # );
     my @ViewableLockIDs;
@@ -78,14 +78,14 @@ sub TicketAcceleratorIndex {
         @ViewableLockIDs = @{ $Param{ViewableLockIDs} };
     }
     else {
-        @ViewableLockIDs = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock( Type => 'ID' );
+        @ViewableLockIDs = $Kernel::OM->Get('Lock')->LockViewableLock( Type => 'ID' );
     }
 
     # EO KIX4OTRS-capeIT
 
     my %ViewableLockIDs = ( map { $_ => 1 } @ViewableLockIDs );
 
-    my @ViewableStateIDs = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+    my @ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Viewable',
         Result => 'ID',
     );
@@ -175,7 +175,7 @@ sub TicketAcceleratorIndex {
     );
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my %QueuesSeen;
     while ( my @Row = $DBObject->FetchrowArray() ) {

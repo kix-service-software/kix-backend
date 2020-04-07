@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">UserID</Item>
                 <Item Key="ResponseSchema">UserResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserPatchRequest</Item>
                 <Item Key="ResponseSchema">UserPostPatchResponse</Item>
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SessionGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::SessionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">SessionResponse</Item>
             </Hash>
@@ -41,6 +44,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SessionDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::SessionDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -67,6 +71,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserPreferenceSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">UserPreferenceCollectionResponse</Item>
             </Hash>
@@ -77,6 +82,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserPreferenceGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">UserPreferenceID</Item>
                 <Item Key="ResponseSchema">UserPreferenceResponse</Item>
@@ -90,6 +96,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserPreferenceCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserPreferencePostRequest</Item>
                 <Item Key="ResponseSchema">UserPreferencePostPatchResponse</Item>
@@ -101,6 +108,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserPreferenceUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">UserPreferencePatchRequest</Item>
                 <Item Key="ResponseSchema">UserPreferencePostPatchResponse</Item>
@@ -112,6 +120,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserPreferenceDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserPreferenceDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -122,6 +131,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">UserRoleIDSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserRoleIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">UserRoleIDCollectionResponse</Item>
             </Hash>

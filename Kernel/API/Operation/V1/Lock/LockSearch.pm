@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Lock search
-    my %LockList = $Kernel::OM->Get('Kernel::System::Lock')->LockList(
+    my %LockList = $Kernel::OM->Get('Lock')->LockList(
         UserID => $Self->{Authorization}->{UserID},
     );
 

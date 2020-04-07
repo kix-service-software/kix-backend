@@ -104,7 +104,7 @@ sub Validate {
     my $Found;
     if ( $Param{Attribute} eq 'ContactID' ) {
         if ( $Param{Data}->{$Param{Attribute}} =~ /^\d+$/ ) {
-            $Found = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            $Found = $Kernel::OM->Get('Contact')->ContactGet(
                 ID => $Param{Data}->{$Param{Attribute}},
             );
         }
@@ -113,7 +113,7 @@ sub Validate {
             $Found = 0;            
             for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
                 $Found = 1;
-                if ( !$Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail( Address => $Email->address() ) ) {
+                if ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Email->address() ) ) {
                     $Found = 0;
                     last;
                 }

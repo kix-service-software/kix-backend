@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::KIXUtils',
+    'KIXUtils',
 );
 
 sub Configure {
@@ -46,7 +46,7 @@ sub Run {
 
     $Self->Print("<yellow>NOTE: start to register package '$PackageName'\n\n</yellow>\n");
 
-    $Kernel::OM->Get('Kernel::System::KIXUtils')->RegisterCustomPackage(
+    $Kernel::OM->Get('KIXUtils')->RegisterCustomPackage(
         PackageName => $PackageName,
         Priority    => $Priority
     );

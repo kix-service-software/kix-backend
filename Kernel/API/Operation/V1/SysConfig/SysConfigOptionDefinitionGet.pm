@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfig::SysConfigOptionDefinitionGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SysConfig::SysConfigOptionDefinitionGet');
 
     return $Self;
 }
@@ -125,7 +125,7 @@ sub Run {
 
     my @SysConfigList;
 
-    my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
     # start loop 
     foreach my $Option ( @{$Param{Data}->{Option}} ) {

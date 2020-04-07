@@ -16,16 +16,16 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
 
 # define needed variable
 my $RandomID = $Helper->GetRandomNumber();
@@ -75,7 +75,7 @@ $Self->True(
 );
 
 # get the Dynamic Fields configuration
-my $DynamicFieldsConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Driver');
+my $DynamicFieldsConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::Driver');
 
 # sanity check
 $Self->Is(
@@ -96,7 +96,7 @@ $Self->True(
 
 $Self->Is(
     ref $BackendObject,
-    'Kernel::System::DynamicField::Backend',
+    'DynamicField::Backend',
     'Backend object was created successfuly',
 );
 

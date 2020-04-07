@@ -118,7 +118,7 @@ sub Run {
     my @ClassList;
     foreach my $ClassID ( @{ $Param{Data}->{ClassID} } ) {
 
-        my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+        my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
             ItemID => $ClassID,
         );
 
@@ -198,14 +198,14 @@ sub Run {
                 }
             }
 
-            my $PreProductiveList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
+            my $PreProductiveList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
                 ClassIDs     => [$ClassID],
                 DeplStateIDs => \@PreProductiveDeplStateIDs,
                 UserID       => $Self->{Authorization}->{UserID},
             );
             $ConfigItemStats{PreProductiveCount} = @{$PreProductiveList};
 
-            my $ProductiveList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
+            my $ProductiveList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
                 ClassIDs     => [$ClassID],
                 DeplStateIDs => \@ProductiveDeplStateIDs,
                 UserID       => $Self->{Authorization}->{UserID},

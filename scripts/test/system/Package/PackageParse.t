@@ -17,10 +17,10 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get package object
-my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+my $PackageObject = $Kernel::OM->Get('Package');
 
 # get KIX Version
-my $KIXVersion = $Kernel::OM->Get('Kernel::Config')->Get('Version');
+my $KIXVersion = $Kernel::OM->Get('Config')->Get('Version');
 
 # leave only major and minor level versions
 $KIXVersion =~ s{ (\d+ \. \d+) .+ }{$1}msx;
@@ -117,7 +117,7 @@ for my $Test (@Tests) {
 }
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

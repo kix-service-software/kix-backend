@@ -131,7 +131,7 @@ sub Run {
 
     # set name to support internal representation of hierarchy
     if ( $Queue->{ParentID} ) {
-        my $ParentQueueName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+        my $ParentQueueName = $Kernel::OM->Get('Queue')->QueueLookup(
             QueueID => $Queue->{ParentID},
         );
         if ( !$ParentQueueName ) {
@@ -144,7 +144,7 @@ sub Run {
     }
 
     # check if Queue exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+    my $Exists = $Kernel::OM->Get('Queue')->QueueLookup(
         Queue => $Queue->{Name},
     );
     
@@ -155,7 +155,7 @@ sub Run {
     }
 
     # create Queue
-    my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
+    my $QueueID = $Kernel::OM->Get('Queue')->QueueAdd(
         Name                => $Queue->{Name},
         Comment             => $Queue->{Comment} || '',
         ValidID             => $Queue->{ValidID} || 1,

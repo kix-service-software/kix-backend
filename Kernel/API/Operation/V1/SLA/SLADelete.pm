@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $SLAID ( @{$Param{Data}->{SLAID}} ) {
 
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
@@ -133,7 +133,7 @@ sub Run {
         }
       
         # delete SLA	    
-        my $Success = $Kernel::OM->Get('Kernel::System::SLA')->SLADelete(
+        my $Success = $Kernel::OM->Get('SLA')->SLADelete(
             SLAID  => $SLAID,
             UserID  => $Self->{Authorization}->{UserID},
         );

@@ -32,16 +32,16 @@ my $ValidatorObject = Kernel::API::Validator::RoleValidator->new(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RoleRandom = 'testrole' . $Helper->GetRandomID();
 
 # create role
-my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
+my $RoleID = $Kernel::OM->Get('Role')->RoleAdd(
     Name    => $RoleRandom,
     ValidID => 1,
     UserID  => 1,

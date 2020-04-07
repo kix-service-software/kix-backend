@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ClientRegistration::ClientRegistrationGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ClientRegistration::ClientRegistrationGet');
 
     return $Self;
 }
@@ -128,7 +128,7 @@ sub Run {
     foreach my $ClientID ( @{$Param{Data}->{ClientID}} ) {
 
         # get the ClientRegistration data
-        my %ClientRegistrationData = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationGet(
+        my %ClientRegistrationData = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
             ClientID => $ClientID,             
         );
 

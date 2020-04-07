@@ -14,8 +14,8 @@ use warnings;
 use utf8;
 
 our @ObjectDependencies = (
-    'Kernel::System::FAQ',
-    'Kernel::System::LinkObject'
+    'FAQ',
+    'LinkObject'
 );
 
 sub new {
@@ -25,8 +25,8 @@ sub new {
     my $Self = {%Param};
     bless( $Self, $Type );
 
-    $Self->{FAQObject}  = $Kernel::OM->Get('Kernel::System::FAQ');
-    $Self->{LinkObject} = $Kernel::OM->Get('Kernel::System::LinkObject');
+    $Self->{FAQObject}  = $Kernel::OM->Get('FAQ');
+    $Self->{LinkObject} = $Kernel::OM->Get('LinkObject');
 
     return $Self;
 }

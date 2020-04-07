@@ -83,7 +83,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get macro types
-    my $MacroTypes = $Kernel::OM->Get('Kernel::Config')->Get('Automation::MacroType');
+    my $MacroTypes = $Kernel::OM->Get('Config')->Get('Automation::MacroType');
 
     if ( IsHashRefWithData($MacroTypes) ) {
         my @MacroTypeList;

@@ -22,11 +22,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1132.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1132',
     },
 );
-my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
@@ -40,14 +40,14 @@ exit 0;
 
 sub _AddPermissionsForRoleCustomer {
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
-    my $RoleID = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+    my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
         Role => 'Customer'
     );
 
     if (!$RoleID) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Unable to find role "Customer"! Aborting.'
         );
@@ -465,22 +465,22 @@ sub _AddPermissionsForRoleCustomer {
     </Insert>
 </database>";
 
-    my @XMLArray = $Kernel::OM->Get('Kernel::System::XML')->XMLParse(
+    my @XMLArray = $Kernel::OM->Get('XML')->XMLParse(
         String => $XML,
     );
     if (!@XMLArray) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to parse permission XML!"
         );
         return;
     }
 
-    my @SQL = $Kernel::OM->Get('Kernel::System::DB')->SQLProcessor(
+    my @SQL = $Kernel::OM->Get('DB')->SQLProcessor(
         Database => \@XMLArray,
     );
     if (!@SQL) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to generate SQL from permission XML!"
         );
@@ -490,11 +490,11 @@ sub _AddPermissionsForRoleCustomer {
     my $Line = 0;
     for my $SQL (@SQL) {
         $Line++;
-        my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do( 
+        my $Result = $Kernel::OM->Get('DB')->Do( 
             SQL => $SQL 
         );
         if (!$Result) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to execute permission SQL (line $Line)!"
             );
@@ -502,7 +502,7 @@ sub _AddPermissionsForRoleCustomer {
     }
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     return 1;
 }

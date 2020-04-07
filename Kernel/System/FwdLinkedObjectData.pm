@@ -12,14 +12,14 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Language',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Ticket',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::Main',
-    'Kernel::System::Log',
-    'Kernel::Output::HTML::Layout',
+    'Config',
+    'Language',
+    'LinkObject',
+    'Ticket',
+    'ITSMConfigItem',
+    'Main',
+    'Log',
+    'Output::HTML::Layout',
 );
 
 use vars qw($VERSION);
@@ -31,9 +31,9 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{ConfigObject}   = $Kernel::OM->Get('Kernel::Config');
-    $Self->{LayoutObject}   = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    $Self->{LanguageObject} = $Kernel::OM->Get('Kernel::Language');
+    $Self->{ConfigObject}   = $Kernel::OM->Get('Config');
+    $Self->{LayoutObject}   = $Kernel::OM->Get('Output::HTML::Layout');
+    $Self->{LanguageObject} = $Kernel::OM->Get('Language');
 
     return $Self;
 }
@@ -59,11 +59,11 @@ sub BuildFwdContent {
         = $Self->{ConfigObject}->Get('ExternalSupplierForwarding::ForwardObjectClasses');
 
     #get ticket data...
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
         UserID   => 1,
     );
-    my %FirstArticle = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleFirstArticle(
+    my %FirstArticle = $Kernel::OM->Get('Ticket')->ArticleFirstArticle(
         TicketID => $Param{TicketID},
     );
 
@@ -90,10 +90,10 @@ sub BuildFwdContent {
 
     #handle ITSMConfigItem-partners...
     my $ITSMConfigItemIsInstalled
-        = $Kernel::OM->Get('Kernel::System::Main')->Require('Kernel::System::ITSMConfigItem');
+        = $Kernel::OM->Get('Main')->Require('ITSMConfigItem');
     if ( $PartnerList{'ConfigItem'} && $ITSMConfigItemIsInstalled ) {
 
-        my $ITSMConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+        my $ITSMConfigItemObject = $Kernel::OM->Get('ITSMConfigItem');
 
         #get attributes relevant to forwarding...
         my @RelevantLinkObjectAttributes =
@@ -243,7 +243,7 @@ sub _GetLinkedObjects {
 
     #as long as it's not implemented...
     if ( $Param{ToObject} ne 'ConfigItem' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "FwdLinkedObjectData::_GetLinkedObjects: "
                 . "unknown ToObject $Param{ToObject} - won't do anything.",
@@ -256,7 +256,7 @@ sub _GetLinkedObjects {
     }
 
     #get all linked ToObjects...
-    my $PartnerLinkList = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkListWithData(
+    my $PartnerLinkList = $Kernel::OM->Get('LinkObject')->LinkListWithData(
         Object    => $Param{FromObject},
         Key       => $Param{FromObjectID},
         Object2   => $Param{ToObject},
@@ -372,7 +372,7 @@ sub _StringOutputFromCIXMLData {
             last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
 
             # get the value...
-            my $Value = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->XMLValueLookup(
+            my $Value = $Kernel::OM->Get('ITSMConfigItem')->XMLValueLookup(
                 Item => $Item,
                 Value => $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} || '',
             );

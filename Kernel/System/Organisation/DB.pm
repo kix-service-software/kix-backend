@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Valid',
+    'Cache',
+    'DB',
+    'Log',
+    'Valid',
 );
 
 sub new {
@@ -46,13 +46,13 @@ sub new {
 
     # create cache object, but only if CacheTTL is set in customer config
     if ( $Self->{OrganisationMap}->{CacheTTL} ) {
-        $Self->{CacheObject} = $Kernel::OM->Get('Kernel::System::Cache');
+        $Self->{CacheObject} = $Kernel::OM->Get('Cache');
         $Self->{CacheType}   = 'Organisation' . $Param{Count};
         $Self->{CacheTTL}    = $Self->{OrganisationMap}->{CacheTTL} || 0;
     }
 
     # get database object
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
 
     # create new db connect if DSN is given
     if ( $Self->{OrganisationMap}->{Params}->{DSN} ) {
@@ -124,7 +124,7 @@ sub OrganisationSearch {
     if ($Valid) {
 
         # get valid object
-        my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+        my $ValidObject = $Kernel::OM->Get('Valid');
 
         $SQL
             .= "$Self->{OrganisationValid} IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
@@ -202,7 +202,7 @@ sub OrganisationGet {
 
     # check needed stuff
     if ( !$Param{CustomerID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need CustomerID!'
         );
@@ -288,7 +288,7 @@ sub OrganisationAdd {
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Organisation backend is read only!'
         );
@@ -320,7 +320,7 @@ sub OrganisationAdd {
     );
 
     # log notice
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message =>
             "Organisation: '$Param{OrganisationName}/$Param{CustomerID}' created successfully ($Param{UserID})!",
@@ -336,7 +336,7 @@ sub OrganisationUpdate {
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Customer backend is read only!'
         );
@@ -346,7 +346,7 @@ sub OrganisationUpdate {
     # check needed stuff
     for my $Entry ( @{ $Self->{OrganisationMap}->{Map} } ) {
         if ( !$Param{ $Entry->{Attribute} } && $Entry->{Required} && $Entry->{Attribute} ne 'UserPassword' ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Entry->{Attribute}!"
             );
@@ -386,7 +386,7 @@ sub OrganisationUpdate {
     );
 
     # log notice
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message =>
             "Organisation: '$Param{OrganisationName}/$Param{CustomerID}' updated successfully ($Param{UserID})!",
@@ -406,7 +406,7 @@ sub _OrganisationCacheClear {
     return if !$Self->{CacheObject};
 
     if ( !$Param{CustomerID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need CustomerID!'
         );

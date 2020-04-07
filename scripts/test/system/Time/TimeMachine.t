@@ -15,12 +15,12 @@ use utf8;
 use vars (qw($Self));
 
 # get time object
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 my $StartSystemTime = $TimeObject->SystemTime();
 
 {
-    my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+    my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
     sleep 1;
 
@@ -51,7 +51,7 @@ my $StartSystemTime = $TimeObject->SystemTime();
     );
 
     # Let object be destroyed at the end of this scope
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::UnitTest::Helper'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['UnitTest::Helper'] );
 }
 
 sleep 1;

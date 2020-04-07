@@ -17,11 +17,11 @@ use List::Util();
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Log',
+    'Main',
+    'Time',
 );
 
 # capeIT
@@ -50,7 +50,7 @@ Usually you do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::DB' => {
+        'DB' => {
             # if you don't supply the following parameters, the ones found in
             # Kernel/Config.pm are used instead:
             DatabaseDSN  => 'DBI:odbc:database=123;host=localhost;',
@@ -63,7 +63,7 @@ Usually you do not use it directly, instead use:
             },
         },
     );
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
 =cut
 
@@ -79,7 +79,7 @@ sub new {
 
 # capeIT
 #    # get config object
-#    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+#    my $ConfigObject = $Kernel::OM->Get('Config');
 # EO capeIT
 
     # get config data
@@ -141,15 +141,15 @@ sub new {
 
     # load backend module
     if ( $Self->{'DB::Type'} ) {
-        my $GenericModule = 'Kernel::System::DB::' . $Self->{'DB::Type'};
-        return if !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule);
+        my $GenericModule = 'DB::' . $Self->{'DB::Type'};
+        return if !$Kernel::OM->Get('Main')->Require($GenericModule);
         $Self->{Backend} = $GenericModule->new( %{$Self} );
 
         # set database functions
         $Self->{Backend}->LoadPreferences();
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => 'Unknown database type! Set option Database::Type in '
                 . 'Kernel/Config.pm to (mysql|postgresql|oracle|db2|mssql).',
@@ -214,7 +214,7 @@ sub Connect {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
             Message =>
@@ -234,7 +234,7 @@ sub Connect {
     );
 
     if ( !$Self->{dbh} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'Error',
             Message  => $DBI::errstr,
@@ -279,7 +279,7 @@ sub Disconnect {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
 # capeIT
@@ -329,7 +329,7 @@ sub Do {
 
     # check needed stuff
     if ( !$Param{SQL} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQL!',
         );
@@ -348,7 +348,7 @@ sub Do {
                 push @Array, $$Data;
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind!',
@@ -365,7 +365,7 @@ sub Do {
     # - This avoids time inconsistencies of app and db server
     # - This avoids timestamp problems in Postgresql servers where
     #   the timestamp is sometimes 1 second off the perl timestamp.
-    my $Timestamp = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+    my $Timestamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
     $Param{SQL} =~ s{
         (?<= \s | \( | , )  # lookahead
         current_timestamp   # replace current_timestamp by 'yyyy-mm-dd hh:mm:ss'
@@ -378,7 +378,7 @@ sub Do {
     # debug
     if ( $Self->{Debug} > 0 ) {
         $Self->{DoCounter}++;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
 # capeIT
@@ -398,7 +398,7 @@ sub Do {
 
     # send sql to database
     if ( !$Self->{dbh}->do( $Param{SQL}, undef, @Array ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'error',
             Message  => "$DBI::errstr, SQL: '$Param{SQL}'",
@@ -455,7 +455,7 @@ sub Prepare {
 
     # check needed stuff
     if ( !$Param{SQL} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQL!',
         );
@@ -508,7 +508,7 @@ sub Prepare {
     # debug
     if ( $Self->{Debug} > 1 ) {
         $Self->{PrepareCounter}++;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
 # capeIT
@@ -536,7 +536,7 @@ sub Prepare {
                 push @Array, $$Data;
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind!',
@@ -553,7 +553,7 @@ sub Prepare {
 
     # do
     if ( !( $Self->{Cursor} = $Self->{dbh}->prepare($SQL) ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'Error',
             Message  => "$DBI::errstr, SQL: '$SQL'",
@@ -562,7 +562,7 @@ sub Prepare {
     }
 
     if ( !$Self->{Cursor}->execute(@Array) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'Error',
             Message  => "$DBI::errstr, SQL: '$SQL'",
@@ -574,7 +574,7 @@ sub Prepare {
     if ( $Self->{SlowLog} ) {
         my $LogTimeTaken = time() - $LogTime;
         if ( $LogTimeTaken > 4 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
                 Message  => "Slow ($LogTimeTaken s) SQL: '$SQL'",

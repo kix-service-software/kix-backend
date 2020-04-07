@@ -18,10 +18,10 @@ use MIME::Base64;
 use Encode ();
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'Log',
+    'Main',
+    'Time',
 );
 
 sub new {
@@ -79,7 +79,7 @@ sub LoadPreferences {
     #$Self->{'DB::ShellConnect'} = '';
 
     # init sql setting on db connect
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('Database::ShellOutput') ) {
+    if ( !$Kernel::OM->Get('Config')->Get('Database::ShellOutput') ) {
         $Self->{'DB::Connect'} = 'SET NAMES utf8';
     }
 
@@ -145,7 +145,7 @@ sub DatabaseCreate {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name!'
         );
@@ -161,7 +161,7 @@ sub DatabaseDrop {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name!'
         );
@@ -176,7 +176,7 @@ sub TableCreate {
     my ( $Self, @Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $SQLStart     = '';
     my $SQLEnd       = '';
@@ -365,7 +365,7 @@ sub TableDrop {
     my ( $Self, @Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $SQL = '';
     for my $Tag (@Param) {
@@ -388,7 +388,7 @@ sub TableAlter {
     my ( $Self, @Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $SQLStart      = '';
     my @SQL           = ();
@@ -564,7 +564,7 @@ sub IndexCreate {
     # check needed stuff
     for (qw(TableName Name Data)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -596,7 +596,7 @@ sub IndexDrop {
     # check needed stuff
     for (qw(TableName Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -613,7 +613,7 @@ sub ForeignKeyCreate {
     # check needed stuff
     for (qw(LocalTableName Local ForeignTableName Foreign)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -624,7 +624,7 @@ sub ForeignKeyCreate {
     # create foreign key name
     my $ForeignKey = "FK_$Param{LocalTableName}_$Param{Local}_$Param{Foreign}";
     if ( length($ForeignKey) > 60 ) {
-        my $MD5 = $Kernel::OM->Get('Kernel::System::Main')->MD5sum(
+        my $MD5 = $Kernel::OM->Get('Main')->MD5sum(
             String => $ForeignKey,
         );
         $ForeignKey = substr $ForeignKey, 0, 58;
@@ -645,7 +645,7 @@ sub ForeignKeyDrop {
     # check needed stuff
     for (qw(LocalTableName Local ForeignTableName Foreign)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -656,7 +656,7 @@ sub ForeignKeyDrop {
     # create foreign key name
     my $ForeignKey = "FK_$Param{LocalTableName}_$Param{Local}_$Param{Foreign}";
     if ( length($ForeignKey) > 60 ) {
-        my $MD5 = $Kernel::OM->Get('Kernel::System::Main')->MD5sum(
+        my $MD5 = $Kernel::OM->Get('Main')->MD5sum(
             String => $ForeignKey,
         );
         $ForeignKey = substr $ForeignKey, 0, 58;
@@ -667,7 +667,7 @@ sub ForeignKeyDrop {
     # drop foreign key
     my @SQL;
 
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Database::ShellOutput') ) {
+    if ( $Kernel::OM->Get('Config')->Get('Database::ShellOutput') ) {
         push @SQL, $Self->{'DB::Comment'}
             . ' MySQL does not create foreign key constraints in MyISAM. Dropping nonexisting constraints in MyISAM works just fine.';
         push @SQL, $Self->{'DB::Comment'}
@@ -690,7 +690,7 @@ sub UniqueCreate {
     # check needed stuff
     for (qw(TableName Name Data)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -718,7 +718,7 @@ sub UniqueDrop {
     # check needed stuff
     for (qw(TableName Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -733,8 +733,8 @@ sub Insert {
     my ( $Self, @Param ) = @_;
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $TimeObject   = $Kernel::OM->Get('Kernel::System::Time');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $TimeObject   = $Kernel::OM->Get('Time');
 
     my $SQL    = '';
     my @Keys   = ();
@@ -756,7 +756,7 @@ sub Insert {
             my $Value;
             if ( defined $Tag->{Value} ) {
                 $Value = $Tag->{Value};
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => 'The content for inserts is not longer appreciated '
                         . 'attribut Value, use Content from now on! Reason: You can\'t '

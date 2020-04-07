@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ConsoleFile::ConsoleFileDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ConsoleFile::ConsoleFileDelete');
 
     return $Self;
 }
@@ -119,7 +119,7 @@ sub Run {
     foreach my $FileID ( @{$Param{Data}->{FileID}} ) {
 
         # delete the file
-        my $Result = $Kernel::OM->Get('Kernel::System::Console')->FileDelete(
+        my $Result = $Kernel::OM->Get('Console')->FileDelete(
             ID => $FileID,
         );
 

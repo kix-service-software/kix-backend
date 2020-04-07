@@ -17,12 +17,12 @@ use MIME::Base64 qw();
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'DB',
+    'Encode',
+    'Log',
+    'Main',
+    'Time',
 );
 
 

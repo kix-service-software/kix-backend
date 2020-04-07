@@ -17,9 +17,9 @@ use vars (qw($Self));
 use Kernel::System::ObjectManager;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
-my $StatsObject = $Kernel::OM->Get('Kernel::System::Stats');
+my $StatsObject = $Kernel::OM->Get('Stats');
 
 my $Stats = $StatsObject->StatsListGet(
     UserID => 1,
@@ -27,11 +27,11 @@ my $Stats = $StatsObject->StatsListGet(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $Self->True(
     scalar keys %{$Stats},

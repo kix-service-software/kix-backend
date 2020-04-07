@@ -19,8 +19,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
+    'Config',
+    'Main',
 );
 
 sub Configure {
@@ -43,7 +43,7 @@ sub Run {
     my $CommandModule = "Kernel::System::Console::Command::$SearchCommand";
 
     # Is it an existing command? Then show help for it.
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require( $CommandModule, Silent => 1 ) ) {
+    if ( $Kernel::OM->Get('Main')->Require( $CommandModule, Silent => 1 ) ) {
         my $Command = $Kernel::OM->Get($CommandModule);
         $Command->ANSI( $Self->ANSI() );
         print $Command->GetUsageHelp();

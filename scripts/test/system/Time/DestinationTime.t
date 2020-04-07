@@ -16,7 +16,7 @@ use Time::Local;
 
 use vars (qw($Self));
 
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Tests = (
     {
@@ -142,7 +142,7 @@ my @Tests = (
 );
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # use a calendar with the same business hours for every day so that the UT runs correctly
 # on every day of the week and outside usual business hours
@@ -151,7 +151,7 @@ my @Days = qw(Sun Mon Tue Wed Thu Fri Sat);
 for my $Day (@Days) {
     $Week{$Day} = [ 0 .. 23 ];
 }
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeWorkingHours',
     Value => \%Week,
 );
@@ -185,11 +185,11 @@ for my $Test (@Tests) {
     );
 
     $Kernel::OM->ObjectsDiscard(
-        Objects => ['Kernel::System::Time'],
+        Objects => ['Time'],
     );
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $StartTime = $TimeObject->TimeStamp2SystemTime(
         String => $Test->{TimeStampStart},

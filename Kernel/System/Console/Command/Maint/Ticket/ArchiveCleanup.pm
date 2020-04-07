@@ -18,9 +18,9 @@ use Time::HiRes();
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Ticket',
+    'Config',
+    'DB',
+    'Ticket',
 );
 
 sub Configure {
@@ -41,7 +41,7 @@ sub Configure {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::ArchiveSystem') ) {
+    if ( !$Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         die "Ticket::ArchiveSystem is not enabled!\n";
     }
 
@@ -53,9 +53,9 @@ sub Run {
 
     $Self->Print("<yellow>Cleaning up ticket archive...</yellow>\n");
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $DBObject     = $Kernel::OM->Get('DB');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
     my $MicroSleep   = $Self->GetOption('micro-sleep');
 
     if ( $ConfigObject->Get('Ticket::ArchiveSystem::RemoveSeenFlags') ) {

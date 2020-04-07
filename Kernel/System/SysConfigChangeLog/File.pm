@@ -14,8 +14,8 @@ use warnings;
 umask "002";
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
+    'Config',
+    'Encode',
 );
 
 sub new {
@@ -26,7 +26,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get logfile location
     # KIX4OTRS-capeIT
@@ -84,7 +84,7 @@ sub Log {
     }
 
     # write log file
-    $Kernel::OM->Get('Kernel::System::Encode')->SetIO($FH);
+    $Kernel::OM->Get('Encode')->SetIO($FH);
 
     print $FH '[' . localtime() . ']';    ## no critic
 

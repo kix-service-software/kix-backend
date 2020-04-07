@@ -14,17 +14,17 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::SystemAddress::Add');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::SystemAddress::Add');
 
 my ( $Result, $ExitCode );
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $SystemAddressName = 'SystemAddress' . $Helper->GetRandomID();
 my $SystemAddress     = $SystemAddressName . '@example.com',
@@ -57,7 +57,7 @@ $Self->Is(
     "Invalid queue",
 );
 
-my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
+my $QueueID = $Kernel::OM->Get('Queue')->QueueAdd(
     Name            => $QueueName,
     ValidID         => 1,
     GroupID         => 1,

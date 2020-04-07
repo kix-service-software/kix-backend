@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketChecklistCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketChecklistCreate');
 
     return $Self;
 }
@@ -81,7 +81,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     # get possible item states
-    my $PossibleItemStates = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
+    my $PossibleItemStates = $Kernel::OM->Get('Config')->Get('Ticket::Frontend::KIXSidebarChecklist')->{ItemState};
     my @PossibleItemStates = sort keys %{$PossibleItemStates};
 
     return {
@@ -140,7 +140,7 @@ sub Run {
         Data => $Param{Data}->{ChecklistItem},
     );
 
-    my $ChecklistItemID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketChecklistItemCreate(
+    my $ChecklistItemID = $Kernel::OM->Get('Ticket')->TicketChecklistItemCreate(
         TicketID   => $Param{Data}->{TicketID},
         Text       => $ChecklistItem->{Text},
         State      => $ChecklistItem->{State},

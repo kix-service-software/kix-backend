@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PriorityGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Priority::PriorityGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">PriorityID</Item>
                 <Item Key="ResponseSchema">PriorityResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PrioritySearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Priority::PrioritySearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">PriorityCollectionResponse</Item>
                 <Item Key="CacheType">API_priorities</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PriorityCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Priority::PriorityCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">PriorityPostRequest</Item>
                 <Item Key="ResponseSchema">PriorityPostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PriorityUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Priority::PriorityUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">PriorityPatchRequest</Item>
                 <Item Key="ResponseSchema">PriorityPostPatchResponse</Item>
@@ -53,6 +57,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PriorityDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Priority::PriorityDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

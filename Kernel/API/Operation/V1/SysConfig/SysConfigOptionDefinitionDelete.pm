@@ -112,7 +112,7 @@ sub Run {
     foreach my $Option ( @{$Param{Data}->{Option}} ) {
 
         # check if SysConfigOptionDefinition exists
-        my $Exists = $Kernel::OM->Get('Kernel::System::SysConfig')->Exists(
+        my $Exists = $Kernel::OM->Get('SysConfig')->Exists(
             Name => $Option,
         );
         
@@ -124,7 +124,7 @@ sub Run {
         }
 
         # delete SysConfigOptionDefinition	    
-        my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionDelete(
+        my $Success = $Kernel::OM->Get('SysConfig')->OptionDelete(
             Name    => $Option,
             UserID  => $Self->{Authorization}->{UserID},
         );

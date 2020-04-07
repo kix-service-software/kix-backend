@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::StateType::StateTypeGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::StateType::StateTypeGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $StateTypeID ( @{$Param{Data}->{StateTypeID}} ) {
 
         # get the StateType data
-        my $StateTypeName = $Kernel::OM->Get('Kernel::System::State')->StateTypeLookup(
+        my $StateTypeName = $Kernel::OM->Get('State')->StateTypeLookup(
             StateTypeID => $StateTypeID,
         );
 

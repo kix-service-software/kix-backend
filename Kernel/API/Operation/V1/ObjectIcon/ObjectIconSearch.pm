@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform ObjectIcon search
-    my $ObjectIconList = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconList();
+    my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList();
 
 	# get already prepared ObjectIcon data from ObjectIconGet operation
     if ( IsArrayRefWithData($ObjectIconList) ) {  	

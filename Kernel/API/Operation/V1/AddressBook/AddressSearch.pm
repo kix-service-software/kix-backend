@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform AddressBook search
-    my %AddressList = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
+    my %AddressList = $Kernel::OM->Get('AddressBook')->AddressList(
         Search => '',               
     );
 

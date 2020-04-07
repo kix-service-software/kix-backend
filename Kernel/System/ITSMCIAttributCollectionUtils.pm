@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::ITSMConfigItem'
+    'ITSMConfigItem'
 );
 
 sub new {
@@ -22,7 +22,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{ConfigItemObject} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+    $Self->{ConfigItemObject} = $Kernel::OM->Get('ITSMConfigItem');
 
     return $Self;
 }

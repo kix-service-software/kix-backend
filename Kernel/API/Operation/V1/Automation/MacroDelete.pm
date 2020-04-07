@@ -110,7 +110,7 @@ sub Run {
     foreach my $MacroID ( @{$Param{Data}->{MacroID}} ) {
    
         # delete macro 
-        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->MacroDelete(
+        my $Success = $Kernel::OM->Get('Automation')->MacroDelete(
             ID  => $MacroID,
             UserID  => $Self->{Authorization}->{UserID},
         );

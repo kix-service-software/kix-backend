@@ -16,8 +16,8 @@ use warnings;
 use Authen::Radius;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 sub new {
@@ -31,7 +31,7 @@ sub new {
     $Self->{Debug} = 0;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get config
     $Self->{Die} = $ConfigObject->Get( 'AuthModule::Radius::Die' . $Param{Count} );
@@ -50,7 +50,7 @@ sub GetOption {
 
     # check needed stuff
     if ( !$Param{What} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need What!"
         );
@@ -68,7 +68,7 @@ sub Auth {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need User!"
         );
@@ -84,7 +84,7 @@ sub Auth {
 
     # just in case for debug!
     if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: '$User' tried to authenticate with Pw: '$Pw' ($RemoteAddr)",
         );
@@ -92,7 +92,7 @@ sub Auth {
 
     # just a note
     if ( !$User ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "No User given!!! (REMOTE_ADDR: $RemoteAddr)",
         );
@@ -101,7 +101,7 @@ sub Auth {
 
     # just a note
     if ( !$Pw ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $User authentication without Pw!!! (REMOTE_ADDR: $RemoteAddr)",
         );
@@ -118,7 +118,7 @@ sub Auth {
             die "Can't connect to $Self->{RadiusHost}: $@";
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't connect to $Self->{RadiusHost}: $@",
             );
@@ -129,7 +129,7 @@ sub Auth {
 
     # login note
     if ( defined($AuthResult) && $AuthResult == 1 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $User authentication ok (REMOTE_ADDR: $RemoteAddr).",
         );
@@ -138,7 +138,7 @@ sub Auth {
 
     # just a note
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $User authentication with wrong Pw!!! (REMOTE_ADDR: $RemoteAddr)"
         );

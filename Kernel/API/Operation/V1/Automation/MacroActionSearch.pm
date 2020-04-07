@@ -112,7 +112,7 @@ sub Run {
     my @MacroActionDataList;
 
     # check if macro exists
-    my %Macro = $Kernel::OM->Get('Kernel::System::Automation')->MacroGet(
+    my %Macro = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
     );
 
@@ -122,7 +122,7 @@ sub Run {
         );
     }
 
-    my %MacroActionList = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionList(
+    my %MacroActionList = $Kernel::OM->Get('Automation')->MacroActionList(
         MacroID => $Param{Data}->{MacroID},
         Valid   => 0,
     );

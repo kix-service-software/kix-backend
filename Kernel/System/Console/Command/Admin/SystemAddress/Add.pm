@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Queue',
-    'Kernel::System::SystemAddress',
+    'Queue',
+    'SystemAddress',
 );
 
 sub Configure {
@@ -61,7 +61,7 @@ sub PreRun {
 
     # check if queue already exists
     $Self->{QueueName} = $Self->GetOption('queue-name');
-    $Self->{QueueID}   = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+    $Self->{QueueID}   = $Kernel::OM->Get('Queue')->QueueLookup(
         Queue => $Self->{QueueName},
     );
     if ( !$Self->{QueueID} ) {
@@ -70,7 +70,7 @@ sub PreRun {
 
     # check if system address already exists
     $Self->{EmailAddress} = $Self->GetOption('email-address');
-    my $SystemExists = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressIsLocalAddress(
+    my $SystemExists = $Kernel::OM->Get('SystemAddress')->SystemAddressIsLocalAddress(
         Address => $Self->{EmailAddress},
     );
     if ($SystemExists) {
@@ -87,7 +87,7 @@ sub Run {
 
     # add system address
     if (
-        !$Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
+        !$Kernel::OM->Get('SystemAddress')->SystemAddressAdd(
             UserID   => 1,
             ValidID  => 1,
             Comment  => $Self->GetOption('comment'),

@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
 
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # force rich text editor
 my $Success = $ConfigObject->Set(
@@ -39,7 +39,7 @@ $Self->True(
 # use DoNotSendEmail email backend
 $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 $Self->True(
     $Success,
@@ -51,25 +51,25 @@ my $UserLogin = $Helper->TestUserCreate(
     Groups => ['users'],
 );
 
-my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+my %UserData = $Kernel::OM->Get('User')->GetUserData(
     User => $UserLogin,
 );
 
 my $UserID = $UserData{UserID};
 
-my %UserContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+my %UserContactData = $Kernel::OM->Get('Contact')->ContactGet(
     UserID => $UserID,
 );
 
 # create new customer user for current test
 my $ContactID = $Helper->TestContactCreate();
 
-my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
     ID => $ContactID,
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -123,8 +123,8 @@ $Self->True(
     "ArticleCreate() successful for Article ID $ArticleID",
 );
 
-my $NotificationEventObject      = $Kernel::OM->Get('Kernel::System::NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
+my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
 
 # create add note notification
 my $NotificationID = $NotificationEventObject->NotificationAdd(

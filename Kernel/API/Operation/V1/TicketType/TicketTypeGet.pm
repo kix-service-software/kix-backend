@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketTypeGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketTypeGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
         # get the TicketType data
-        my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
+        my %TicketTypeData = $Kernel::OM->Get('Type')->TypeGet(
             ID => $TypeID,
         );
 

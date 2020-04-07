@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Queue::QueueGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Queue::QueueGet');
 
     return $Self;
 }
@@ -163,7 +163,7 @@ sub Run {
     foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
 
         # get the Queue data
-        my %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+        my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
             ID => $QueueID,
         );
 
@@ -176,7 +176,7 @@ sub Run {
         }
         # include SubQueues if requested
         if ( $Param{Data}->{include}->{SubQueues} ) {
-            my %SubQueueList = $Kernel::OM->Get('Kernel::System::Queue')->GetAllSubQueues(
+            my %SubQueueList = $Kernel::OM->Get('Queue')->GetAllSubQueues(
                 QueueID => $QueueID,
             );
 
@@ -199,7 +199,7 @@ sub Run {
 
         # add "pseudo" ParentID
         if ( scalar(@ParentQueueParts) > 0 ) {            
-            $QueueData{ParentID} = 0 + $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            $QueueData{ParentID} = 0 + $Kernel::OM->Get('Queue')->QueueLookup(
                 Queue => join('::', @ParentQueueParts),
             );
         }
@@ -210,7 +210,7 @@ sub Run {
         # include Tickets if requested
         if ( $Param{Data}->{include}->{Tickets} ) {
             # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -273,7 +273,7 @@ sub Run {
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
             }            
-            $TicketStats{LockCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{LockCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => \@Filter
                 },
@@ -292,7 +292,7 @@ sub Run {
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
             }
-            $TicketStats{TotalCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{TotalCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => \@Filter
                 },
@@ -311,13 +311,13 @@ sub Run {
                     Field    => 'EscalationTime',
                     Operator => 'LT',
                     DataType => 'NUMERIC',
-                    Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                    Value    => $Kernel::OM->Get('Time')->CurrentTimestamp(),
                 },
             );
             if ( IsHashRefWithData($TicketStatsFilter) ) {
                 push(@Filter, $TicketStatsFilter);
             }
-            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => \@Filter
                 },

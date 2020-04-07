@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::ImportExport',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'ImportExport',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -37,7 +37,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ImportExportCSVBackendObject = $Kernel::OM->Get('Kernel::System::ImportExport::FormatBackend::CSV');
+    my $ImportExportCSVBackendObject = $Kernel::OM->Get('ImportExport::FormatBackend::CSV');
 
 =cut
 
@@ -48,8 +48,8 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require('Text::CSV') ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+    if ( !$Kernel::OM->Get('Main')->Require('Text::CSV') ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "CPAN module Text::CSV is required to use the CSV import/export module!",
         );
@@ -83,7 +83,7 @@ sub FormatAttributesGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -153,7 +153,7 @@ sub MappingFormatAttributesGet {
 
     # check needed object
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -193,7 +193,7 @@ sub ImportDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -205,7 +205,7 @@ sub ImportDataGet {
 
     # check source content
     if ( ref $Param{SourceContent} ne 'SCALAR' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'SourceContent must be a scalar reference',
         );
@@ -213,14 +213,14 @@ sub ImportDataGet {
     }
 
     # get format data
-    my $FormatData = $Kernel::OM->Get('Kernel::System::ImportExport')->FormatDataGet(
+    my $FormatData = $Kernel::OM->Get('ImportExport')->FormatDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check format data
     if ( !$FormatData || ref $FormatData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No format data found for the template id $Param{TemplateID}",
         );
@@ -234,7 +234,7 @@ sub ImportDataGet {
     # check the charset
     if ( !$Charset ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid charset found for the template id $Param{TemplateID}",
         );
@@ -248,7 +248,7 @@ sub ImportDataGet {
     # check the separator
     if ( !$Separator ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid separator found for the template id $Param{TemplateID}",
         );
@@ -300,7 +300,7 @@ sub ImportDataGet {
     # error handling
     my ( $ParseErrorCode, $ParseErrorString ) = $ParseObject->error_diag();
     if ($ParseErrorCode) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ImportError at line $LineCount, "
                 . "ErrorCode: $ParseErrorCode '$ParseErrorString' ",
@@ -340,7 +340,7 @@ sub ExportDataSave {
     # check needed stuff
     for my $Argument (qw(TemplateID ExportDataRow UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -350,7 +350,7 @@ sub ExportDataSave {
 
     # check export data row
     if ( ref $Param{ExportDataRow} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'ExportDataRow must be an array reference',
         );
@@ -358,14 +358,14 @@ sub ExportDataSave {
     }
 
     # get format data
-    my $FormatData = $Kernel::OM->Get('Kernel::System::ImportExport')->FormatDataGet(
+    my $FormatData = $Kernel::OM->Get('ImportExport')->FormatDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check format data
     if ( !$FormatData || ref $FormatData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No format data found for the template id $Param{TemplateID}",
         );
@@ -379,7 +379,7 @@ sub ExportDataSave {
     # check the charset
     if ( !$Charset ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid charset found for the template id $Param{TemplateID}",
         );
@@ -393,7 +393,7 @@ sub ExportDataSave {
     # check the separator
     if ( !$Separator ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid separator found for the template id $Param{TemplateID}",
         );
@@ -420,7 +420,7 @@ sub ExportDataSave {
 
     if ( !$ParseObject->combine( @{ $Param{ExportDataRow} } ) ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't combine the export data to a string!",
         );

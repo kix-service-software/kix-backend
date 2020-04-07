@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Notification::NotificationGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Notification::NotificationGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $NotificationID ( @{ $Param{Data}->{NotificationID} } ) {
 
         # get the Notification data
-        my %NotificationData = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet( 
+        my %NotificationData = $Kernel::OM->Get('NotificationEvent')->NotificationGet( 
             ID => $NotificationID, 
         );
 

@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self %Param));
 
 # get needed objects
-my $ProviderObject = $Kernel::OM->Get('Kernel::Output::Template::Provider');
+my $ProviderObject = $Kernel::OM->Get('Output::Template::Provider');
 
 my @Tests = (
     {

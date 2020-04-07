@@ -18,24 +18,24 @@ use Kernel::System::EmailParser;
 use Kernel::Output::HTML::ArticleCheck::PGP;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase            => 1,
         RestoreSystemConfiguration => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomNumber();
 
 # use Test email backend
 my $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 $Self->True(
@@ -52,7 +52,7 @@ $Success = $ConfigObject->Set(
 my $UserID = 1;
 
 # get dynamic field object
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 # create a dynamic field
 my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
@@ -69,7 +69,7 @@ my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
     UserID  => $UserID,
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 $Success = $TestEmailObject->CleanUp();
 $Self->True(
@@ -118,7 +118,7 @@ if ( !-e $ConfigObject->Get('PGP::Bin') ) {
 }
 
 # create local crypt object
-my $PGPObject = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+my $PGPObject = $Kernel::OM->Get('Crypt::PGP');
 
 if ( !$PGPObject ) {
     print STDERR "NOTICE: No PGP support!\n";
@@ -209,7 +209,7 @@ for my $Item ( sort keys %Check ) {
 }
 
 # add system address
-my $SystemAddressID = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
+my $SystemAddressID = $Kernel::OM->Get('SystemAddress')->SystemAddressAdd(
     Name     => 'unittest3@example.com',
     Realname => 'unit test',
     ValidID  => 1,
@@ -222,7 +222,7 @@ $Self->True(
     'SystemAddressAdd()',
 );
 
-my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+my $QueueObject = $Kernel::OM->Get('Queue');
 
 # set the escalation into the future
 my %Queue = $QueueObject->QueueGet(
@@ -238,7 +238,7 @@ my $QueueUpdate = $QueueObject->QueueUpdate(
 $Self->True( $QueueUpdate, "QueueUpdate() $Queue{Name}" );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -300,8 +300,8 @@ $Self->True(
     "TicketCreate() successful for Ticket ID $TicketID2",
 );
 
-my $NotificationEventObject      = $Kernel::OM->Get('Kernel::System::NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
+my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
 
 my @Tests = (
     {

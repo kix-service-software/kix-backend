@@ -502,7 +502,7 @@ my @Tests = (
 # execute tests
 for my $Test (@Tests) {
 
-    my $Match = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ObjectMatch( %{ $Test->{Config} } );
+    my $Match = $Kernel::OM->Get('DynamicField::Backend')->ObjectMatch( %{ $Test->{Config} } );
 
     if ( $Test->{Success} ) {
         $Self->True(

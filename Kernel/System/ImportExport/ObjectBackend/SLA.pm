@@ -12,15 +12,15 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Service',
-    'Kernel::System::SLA',
-    'Kernel::System::ImportExport',
-    'Kernel::System::Valid',
-    'Kernel::System::Queue',
-    'Kernel::System::Type',
-    'Kernel::System::Main',
-    'Kernel::System::Log',
-    'Kernel::Config',
+    'Service',
+    'SLA',
+    'ImportExport',
+    'Valid',
+    'Queue',
+    'Type',
+    'Main',
+    'Log',
+    'Config',
 );
 
 =head1 NAME
@@ -78,10 +78,10 @@ sub new {
     my $CalendarIndex    = 1;
     my %CalendarNameList = qw{};
     while (
-        $Kernel::OM->Get('Kernel::Config')->Get( "TimeZone::Calendar" . $CalendarIndex . "Name" ) )
+        $Kernel::OM->Get('Config')->Get( "TimeZone::Calendar" . $CalendarIndex . "Name" ) )
     {
         $CalendarNameList{$CalendarIndex} =
-            $Kernel::OM->Get('Kernel::Config')
+            $Kernel::OM->Get('Config')
             ->Get( "TimeZone::Calendar" . $CalendarIndex . "Name" );
         $CalendarIndex++;
     }
@@ -89,7 +89,7 @@ sub new {
     $Self->{CalendarNameList}        = \%CalendarNameList;
     $Self->{ReverseCalendarNameList} = \%TmpHash;
 
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require('Kernel::System::GeneralCatalog') ) {
+    if ( $Kernel::OM->Get('Main')->Require('GeneralCatalog') ) {
         $Self->{GeneralCatalogObject} = Kernel::System::GeneralCatalog->new( %{$Self} );
         if ( $Self->{GeneralCatalogObject} ) {
 
@@ -124,11 +124,11 @@ sub ObjectAttributesGet {
 
     # check needed object
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => 'Need UserID!' );
         return;
     }
-    my %Validlist = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my %Validlist = $Kernel::OM->Get('Valid')->ValidList();
 
     my $Attributes = [
         {
@@ -206,7 +206,7 @@ sub MappingObjectAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -215,7 +215,7 @@ sub MappingObjectAttributesGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -270,8 +270,8 @@ sub MappingObjectAttributesGet {
     #---------------------------------------------------------------------------
     # get preferences...
     my %Preferences = ();
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('SLAPreferences') ) {
-        %Preferences = %{ $Kernel::OM->Get('Kernel::Config')->Get('SLAPreferences') };
+    if ( $Kernel::OM->Get('Config')->Get('SLAPreferences') ) {
+        %Preferences = %{ $Kernel::OM->Get('Config')->Get('SLAPreferences') };
     }
     for my $Item ( sort keys %Preferences ) {
         if (
@@ -376,7 +376,7 @@ sub SearchAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -416,7 +416,7 @@ sub ExportDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -425,14 +425,14 @@ sub ExportDataGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -440,7 +440,7 @@ sub ExportDataGet {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -448,7 +448,7 @@ sub ExportDataGet {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -456,14 +456,14 @@ sub ExportDataGet {
     }
 
     # get search data
-    my $SearchData = $Kernel::OM->Get('Kernel::System::ImportExport')->SearchDataGet(
+    my $SearchData = $Kernel::OM->Get('ImportExport')->SearchDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     if ( $SearchData && ref($SearchData) ne 'HASH' ) {
         $SearchData = 0;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "SLA: search data is not a hash ref - ignoring search limitation.",
@@ -480,7 +480,7 @@ sub ExportDataGet {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -488,7 +488,7 @@ sub ExportDataGet {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for the template id $Param{TemplateID}",
             );
@@ -503,8 +503,8 @@ sub ExportDataGet {
 
     # get preferences configuration...
     my %Preferences = ();
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('SLAPreferences') ) {
-        my %PrefConfig = %{ $Kernel::OM->Get('Kernel::Config')->Get('SLAPreferences') };
+    if ( $Kernel::OM->Get('Config')->Get('SLAPreferences') ) {
+        my %PrefConfig = %{ $Kernel::OM->Get('Config')->Get('SLAPreferences') };
         for my $CurrKey ( keys(%PrefConfig) ) {
             my %CurrPrefs = ();
             $CurrPrefs{Label}               = $PrefConfig{$CurrKey}->{Label};
@@ -515,7 +515,7 @@ sub ExportDataGet {
     }
 
     # search the SLAs...
-    my %SLAList = $Kernel::OM->Get('Kernel::System::SLA')->SLAList(
+    my %SLAList = $Kernel::OM->Get('SLA')->SLAList(
         Valid  => 0,
         UserID => 1,
     );
@@ -532,13 +532,13 @@ sub ExportDataGet {
             }
         }
 
-        my %SLAData = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
+        my %SLAData = $Kernel::OM->Get('SLA')->SLAGet(
             SLAID  => $CurrSLAID,
             UserID => 1,            # no permission restriction for this export
         );
 
         #export valid string instead of ID...
-        $SLAData{Valid} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        $SLAData{Valid} = $Kernel::OM->Get('Valid')->ValidLookup(
             ValidID => $SLAData{ValidID},
         );
 
@@ -562,14 +562,14 @@ sub ExportDataGet {
                 && $Preferences{$CurrKey}->{SelectionSource} eq 'QueueList'
                 )
             {
-                %SelectionList = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
+                %SelectionList = $Kernel::OM->Get('Queue')->QueueList();
             }
             elsif (
                 $Preferences{$CurrKey}->{SelectionSource}
                 && $Preferences{$CurrKey}->{SelectionSource} eq 'TypeList'
                 )
             {
-                %SelectionList = $Kernel::OM->Get('Kernel::System::Type')->TypeList();
+                %SelectionList = $Kernel::OM->Get('Type')->TypeList();
             }
             elsif (
                 ( $Preferences{$CurrKey}->{SelectionSource} )
@@ -600,7 +600,7 @@ sub ExportDataGet {
             my $CurrIndex     = 0;
             for my $CurrServiceID (@ServiceIDList) {
                 my $CurrKeyName = 'AssignedService' . sprintf( "%03d", $CurrIndex );
-                my $CurrService = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+                my $CurrService = $Kernel::OM->Get('Service')->ServiceLookup(
                     ServiceID => $CurrServiceID,
                 );
                 $SLAData{$CurrKeyName} = $CurrService;
@@ -649,7 +649,7 @@ sub ImportDataSave {
     # check needed stuff
     for my $Argument (qw(TemplateID ImportDataRow UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -659,7 +659,7 @@ sub ImportDataSave {
 
     # check import data row
     if ( ref $Param{ImportDataRow} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'ImportDataRow must be an array reference',
         );
@@ -667,14 +667,14 @@ sub ImportDataSave {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -682,7 +682,7 @@ sub ImportDataSave {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -690,7 +690,7 @@ sub ImportDataSave {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -710,7 +710,7 @@ sub ImportDataSave {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -718,7 +718,7 @@ sub ImportDataSave {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for template id $Param{TemplateID}",
             );
@@ -732,7 +732,7 @@ sub ImportDataSave {
             && $Identifier{ $MappingObjectData->{Key} }
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't import this entity. "
                     . "'$MappingObjectData->{Key}' has been used multiple "
@@ -762,7 +762,7 @@ sub ImportDataSave {
 
     # lookup Valid-ID...
     if ( !$NewSLAData{ValidID} && $NewSLAData{Valid} ) {
-        $NewSLAData{ValidID} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        $NewSLAData{ValidID} = $Kernel::OM->Get('Valid')->ValidLookup(
             Valid => $NewSLAData{Valid}
         );
     }
@@ -791,7 +791,7 @@ sub ImportDataSave {
         my $CurrKeyName = 'AssignedService' . sprintf( "%03d", $CurrIndex );
 
         if ( $NewSLAData{$CurrKeyName} && $NewSLAData{$CurrKeyName} ne '-' ) {
-            my $CurrServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+            my $CurrServiceID = $Kernel::OM->Get('Service')->ServiceLookup(
                 Name => $NewSLAData{$CurrKeyName},
             );
             if ($CurrServiceID) {
@@ -807,8 +807,8 @@ sub ImportDataSave {
 
     # get preferences configuration...
     my %Preferences = ();
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('SLAPreferences') ) {
-        my %PrefConfig = %{ $Kernel::OM->Get('Kernel::Config')->Get('SLAPreferences') };
+    if ( $Kernel::OM->Get('Config')->Get('SLAPreferences') ) {
+        my %PrefConfig = %{ $Kernel::OM->Get('Config')->Get('SLAPreferences') };
         for my $CurrKey ( keys(%PrefConfig) ) {
             my %CurrPrefs = ();
             $CurrPrefs{Label}               = $PrefConfig{$CurrKey}->{Label};
@@ -839,10 +839,10 @@ sub ImportDataSave {
         # check for source of preference...
         my %SelectionList = ();
         if ( $Preferences{$CurrUsedKey}->{SelectionSource} eq 'QueueList' ) {
-            %SelectionList = $Kernel::OM->Get('Kernel::System::Queue')->QueueList();
+            %SelectionList = $Kernel::OM->Get('Queue')->QueueList();
         }
         elsif ( $Preferences{$CurrUsedKey}->{SelectionSource} eq 'TypeList' ) {
-            %SelectionList = $Kernel::OM->Get('Kernel::System::Type')->TypeList();
+            %SelectionList = $Kernel::OM->Get('Type')->TypeList();
         }
         elsif (
             ( $Preferences{$CurrUsedKey}->{SelectionSource} eq 'GeneralCatalog' )
@@ -873,7 +873,7 @@ sub ImportDataSave {
         elsif ( $NewSLAData{$CurrUsedKey} && $NewSLAData{$NamePart} ) {
             my $CompareValue = $SelectionList{ $NewSLAData{$CurrUsedKey} };
             if ( $CompareValue ne $NewSLAData{$NamePart} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't import this entity. "
                         . "Ambigous definition of attribute values "
@@ -901,7 +901,7 @@ sub ImportDataSave {
             && !$ReverseSelectionList{ $NewSLAData{$NamePart} }
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't import this entity. "
                     . "Bad definition of attribute value "
@@ -924,19 +924,19 @@ sub ImportDataSave {
         && $NewSLAData{Name}
         )
     {
-        $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+        $SLAID = $Kernel::OM->Get('SLA')->SLALookup(
             Name => $NewSLAData{Name},
         );
     }
 
     if ( $SLAID && $SLAID =~ /\d+/ ) {
-        %SLAData = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
+        %SLAData = $Kernel::OM->Get('SLA')->SLAGet(
             SLAID  => $SLAID,
             UserID => 1,
         );
     }
     elsif ($SLAID) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => 'ImportDataSave: SLAID <' . $SLAID . '> is not a number '
                 . '(maybe label or headline).',
@@ -970,13 +970,13 @@ sub ImportDataSave {
     my $ReturnCode = "";    # Created | Changed | Failed
 
     if ($NewSLA) {
-        $Result = $Kernel::OM->Get('Kernel::System::SLA')->SLAAdd(
+        $Result = $Kernel::OM->Get('SLA')->SLAAdd(
             %SLAData,
             UserID => $Param{UserID},
         );
 
         if ( !$Result ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'ImportDataSave: adding SLA <'
                     . $SLAData{Name}
@@ -990,13 +990,13 @@ sub ImportDataSave {
 
     #(3) if SLA DOES exists => update...
     if ( !$NewSLA ) {
-        $Result = $Kernel::OM->Get('Kernel::System::SLA')->SLAUpdate(
+        $Result = $Kernel::OM->Get('SLA')->SLAUpdate(
             %SLAData,
             UserID => $Param{UserID},
         );
 
         if ( !$Result ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'ImportDataSave: updating SLA <'
                     . $SLAData{Name}
@@ -1014,7 +1014,7 @@ sub ImportDataSave {
     if ($SLAID) {
         for my $CurrKey ( keys(%Preferences) ) {
             next if ( !$NewSLAData{$CurrKey} );
-            $Kernel::OM->Get('Kernel::System::SLA')->SLAPreferencesSet(
+            $Kernel::OM->Get('SLA')->SLAPreferencesSet(
                 SLAID  => $SLAID,
                 Key    => $CurrKey,
                 Value  => $NewSLAData{$CurrKey},

@@ -14,8 +14,8 @@ use warnings;
 use File::Copy;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Time',
+    'DB',
+    'Time',
 );
 
 =item new()
@@ -24,7 +24,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+    my $PackageObject = $Kernel::OM->Get('Package');
 
 =cut
 
@@ -36,9 +36,9 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{MainObject}   = $Kernel::OM->Get('Kernel::System::Main');
-    $Self->{TimeObject}   = $Kernel::OM->Get('Kernel::System::Time');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{MainObject}   = $Kernel::OM->Get('Main');
+    $Self->{TimeObject}   = $Kernel::OM->Get('Time');
 
     $Self->{KIXFRAMEWORKSTRING_START} = '#----------- KIX tsunami framework -----------';
     $Self->{KIXFRAMEWORKSTRING_END}   = '#----------- EO KIX tsunami framework -----------';
@@ -81,7 +81,7 @@ sub RegisterCustomPackage {
     # check mandatory parameters
     for (qw(PackageName Priority)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -123,7 +123,7 @@ sub UnRegisterCustomPackage {
     # check mandatory parameters
     for (qw(PackageName)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -177,7 +177,7 @@ sub GetRegisteredCustomPackages {
         close($FH);
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "KIX-Install: could not read <$KIXPackageFile> - using empty hash.",
         );
@@ -211,7 +211,7 @@ sub SetRegisteredCustomPackages {
     # check mandatory parameters
     for (qw(CustomPackages)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -247,7 +247,7 @@ sub SetRegisteredCustomPackages {
         close($FH);
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "KIX-Install: could not write <$KIXPackageFile> !",
         );
@@ -302,13 +302,13 @@ sub CleanUpConfigPm {
     #---------------------------------------------------------------------------
     # delete storage for custom packages in <KIX_HOME>/var/CustomPackages...
     if ( unlink($KIXPackageFile) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "KIX-Install: deleted <$KIXPackageFile> !",
         );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "KIX-Install: could not delete <$KIXPackageFile> !",
         );
@@ -329,7 +329,7 @@ sub CleanUpConfigPm {
         close($IN);
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not open file $ConfigFile!",
         );
@@ -350,7 +350,7 @@ sub CleanUpConfigPm {
             print $OUT $ConfigFileContentNew;
             close($OUT);
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Updated $ConfigFile.",
             );
@@ -359,7 +359,7 @@ sub CleanUpConfigPm {
 
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not open or edit file $ConfigFile!",
             );
@@ -381,7 +381,7 @@ sub CleanUpConfigPm {
         close($IN);
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not open file $Apache2PerlStartUpFile!",
         );
@@ -402,7 +402,7 @@ sub CleanUpConfigPm {
             print $OUT $Apache2PerlStartUpFileContentNew;
             close($OUT);
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Updated $Apache2PerlStartUpFile.",
             );
@@ -411,7 +411,7 @@ sub CleanUpConfigPm {
 
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not open or edit file $Apache2PerlStartUpFile!",
             );
@@ -451,7 +451,7 @@ sub _UpdateConfigPm {
     # check mandatory parameters
     for (qw(Home)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -479,7 +479,7 @@ sub _UpdateConfigPm {
         close($IN);
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not open file $ConfigFile!",
         );
@@ -532,7 +532,7 @@ sub _UpdateConfigPm {
                 close($OUT);
             }
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Updated $ConfigFile.",
             );
@@ -541,7 +541,7 @@ sub _UpdateConfigPm {
 
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not open or edit file $ConfigFile!",
             );
@@ -566,7 +566,7 @@ sub _UpdateApachePerlStartup {
     # check mandatory parameters
     for (qw(Home)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -596,7 +596,7 @@ sub _UpdateApachePerlStartup {
         close($IN);
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not open file $Apache2PerlStartUp!",
         );
@@ -658,7 +658,7 @@ sub _UpdateApachePerlStartup {
                 close($OUT);
             }
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Updated $Apache2PerlStartUp.",
             );
@@ -667,7 +667,7 @@ sub _UpdateApachePerlStartup {
 
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not open or edit file $Apache2PerlStartUp!",
             );
@@ -692,7 +692,7 @@ sub _UpdateCGIScripts {
     # check mandatory parameters
     for (qw(Home)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -730,7 +730,7 @@ sub _UpdateCGIScripts {
             close($IN);
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not open file $ScriptFile!",
             );
@@ -787,7 +787,7 @@ sub _UpdateCGIScripts {
                     close($OUT);
                 }
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => "Updated $ScriptFile.",
                 );
@@ -796,7 +796,7 @@ sub _UpdateCGIScripts {
 
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Could not open or edit file $ScriptFile!",
                 );

@@ -16,7 +16,7 @@ use base qw(Kernel::System::Console::BaseCommand);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
+    'Cache',
 );
 
 sub Configure {
@@ -31,7 +31,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheStats = $CacheObject->GetCacheStats();
 

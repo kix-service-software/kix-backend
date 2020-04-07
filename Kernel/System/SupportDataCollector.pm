@@ -18,13 +18,13 @@ use File::Basename;
 use Kernel::System::WebUserAgent;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Encode',
-    'Kernel::System::JSON',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::SystemData',
+    'Config',
+    'Cache',
+    'Encode',
+    'JSON',
+    'Log',
+    'Main',
+    'SystemData',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SupportDataCollectorObject = $Kernel::OM->Get('Kernel::System::SupportDataCollector');
+    my $SupportDataCollectorObject = $Kernel::OM->Get('SupportDataCollector');
 
 
 =cut
@@ -83,7 +83,7 @@ collect system data
         Success => 1,
         Result  => [
             {
-                Identifier  => 'Kernel::System::SupportDataCollector::KIX::Version',
+                Identifier  => 'SupportDataCollector::KIX::Version',
                 DisplayPath => 'KIX',
                 Status      => $StatusOK,
                 Label       => 'KIX Version'
@@ -91,7 +91,7 @@ collect system data
                 Message     => '',
             },
             {
-                Identifier  => 'Kernel::System::SupportDataCollector::Apache::mod_perl',
+                Identifier  => 'SupportDataCollector::Apache::mod_perl',
                 DisplayPath => 'KIX',
                 Status      => $StatusProblem,
                 Label       => 'mod_perl usage'
@@ -109,7 +109,7 @@ sub Collect {
     my $CacheKey = 'DataCollect';
 
     if ( $Param{UseCache} ) {
-        my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => 'SupportDataCollector',
             Key  => $CacheKey,
         );
@@ -127,24 +127,24 @@ sub Collect {
     }
 
     # Get the disabled plugins from the config to generate a lookup hash, which can be used to skip these plugins.
-    my $PluginDisabled = $Kernel::OM->Get('Kernel::Config')->Get('SupportDataCollector::DisablePlugins') || [];
+    my $PluginDisabled = $Kernel::OM->Get('Config')->Get('SupportDataCollector::DisablePlugins') || [];
     my %LookupPluginDisabled = map { $_ => 1 } @{$PluginDisabled};
 
     # Get the identifier filter blacklist from the config to generate a lookup hash, which can be used to
     # filter these identifier.
     my $IdentifierFilterBlacklist
-        = $Kernel::OM->Get('Kernel::Config')->Get('SupportDataCollector::IdentifierFilterBlacklist') || [];
+        = $Kernel::OM->Get('Config')->Get('SupportDataCollector::IdentifierFilterBlacklist') || [];
     my %LookupIdentifierFilterBlacklist = map { $_ => 1 } @{$IdentifierFilterBlacklist};
 
     # Look for all plug-ins in the FS
-    my @PluginFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @PluginFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => dirname(__FILE__) . "/SupportDataCollector/Plugin",
         Filter    => "*.pm",
         Recursive => 1,
     );
 
     # Look for all asynchronous plug-ins in the FS
-    my @PluginAsynchronousFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @PluginAsynchronousFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => dirname(__FILE__) . "/SupportDataCollector/PluginAsynchronous",
         Filter    => "*.pm",
         Recursive => 1,
@@ -165,7 +165,7 @@ sub Collect {
 
         next PLUGINFILE if $LookupPluginDisabled{$PluginFile};
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($PluginFile) ) {
+        if ( !$Kernel::OM->Get('Main')->Require($PluginFile) ) {
             return (
                 Success      => 0,
                 ErrorMessage => "Could not load $PluginFile!",
@@ -201,7 +201,7 @@ sub Collect {
     #   to have all support data in the admin view.
     if ( $ENV{GATEWAY_INTERFACE} ) {
 
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => 'SupportDataCollector',
             Key   => $CacheKey,
             Value => \%ReturnData,
@@ -210,7 +210,7 @@ sub Collect {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SupportData',
     );
@@ -223,23 +223,23 @@ sub CollectByWebRequest {
 
     # Create a challenge token to authenticate this request without customer/agent login.
     #   PublicSupportDataCollector requires this ChallengeToken.
-    my $ChallengeToken = $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString(
+    my $ChallengeToken = $Kernel::OM->Get('Main')->GenerateRandomString(
         Length     => 32,
         Dictionary => [ 0 .. 9, 'a' .. 'f' ],    # hexadecimal
     );
 
     if (
-        $Kernel::OM->Get('Kernel::System::SystemData')->SystemDataGet( Key => 'SupportDataCollector::ChallengeToken' )
+        $Kernel::OM->Get('SystemData')->SystemDataGet( Key => 'SupportDataCollector::ChallengeToken' )
         )
     {
-        $Kernel::OM->Get('Kernel::System::SystemData')->SystemDataUpdate(
+        $Kernel::OM->Get('SystemData')->SystemDataUpdate(
             Key    => 'SupportDataCollector::ChallengeToken',
             Value  => $ChallengeToken,
             UserID => 1,
         );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::SystemData')->SystemDataAdd(
+        $Kernel::OM->Get('SystemData')->SystemDataAdd(
             Key    => 'SupportDataCollector::ChallengeToken',
             Value  => $ChallengeToken,
             UserID => 1,
@@ -247,10 +247,10 @@ sub CollectByWebRequest {
     }
 
     my $Host = $Param{Hostname};
-    $Host ||= $Kernel::OM->Get('Kernel::Config')->Get('SupportDataCollector::HTTPHostname');
+    $Host ||= $Kernel::OM->Get('Config')->Get('SupportDataCollector::HTTPHostname');
 
     if ( !$Host ) {
-        my $FQDN = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+        my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
 
         if ( $FQDN ne 'yourhost.example.com' && gethostbyname($FQDN) ) {
             $Host = $FQDN;
@@ -267,20 +267,20 @@ sub CollectByWebRequest {
     # we can specify the htaccess login data here,
     # this is neccessary for the support data collector
     my $AuthString   = '';
-    my $AuthUser     = $Kernel::OM->Get('Kernel::Config')->Get('PublicFrontend::AuthUser');
-    my $AuthPassword = $Kernel::OM->Get('Kernel::Config')->Get('PublicFrontend::AuthPassword');
+    my $AuthUser     = $Kernel::OM->Get('Config')->Get('PublicFrontend::AuthUser');
+    my $AuthPassword = $Kernel::OM->Get('Config')->Get('PublicFrontend::AuthPassword');
     if ( $AuthUser && $AuthPassword ) {
         $AuthString = $AuthUser . ':' . $AuthPassword . '@';
     }
 
     # prepare web service config
     my $URL =
-        $Kernel::OM->Get('Kernel::Config')->Get('HttpType')
+        $Kernel::OM->Get('Config')->Get('HttpType')
         . '://'
         . $AuthString
         . $Host
         . '/'
-        . $Kernel::OM->Get('Kernel::Config')->Get('ScriptAlias')
+        . $Kernel::OM->Get('Config')->Get('ScriptAlias')
         . 'public.pl';
 
     my $WebUserAgentObject = Kernel::System::WebUserAgent->new(
@@ -308,7 +308,7 @@ sub CollectByWebRequest {
     if ( $Response{Status} ne '200 OK' ) {
 
         if ( $Self->{Debug} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "SupportDataCollector - Can't connect to server - $Response{Status}",
             );
@@ -321,7 +321,7 @@ sub CollectByWebRequest {
     if ( !$Response{Content} || ref $Response{Content} ne 'SCALAR' ) {
 
         if ( $Self->{Debug} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "SupportDataCollector - No content received.",
             );
@@ -330,13 +330,13 @@ sub CollectByWebRequest {
     }
 
     # convert internal used charset
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( $Response{Content} );
+    $Kernel::OM->Get('Encode')->EncodeInput( $Response{Content} );
 
     # Discard HTML responses (error pages etc.).
     if ( substr( ${ $Response{Content} }, 0, 1 ) eq '<' ) {
 
         if ( $Self->{Debug} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "SupportDataCollector - Response looks like HTML instead of JSON.",
             );
@@ -346,13 +346,13 @@ sub CollectByWebRequest {
     }
 
     # decode JSON data
-    my $ResponseData = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+    my $ResponseData = $Kernel::OM->Get('JSON')->Decode(
         Data => ${ $Response{Content} },
     );
     if ( !$ResponseData || ref $ResponseData ne 'HASH' ) {
 
         if ( $Self->{Debug} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "SupportDataCollector - Can't decode JSON: '" . ${ $Response{Content} } . "'!",
             );
@@ -384,7 +384,7 @@ sub CollectAsynchronous {
     my ( $Self, %Param ) = @_;
 
     # Look for all plug-ins in the FS
-    my @PluginFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @PluginFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => dirname(__FILE__) . "/SupportDataCollector/PluginAsynchronous",
         Filter    => "*.pm",
         Recursive => 1,
@@ -397,7 +397,7 @@ sub CollectAsynchronous {
         $PluginFile =~ s{^.*(Kernel/System.*)[.]pm$}{$1}xmsg;
         $PluginFile =~ s{/+}{::}xmsg;
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($PluginFile) ) {
+        if ( !$Kernel::OM->Get('Main')->Require($PluginFile) ) {
             return (
                 Success      => 0,
                 ErrorMessage => "Could not load $PluginFile!",
@@ -432,7 +432,7 @@ sub CleanupAsynchronous {
     my ( $Self, %Param ) = @_;
 
     # Look for all plug-ins in the FS
-    my @PluginFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @PluginFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => dirname(__FILE__) . "/SupportDataCollector/PluginAsynchronous",
         Filter    => "*.pm",
         Recursive => 1,
@@ -446,7 +446,7 @@ sub CleanupAsynchronous {
         $PluginFile =~ s{^.*(Kernel/System.*)[.]pm$}{$1}xmsg;
         $PluginFile =~ s{/+}{::}xmsg;
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($PluginFile) ) {
+        if ( !$Kernel::OM->Get('Main')->Require($PluginFile) ) {
             return (
                 Success      => 0,
                 ErrorMessage => "Could not load $PluginFile!",
@@ -460,7 +460,7 @@ sub CleanupAsynchronous {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SupportData',
     );

@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -20,6 +21,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -33,6 +35,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -44,6 +47,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -55,6 +59,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -67,6 +72,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldConfigGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldConfigGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -78,6 +84,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldConfigUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldConfigUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -90,6 +97,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -102,6 +110,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">DynamicFieldObjectTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::DynamicField::DynamicFieldObjectTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">DynamicField</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

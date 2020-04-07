@@ -11,6 +11,8 @@ package Kernel::API::Transport;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::API::Common
 );
@@ -75,12 +77,25 @@ sub new {
     }
 
     # select and instantiate the backend
-    my $Backend = 'Kernel::API::Transport::' . $Self->{TransportConfig}->{Type};
-
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
+    my $BackendReg = $Kernel::OM->Get('Config')->Get('API::Transport::Module');
+    if ( !IsHashRefWithData($BackendReg) ) {
         return $Self->_Error(
             Code    => 'Transport.InternalError',            
-            Message => "Backend $Backend not found." 
+            Message => "No backends found." 
+        );
+    }
+    if ( !IsHashRefWithData($BackendReg->{$Self->{TransportConfig}->{Type}}) ) {
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',            
+            Message => "Backend $Self->{TransportConfig}->{Type} not found." 
+        );
+    }
+
+    my $Backend = $BackendReg->{$Self->{TransportConfig}->{Type}}->{Module};
+    if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',            
+            Message => "Can't load module $Backend." 
         );
     }
     $Self->{BackendObject} = $Backend->new( %{$Self} );

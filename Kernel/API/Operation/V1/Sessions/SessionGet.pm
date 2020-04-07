@@ -110,7 +110,7 @@ remove token (invalidate)
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Payload = $Kernel::OM->Get('Kernel::System::Token')->ExtractToken(
+    my $Payload = $Kernel::OM->Get('Token')->ExtractToken(
         Token => $Param{Data}->{Token}
     );
 

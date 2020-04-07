@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get layout object
-my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
 my @Tests = (
 

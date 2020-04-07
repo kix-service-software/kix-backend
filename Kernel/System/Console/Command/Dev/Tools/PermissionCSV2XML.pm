@@ -16,11 +16,11 @@ use base qw(Kernel::System::Console::BaseCommand);
 use Kernel::Language;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Main',
+    'SysConfig',
+    'Time',
 );
 
 sub Configure {
@@ -72,7 +72,7 @@ sub Run {
     $Self->Print("<yellow>generating XML...</yellow>\n\n");
 
     # read CSV file
-    my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Location => $CSVFile,
     );
     if ( !$Content ) {
@@ -80,7 +80,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $LinesRef = $Kernel::OM->Get('Kernel::System::CSV')->CSV2Array(
+    my $LinesRef = $Kernel::OM->Get('CSV')->CSV2Array(
         String => $$Content
     );
 
@@ -99,7 +99,7 @@ sub Run {
             + ( $Line->[6] ? Kernel::System::Role::Permission->PERMISSION->{DELETE} : 0 )
             + ( $Line->[7] ? Kernel::System::Role::Permission->PERMISSION->{DENY}   : 0 );
 
-        my $PermissionStr = $Kernel::OM->Get('Kernel::System::Role')->GetReadablePermissionValue(
+        my $PermissionStr = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
             Value  => $Value,
             Format => 'Short'
         );

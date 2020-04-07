@@ -110,7 +110,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if pattern already exists
-    my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+    my %PatternData = $Kernel::OM->Get('Translation')->PatternGet(
         ID => $Param{Data}->{PatternID},
         IncludeAvailableLanguages => 1,
     );

@@ -125,7 +125,7 @@ sub Map {
     # load required libraries (XML::LibXML and XML::LibXSLT)
     LIBREQUIRED:
     for my $LibRequired (qw(XML::LibXML XML::LibXSLT)) {
-        my $LibFound = $Kernel::OM->Get('Kernel::System::Main')->Require($LibRequired);
+        my $LibFound = $Kernel::OM->Get('Main')->Require($LibRequired);
         next LIBREQUIRED if $LibFound;
 
         return $Self->{DebuggerObject}->Error(
@@ -166,7 +166,7 @@ sub Map {
     #  http://stackoverflow.com/questions/12182129/convert-string-to-hash-using-libxml-in-perl
 
     # convert data to xml structure
-    $Kernel::OM->Get('Kernel::System::Main')->Require('XML::Simple');
+    $Kernel::OM->Get('Main')->Require('XML::Simple');
     my $XMLSimple = XML::Simple->new();
     my $XMLPre;
     eval {

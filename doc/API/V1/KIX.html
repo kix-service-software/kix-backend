@@ -775,6 +775,58 @@ pre code {
                   }
                ],
                "readOnly" : true
+            },
+            "Plugins" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Description" : {
+                        "type" : "string"
+                     },
+                     "ExtendedData" : {
+                        "description" : "a key-value list of additional attributes",
+                        "type" : "object"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     },
+                     "Requires" : {
+                        "type" : "string"
+                     },
+                     "Version" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "BuildNumber",
+                     "Product"
+                  ]
+               }
+            },
+            "Requires" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Operator" : {
+                        "description" : "supported operators: &lt;, &gt;, =, !",
+                        "type" : "string"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Product"
+                  ]
+               }
             }
          },
          "required" : [
@@ -834,6 +886,58 @@ pre code {
             },
             "NotificationURL" : {
                "type" : "string"
+            },
+            "Plugins" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Description" : {
+                        "type" : "string"
+                     },
+                     "ExtendedData" : {
+                        "description" : "a key-value list of additional attributes",
+                        "type" : "object"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     },
+                     "Requires" : {
+                        "type" : "string"
+                     },
+                     "Version" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "BuildNumber",
+                     "Product"
+                  ]
+               }
+            },
+            "Requires" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Operator" : {
+                        "description" : "supported operators: &lt;, &gt;, =, !",
+                        "type" : "string"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Product"
+                  ]
+               }
             },
             "Tanslations" : {
                "type" : "array",
@@ -984,6 +1088,58 @@ pre code {
                   }
                ],
                "readOnly" : true
+            },
+            "Plugins" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Description" : {
+                        "type" : "string"
+                     },
+                     "ExtendedData" : {
+                        "description" : "a key-value list of additional attributes",
+                        "type" : "object"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     },
+                     "Requires" : {
+                        "type" : "string"
+                     },
+                     "Version" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "BuildNumber",
+                     "Product"
+                  ]
+               }
+            },
+            "Requires" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Operator" : {
+                        "description" : "supported operators: &lt;, &gt;, =, !",
+                        "type" : "string"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Product"
+                  ]
+               }
             }
          },
          "required" : [
@@ -9970,6 +10126,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "State" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateID" : {
                "type" : "integer",
                "readOnly" : true
@@ -9980,6 +10140,7 @@ pre code {
             "StartTime",
             "ID",
             "JobID",
+            "State",
             "StateID"
          ]
       }
@@ -9995,6 +10156,7 @@ pre code {
             "JobID": 293,
             "Logs": [],
             "StartTime": "2019-11-25 16:55:26",
+            "State": "warning",
             "StateID": 3
         },
         {
@@ -10005,6 +10167,7 @@ pre code {
             "JobID": 293,
             "Logs": [],
             "StartTime": "2019-11-25 17:11:28",
+            "State": "finished",
             "StateID": 2
         }
     ]    

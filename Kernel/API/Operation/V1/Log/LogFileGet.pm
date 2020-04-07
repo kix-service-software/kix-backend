@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::LogFile::LogFileGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::LogFile::LogFileGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $LogFileID ( @{$Param{Data}->{LogFileID}} ) {
 
         # get the LogFile data
-        my %LogFileData = $Kernel::OM->Get('Kernel::System::LogFile')->LogFileGet(
+        my %LogFileData = $Kernel::OM->Get('LogFile')->LogFileGet(
             ID        => $LogFileID,
             NoContent => $Param{Data}->{include}->{Content} ? 0 : 1
         );

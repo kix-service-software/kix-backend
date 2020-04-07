@@ -15,8 +15,8 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $DBObject  = $Kernel::OM->Get('Kernel::System::DB');
-my $XMLObject = $Kernel::OM->Get('Kernel::System::XML');
+my $DBObject  = $Kernel::OM->Get('DB');
+my $XMLObject = $Kernel::OM->Get('XML');
 
 # ------------------------------------------------------------ #
 # QueryCondition tests

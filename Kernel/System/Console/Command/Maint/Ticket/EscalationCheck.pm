@@ -18,9 +18,9 @@ use List::Util qw(first);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
+    'Config',
+    'Ticket',
+    'Time',
 );
 
 sub Configure {
@@ -63,11 +63,11 @@ sub Run {
     $Self->Print("<yellow>Processing ticket escalation events ...</yellow>\n");
 
     # get needed objects
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $TimeObject   = $Kernel::OM->Get('Kernel::System::Time');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
+    my $TimeObject   = $Kernel::OM->Get('Time');
 
     # the decay time is configured in minutes
-    my $DecayTimeInSeconds = $Kernel::OM->Get('Kernel::Config')->Get('EscalationEvents::DecayTime') || 0;
+    my $DecayTimeInSeconds = $Kernel::OM->Get('Config')->Get('EscalationEvents::DecayTime') || 0;
     $DecayTimeInSeconds *= 60;
 
     # check if it's a escalation or escalation notification

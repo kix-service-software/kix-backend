@@ -22,7 +22,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub Configure {
@@ -99,13 +99,13 @@ sub Run {
         my $Cwd = cwd();
         chdir "$SchemaDirectory";
 
-        my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => ".",
             Filter    => '*.json'
         );
 
-        my $JSONObject =$Kernel::OM->Get('Kernel::System::JSON');
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $JSONObject =$Kernel::OM->Get('JSON');
+        my $MainObject = $Kernel::OM->Get('Main');
         my $ValidatorObject = JSON::Validator->new();
 
         foreach my $File ( @Files ) {
@@ -200,13 +200,13 @@ sub Run {
     if ( -d "$ExampleDirectory" && -d "$TargetDirectory/schemas") {
         $Self->Print("validating examples\n");
 
-        my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => "$ExampleDirectory",
             Filter    => '*.json'
         );
 
-        my $JSONObject =$Kernel::OM->Get('Kernel::System::JSON');
-        my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+        my $JSONObject =$Kernel::OM->Get('JSON');
+        my $MainObject = $Kernel::OM->Get('Main');
         my $ValidatorObject = JSON::Validator->new();
 
         foreach my $File ( @Files ) {

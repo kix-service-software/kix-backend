@@ -16,8 +16,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -78,7 +78,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -123,7 +123,7 @@ sub Search {
         push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

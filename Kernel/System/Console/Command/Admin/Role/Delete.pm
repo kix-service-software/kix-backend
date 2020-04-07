@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
+    'Role',
 );
 
 sub Configure {
@@ -42,7 +42,7 @@ sub PreRun {
     $Self->{RoleName} = $Self->GetOption('name');
 
     # check role
-    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
+    $Self->{RoleID} = $Kernel::OM->Get('Role')->RoleLookup( Role => $Self->{RoleName} );
     if ( !$Self->{RoleID} ) {
         die "Role $Self->{RoleName} does not exist.\n";
     }
@@ -55,7 +55,7 @@ sub Run {
 
     $Self->Print("<yellow>Delete a role...</yellow>\n");
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleDelete(
+    my $Success = $Kernel::OM->Get('Role')->RoleDelete(
         ID     => $Self->{RoleID},
         UserID => 1,
     );

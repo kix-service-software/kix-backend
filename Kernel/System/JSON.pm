@@ -24,7 +24,7 @@ BEGIN {
 use JSON;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -47,7 +47,7 @@ create a JSON object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $JSONObject = $Kernel::OM->Get('Kernel::System::JSON');
+    my $JSONObject = $Kernel::OM->Get('JSON');
 
 =cut
 
@@ -78,7 +78,7 @@ sub Encode {
 
     # check for needed data
     if ( !defined $Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Data!',
         );
@@ -144,7 +144,7 @@ sub Decode {
     # use eval here, as JSON::XS->decode() dies when providing a malformed JSON string
     if ( !eval { $Scalar = $JSONObject->decode( $Param{Data} ) } ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Decoding the JSON string failed: ' . $@,
         );

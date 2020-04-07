@@ -20,18 +20,18 @@ use Kernel::System::PostMaster;
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject    = $Kernel::OM->Get('Kernel::Config');
-my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
-my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
-my $TicketObject    = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject    = $Kernel::OM->Get('Config');
+my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
+my $MainObject      = $Kernel::OM->Get('Main');
+my $TicketObject    = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set config
 $ConfigObject->Set(
@@ -50,7 +50,7 @@ $ConfigObject->Set(
 
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # check if gpg is located there
@@ -73,7 +73,7 @@ if ( !-e $ConfigObject->Get('PGP::Bin') ) {
 }
 
 # create local crypt object
-my $PGPObject = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+my $PGPObject = $Kernel::OM->Get('Crypt::PGP');
 
 if ( !$PGPObject ) {
     print STDERR "NOTICE: No PGP support!\n";

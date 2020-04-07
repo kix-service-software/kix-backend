@@ -19,7 +19,7 @@ use Kernel::System::WebUserAgent;
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $TestNumber     = 1;
 my $TimeOut        = $ConfigObject->Get('Package::Timeout');
@@ -179,7 +179,7 @@ for my $Test (@Tests) {
 
         $Self->Is(
             ref $WebUserAgentObject,
-            'Kernel::System::WebUserAgent',
+            'WebUserAgent',
             "$Test->{Name} - WebUserAgent object creation",
         );
 

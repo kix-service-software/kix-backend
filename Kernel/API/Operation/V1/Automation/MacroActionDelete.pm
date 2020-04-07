@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
     
     # check if macro exists
-    my %Macro = $Kernel::OM->Get('Kernel::System::Automation')->MacroGet(
+    my %Macro = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
     );
 
@@ -125,7 +125,7 @@ sub Run {
     foreach my $MacroActionID ( @{$Param{Data}->{MacroActionID}} ) {
 
         # check if macro action belongs to the given macro
-        my %MacroAction = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionGet(
+        my %MacroAction = $Kernel::OM->Get('Automation')->MacroActionGet(
             ID      => $MacroActionID,
             UserID  => $Self->{Authorization}->{UserID},
         );
@@ -136,7 +136,7 @@ sub Run {
         }
 
         # delete macro action
-        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionDelete(
+        my $Success = $Kernel::OM->Get('Automation')->MacroActionDelete(
             ID      => $MacroActionID,
             UserID  => $Self->{Authorization}->{UserID},
         );

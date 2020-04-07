@@ -108,7 +108,7 @@ sub Run {
     foreach my $NotificationID ( @{ $Param{Data}->{NotificationID} } ) {
 
         # check if Notification exists
-        my %NotificationData = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet(
+        my %NotificationData = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
             ID => $NotificationID,
         );
         if ( !IsHashRefWithData(\%NotificationData) ) {
@@ -118,7 +118,7 @@ sub Run {
         }
 
         # delete Notification
-        my $Success = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationDelete(
+        my $Success = $Kernel::OM->Get('NotificationEvent')->NotificationDelete(
             ID     => $NotificationID,
             UserID => $Self->{Authorization}->{UserID}
         );

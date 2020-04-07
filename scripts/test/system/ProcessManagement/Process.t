@@ -17,25 +17,25 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-my $QueueObject   = $Kernel::OM->Get('Kernel::System::Queue');
-my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Process');
+my $ConfigObject  = $Kernel::OM->Get('Config');
+my $QueueObject   = $Kernel::OM->Get('Queue');
+my $ProcessObject = $Kernel::OM->Get('ProcessManagement::Process');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create common objects to be used in ActivityDialog object creation
 my %CommonObject;
-$CommonObject{ActivityObject}         = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity');
-$CommonObject{ActivityDialogObject}   = $Kernel::OM->Get('Kernel::System::ProcessManagement::ActivityDialog');
-$CommonObject{TransitionObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::Transition');
-$CommonObject{TransitionActionObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction');
-$CommonObject{TicketObject}           = $Kernel::OM->Get('Kernel::System::Ticket');
+$CommonObject{ActivityObject}         = $Kernel::OM->Get('ProcessManagement::Activity');
+$CommonObject{ActivityDialogObject}   = $Kernel::OM->Get('ProcessManagement::ActivityDialog');
+$CommonObject{TransitionObject}       = $Kernel::OM->Get('ProcessManagement::Transition');
+$CommonObject{TransitionActionObject} = $Kernel::OM->Get('ProcessManagement::TransitionAction');
+$CommonObject{TicketObject}           = $Kernel::OM->Get('Ticket');
 
 # define needed variables
 my $RandomID = $Helper->GetRandomID();
@@ -98,7 +98,7 @@ $Self->IsNot(
 my $TestContactLogin = $Helper->TestContactCreate();
 
 # Get ServiceObject.
-my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
+my $ServiceObject = $Kernel::OM->Get('Service');
 
 my $ServiceID = $ServiceObject->ServiceAdd(
     Name    => $RandomID,
@@ -119,7 +119,7 @@ $ServiceObject->ContactServiceMemberAdd(
     UserID            => 1,
 );
 
-my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLAAdd(
+my $SLAID = $Kernel::OM->Get('SLA')->SLAAdd(
     ServiceIDs => [$ServiceID],
 # ---
 # ITSMCore
@@ -1686,7 +1686,7 @@ my @Tests = (
                     'TA1' => {
                         Name => 'Queue Move',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                            'ProcessManagement::TransitionAction::TicketQueueSet',
                         Config => {
                             Queue => $QueueData1{Name},
                         },
@@ -1695,7 +1695,7 @@ my @Tests = (
                     'TA2' => {
                         Name => 'Queue Move',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                            'ProcessManagement::TransitionAction::TicketQueueSet',
                         Config => {
                             Queue => $QueueData2{Name},
                         },
@@ -1704,7 +1704,7 @@ my @Tests = (
                     'TA3' => {
                         Name => 'Queue Move',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                            'ProcessManagement::TransitionAction::TicketQueueSet',
                         Config => {
                             Queue => $QueueData3{Name},
                         },
@@ -1850,7 +1850,7 @@ my @Tests = (
                     'TA1' => {
                         Name => 'Queue Move',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                            'ProcessManagement::TransitionAction::TicketQueueSet',
                         Config => {
                             Queue => $QueueData1{Name},
                         },
@@ -1859,7 +1859,7 @@ my @Tests = (
                     'TA2' => {
                         Name => 'Queue Move',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                            'ProcessManagement::TransitionAction::TicketQueueSet',
                         Config => {
                             Queue => $QueueData2{Name},
                         },
@@ -1868,7 +1868,7 @@ my @Tests = (
                     'TA3' => {
                         Name => 'Queue Move',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                            'ProcessManagement::TransitionAction::TicketQueueSet',
                         Config => {
                             Queue => $QueueData3{Name},
                         },
@@ -1955,7 +1955,7 @@ my @Tests = (
                     'TA1' => {
                         Name => 'Service Set',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketServiceSet',
+                            'ProcessManagement::TransitionAction::TicketServiceSet',
                         Config => {
                             ServiceID => $ServiceID,
                         },
@@ -1964,7 +1964,7 @@ my @Tests = (
                     'TA2' => {
                         Name => 'SLA Set',
                         Module =>
-                            'Kernel::System::ProcessManagement::TransitionAction::TicketSLASet',
+                            'ProcessManagement::TransitionAction::TicketSLASet',
                         Config => {
                             SLAID => $SLAID,
                         },

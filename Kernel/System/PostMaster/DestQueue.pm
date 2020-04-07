@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Queue',
-    'Kernel::System::SystemAddress',
+    'Config',
+    'Log',
+    'Queue',
+    'SystemAddress',
 );
 
 sub new {
@@ -56,7 +56,7 @@ sub GetQueueID {
     }
 
     # get system address object
-    my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
+    my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
 
     # get addresses
     my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine( Line => $Recipient );
@@ -77,7 +77,7 @@ sub GetQueueID {
             Name => $Address,
         );
         if ( $SystemAddressID ) {
-            $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
                 SystemAddressID => $SystemAddressID
             );
         }
@@ -85,14 +85,14 @@ sub GetQueueID {
         # debug
         if ( $Self->{Debug} > 1 ) {
             if ($QueueID) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'debug',
                     Message =>
                         "Match email: $Email to QueueID $QueueID (MessageID:$GetParam{'Message-ID'})!",
                 );
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'debug',
                     Message  => "Does not match email: $Email (MessageID:$GetParam{'Message-ID'})!",
                 );
@@ -104,9 +104,9 @@ sub GetQueueID {
 
     return $QueueID if $QueueID;
 
-    my $Queue = $Kernel::OM->Get('Kernel::Config')->Get('PostmasterDefaultQueue');
+    my $Queue = $Kernel::OM->Get('Config')->Get('PostmasterDefaultQueue');
 
-    return $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+    return $Kernel::OM->Get('Queue')->QueueLookup(
         Queue => $Queue,
     ) || 1;
 }
@@ -120,7 +120,7 @@ sub GetTrustedQueueID {
     return if !$GetParam{'X-KIX-Queue'};
 
     if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message =>
                 "There exists a X-KIX-Queue header: $GetParam{'X-KIX-Queue'} (MessageID:$GetParam{'Message-ID'})!",
@@ -128,7 +128,7 @@ sub GetTrustedQueueID {
     }
 
     # get dest queue
-    return $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+    return $Kernel::OM->Get('Queue')->QueueLookup(
         Queue => $GetParam{'X-KIX-Queue'},
     );
 

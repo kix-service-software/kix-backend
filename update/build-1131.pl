@@ -25,17 +25,17 @@ use Kernel::System::EmailParser;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1131.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1131',
     },
 );
-my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
 sub _SetAgents() {
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     $LogObject->Log(
         Priority => "info",
         Message  => "Setting new agent flag for current agents..."
@@ -51,7 +51,7 @@ sub _SetAgents() {
 }
 
 sub _MigrateUserInfoToContact() {
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     $LogObject->Log(
         Priority => "info",
         Message  => "Migrating user info to table 'contact'..."
@@ -150,7 +150,7 @@ sub _MigrateUserInfoToContact() {
 
 sub _MigrateContactInfoToUsers {
     #contact without an password are not migrated. they remain as a conact without an user.
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     $LogObject->Log(
         Priority => "info",
         Message  => "Migrating contact login info into table 'users'..."
@@ -235,7 +235,7 @@ sub _MigrateContactInfoToUsers {
 }
 
 sub _PrepareAndValidateTableOrganisation {
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     #change_by and create_by have missing foreign key constrains --> validate before adding constrains
     $LogObject->Log(
         Priority => "info",
@@ -295,7 +295,7 @@ sub _PrepareAndValidateTableOrganisation {
 }
 
 sub _PrepareAndValidateTableTicket {
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     $LogObject->Log(
         Priority => "info",
         Message  => "Validating organisation IDs in table 'ticket'..."
@@ -413,7 +413,7 @@ sub _PrepareAndValidateTableTicket {
 }
 
 sub _PopulateContactOrganisationMappingTable {
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     $LogObject->Log(
         Priority => "info",

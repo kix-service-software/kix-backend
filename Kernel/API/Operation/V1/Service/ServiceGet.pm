@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Service::ServiceGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Service::ServiceGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $ServiceID ( @{$Param{Data}->{ServiceID}} ) {
 
         # get the Service data
-        my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
+        my %ServiceData = $Kernel::OM->Get('Service')->ServiceGet(
             ServiceID => $ServiceID,
             IncidentState => $Param{Data}->{include}->{IncidentState} || 0,
             UserID  => $Self->{Authorization}->{UserID},
@@ -146,7 +146,7 @@ sub Run {
         
         # include SubServices if requested
         if ( $Param{Data}->{include}->{SubServices} ) {
-            my %SubServiceList = $Kernel::OM->Get('Kernel::System::Service')->GetAllSubServices(
+            my %SubServiceList = $Kernel::OM->Get('Service')->GetAllSubServices(
                 ServiceID => $ServiceID,
             );
 

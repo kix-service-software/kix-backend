@@ -13,15 +13,15 @@ use utf8;
 use vars (qw($Self));
 
 # get TranslationLanguage object
-my $TranslationObject = $Kernel::OM->Get('Kernel::System::Translation');
+my $TranslationObject = $Kernel::OM->Get('Translation');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 ########################################################################################################################################
 # Pattern handling

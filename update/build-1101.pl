@@ -23,8 +23,8 @@ use Kernel::System::VariableCheck qw(:all);
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1101.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1101',
     },
 );
 
@@ -38,7 +38,7 @@ exit 0;
 sub _CreateDynamicFields {
     my ( $Self, %Param ) = @_;
 
-    $Self->{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
+    $Self->{DynamicFieldObject} = $Kernel::OM->Get('DynamicField');
 
     # get all current dynamic fields
     my $DynamicFieldList = $Self->{DynamicFieldObject}->DynamicFieldListGet(
@@ -123,7 +123,7 @@ sub _GetDynamicFieldsDefinition {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # define possible values
     my %MobileProcessingStatePossibleValues = (

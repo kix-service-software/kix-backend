@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get StandardTemplate object
-my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
+my $StandardTemplateObject = $Kernel::OM->Get('StandardTemplate');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 

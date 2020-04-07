@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Contact',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -36,7 +36,7 @@ sub Run {
     # check needed stuff
     for (qw(TicketID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -46,10 +46,10 @@ sub Run {
 
     # disable output of customer company tickets if configured
     return
-        if $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::CustomerDisableCompanyTicketAccess');
+        if $Kernel::OM->Get('Config')->Get('Ticket::Frontend::CustomerDisableCompanyTicketAccess');
 
     # get ticket data
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Param{TicketID},
         DynamicFields => 0,
     );
@@ -58,7 +58,7 @@ sub Run {
     return if !$Ticket{CustomerID};
 
     # get customer user object
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my $ContactObject = $Kernel::OM->Get('Contact');
 
     # check customer id
     my %CustomerData = $ContactObject->ContactGet(

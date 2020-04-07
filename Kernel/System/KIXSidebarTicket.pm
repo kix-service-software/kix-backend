@@ -14,9 +14,9 @@ use warnings;
 use utf8;
 
 our @ObjectDependencies = (
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket'
+    'LinkObject',
+    'Log',
+    'Ticket'
 );
 
 sub new {
@@ -26,9 +26,9 @@ sub new {
     my $Self = {%Param};
     bless( $Self, $Type );
 
-    $Self->{LinkObject}   = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{LinkObject}   = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{TicketObject} = $Kernel::OM->Get('Ticket');
 
     return $Self;
 }

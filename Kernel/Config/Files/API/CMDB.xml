@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ClassID</Item>
                 <Item Key="ResponseSchema">ConfigItemClassResponse</Item>
@@ -20,6 +21,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ConfigItemClassCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_classes</Item>
@@ -32,6 +34,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ConfigItemClassPostRequest</Item>
                 <Item Key="ResponseSchema">ConfigItemClassPostPatchResponse</Item>
@@ -43,6 +46,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ConfigItemClassPatchRequest</Item>
                 <Item Key="ResponseSchema">ConfigItemClassPostPatchResponse</Item>
@@ -54,6 +58,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -64,6 +69,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDefinitionGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassDefinitionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
                 <Item Key="ResponseSchema">ConfigItemClassDefinitionResponse</Item>
@@ -77,6 +83,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDefinitionSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassDefinitionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">DefinitionID</Item>
                 <Item Key="ResponseSchema">ConfigItemClassDefinitionCollectionResponse</Item>
@@ -90,6 +97,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDefinitionDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassDefinitionDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -99,6 +107,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ClassDefinitionCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ClassDefinitionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ConfigItemClassDefinitionPostRequest</Item>
                 <Item Key="ResponseSchema">ConfigItemClassDefinitionPostResponse</Item>
@@ -111,6 +120,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ConfigItemID</Item>
                 <Item Key="ResponseSchema">ConfigItemResponse</Item>
@@ -124,6 +134,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ConfigItemCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
@@ -136,6 +147,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ConfigItemPostRequest</Item>
                 <Item Key="ResponseSchema">ConfigItemPostPatchResponse</Item>
@@ -147,6 +159,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ConfigItemPatchRequest</Item>
                 <Item Key="ResponseSchema">ConfigItemPostPatchResponse</Item>
@@ -158,6 +171,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -168,6 +182,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemVersionGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemVersionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">VersionID</Item>
                 <Item Key="ResponseSchema">ConfigItemVersionResponse</Item>
@@ -181,6 +196,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemVersionSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemVersionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ConfigItemVersionCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
@@ -193,6 +209,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemVersionCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemVersionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ConfigItemVersionPostRequest</Item>
                 <Item Key="ResponseSchema">ConfigItemVersionPostResponse</Item>
@@ -205,6 +222,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemImageGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemImageGet</Item>
                 <Item Key="APIImage">V1</Item>
                 <Item Key="ObjectID">ImageID</Item>
                 <Item Key="ResponseSchema">ConfigItemImageResponse</Item>
@@ -218,6 +236,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemImageSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemImageSearch</Item>
                 <Item Key="APIImage">V1</Item>
                 <Item Key="ResponseSchema">ConfigItemImageCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
@@ -230,6 +249,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemImageCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemImageCreate</Item>
                 <Item Key="APIImage">V1</Item>
                 <Item Key="RequestSchema">ConfigItemImagePostRequest</Item>
                 <Item Key="ResponseSchema">ConfigItemImagePostResponse</Item>
@@ -241,6 +261,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemImageDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemImageDelete</Item>
                 <Item Key="APIImage">V1</Item>
                 <Item Key="Controller">CMDB</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -253,6 +274,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemHistoryGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemHistoryGet</Item>
                 <Item Key="APIHistory">V1</Item>
                 <Item Key="ObjectID">HistoryID</Item>
                 <Item Key="ResponseSchema">ConfigItemHistoryResponse</Item>
@@ -266,6 +288,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemHistorySearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemHistorySearch</Item>
                 <Item Key="APIHistory">V1</Item>
                 <Item Key="ResponseSchema">ConfigItemHistoryCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
@@ -279,6 +302,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ConfigItemAttachmentGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemAttachmentGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
                 <Item Key="ResponseSchema">ConfigItemAttachmentResponse</Item>

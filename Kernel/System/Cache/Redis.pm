@@ -20,10 +20,10 @@ umask 002;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Encode',
+    'Log',
+    'Main',
 );
 
 use vars qw(@ISA);
@@ -36,7 +36,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     $Self->{Config} = $ConfigObject->Get('Cache::Module::Redis');
     if ( $Self->{Config} ) {
@@ -51,7 +51,7 @@ sub Set {
 
     for my $Needed (qw(Type Key Value TTL)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -85,7 +85,7 @@ sub Set {
     );
 
     if ( $Self->{Config}->{Debug} ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
+        $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
     }
 
     return $Result;
@@ -97,7 +97,7 @@ sub Get {
     # check needed stuff
     for (qw(Type Key)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -111,7 +111,7 @@ sub Get {
     );
 
     if ($Value && $Self->{Config}->{Debug} ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: get() for key \"$PreparedKey\" returned value");
+        $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: get() for key \"$PreparedKey\" returned value");
     }
 
     return $Value if !$Value || substr($Value, 0, 10) ne '__base64::';
@@ -127,7 +127,7 @@ sub Delete {
     # check needed stuff
     for (qw(Type Key)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
@@ -152,15 +152,15 @@ sub CleanUp {
 
         if ( $Self->{Config}->{Debug} ) {
             use Data::Dumper;
-            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: deleting keys of type \"$Param{Type}\": ".Dumper(\@Keys));
+            $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: deleting keys of type \"$Param{Type}\": ".Dumper(\@Keys));
         }
 
         # delete keys
         my $OK = $Self->{RedisObject}->del(@Keys);
 
         if ( $Self->{Config}->{Debug} ) {
-            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executed del() for $KeyCount keys of type \"$Param{Type}\" (deleted $OK/$KeyCount)");
-            $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
+            $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: executed del() for $KeyCount keys of type \"$Param{Type}\" (deleted $OK/$KeyCount)");
+            $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
         }
         return 1;
     }
@@ -181,7 +181,7 @@ sub CleanUp {
         } 
         else {
             if ( $Self->{Config}->{Debug} ) {
-                $Kernel::OM->Get('Kernel::System::Cache')->_Debug(0, "    Redis: executing flushall()");
+                $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: executing flushall()");
             }
             return $Self->{RedisObject}->flushall();
         }        
@@ -230,7 +230,7 @@ sub _prepareRedisKey {
     }
 
     my $Key = $Param{Key};
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Key );
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$Key );
     $Key = Digest::MD5::md5_hex($Key);
     $Key = $Param{Type} . '::' . $Key;
     return $Key;

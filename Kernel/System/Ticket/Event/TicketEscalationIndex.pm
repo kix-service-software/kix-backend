@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -34,7 +34,7 @@ sub Run {
     # check needed stuff
     for (qw(Data Event Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -43,7 +43,7 @@ sub Run {
     }
     for (qw(TicketID)) {
         if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_ in Data!"
             );
@@ -51,7 +51,7 @@ sub Run {
         }
     }
 
-    $Kernel::OM->Get('Kernel::System::Ticket')->TicketEscalationIndexBuild(
+    $Kernel::OM->Get('Ticket')->TicketEscalationIndexBuild(
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Param{UserID},
     );

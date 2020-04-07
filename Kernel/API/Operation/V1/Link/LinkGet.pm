@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Link::LinkGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Link::LinkGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $LinkID ( @{$Param{Data}->{LinkID}} ) {
 
         # get the Link data
-        my %LinkData = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkGet(
+        my %LinkData = $Kernel::OM->Get('LinkObject')->LinkGet(
             LinkID => $LinkID,
             UserID  => $Self->{Authorization}->{UserID},
         );

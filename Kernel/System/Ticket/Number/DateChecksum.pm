@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'Log',
+    'Main',
+    'Time',
 );
 
 sub TicketCreateNumber {
@@ -28,9 +28,9 @@ sub TicketCreateNumber {
     }
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-    my $TimeObject   = $Kernel::OM->Get('Kernel::System::Time');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $MainObject   = $Kernel::OM->Get('Main');
+    my $TimeObject   = $Kernel::OM->Get('Time');
 
     # get needed config options
     my $CounterLog = $ConfigObject->Get('Ticket::CounterLog');
@@ -56,7 +56,7 @@ sub TicketCreateNumber {
 
             # just debug
             if ( $Self->{Debug} > 0 ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'debug',
                     Message  => "Read counter from $CounterLog: $Count",
                 );
@@ -83,7 +83,7 @@ sub TicketCreateNumber {
     if ($Write) {
 
         if ( $Self->{Debug} > 0 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => "Write counter: $Count",
             );
@@ -129,7 +129,7 @@ sub TicketCreateNumber {
         if ( $Self->{LoopProtectionCounter} >= 16000 ) {
 
             # loop protection
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "CounterLoopProtection is now $Self->{LoopProtectionCounter}!"
                     . " Stopped TicketCreateNumber()!",
@@ -138,7 +138,7 @@ sub TicketCreateNumber {
         }
 
         # create new ticket number again
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Tn ($Tn) exists! Creating a new one.",
         );
@@ -157,7 +157,7 @@ sub GetTNByString {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get needed config options
     my $CheckSystemID = $ConfigObject->Get('Ticket::NumberGenerator::CheckSystemID');
@@ -191,7 +191,7 @@ sub GetTNArrayByString {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get needed config options
     my $CheckSystemID = $ConfigObject->Get('Ticket::NumberGenerator::CheckSystemID');

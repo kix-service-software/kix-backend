@@ -78,7 +78,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+    my %BackendList = $Kernel::OM->Get('MailAccount')->MailAccountBackendList();
     my @Types = sort keys %BackendList;
 
     return {
@@ -164,7 +164,7 @@ sub Run {
     }
 
     # create MailAccount
-    my $MailAccountID = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountAdd(
+    my $MailAccountID = $Kernel::OM->Get('MailAccount')->MailAccountAdd(
         Login         => $MailAccount->{Login},
         Password      => $MailAccount->{Password},
         Host          => $MailAccount->{Host},

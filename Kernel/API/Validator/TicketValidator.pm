@@ -103,7 +103,7 @@ sub Validate {
     my $Found;
     if ( $Param{Attribute} eq 'TicketID' ) {
         if ( $Param{Data}->{$Param{Attribute}} =~ /\d+/ ) {
-            $Found = $Kernel::OM->Get('Kernel::System::Ticket')->TicketNumberLookup(
+            $Found = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
                 TicketID => $Param{Data}->{$Param{Attribute}},
                 UserID   => 1,
             );        

@@ -16,8 +16,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -77,14 +77,14 @@ sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
 
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('Ticket::ArchiveSystem') ) {
+    if ( !$Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         # do nothing if archive system is not used
         return;
     }
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -98,7 +98,7 @@ sub Search {
         push( @SQLWhere, 'st.archive_flag IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

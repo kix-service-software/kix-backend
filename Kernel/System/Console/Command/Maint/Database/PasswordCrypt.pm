@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
+    'DB',
 );
 
 sub Configure {
@@ -38,7 +38,7 @@ sub Run {
 
     my $Password = $Self->GetArgument('password');
     chomp $Password;
-    my $CryptedString = $Kernel::OM->Get('Kernel::System::DB')->_Encrypt($Password);
+    my $CryptedString = $Kernel::OM->Get('DB')->_Encrypt($Password);
 
     $Self->Print(
         "<red>Please note that this just makes the password unreadable but is not a secure form of encryption.</red>\n"

@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -56,7 +56,7 @@ sub FollowUpTypeList {
     my $CacheKey = 'FollowUpTypeList::' . $Valid;
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -68,17 +68,17 @@ sub FollowUpTypeList {
         $SQL .= ' WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL => $SQL,
     );
 
     my %Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{$Row[0]} = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
@@ -116,7 +116,7 @@ sub FollowUpTypeGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -125,13 +125,13 @@ sub FollowUpTypeGet {
 
     # check cache
     my $CacheKey = 'FollowUpTypeGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => "SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM follow_up_possible WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -139,7 +139,7 @@ sub FollowUpTypeGet {
     my %Result;
     
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
             ID         => $Row[0],
             Name       => $Row[1],
@@ -154,7 +154,7 @@ sub FollowUpTypeGet {
     
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "FollowUpType with ID $Param{ID} not found!",
         );
@@ -162,7 +162,7 @@ sub FollowUpTypeGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -187,7 +187,7 @@ sub GetFollowUpOption {
 
     # check needed stuff
     if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need QueueID!'
         );
@@ -195,7 +195,7 @@ sub GetFollowUpOption {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # fetch queues data
     return if !$DBObject->Prepare(
@@ -228,7 +228,7 @@ sub GetFollowUpLockOption {
 
     # check needed stuff
     if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need QueueID!'
         );

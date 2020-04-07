@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Daemon::DaemonModules::BaseTaskWorker);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -37,7 +37,7 @@ This task handler executes scheduler generic asynchronous tasks.
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TaskHandlerObject = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor');
+    my $TaskHandlerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor');
 
 =cut
 
@@ -93,7 +93,7 @@ sub Run {
         $LocalObject = $Kernel::OM->Get( $Param{Data}->{Object} );
     };
     if ( !$LocalObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not create a new object $Param{Data}->{Object}! - Task: $Param{TaskName}",
         );
@@ -103,7 +103,7 @@ sub Run {
 
     # Check if the module provide the required function().
     if ( !$LocalObject->can( $Param{Data}->{Function} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$Param{Data}->{Object} does not provide $Param{Data}->{Function}()! - Task: $Param{TaskName}",
         );

@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::TicketGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TicketID</Item>
                 <Item Key="ResponseSchema">TicketResponse</Item>
@@ -21,6 +22,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::TicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
@@ -33,6 +35,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::TicketCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketPostRequest</Item>
                 <Item Key="ResponseSchema">TicketPostPatchResponse</Item>
@@ -44,6 +47,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::TicketUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketPatchRequest</Item>
                 <Item Key="ResponseSchema">TicketPostPatchResponse</Item>
@@ -55,6 +59,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::TicketDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -93,6 +98,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ArticleID</Item>
                 <Item Key="ResponseSchema">TicketArticleResponse</Item>
@@ -106,6 +112,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketArticleCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
@@ -118,6 +125,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketArticlePostRequest</Item>
                 <Item Key="ResponseSchema">TicketArticlePostPatchResponse</Item>
@@ -129,6 +137,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketArticlePatchRequest</Item>
                 <Item Key="ResponseSchema">TicketArticlePostPatchResponse</Item>
@@ -140,6 +149,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -174,6 +184,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleAttachmentGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">AttachmentID</Item>
                 <Item Key="ResponseSchema">TicketArticleAttachmentResponse</Item>
@@ -187,6 +198,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleAttachmentSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketArticleAttachmentCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
@@ -199,6 +211,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleAttachmentCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketArticleAttachmentPostRequest</Item>
                 <Item Key="ResponseSchema">TicketArticleAttachmentPostResponse</Item>
@@ -211,6 +224,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleFlagGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">FlagName</Item>
                 <Item Key="ResponseSchema">TicketArticleFlagResponse</Item>
@@ -224,6 +238,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleFlagSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketArticleFlagCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
@@ -236,6 +251,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleFlagCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketArticleFlagPostRequest</Item>
                 <Item Key="ResponseSchema">TicketArticleFlagPostPatchResponse</Item>
@@ -247,6 +263,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleFlagUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleFlagUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketArticleFlagPostRequest</Item>
                 <Item Key="ResponseSchema">TicketArticleFlagPostPatchResponse</Item>
@@ -259,6 +276,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">HistoryGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::HistoryGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">HistoryID</Item>
                 <Item Key="ResponseSchema">TicketHistoryResponse</Item>
@@ -272,6 +290,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">HistorySearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::HistorySearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketHistoryCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
@@ -285,6 +304,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ChecklistID</Item>
                 <Item Key="ResponseSchema">TicketChecklistResponse</Item>
@@ -298,6 +318,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketChecklistCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
@@ -310,6 +331,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketChecklistPostRequest</Item>
                 <Item Key="ResponseSchema">TicketChecklistPostPatchResponse</Item>
@@ -321,6 +343,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TicketChecklistPatchRequest</Item>
                 <Item Key="ResponseSchema">TicketChecklistPostPatchResponse</Item>
@@ -332,6 +355,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ChecklistDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -342,6 +366,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ArticleAttachmentZipGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ArticleAttachmentZipGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketArticleAttachmentZipResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>

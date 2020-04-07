@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SenderTypeGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SenderType::SenderTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">SenderTypeID</Item>
                 <Item Key="ResponseSchema">SenderTypeResponse</Item>
@@ -17,6 +18,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">SenderTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::SenderType::SenderTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">SenderTypeCollectionResponse</Item>
             </Hash>

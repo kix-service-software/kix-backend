@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
+    'DB',
 );
 
 sub Configure {
@@ -30,7 +30,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # print database information
     my $DatabaseDSN  = $DBObject->{DSN};

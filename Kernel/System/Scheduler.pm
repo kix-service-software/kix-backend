@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Daemon::SchedulerDB',
-    'Kernel::System::Log',
+    'Daemon::SchedulerDB',
+    'Log',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create a scheduler object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SchedulerObject = $Kernel::OM->Get('Kernel::System::Scheduler');
+    my $SchedulerObject = $Kernel::OM->Get('Scheduler');
 
 =cut
 
@@ -78,7 +78,7 @@ sub TaskAdd {
     # check needed stuff
     for my $Key (qw(Type Data)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -88,7 +88,7 @@ sub TaskAdd {
     }
 
     # get scheduler database object
-    my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+    my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
     my $TaskID;
     if ( $Param{ExecutionTime} ) {
@@ -133,7 +133,7 @@ Returns:
 sub FutureTaskList {
     my ( $Self, %Param ) = @_;
 
-    my @List = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskList(%Param);
+    my @List = $Kernel::OM->Get('Daemon::SchedulerDB')->FutureTaskList(%Param);
 
     return @List;
 }
@@ -153,14 +153,14 @@ sub FutureTaskDelete {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TaskID!',
         );
         return;
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskDelete(%Param);
+    my $Success = $Kernel::OM->Get('Daemon::SchedulerDB')->FutureTaskDelete(%Param);
 
     return $Success;
 }

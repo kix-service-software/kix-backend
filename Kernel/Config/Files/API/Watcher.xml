@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Watcher::WatcherSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">WatcherCollectionResponse</Item>
                 <Item Key="CacheType">API_watchers</Item>
@@ -18,6 +19,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Watcher::WatcherGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">WatcherID</Item>
                 <Item Key="ResponseSchema">WatcherResponse</Item>
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Watcher::WatcherCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">WatcherPostRequest</Item>
                 <Item Key="ResponseSchema">WatcherPostResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Watcher::WatcherDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

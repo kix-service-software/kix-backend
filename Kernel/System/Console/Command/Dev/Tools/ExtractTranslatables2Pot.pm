@@ -22,11 +22,11 @@ use Storable ();
 use Kernel::Language;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Main',
+    'SysConfig',
+    'Time',
 );
 
 our $DisableWarnings = 0;
@@ -44,7 +44,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Home}    = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    $Self->{Home}    = $Kernel::OM->Get('Config')->Get('Home');
     $Self->{POTFile} = "$Self->{Home}/locale/templates.pot";
 
     $Self->Print("<yellow>gathering Translatables and updating templates.pot file...</yellow>\n\n");
@@ -107,7 +107,7 @@ sub WritePOTFile {
 
     my $Package = 'KIX';
 
-    my $TimeObject   = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject   = $Kernel::OM->Get('Time');
     my $CreationDate = $TimeObject->SystemTime2TimeStamp(
         SystemTime => $TimeObject->SystemTime(),
     );
@@ -132,7 +132,7 @@ sub WritePOTFile {
     for my $Translatable ( sort { "$Param{TranslationStrings}->{$a}$a" cmp "$Param{TranslationStrings}->{$b}$b" } keys %{ $Param{TranslationStrings} } ) {
         my $String = $Translatable;
         $String =~ s/\\/\\\\/g;
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$String );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$String );
 
         push @POTEntries, Locale::PO->new(
             -msgid     => $String,
@@ -155,7 +155,7 @@ sub _ExtractFromTemplateFiles {
     my %UsedWords;
     my $Directory = "$Self->{Home}/Kernel/Output/HTML/Templates";
 
-    my @TemplateList = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @TemplateList = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Directory,
         Filter    => '*.tt',
         Recursive => 1,
@@ -166,7 +166,7 @@ sub _ExtractFromTemplateFiles {
     for my $File (@TemplateList) {
         my $Count = 0;
 
-        my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
             Mode     => 'utf8',
         );
@@ -213,7 +213,7 @@ sub _ExtractFromPerlFiles {
 
     $Self->Print("\n<yellow>extracting perl files...</yellow>\n");
 
-    my @PerlModuleList = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @PerlModuleList = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => "$Self->{Home}/Kernel",
         Filter    => '*.pm',
         Recursive => 1,
@@ -225,7 +225,7 @@ sub _ExtractFromPerlFiles {
 
         next FILE if ( $File =~ m{cpan-lib}xms );
 
-        my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
             Mode     => 'utf8',
         );
@@ -288,7 +288,7 @@ sub _ExtractFromXMLFiles {
 
     $Self->Print("\n<yellow>extracting $Param{Source} XML files...</yellow>\n");
 
-    my @DBXMLFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @DBXMLFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Param{Directory},
         Filter    => '*.xml',
         Recursive => 1
@@ -298,7 +298,7 @@ sub _ExtractFromXMLFiles {
     for my $File (@DBXMLFiles) {
         my $Count = 0;
 
-        my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
             Mode     => 'utf8',
         );

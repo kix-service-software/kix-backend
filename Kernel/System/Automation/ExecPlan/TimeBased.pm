@@ -20,12 +20,12 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -84,7 +84,7 @@ sub Validate {
 
     # check needed stuff
     if ( !$Param{Config} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Config!',
         );
@@ -121,7 +121,7 @@ sub Run {
     # check needed stuff
     for (qw(Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -132,10 +132,10 @@ sub Run {
     return 0 if !IsHashRefWithData($Param{Config}) || !IsArrayRefWithData($Param{Config}->{Weekday}) || !IsArrayRefWithData($Param{Config}->{Time});
 
     # convert given time to system time and split
-    my $CheckSystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+    my $CheckSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Param{Time}
     );
-    my ($Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay) = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
+    my ($Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay) = $Kernel::OM->Get('Time')->SystemTime2Date(
         SystemTime => $CheckSystemTime
     );
 
@@ -151,12 +151,12 @@ sub Run {
     return 0 if !$CanExecute;
 
     # check time
-    my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear ) = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
-        SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime()
+    my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear ) = $Kernel::OM->Get('Time')->SystemTime2Date(
+        SystemTime => $Kernel::OM->Get('Time')->SystemTime()
     );
     my $LastRunSystemTime = 0;
     if ( $Param{LastExecutionTime} ) {
-        $LastRunSystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        $LastRunSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $Param{LastExecutionTime}
         );
     }
@@ -164,7 +164,7 @@ sub Run {
     $CanExecute = 0;
     foreach my $Time ( @{$Param{Config}->{Time}} ) {
         # calculate time of next run 
-        my $NextRunSystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        my $NextRunSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => "$CurrYear-$CurrMonth-$CurrDay ".$Time.':00'
         );
         # ignore if next run time is not after the last job run

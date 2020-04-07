@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Cache::Delete');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Cache::Delete');
 
 my ( $Result, $ExitCode );
 
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create cache object and disable inmemory caching to force
 # the cache to read from file system
-my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+my $CacheObject = $Kernel::OM->Get('Cache');
 $CacheObject->Configure(
     CacheInMemory => 0,
 );

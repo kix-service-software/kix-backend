@@ -17,17 +17,17 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $GroupObject  = $Kernel::OM->Get('Kernel::System::Group');
-my $UserObject   = $Kernel::OM->Get('Kernel::System::User');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $GroupObject  = $Kernel::OM->Get('Group');
+my $UserObject   = $Kernel::OM->Get('User');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define a testing environment, set defined processes to be easy to compare, this are done in memory
 #   no changes to the real system configuration
@@ -906,7 +906,7 @@ for my $Test (@Tests) {
             $UserType = 'Not Affected User';
         }
 
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         # validate the ProcessList with stored ACLs
         my $ACL = $TicketObject->TicketAcl(

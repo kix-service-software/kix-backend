@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $ConfigObject->Set(
     Key   => 'Ticket::ArchiveSystem',
@@ -31,7 +31,7 @@ $ConfigObject->Set(
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 my @Tests = (
     {
@@ -148,7 +148,7 @@ for my $Test (@Tests) {
     );
 
     # subscribe user to ticket
-    my $Success = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherAdd(
+    my $Success = $Kernel::OM->Get('Watcher')->WatcherAdd(
         Object      => 'Ticket',
         ObjectID    => $TicketID,
         WatchUserID => 1,
@@ -160,7 +160,7 @@ for my $Test (@Tests) {
         "$Test->{Name} - subscribe watcher",
     );
 
-    my @Watchers = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherList(
+    my @Watchers = $Kernel::OM->Get('Watcher')->WatcherList(
         ObjectType  => 'Ticket',
         ObjectID    => $TicketID,
     );

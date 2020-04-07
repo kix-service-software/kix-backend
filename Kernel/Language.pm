@@ -19,10 +19,10 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(Translatable);    ## no critic
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'Log',
+    'Main',
+    'Time',
 );
 
 my @DAYS = qw/Sun Mon Tue Wed Thu Fri Sat/;
@@ -48,11 +48,11 @@ create a language object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::Language' => {
+        'Language' => {
             UserLanguage => 'de',
         },
     );
-    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+    my $LanguageObject = $Kernel::OM->Get('Language');
 
 =cut
 
@@ -67,8 +67,8 @@ sub new {
     $Self->{Debug} = 0;
 
     # get needed object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $MainObject   = $Kernel::OM->Get('Main');
 
     # check if LanguageDebug is configured
     if ( $ConfigObject->Get('LanguageDebug') ) {
@@ -91,7 +91,7 @@ sub new {
 
     # Debug
     if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'Debug',
             Message  => "UserLanguage = $Self->{UserLanguage}",
         );
@@ -99,7 +99,7 @@ sub new {
 
     # load text catalog ...
     if ( !$MainObject->Require("Kernel::Language::$Self->{UserLanguage}") ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => "Sorry, can't locate or load Kernel::Language::$Self->{UserLanguage} "
                 . "translation! Check the Kernel/Language/$Self->{UserLanguage}.pm (perl -cw)!",
@@ -114,7 +114,7 @@ sub new {
 
         # debug info
         if ( $Self->{Debug} > 0 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'Debug',
                 Message  => "Kernel::Language::$Self->{UserLanguage} load ... done.",
             );
@@ -174,7 +174,7 @@ sub new {
 
             # load translation module
             if ( !$MainObject->Require($File) ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'Error',
                     Message  => "Sorry, can't load $File! " . "Check the $File (perl -cw)!",
                 );
@@ -189,7 +189,7 @@ sub new {
 
                 # debug info
                 if ( $Self->{Debug} > 0 ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'Debug',
                         Message  => "$File load ... done.",
                     );
@@ -208,7 +208,7 @@ sub new {
 
                 # debug info
                 if ( $Self->{Debug} > 0 ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'Debug',
                         Message  => "Kernel::Language::$Self->{UserLanguage}_Custom load ... done.",
                     );
@@ -302,7 +302,7 @@ sub Get {
 
         # Debug
         if ( $Self->{Debug} > 3 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'Debug',
                 Message  => "->Get('$What') = ('$Self->{Translation}->{$What}').",
             );
@@ -334,7 +334,7 @@ sub Get {
 
     # warn if the value is not def
     if ( $Self->{Debug} > 1 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "->Get('$What') Is not translated!!!",
         );
@@ -402,7 +402,7 @@ sub FormatTimeString {
         my $ReturnString = $Self->{$Config} || "$Config needs to be translated!";
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         my $TimeStamp = $TimeObject->TimeStamp2SystemTime(
             String => "$Y-$M-$D $h:$m:$s",
@@ -440,7 +440,7 @@ sub FormatTimeString {
 
     # Invalid string passed? (don't log for ISO dates)
     if ( $String !~ /^(\d{2}:\d{2}:\d{2})$/ ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "No FormatTimeString() translation found for '$String' string!",
         );
@@ -535,7 +535,7 @@ sub Time {
     # check needed stuff
     for (qw(Action Format)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -549,7 +549,7 @@ sub Time {
     if ( lc $Param{Action} eq 'get' ) {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         ( $s, $m, $h, $D, $M, $Y, $WD, $YD, $DST ) = $TimeObject->SystemTime2Date(
             SystemTime => $TimeObject->SystemTime(),

@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'LockID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
+        $Found = $Kernel::OM->Get('Lock')->LockLookup(
             LockID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Lock' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
+        $Found = $Kernel::OM->Get('Lock')->LockLookup(
             Lock => $Param{Data}->{$Param{Attribute}},
         );        
     }

@@ -12,8 +12,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -36,7 +36,7 @@ create a Document object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $DocumentObject = $Kernel::OM->Get('Kernel::System::DocumentField');
+    my $DocumentObject = $Kernel::OM->Get('DocumentField');
 
 =cut
 
@@ -48,9 +48,9 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{MainObject}   = $Kernel::OM->Get('Kernel::System::Main');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{MainObject}   = $Kernel::OM->Get('Main');
 
     $Self->{Config} = $Self->{ConfigObject}->Get('Document');
 
@@ -166,7 +166,7 @@ sub DocumentLinkGet {
     my %LinkData;
     if ( $Permission eq 'Access' ) {
         $LinkData{URL}
-            = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->{Baselink} . 'Action=AgentLinkObjectUtils;Subaction=DownloadDocument;DocumentID='
+            = $Kernel::OM->Get('Output::HTML::Layout')->{Baselink} . 'Action=AgentLinkObjectUtils;Subaction=DownloadDocument;DocumentID='
             . $Param{DocumentBackendID} . ':'
             . $Param{DocumentID};
     }

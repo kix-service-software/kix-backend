@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ArticleUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ArticleUpdate');
 
     return $Self;
 }
@@ -149,7 +149,7 @@ sub Run {
     );
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Article = $TicketObject->ArticleGet(
         ArticleID     => $Param{Data}->{ArticleID},
@@ -214,7 +214,7 @@ sub _ArticleUpdate {
 
     my $Article = $Param{Article};
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # update normal attributes
     foreach my $Attribute ( qw(Subject Body From ChannelID Channel CustomerVisible SenderType SenderTypeID) ) {

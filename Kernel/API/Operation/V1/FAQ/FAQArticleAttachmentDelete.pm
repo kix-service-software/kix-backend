@@ -114,7 +114,7 @@ sub Run {
     foreach my $FAQAttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
         # delete FAQArticleAttachment        
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentDelete(
+        my $Success = $Kernel::OM->Get('FAQ')->AttachmentDelete(
             ItemID => $Param{Data}->{FAQArticleID},
             FileID => $FAQAttachmentID,
             UserID => $Self->{Authorization}->{UserID},

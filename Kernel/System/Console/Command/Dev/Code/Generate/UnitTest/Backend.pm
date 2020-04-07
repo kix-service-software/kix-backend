@@ -19,9 +19,9 @@ use File::Basename ();
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
-    'Kernel::Output::HTML::Layout',
+    'Config',
+    'Main',
+    'Output::HTML::Layout',
 );
 
 sub Configure {
@@ -58,7 +58,7 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my $TargetHome      = $Home;
     my $ModuleDirectory = $Self->GetOption('module-directory');
@@ -72,7 +72,7 @@ sub Run {
     my $SkeletonFile = __FILE__;
     $SkeletonFile =~ s{Backend\.pm$}{Backend/Backend.t.skel}xms;
 
-    my $SkeletonTemplate = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $SkeletonTemplate = $Kernel::OM->Get('Main')->FileRead(
         Location => $SkeletonFile,
     );
     if ( !$SkeletonTemplate || !${$SkeletonTemplate} ) {
@@ -80,7 +80,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $Skeleton = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->Output(
+    my $Skeleton = $Kernel::OM->Get('Output::HTML::Layout')->Output(
         Template => ${$SkeletonTemplate},
     );
 
@@ -96,7 +96,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $Success = $Kernel::OM->Get('Main')->FileWrite(
         Location => $TargetLocation,
         Content  => \$Skeleton,
     );

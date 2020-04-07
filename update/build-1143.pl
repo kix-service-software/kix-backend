@@ -20,29 +20,44 @@ use File::Path qw(mkpath);
 
 use Kernel::System::ObjectManager;
 
+use Kernel::System::VariableCheck qw(:all);
+
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1079.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1143',
     },
 );
 
 use vars qw(%INC);
 
-# remove obsolete permission type 'Object'
-_RemovePermissionTypeObject();
+# adjust notifaction for new ticket
+_ReconfigureNotificationCreateArticle();
 
 exit 0;
 
 
-sub _RemovePermissionTypeObject {
-    # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+sub _ReconfigureNotificationCreateArticle {
 
-    # get all ticket watchers
-    return if !$DBObject->Do(
-        SQL => "DELETE FROM permission_type WHERE name IN ('Object')",
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my %Notification = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
+        Name => 'Customer - New Ticket Receipt'
     );
+
+    if( %Notification ) {
+
+        # prevent article create for notification
+        if ( IsArrayRefWithData( $Notification{Data}->{CreateArticle} ) ) {
+            $Notification{Data}->{CreateArticle} = ['0'];
+            $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
+                ID => $Notification{ID},
+                %Notification,
+                UserID => 1
+            )
+        }
+    }
 
     return 1;
 }

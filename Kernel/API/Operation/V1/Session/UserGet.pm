@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Session::UserGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Session::UserGet');
 
     return $Self;
 }
@@ -91,7 +91,7 @@ sub Run {
 
     # get the user data
     my %UserData;
-    %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    %UserData = $Kernel::OM->Get('User')->GetUserData(
         UserID        => $Self->{Authorization}->{UserID},
         NoPreferences => 1
     );
@@ -181,9 +181,9 @@ sub Run {
     if ($Param{Data}->{include}->{RoleIDs}) {
 
         # get roles list
-        my @RoleList = $Kernel::OM->Get('Kernel::System::User')->RoleList(
+        my @RoleList = $Kernel::OM->Get('User')->RoleList(
             UserID => $Self->{Authorization}->{UserID},
-        );
+        )
         my @RoleIDs;
         foreach my $RoleID (sort @RoleList) {
             push(@RoleIDs, 0 + $RoleID); # enforce nummeric ID
@@ -193,7 +193,7 @@ sub Run {
 
     #FIXME: workaoround KIX2018-3308
     $Self->AddCacheDependency(Type => 'Contact');
-    my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         UserID => $Self->{Authorization}->{UserID},
     );
     $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
@@ -225,7 +225,7 @@ sub _GetOwnedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => \@Filter
         },
@@ -259,7 +259,7 @@ sub _GetOwnedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => \@Filter
         },
@@ -300,7 +300,7 @@ sub _GetOwnedAndLockedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => \@Filter
         },
@@ -338,7 +338,7 @@ sub _GetOwnedAndLockedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => \@Filter
         },
@@ -374,7 +374,7 @@ sub _GetWatchedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => \@Filter
         },
@@ -407,7 +407,7 @@ sub _GetWatchedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => \@Filter
         },

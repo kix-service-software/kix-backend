@@ -15,19 +15,19 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $CacheObject        = $Kernel::OM->Get('Kernel::System::Cache');
-my $ContactObject      = $Kernel::OM->Get('Kernel::System::Contact');
-my $OrganisationObject = $Kernel::OM->Get('Kernel::System::Organisation');
-my $DBObject           = $Kernel::OM->Get('Kernel::System::DB');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $CacheObject        = $Kernel::OM->Get('Cache');
+my $ContactObject      = $Kernel::OM->Get('Contact');
+my $OrganisationObject = $Kernel::OM->Get('Organisation');
+my $DBObject           = $Kernel::OM->Get('DB');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # add three users
 $ConfigObject->Set(
@@ -183,8 +183,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     # START CaseSensitive
     $ConfigObject->{Contact}->{Params}->{SearchCaseSensitive} = 1;
 
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Contact'] );
-    $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    $Kernel::OM->ObjectsDiscard( Objects => ['Contact'] );
+    $ContactObject = $Kernel::OM->Get('Contact');
 
     $CacheObject->CleanUp();
 

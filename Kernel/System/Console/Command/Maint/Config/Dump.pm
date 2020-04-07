@@ -17,7 +17,7 @@ use utf8;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub Configure {
@@ -39,7 +39,7 @@ sub Run {
 
     my $Key = $Self->GetArgument('name');
     chomp $Key;
-    my $Value = $Kernel::OM->Get('Kernel::Config')->Get($Key);
+    my $Value = $Kernel::OM->Get('Config')->Get($Key);
 
     if ( !defined $Value ) {
         $Self->PrintError("The config setting $Key could not be found.");

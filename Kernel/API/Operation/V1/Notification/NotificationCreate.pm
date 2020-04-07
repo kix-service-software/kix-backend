@@ -142,7 +142,7 @@ sub Run {
     my $Notification = $Self->_Trim( Data => $Param{Data}->{Notification} );
 
     # check if filter exists
-    my %Exists = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationGet( Name => $Notification->{Name} );
+    my %Exists = $Kernel::OM->Get('NotificationEvent')->NotificationGet( Name => $Notification->{Name} );
     if ( IsHashRefWithData(\%Exists) ) {
         return $Self->_Error( Code => 'Object.AlreadyExists' );
     }
@@ -156,7 +156,7 @@ sub Run {
     }
 
     # create Notification
-    my $NotificationID = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationAdd(
+    my $NotificationID = $Kernel::OM->Get('NotificationEvent')->NotificationAdd(
         Name    => $Notification->{Name},
         Comment => $Notification->{Comment} || '',
         Data    => $Notification->{Data} || {},

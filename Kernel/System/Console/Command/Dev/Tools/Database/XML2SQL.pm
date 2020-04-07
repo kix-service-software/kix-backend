@@ -16,10 +16,10 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Main',
-    'Kernel::System::XML',
+    'Config',
+    'DB',
+    'Main',
+    'XML',
 );
 
 sub Configure {
@@ -96,7 +96,7 @@ sub Run {
     my $SourceFilename = $Self->GetOption('source-path');
     my $SourceXML;
     if ($SourceFilename) {
-        my $FileStringRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $FileStringRef = $Kernel::OM->Get('Main')->FileRead(
             Location        => $SourceFilename,
             Mode            => 'utf8',
             Type            => 'Local',
@@ -115,19 +115,19 @@ sub Run {
 
         local $Kernel::OM = Kernel::System::ObjectManager->new();
 
-        $Kernel::OM->Get('Kernel::Config')->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Database::Type',
             Value => $DatabaseType,
         );
-        $Kernel::OM->Get('Kernel::Config')->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Database::ShellOutput',
             Value => 1,
         );
 
         # parse xml package
-        my @XMLARRAY = $Kernel::OM->Get('Kernel::System::XML')->XMLParse( String => $SourceXML );
+        my @XMLARRAY = $Kernel::OM->Get('XML')->XMLParse( String => $SourceXML );
 
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('DB');
 
         my $Head = $DBObject->{Backend}->{'DB::Comment'}
             . "----------------------------------------------------------\n";
@@ -199,7 +199,7 @@ sub Dump {
 
         $Self->Print("Writing: <yellow>$Filename</yellow>\n");
 
-        my $Written = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        my $Written = $Kernel::OM->Get('Main')->FileWrite(
             Location => $Filename,
             Content  => \$Content,
             Mode     => 'utf8',

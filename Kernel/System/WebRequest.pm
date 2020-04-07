@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Web::Request;
+package Kernel::System::WebRequest;
 
 use strict;
 use warnings;
@@ -18,14 +18,14 @@ use CGI::Carp;
 use File::Path qw();
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CheckItem',
-    'Kernel::System::Encode',
+    'Config',
+    'CheckItem',
+    'Encode',
 );
 
 =head1 NAME
 
-Kernel::System::Web::Request - global CGI interface
+Kernel::System::WebRequest - global CGI interface
 
 =head1 SYNOPSIS
 
@@ -43,13 +43,13 @@ create param object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::Web::Request' => {
+        'WebRequest' => {
             WebRequest   => CGI::Fast->new(), # optional, e. g. if fast cgi is used
         }
     );
-    my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
+    my $ParamObject = $Kernel::OM->Get('WebRequest');
 
-If Kernel::System::Web::Request is instantiated several times, they will share the
+If Kernel::System::WebRequest is instantiated several times, they will share the
 same CGI data (this can be helpful in filters which do not have access to the
 ParamObject, for example.
 
@@ -57,7 +57,7 @@ If you need to reset the CGI data before creating a new instance, use
 
     CGI::initialize_globals();
 
-before calling Kernel::System::Web::Request->new();
+before calling Kernel::System::WebRequest->new();
 
 =cut
 
@@ -69,7 +69,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # max 5 MB posts
     $CGI::POST_MAX = $ConfigObject->Get('WebMaxFileUpload') || 1024 * 1024 * 5;    ## no critic
@@ -127,7 +127,7 @@ sub GetParam {
         $Value = $Self->{Query}->url_param( $Param{Param} );
     }
 
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Value );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Value );
 
     my $Raw = defined $Param{Raw} ? $Param{Raw} : 0;
 
@@ -135,7 +135,7 @@ sub GetParam {
 
         # If it is a plain string, perform trimming
         if ( ref \$Value eq 'SCALAR' ) {
-            $Kernel::OM->Get('Kernel::System::CheckItem')->StringClean(
+            $Kernel::OM->Get('CheckItem')->StringClean(
                 StringRef => \$Value,
                 TrimLeft  => 1,
                 TrimRight => 1,
@@ -182,7 +182,7 @@ sub GetParamNames {
     }
 
     for my $Name (@ParamNames) {
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Name );
+        $Kernel::OM->Get('Encode')->EncodeInput( \$Name );
     }
 
     return @ParamNames;
@@ -211,14 +211,14 @@ sub GetArray {
         @Values = $Self->{Query}->url_param( $Param{Param} );
     }
 
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \@Values );
+    $Kernel::OM->Get('Encode')->EncodeInput( \@Values );
 
     my $Raw = defined $Param{Raw} ? $Param{Raw} : 0;
 
     if ( !$Raw ) {
 
         # get check item object
-        my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+        my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
         VALUE:
         for my $Value (@Values) {
@@ -264,7 +264,7 @@ sub GetUploadAll {
     my $UploadFilenameOrig = $Self->GetParam( Param => $Param{Param} ) || 'unknown';
 
     my $NewFileName = "$UploadFilenameOrig";    # use "" to get filename of anony. object
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$NewFileName );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$NewFileName );
 
     # replace all devices like c: or d: and dirs for IE!
     $NewFileName =~ s/.:\\(.*)/$1/g;

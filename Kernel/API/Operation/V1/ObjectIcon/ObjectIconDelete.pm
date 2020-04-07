@@ -110,7 +110,7 @@ sub Run {
     foreach my $ObjectIconID ( @{$Param{Data}->{ObjectIconID}} ) {
 
         # delete ObjectIcon	    
-        my $Success = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconDelete(
+        my $Success = $Kernel::OM->Get('ObjectIcon')->ObjectIconDelete(
             ID     => $ObjectIconID,
             UserID => $Self->{Authorization}->{UserID},
         );

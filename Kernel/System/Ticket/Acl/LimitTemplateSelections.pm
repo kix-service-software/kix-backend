@@ -12,14 +12,14 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Type',
-    'Kernel::System::Queue',
-    'Kernel::System::Service',
-    'Kernel::System::SLA',
-    'Kernel::System::Priority',
+    'Config',
+    'Log',
+    'Ticket',
+    'Type',
+    'Queue',
+    'Service',
+    'SLA',
+    'Priority',
 );
 
 sub new {
@@ -30,13 +30,13 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects...
-    $Self->{LogObject}      = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject}   = $Kernel::OM->Get('Kernel::System::Ticket');
-    $Self->{TypeObject}     = $Kernel::OM->Get('Kernel::System::Type');
-    $Self->{QueueObject}    = $Kernel::OM->Get('Kernel::System::Queue');
-    $Self->{ServiceObject}  = $Kernel::OM->Get('Kernel::System::Service');
-    $Self->{SLAObject}      = $Kernel::OM->Get('Kernel::System::SLA');
-    $Self->{PriorityObject} = $Kernel::OM->Get('Kernel::System::Priority');
+    $Self->{LogObject}      = $Kernel::OM->Get('Log');
+    $Self->{TicketObject}   = $Kernel::OM->Get('Ticket');
+    $Self->{TypeObject}     = $Kernel::OM->Get('Type');
+    $Self->{QueueObject}    = $Kernel::OM->Get('Queue');
+    $Self->{ServiceObject}  = $Kernel::OM->Get('Service');
+    $Self->{SLAObject}      = $Kernel::OM->Get('SLA');
+    $Self->{PriorityObject} = $Kernel::OM->Get('Priority');
 
     $Self->{PriorityList} = { $Self->{PriorityObject}->PriorityList() };
     $Self->{TypeList}     = { $Self->{TypeObject}->TypeList() };

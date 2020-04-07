@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Valid',
+    'Cache',
+    'DB',
+    'Log',
+    'Valid',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
+    my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
 
 =cut
 
@@ -51,7 +51,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
 
     $Self->{CacheType} = 'SystemAddress';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
@@ -79,7 +79,7 @@ sub SystemAddressAdd {
     # check needed stuff
     for my $Needed (qw(Name ValidID Realname UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -111,12 +111,12 @@ sub SystemAddressAdd {
         $ID = $Row[0];
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SystemAddress',
         ObjectID  => $ID,
@@ -152,7 +152,7 @@ sub SystemAddressGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID!"
         );
@@ -161,7 +161,7 @@ sub SystemAddressGet {
 
     my $CacheKey = 'SystemAddressGet::' . $Param{ID};
 
-    my $Cached = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cached = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -194,7 +194,7 @@ sub SystemAddressGet {
         );
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -225,7 +225,7 @@ sub SystemAddressUpdate {
     # check needed stuff
     for my $Needed (qw(ID Name ValidID Realname UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -243,12 +243,12 @@ sub SystemAddressUpdate {
     );
 
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SystemAddress',
         ObjectID  => $Param{ID},
@@ -285,7 +285,7 @@ sub SystemAddressList {
 
     my $CacheKey = 'SystemAddressList::' . $Valid;
 
-    my $Cached = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cached = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -296,7 +296,7 @@ sub SystemAddressList {
 
     my $ValidSQL = '';
     if ($Valid) {
-        my $ValidIDs = join ',', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        my $ValidIDs = join ',', $Kernel::OM->Get('Valid')->ValidIDsGet();
         $ValidSQL = " WHERE valid_id IN ($ValidIDs)";
     }
 
@@ -314,7 +314,7 @@ sub SystemAddressList {
         $List{ $Data[0] } = $Data[1];
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -344,7 +344,7 @@ sub SystemAddressIsLocalAddress {
     # check needed stuff
     for my $Needed (qw(Address)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -379,7 +379,7 @@ sub SystemAddressLookup {
 
     # check needed stuff
     if ( !$Param{SystemAddressID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SystemAddressID or Name!',
         );
@@ -388,20 +388,20 @@ sub SystemAddressLookup {
 
     my $CacheKey = 'SystemAddressLookup::' . ($Param{SystemAddressID} || '') . '::' . ($Param{Name} || '');
 
-    my $Cached = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cached = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cached if $Cached;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{SystemAddressID} ) {
         # lookup
         $DBObject->Prepare(
             SQL => "SELECT value0 FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) "
+                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) "
                 . "AND id = ?",        
             Bind  => [ \$Param{SystemAddressID}, ],
             Limit => 1,
@@ -413,7 +413,7 @@ sub SystemAddressLookup {
             $Name = $Row[0];
         }
 
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -427,7 +427,7 @@ sub SystemAddressLookup {
         # lookup
         $DBObject->Prepare(
             SQL => "SELECT id FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) "
+                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) "
                 . "AND value0 = ?",        
             Bind  => [ \$Param{Name} ],
             Limit => 1,
@@ -439,7 +439,7 @@ sub SystemAddressLookup {
             $SystemAddressID = $Row[0];
         }
         
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -456,7 +456,7 @@ sub SystemAddressDelete {
     # check needed stuff
     for (qw(SystemAddressID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -465,19 +465,19 @@ sub SystemAddressDelete {
     }
  
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM system_address WHERE id = ?',
         Bind => [ \$Param{SystemAddressID} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SystemAddress',
         ObjectID  => $Param{ID},

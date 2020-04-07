@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::StandardAttachmentUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::StandardAttachmentUpdate');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     );
     
     # check if StandardAttachment exists 
-    my %StandardAttachmentData = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentGet(
+    my %StandardAttachmentData = $Kernel::OM->Get('StdAttachment')->StdAttachmentGet(
         ID     => $Param{Data}->{AttachmentID},
     );
  
@@ -142,7 +142,7 @@ sub Run {
 
     # check if name already exists
     if ( $StandardAttachment->{Name} ) {
-        my $ID = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentLookup(
+        my $ID = $Kernel::OM->Get('StdAttachment')->StdAttachmentLookup(
             StdAttachment => $StandardAttachment->{Name},
         );
         
@@ -154,7 +154,7 @@ sub Run {
     }
 
     # update StandardAttachment
-    my $Success = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentUpdate(
+    my $Success = $Kernel::OM->Get('StdAttachment')->StdAttachmentUpdate(
         ID          => $Param{Data}->{AttachmentID},
         Name        => $StandardAttachment->{Name} || $StandardAttachmentData{Name},
         Content     => $StandardAttachment->{Content} || $StandardAttachmentData{Content},

@@ -112,7 +112,7 @@ sub Run {
     foreach my $PriorityID ( @{$Param{Data}->{PriorityID}} ) {
 
         # search ticket       
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
@@ -136,7 +136,7 @@ sub Run {
         }
 
         # delete Priority	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Priority')->PriorityDelete(
+        my $Success = $Kernel::OM->Get('Priority')->PriorityDelete(
             PriorityID  => $PriorityID,
             UserID  => $Self->{Authorization}->{UserID},
         );

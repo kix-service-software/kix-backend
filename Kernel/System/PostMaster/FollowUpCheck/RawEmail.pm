@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Ticket',
+    'Config',
+    'Ticket',
 );
 
 sub new {
@@ -33,7 +33,7 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @Result = $TicketObject->GetTNByString( $Self->{ParserObject}->GetPlainEmail() );
 

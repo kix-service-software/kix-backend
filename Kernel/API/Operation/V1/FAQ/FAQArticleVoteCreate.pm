@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticleCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQArticleCreate');
 
     return $Self;
 }
@@ -146,7 +146,7 @@ sub Run {
     );
     
     # everything is ok, let's create the Vote
-    my $VoteID = $Kernel::OM->Get('Kernel::System::FAQ')->VoteAdd(
+    my $VoteID = $Kernel::OM->Get('FAQ')->VoteAdd(
         ItemID      => $Param{Data}->{FAQArticleID},
         IP          => $FAQVote->{IPAddress},
         Interface   => $FAQVote->{Interface},

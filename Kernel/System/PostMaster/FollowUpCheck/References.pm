@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Ticket',
+    'Config',
+    'Ticket',
 );
 
 sub new {
@@ -36,7 +36,7 @@ sub Run {
     my @References = $Self->{ParserObject}->GetReferences();
     return if !@References;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @Result = ();
 

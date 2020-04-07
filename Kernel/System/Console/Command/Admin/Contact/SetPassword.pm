@@ -14,8 +14,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
+    'Config',
+    'Contact',
 );
 
 sub Configure {
@@ -43,7 +43,7 @@ sub Run {
 
     $Self->Print("<yellow>Setting password for contact '$Login'...</yellow>\n");
 
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my $ContactObject = $Kernel::OM->Get('Contact');
 
     # get contact
     my %ContactList = $ContactObject->ContactSearch(

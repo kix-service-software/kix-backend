@@ -16,15 +16,15 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $WebService = 'webservice' . $Helper->GetRandomID();
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 # test cases
 my @Tests = (
@@ -89,7 +89,7 @@ my @Tests = (
 );
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::WebService::Add');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::WebService::Add');
 
 for my $Test (@Tests) {
 

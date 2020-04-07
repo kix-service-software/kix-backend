@@ -16,9 +16,9 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
+    'Config',
+    'Cache',
+    'DB',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $WatcherObject = $Kernel::OM->Get('Kernel::System::Watcher');
+    my $WatcherObject = $Kernel::OM->Get('Watcher');
 
 =cut
 
@@ -81,7 +81,7 @@ sub WatcherAdd {
     # check needed stuff
     for my $Needed (qw(WatcherID Object ObjectID WatchUserID UserID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -90,15 +90,15 @@ sub WatcherAdd {
     }
 
     # get user data
-    my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %User = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Param{WatchUserID},
     );
 
-    my %UserContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %UserContact = $Kernel::OM->Get('Contact')->ContactGet(
         UserID => $Param{WatchUserID},
     );
  
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # add history
     $TicketObject->HistoryAdd(
@@ -143,7 +143,7 @@ sub WatcherDelete {
     # check needed stuff
     for my $Needed (qw(Object ObjectID WatchUserID UserID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -151,15 +151,15 @@ sub WatcherDelete {
         }
     }
 
-    my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %User = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Param{WatchUserID},
     );
 
-    my %UserContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %UserContact = $Kernel::OM->Get('Contact')->ContactGet(
         UserID => $Param{WatchUserID},
     );
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     $TicketObject->HistoryAdd(
         TicketID     => $Param{ObjectID},

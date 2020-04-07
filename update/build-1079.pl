@@ -22,45 +22,27 @@ use Kernel::System::ObjectManager;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-17.3.0.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1079',
     },
 );
 
 use vars qw(%INC);
 
-# migrate column object_id from varchar to integer
-_MigrateWatcherObjectID();
+# remove obsolete permission type 'Object'
+_RemovePermissionTypeObject();
 
 exit 0;
 
 
-sub _MigrateWatcherObjectID {
+sub _RemovePermissionTypeObject {
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get all ticket watchers
-    return if !$DBObject->Prepare(
-        SQL => 'SELECT id, object_id FROM watcher',
+    return if !$DBObject->Do(
+        SQL => "DELETE FROM permission_type WHERE name IN ('Object')",
     );
-
-    # fetch the result
-    my $Rows = $DBObject->FetchAllArrayRef(
-        Columns => [ 'ID', 'ObjectID' ],
-    );
-
-    foreach my $Row (@{$Rows}) {
-        my $Success = $DBObject->Do(
-            SQL  => "UPDATE watcher SET object_id_int = ? WHERE id = ?",
-            Bind => [ \$Row->{ObjectID}, \$Row->{ID} ],
-        );
-        if (!$Success) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to migrate watcher table!"
-            );
-        }
-    }
 
     return 1;
 }

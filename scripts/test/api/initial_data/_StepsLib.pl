@@ -84,7 +84,7 @@ Then qr/the response code is (\d+)/, sub {
 
 Then qr/the response object is (.*?)$/, sub {
   my $SchemaName = $1;
-  my $Schema = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+  my $Schema = $Kernel::OM->Get('Main')->FileRead(
      Directory => S->{API_SCHEMA_LOCATION},
      Filename  => $SchemaName .'.json'
   );

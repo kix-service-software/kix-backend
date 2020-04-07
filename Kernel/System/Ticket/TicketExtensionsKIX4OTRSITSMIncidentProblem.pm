@@ -27,9 +27,9 @@ sub TicketCriticalityStringGet {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $LayoutObject       = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $LayoutObject       = $Kernel::OM->Get('Output::HTML::Layout');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+    my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
 
     # init return value
     my $RetVal = "-";
@@ -70,9 +70,9 @@ sub TicketImpactStringGet {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $LayoutObject       = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $LayoutObject       = $Kernel::OM->Get('Output::HTML::Layout');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+    my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
 
     # init return value
     my $RetVal = "-";

@@ -130,6 +130,10 @@
                "type" : "string",
                "readOnly" : true
             },
+            "State" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateID" : {
                "type" : "integer",
                "readOnly" : true
@@ -140,6 +144,7 @@
             "StartTime",
             "ID",
             "JobID",
+            "State",
             "StateID"
          ]
       }

@@ -17,16 +17,16 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $CacheObject            = $Kernel::OM->Get('Kernel::System::Cache');
-my $TransitionActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
+my $CacheObject            = $Kernel::OM->Get('Cache');
+my $TransitionActionObject = $Kernel::OM->Get('ProcessManagement::DB::TransitionAction');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set fixed time
 $Helper->FixedTimeSet();
@@ -35,7 +35,7 @@ $Helper->FixedTimeSet();
 my $RandomID = $Helper->GetRandomID();
 my $UserID   = 1;
 
-my $EntityID = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity')->EntityIDGenerate(
+my $EntityID = $Kernel::OM->Get('ProcessManagement::DB::Entity')->EntityIDGenerate(
     EntityType => 'TransitionAction',
     UserID     => 1,
 );
@@ -95,7 +95,7 @@ my @Tests = (
             EntityID => $RandomID,
             Name     => "TransitionAction-$RandomID",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
             },
             UserID => $UserID,
         },
@@ -123,7 +123,7 @@ my @Tests = (
             EntityID => $RandomID,
             Name     => "TransitionAction-$RandomID",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
                 Config => {
                     Key1 => 'String',
                     Key2 => 2,
@@ -150,7 +150,7 @@ my @Tests = (
             Name     => "TransitionAction-$RandomID",
             Config   => {
                 Module => {
-                    String => 'Kernel::System::Process::Transition::Action::QueueMove',
+                    String => 'Process::Transition::Action::QueueMove',
                 },
                 Config => {
                     Key1 => 'String',
@@ -165,7 +165,7 @@ my @Tests = (
             EntityID => $RandomID,
             Name     => "TransitionAction-$RandomID",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
                 Config => 'Config',
             },
             UserID => $UserID,
@@ -178,7 +178,7 @@ my @Tests = (
             EntityID => $RandomID,
             Name     => "TransitionAction-$RandomID",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
                 Config => {
                     Key1 => 'String',
                     Key2 => 2,
@@ -194,7 +194,7 @@ my @Tests = (
             EntityID => $RandomID,
             Name     => "TransitionAction-$RandomID",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
                 Config => {
                     Key1 => 'String',
                     Key2 => 2,
@@ -210,7 +210,7 @@ my @Tests = (
             EntityID => "$RandomID-1",
             Name     => "TransitionAction-$RandomID--äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
                 Config => {
                     Key1 => '-äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ',
                     Key2 => 2,
@@ -226,7 +226,7 @@ my @Tests = (
             EntityID => "$RandomID-2",
             Name     => "TransitionAction-$RandomID--!Â§$%&/()=?Ã*ÃÃL:L@,.",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
                 Config => {
                     Key1 => '-!Â§$%&/()=?Ã*ÃÃL:L@,.',
                     Key2 => 2,
@@ -242,7 +242,7 @@ my @Tests = (
             EntityID => $EntityID,
             Name     => $EntityID,
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove',
+                Module => 'Process::Transition::Action::QueueMove',
                 Config => {
                     Key1 => '-!Â§$%&/()=?Ã*ÃÃL:L@,.',
                     Key2 => 2,
@@ -527,7 +527,7 @@ for my $Test (@Tests) {
             EntityID => $RandomID . '-U',
             Name     => "TransitionAction-$RandomID -U",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove-U',
+                Module => 'Process::Transition::Action::QueueMove-U',
                 Config => {
                     Key1 => 'String-U',
                     Key2 => 2,
@@ -545,7 +545,7 @@ for my $Test (@Tests) {
             EntityID => $RandomID . '-1-U',
             Name     => "TransitionAction-$RandomID -äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-U",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove-U',
+                Module => 'Process::Transition::Action::QueueMove-U',
                 Config => {
                     Key1 => '-äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-U',
                     Key2 => 2,
@@ -563,7 +563,7 @@ for my $Test (@Tests) {
             EntityID => $RandomID . '-2-U',
             Name     => "TransitionAction-$RandomID--!Â§$%&/()=?Ã*ÃÃL:L@,.-U",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove-U',
+                Module => 'Process::Transition::Action::QueueMove-U',
                 Config => {
                     Key1 => '-!Â§$%&/()=?Ã*ÃÃL:L@,.-U',
                     Key2 => 2,
@@ -581,7 +581,7 @@ for my $Test (@Tests) {
             EntityID => $RandomID . '-U',
             Name     => "TransitionAction-$RandomID -U",
             Config   => {
-                Module => 'Kernel::System::Process::Transition::Action::QueueMove-U',
+                Module => 'Process::Transition::Action::QueueMove-U',
                 Config => {
                     Key1 => 'String-U',
                     Key2 => 2,

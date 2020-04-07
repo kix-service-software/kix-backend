@@ -18,13 +18,13 @@ use File::Basename qw();
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
 # call Output() once so that the TT objects are created.
 $LayoutObject->Output( Template => '' );
@@ -32,10 +32,10 @@ $LayoutObject->Output( Template => '' );
 # now add this directory as include path to be able to use the test templates
 my $IncludePaths = $LayoutObject->{TemplateProviderObject}->include_path();
 unshift @{$IncludePaths},
-    $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/scripts/test/system/Layout/Template';
+    $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/Layout/Template';
 $LayoutObject->{TemplateProviderObject}->include_path($IncludePaths);
 
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 # uncached and cached
 for ( 1 .. 2 ) {

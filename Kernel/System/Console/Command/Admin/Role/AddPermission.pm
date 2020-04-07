@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
+    'Role',
 );
 
 sub Configure {
@@ -75,13 +75,13 @@ sub PreRun {
     $Self->{RoleName} = $Self->GetOption('role-name');
 
     # check permission type
-    $Self->{PermissionTypeID} = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
+    $Self->{PermissionTypeID} = $Kernel::OM->Get('Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
     if ( !$Self->{PermissionTypeID} ) {
         die "Permission type $Self->{PermissionType} does not exist.\n";
     }
 
     # check role
-    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
+    $Self->{RoleID} = $Kernel::OM->Get('Role')->RoleLookup( Role => $Self->{RoleName} );
     if ( !$Self->{RoleID} ) {
         die "Role $Self->{RoleName} does not exist.\n";
     }
@@ -104,7 +104,7 @@ sub Run {
 
     my $IsRequired = $Self->GetOption('required') || 'no';
 
-    my $PermissionID = $Kernel::OM->Get('Kernel::System::Role')->PermissionAdd(
+    my $PermissionID = $Kernel::OM->Get('Role')->PermissionAdd(
         RoleID     => $Self->{RoleID},
         TypeID     => $Self->{PermissionTypeID},
         Target     => $Self->GetOption('target') || '',

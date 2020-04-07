@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Organisation::OrganisationDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Organisation::OrganisationDelete');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $OrganisationID ( @{$Param{Data}->{OrganisationID}} ) {
 
         # get the Organisation data
-        my %OrganisationData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        my %OrganisationData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $OrganisationID,
         );
 
@@ -142,7 +142,7 @@ sub Run {
         }
 
         # delete contact
-        my $Success = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationDelete(
+        my $Success = $Kernel::OM->Get('Organisation')->OrganisationDelete(
             ID  => $OrganisationID,
         );
 

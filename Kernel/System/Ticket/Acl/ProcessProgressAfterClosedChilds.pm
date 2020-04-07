@@ -16,9 +16,9 @@ use utf8;
 # EO BPMX-capeIT
 
 our @ObjectDependencies = (
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'LinkObject',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -37,7 +37,7 @@ sub Run {
     # check needed stuff
     for (qw(Config Acl)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -49,7 +49,7 @@ sub Run {
     return 1 if !$Param{TicketID} || !$Param{UserID};
 
     # link tickets
-    my $Links = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkList(
+    my $Links = $Kernel::OM->Get('LinkObject')->LinkList(
         Object => 'Ticket',
         Key    => $Param{TicketID},
         State  => 'Valid',
@@ -71,7 +71,7 @@ sub Run {
     for my $TicketID ( sort keys %{ $Links->{Ticket}->{ParentChild}->{Target} } ) {
 
         # get ticket
-        my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID      => $TicketID,
             DynamicFields => 0,
         );

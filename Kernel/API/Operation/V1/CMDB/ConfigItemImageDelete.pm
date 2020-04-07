@@ -124,7 +124,7 @@ sub Run {
     }
 
     # get config item data
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID}
     );
 
@@ -138,7 +138,7 @@ sub Run {
        
     foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
 
-        my %Image = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageGet(
+        my %Image = $Kernel::OM->Get('ITSMConfigItem')->ImageGet(
             ConfigItemID => $Param{Data}->{ConfigItemID},
             ImageID      => $ImageID,
         );
@@ -150,7 +150,7 @@ sub Run {
             );
         }     
 
-        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageDelete(
+        my $Success = $Kernel::OM->Get('ITSMConfigItem')->ImageDelete(
             ConfigItemID => $Param{Data}->{ConfigItemID},
             ImageID      => $ImageID,
             UserID       => $Self->{Authorization}->{UserID}

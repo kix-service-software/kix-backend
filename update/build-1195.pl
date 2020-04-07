@@ -25,8 +25,8 @@ use Kernel::System::EmailParser;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1195.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1195',
     },
 );
 
@@ -35,7 +35,7 @@ use vars qw(%INC);
 sub _MigratePriorities {
     my ( $Self, %Param ) = @_;
     
-    $Self->{PriorityObject} = $Kernel::OM->Get('Kernel::System::Priority');
+    $Self->{PriorityObject} = $Kernel::OM->Get('Priority');
 
     $Self->{PriorityObject}->PriorityUpdate(
         PriorityID     => 1,
@@ -71,7 +71,7 @@ sub _MigratePriorities {
 sub _AddRecipientSubjectToNotifications {
     my ( $Self, %Param ) = @_;
 
-    $Self->{NotificationEventObject} = $Kernel::OM->Get('Kernel::System::NotificationEvent');
+    $Self->{NotificationEventObject} = $Kernel::OM->Get('NotificationEvent');
 
     # get all current notifications
     my %NotificationList = $Self->{NotificationEventObject}->NotificationList(

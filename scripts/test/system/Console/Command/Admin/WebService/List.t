@@ -16,16 +16,16 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $WebService = 'webservice' . $Helper->GetRandomID();
 
 # get web service object
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('GenericInterface::Webservice');
 
 # create a base web service
 my $WebServiceID = $WebserviceObject->WebserviceAdd(
@@ -45,7 +45,7 @@ my $WebServiceID = $WebserviceObject->WebserviceAdd(
 );
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::WebService::List');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::WebService::List');
 
 my ( $Result, $ExitCode );
 

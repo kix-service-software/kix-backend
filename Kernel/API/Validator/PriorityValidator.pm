@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'PriorityID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+        $Found = $Kernel::OM->Get('Priority')->PriorityLookup(
             PriorityID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Priority' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+        $Found = $Kernel::OM->Get('Priority')->PriorityLookup(
             Priority => $Param{Data}->{$Param{Attribute}},
         );        
     }

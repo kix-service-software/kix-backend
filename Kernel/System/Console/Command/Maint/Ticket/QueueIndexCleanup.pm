@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
+    'Config',
+    'DB',
 );
 
 sub Configure {
@@ -31,7 +31,7 @@ sub Configure {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    my $Module = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::IndexModule');
+    my $Module = $Kernel::OM->Get('Config')->Get('Ticket::IndexModule');
     if ( $Module =~ m{StaticDB} ) {
         my $Error = "$Module is the active queue index, aborting.\n";
         $Error .= "Use Maint::Ticket::QueueIndexRebuild to regenerate the active index.\n";
@@ -46,7 +46,7 @@ sub Run {
 
     $Self->Print("<yellow>Cleaning up ticket queue index...</yellow>\n");
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $Records;
 
@@ -68,7 +68,7 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM ticket_index',
     );
 

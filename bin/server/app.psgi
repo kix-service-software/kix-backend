@@ -23,13 +23,13 @@ use Fcntl qw(:flock);
 use FindBin qw($Bin);
 use lib "$Bin/../..";
 use lib "$Bin/../../Kernel/cpan-lib";
-use lib "$Bin/../../Custom";
+use lib "$Bin/../../plugins";
 
 use Kernel::API::Provider;
 use Kernel::System::ObjectManager;
 
 $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'API',
     },
 );
@@ -83,7 +83,7 @@ my $App = CGI::Emulate::PSGI->handler(
 
 sub _LockPID {
 	# create ConfigObject
-	my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+	my $ConfigObject = $Kernel::OM->Get('Config');
 
 	my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
 	my $PIDFile = $PIDDir . "service.pid";
@@ -104,14 +104,14 @@ sub _LockPID {
 	}
 
 	# create new PID file (set exclusive lock while writing the PIDFile)
-	open my $FH, '>', $PIDFile || die "Can not create PID file: $PIDFile\n";    ## no critic
+	open my $FH, '>', $PIDFile || die "Cannot create PID file: $PIDFile\n";    ## no critic
 	return if !flock( $FH, LOCK_EX | LOCK_NB );
 	print $FH $$;
 	close $FH;
 }
 
 sub _Autostart {
-    my $Result = $Kernel::OM->Get('Kernel::System::Autostart')->Run();
+    my $Result = $Kernel::OM->Get('Autostart')->Run();
  	if ( $Result ) {
 		print STDERR "At least one autostart module failed. Please see the KIX log for details.\n";
 		exit $Result;

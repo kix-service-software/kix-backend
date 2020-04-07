@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::AddressBook::AddressBookGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::AddressBook::AddressBookGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $AddressID ( @{$Param{Data}->{AddressID}} ) {
 
         # get the Address data
-        my %AddressData = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressGet(
+        my %AddressData = $Kernel::OM->Get('AddressBook')->AddressGet(
             AddressID => $AddressID,             
         );
 

@@ -16,13 +16,13 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::FAQ::Import');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::FAQ::Import');
 
 # test command without source argument
 my $ExitCode = $CommandObject->Execute();
@@ -33,7 +33,7 @@ $Self->Is(
     "Option - without source-path argument",
 );
 
-my $SourcePath = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/scripts/test/system/sample/FAQ.csv";
+my $SourcePath = $Kernel::OM->Get('Config')->Get('Home') . "/scripts/test/system/sample/FAQ.csv";
 
 # test command with source argument
 $ExitCode = $CommandObject->Execute( '--separator', ';', '--quote', '', $SourcePath );

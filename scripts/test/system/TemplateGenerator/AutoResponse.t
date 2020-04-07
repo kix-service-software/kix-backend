@@ -14,15 +14,15 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # force rich text editor
 my $Success = $ConfigObject->Set(
@@ -37,7 +37,7 @@ $Self->True(
 # use DoNotSendEmail email backend
 $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 $Self->True(
     $Success,
@@ -65,7 +65,7 @@ my $TestUserLoginDE = $Helper->TestContactCreate(
 );
 
 # get queue object
-my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+my $QueueObject = $Kernel::OM->Get('Queue');
 
 # create new queue
 my $QueueName     = 'Some::Queue' . $RandomID;
@@ -85,7 +85,7 @@ $Self->IsNot(
 );
 
 # get auto response object
-my $AutoResponseObject = $Kernel::OM->Get('Kernel::System::AutoResponse');
+my $AutoResponseObject = $Kernel::OM->Get('AutoResponse');
 
 # create new auto response
 my $AutoResonseName      = 'Some::AutoResponse' . $RandomID;
@@ -118,7 +118,7 @@ $Self->True(
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create a new ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -159,7 +159,7 @@ my @Tests = (
 );
 
 # get template generator object
-my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
+my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
 for my $Test (@Tests) {
 

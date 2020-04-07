@@ -18,9 +18,9 @@ use Scalar::Util;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'DB',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -71,7 +71,7 @@ sub PostValueSet {
     # check needed stuff
     for my $Needed (qw(DynamicFieldConfig ObjectID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -81,7 +81,7 @@ sub PostValueSet {
 
     # check DynamicFieldConfig (general)
     if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The field configuration is invalid",
         );
@@ -91,7 +91,7 @@ sub PostValueSet {
     # check DynamicFieldConfig (internally)
     for my $Needed (qw(ID FieldType ObjectType)) {
         if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed in DynamicFieldConfig!",
             );
@@ -102,7 +102,7 @@ sub PostValueSet {
     # Don't hold a permanent reference to the TicketObject.
     #   This is because the TicketObject has a Kernel::DynamicField::Backend object, which has this
     #   object, which has a TicketObject again. Without weaken() we'd have a cyclic reference.
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Article = $TicketObject->ArticleGet(
         ArticleID     => $Param{ObjectID},
@@ -110,7 +110,7 @@ sub PostValueSet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # update change time
     return if !$DBObject->Do(

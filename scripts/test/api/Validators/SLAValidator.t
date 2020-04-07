@@ -32,14 +32,14 @@ my $ValidatorObject = Kernel::API::Validator::SLAValidator->new(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create SLA
-my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLAAdd(
+my $SLAID = $Kernel::OM->Get('SLA')->SLAAdd(
         Name    => 'TestSLA-Unittest',
         ValidID => 1,
         TypeID  => 10,

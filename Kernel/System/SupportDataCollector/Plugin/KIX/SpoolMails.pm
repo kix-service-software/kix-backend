@@ -16,8 +16,8 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
+    'Config',
+    'Main',
 );
 
 sub GetDisplayPath {
@@ -27,10 +27,10 @@ sub GetDisplayPath {
 sub Run {
     my $Self = shift;
 
-    my $Home     = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home     = $Kernel::OM->Get('Config')->Get('Home');
     my $SpoolDir = "$Home/var/spool";
 
-    my @SpoolMails = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @SpoolMails = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $SpoolDir,
         Filter    => '*',
     );

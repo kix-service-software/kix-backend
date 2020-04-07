@@ -16,13 +16,13 @@ use warnings;
 use FindBin qw($Bin);
 use lib "$Bin/../..";
 use lib "$Bin/../../Kernel/cpan-lib";
-use lib "$Bin/../../Custom";
+use lib "$Bin/../../plugins";
 
 use Kernel::API::Provider;
 use Kernel::System::ObjectManager;
 
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'API',
     },
 );

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ObjectIconUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ObjectIconUpdate');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     );   
 
     # check if ObjectIcon entry exists
-    my %ObjectIconData = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconGet(
+    my %ObjectIconData = $Kernel::OM->Get('ObjectIcon')->ObjectIconGet(
         ID => $Param{Data}->{ObjectIconID},
     );
   
@@ -140,7 +140,7 @@ sub Run {
     }
     
     # check if ObjectIcon exists
-    my $ObjectIconList = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconList(
+    my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
         Object   => $ObjectIcon->{Object},
         ObjectID => $ObjectIcon->{ObjectID},        
     );
@@ -152,7 +152,7 @@ sub Run {
     }
     
     # update ObjectIcon
-    my $Success = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconUpdate(
+    my $Success = $Kernel::OM->Get('ObjectIcon')->ObjectIconUpdate(
         ID          => $Param{Data}->{ObjectIconID},
         Object      => $ObjectIcon->{Object} || $ObjectIconData{Object},
         ObjectID    => $ObjectIcon->{ObjectID} || $ObjectIconData{ObjectID},

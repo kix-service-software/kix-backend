@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'TypeID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+        $Found = $Kernel::OM->Get('Type')->TypeLookup(
             TypeID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Type' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+        $Found = $Kernel::OM->Get('Type')->TypeLookup(
             Type => $Param{Data}->{$Param{Attribute}},
         );        
     }

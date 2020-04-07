@@ -27,9 +27,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Time',
+    'Config',
+    'DB',
+    'Time',
 );
 
 our %Jobs = (
@@ -116,7 +116,7 @@ sub _Benchmark {
 
     my $TotalRecords = $Param{Records} * $Param{Processes};
 
-    $Self->{TimeObject} = $Kernel::OM->Get('Kernel::System::Time');
+    $Self->{TimeObject} = $Kernel::OM->Get('Time');
         $Self->{DBObject}   = Kernel::System::DB->new( %{$Self} );
 
     # create the table
@@ -130,10 +130,10 @@ sub _Benchmark {
             </Index>
         </TableCreate>';
 
-    my @XMLArray = $Kernel::OM->Get('Kernel::System::XML')->XMLParse(
+    my @XMLArray = $Kernel::OM->Get('XML')->XMLParse(
         String => $TableCreate,
     );
-    my @SQL = $Kernel::OM->Get('Kernel::System::DB')->SQLProcessor(
+    my @SQL = $Kernel::OM->Get('DB')->SQLProcessor(
         Database => \@XMLArray,
     );
 
@@ -211,7 +211,7 @@ sub _DoJobWin32 {
     my ( $Self, %Param ) = @_;
     my @Children;
     my $TimeStart = $Self->{TimeObject}->SystemTime();
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     for my $Process ( 1 .. $Param{Processes} ) {
         my $Child;

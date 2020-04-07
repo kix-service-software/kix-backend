@@ -19,14 +19,14 @@ use Kernel::System::PostMaster;
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # Get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $HomeDir = $ConfigObject->Get('Home');
 
@@ -71,13 +71,13 @@ $ConfigObject->Set(
 );
 
 # Do not really send emails.
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 # Get test email backed object.
-my $TestBackendObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestBackendObject = $Kernel::OM->Get('Email::Test');
 
 my $Success = $TestBackendObject->CleanUp();
 $Self->True(
@@ -104,7 +104,7 @@ if ( !-e $ConfigObject->Get('SMIME::Bin') ) {
 }
 
 # Create crypt object.
-my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
 if ( !$SMIMEObject ) {
     print STDERR "NOTICE: No SMIME support!\n";
@@ -194,7 +194,7 @@ my @Certificates = (
 );
 
 # Get main object.
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
 my @Crypted;
 
@@ -231,7 +231,7 @@ for my $Certificate (@Certificates) {
     );
 }
 
-my $PostMasterFilter = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
+my $PostMasterFilter = $Kernel::OM->Get('PostMaster::Filter');
 my $FilterRand1      = 'filter' . $Helper->GetRandomID();
 
 $PostMasterFilter->FilterAdd(
@@ -267,11 +267,11 @@ $ConfigObject->Set(
     Key   => 'PostMaster::PreFilterModule',
     Value => {
         '000-DecryptBody' => {
-            'Module'             => 'Kernel::System::PostMaster::Filter::Decrypt',
+            'Module'             => 'PostMaster::Filter::Decrypt',
             'StoreDecryptedBody' => '1',
         },
         '000-MatchDBSource' => {
-            'Module' => 'Kernel::System::PostMaster::Filter::MatchDBSource',
+            'Module' => 'PostMaster::Filter::MatchDBSource',
             }
         }
 );
@@ -295,7 +295,7 @@ $Self->True(
 );
 
 # Get ticket object.
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 my $TicketID = $Return[1];
 

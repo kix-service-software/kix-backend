@@ -25,18 +25,18 @@ use Kernel::System::EmailParser;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1157.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1157',
     },
 );
-my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
 sub _AddPrefixToNotificationFilterData {
     my ( $Self, %Param ) = @_;
 
-    $Self->{NotificationEventObject} = $Kernel::OM->Get('Kernel::System::NotificationEvent');
+    $Self->{NotificationEventObject} = $Kernel::OM->Get('NotificationEvent');
 
     # get all current notifications
     my %NotificationList = $Self->{NotificationEventObject}->NotificationList(

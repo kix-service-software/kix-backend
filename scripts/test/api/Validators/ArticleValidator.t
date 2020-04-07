@@ -32,13 +32,13 @@ my $ValidatorObject = Kernel::API::Validator::ArticleValidator->new(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
     Title           => 'Testticket Unittest',
     TypeID          => 1,
     StateID         => 1,
@@ -54,7 +54,7 @@ $Self->True(
     'create test ticket',
 );
 
-my $ArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
+my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID        => $TicketID,
     ChannelID       => 1,
     SenderTypeID    => 1,

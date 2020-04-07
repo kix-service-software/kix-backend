@@ -112,7 +112,7 @@ sub ProviderProcessRequest {
     }
 
     # get Encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     my $Operation;
     my %URIData;
@@ -346,7 +346,7 @@ sub ProviderProcessRequest {
         Data    => $Content,
     );
 
-    my $ContentDecoded = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+    my $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
         Data => $Content,
     );
 
@@ -498,7 +498,7 @@ sub ProviderGenerateResponse {
     # prepare data
     my $JSONString = '';
     if ( IsHashRefWithData($Param{Data}) ) {
-        $JSONString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $JSONString = $Kernel::OM->Get('JSON')->Encode(
             Data     => $Param{Data},
             SortKeys => 1
         );
@@ -757,8 +757,8 @@ sub RequesterPerformRequest {
     }
 
     # get JSON and Encode object
-    my $JSONObject   = $Kernel::OM->Get('Kernel::System::JSON');
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $JSONObject   = $Kernel::OM->Get('JSON');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     my $Body;
     if ( IsHashRefWithData( $Param{Data} ) ) {
@@ -865,7 +865,7 @@ sub RequesterPerformRequest {
     my $SizeExeeded = 0;
     {
         my $MaxSize
-            = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::ResponseLoggingMaxSize') || 200;
+            = $Kernel::OM->Get('Config')->Get('API::Operation::ResponseLoggingMaxSize') || 200;
         $MaxSize = $MaxSize * 1024;
         use bytes;
 
@@ -959,7 +959,7 @@ sub _Output {
     my $Message;
 
     if ( IsHashRefWithData($Param{Content}) ) {
-        $Param{Content} = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+        $Param{Content} = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Content},
         );
 

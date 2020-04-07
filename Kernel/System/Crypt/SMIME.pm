@@ -16,14 +16,14 @@ use warnings;
 use MIME::Decoder;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::FileTemp',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Contact',
-    'Kernel::System::CheckItem',
+    'Config',
+    'Cache',
+    'DB',
+    'FileTemp',
+    'Log',
+    'Main',
+    'Contact',
+    'CheckItem',
 );
 
 =head1 NAME
@@ -50,7 +50,7 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     # check if module is enabled
-    return 0 if !$Kernel::OM->Get('Kernel::Config')->Get('SMIME');
+    return 0 if !$Kernel::OM->Get('Config')->Get('SMIME');
 
     # call init()
     $Self->_Init();
@@ -73,56 +73,56 @@ sub Check {
     my ( $Self, %Param ) = @_;
 
     if ( !-e $Self->{Bin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such $Self->{Bin}!",
         );
         return "No such $Self->{Bin}!";
     }
     elsif ( !-x $Self->{Bin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$Self->{Bin} not executable!",
         );
         return "$Self->{Bin} not executable!";
     }
     elsif ( !-e $Self->{CertPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such $Self->{CertPath}!",
         );
         return "No such $Self->{CertPath}!";
     }
     elsif ( !-d $Self->{CertPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such $Self->{CertPath} directory!",
         );
         return "No such $Self->{CertPath} directory!";
     }
     elsif ( !-w $Self->{CertPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$Self->{CertPath} not writable!",
         );
         return "$Self->{CertPath} not writable!";
     }
     elsif ( !-e $Self->{PrivatePath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such $Self->{PrivatePath}!",
         );
         return "No such $Self->{PrivatePath}!";
     }
     elsif ( !-d $Self->{PrivatePath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such $Self->{PrivatePath} directory!",
         );
         return "No such $Self->{PrivatePath} directory!";
     }
     elsif ( !-w $Self->{PrivatePath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$Self->{PrivatePath} not writable!",
         );
@@ -155,7 +155,7 @@ sub Crypt {
     # check needed stuff
     for (qw(Message)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -164,7 +164,7 @@ sub Crypt {
     }
 
     if ( !$Param{Filename} && !( $Param{Hash} || $Param{Fingerprint} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "Need Param: Filename or Hash and Fingerprint!",
             Priority => 'error',
         );
@@ -172,7 +172,7 @@ sub Crypt {
     }
 
     # get temp file object
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     my $Certificate = $Self->CertificateGet(%Param);
     my ( $FHCertificate, $CertFile ) = $FileTempObject->TempFile();
@@ -187,14 +187,14 @@ sub Crypt {
     my $Options    = "smime -encrypt -binary -des3 -in $PlainFile -out $CryptedFile $CertFile";
     my $LogMessage = $Self->_CleanOutput(qx{$Self->{Cmd} $Options 2>&1});
     if ($LogMessage) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't crypt: $LogMessage!"
         );
         return;
     }
 
-    my $CryptedRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead( Location => $CryptedFile );
+    my $CryptedRef = $Kernel::OM->Get('Main')->FileRead( Location => $CryptedFile );
 
     return if !$CryptedRef;
     return $$CryptedRef;
@@ -223,7 +223,7 @@ sub Decrypt {
     # check needed stuff
     for (qw(Message)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -232,7 +232,7 @@ sub Decrypt {
     }
 
     if ( !$Param{Filename} && !( $Param{Hash} || $Param{Fingerprint} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "Need Param: Filename or Hash and Fingerprint!",
             Priority => 'error',
         );
@@ -248,7 +248,7 @@ sub Decrypt {
     my ( $Private, $Secret ) = $Self->PrivateGet(%Attributes);
 
     # get temp file object
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     my ( $FHPrivate, $PrivateKeyFile ) = $FileTempObject->TempFile();
     print $FHPrivate $Private;
@@ -283,7 +283,7 @@ sub Decrypt {
     }
 
     if ($LogMessage) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't decrypt: $LogMessage!"
         );
@@ -293,7 +293,7 @@ sub Decrypt {
         );
     }
 
-    my $DecryptedRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead( Location => $PlainFile );
+    my $DecryptedRef = $Kernel::OM->Get('Main')->FileRead( Location => $PlainFile );
     if ( !$DecryptedRef ) {
         return (
             Successful => 0,
@@ -331,7 +331,7 @@ sub Sign {
     # check needed stuff
     for (qw(Message)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -340,7 +340,7 @@ sub Sign {
     }
 
     if ( !$Param{Filename} && !( $Param{Hash} || $Param{Fingerprint} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "Need Param: Filename or Hash and Fingerprint!",
             Priority => 'error',
         );
@@ -358,7 +358,7 @@ sub Sign {
     my @RelatedCertificates = $Self->SignerCertRelationGet( CertFingerprint => $Attributes{Fingerprint} );
 
     # get temp file object
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     my $FHCACertFileActive;
     my ( $FHCACertFile, $CAFileName ) = $FileTempObject->TempFile();
@@ -404,14 +404,14 @@ sub Sign {
     my $LogMessage = $Self->_CleanOutput(qx{$Self->{Cmd} $Options 2>&1});
     unlink $SecretFile;
     if ($LogMessage) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't sign: $LogMessage! (Command: $Options)"
         );
         return;
     }
 
-    my $SignedRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead( Location => $SignFile );
+    my $SignedRef = $Kernel::OM->Get('Main')->FileRead( Location => $SignFile );
 
     return if !$SignedRef;
     return $$SignedRef;
@@ -454,7 +454,7 @@ sub Verify {
 
     # check needed stuff
     if ( !$Param{Message} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Message!"
         );
@@ -462,7 +462,7 @@ sub Verify {
     }
 
     # get temp file object
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     my ( $FH, $SignedFile ) = $FileTempObject->TempFile();
     print $FH $Param{Message};
@@ -495,7 +495,7 @@ sub Verify {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my $SignerCertRef    = $MainObject->FileRead( Location => $SignerFile );
     my $SignedContentRef = $MainObject->FileRead( Location => $VerifiedFile );
@@ -613,7 +613,7 @@ sub CertificateSearch {
     }
 
     # 3 - If there are no results already in the system, then check for the certificate in customer data
-    if ( !@Result && $Kernel::OM->Get('Kernel::Config')->Get('SMIME::FetchFromCustomer') ) {
+    if ( !@Result && $Kernel::OM->Get('Config')->Get('SMIME::FetchFromCustomer') ) {
 
         # Search and add certificates from Customer data if Result from CertList is empty
         if (
@@ -695,7 +695,7 @@ sub FetchFromCustomer {
 
     # check needed stuff
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!"
         );
@@ -703,11 +703,11 @@ sub FetchFromCustomer {
     }
 
     # Check customer users for userSMIMECertificate
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my $ContactObject = $Kernel::OM->Get('Contact');
     my %Contacts;
     if ( $Param{Search} ) {
 
-        my $ValidEmail = $Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail(
+        my $ValidEmail = $Kernel::OM->Get('CheckItem')->CheckEmail(
             Address => $Param{Search},
         );
 
@@ -773,7 +773,7 @@ sub ConvertCertFormat {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need String!"
         );
@@ -782,7 +782,7 @@ sub ConvertCertFormat {
     my $String = $Param{String};
     my $PassPhrase = $Param{Passphrase} // '';
 
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     # Create original certificate file.
     my ( $FileHandle, $TmpCertificate ) = $FileTempObject->TempFile();
@@ -830,7 +830,7 @@ sub ConvertCertFormat {
     }
 
     if ( !$DetectedFormat ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Certificate could not be read, PassPhrase is invalid or file is corrupted!",
         );
@@ -841,7 +841,7 @@ sub ConvertCertFormat {
     my $ConvertError = $Self->_CleanOutput(qx{$Self->{Cmd} $OptionsLookup{$DetectedFormat}->{Convert} 2>&1});
 
     if ($ConvertError) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't convert certificate from $DetectedFormat to PEM: $ConvertError",
         );
@@ -850,7 +850,7 @@ sub ConvertCertFormat {
     }
 
     # Read converted certificate.
-    my $CertFileRefPEM = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $CertFileRefPEM = $Kernel::OM->Get('Main')->FileRead(
         Location => $CertFile,
     );
 
@@ -873,7 +873,7 @@ sub CertificateAdd {
 
     # check needed stuff
     if ( !$Param{Certificate} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Certificate!'
         );
@@ -885,7 +885,7 @@ sub CertificateAdd {
     my %Result;
 
     if ( !$Attributes{Hash} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Can\'t add invalid certificate!'
         );
@@ -913,7 +913,7 @@ sub CertificateAdd {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # look for an available filename
     FILENAME:
@@ -945,7 +945,7 @@ sub CertificateAdd {
             return %Result;
         }
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't write $File: $!!"
         );
@@ -983,7 +983,7 @@ sub CertificateGet {
 
     # check needed stuff
     if ( !$Param{Filename} && !( $Param{Fingerprint} && $Param{Hash} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename or Fingerprint and Hash!'
         );
@@ -996,7 +996,7 @@ sub CertificateGet {
     }
 
     my $File = "$Self->{CertPath}/$Param{Filename}";
-    my $CertificateRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead( Location => $File );
+    my $CertificateRef = $Kernel::OM->Get('Main')->FileRead( Location => $File );
 
     return if !$CertificateRef;
     return $$CertificateRef;
@@ -1022,7 +1022,7 @@ sub CertificateRemove {
 
     # check needed stuff
     if ( !$Param{Filename} && !( $Param{Hash} && $Param{Fingerprint} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename or Hash and Fingerprint!'
         );
@@ -1074,7 +1074,7 @@ sub CertificateRemove {
     if ($Success) {
 
         # get cache object
-        my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        my $CacheObject = $Kernel::OM->Get('Cache');
 
         # delete cache
         $CacheObject->CleanUp(
@@ -1110,7 +1110,7 @@ sub CertificateList {
         push @Filters, "*.$Number";
     }
 
-    my @List = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @List = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => "$Self->{CertPath}",
         Filter    => \@Filters,
     );
@@ -1139,7 +1139,7 @@ sub CertificateAttributes {
 
     my %Attributes;
     if ( !$Param{Certificate} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Certificate!'
         );
@@ -1147,7 +1147,7 @@ sub CertificateAttributes {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey;
     if ( defined $Param{Filename} && $Param{Filename} ) {
@@ -1165,7 +1165,7 @@ sub CertificateAttributes {
     }
 
     # get temp file object
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     my ( $FH, $Filename ) = $FileTempObject->TempFile();
     print $FH $Param{Certificate};
@@ -1216,7 +1216,7 @@ sub CertificateRead {
 
     # check needed stuff
     if ( !$Param{Filename} && !( $Param{Fingerprint} && $Param{Hash} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename or Fingerprint and Hash!'
         );
@@ -1232,16 +1232,16 @@ sub CertificateRead {
 
     # check if file exists and can be readed
     if ( !-e $File ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Certificate $File does not exist!"
         );
         return;
     }
     if ( !-r $File ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can not read certificate $File!"
+            Message  => "Cannot read certificate $File!"
         );
         return;
     }
@@ -1318,7 +1318,7 @@ sub PrivateAdd {
     # check needed stuff
     for my $Needed (qw(Private Secret)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1331,7 +1331,7 @@ sub PrivateAdd {
     # get private attributes
     my %Attributes = $Self->PrivateAttributes(%Param);
     if ( !$Attributes{Modulus} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No Private Key!'
         );
@@ -1345,7 +1345,7 @@ sub PrivateAdd {
     # get certificate
     my @Certificates = $Self->CertificateSearch( Search => $Attributes{Modulus} );
     if ( !@Certificates ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Certificate of Private Key first -$Attributes{Modulus})!",
         );
@@ -1356,7 +1356,7 @@ sub PrivateAdd {
         return %Result;
     }
     elsif ( $#Certificates > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Multiple Certificates with the same Modulus, can\'t add Private Key!',
         );
@@ -1387,7 +1387,7 @@ sub PrivateAdd {
             );
 
             # get cache object
-            my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+            my $CacheObject = $Kernel::OM->Get('Cache');
 
             # delete cache
             $CacheObject->CleanUp(
@@ -1400,7 +1400,7 @@ sub PrivateAdd {
             return %Result;
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't write $File: $!!"
             );
@@ -1412,7 +1412,7 @@ sub PrivateAdd {
         }
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => 'Can\'t add invalid private key!'
     );
@@ -1444,7 +1444,7 @@ sub PrivateGet {
 
     # check needed stuff
     if ( !$Param{Filename} && !( $Param{Hash} && $Param{Modulus} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename or Hash and Modulus!'
         );
@@ -1462,7 +1462,7 @@ sub PrivateGet {
     my $File = "$Self->{PrivatePath}/$Param{Filename}";
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my $Private;
     if ( -e $File ) {
@@ -1500,7 +1500,7 @@ sub PrivateRemove {
 
     # check needed stuff
     if ( !$Param{Filename} && !( $Param{Hash} && $Param{Modulus} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename or Hash and Modulus!'
         );
@@ -1555,7 +1555,7 @@ sub PrivateRemove {
         );
 
         # get cache object
-        my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        my $CacheObject = $Kernel::OM->Get('Cache');
 
         # delete cache
         $CacheObject->CleanUp(
@@ -1593,7 +1593,7 @@ sub PrivateList {
         push @Filters, "*.$Number";
     }
 
-    my @List = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @List = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => "$Self->{PrivatePath}",
         Filter    => \@Filters,
     );
@@ -1624,7 +1624,7 @@ sub PrivateAttributes {
 
     for my $Needed (qw(Private Secret)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1633,7 +1633,7 @@ sub PrivateAttributes {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey;
     if ( defined $Param{Filename} && $Param{Filename} ) {
@@ -1651,7 +1651,7 @@ sub PrivateAttributes {
     }
 
     # get temp file object
-    my $FileTempObject = $Kernel::OM->Get('Kernel::System::FileTemp');
+    my $FileTempObject = $Kernel::OM->Get('FileTemp');
 
     my %Attributes;
     my %Option = (
@@ -1704,7 +1704,7 @@ sub SignerCertRelationAdd {
     # check needed stuff
     for my $Needed (qw( CertFingerprint CAFingerprint UserID )) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1713,7 +1713,7 @@ sub SignerCertRelationAdd {
     }
 
     if ( $Param{CertFingerprint} eq $Param{CAFingerprint} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'CertFingerprint must be different to the CAFingerprint param',
         );
@@ -1727,7 +1727,7 @@ sub SignerCertRelationAdd {
 
     # results?
     if ( !scalar @CertResult ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "Wrong CertFingerprint, certificate not found!",
             Priority => 'error',
         );
@@ -1741,14 +1741,14 @@ sub SignerCertRelationAdd {
 
     # results?
     if ( !scalar @CAResult ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "Wrong CAFingerprint, certificate not found!",
             Priority => 'error',
         );
         return 0;
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Success = $Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO smime_signer_cert_relations'
             . ' ( cert_hash, cert_fingerprint, ca_hash, ca_fingerprint, create_time, create_by, change_time, change_by)'
             . ' VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
@@ -1782,7 +1782,7 @@ sub SignerCertRelationGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{CertFingerprint} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Needed ID or CertFingerprint!'
         );
@@ -1790,7 +1790,7 @@ sub SignerCertRelationGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ID
     my %Data;
@@ -1824,7 +1824,7 @@ sub SignerCertRelationGet {
             return %Data || '';
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => 'DB error: not possible to get relation!',
                 Priority => 'error',
             );
@@ -1858,7 +1858,7 @@ sub SignerCertRelationGet {
             return @Data;
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => 'DB error: not possible to get relations!',
                 Priority => 'error',
             );
@@ -1888,7 +1888,7 @@ sub SignerCertRelationExists {
 
     # check needed stuff
     if ( !$Param{ID} && !( $Param{CertFingerprint} && $Param{CAFingerprint} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID or CertFingerprint & CAFingerprint!"
         );
@@ -1896,7 +1896,7 @@ sub SignerCertRelationExists {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{CertFingerprint} && $Param{CAFingerprint} ) {
         my $Data;
@@ -1914,7 +1914,7 @@ sub SignerCertRelationExists {
             return $Data || '';
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => 'DB error: not possible to check relation!',
                 Priority => 'error',
             );
@@ -1937,7 +1937,7 @@ sub SignerCertRelationExists {
             return $Data || '';
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => 'DB error: not possible to check relation!',
                 Priority => 'error',
             );
@@ -1976,7 +1976,7 @@ sub SignerCertRelationDelete {
 
     # check needed stuff
     if ( !$Param{CertFingerprint} && !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID or CertFingerprint!'
         );
@@ -1984,7 +1984,7 @@ sub SignerCertRelationDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{ID} ) {
 
@@ -1996,7 +1996,7 @@ sub SignerCertRelationDelete {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => "DB Error, Not possible to delete relation ID:$Param{ID}!",
                 Priority => 'error',
             );
@@ -2013,7 +2013,7 @@ sub SignerCertRelationDelete {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message =>
                     "DB Error, Not possible to delete relation for "
                     . "CertFingerprint:$Param{CertFingerprint} and CAFingerprint:$Param{CAFingerprint}!",
@@ -2032,7 +2032,7 @@ sub SignerCertRelationDelete {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message =>
                     "DB Error, Not possible to delete relations for CertFingerprint:$Param{CertFingerprint}!",
                 Priority => 'error',
@@ -2113,7 +2113,7 @@ sub _Init {
     my ( $Self, %Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     $Self->{Bin}         = $ConfigObject->Get('SMIME::Bin') || '/usr/bin/openssl';
     $Self->{CertPath}    = $ConfigObject->Get('SMIME::CertPath');
@@ -2296,7 +2296,7 @@ sub _CertificateFilename {
     # check needed stuff
     for my $Needed (qw(Fingerprint Hash)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -2305,7 +2305,7 @@ sub _CertificateFilename {
     }
 
     # get all certificates with hash name
-    my @CertList = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @CertList = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Self->{CertPath},
         Filter    => "$Param{Hash}.*",
     );
@@ -2331,7 +2331,7 @@ sub _PrivateFilename {
     # check needed stuff
     for my $Needed (qw(Hash Modulus)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -2340,7 +2340,7 @@ sub _PrivateFilename {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # get all certificates with hash name
     my @CertList = $MainObject->DirectoryRead(
@@ -2384,7 +2384,7 @@ sub _NormalizePrivateSecretFiles {
     my ( $Self, %Param ) = @_;
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # get all files that ends with .P from the private directory
     my @List = $MainObject->DirectoryRead(
@@ -2472,7 +2472,7 @@ sub _NormalizePrivateSecretFiles {
             my $CorrectFileLocation = "$Self->{PrivatePath}/$CorrectFile";
             if ( !rename $WrongFileLocation, $CorrectFileLocation ) {
                 my $Message = "Could not rename private secret file $WrongFileLocation to $CorrectFileLocation!";
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $Message,
                 );
@@ -2525,7 +2525,7 @@ sub _NormalizePrivateSecretFiles {
                 # return error if file was not deleted
                 if ( !$Success ) {
                     my $Message = "Could not remove private secret file $WrongFileLocation from the file system!";
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => $Message,
                     );
@@ -2627,7 +2627,7 @@ sub _ReHashCertificates {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # loop over wrong certificates
     CERTIFICATE:
@@ -2639,7 +2639,7 @@ sub _ReHashCertificates {
         # check if certificate exists
         if ( !-e $WrongCertificateFile ) {
             my $Message = "SMIME certificate $WrongCertificateFile file does not exist!";
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Message",
             );
@@ -2670,7 +2670,7 @@ sub _ReHashCertificates {
 
         if ( !$NewCertificateFile ) {
             my $Message = "No more available filenames for certificate hash: $WrongCertificate->{NewHash}!";
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $Message,
             );
@@ -2697,7 +2697,7 @@ sub _ReHashCertificates {
             # check new private key and secret files
             if ( -e $NewPrivateKeyFile ) {
                 my $Message = "Filename for private key: $NewPrivateKeyFile is already in use!";
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $Message,
                 );
@@ -2716,7 +2716,7 @@ sub _ReHashCertificates {
 
                 if ( -e "$NewPrivateKeyFile.P" ) {
                     my $Message = "Filename for private secret: $NewPrivateKeyFile.P is already in use!";
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => $Message,
                     );
@@ -2736,7 +2736,7 @@ sub _ReHashCertificates {
             . " to $WrongCertificate->{NewHash}.$NewIndex...";
 
         if ( !rename $WrongCertificateFile, $NewCertificateFile ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not rename SMIME certificate file $WrongCertificateFile to $NewCertificateFile!",
             );
@@ -2875,7 +2875,7 @@ sub _ReHashCertificates {
                 . " $WrongCertificate->{NewHash}.$NewIndex...";
 
             if ( !rename $WrongPrivateKeyFile, $NewPrivateKeyFile ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Could not rename SMIME private key file $WrongPrivateKeyFile to $NewPrivateKeyFile!",
                 );
@@ -2896,7 +2896,7 @@ sub _ReHashCertificates {
                     . " $WrongCertificate->{NewHash}.$NewIndex.P...";
 
                 if ( !rename $WrongPrivateKeyFile . '.P', $NewPrivateKeyFile . '.P' ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Could not rename SMIME private secret file"
                             . " $WrongPrivateKeyFile.P to $NewPrivateKeyFile.P!",

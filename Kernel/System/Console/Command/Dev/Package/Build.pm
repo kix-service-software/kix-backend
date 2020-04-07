@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::Package',
+    'Main',
+    'Package',
 );
 
 sub Configure {
@@ -83,7 +83,7 @@ sub Run {
 
     my $FileString;
     my $SourcePath = $Self->GetArgument('source-path');
-    my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
         Location => $SourcePath,
         Mode     => 'utf8',        # optional - binmode|utf8
         Result   => 'SCALAR',      # optional - SCALAR|ARRAY
@@ -94,7 +94,7 @@ sub Run {
     }
     $FileString = ${$ContentRef};
 
-    my %Structure = $Kernel::OM->Get('Kernel::System::Package')->PackageParse(
+    my %Structure = $Kernel::OM->Get('Package')->PackageParse(
         String => $FileString,
     );
 
@@ -118,12 +118,12 @@ sub Run {
     }
 
     my $Filename = $Structure{Name}->{Content} . '-' . $Structure{Version}->{Content} . '.kpm';
-    my $Content  = $Kernel::OM->Get('Kernel::System::Package')->PackageBuild(%Structure);
+    my $Content  = $Kernel::OM->Get('Package')->PackageBuild(%Structure);
     if ( !$Content ) {
         $Self->PrintError("Package build failed.\n");
         return $Self->ExitCodeError();
     }
-    my $File = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $File = $Kernel::OM->Get('Main')->FileWrite(
         Location   => $Self->GetArgument('target-directory') . '/' . $Filename,
         Content    => \$Content,
         Mode       => 'utf8',                                                     # binmode|utf8

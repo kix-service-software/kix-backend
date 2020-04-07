@@ -14,26 +14,26 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
+    'Config',
+    'Contact',
+    'DynamicField',
+    'DynamicField::Backend',
     # KIX4OTRS-capeIT
-    'Kernel::System::HTMLUtils',
+    'HTMLUtils',
     # EO KIX4OTRS-capeIT
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Priority',
-    'Kernel::System::Queue',
-    'Kernel::System::Service',
+    'LinkObject',
+    'Log',
+    'Priority',
+    'Queue',
+    'Service',
      # KIX4OTRS-capeIT
-    'Kernel::System::SLA',
+    'SLA',
     # EO KIX4OTRS-capeIT
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::Type',
-    'Kernel::System::User',
+    'State',
+    'Ticket',
+    'Time',
+    'Type',
+    'User',
 );
 
 sub new {
@@ -57,7 +57,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(InmailUserID GetParam)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -72,7 +72,7 @@ sub Run {
     # get ticket template
     my %TicketTemplate;
     if ( $GetParam{'X-KIX-TicketTemplate'} ) {
-        %TicketTemplate = $Kernel::OM->Get('Kernel::System::Ticket')->TicketTemplateGet(
+        %TicketTemplate = $Kernel::OM->Get('Ticket')->TicketTemplateGet(
             Name => $GetParam{'X-KIX-TicketTemplate'},
         );
     }
@@ -86,19 +86,19 @@ sub Run {
 
     # EO KIX4OTRS-capeIT
 
-    my $Queue = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+    my $Queue = $Kernel::OM->Get('Queue')->QueueLookup(
         QueueID => $QueueID,
     );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get state
     # KIX4OTRS-capeIT
     # my $State = $ConfigObject->Get('PostmasterDefaultState') || 'new';
     my $State;
     if ( defined $TicketTemplate{StateID} ) {
-        $State = $Kernel::OM->Get('Kernel::System::State')->StateLookup( StateID => $TicketTemplate{StateID} );
+        $State = $Kernel::OM->Get('State')->StateLookup( StateID => $TicketTemplate{StateID} );
     }
     else {
         $State = $ConfigObject->Get('PostmasterDefaultState') || 'new';
@@ -108,7 +108,7 @@ sub Run {
 
     if ( $GetParam{'X-KIX-State'} ) {
 
-        my $StateID = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+        my $StateID = $Kernel::OM->Get('State')->StateLookup(
             State => $GetParam{'X-KIX-State'},
         );
 
@@ -116,7 +116,7 @@ sub Run {
             $State = $GetParam{'X-KIX-State'};
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "State ".$GetParam{'X-KIX-State'}." does not exist, falling back to $State!"
             );
@@ -129,7 +129,7 @@ sub Run {
     my $Priority;
     if ( defined $TicketTemplate{PriorityID} ) {
         $Priority
-            = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup( PriorityID => $TicketTemplate{PriorityID} );
+            = $Kernel::OM->Get('Priority')->PriorityLookup( PriorityID => $TicketTemplate{PriorityID} );
     }
     else {
         $Priority = $ConfigObject->Get('PostmasterDefaultPriority') || '3 normal';
@@ -139,7 +139,7 @@ sub Run {
 
     if ( $GetParam{'X-KIX-Priority'} ) {
 
-        my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+        my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
             Priority => $GetParam{'X-KIX-Priority'},
         );
 
@@ -147,7 +147,7 @@ sub Run {
             $Priority = $GetParam{'X-KIX-Priority'};
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Priority ".$GetParam{'X-KIX-Priority'}." does not exist, falling back to $Priority!"
@@ -160,10 +160,10 @@ sub Run {
     if ( $GetParam{'X-KIX-Type'} ) {
 
         # Check if type exists
-        $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup( Type => $GetParam{'X-KIX-Type'} );
+        $TypeID = $Kernel::OM->Get('Type')->TypeLookup( Type => $GetParam{'X-KIX-Type'} );
 
         if ( !$TypeID ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Type ".$GetParam{'X-KIX-Type'}." does not exist, falling back to default type."
@@ -185,7 +185,7 @@ sub Run {
     if ( $GetParam{'X-KIX-CustomerNo'} ) {
 
         # get organisation object
-        my $OrgObject = $Kernel::OM->Get('Kernel::System::Organisation');
+        my $OrgObject = $Kernel::OM->Get('Organisation');
 
         # search organisation based on X-KIX-CustomerNo
         my %OrgList = $OrgObject->OrganisationSearch(
@@ -218,7 +218,7 @@ sub Run {
             if ( $GetParam{EmailFrom} ) {
 
                 # get customer user object
-                my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+                my $ContactObject = $Kernel::OM->Get('Contact');
 
                 my %List = $ContactObject->ContactSearch(
                     PostMasterSearch => lc( $GetParam{EmailFrom} ),
@@ -239,7 +239,7 @@ sub Run {
             $GetParam{'X-KIX-Contact'} = $ContactData{ID};
 
             # notice that Login is from contact data
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Take Login ($ContactData{ID}) from contact based on ($GetParam{'EmailFrom'}).",
             );
@@ -248,7 +248,7 @@ sub Run {
             $GetParam{'X-KIX-CustomerNo'} = $ContactData{PrimaryOrganisationID};
 
             # notice that PrimaryOrganisationID is from customer source backend
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Take PrimaryOrganisationID ($ContactData{PrimaryOrganisationID})"
                     . " from contact based on ($GetParam{'EmailFrom'}).",
@@ -260,7 +260,7 @@ sub Run {
         my %ContactData;
 
         # get contact object
-        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+        my $ContactObject = $Kernel::OM->Get('Contact');
 
         my %List = $ContactObject->ContactSearch(
             PostMasterSearch => $GetParam{'X-KIX-Contact'},
@@ -285,7 +285,7 @@ sub Run {
     # EO KIX4OTRS-capeIT
     if ( $GetParam{'X-KIX-Owner'} ) {
 
-        my $TmpOwnerID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        my $TmpOwnerID = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $GetParam{'X-KIX-Owner'},
         );
 
@@ -306,7 +306,7 @@ sub Run {
 
     if ( $GetParam{'X-KIX-Responsible'} ) {
 
-        my $TmpResponsibleID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        my $TmpResponsibleID = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $GetParam{'X-KIX-Responsible'},
         );
 
@@ -314,25 +314,25 @@ sub Run {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # KIX4OTRS-capeIT
     # get ticket type
     my $Type;
     if ( $ConfigObject->Get('Ticket::Type') && defined $TicketTemplate{TypeID} ) {
-        $Type = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup( TypeID => $TicketTemplate{TypeID} );
+        $Type = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $TicketTemplate{TypeID} );
     }
 
     # get service
     my $Service;
     if ( defined $TicketTemplate{ServiceID} ) {
-        $Service = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup( ServiceID => $TicketTemplate{ServiceID} );
+        $Service = $Kernel::OM->Get('Service')->ServiceLookup( ServiceID => $TicketTemplate{ServiceID} );
     }
 
     # get sla
     my $SLA;
     if ( defined $TicketTemplate{SLAID} ) {
-        $SLA = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup( SLAID => $TicketTemplate{SLAID} );
+        $SLA = $Kernel::OM->Get('SLA')->SLALookup( SLAID => $TicketTemplate{SLAID} );
     }
 
 #rbo - T2016121190001552 - added KIX placeholders
@@ -415,7 +415,7 @@ sub Run {
             $Seconds = $Seconds * $UnitMultiplier{$Unit};
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             $TargetTimeStamp = $TimeObject->SystemTime2TimeStamp(
                 SystemTime => $TimeObject->SystemTime() + $Seconds,
@@ -435,8 +435,8 @@ sub Run {
     }
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # dynamic fields
     my $DynamicFieldList =
@@ -521,7 +521,7 @@ sub Run {
         if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             my $SystemTime = $TimeObject->TimeStamp2SystemTime(
                 String => $GetParam{$Key},
@@ -567,7 +567,7 @@ sub Run {
     # get channel
     my $Channel;
     if ( defined $TicketTemplate{Channel} ) {
-        $Channel = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( ID => $TicketTemplate{Channel} );
+        $Channel = $Kernel::OM->Get('Channel')->ChannelLookup( ID => $TicketTemplate{Channel} );
     }
 
     # EO KIX4OTRS-capeIT
@@ -603,7 +603,7 @@ sub Run {
             TicketID => $TicketID,
             UserID   => $Param{InmailUserID},
         );
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't process email with MessageID <$GetParam{'Message-ID'}>! "
                 . "Please create a bug report with this email (From: $GetParam{From}, Located "
@@ -617,7 +617,7 @@ sub Run {
         my $SourceKey = $Param{LinkToTicketID};
         my $TargetKey = $TicketID;
 
-        $Kernel::OM->Get('Kernel::System::LinkObject')->LinkAdd(
+        $Kernel::OM->Get('LinkObject')->LinkAdd(
             SourceObject => 'Ticket',
             SourceKey    => $SourceKey,
             TargetObject => 'Ticket',

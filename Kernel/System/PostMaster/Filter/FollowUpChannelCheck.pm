@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Contact',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -39,7 +39,7 @@ sub Run {
     # check needed stuff
     for (qw(JobConfig GetParam)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -60,7 +60,7 @@ sub Run {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # Get all articles.
     my @ArticleIndex = $TicketObject->ArticleGet(
@@ -75,7 +75,7 @@ sub Run {
     );
 
     # Check if it is a known customer, otherwise use email address from ContactID field of the ticket.
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %CustomerData = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Ticket{ContactID},
     );
     my $CustomerEmailAddress = $CustomerData{Email} || $Ticket{ContactID};

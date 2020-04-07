@@ -17,8 +17,8 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -49,8 +49,8 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
     
     return $Self;
 }
@@ -66,15 +66,15 @@ Run autostart.
 sub Run {
     my ( $Self, %Param ) = @_;
     
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Home.'/autostart',
         Filter    => '*'
     );
 
     foreach my $File ( sort @Files ) {
-        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
             Result   => 'ARRAY'
         );
@@ -92,7 +92,7 @@ sub Run {
             next if ( $Line =~ /^\s*$/ || $Line =~ /^\s*#/ );
 
             # replace placeholders
-            $Line = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+            $Line = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
                 Text     => $Line,
                 Data     => {},
                 RichText => 0,
@@ -108,7 +108,7 @@ sub Run {
             my @Command = Text::ParseWords::quotewords('\s+', 0, $Line);
     
             if ( @Command ) {
-                my $Result = $Kernel::OM->Get('Kernel::System::Console')->Run(@Command);
+                my $Result = $Kernel::OM->Get('Console')->Run(@Command);
                 if ( $Result ) {
                     $Self->{LogObject}->Log( 
                         Priority => 'error', 

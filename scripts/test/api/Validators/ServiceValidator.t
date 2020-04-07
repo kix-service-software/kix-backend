@@ -32,14 +32,14 @@ my $ValidatorObject = Kernel::API::Validator::ServiceValidator->new(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create service
-my $ServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceAdd(
+my $ServiceID = $Kernel::OM->Get('Service')->ServiceAdd(
     Name        => 'TestService-Unittest',
     ValidID     => 1,
     Criticality => '3 normal',

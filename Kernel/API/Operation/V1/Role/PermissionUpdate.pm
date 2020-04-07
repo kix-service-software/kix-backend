@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::PermissionUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::PermissionUpdate');
 
     return $Self;
 }
@@ -134,7 +134,7 @@ sub Run {
     );
  
     # check if role exists 
-    my $Rolename = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+    my $Rolename = $Kernel::OM->Get('Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
     );
   
@@ -145,7 +145,7 @@ sub Run {
     }
 
     # check if permission exists and belongs to this role    
-    my %PermissionData = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet(
+    my %PermissionData = $Kernel::OM->Get('Role')->PermissionGet(
         ID => $Param{Data}->{PermissionID},
     );
 
@@ -156,7 +156,7 @@ sub Run {
     }
 
     # validate permission
-    my $ValidationResult = $Kernel::OM->Get('Kernel::System::Role')->ValidatePermission(
+    my $ValidationResult = $Kernel::OM->Get('Role')->ValidatePermission(
         TypeID => $Permission->{TypeID} || $PermissionData{TypeID},
         Target => $Permission->{Target} || $PermissionData{Target},
         Value  => defined $Permission->{Value} ? $Permission->{Value} : $PermissionData{Value},
@@ -169,7 +169,7 @@ sub Run {
     }
 
     # update permission
-    my $Success = $Kernel::OM->Get('Kernel::System::Role')->PermissionUpdate(
+    my $Success = $Kernel::OM->Get('Role')->PermissionUpdate(
         ID         => $Param{Data}->{PermissionID},
         TypeID     => $Permission->{TypeID} || $PermissionData{TypeID},
         Target     => $Permission->{Target} || $PermissionData{Target},

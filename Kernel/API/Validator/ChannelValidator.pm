@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'ChannelID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+        $Found = $Kernel::OM->Get('Channel')->ChannelLookup(
             ID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Channel' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+        $Found = $Kernel::OM->Get('Channel')->ChannelLookup(
             Name => $Param{Data}->{$Param{Attribute}},
         );      
     }

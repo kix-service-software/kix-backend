@@ -15,15 +15,15 @@ use vars (qw($Self));
 use Kernel::API::Debugger;
 
 # get webservice object
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -123,7 +123,7 @@ $DebuggerObject = Kernel::API::Debugger->new(
 );
 $Self->Is(
     ref $DebuggerObject,
-    'Kernel::API::Debugger',
+    'API::Debugger',
     'DebuggerObject instantiate correctly',
 );
 
@@ -301,7 +301,7 @@ for my $Test (@Tests) {
     }
 
     # test LogGetWithData
-    my $LogData = $Kernel::OM->Get('Kernel::System::API::DebugLog')->LogGetWithData(
+    my $LogData = $Kernel::OM->Get('API::DebugLog')->LogGetWithData(
         CommunicationID => $DebuggerObject->{CommunicationID},
     );
     $Self->Is(

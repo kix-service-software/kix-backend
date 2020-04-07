@@ -12,13 +12,13 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Queue',
-    'Kernel::System::SLA',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
+    'Config',
+    'Log',
+    'Queue',
+    'SLA',
+    'State',
+    'Ticket',
+    'Time',
 );
 
 =item new()
@@ -35,13 +35,13 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{QueueObject}  = $Kernel::OM->Get('Kernel::System::Queue');
-    $Self->{SLAObject}    = $Kernel::OM->Get('Kernel::System::SLA');
-    $Self->{StateObject}  = $Kernel::OM->Get('Kernel::System::State');
-    $Self->{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
-    $Self->{TimeObject}   = $Kernel::OM->Get('Kernel::System::Time');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{QueueObject}  = $Kernel::OM->Get('Queue');
+    $Self->{SLAObject}    = $Kernel::OM->Get('SLA');
+    $Self->{StateObject}  = $Kernel::OM->Get('State');
+    $Self->{TicketObject} = $Kernel::OM->Get('Ticket');
+    $Self->{TimeObject}   = $Kernel::OM->Get('Time');
 
     return $Self;
 }

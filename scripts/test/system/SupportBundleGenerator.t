@@ -18,30 +18,30 @@ use Archive::Tar;
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject                 = $Kernel::OM->Get('Kernel::Config');
-my $MainObject                   = $Kernel::OM->Get('Kernel::System::Main');
-my $SupportBundleGeneratorObject = $Kernel::OM->Get('Kernel::System::SupportBundleGenerator');
-my $PackageObject                = $Kernel::OM->Get('Kernel::System::Package');
-my $CSVObject                    = $Kernel::OM->Get('Kernel::System::CSV');
-my $JSONObject                   = $Kernel::OM->Get('Kernel::System::JSON');
-my $RegistrationObject           = $Kernel::OM->Get('Kernel::System::Registration');
-my $SupportDataCollectorObject   = $Kernel::OM->Get('Kernel::System::SupportDataCollector');
-my $TempObject                   = $Kernel::OM->Get('Kernel::System::FileTemp');
+my $ConfigObject                 = $Kernel::OM->Get('Config');
+my $MainObject                   = $Kernel::OM->Get('Main');
+my $SupportBundleGeneratorObject = $Kernel::OM->Get('SupportBundleGenerator');
+my $PackageObject                = $Kernel::OM->Get('Package');
+my $CSVObject                    = $Kernel::OM->Get('CSV');
+my $JSONObject                   = $Kernel::OM->Get('JSON');
+my $RegistrationObject           = $Kernel::OM->Get('Registration');
+my $SupportDataCollectorObject   = $Kernel::OM->Get('SupportDataCollector');
+my $TempObject                   = $Kernel::OM->Get('FileTemp');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # cleanup the Home variable (remove tailing "/")
 $Helper->ConfigSettingChange(
     Valid => 1,
     Key   => 'SupportDataCollector::DisablePlugins',
     Value => [
-        'Kernel::System::SupportDataCollector::Plugin::KIX::PackageDeployment',
+        'SupportDataCollector::Plugin::KIX::PackageDeployment',
     ],
 );
 

@@ -18,14 +18,14 @@ local $ENV{TZ} = 'UTC';
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 0,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 $ConfigObject->Set(
     Key   => 'TimeZone',
@@ -44,7 +44,7 @@ $ConfigObject->Set(
 $Helper->FixedTimeSet(0);
 
 # get time object
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 # configure auth backend to db
 $ConfigObject->Set(
@@ -70,8 +70,8 @@ $ConfigObject->Set(
 my $UserRand     = 'example-user' . $Helper->GetRandomID();
 my $TestCustomerID = 'example-customer' . $Helper->GetRandomID();
 
-my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $UserObject = $Kernel::OM->Get('User');
+my $ContactObject = $Kernel::OM->Get('Contact');
 
 # add test agent and contact
 my $TestAgentID = $UserObject->UserAdd(
@@ -130,15 +130,15 @@ for my $ConfigKey ( sort keys %CurrentConfig ) {
 
 # create Google authenticator object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::Auth::TwoFactor::GoogleAuthenticator' => {
+    'Auth::TwoFactor::GoogleAuthenticator' => {
         Count => 10,
     },
-    'Kernel::System::ContactAuth::TwoFactor::GoogleAuthenticator' => {
+    'ContactAuth::TwoFactor::GoogleAuthenticator' => {
         Count => 10,
     },
 );
-my $AuthTwoFactorObject         = $Kernel::OM->Get('Kernel::System::Auth::TwoFactor::GoogleAuthenticator');
-my $ContactAuthTwoFactorObject = $Kernel::OM->Get('Kernel::System::ContactAuth::TwoFactor::GoogleAuthenticator');
+my $AuthTwoFactorObject         = $Kernel::OM->Get('Auth::TwoFactor::GoogleAuthenticator');
+my $ContactAuthTwoFactorObject = $Kernel::OM->Get('ContactAuth::TwoFactor::GoogleAuthenticator');
 
 my @Tests = (
     {
@@ -239,7 +239,7 @@ for my $Test (@Tests) {
 
         # a different timezone config requires a new time object
         $Kernel::OM->ObjectsDiscard(
-            Objects => ['Kernel::System::Time'],
+            Objects => ['Time'],
         );
     }
 

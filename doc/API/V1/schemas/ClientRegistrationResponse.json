@@ -65,6 +65,58 @@
                   }
                ],
                "readOnly" : true
+            },
+            "Plugins" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Description" : {
+                        "type" : "string"
+                     },
+                     "ExtendedData" : {
+                        "description" : "a key-value list of additional attributes",
+                        "type" : "object"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     },
+                     "Requires" : {
+                        "type" : "string"
+                     },
+                     "Version" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "BuildNumber",
+                     "Product"
+                  ]
+               }
+            },
+            "Requires" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "BuildNumber" : {
+                        "type" : "integer"
+                     },
+                     "Operator" : {
+                        "description" : "supported operators: <, >, =, !",
+                        "type" : "string"
+                     },
+                     "Product" : {
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Product"
+                  ]
+               }
             }
          },
          "required" : [

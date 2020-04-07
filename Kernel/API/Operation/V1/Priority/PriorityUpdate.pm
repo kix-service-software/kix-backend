@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::PriorityUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::PriorityUpdate');
 
     return $Self;
 }
@@ -127,7 +127,7 @@ sub Run {
     );
 
     # check if Priority exists 
-    my %PriorityData = $Kernel::OM->Get('Kernel::System::Priority')->PriorityGet(
+    my %PriorityData = $Kernel::OM->Get('Priority')->PriorityGet(
         PriorityID => $Param{Data}->{PriorityID},
         UserID  => $Self->{Authorization}->{UserID},
     );
@@ -139,7 +139,7 @@ sub Run {
     }
 
     # update Priority
-    my $Success = $Kernel::OM->Get('Kernel::System::Priority')->PriorityUpdate(
+    my $Success = $Kernel::OM->Get('Priority')->PriorityUpdate(
         PriorityID     => $Param{Data}->{PriorityID},
         Name           => $Priority->{Name} || $PriorityData{Name},
         Comment        => exists $Priority->{Comment} ? $Priority->{Comment} : $PriorityData{Comment},

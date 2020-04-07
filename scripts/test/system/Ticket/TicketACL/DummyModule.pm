@@ -16,7 +16,7 @@ use Kernel::System::ObjectManager;
 package scripts::test::Ticket::TicketACL::DummyModule;    ## no critic
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 sub new {
@@ -35,7 +35,7 @@ sub Run {
     # check needed stuff
     for (qw(Config Acl)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );

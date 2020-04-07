@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform search
-    my @OptionTypeList = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionTypeList();
+    my @OptionTypeList = $Kernel::OM->Get('SysConfig')->OptionTypeList();
 
 	# get prepare 
     if ( IsArrayRefWithData(\@OptionTypeList) ) {  	

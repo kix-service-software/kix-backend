@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get type object
-my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
+my $TypeObject = $Kernel::OM->Get('Type');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # add type
 my $TypeName = 'Type' . $Helper->GetRandomID();
@@ -197,7 +197,7 @@ $Self->False(
 );
 
 # set Ticket::Type::Default config item
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'Ticket::Type::Default',
     Value => $TypeSecondName,
 );

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::User::UserUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::User::UserUpdate');
 
     return $Self;
 }
@@ -131,7 +131,7 @@ sub Run {
     delete $User->{UserID};
 
     # check UserLogin exists
-    my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Self->{Authorization}->{UserID},
     );
     if ( !%UserData ) {
@@ -142,19 +142,19 @@ sub Run {
 
     # check if UserLogin already exists
     if ( IsStringWithData( $User->{UserLogin} ) ) {
-        my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+        my %UserList = $Kernel::OM->Get('User')->UserSearch(
             Search => $User->{UserLogin},
         );
         if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => 'Can not update user. Another user with same login already exists.',
+                Message => 'Cannot update user. Another user with same login already exists.',
             );
         }
     }
 
     # update User
-    my $Success = $Kernel::OM->Get('Kernel::System::User')->UserUpdate(
+    my $Success = $Kernel::OM->Get('User')->UserUpdate(
         %UserData,
         %{$User},
         UserPw       => $User->{UserPw},

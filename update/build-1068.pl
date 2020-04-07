@@ -22,44 +22,42 @@ use Kernel::System::ObjectManager;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'db-update-17.3.0.pl',
     },
 );
 
 use vars qw(%INC);
 
-# migrate ticket watchers to generic watchers
-_MigrateWatchers();
+# migrate column object_id from varchar to integer
+_MigrateWatcherObjectID();
 
 exit 0;
 
 
-sub _MigrateWatchers {
+sub _MigrateWatcherObjectID {
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get all ticket watchers
     return if !$DBObject->Prepare(
-        SQL => 'SELECT ticket_id, user_id, create_time, create_by, change_time, change_by FROM ticket_watcher',
+        SQL => 'SELECT id, object_id FROM watcher',
     );
 
     # fetch the result
     my $Rows = $DBObject->FetchAllArrayRef(
-        Columns => [ 'TicketID', 'UserID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ],
+        Columns => [ 'ID', 'ObjectID' ],
     );
 
     foreach my $Row (@{$Rows}) {
         my $Success = $DBObject->Do(
-            SQL  => "
-                INSERT INTO watcher (object, object_id, user_id, create_time, create_by, change_time, change_by)
-                VALUES ('Ticket', ?, ?, ?, ?, ?, ?)",
-            Bind => [ \$Row->{TicketID}, \$Row->{UserID}, \$Row->{CreateTime}, \$Row->{CreateBy}, \$Row->{ChangeTime}, \$Row->{ChangeBy} ],
+            SQL  => "UPDATE watcher SET object_id_int = ? WHERE id = ?",
+            Bind => [ \$Row->{ObjectID}, \$Row->{ID} ],
         );
         if (!$Success) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to migrate ticket watchers!"
+                Message  => "Unable to migrate watcher table!"
             );
         }
     }

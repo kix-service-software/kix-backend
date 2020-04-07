@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::ITSMCIAttributCollectionUtils',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::Log'
+    'GeneralCatalog',
+    'ITSMCIAttributCollectionUtils',
+    'ITSMConfigItem',
+    'Log'
 );
 
 =head1 NAME
@@ -36,7 +36,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $BackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::CIClassReference');
+    my $BackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::CIClassReference');
 
 =cut
 
@@ -47,10 +47,10 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-    $Self->{CIACUtilsObject}      = $Kernel::OM->Get('Kernel::System::ITSMCIAttributCollectionUtils');
-    $Self->{ConfigItemObject}     = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-    $Self->{LogObject}            = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{CIACUtilsObject}      = $Kernel::OM->Get('ITSMCIAttributCollectionUtils');
+    $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
+    $Self->{LogObject}            = $Kernel::OM->Get('Log');
 
     return $Self;
 }

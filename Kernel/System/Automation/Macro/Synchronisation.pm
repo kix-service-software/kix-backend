@@ -18,12 +18,12 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -59,7 +59,7 @@ sub Run {
     # check needed stuff
     for (qw(ObjectID ExecOrder UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -70,7 +70,7 @@ sub Run {
     
     # execute all macro action given in the execution order attribute
     foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
-        my $Result = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionExecute(
+        my $Result = $Kernel::OM->Get('Automation')->MacroActionExecute(
             ID        => $MacroActionID,
             ObjectID  => $Param{ObjectID},
             UserID    => $Param{UserID},

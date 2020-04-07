@@ -19,8 +19,8 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketResponsibleSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketResponsibleSet');
+    my $TicketResponsibleSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketResponsibleSet');
 
 =cut
 
@@ -108,7 +108,7 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{ResponsibleID} && !$Param{Config}->{Responsible} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No Responsible or ResponsibleID configured!",
         );
@@ -122,7 +122,7 @@ sub Run {
         && $Param{Config}->{Responsible} ne $Param{Ticket}->{Responsible}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketResponsibleSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketResponsibleSet(
             TicketID => $Param{Ticket}->{TicketID},
             NewUser  => $Param{Config}->{Responsible},
             UserID   => $Param{UserID},
@@ -133,7 +133,7 @@ sub Run {
         && $Param{Config}->{ResponsibleID} ne $Param{Ticket}->{ResponsibleID}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketResponsibleSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketResponsibleSet(
             TicketID  => $Param{Ticket}->{TicketID},
             NewUserID => $Param{Config}->{ResponsibleID},
             UserID    => $Param{UserID},
@@ -153,7 +153,7 @@ sub Run {
         else {
             $CustomMessage = "ResponsibleID: $Param{Config}->{ResponsibleID},";
         }
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . 'Ticket responsible could not be updated to '

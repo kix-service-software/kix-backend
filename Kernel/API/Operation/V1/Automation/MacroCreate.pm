@@ -79,8 +79,8 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
     my @MacroTypes;
     
-    if ( IsHashRefWithData($Kernel::OM->Get('Kernel::Config')->Get('Automation::MacroType')) ) {
-        @MacroTypes = sort keys %{ $Kernel::OM->Get('Kernel::Config')->Get('Automation::MacroType') };
+    if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Automation::MacroType')) ) {
+        @MacroTypes = sort keys %{ $Kernel::OM->Get('Config')->Get('Automation::MacroType') };
     }
 
     return {
@@ -141,7 +141,7 @@ sub Run {
         Data => $Param{Data}->{Macro}
     );
 
-    my $MacroID = $Kernel::OM->Get('Kernel::System::Automation')->MacroLookup(
+    my $MacroID = $Kernel::OM->Get('Automation')->MacroLookup(
         Name => $Macro->{Name},
     );
 
@@ -153,7 +153,7 @@ sub Run {
     }
 
     # create Macro
-    $MacroID = $Kernel::OM->Get('Kernel::System::Automation')->MacroAdd(
+    $MacroID = $Kernel::OM->Get('Automation')->MacroAdd(
         Name      => $Macro->{Name},
         Type      => $Macro->{Type},
         Comment   => $Macro->{Comment} || '',

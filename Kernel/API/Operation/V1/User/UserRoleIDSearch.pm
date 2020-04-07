@@ -110,7 +110,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get roles list
-    my @RoleList = $Kernel::OM->Get('Kernel::System::User')->RoleList(
+    my @RoleList = $Kernel::OM->Get('User')->RoleList(
         UserID => $Param{Data}->{UserID},
     );
 

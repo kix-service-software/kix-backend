@@ -19,10 +19,10 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
+    'Log',
+    'State',
+    'Ticket',
+    'Time',
 );
 
 =head1 NAME
@@ -87,7 +87,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
@@ -97,7 +97,7 @@ sub Run {
         return;
     }
 
-    my $State = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    my $State = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{State},
         TicketID => $Param{TicketID},
@@ -106,12 +106,12 @@ sub Run {
     );
 
     # set the new state
-    my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+    my %State = $Kernel::OM->Get('State')->StateGet(
         Name => $State
     );
 
     if ( !%State || !$State{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - can't find ticket state \"$Param{Config}->{State}\"!",
             UserID   => $Param{UserID},
@@ -131,7 +131,7 @@ sub Run {
     }
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer  => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the state \"$Param{Config}->{State}\" failed!",
             UserID   => $Param{UserID},
@@ -143,7 +143,7 @@ sub Run {
     if ( $Success && $State{TypeName} =~ m{\A pending}msxi && IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         # get current time
         my $PendingTime = $TimeObject->SystemTime();
@@ -164,7 +164,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't update ticket $Param{TicketID} - setting the pending time for state \"$Param{Config}->{State}\" failed!",
                 UserID   => $Param{UserID},
@@ -192,13 +192,13 @@ sub ValidateConfig {
 
     return if !$Self->SUPER::ValidateConfig(%Param);
 
-    my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+    my %State = $Kernel::OM->Get('State')->StateGet(
         Name => $Param{Config}->{State}
     );
 
     if (%State) {
         if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Validation of parameter \"PendingTimeDiff\" failed!"
             );

@@ -14,9 +14,9 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -60,7 +60,7 @@ sub LogFileGet {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -68,21 +68,21 @@ sub LogFileGet {
         }
     }
 
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get log files
     my %LogFileList = $Self->LogFileList();
 
-    my $LogDir = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/log';
+    my $LogDir = $Kernel::OM->Get('Config')->Get('Home') . '/var/log';
     my $Filename = $LogFileList{$Param{ID}};
     $Filename    =~ s/\//_/g;
 
-    my $Stat = $Kernel::OM->Get('Kernel::System::Main')->FileStat(
+    my $Stat = $Kernel::OM->Get('Main')->FileStat(
         Location => $LogDir.'/'.$LogFileList{$Param{ID}},
     );
 
     if ( !$Stat ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to read log file: $LogFileList{$Param{ID}} (ID: $Param{ID})!",
         );
@@ -118,12 +118,12 @@ sub LogFileGet {
     }
 
     if ( !$Param{NoContent} ) {
-        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location => $LogDir.'/'.$LogFileList{$Param{ID}},
         );
 
         if ( !$Content ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to read log file: $LogFileList{$Param{LogFileID}} (ID: $Param{ID})!",
             );
@@ -148,9 +148,9 @@ sub LogFileList {
     my ( $Self, %Param ) = @_;
     my %LogFileList;
 
-    my $LogDir = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/log';
+    my $LogDir = $Kernel::OM->Get('Config')->Get('Home') . '/var/log';
 
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $LogDir,
         Filter    => '*',
         Recursive => 1,
@@ -163,7 +163,7 @@ sub LogFileList {
         my $Filename = $File;
         $Filename =~ s{$LogDir/}{}g;
 
-        my $MD5sum = $Kernel::OM->Get('Kernel::System::Main')->MD5sum(
+        my $MD5sum = $Kernel::OM->Get('Main')->MD5sum(
             String => $Filename
         );
         $LogFileList{$MD5sum} = $Filename;

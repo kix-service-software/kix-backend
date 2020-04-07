@@ -12,11 +12,11 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
+    'Config',
+    'DB',
+    'Log',
+    'State',
+    'Ticket',
 );
 
 =item new()
@@ -33,11 +33,11 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{StateObject}  = $Kernel::OM->Get('Kernel::System::State');
-    $Self->{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{DBObject}     = $Kernel::OM->Get('DB');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{StateObject}  = $Kernel::OM->Get('State');
+    $Self->{TicketObject} = $Kernel::OM->Get('Ticket');
     return $Self;
 }
 

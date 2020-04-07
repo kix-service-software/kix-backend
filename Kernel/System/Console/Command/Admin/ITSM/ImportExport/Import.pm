@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::ImportExport',
+    'Main',
+    'ImportExport',
 );
 
 sub Configure {
@@ -58,7 +58,7 @@ sub Run {
     my $TemplateID = $Self->GetOption('template-number');
 
     # get template data
-    my $TemplateData = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateGet(
+    my $TemplateData = $Kernel::OM->Get('ImportExport')->TemplateGet(
         TemplateID => $TemplateID,
         UserID     => 1,
     );
@@ -80,7 +80,7 @@ sub Run {
         $Self->Print("<yellow>Read File $SourceFile.</yellow>\n");
 
         # read source file
-        $SourceContent = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        $SourceContent = $Kernel::OM->Get('Main')->FileRead(
             Location => $SourceFile,
             Result   => 'SCALAR',
             Mode     => 'binmode',
@@ -94,7 +94,7 @@ sub Run {
     }
 
     # import data
-    my $Result = $Kernel::OM->Get('Kernel::System::ImportExport')->Import(
+    my $Result = $Kernel::OM->Get('ImportExport')->Import(
         TemplateID    => $TemplateID,
         SourceContent => $SourceContent,
         UserID        => 1,

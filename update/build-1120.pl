@@ -24,8 +24,8 @@ use Kernel::System::VariableCheck qw(:all);
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
-        LogPrefix => 'db-update-build-1120.pl',
+    'Log' => {
+        LogPrefix => 'framework_update-to-build-1120',
     },
 );
 
@@ -39,9 +39,9 @@ exit 0;
 
 sub _ReconfigureNotificationTransports {
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
-    my %NotificationList = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationList(
+    my %NotificationList = $Kernel::OM->Get('NotificationEvent')->NotificationList(
         All     => 1,
         Details => 1, 
     ); 
@@ -52,7 +52,7 @@ sub _ReconfigureNotificationTransports {
         # check and re-add transport "Email"
         if ( IsArrayRefWithData($Notification->{Data}->{Transports}) ) {
             $Notification->{Data}->{Transports} = ['Email'];
-            $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationUpdate(
+            $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
                 ID => $NotificationID,
                 %{$Notification},
                 UserID => 1

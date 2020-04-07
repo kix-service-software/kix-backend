@@ -18,11 +18,11 @@ use MIME::Base64 qw(encode_base64);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Main',
+    'SysConfig',
+    'Time',
 );
 
 sub Configure {
@@ -53,7 +53,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Home      = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home      = $Kernel::OM->Get('Config')->Get('Home');
 
     my $IconDir = $Self->GetOption('icon-directory');
 
@@ -66,7 +66,7 @@ sub Run {
     $Self->Print("<yellow>Updating icon database...</yellow>\n");
 
     # read CSV file
-    my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Location => $CSVFile,
     );
     if ( !$Content ) {
@@ -74,7 +74,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $LinesRef = $Kernel::OM->Get('Kernel::System::CSV')->CSV2Array(
+    my $LinesRef = $Kernel::OM->Get('CSV')->CSV2Array(
         String => $$Content
     );
 
@@ -94,7 +94,7 @@ sub Run {
         my $ContentType = $Line->[4];
 
         # read icon file
-        my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
             Directory => $IconDir,
             Filename  => $File,
         );
@@ -114,7 +114,7 @@ sub Run {
             next;
         }
 
-        my $ObjectIconList = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconList(
+        my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
             Object   => $Object,
             ObjectID => $Value,
         );
@@ -122,7 +122,7 @@ sub Run {
         my $Result;
         if ( IsArrayRefWithData($ObjectIconList) ) {
             # update
-            $Result = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconUpdate(
+            $Result = $Kernel::OM->Get('ObjectIcon')->ObjectIconUpdate(
                 ID          => $ObjectIconList->[0],
                 Object      => $Object,
                 ObjectID    => $Value,
@@ -134,7 +134,7 @@ sub Run {
         else 
         {
             # import
-            $Result = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconAdd(
+            $Result = $Kernel::OM->Get('ObjectIcon')->ObjectIconAdd(
                 Object      => $Object,
                 ObjectID    => $Value,
                 ContentType => $ContentType,
@@ -163,49 +163,49 @@ sub _LookupValue {
     my $Value = $Param{RawValue};
 
     if ( $Param{Object} eq 'GeneralCatalogItem' ) {
-        my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class => $Param{Parent},
         );
         my %ItemListReverse = reverse %{$ItemList};
         $Value = $ItemListReverse{$Param{RawValue}};
     }
     elsif ( $Param{Object} eq 'FAQCategory' ) {
-        $Value = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryLookup(
+        $Value = $Kernel::OM->Get('FAQ')->CategoryLookup(
             Name => $Param{RawValue}
         );
     }
     elsif ( $Param{Object} eq 'Queue' ) {
-        $Value = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+        $Value = $Kernel::OM->Get('Queue')->QueueLookup(
             Queue => $Param{RawValue}
         );
     }
     elsif ( $Param{Object} eq 'TicketType' ) {
-        $Value = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+        $Value = $Kernel::OM->Get('Type')->TypeLookup(
             Type => $Param{RawValue}
         );
     }
     elsif ( $Param{Object} eq 'Priority' ) {
-        $Value = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+        $Value = $Kernel::OM->Get('Priority')->PriorityLookup(
             Priority => $Param{RawValue}
         );
     }
     elsif ( $Param{Object} eq 'TicketState' ) {
-        $Value = $Kernel::OM->Get('Kernel::System::State')->StateLookup(
+        $Value = $Kernel::OM->Get('State')->StateLookup(
             State => $Param{RawValue}
         );
     }
     elsif ( $Param{Object} eq 'TicketLockType' ) {
-        $Value = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
+        $Value = $Kernel::OM->Get('Lock')->LockLookup(
             Lock => $Param{RawValue}
         );
     }
     elsif ( $Param{Object} eq 'ArticleSenderType' ) {
-        my $Value = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
+        my $Value = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
             SenderType => $Param{RawValue},
         );
     }
     elsif ( $Param{Object} eq 'Channel' ) {
-        $Value = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+        $Value = $Kernel::OM->Get('Channel')->ChannelLookup(
             Name => $Param{RawValue}
         );
     }

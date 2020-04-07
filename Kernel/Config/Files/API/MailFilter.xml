@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailFilterGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailFilter::MailFilterGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">MailFilterID</Item>
                 <Item Key="ResponseSchema">MailFilterResponse</Item>
@@ -17,6 +18,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailFilterSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailFilter::MailFilterSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">MailFilterCollectionResponse</Item>
             </Hash>
@@ -27,6 +29,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailFilterCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailFilter::MailFilterCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MailFilterPostRequest</Item>
                 <Item Key="ResponseSchema">MailFilterPostPatchResponse</Item>
@@ -38,6 +41,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailFilterUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailFilter::MailFilterUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MailFilterPatchRequest</Item>
                 <Item Key="ResponseSchema">MailFilterPostPatchResponse</Item>
@@ -49,6 +53,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">MailFilterDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::MailFilter::MailFilterDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>

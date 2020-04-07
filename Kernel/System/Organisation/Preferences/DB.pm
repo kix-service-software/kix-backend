@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
+    'Config',
+    'Cache',
+    'DB',
 );
 
 sub new {
@@ -28,7 +28,7 @@ sub new {
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # preferences table data
     $Self->{PreferencesTable} = $ConfigObject->Get('OrganisationPreferences')->{Params}->{Table}
@@ -42,7 +42,7 @@ sub new {
 
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -65,7 +65,7 @@ sub SetPreferences {
     my $Value = defined $Param{Value} ? $Param{Value} : '';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete old data
     return if !$DBObject->Do(
@@ -86,7 +86,7 @@ sub SetPreferences {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -101,14 +101,14 @@ sub GetPreferences {
     my $CacheKey = $Self->{CachePrefix} . "::GetPreferences::" . $Param{ContactID};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get preferences
     return if !$DBObject->Prepare(
@@ -126,7 +126,7 @@ sub GetPreferences {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -145,14 +145,14 @@ sub SearchPreferences {
     my $CacheKey = $Self->{CachePrefix} . "::SearchPreferences::" . $Key . '::' . $Value;
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $Lower = '';
     if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
@@ -183,7 +183,7 @@ sub SearchPreferences {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,

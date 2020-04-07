@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::ClientRegistration',
+    'ClientRegistration',
 );
 
 sub Configure {
@@ -31,13 +31,13 @@ sub Run {
     $Self->Print("<yellow>Listing registered clients...</yellow>\n");
 
     my @ClientIDs;
-    my $ClientList = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationList();
+    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
     if ( ref $ClientList eq 'ARRAY' ) {
         @ClientIDs = @{$ClientList};
     }
 
     foreach my $ClientID ( sort @ClientIDs ) {
-        my %ClientRegistration = $Kernel::OM->Get('Kernel::System::ClientRegistration')->ClientRegistrationGet(
+        my %ClientRegistration = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
             ClientID => $ClientID
         );
         foreach my $Key ( sort keys %ClientRegistration ) {

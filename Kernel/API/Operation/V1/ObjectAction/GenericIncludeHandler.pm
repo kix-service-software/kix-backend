@@ -67,7 +67,7 @@ sub Run {
     # check required parameters
     foreach my $Key ( qw(Object ObjectID) ) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -90,10 +90,10 @@ sub _LoadObjectActionBackend {
     $Self->{ObjectActionModules} //= {};
 
     if ( !$Self->{ObjectActionModules}->{$Param{Object}} ) {
-        my $Backend = 'Kernel::API::Operation::V1::ObjectAction::' . $Param{Object};
+        my $Backend = 'API::Operation::V1::ObjectAction::' . $Param{Object};
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
             );     
@@ -102,7 +102,7 @@ sub _LoadObjectActionBackend {
 
         my $BackendObject = $Backend->new( %{$Self} );
         if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
             );        

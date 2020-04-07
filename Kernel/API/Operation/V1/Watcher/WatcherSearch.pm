@@ -84,7 +84,7 @@ perform WatchenSearch Operation. This will return a Watcher item list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @WatcherList = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherList();
+    my @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList();
 
     if ( IsArrayRefWithData(\@WatcherList) ) {
         return $Self->_Success(

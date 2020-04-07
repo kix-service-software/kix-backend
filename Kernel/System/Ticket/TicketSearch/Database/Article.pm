@@ -16,8 +16,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -91,7 +91,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -108,7 +108,7 @@ sub Search {
     );
 
     my $IsStaticSearch = 0;
-    my $SearchIndexModule = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndexModule');
+    my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
     if ( $SearchIndexModule =~ /::StaticDB$/ ) {
         $IsStaticSearch = 1;
     }
@@ -131,7 +131,7 @@ sub Search {
 
     if ( $Param{Search}->{Field} =~ /ArticleCreateTime/ ) {
         # convert to unix time
-        my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        my $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $Param{Search}->{Value},
         );
 
@@ -144,7 +144,7 @@ sub Search {
         );
 
         if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );
@@ -178,7 +178,7 @@ sub Search {
             $FieldValue =~ s/\*/%/g;
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );

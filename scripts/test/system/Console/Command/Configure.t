@@ -14,8 +14,8 @@ use utf8;
 
 use vars (qw($Self));
 
-my @CommandFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-    Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/Kernel/System/Console/Command',
+my @CommandFiles = $Kernel::OM->Get('Main')->DirectoryRead(
+    Directory => $Kernel::OM->Get('Config')->Get('Home') . '/Kernel/System/Console/Command',
     Filter    => '*.pm',
     Recursive => 1,
 );

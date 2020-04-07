@@ -14,9 +14,9 @@ use warnings;
 use utf8;
 
 our @ObjectDependencies = (
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::LinkObject'
+    'GeneralCatalog',
+    'ITSMConfigItem',
+    'LinkObject'
 );
 
 sub new {
@@ -26,9 +26,9 @@ sub new {
     my $Self = {%Param};
     bless( $Self, $Type );
 
-    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-    $Self->{ConfigItemObject}     = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-    $Self->{LinkObject}           = $Kernel::OM->Get('Kernel::System::LinkObject');
+    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
+    $Self->{LinkObject}           = $Kernel::OM->Get('LinkObject');
 
     return $Self;
 }

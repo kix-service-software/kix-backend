@@ -14,8 +14,8 @@ use warnings;
 use MIME::Base64;
 
 our @ObjectDependencies = (
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::Log'
+    'ITSMConfigItem',
+    'Log'
 );
 
 =head1 NAME
@@ -36,7 +36,7 @@ create a object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $BackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::Attachment');
+    my $BackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::Attachment');
 
 =cut
 
@@ -66,12 +66,12 @@ sub ValueLookup {
     
     return if !$Param{Value};
 
-    my $StoredAttachment = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGet(
+    my $StoredAttachment = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGet(
         ID => $Param{Value},
     );
 
     if (!$StoredAttachment) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to find attachment with ID $Param{Value} in attachment storage!"
         );
@@ -124,7 +124,7 @@ sub InternalValuePrepare {
     # check needed stuff
     foreach (qw(Filename ContentType Content)) {
         if ( !$Param{Value}->{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -135,7 +135,7 @@ sub InternalValuePrepare {
     my $Content = MIME::Base64::decode_base64($Param{Value}->{Content});
 
     # store the attachment in the default storage backend....
-    my $AttDirID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageAdd(
+    my $AttDirID = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageAdd(
         DataRef         => \$Content,
         Filename        => $Param{Value}->{Filename},
         UserID          => 1,
@@ -165,7 +165,7 @@ sub StatsAttributeCreate {
     # check needed stuff
     for my $Argument (qw(Key Name Item)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!"
             );
@@ -227,7 +227,7 @@ sub ExportValuePrepare {
     my $RealMD5Sum   = "";
 
     # get saved properties (attachment directory info)
-    my %AttDirData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGetDirectory(
+    my %AttDirData = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGetDirectory(
         ID => $Param{Value},
     );
 
@@ -239,7 +239,7 @@ sub ExportValuePrepare {
     {
 
         my %RealProperties =
-            $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->AttachmentStorageGetRealProperties(
+            $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGetRealProperties(
             %AttDirData,
             );
 
@@ -344,7 +344,7 @@ sub ValidateValue {
         return 'not a valid attachment'
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $ForbiddenExtensions   = $ConfigObject->Get('FileUpload::ForbiddenExtensions');
     my $ForbiddenContentTypes = $ConfigObject->Get('FileUpload::ForbiddenContentTypes');

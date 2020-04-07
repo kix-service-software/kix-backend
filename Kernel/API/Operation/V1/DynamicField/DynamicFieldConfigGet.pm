@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::DynamicField::DynamicFieldConfigGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::DynamicField::DynamicFieldConfigGet');
 
     return $Self;
 }
@@ -117,7 +117,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get the DynamicField data
-    my $DynamicFieldData = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+    my $DynamicFieldData = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
         ID => $Param{Data}->{DynamicFieldID}
     );
 

@@ -17,9 +17,9 @@ use Kernel::System::VariableCheck qw(IsArrayRefWithData);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::ITSMConfigItem',
+    'Config',
+    'GeneralCatalog',
+    'ITSMConfigItem',
 );
 
 sub Configure {
@@ -59,7 +59,7 @@ sub PreRun {
     if ($Class) {
 
         # get class list
-        my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class => 'ITSM::ConfigItem::Class',
         );
 
@@ -88,7 +88,7 @@ sub Run {
 
     if ( !$Self->GetOption('all-states') ) {
 
-        my $StateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        my $StateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class       => 'ITSM::ConfigItem::DeploymentState',
             Preferences => {
                 Functionality => [ 'preproductive', 'productive' ],
@@ -102,7 +102,7 @@ sub Run {
     }
 
     # get ITSMConfigitem object
-    my $ITSMConfigitemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+    my $ITSMConfigitemObject = $Kernel::OM->Get('ITSMConfigItem');
 
     # get all config items ids
     my @ConfigItemIDs = @{ $ITSMConfigitemObject->ConfigItemSearch( %{ $Self->{SearchCriteria} } ) };
@@ -120,7 +120,7 @@ sub Run {
         # value set in SysConfig
         my $Scope = $Self->GetOption('scope');
         if ($Scope) {
-            $Kernel::OM->Get('Kernel::Config')->Set(
+            $Kernel::OM->Get('Config')->Set(
                 Key   => 'UniqueCIName::UniquenessCheckScope',
                 Value => $Scope,
             );

@@ -110,7 +110,7 @@ sub Run {
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
         # search ticket       
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
@@ -134,7 +134,7 @@ sub Run {
         }
 
         # delete tickettype	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeDelete(
+        my $Success = $Kernel::OM->Get('Type')->TypeDelete(
             TypeID  => $TypeID,
             UserID  => $Self->{Authorization}->{UserID},
         );

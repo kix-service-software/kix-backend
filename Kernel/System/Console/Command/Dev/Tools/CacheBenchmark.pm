@@ -27,9 +27,9 @@ use Time::HiRes ();
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Main',
+    'Config',
+    'Cache',
+    'Main',
 );
 
 sub Configure {
@@ -90,10 +90,10 @@ sub Run {
     if (!$ProcessID) {
 
         # get home directory
-        my $HomeDir = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+        my $HomeDir = $Kernel::OM->Get('Config')->Get('Home');
 
         # get all avaliable backend modules
-        my @BackendModuleFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        my @BackendModuleFiles = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $HomeDir . '/Kernel/System/Cache/',
             Filter    => $Backend ? $Backend.'.pm' : '*.pm',
             Silent    => 1,
@@ -109,17 +109,17 @@ sub Run {
 
             next MODULEFILE if !$Module;
 
-            $Kernel::OM->Get('Kernel::Config')->Set(
+            $Kernel::OM->Get('Config')->Set(
                 Key   => 'Cache::Module',
                 Value => "Kernel::System::Cache::$Module",
             );
 
             # Make sure we get a fresh instance
             $Kernel::OM->ObjectsDiscard(
-                Objects => ['Kernel::System::Cache'],
+                Objects => ['Cache'],
             );
 
-            my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+            my $CacheObject = $Kernel::OM->Get('Cache');
 
             if ( !$CacheObject->{CacheObject}->isa("Kernel::System::Cache::$Module") ) {
                 die "Could not create cache backend Kernel::System::Cache::$Module";
@@ -168,17 +168,17 @@ sub Run {
         my $ItemSize = $Self->GetOption('item-size');
         my $Preload = $Self->GetOption('preload');
 
-        $Kernel::OM->Get('Kernel::Config')->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Cache::Module',
             Value => "Kernel::System::Cache::$Param{Backend}",
         );
 
         # Make sure we get a fresh instance
         $Kernel::OM->ObjectsDiscard(
-            Objects => ['Kernel::System::Cache'],
+            Objects => ['Cache'],
         );
 
-        my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+        my $CacheObject = $Kernel::OM->Get('Cache');
 
         if ( !$CacheObject->{CacheObject}->isa("Kernel::System::Cache::$Param{Backend}") ) {
             die "Could not create cache backend Kernel::System::Cache::$Param{Backend}";
@@ -283,7 +283,7 @@ sub Benchmark {
 sub _DoPreload {
     my ( $Self, %Param ) = @_;
 
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Content1kB = '.' x 1024;
     
@@ -344,8 +344,8 @@ sub _DoJob {
             waitpid($PID, 0); 
 
             # read result file
-            my $JobResult = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
-                Directory => $Kernel::OM->Get('Kernel::Config')->Get('TempDir'),
+            my $JobResult = $Kernel::OM->Get('Main')->FileRead(
+                Directory => $Kernel::OM->Get('Config')->Get('TempDir'),
                 Filename  => 'CacheBenchmark.'.$Param{ItemSize}.'.'.$PID.'.result',
             );        
 
@@ -377,7 +377,7 @@ sub _DoJobWin32 {
 
     my @Children;
     my $TimeStart = $Self->{TimeObject}->SystemTime();
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     for my $ProcessID ( 1 .. $Param{Processes} ) {
         my $Child;
@@ -407,7 +407,7 @@ sub _DoJobWin32 {
 sub _TestItemSize {
     my ( $Self, %Param ) = @_;
 
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Content = ' ' x $Param{ItemSize};
     my $OpCount = 10 + 50 * int( 7 - Log10($Param{ItemSize}) );
@@ -447,8 +447,8 @@ sub _TestItemSize {
     # report
     my $Result = (100 * $SetOK /   ($OpCount)).'::'.(100 * $GetOK /   ( 98 * $OpCount )).'::'.(100 * $DelOK /   ($OpCount));
 
-    $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
-        Directory => $Kernel::OM->Get('Kernel::Config')->Get('TempDir'),
+    $Kernel::OM->Get('Main')->FileWrite(
+        Directory => $Kernel::OM->Get('Config')->Get('TempDir'),
         Filename  => 'CacheBenchmark.'.$Param{ItemSize}.'.'.$$.'.result',
         Content   => \$Result,
     );
