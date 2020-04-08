@@ -103,10 +103,13 @@ sub PluginList {
             while (<HANDLE>) {
                 # ignore comments and empty lines
                 next if $_ =~ /^#/;
+                next if $_ =~ /^\s*$/;
 
                 chomp;
-                my ($Object, $Module) = split(/\s+=\s+/, $_);
-                
+                $_ =~ s/^\s*(.*?)\s*$/$1/g;
+
+                my ($Object, $Module) = split(/\s+=\s+/, $_);                
+
                 next if !$Object && !$Module;
 
                 $Plugin{Exports}->{$Object} = $Module;

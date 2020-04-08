@@ -643,7 +643,18 @@ sub _LoadMacroActionTypeBackend {
     $Self->{MacroActionTypeModules} //= {};
 
     if ( !$Self->{MacroActionTypeModules}->{$Param{MacroType}} || !$Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} ) {
-        my $Backend = 'Automation::MacroAction::' . $Param{MacroType} . '::' . $Param{Name};
+        # load backend modules
+        my $Backends = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{MacroType});
+
+        if ( !IsHashRefWithData($Backends) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No macro action backend modules for macro type \"$Param{MacroType}\" found!",
+            );
+            return;
+        }        
+
+        my $Backend = $Backends->{$Param{Name}}->{Module}; 
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
