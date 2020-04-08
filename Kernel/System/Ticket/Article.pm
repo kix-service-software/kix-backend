@@ -2062,6 +2062,7 @@ sub ArticleUpdate {
         ReplyTo       => 'a_reply_to',
         To            => 'a_to',
         Cc            => 'a_cc',
+        Bcc           => 'a_bcc',
         CustomerVisible => 'customer_visible',
         SenderTypeID  => 'article_sender_type_id',
     );

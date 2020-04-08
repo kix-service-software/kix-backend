@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-03-26 15:02+0000\n"
+"POT-Creation-Date: 2020-04-08 12:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -343,6 +343,10 @@ msgid "Permission type that restricts access of objects based on their property 
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Permission type that restricts access on object properties (QueueID in tickets)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Phone"
 msgstr ""
 
@@ -363,6 +367,10 @@ msgid "Production"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Property"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "PropertyValue"
 msgstr ""
 
@@ -372,6 +380,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Repair"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Resource"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -460,6 +472,26 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "TextArea"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The import is running."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The import run has been finished."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The job is running."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The last job run has been finished but some errors occured."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The last job run has been finished."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -567,6 +599,10 @@ msgid "external"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "finished"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "full permissions on everything (CRUD on resource /*)"
 msgstr ""
 
@@ -603,6 +639,10 @@ msgid "reject"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "running"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "same as Asset-Reader, but additionally  allows to create new or update any existing asset entry and allows to CREATE, UPDATE, DELETE links"
 msgstr ""
 
@@ -626,68 +666,8 @@ msgstr ""
 msgid "valid"
 msgstr ""
 
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
-msgid "The job is running."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
-msgid "The last job run has been finished but some errors occured."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
-msgid "The last job run has been finished."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "The import is running."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "The import run has been finished."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "finished"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "running"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1132_pre.xml
-msgid "Permission type that restricts access on object properties (QueueID in tickets)."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1132_pre.xml
-msgid "Property"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Object"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Permission type for the relationship of queues and tickets."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Permission type that corresponds with a collection resource."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Permission type that corresponds with a item resource."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Queue->Ticket"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Resource"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
