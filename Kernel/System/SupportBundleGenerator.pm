@@ -91,18 +91,6 @@ Returns:
 sub Generate {
     my ( $Self, %Param ) = @_;
 
-    if ( !-e $Self->{Home} . '/ARCHIVE' ) {
-        my $Message = $Self->{Home} . '/ARCHIVE: Is missing, can not continue!';
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => $Message,
-        );
-        return {
-            Success => 0,
-            Message => $Message,
-        };
-    }
-
     my %SupportFiles;
 
     # get the list of installed packages
