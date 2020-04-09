@@ -82,6 +82,10 @@
          ],
          "readOnly" : true
       },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      },
       "Versions" : {
          "description" : "added via include \"Versions\"",
          "type" : "array",
@@ -97,7 +101,8 @@
       "ClassID",
       "CreateBy",
       "CreateTime",
-      "ConfigItemID"
+      "ConfigItemID",
+      "Name"
    ],
    "definitions" : {
       "ConfigItemClassDefinition_json-fb2ac7494e" : {

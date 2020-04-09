@@ -299,6 +299,7 @@ A hashref with the following keys is returned:
 
     $ConfigItem{ConfigItemID}
     $ConfigItem{Number}
+    $ConfigItem{Name}
     $ConfigItem{ClassID}
     $ConfigItem{Class}
     $ConfigItem{LastVersionID}
@@ -343,7 +344,7 @@ sub ConfigItemGet {
 
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
-        SQL => 'SELECT id, configitem_number, class_id, last_version_id, '
+        SQL => 'SELECT id, configitem_number, name, class_id, last_version_id, '
             . 'cur_depl_state_id, cur_inci_state_id, '
             . 'create_time, create_by, change_time, change_by '
             . 'FROM configitem WHERE id = ?',
@@ -356,14 +357,15 @@ sub ConfigItemGet {
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ConfigItem{ConfigItemID}   = $Row[0];
         $ConfigItem{Number}         = $Row[1];
-        $ConfigItem{ClassID}        = $Row[2];
-        $ConfigItem{LastVersionID}  = $Row[3];
-        $ConfigItem{CurDeplStateID} = $Row[4];
-        $ConfigItem{CurInciStateID} = $Row[5];
-        $ConfigItem{CreateTime}     = $Row[6];
-        $ConfigItem{CreateBy}       = $Row[7];
-        $ConfigItem{ChangeTime}     = $Row[8];
-        $ConfigItem{ChangeBy}       = $Row[9];
+        $ConfigItem{Name}           = $Row[2];
+        $ConfigItem{ClassID}        = $Row[3];
+        $ConfigItem{LastVersionID}  = $Row[4];
+        $ConfigItem{CurDeplStateID} = $Row[5];
+        $ConfigItem{CurInciStateID} = $Row[6];
+        $ConfigItem{CreateTime}     = $Row[7];
+        $ConfigItem{CreateBy}       = $Row[8];
+        $ConfigItem{ChangeTime}     = $Row[9];
+        $ConfigItem{ChangeBy}       = $Row[10];
     }
 
     # check config item
@@ -1131,29 +1133,16 @@ sub ConfigItemSearchExtended {
         last CONFIGITEMPARAM;
     }
 
-    # special handling for config item number
+    # configitem search is required if Number or Name is given
+    # special handling for config item number and name
     # number 0 is allowed but not the empty string
-    if ( defined $Param{Number} && $Param{Number} ne '' ) {
+    if ( (defined $Param{Number} && $Param{Number} ne '') || $Param{Name} ) {
         $RequiredSearch{ConfigItem} = 1;
     }
 
-    # version search is required if Name, What or PreviousVersionSearch is given
-    if (
-        ( defined $Param{Name} && $Param{Name} ne '' )
-        || ( defined $Param{What} && $Param{What} ne '' )
-        || $Param{PreviousVersionSearch}
-        )
-    {
+    # version search is required if What or PreviousVersionSearch is given
+    if ( ( defined $Param{What} && $Param{What} ne '' ) || $Param{PreviousVersionSearch} ) {
         $RequiredSearch{Version} = 1;
-    }
-
-    # version search is also required if sorting by name (fix for bug #7072)
-    ORDERBY:
-    for my $OrderBy ( @{ $Param{OrderBy} } ) {
-        if ( $OrderBy eq 'Name' ) {
-            $RequiredSearch{Version} = 1;
-            last ORDERBY;
-        }
     }
 
     # xml version search is required if What is given
@@ -1259,6 +1248,7 @@ return a config item list as an array reference
 
     my $ConfigItemIDs = $ConfigItemObject->ConfigItemSearch(
         Number       => 'The ConfigItem Number',  # (optional)
+        Name         => 'some name',              # (optional)
         ClassIDs     => [9, 8, 7, 6],             # (optional)
         DeplStateIDs => [1, 2, 3, 4],             # (optional)
         InciStateIDs => [1, 2, 3, 4],             # (optional)
@@ -1325,6 +1315,7 @@ sub ConfigItemSearch {
     my %OrderByTable = (
         ConfigItemID => 'id',
         Number       => 'configitem_number',
+        Name         => 'name',
         ClassID      => 'class_id',
         DeplStateID  => 'cur_depl_state_id',
         InciStateID  => 'cur_inci_state_id',
@@ -1351,8 +1342,6 @@ sub ConfigItemSearch {
     my %OrderBySeen;
     ORDERBY:
     for my $OrderBy ( @{ $Param{OrderBy} } ) {
-
-        next ORDERBY if $OrderBy eq 'Name';
 
         if ( !$OrderBy || !$OrderByTable{$OrderBy} || $OrderBySeen{$OrderBy} ) {
 
@@ -1399,8 +1388,6 @@ sub ConfigItemSearch {
     ORDERBY:
     for my $OrderBy ( @{ $Param{OrderBy} } ) {
 
-        next ORDERBY if $OrderBy eq 'Name';
-
         # set the default order direction
         my $Direction = 'DESC';
 
@@ -1445,6 +1432,23 @@ sub ConfigItemSearch {
         }
         else {
             push @SQLWhere, "LOWER(configitem_number) = LOWER('$Param{Number}')";
+        }
+    }
+    if ( defined $Param{Name} && $Param{Name} ne '' ) {
+
+        # quote
+        $Param{Name} = $Kernel::OM->Get('DB')->Quote( $Param{Name} );
+
+        if ( $Param{UsingWildcards} ) {
+
+            # prepare like string
+            $Self->_PrepareLikeString( \$Param{Name} );
+
+            push @SQLWhere,
+                "LOWER(name) LIKE LOWER('$Param{Name}') $LikeEscapeString";
+        }
+        else {
+            push @SQLWhere, "LOWER(name) = LOWER('$Param{Name}')";
         }
     }
 
