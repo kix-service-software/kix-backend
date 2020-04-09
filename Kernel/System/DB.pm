@@ -430,7 +430,7 @@ sub Do {
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper \$Param{Bind} : '',
+                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
@@ -669,7 +669,7 @@ sub Prepare {
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper \$Param{Bind} : '',
+                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
