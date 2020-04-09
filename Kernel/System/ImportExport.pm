@@ -627,7 +627,7 @@ sub ObjectAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Object}}->{Module}
+        $ModuleList->{$TemplateData->{Object}}->{Module}
     );
 
     return if !$Backend;
@@ -878,7 +878,7 @@ sub FormatAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Format}}->{Module}
+        $ModuleList->{$TemplateData->{Format}}->{Module}
     );
 
     return if !$Backend;
@@ -1481,7 +1481,7 @@ sub MappingObjectAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Object}}->{Module}
+        $ModuleList->{$TemplateData->{Object}}->{Module}
     );
 
     return if !$Backend;
@@ -1706,7 +1706,7 @@ sub MappingFormatAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Format}}->{Module}
+        $ModuleList->{$TemplateData->{Format}}->{Module}
     );
 
     return if !$Backend;
@@ -1930,7 +1930,7 @@ sub SearchAttributesGet {
 
     # load backend
     my $Backend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Object}}->{Module}
+        $ModuleList->{$TemplateData->{Object}}->{Module}
     );
 
     return if !$Backend;
@@ -2167,7 +2167,7 @@ sub Export {
 
     # load backend
     my $ObjectBackend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Object}}->{Module}
+        $ModuleList->{$TemplateData->{Object}}->{Module}
     );
     
     return if !$ObjectBackend;
@@ -2176,7 +2176,7 @@ sub Export {
 
     # load backend
     my $FormatBackend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Format}}->{Module}
+        $ModuleList->{$TemplateData->{Format}}->{Module}
     );
 
     return if !$FormatBackend;
@@ -2333,7 +2333,7 @@ sub Import {
 
     # load backend
     my $ObjectBackend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Object}}->{Module}
+        $ModuleList->{$TemplateData->{Object}}->{Module}
     );
 
     return if !$ObjectBackend;
@@ -2342,7 +2342,7 @@ sub Import {
 
     # load backend
     my $FormatBackend = $Kernel::OM->Get(
-        $ModuleList->{{$TemplateData->{Format}}->{Module}
+        $ModuleList->{$TemplateData->{Format}}->{Module}
     );
 
     return if !$FormatBackend;
