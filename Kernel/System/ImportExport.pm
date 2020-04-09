@@ -623,9 +623,11 @@ sub ObjectAttributesGet {
         return;
     }
 
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
+
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        $ModuleList->{{$TemplateData->{Object}}->{Module}
     );
 
     return if !$Backend;
@@ -872,9 +874,11 @@ sub FormatAttributesGet {
         return;
     }
 
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
+
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'ImportExport::FormatBackend::' . $TemplateData->{Format}
+        $ModuleList->{{$TemplateData->{Format}}->{Module}
     );
 
     return if !$Backend;
@@ -1473,9 +1477,11 @@ sub MappingObjectAttributesGet {
         return;
     }
 
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
+
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        $ModuleList->{{$TemplateData->{Object}}->{Module}
     );
 
     return if !$Backend;
@@ -1696,9 +1702,11 @@ sub MappingFormatAttributesGet {
         return;
     }
 
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
+
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'ImportExport::FormatBackend::' . $TemplateData->{Format}
+        $ModuleList->{{$TemplateData->{Format}}->{Module}
     );
 
     return if !$Backend;
@@ -1918,9 +1926,11 @@ sub SearchAttributesGet {
         return;
     }
 
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
+
     # load backend
     my $Backend = $Kernel::OM->Get(
-        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        $ModuleList->{{$TemplateData->{Object}}->{Module}
     );
 
     return if !$Backend;
@@ -2153,16 +2163,20 @@ sub Export {
         return;
     }
 
-    # load object backend
-    my $ObjectBackend = $Kernel::OM->Get(
-        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
-    );
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
 
+    # load backend
+    my $ObjectBackend = $Kernel::OM->Get(
+        $ModuleList->{{$TemplateData->{Object}}->{Module}
+    );
+    
     return if !$ObjectBackend;
 
-    # load format backend
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
+
+    # load backend
     my $FormatBackend = $Kernel::OM->Get(
-        'ImportExport::FormatBackend::' . $TemplateData->{Format}
+        $ModuleList->{{$TemplateData->{Format}}->{Module}
     );
 
     return if !$FormatBackend;
@@ -2315,16 +2329,20 @@ sub Import {
         return;
     }
 
-    # load object backend
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
+
+    # load backend
     my $ObjectBackend = $Kernel::OM->Get(
-        'ImportExport::ObjectBackend::' . $TemplateData->{Object}
+        $ModuleList->{{$TemplateData->{Object}}->{Module}
     );
 
     return if !$ObjectBackend;
 
-    # load format backend
+    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
+
+    # load backend
     my $FormatBackend = $Kernel::OM->Get(
-        'ImportExport::FormatBackend::' . $TemplateData->{Format}
+        $ModuleList->{{$TemplateData->{Format}}->{Module}
     );
 
     return if !$FormatBackend;

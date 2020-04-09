@@ -18,7 +18,7 @@ use vars qw($Self);
 my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
 my $ImportExportObject   = $Kernel::OM->Get('ImportExport');
-my $ObjectBackendObject  = $Kernel::OM->Get('ImportExport::ObjectBackend::ITSMConfigItem');
+my $ObjectBackendObject  = $Kernel::OM->Get('Kernel::System::ImportExport::ObjectBackend::ITSMConfigItem');
 my $XMLObject            = $Kernel::OM->Get('XML');
 
 # get helper object
