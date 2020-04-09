@@ -1071,13 +1071,14 @@ sub VersionAdd {
         );
     }
 
-    # update last_version_id, cur_depl_state_id, cur_inci_state_id, change_time and change_by
+    # update name, last_version_id, cur_depl_state_id, cur_inci_state_id, change_time and change_by
     $Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE configitem SET last_version_id = ?, '
+        SQL => 'UPDATE configitem SET name = ?, last_version_id = ?, '
             . 'cur_depl_state_id = ?, cur_inci_state_id = ?, '
             . 'change_time = ?, change_by = ? '
             . 'WHERE id = ?',
         Bind => [
+            \$Param{Name},
             \$VersionID,
             \$Param{DeplStateID},
             \$Param{InciStateID},

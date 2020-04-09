@@ -425,6 +425,7 @@ sub Do {
                 push @Array, $$Data;
             }
             else {
+                use Data::Dumper;
                 $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',

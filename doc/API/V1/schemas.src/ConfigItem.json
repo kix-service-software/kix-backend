@@ -59,6 +59,10 @@
       ],
       "readOnly": true
     },
+    "Name" : {
+        "type" : "string",
+        "readOnly" : true
+     },
     "History": {
       "type": "array",
       "description": "added via include \"History\"",
@@ -88,6 +92,7 @@
     "ClassID",
     "CreateBy",
     "CreateTime",
-    "ConfigItemID"
+    "ConfigItemID",
+    "Name"
   ]
 }
