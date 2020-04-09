@@ -8,7 +8,7 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ImprintLink" Required="0" Valid="1">
+    <ConfigItem AccessLevel="external" Name="ImprintLink" Required="0" Valid="1">
         <Description Translatable="1">Defines the language dependent link to an online imprint.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
