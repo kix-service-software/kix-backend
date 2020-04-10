@@ -4631,4 +4631,14 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Watcher::Backend###Ticket" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module for the watcher feature.</Description>
+        <Group>Watcher</Group>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Watcher::Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>

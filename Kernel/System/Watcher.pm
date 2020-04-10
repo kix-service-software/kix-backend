@@ -60,16 +60,12 @@ sub new {
     $Self->{CacheType} = 'Watcher';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
-    # get all type modules
-    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Config')->Get('Home').'/Kernel/System/Watcher',
-        Filter    => '*.pm',
-    );
-    my @BackendList = map { my $Module = fileparse($_, '.pm'); $Module } @Files;
+
+    my $BackendList = $Kernel::OM->Get('Config')->{'Watcher::Backend'};
 
     # load backends
-    foreach my $Backend ( @BackendList ) {
-        my $Package = 'Watcher::' . $Backend;
+    foreach my $Backend ( sort keys %{$BackendList} ) {
+        my $Package = $BackendList->{$Backend}->{Module};
 
         if ( !$Kernel::OM->Get('Main')->Require($Package) ) {
             $Kernel::OM->Get('Log')->Log(

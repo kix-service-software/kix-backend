@@ -2118,8 +2118,7 @@ sub _ApplyInclude {
             next if $GenericIncludes->{$Include}->{IgnoreOperationRegEx} && $Self->{OperationType} =~ /$GenericIncludes->{$Include}->{IgnoreOperationRegEx}/;
 
             # we've found a requested generic include, now we have to handle it
-            my $IncludeHandler = 'API::Operation::' . $GenericIncludes->{$Include}->{Module};
-
+            my $IncludeHandler = $GenericIncludes->{$Include}->{Module};
             if ( !$Self->{IncludeHandler}->{$IncludeHandler} ) {
                 if ( !$Kernel::OM->Get('Main')->Require($IncludeHandler) ) {
 
