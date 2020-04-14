@@ -2172,7 +2172,7 @@ sub Export {
     
     return if !$ObjectBackend;
 
-    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
+    $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
 
     # load backend
     my $FormatBackend = $Kernel::OM->Get(
@@ -2338,7 +2338,7 @@ sub Import {
 
     return if !$ObjectBackend;
 
-    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
+    $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
 
     # load backend
     my $FormatBackend = $Kernel::OM->Get(
