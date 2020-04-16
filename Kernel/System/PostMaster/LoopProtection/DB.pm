@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Log',
 );
 
 sub new {
@@ -27,7 +27,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config options
-    $Self->{PostmasterMaxEmails} = $Kernel::OM->Get('Kernel::Config')->Get('PostmasterMaxEmails') || 40;
+    $Self->{PostmasterMaxEmails} = $Kernel::OM->Get('Config')->Get('PostmasterMaxEmails') || 40;
 
     # create logfile name
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = localtime(time);    ## no critic
@@ -42,7 +42,7 @@ sub SendEmail {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $To = $Param{To} || return;
 
@@ -67,7 +67,7 @@ sub Check {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $To = $Param{To} || return;
     my $Count = 0;
@@ -85,7 +85,7 @@ sub Check {
 
     # check possible loop
     if ( $Count >= $Self->{PostmasterMaxEmails} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
                 "LoopProtection: send no more emails to '$To'! Max. count of $Self->{PostmasterMaxEmails} has been reached!",

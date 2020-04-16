@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
-    'Kernel::System::User',
+    'Role',
+    'User',
 );
 
 sub Configure {
@@ -75,7 +75,7 @@ sub PreRun {
 
     # check if all groups exist
     my @Roles = split( /\s*,\s*/, ( $Self->GetOption('roles') || '' ) );
-    my %RoleList = reverse $Kernel::OM->Get('Kernel::System::Role')->RoleList( Valid => 1 );
+    my %RoleList = reverse $Kernel::OM->Get('Role')->RoleList( Valid => 1 );
 
     ROLE:
     for my $Role (@Roles) {
@@ -94,7 +94,7 @@ sub Run {
     $Self->Print("<yellow>Adding a new user...</yellow>\n");
 
     # add user
-    my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserAdd(
+    my $UserID = $Kernel::OM->Get('User')->UserAdd(
         UserLogin    => $Self->GetOption('user-name'),
         UserPw       => $Self->GetOption('password'),
         ChangeUserID => 1,
@@ -110,7 +110,7 @@ sub Run {
 
     for my $RoleID ( sort keys %{ $Self->{Roles} } ) {
 
-        my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+        my $Success = $Kernel::OM->Get('Role')->RoleUserAdd(
             AssignUserID => $UserID,
             RoleID       => $RoleID,
             UserID       => 1,

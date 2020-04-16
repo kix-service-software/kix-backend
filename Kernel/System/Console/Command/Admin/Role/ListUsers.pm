@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
+    'Role',
 );
 
 sub Configure {
@@ -46,9 +46,9 @@ sub PreRun {
     $Self->{RoleName} = $Self->GetOption('role-name');
     $Self->{ListAll} =  $Self->GetOption('all');
     #deleteme
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => '$Self' . Data::Dumper::Dumper \$Self,
+        Message  => '$Self' . Data::Dumper::Dumper(\$Self),
     );
 
     if (!$Self->{ListAll} && !$Self->{RoleName}) {
@@ -63,7 +63,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     if ($Self->{ListAll}) {
-        my %Roles = $Kernel::OM->Get('Kernel::System::Role')->RoleList();
+        my %Roles = $Kernel::OM->Get('Role')->RoleList();
         for my $RoleID (keys %Roles) {
             $Self->_ListUsers(
                 RoleID   => $RoleID,
@@ -73,7 +73,7 @@ sub Run {
     }
     elsif($Self->{RoleName}) {
         # check role
-        $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
+        $Self->{RoleID} = $Kernel::OM->Get('Role')->RoleLookup( Role => $Self->{RoleName} );
         if ( !$Self->{RoleID} ) {
             die "Role $Self->{RoleName} does not exist.\n";
         }
@@ -93,22 +93,22 @@ sub _ListUsers {
 
     $Self->Print("<yellow>Listing users assigned to role $Param{RoleName}...</yellow>\n");
 
-    my @UserIDs = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
+    my @UserIDs = $Kernel::OM->Get('Role')->RoleUserList(
         RoleID => $Param{RoleID},
         UserID => 1,
     );
 
     foreach my $ID (sort @UserIDs) {
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %User = $Kernel::OM->Get('User')->GetUserData(
             UserID => $ID
         );
-        my %UserContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %UserContactData = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $User{UserID}
         );
         my $Fullname;
-        my $FirstnameLastnameOrder = $Kernel::OM->Get('Kernel::Config')->Get('FirstnameLastnameOrder') || 2;
+        my $FirstnameLastnameOrder = $Kernel::OM->Get('Config')->Get('FirstnameLastnameOrder') || 2;
         if (%UserContactData) {
-            $Fullname = $Kernel::OM->Get('Kernel::System::Contact')->_ContactFullname(
+            $Fullname = $Kernel::OM->Get('Contact')->_ContactFullname(
                 Firstname => $UserContactData{Firstname},
                 Lastname  => $UserContactData{Lastname},
                 UserLogin => $User{UserLogin},

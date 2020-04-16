@@ -14,7 +14,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Dev::Tools::GenericInterface::DebugRead');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Dev::Tools::GenericInterface::DebugRead');
 
 my $ExitCode = $CommandObject->Execute();
 

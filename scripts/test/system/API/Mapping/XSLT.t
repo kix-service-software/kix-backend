@@ -15,7 +15,7 @@ use vars (qw($Self));
 use Kernel::API::Debugger;
 use Kernel::API::Mapping;
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 my $DebuggerObject = Kernel::API::Debugger->new(
     DebuggerConfig => {
@@ -230,15 +230,15 @@ for my $Test (@MappingTests) {
     if ( $Test->{ConfigSuccess} ) {
         $Self->Is(
             ref $MappingObject,
-            'Kernel::API::Mapping',
+            'API::Mapping',
             $Test->{Name} . ' MappingObject was correctly instantiated',
         );
-        next TEST if ref $MappingObject ne 'Kernel::API::Mapping';
+        next TEST if ref $MappingObject ne 'API::Mapping';
     }
     else {
         $Self->IsNot(
             ref $MappingObject,
-            'Kernel::API::Mapping',
+            'API::Mapping',
             $Test->{Name} . ' MappingObject was not correctly instantiated',
         );
         next TEST;
@@ -281,7 +281,7 @@ for my $Test (@MappingTests) {
 
     $Self->Is(
         ref $SecondMappingObject,
-        'Kernel::API::Mapping',
+        'API::Mapping',
         $Test->{Name} . ' SecondMappingObject was correctly instantiated',
     );
 }

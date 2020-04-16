@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Email',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Email',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -38,7 +38,7 @@ sub Run {
     # check needed stuff
     for (qw(JobConfig GetParam)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -68,7 +68,7 @@ sub Run {
         if ( $Param{GetParam}->{$_} && $Param{GetParam}->{$_} =~ /$Match{$_}/i ) {
             $Matched = $1 || '1';
             if ( $Self->{Debug} > 1 ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'debug',
                     Message  => "'$Param{GetParam}->{$_}' =~ /$Match{$_}/i matched!",
                 );
@@ -77,7 +77,7 @@ sub Run {
         else {
             $MatchedNot = 1;
             if ( $Self->{Debug} > 1 ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'debug',
                     Message  => "'$Param{GetParam}->{$_}' =~ /$Match{$_}/i matched NOT!",
                 );
@@ -87,7 +87,7 @@ sub Run {
     if ( $Matched && !$MatchedNot ) {
 
         # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         # check if new ticket
         my $Tn = $TicketObject->GetTNByString( $Param{GetParam}->{Subject} );
@@ -97,7 +97,7 @@ sub Run {
         # set attributes if ticket is created
         for ( sort keys %Set ) {
             $Param{GetParam}->{$_} = $Set{$_};
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message =>
                     "Set param '$_' to '$Set{$_}' (Message-ID: $Param{GetParam}->{'Message-ID'}) ",
@@ -105,7 +105,7 @@ sub Run {
         }
 
         # get config object
-        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+        my $ConfigObject = $Kernel::OM->Get('Config');
 
         # send bounce mail
         my $Subject = $ConfigObject->Get(
@@ -118,7 +118,7 @@ sub Run {
             'PostMaster::PreFilterModule::NewTicketReject::Sender'
         ) || '';
 
-        $Kernel::OM->Get('Kernel::System::Email')->Send(
+        $Kernel::OM->Get('Email')->Send(
             From       => $Sender,
             To         => $Param{GetParam}->{From},
             Subject    => $Subject,
@@ -135,7 +135,7 @@ sub Run {
             ],
         );
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Send reject mail to '$Param{GetParam}->{From}'!",
         );

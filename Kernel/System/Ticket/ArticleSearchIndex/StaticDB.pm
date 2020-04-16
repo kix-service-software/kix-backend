@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Log',
 );
 
 sub ArticleIndexBuild {
@@ -25,7 +25,7 @@ sub ArticleIndexBuild {
     # check needed stuff
     for my $Needed (qw(ArticleID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -40,7 +40,7 @@ sub ArticleIndexBuild {
         DynamicFields => 0,
     );
 
-    my $SearchIndexAttributes = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndex::Attribute');
+    my $SearchIndexAttributes = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndex::Attribute');
     for my $Key (qw(From To Cc Subject)) {
         if ( $Article{$Key} ) {
             $Article{$Key} = $Self->_ArticleIndexString(
@@ -58,7 +58,7 @@ sub ArticleIndexBuild {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # update search index table
     $DBObject->Do(
@@ -94,7 +94,7 @@ sub ArticleIndexDelete {
     # check needed stuff
     for my $Needed (qw(ArticleID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -103,7 +103,7 @@ sub ArticleIndexDelete {
     }
 
     # delete articles
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM article_search WHERE id = ?',
         Bind => [ \$Param{ArticleID} ],
     );
@@ -117,7 +117,7 @@ sub ArticleIndexDeleteTicket {
     # check needed stuff
     for my $Needed (qw(TicketID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -126,7 +126,7 @@ sub ArticleIndexDeleteTicket {
     }
 
     # delete articles
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM article_search WHERE ticket_id = ?',
         Bind => [ \$Param{TicketID} ],
     );
@@ -138,7 +138,7 @@ sub ArticleIndexDeleteTicket {
 #     my ( $Self, %Param ) = @_;
 
 #     if ( !$Param{Data} ) {
-#         $Kernel::OM->Get('Kernel::System::Log')->Log(
+#         $Kernel::OM->Get('Log')->Log(
 #             Priority => 'error',
 #             Message  => "Need Data!"
 #         );
@@ -166,7 +166,7 @@ sub ArticleIndexDeleteTicket {
 #     my ( $Self, %Param ) = @_;
 
 #     if ( !$Param{Data} ) {
-#         $Kernel::OM->Get('Kernel::System::Log')->Log(
+#         $Kernel::OM->Get('Log')->Log(
 #             Priority => 'error',
 #             Message  => "Need Data!"
 #         );
@@ -182,7 +182,7 @@ sub ArticleIndexDeleteTicket {
 #     );
 
 #     # get database object
-#     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+#     my $DBObject = $Kernel::OM->Get('DB');
 
 #     my $SQLExt      = '';
 #     my $FullTextSQL = '';
@@ -255,14 +255,14 @@ sub _ArticleIndexString {
     my ( $Self, %Param ) = @_;
 
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need String!",
         );
         return;
     }
 
-    my $SearchIndexAttributes = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::SearchIndex::Attribute');
+    my $SearchIndexAttributes = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndex::Attribute');
 
     my $WordCountMax = $SearchIndexAttributes->{WordCountMax} || 1000;
 
@@ -315,7 +315,7 @@ sub _ArticleIndexStringToWord {
 
     # check needed stuff
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need String!",
         );
@@ -323,7 +323,7 @@ sub _ArticleIndexStringToWord {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $SearchIndexAttributes = $ConfigObject->Get('Ticket::SearchIndex::Attribute');
     my @Filters               = @{ $ConfigObject->Get('Ticket::SearchIndex::Filters') || [] };
@@ -332,7 +332,7 @@ sub _ArticleIndexStringToWord {
     # error handling
     if ( !$StopWordRaw || ref $StopWordRaw ne 'HASH' ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid config option Ticket::SearchIndex::StopWords! "
                 . "Please reset the search index options to reactivate the factory defaults.",
@@ -347,7 +347,7 @@ sub _ArticleIndexStringToWord {
 
         if ( !$Language || !$StopWordRaw->{$Language} || ref $StopWordRaw->{$Language} ne 'ARRAY' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid config option Ticket::SearchIndex::StopWords###$Language! "
                     . "Please reset this option to reactivate the factory defaults.",

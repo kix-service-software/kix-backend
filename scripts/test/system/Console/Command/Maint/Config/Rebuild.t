@@ -18,18 +18,18 @@ use File::stat();
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $ZZZAAuto = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/Kernel/Config/Files/ZZZAAuto.pm';
+my $ZZZAAuto = $Kernel::OM->Get('Config')->Get('Home') . '/Kernel/Config/Files/ZZZAAuto.pm';
 my $Before   = File::stat::stat($ZZZAAuto);
 sleep 2;
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Config::Rebuild');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Config::Rebuild');
 my $ExitCode      = $CommandObject->Execute();
 
 my $After = File::stat::stat($ZZZAAuto);

@@ -8,7 +8,7 @@
       "type": "object",
       "properties": {
         "CreatedBy": {
-          "type": "integer"
+          "type": "string"
         },
         "IPAddress": {
           "type": "string"
@@ -23,13 +23,13 @@
         }
       },
       "required": [
-        "Name"
+        "IPAddress",
+        "Interface",
+        "Rating"
       ]
     }
   },
   "required": [
-    "IPAddress",
-    "Interface",
-    "Rating"
+    "FAQVote"
   ]
 }

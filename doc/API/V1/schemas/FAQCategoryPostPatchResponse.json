@@ -1,0 +1,14 @@
+{
+   "$id" : "#FAQCategoryPostPatchResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created or updated FAQ category.",
+   "type" : "object",
+   "properties" : {
+      "FAQCategoryID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "FAQCategoryID"
+   ]
+}

@@ -62,7 +62,7 @@ sub _CheckLink {
 
     my $Link = $Param{Link};
 
-    my $LinkObject = $Kernel::OM->Get('Kernel::System::LinkObject');
+    my $LinkObject = $Kernel::OM->Get('LinkObject');
 
     # check if this link type is allowed
     my %PossibleTypesList = $LinkObject->PossibleTypesList(
@@ -74,7 +74,7 @@ sub _CheckLink {
     if ( !$PossibleTypesList{ $Link->{Type} } ) {
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "Can not create Link. The given link type is not supported by the given objects.",
+            Message => "Cannot create Link. The given link type is not supported by the given objects.",
         );
     }
 
@@ -82,7 +82,7 @@ sub _CheckLink {
     if ( $Link->{SourceObject} eq $Link->{TargetObject} && $Link->{SourceKey} eq $Link->{TargetKey} ) {
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "Can not create Link. It's not possible to link an object with itself.",
+            Message => "Cannot create Link. It's not possible to link an object with itself.",
         );
     }
 
@@ -93,7 +93,7 @@ sub _CheckLink {
     if ( !$SourceObjectID ) {
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "Can not create Link. Unknown SourceObject.",
+            Message => "Cannot create Link. Unknown SourceObject.",
         );
     }
 
@@ -104,7 +104,7 @@ sub _CheckLink {
     if ( !$TargetObjectID ) {
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "Can not create Link. Unknown TargetObject.",
+            Message => "Cannot create Link. Unknown TargetObject.",
         );
     }
 

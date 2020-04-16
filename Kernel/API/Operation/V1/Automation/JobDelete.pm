@@ -110,7 +110,7 @@ sub Run {
     foreach my $JobID ( @{$Param{Data}->{JobID}} ) {
    
         # delete job 
-        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->JobDelete(
+        my $Success = $Kernel::OM->Get('Automation')->JobDelete(
             ID  => $JobID,
             UserID  => $Self->{Authorization}->{UserID},
         );

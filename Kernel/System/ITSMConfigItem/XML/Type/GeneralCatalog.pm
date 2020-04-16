@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::Log',
+    'GeneralCatalog',
+    'Log',
 );
 
 =head1 NAME
@@ -36,7 +36,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeGeneralCatalogBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::GeneralCatalog');
+    my $XMLTypeGeneralCatalogBackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::GeneralCatalog');
 
 =cut
 
@@ -66,7 +66,7 @@ sub ValueLookup {
 
     # check needed stuff
     if ( !$Param{Item} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Item!',
         );
@@ -76,7 +76,7 @@ sub ValueLookup {
     return if !$Param{Value};
 
     # get item list
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $Param{Item}->{Input}->{Class} || '',
     );
 
@@ -106,7 +106,7 @@ sub StatsAttributeCreate {
     # check needed stuff
     for my $Argument (qw(Key Name Item)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -115,7 +115,7 @@ sub StatsAttributeCreate {
     }
 
     # get item list
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $Param{Item}->{Input}->{Class} || '',
     );
 
@@ -172,7 +172,7 @@ sub ExportValuePrepare {
     return if !defined $Param{Value};
 
     # get item list
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $Param{Item}->{Input}->{Class} || '',
     );
 
@@ -195,7 +195,7 @@ sub ImportSearchValuePrepare {
     return if !defined $Param{Value};
 
     # get item list
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $Param{Item}->{Input}->{Class} || '',
     );
 
@@ -205,7 +205,7 @@ sub ImportSearchValuePrepare {
     my $GeneralCatalogID = $Name2ID{ $Param{Value} };
 
     if ( !$GeneralCatalogID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "General catalog lookup of'$Param{Value}' failed!",
         );
@@ -232,7 +232,7 @@ sub ImportValuePrepare {
     return if !defined $Param{Value};
 
     # get item list
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $Param{Item}->{Input}->{Class} || '',
     );
 
@@ -242,7 +242,7 @@ sub ImportValuePrepare {
     my $GeneralCatalogID = $Name2ID{ $Param{Value} };
 
     if ( !$GeneralCatalogID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "General catalog lookup of'$Param{Value}' failed!",
         );
@@ -268,7 +268,7 @@ sub ValidateValue {
     my $Value = $Param{Value};
 
     # get the values for the General catalog class
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $Param{Input}->{Class},
     );
 

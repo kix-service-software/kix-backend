@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectIcon::ObjectIconGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ObjectIconID</Item>
                 <Item Key="ResponseSchema">ObjectIconResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectIcon::ObjectIconSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ObjectIconCollectionResponse</Item>
                 <Item Key="CacheType">API_objecticons</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectIcon::ObjectIconCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ObjectIconPostRequest</Item>
                 <Item Key="ResponseSchema">ObjectIconPostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectIcon::ObjectIconUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ObjectIconPatchRequest</Item>
                 <Item Key="ResponseSchema">ObjectIconPostPatchResponse</Item>
@@ -53,6 +57,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ObjectIconDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectIcon::ObjectIconDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -62,7 +67,7 @@
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">V1::ObjectIcon::GenericIncludeHandler</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectIcon::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx">V1::ObjectIcon::ObjectIconGet</Item>
                 <Item Key="CacheType">API_objecticons</Item>
                 <Item Key="CacheTypeDependency">ObjectIcon</Item>

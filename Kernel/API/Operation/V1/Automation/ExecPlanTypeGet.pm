@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Automation::ExecPlanTypeGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Automation::ExecPlanTypeGet');
 
     return $Self;
 }
@@ -125,13 +125,13 @@ sub Run {
 
     my @ExecPlanTypeList;
 
-    my $ExecPlanTypes = $Kernel::OM->Get('Kernel::Config')->Get('Automation::ExecPlanType');
+    my $ExecPlanTypes = $Kernel::OM->Get('Config')->Get('Automation::ExecPlanType');
 
     # start loop
     foreach my $ExecPlanType ( @{$Param{Data}->{ExecPlanType}} ) {
 
 	    # get the ExecPlanType data
-	    my %ExecPlanTypeData = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanTypeGet(
+	    my %ExecPlanTypeData = $Kernel::OM->Get('Automation')->ExecPlanTypeGet(
 	        Name => $ExecPlanType,
 	    );
 

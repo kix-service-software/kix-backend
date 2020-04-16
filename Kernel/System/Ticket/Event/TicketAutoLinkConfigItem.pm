@@ -12,13 +12,13 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::LinkObject',
+    'Config',
+    'Log',
+    'Ticket',
+    'User',
+    'GeneralCatalog',
+    'ITSMConfigItem',
+    'LinkObject',
 );
 
 use vars qw($VERSION);
@@ -31,13 +31,13 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{ConfigObject}         = $Kernel::OM->Get('Kernel::Config');
-    $Self->{LogObject}            = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject}         = $Kernel::OM->Get('Kernel::System::Ticket');
-    $Self->{UserObject}           = $Kernel::OM->Get('Kernel::System::User');
-    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-    $Self->{ConfigItemObject}     = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-    $Self->{LinkObject}           = $Kernel::OM->Get('Kernel::System::LinkObject');
+    $Self->{ConfigObject}         = $Kernel::OM->Get('Config');
+    $Self->{LogObject}            = $Kernel::OM->Get('Log');
+    $Self->{TicketObject}         = $Kernel::OM->Get('Ticket');
+    $Self->{UserObject}           = $Kernel::OM->Get('User');
+    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
+    $Self->{LinkObject}           = $Kernel::OM->Get('LinkObject');
 
     return $Self;
 }

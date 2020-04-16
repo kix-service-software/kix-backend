@@ -19,10 +19,10 @@ use IO::Interactive();
 use Encode::Locale();
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
+    'Config',
+    'Cache',
+    'Encode',
+    'Main',
 );
 
 our $SuppressANSI = 0;
@@ -66,7 +66,7 @@ sub new {
     }
 
     # Force creation of the EncodeObject as it initialzes STDOUT/STDERR for unicode output.
-    $Kernel::OM->Get('Kernel::System::Encode');
+    $Kernel::OM->Get('Encode');
 
     # Call object specific configure method. We use an eval to trap any exceptions
     #   that might occur here. Only if everything was ok we set the _ConfigureSuccessful
@@ -381,7 +381,7 @@ sub Execute {
     #   Change the LogPrefix so that it indicates which command causes the log entry.
     #   In future we might need to check if it was created and update it on the fly.
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::Log' => {
+        'Log' => {
             LogPrefix => 'kix.Console.pl-' . $Self->Name(),
         },
     );
@@ -398,7 +398,7 @@ sub Execute {
     }
 
     # Disable in-memory cache to avoid problems with long running scripts.
-    $Kernel::OM->Get('Kernel::System::Cache')->Configure(
+    $Kernel::OM->Get('Cache')->Configure(
         CacheInMemory => 0,
     );
 
@@ -433,7 +433,7 @@ sub Execute {
     # If we have an interactive console, make sure that the output can handle UTF-8.
     if (
         IO::Interactive::is_interactive()
-        && !$Kernel::OM->Get('Kernel::Config')->Get('SuppressConsoleEncodingCheck')
+        && !$Kernel::OM->Get('Config')->Get('SuppressConsoleEncodingCheck')
         )
     {
         my $ConsoleEncoding = lc $Encode::Locale::ENCODING_CONSOLE_OUT;    ## no critic

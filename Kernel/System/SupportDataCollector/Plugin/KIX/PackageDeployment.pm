@@ -16,8 +16,8 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Package',
+    'Config',
+    'Package',
 );
 
 sub GetDisplayPath {
@@ -28,7 +28,7 @@ sub Run {
     my $Self = shift;
 
     # get package object
-    my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+    my $PackageObject = $Kernel::OM->Get('Package');
 
     my @InvalidPackages;
     my @NotVerifiedPackages;
@@ -67,7 +67,7 @@ sub Run {
     }
 
     if (@InvalidPackages) {
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('Package::AllowLocalModifications') ) {
+        if ( $Kernel::OM->Get('Config')->Get('Package::AllowLocalModifications') ) {
             $Self->AddResultInformation(
                 Label   => Translatable('Package Installation Status'),
                 Value   => join( ', ', @InvalidPackages ),
@@ -90,7 +90,7 @@ sub Run {
     }
 
     if (@NotVerifiedPackages) {
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('Package::AllowLocalModifications') ) {
+        if ( $Kernel::OM->Get('Config')->Get('Package::AllowLocalModifications') ) {
             $Self->AddResultInformation(
                 Identifier => 'Verification',
                 Label      => Translatable('Package Verification Status'),
@@ -120,7 +120,7 @@ sub Run {
     }
 
     if (@WrongFrameworkVersion) {
-        if ( $Kernel::OM->Get('Kernel::Config')->Get('Package::AllowLocalModifications') ) {
+        if ( $Kernel::OM->Get('Config')->Get('Package::AllowLocalModifications') ) {
             $Self->AddResultInformation(
                 Identifier => 'FrameworkVersion',
                 Label      => Translatable('Package Framework Version Status'),

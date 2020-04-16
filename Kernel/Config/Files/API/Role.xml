@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">RoleID</Item>
                 <Item Key="ResponseSchema">RoleResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">RoleCollectionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">RolePostRequest</Item>
                 <Item Key="ResponseSchema">RolePostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">RolePatchRequest</Item>
                 <Item Key="ResponseSchema">RolePostPatchResponse</Item>
@@ -53,6 +57,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -63,6 +68,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleUserIDSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleUserIDSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">RoleUserIDCollectionResponse</Item>
             </Hash>
@@ -73,6 +79,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleUserIDCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleUserIDCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">RoleUserIDPostRequest</Item>
                 <Item Key="ResponseSchema">RoleUserIDPostResponse</Item>
@@ -84,6 +91,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">RoleUserIDDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::RoleUserIDDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -94,6 +102,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::PermissionTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">PermissionTypeCollectionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
@@ -107,6 +116,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::PermissionGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">PermissionID</Item>
                 <Item Key="ResponseSchema">PermissionResponse</Item>
@@ -120,6 +130,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::PermissionSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">PermissionCollectionResponse</Item>
                 <Item Key="CacheType">API_roles</Item>                
@@ -132,6 +143,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::PermissionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">PermissionPostRequest</Item>
                 <Item Key="ResponseSchema">PermissionPostPatchResponse</Item>
@@ -143,6 +155,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::PermissionUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">PermissionPatchRequest</Item>
                 <Item Key="ResponseSchema">PermissionPostPatchResponse</Item>
@@ -154,6 +167,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">PermissionDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::PermissionDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -163,7 +177,7 @@
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">V1::Role::GenericIncludeHandler</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Role::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
                 <Item Key="CacheType">API_permission</Item>
                 <Item Key="CacheTypeDependency">Role</Item>

@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">QueueGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">QueueID</Item>
                 <Item Key="ResponseSchema">QueueResponse</Item>
@@ -21,6 +22,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">QueueSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">QueueCollectionResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
@@ -33,6 +35,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">QueueCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">QueuePostRequest</Item>
                 <Item Key="ResponseSchema">QueuePostPatchResponse</Item>
@@ -44,6 +47,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">QueueUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">QueuePatchRequest</Item>
                 <Item Key="ResponseSchema">QueuePostPatchResponse</Item>
@@ -55,6 +59,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">QueueDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -65,6 +70,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">FollowUpTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::FollowUpTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">FollowUpTypeCollectionResponse</Item>
                 <Item Key="CacheType">API_queues</Item>

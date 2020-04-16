@@ -15,8 +15,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 sub new {
@@ -27,7 +27,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get config options
     $Self->{LoopProtectionLog} = $ConfigObject->Get('LoopProtectionLog')
@@ -57,7 +57,7 @@ sub SendEmail {
         close($Out);
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "LoopProtection! Can't write '$Self->{LoopProtectionLog}': $!!",
         );
@@ -81,7 +81,7 @@ sub Check {
         ## no critic
         if ( !open( my $Out, '>', $Self->{LoopProtectionLog} ) ) {
             ## use critic
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "LoopProtection! Can't write '$Self->{LoopProtectionLog}': $!!",
             );
@@ -104,7 +104,7 @@ sub Check {
 
     # check possible loop
     if ( $Count >= $Self->{PostmasterMaxEmails} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
                 "LoopProtection: send no more emails to '$To'! Max. count of $Self->{PostmasterMaxEmails} has been reached!",

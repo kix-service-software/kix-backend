@@ -136,7 +136,7 @@ sub Run {
     }
 
     # get config item data
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID}
     );
 
@@ -153,7 +153,7 @@ sub Run {
     );
 
     # everything is ok, let's create the image
-    my $ImageID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageAdd(
+    my $ImageID = $Kernel::OM->Get('ITSMConfigItem')->ImageAdd(
         ConfigItemID => $Param{Data}->{ConfigItemID},
         Filename     => $Image->{Filename},
         Content      => $Image->{Content},

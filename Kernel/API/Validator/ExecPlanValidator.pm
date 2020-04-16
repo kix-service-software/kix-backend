@@ -102,7 +102,7 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'ExecPlanID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanLookup(
+        $Found = $Kernel::OM->Get('Automation')->ExecPlanLookup(
             ID => $Param{Data}->{$Param{Attribute}},
         );        
     }

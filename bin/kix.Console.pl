@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, http://www.cape-it.de
+# based on the original work of:
+# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
-# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# the enclosed file COPYING for license information (AGPL). If you
+# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
 use strict;
@@ -14,17 +16,17 @@ use File::Basename;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . '/Kernel/cpan-lib';
-use lib dirname($RealBin) . '/Custom';
+use lib dirname($RealBin) . '/plugins';
 
 use Kernel::System::ObjectManager;
 
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'kix.Console.pl',
     },
 );
 
-exit $Kernel::OM->Get('Kernel::System::Console')->Run(@ARGV);
+exit $Kernel::OM->Get('Console')->Run(@ARGV);
 
 
 

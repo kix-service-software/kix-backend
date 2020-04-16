@@ -108,7 +108,7 @@ sub Run {
     foreach my $MailFilterID ( @{ $Param{Data}->{MailFilterID} } ) {
 
         # delete MailFilter
-        my $Success = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->FilterDelete(
+        my $Success = $Kernel::OM->Get('PostMaster::Filter')->FilterDelete(
             ID     => $MailFilterID,
             UserID => $Self->{Authorization}->{UserID},
         );

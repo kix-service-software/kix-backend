@@ -16,10 +16,10 @@ use warnings;
 use Net::SMTP;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Encode',
+    'Log',
 );
 
 sub new {
@@ -44,7 +44,7 @@ sub Check {
     my ( $Self, %Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get config data
     $Self->{FQDN}     = $ConfigObject->Get('FQDN');
@@ -107,7 +107,7 @@ sub Send {
     # check needed stuff
     for (qw(Header Body ToArray)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -121,7 +121,7 @@ sub Send {
     # check mail configuration - is there a working smtp host?
     my %Result = $Self->Check();
     if ( !$Result{Successful} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Result{Message},
         );
@@ -134,7 +134,7 @@ sub Send {
     # set from, return it from was not accepted
     if ( !$SMTP->mail( $Param{From} ) ) {
         my $Error = $SMTP->code() . $SMTP->message();
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Can't use from '$Param{From}': $Error!",
@@ -149,7 +149,7 @@ sub Send {
         $ToString .= $To . ',';
         if ( !$SMTP->to($To) ) {
             my $Error = $SMTP->code() . $SMTP->message();
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't send to '$To': $Error!",
             );
@@ -159,7 +159,7 @@ sub Send {
     }
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # encode utf8 header strings (of course, there should only be 7 bit in there!)
     $EncodeObject->EncodeOutput( $Param{Header} );
@@ -170,7 +170,7 @@ sub Send {
     # send data
     if ( !$SMTP->data( ${ $Param{Header} }, "\n", ${ $Param{Body} } ) ) {
         my $Error = $SMTP->code() . $SMTP->message();
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't send message: $Error!"
         );
@@ -181,7 +181,7 @@ sub Send {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$ToString' from '$Param{From}'.",
         );
@@ -195,7 +195,7 @@ sub _Connect {
     # check needed stuff
     for (qw(MailHost FQDN)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );

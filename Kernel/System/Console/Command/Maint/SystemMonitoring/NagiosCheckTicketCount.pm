@@ -14,8 +14,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::Ticket',
+    'Main',
+    'Ticket',
 );
 
 sub Configure {
@@ -72,7 +72,7 @@ sub Run {
     my %Config = %{ $Self->{Config} || {} };
 
     # search tickets
-    my $TicketCount = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+    my $TicketCount = $Kernel::OM->Get('Ticket')->TicketSearch(
         %{ $Config{Search} },
         Limit  => 100_000,
         Result => 'COUNT',

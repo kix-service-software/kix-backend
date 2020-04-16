@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 use File::Path qw(mkpath rmtree);
 
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
@@ -62,7 +62,7 @@ if ( !-e $OpenSSLBin ) {
     }
 }
 
-my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
 if ( !$SMIMEObject ) {
     print STDERR "NOTICE: No SMIME support!\n";
@@ -118,14 +118,14 @@ if ( !$SMIMEObject ) {
     return 1;
 }
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::SMIME::CustomerCertificate::Renew');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::SMIME::CustomerCertificate::Renew');
 
 my ( $Result, $ExitCode );
 {
     local *STDOUT;
     open STDOUT, '>:encoding(UTF-8)', \$Result;
     $ExitCode = $CommandObject->Execute();
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Result );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Result );
 }
 
 $Self->True(

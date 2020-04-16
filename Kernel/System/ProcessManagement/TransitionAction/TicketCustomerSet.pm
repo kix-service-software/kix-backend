@@ -19,8 +19,8 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketCustomerSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketCustomerSet');
+    my $TicketCustomerSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketCustomerSet');
 
 =cut
 
@@ -119,7 +119,7 @@ sub Run {
         && !$Param{Config}->{User}
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No CustomerID/No or ContactID/User configured!",
         );
@@ -143,7 +143,7 @@ sub Run {
         )
     {
         # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         my $Success = $TicketObject->TicketCustomerSet(
             TicketID => $Param{Ticket}->{TicketID},
@@ -152,7 +152,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket CustomerID: '
@@ -174,7 +174,7 @@ sub Run {
         )
     {
         # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         my $Success = $TicketObject->TicketCustomerSet(
             TicketID => $Param{Ticket}->{TicketID},
@@ -183,7 +183,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket ContactID: '

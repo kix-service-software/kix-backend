@@ -16,15 +16,15 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # disable rich text editor
 my $Success = $ConfigObject->Set(
@@ -40,7 +40,7 @@ $Self->True(
 # use Test email backend
 $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 $Self->True(
@@ -70,7 +70,7 @@ $Self->True(
     "Disable Agent Self Notify On Action",
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 $Success = $TestEmailObject->CleanUp();
 $Self->True(
@@ -94,7 +94,7 @@ $ConfigObject->Set(
 my $RandomID = $Helper->GetRandomID();
 
 # create role without permissions
-my $RoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+my $RoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
     Name        => "example-role$RandomID",
     Permissions => {
         Resource => [
@@ -107,7 +107,7 @@ my $RoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreat
 );
 
 # create role with DENY on tickets
-my $TicketDenyRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+my $TicketDenyRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
     Name        => "ticket_deny_$RandomID",
     Permissions => {
         Resource => [
@@ -120,7 +120,7 @@ my $TicketDenyRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->Tes
 );
 
 # create role with READ on tickets
-my $TicketReadRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+my $TicketReadRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
     Name        => "ticket_read_$RandomID",
     Permissions => {
         Resource => [
@@ -133,7 +133,7 @@ my $TicketReadRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->Tes
 );
 
 # create role with WRITE on tickets
-my $TicketWriteRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+my $TicketWriteRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
     Name        => "ticket_write_$RandomID",
     Permissions => {
         Resource => [
@@ -146,9 +146,9 @@ my $TicketWriteRoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->Te
 );
 
 # get objects
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
-my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-my $OrgaObject = $Kernel::OM->Get('Kernel::System::Organisation');
+my $ContactObject = $Kernel::OM->Get('Contact');
+my $UserObject = $Kernel::OM->Get('User');
+my $OrgaObject = $Kernel::OM->Get('Organisation');
 
 # create a new user for current test
 my $UserLogin = $Helper->TestUserCreate(
@@ -225,7 +225,7 @@ my $OrgID = $OrgaObject->OrgansationAdd(
 );
 
 # get queue object
-my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+my $QueueObject = $Kernel::OM->Get('Queue');
 
 # get queue data
 my %Queue = $QueueObject->QueueGet(
@@ -233,7 +233,7 @@ my %Queue = $QueueObject->QueueGet(
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -277,8 +277,8 @@ $Self->True(
     "ArticleCreate() successful for Article ID $ArticleID",
 );
 
-my $DynamicFieldObject      = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+my $DynamicFieldObject      = $Kernel::OM->Get('DynamicField');
+my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
 # Create test ticket dynamic field of type checkbox.
 my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
@@ -315,7 +315,7 @@ $Self->True(
     'ValueSet - Checkbox value set to unchecked',
 );
 
-my $SuccessWatcher = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherAdd(
+my $SuccessWatcher = $Kernel::OM->Get('Watcher')->WatcherAdd(
     Object      => 'Ticket',
     ObjectID    => $TicketID,
     WatchUserID => $UserID,
@@ -1100,7 +1100,7 @@ my $SetOutOfOffice = sub {
     if ( $Param{OutOfOffice} ) {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
         my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
             SystemTime => $TimeObject->SystemTime() + $Param{SetOutOfOfficeDiffStart},
         );
@@ -1189,7 +1189,7 @@ my $SetTicketHistory = sub {
 my $SetUserNotificationPreference = sub {
     my %Param = @_;
 
-    my $Value = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+    my $Value = $Kernel::OM->Get('JSON')->Encode(
         Data => {
             "Notification-$Param{NotificationID}-Email" => $Param{Value},
         },
@@ -1209,8 +1209,8 @@ my $SetUserNotificationPreference = sub {
 
 my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
 
-my $NotificationEventObject      = $Kernel::OM->Get('Kernel::System::NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
+my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
 
 my $Count = 0;
 my $NotificationID;
@@ -1228,7 +1228,7 @@ for my $Test (@Tests) {
 
     if ( $Test->{ContentType} && $Test->{ContentType} eq 'text/html' ) {
         # enable RichText
-        $Kernel::OM->Get('Kernel::System::TemplateGenerator')->{RichText} = 1;
+        $Kernel::OM->Get('TemplateGenerator')->{RichText} = 1;
         my $Success = $ConfigObject->Set(
             Key   => 'Frontend::RichText',
             Value => 1,
@@ -1236,7 +1236,7 @@ for my $Test (@Tests) {
     }
     elsif ( $ConfigObject->Get('Frontend::RichText' )) {
         # disable RichText
-        $Kernel::OM->Get('Kernel::System::TemplateGenerator')->{RichText} = 0;
+        $Kernel::OM->Get('TemplateGenerator')->{RichText} = 0;
         my $Success = $ConfigObject->Set(
             Key   => 'Frontend::RichText',
             Value => 0,

@@ -113,7 +113,7 @@ perform ArticleAttachmentSearch Operation. This will return a article attachment
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Article = $TicketObject->ArticleGet(
         ArticleID  => $Param{Data}->{ArticleID},

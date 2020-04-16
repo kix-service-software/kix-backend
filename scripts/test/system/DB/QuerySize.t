@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get DB object
-my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+my $DBObject = $Kernel::OM->Get('DB');
 
 # ------------------------------------------------------------ #
 # Statement size checks (test 11)

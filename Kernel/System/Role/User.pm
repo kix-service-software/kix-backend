@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -52,7 +52,7 @@ sub RoleUserAdd {
     # check needed stuff
     for (qw(AssignUserID RoleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -61,7 +61,7 @@ sub RoleUserAdd {
     }
     
     # insert new relation
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO role_user '
             . '(user_id, role_id, create_time, create_by, change_time, change_by) '
             . 'VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
@@ -69,10 +69,10 @@ sub RoleUserAdd {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Role.User',
         ObjectID  => $Param{RoleID}.'::'.$Param{AssignUserID},
@@ -103,7 +103,7 @@ sub RoleUserList {
     # check needed stuff
     for (qw(RoleID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -115,24 +115,24 @@ sub RoleUserList {
     my $CacheKey = 'RoleUserList::' . $Param{RoleID};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => 'SELECT user_id FROM role_user WHERE role_id = ?',
         Bind => [ \$Param{RoleID} ]
     );
 
     my @Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Row[0]);
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \@Result,
@@ -159,7 +159,7 @@ sub RoleUserDelete {
     # check needed stuff
     for (qw(RoleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -168,16 +168,16 @@ sub RoleUserDelete {
     }
 
     # delete existing RoleUser relation
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM role_user WHERE user_id = ? AND role_id = ?',
         Bind => [ \$Param{UserID}, \$Param{RoleID} ],
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Role.User',
         ObjectID  => $Param{RoleID}.'::'.$Param{UserID},

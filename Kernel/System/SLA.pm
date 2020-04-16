@@ -14,17 +14,17 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::CheckItem',
-    'Kernel::System::DB',
+    'Config',
+    'Cache',
+    'CheckItem',
+    'DB',
 # ---
 # GeneralCatalog
 # ---
-    'Kernel::System::GeneralCatalog',
+    'GeneralCatalog',
 # ---
-    'Kernel::System::Log',
-    'Kernel::System::Valid',
+    'Log',
+    'Valid',
 );
 
 =head1 NAME
@@ -47,7 +47,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SLAObject = $Kernel::OM->Get('Kernel::System::SLA');
+    my $SLAObject = $Kernel::OM->Get('SLA');
 
 =cut
 
@@ -59,7 +59,7 @@ sub new {
     bless( $Self, $Type );
 
     # get configured preferences object
-    my $GeneratorModule = $Kernel::OM->Get('Kernel::Config')->Get('SLA::PreferencesModule')
+    my $GeneratorModule = $Kernel::OM->Get('Config')->Get('SLA::PreferencesModule')
         || 'Kernel::System::SLA::PreferencesDB';
 
     # get preferences object
@@ -70,7 +70,7 @@ sub new {
 
     # KIX4OTRS-capeIT
     # load service extension modules
-    my $CustomModule = $Kernel::OM->Get('Kernel::Config')->Get('SLA::CustomModule');
+    my $CustomModule = $Kernel::OM->Get('Config')->Get('SLA::CustomModule');
     if ($CustomModule) {
         my %ModuleList;
         if ( ref $CustomModule eq 'HASH' ) {
@@ -83,7 +83,7 @@ sub new {
         for my $ModuleKey ( sort keys %ModuleList ) {
             my $Module = $ModuleList{$ModuleKey};
             next MODULEKEY if !$Module;
-            next MODULEKEY if !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass($Module);
+            next MODULEKEY if !$Kernel::OM->Get('Main')->RequireBaseClass($Module);
         }
     }
     # EO KIX4OTRS-capeIT
@@ -107,7 +107,7 @@ sub SLAList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!'
         );
@@ -120,7 +120,7 @@ sub SLAList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
 
     my %SQLTable;
@@ -131,7 +131,7 @@ sub SLAList {
     if ( $Param{Valid} ) {
 
         # get valid object
-        my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+        my $ValidObject = $Kernel::OM->Get('Valid');
 
         # create the valid list
         my $ValidIDs = join ', ', $ValidObject->ValidIDsGet();
@@ -201,7 +201,7 @@ sub SLAGet {
     # check needed stuff
     for my $Argument (qw(SLAID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -211,7 +211,7 @@ sub SLAGet {
 
     # check if result is already cached
     my $CacheKey = 'Cache::SLAGet::' . $Param{SLAID};
-    my $Cached   = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cached   = $Kernel::OM->Get('Cache')->Get(
         Type           => $Self->{CacheType},
         Key            => $CacheKey,
         CacheInMemory  => 1,
@@ -223,7 +223,7 @@ sub SLAGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get sla from db
     $DBObject->Prepare(
@@ -270,7 +270,7 @@ sub SLAGet {
 
     # check sla
     if ( !$SLAData{SLAID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such SLAID ($Param{SLAID})!",
         );
@@ -280,7 +280,7 @@ sub SLAGet {
 # GeneralCatalog
 # ---
     # get sla type list
-    my $SLATypeList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $SLATypeList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::SLA::Type',
     );
     $SLAData{Type} = $SLATypeList->{ $SLAData{TypeID} } || '';
@@ -295,7 +295,7 @@ sub SLAGet {
     }
 
     # cache result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type => $Self->{CacheType},
         TTL  => $Self->{CacheTTL},
         Key  => $CacheKey,
@@ -330,7 +330,7 @@ sub SLALookup {
 
     # check needed stuff
     if ( !$Param{SLAID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SLAID or Name!',
         );
@@ -338,13 +338,13 @@ sub SLALookup {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{SLAID} ) {
 
         # check cache
         my $CacheKey = 'Cache::SLALookup::ID::' . $Param{SLAID};
-        my $Cached   = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cached   = $Kernel::OM->Get('Cache')->Get(
             Type           => $Self->{CacheType},
             Key            => $CacheKey,
             CacheInMemory  => 1,
@@ -368,7 +368,7 @@ sub SLALookup {
         }
 
         # cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type           => $Self->{CacheType},
             TTL            => $Self->{CacheTTL},
             Key            => $CacheKey,
@@ -383,7 +383,7 @@ sub SLALookup {
 
         # check cache
         my $CacheKey = 'Cache::SLALookup::Name::' . $Param{Name};
-        my $Cached   = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cached   = $Kernel::OM->Get('Cache')->Get(
             Type           => $Self->{CacheType},
             Key            => $CacheKey,
             CacheInMemory  => 1,
@@ -407,7 +407,7 @@ sub SLALookup {
         }
 
         # cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type           => $Self->{CacheType},
             TTL            => $Self->{CacheTTL},
             Key            => $CacheKey,
@@ -457,7 +457,7 @@ sub SLAAdd {
     for my $Argument (qw(Name ValidID UserID TypeID)) {
 # ---
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -481,7 +481,7 @@ sub SLAAdd {
 # ---
 
     # get check item object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # cleanup given params
     for my $Argument (qw(Name Comment)) {
@@ -493,7 +493,7 @@ sub SLAAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # find exiting sla's with the same name
     $DBObject->Prepare(
@@ -510,7 +510,7 @@ sub SLAAdd {
 
     # abort insert of new sla, if name already exists
     if ($NoAdd) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't add new SLA! '$Param{Name}' already exists.",
         );
@@ -563,7 +563,7 @@ sub SLAAdd {
 
     # check sla id
     if ( !$SLAID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't find SLAID for '$Param{Name}'!",
         );
@@ -571,7 +571,7 @@ sub SLAAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SLA',
         ObjectID  => $SLAID,
@@ -618,7 +618,7 @@ sub SLAUpdate {
     for my $Argument (qw(SLAID Name ValidID UserID TypeID)) {
 # ---
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -642,7 +642,7 @@ sub SLAUpdate {
 # ---
 
     # get check item object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # cleanup given params
     for my $Argument (qw(Name Comment)) {
@@ -654,7 +654,7 @@ sub SLAUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # find exiting sla's with the same name
     return if !$DBObject->Prepare(
@@ -673,7 +673,7 @@ sub SLAUpdate {
 
     # abort update of sla, if name already exists
     if ($Update) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't update SLA! '$Param{Name}' already exists.",
         );
@@ -681,15 +681,15 @@ sub SLAUpdate {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => $Self->{CacheType},
         Key  => 'Cache::SLAGet::' . $Param{SLAID},
     );
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => $Self->{CacheType},
         Key  => 'Cache::SLALookup::Name::' . $Param{Name},
     );
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => $Self->{CacheType},
         Key  => 'Cache::SLALookup::ID::' . $Param{SLAID},
     );
@@ -725,7 +725,7 @@ sub SLAUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SLA',
         ObjectID  => $Param{SLAID},
@@ -776,7 +776,7 @@ sub SLADelete {
     # check needed stuff
     for (qw(SLAID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -785,19 +785,19 @@ sub SLADelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM SLA WHERE id = ?',
         Bind => [ \$Param{SLAID} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SLA',
         ObjectID  => $Param{SLAID},

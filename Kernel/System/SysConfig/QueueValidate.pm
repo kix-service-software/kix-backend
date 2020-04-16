@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Queue',
+    'Log',
+    'Queue',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $QueueValidateObject = $Kernel::OM->Get('Kernel::System::SysConfig::QueueValidate');
+    my $QueueValidateObject = $Kernel::OM->Get('SysConfig::QueueValidate');
 
 =cut
 
@@ -70,7 +70,7 @@ sub Validate {
 
     # check needed stuff
     if ( !$Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Data!",
         );
@@ -83,7 +83,7 @@ sub Validate {
         # get the reference type
         my $RefType = ref $Param{Data};
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Data must be a scalar, but it is a $RefType!",
         );
@@ -91,7 +91,7 @@ sub Validate {
     }
 
     # get list of all valid queues
-    my %Queues = $Kernel::OM->Get('Kernel::System::Queue')->QueueList(
+    my %Queues = $Kernel::OM->Get('Queue')->QueueList(
         Valid => 1,
     );
 
@@ -117,7 +117,7 @@ sub GetAutoCorrectValue {
     my ( $Self, %Param ) = @_;
 
     # get list of all valid queues
-    my %Queues = $Kernel::OM->Get('Kernel::System::Queue')->QueueList(
+    my %Queues = $Kernel::OM->Get('Queue')->QueueList(
         Valid => 1,
     );
 

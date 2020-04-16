@@ -19,8 +19,8 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketTitleSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketTitleSet');
+    my $TicketTitleSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketTitleSet');
 
 =cut
 
@@ -105,7 +105,7 @@ sub Run {
 
     # Check for required parameters in ConfigHash
     if ( !defined $Param{Config}->{Title} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No Title configured!",
         );
@@ -117,7 +117,7 @@ sub Run {
         $Param{Config}->{Title} ne $Param{Ticket}->{Title}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketTitleUpdate(
+        $Success = $Kernel::OM->Get('Ticket')->TicketTitleUpdate(
             Title    => $Param{Config}->{Title},
             TicketID => $Param{Ticket}->{TicketID},
             UserID   => $Param{UserID},
@@ -130,7 +130,7 @@ sub Run {
     }
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . 'Ticket title could not be updated for Ticket: '

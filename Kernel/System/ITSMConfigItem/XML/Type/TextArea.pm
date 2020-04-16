@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -35,7 +35,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeTextAreaBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::TextArea');
+    my $XMLTypeTextAreaBackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::TextArea');
 
 =cut
 
@@ -83,7 +83,7 @@ sub StatsAttributeCreate {
     # check needed stuff
     for my $Argument (qw(Key Name Item)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );

@@ -15,14 +15,14 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
 
     for my $TicketSubjectConfig ( 'Right', 'Left' ) {
 
         # make sure that the TicketObject gets recreated for each loop.
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
         $ConfigObject->Set(
             Key   => 'Ticket::Hook',
@@ -34,7 +34,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         );
         $ConfigObject->Set(
             Key   => 'Ticket::NumberGenerator',
-            Value => 'Kernel::System::Ticket::Number::DateChecksum',
+            Value => 'Ticket::Number::DateChecksum',
         );
         $ConfigObject->Set(
             Key   => 'Ticket::SubjectRe',
@@ -45,10 +45,10 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
             Value => 'AW',
         );
 
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $Self->True(
-            $TicketObject->isa('Kernel::System::Ticket::Number::DateChecksum'),
+            $TicketObject->isa('Ticket::Number::DateChecksum'),
             "TicketObject loaded the correct backend",
         );
 

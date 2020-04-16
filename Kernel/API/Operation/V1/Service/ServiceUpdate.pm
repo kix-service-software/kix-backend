@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ServiceUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ServiceUpdate');
 
     return $Self;
 }
@@ -131,7 +131,7 @@ sub Run {
     );
 
     # check if Service exists 
-    my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
+    my %ServiceData = $Kernel::OM->Get('Service')->ServiceGet(
         ServiceID => $Param{Data}->{ServiceID},
         UserID    => 1,        
     );
@@ -146,7 +146,7 @@ sub Run {
     # prepare full name for lookup
     my $FullName = $Service->{Name} || $ServiceData{Name};
     if ( $Service->{ParentID} || $ServiceData{ParentID} ) {
-        my $ParentName = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+        my $ParentName = $Kernel::OM->Get('Service')->ServiceLookup(
             ServiceID => $Service->{ParentID} || $ServiceData{ParentID},
         );        
         if ($ParentName) {
@@ -160,7 +160,7 @@ sub Run {
     }
 
     # check if Service exists
-    my $ServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup(
+    my $ServiceID = $Kernel::OM->Get('Service')->ServiceLookup(
         Name    => $FullName,
         UserID  => 1,
     );
@@ -172,7 +172,7 @@ sub Run {
     }
 
     # update Service
-    my $Success = $Kernel::OM->Get('Kernel::System::Service')->ServiceUpdate(
+    my $Success = $Kernel::OM->Get('Service')->ServiceUpdate(
         ServiceID   => $Service->{ServiceID} || $ServiceData{ServiceID},    
         Name        => $Service->{Name} || $ServiceData{Name},
         Comment     => exists $Service->{Comment} ? $Service->{Comment} : $ServiceData{Comment},

@@ -14,15 +14,15 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::StandardTemplate::QueueLink');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::StandardTemplate::QueueLink');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $TemplateName = 'template' . $Helper->GetRandomID();
 
@@ -59,7 +59,7 @@ $Self->Is(
     "Invalid queue name",
 );
 
-my $StandardTemplateID = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateAdd(
+my $StandardTemplateID = $Kernel::OM->Get('StandardTemplate')->StandardTemplateAdd(
     Name         => $TemplateName,
     Template     => 'Thank you for your email.',
     ContentType  => 'text/plain; charset=utf-8',
@@ -73,7 +73,7 @@ $Self->True(
     "Test standard template is created - $StandardTemplateID",
 );
 
-my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
+my $QueueID = $Kernel::OM->Get('Queue')->QueueAdd(
     Name            => $QueueName,
     ValidID         => 1,
     GroupID         => 1,

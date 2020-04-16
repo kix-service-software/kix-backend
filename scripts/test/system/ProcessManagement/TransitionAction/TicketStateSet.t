@@ -17,10 +17,10 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-my $UserObject   = $Kernel::OM->Get('Kernel::System::User');
-my $ModuleObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketStateSet');
-my $Helper       = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $TicketObject = $Kernel::OM->Get('Ticket');
+my $UserObject   = $Kernel::OM->Get('User');
+my $ModuleObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketStateSet');
+my $Helper       = $Kernel::OM->Get('UnitTest::Helper');
 
 $Helper->FixedTimeSet();
 
@@ -347,7 +347,7 @@ $Self->True(
 );
 
 # cleanUp casche
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

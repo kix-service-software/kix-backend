@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::RoleUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::RoleUpdate');
 
     return $Self;
 }
@@ -126,7 +126,7 @@ sub Run {
     );
 
     # check if Role exists
-    my %RoleData = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+    my %RoleData = $Kernel::OM->Get('Role')->RoleGet(
         ID => $Param{Data}->{RoleID},
     );
 
@@ -137,7 +137,7 @@ sub Run {
     }
 
     # update Role
-    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUpdate(
+    my $Success = $Kernel::OM->Get('Role')->RoleUpdate(
         ID           => $Param{Data}->{RoleID},
         Name         => $Role->{Name} || $RoleData{Name},
         Comment      => exists $Role->{Comment} ? $Role->{Comment} : $RoleData{Comment},

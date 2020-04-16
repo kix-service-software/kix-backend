@@ -16,9 +16,9 @@ use vars (qw($Self));
 
 # This test checks the slave handling features in DB.pm
 
-my $MasterDSN      = $Kernel::OM->Get('Kernel::Config')->Get('DatabaseDSN');
-my $MasterUser     = $Kernel::OM->Get('Kernel::Config')->Get('DatabaseUser');
-my $MasterPassword = $Kernel::OM->Get('Kernel::Config')->Get('DatabasePw');
+my $MasterDSN      = $Kernel::OM->Get('Config')->Get('DatabaseDSN');
+my $MasterUser     = $Kernel::OM->Get('Config')->Get('DatabaseUser');
+my $MasterPassword = $Kernel::OM->Get('Config')->Get('DatabasePw');
 
 my @Tests = (
     {
@@ -122,7 +122,7 @@ for my $Test (@Tests) {
         $Kernel::OM->ObjectsDiscard();
 
         for my $ConfigKey ( sort keys %{ $Test->{Config} } ) {
-            $Kernel::OM->Get('Kernel::Config')->Set(
+            $Kernel::OM->Get('Config')->Set(
                 Key   => $ConfigKey,
                 Value => $Test->{Config}->{$ConfigKey},
             );
@@ -130,7 +130,7 @@ for my $Test (@Tests) {
 
         {
             # Regular fetch from master
-            my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+            my $DBObject = $Kernel::OM->Get('DB');
             my @ValidIDs;
             my $TestPrefix = "$Test->{Name} - $TestIteration - UseSlaveDB 0: ";
             $DBObject->Prepare(
@@ -153,14 +153,14 @@ for my $Test (@Tests) {
             );
 
             $Kernel::OM->ObjectsDiscard(
-                Objects => ['Kernel::System::DB'],
+                Objects => ['DB'],
             );
         }
 
         {
             local $Kernel::System::DB::UseSlaveDB = 1;
 
-            my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
+            my $DBObject   = $Kernel::OM->Get('DB');
             my @ValidIDs   = ();
             my $TestPrefix = "$Test->{Name} - $TestIteration - UseSlaveDB 1: ";
 

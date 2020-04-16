@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::MailFilter::MailFilterGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::MailFilter::MailFilterGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $MailFilterID ( @{ $Param{Data}->{MailFilterID} } ) {
 
         # get the MailFilter data
-        my %MailFilterData = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->FilterGet( ID => $MailFilterID, );
+        my %MailFilterData = $Kernel::OM->Get('PostMaster::Filter')->FilterGet( ID => $MailFilterID, );
 
         if ( !IsHashRefWithData( \%MailFilterData ) ) {
             return $Self->_Error( 

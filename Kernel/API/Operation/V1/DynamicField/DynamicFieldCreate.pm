@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::DynamicFieldCreate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::DynamicFieldCreate');
 
     return $Self;
 }
@@ -80,7 +80,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my $GeneralCatalogItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $GeneralCatalogItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'DynamicField::DisplayGroup',
     );
     my @DisplayGroupIDs;
@@ -175,7 +175,7 @@ sub Run {
 
     # check if name is duplicated
     my %DynamicFieldsList = %{
-        $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList(
+        $Kernel::OM->Get('DynamicField')->DynamicFieldList(
             Valid      => 0,
             ResultType => 'HASH',
         )
@@ -187,12 +187,12 @@ sub Run {
 
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => 'Can not create DynamicField. Another DynamicField with the name already exists.',
+            Message => 'Cannot create DynamicField. Another DynamicField with the name already exists.',
         );
     }
 
     # create DynamicField
-    my $ID = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldAdd(
+    my $ID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
         Name            => $DynamicField->{Name},
         Label           => $DynamicField->{Label},
         InternalField   => $DynamicField->{InternalField} || 0,

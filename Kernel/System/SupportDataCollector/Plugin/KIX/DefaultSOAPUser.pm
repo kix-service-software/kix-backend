@@ -16,7 +16,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub GetDisplayPath {
@@ -27,7 +27,7 @@ sub Run {
     my $Self = shift;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $SOAPUser     = $ConfigObject->Get('SOAP::User')     || '';
     my $SOAPPassword = $ConfigObject->Get('SOAP::Password') || '';

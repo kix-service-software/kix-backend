@@ -126,7 +126,7 @@ sub Run {
 
     # check assigned User exists and is not assigned to another contact
     if ($Contact->{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
             UserID => $Contact->{AssignedUserID},
             Silent => 1,
         );
@@ -137,7 +137,7 @@ sub Run {
             );
         }
         else {
-            my $ExistingContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+            my $ExistingContact = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Contact->{AssignedUserID},
                 Silent => 1,
             );
@@ -152,7 +152,7 @@ sub Run {
 
     # check if Email is provided and if so if it exists
     if ($Contact->{Email}) {
-        my $ExistingContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+        my $ExistingContact = $Kernel::OM->Get('Contact')->ContactLookup(
             Email => $Contact->{Email},
             Silent           => 1,
         );
@@ -166,7 +166,7 @@ sub Run {
 
     # check if primary OrganisationID exists
     if ($Contact->{PrimaryOrganisationID}) {
-        my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $Contact->{PrimaryOrganisationID},
         );
 
@@ -191,7 +191,7 @@ sub Run {
         }
         # check if each assigned orga exists and is valid
         foreach my $OrgID (@OrgIDs) {
-            my %OrgData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+            my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
             if (!%OrgData || $OrgData{ValidID} != 1) {
@@ -207,7 +207,7 @@ sub Run {
     }
 
     # create Contact
-    my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+    my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
         %{$Contact},
         ValidID         => $Contact->{ValidID} || 1,
         UserID          => $Self->{Authorization}->{UserID},

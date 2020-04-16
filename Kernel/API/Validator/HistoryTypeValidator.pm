@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'HistoryTypeID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup(
+        $Found = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
             TypeID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'HistoryType' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup(
+        $Found = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
             Type => $Param{Data}->{$Param{Attribute}},
         );      
     }

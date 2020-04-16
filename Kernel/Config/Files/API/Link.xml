@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LinkGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Link::LinkGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Link</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -20,6 +21,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LinkSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Link::LinkSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Link</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -33,6 +35,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LinkCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Link::LinkCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Link</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -44,6 +47,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LinkDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Link::LinkDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Link</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -56,6 +60,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">LinkTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Link::LinkTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">Link</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -67,7 +72,7 @@
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">V1::Link::GenericIncludeHandler</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Link::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx">V1::Link::LinkGet</Item>
                 <Item Key="CacheType">API_links</Item>
                 <Item Key="CacheTypeDependency">LinkObject</Item>

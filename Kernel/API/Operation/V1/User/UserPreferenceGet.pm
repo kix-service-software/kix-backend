@@ -116,7 +116,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if user exists and if preference exists for given user
-    my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Param{Data}->{UserID},
     );
     if ( !%UserData ) {

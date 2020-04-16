@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Cache',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SystemDataObject = $Kernel::OM->Get('Kernel::System::SystemData');
+    my $SystemDataObject = $Kernel::OM->Get('SystemData');
 
 =cut
 
@@ -50,7 +50,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
 
     # create additional objects
     $Self->{CacheType} = 'SystemData';
@@ -90,7 +90,7 @@ sub SystemDataAdd {
     # check needed stuff
     for (qw(Key UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -98,7 +98,7 @@ sub SystemDataAdd {
         }
     }
     if ( !defined $Param{Value} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Value!"
         );
@@ -108,7 +108,7 @@ sub SystemDataAdd {
     # return if key does not already exists - then we can't do an update
     my $Value = $Self->SystemDataGet( Key => $Param{Key} );
     if ( defined $Value ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't add SystemData key '$Param{Key}', it already exists!",
         );
@@ -131,7 +131,7 @@ sub SystemDataAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SystemData',
         ObjectID  => $Param{Key},
@@ -158,7 +158,7 @@ sub SystemDataGet {
 
     # check needed stuff
     if ( !$Param{Key} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Key!"
         );
@@ -167,7 +167,7 @@ sub SystemDataGet {
 
     # check cache
     my $CacheKey = 'SystemDataGet::' . $Param{Key};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -189,7 +189,7 @@ sub SystemDataGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -225,7 +225,7 @@ sub SystemDataGroupGet {
 
     # check needed stuff
     if ( !$Param{Group} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Group!"
         );
@@ -234,7 +234,7 @@ sub SystemDataGroupGet {
 
     # check cache
     my $CacheKey = 'SystemDataGetGroup::' . $Param{Group};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -264,7 +264,7 @@ sub SystemDataGroupGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -295,7 +295,7 @@ sub SystemDataUpdate {
     # check needed stuff
     for (qw(Key UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -303,7 +303,7 @@ sub SystemDataUpdate {
         }
     }
     if ( !defined $Param{Value} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Value!"
         );
@@ -313,7 +313,7 @@ sub SystemDataUpdate {
     # return if key does not already exists - then we can't do an update
     my $Value = $Self->SystemDataGet( Key => $Param{Key} );
     if ( !defined $Value ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't update SystemData key '$Param{Key}', it does not exist!",
         );
@@ -339,7 +339,7 @@ sub SystemDataUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SystemData',
         ObjectID  => $Param{Key},
@@ -368,7 +368,7 @@ sub SystemDataDelete {
     # check needed stuff
     for (qw(Key UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -379,7 +379,7 @@ sub SystemDataDelete {
     # return if key does not already exists - then we can't do a delete
     my $Value = $Self->SystemDataGet( Key => $Param{Key} );
     if ( !defined $Value ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't delete SystemData key '$Param{Key}', it does not exist!",
         );
@@ -401,7 +401,7 @@ sub SystemDataDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SystemData',
         ObjectID  => $Param{Key},
@@ -432,7 +432,7 @@ sub _SystemDataCacheKeyDelete {
 
     # check needed stuff
     if ( !$Param{Key} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "_SystemDataCacheKeyDelete: need 'Key'!"
         );
@@ -440,7 +440,7 @@ sub _SystemDataCacheKeyDelete {
     }
 
     # delete cache entry
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => $Self->{CacheType},
         Key  => 'SystemDataGet::' . $Param{Key},
     );
@@ -455,7 +455,7 @@ sub _SystemDataCacheKeyDelete {
         for my $Part (@Parts) {
             pop @Parts;
             my $CacheKey = join( '::', @Parts );
-            $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+            $Kernel::OM->Get('Cache')->Delete(
                 Type => $Self->{CacheType},
                 Key  => 'SystemDataGetGroup::' . join( '::', @Parts ),
             );

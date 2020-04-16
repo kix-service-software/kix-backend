@@ -131,7 +131,7 @@ sub Run {
         Data => $Param{Data}->{ExecPlan}
     );
 
-    my $ExecPlanID = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanLookup(
+    my $ExecPlanID = $Kernel::OM->Get('Automation')->ExecPlanLookup(
         Name => $ExecPlan->{Name},
     );
 
@@ -143,7 +143,7 @@ sub Run {
     }
 
     # create ExecPlan
-    $ExecPlanID = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanAdd(
+    $ExecPlanID = $Kernel::OM->Get('Automation')->ExecPlanAdd(
         Name       => $ExecPlan->{Name},
         Type       => $ExecPlan->{Type},
         Parameters => $ExecPlan->{Parameters},

@@ -110,7 +110,7 @@ sub Run {
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
         # get all users assigned to this role
-        my @UserList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
+        my @UserList = $Kernel::OM->Get('Role')->RoleUserList(
             RoleID => $RoleID,
         );
    
@@ -122,7 +122,7 @@ sub Run {
         }
 
         # delete Role       
-        my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleDelete(
+        my $Success = $Kernel::OM->Get('Role')->RoleDelete(
             ID  => $RoleID,
         );
 

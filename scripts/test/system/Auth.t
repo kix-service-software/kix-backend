@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # configure auth backend to db
 $ConfigObject->Set(
@@ -50,7 +50,7 @@ my $TestUserID;
 my $UserRand = 'example-user' . $Helper->GetRandomID();
 
 # get user object
-my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+my $UserObject = $Kernel::OM->Get('User');
 
 # add test user
 $TestUserID = $UserObject->UserAdd(
@@ -110,8 +110,8 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 bcrypt)) {
     # make sure that the customer user objects gets recreated for each loop.
     $Kernel::OM->ObjectsDiscard(
         Objects => [
-            'Kernel::System::User',
-            'Kernel::System::Auth',
+            'User',
+            'Auth',
         ],
     );
 
@@ -121,8 +121,8 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 bcrypt)) {
     );
 
     # get needed objects
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-    my $AuthObject = $Kernel::OM->Get('Kernel::System::Auth');
+    my $UserObject = $Kernel::OM->Get('User');
+    my $AuthObject = $Kernel::OM->Get('Auth');
 
     TEST:
     for my $Test (@Tests) {

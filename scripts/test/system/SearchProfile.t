@@ -17,19 +17,19 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject        = $Kernel::OM->Get('Kernel::Config');
-my $DBObject            = $Kernel::OM->Get('Kernel::System::DB');
-my $SearchProfileObject = $Kernel::OM->Get('Kernel::System::SearchProfile');
-my $ContactObject  = $Kernel::OM->Get('Kernel::System::Contact');
-my $UserObject          = $Kernel::OM->Get('Kernel::System::User');
+my $ConfigObject        = $Kernel::OM->Get('Config');
+my $DBObject            = $Kernel::OM->Get('DB');
+my $SearchProfileObject = $Kernel::OM->Get('SearchProfile');
+my $ContactObject  = $Kernel::OM->Get('Contact');
+my $UserObject          = $Kernel::OM->Get('User');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
@@ -38,7 +38,7 @@ $ConfigObject->Set(
 
 # create test user
 my $Login = $Helper->TestUserCreate();
-my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup( UserLogin => $Login );
+my $UserID = $Kernel::OM->Get('User')->UserLookup( UserLogin => $Login );
 
 my $RandomID = $Helper->GetRandomID();
 

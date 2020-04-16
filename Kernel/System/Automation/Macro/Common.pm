@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $Object = $Kernel::OM->Get('Kernel::System::Automation::Macro::Ticket');
+    my $Object = $Kernel::OM->Get('Automation::Macro::Ticket');
 
 =cut
 

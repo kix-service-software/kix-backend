@@ -11,10 +11,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
+    'Config',
+    'DynamicField',
+    'LinkObject',
+    'Log',
 );
 
 sub new {
@@ -25,10 +25,10 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject}       = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
-    $Self->{LinkObject}         = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{ConfigObject}       = $Kernel::OM->Get('Config');
+    $Self->{DynamicFieldObject} = $Kernel::OM->Get('DynamicField');
+    $Self->{LinkObject}         = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}          = $Kernel::OM->Get('Log');
 
     return $Self;
 }

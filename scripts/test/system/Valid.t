@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $ValidObject  = $Kernel::OM->Get('Kernel::System::Valid');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $ValidObject  = $Kernel::OM->Get('Valid');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # tests the method to make sure there is at least 2 registries: valid - invalid
 my %ValidList = $ValidObject->ValidList();

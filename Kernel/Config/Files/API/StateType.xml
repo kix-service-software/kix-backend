@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">StateTypeGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::StateType::StateTypeGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">StateTypeID</Item>
                 <Item Key="ResponseSchema">StateTypeResponse</Item>
@@ -17,6 +18,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">StateTypeSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::StateType::StateTypeSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">StateTypeCollectionResponse</Item>
             </Hash>

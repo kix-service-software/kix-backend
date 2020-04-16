@@ -16,11 +16,11 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'DB',
+    'Ticket',
+    'Time',
+    'User',
 );
 
 sub Configure {
@@ -47,10 +47,10 @@ sub Run {
 
     # Users must be invalid for at least one month
     my $Offset        = 60 * 60 * 24 * 31;
-    my $InvalidBefore = $Kernel::OM->Get('Kernel::System::Time')->SystemTime() - $Offset;
+    my $InvalidBefore = $Kernel::OM->Get('Time')->SystemTime() - $Offset;
 
     # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
     my $MicroSleep = $Self->GetOption('micro-sleep');
 
     # First, find all invalid users which are invalid for more than one month
@@ -67,7 +67,7 @@ sub Run {
         next USERID if ( $User{ValidID} != $InvalidID );
 
         # Only take users which are invalid for more than one month
-        my $InvalidTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        my $InvalidTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $User{ChangeTime},
         );
 
@@ -84,9 +84,9 @@ sub Run {
     $Self->Print( "<green>Cleanup for " . ( scalar @CleanupInvalidUsers ) . " starting...</green>\n" );
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $DBObject     = $Kernel::OM->Get('DB');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     for my $UserID (@CleanupInvalidUsers) {
 

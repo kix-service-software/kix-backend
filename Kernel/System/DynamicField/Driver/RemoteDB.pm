@@ -17,13 +17,13 @@ use Kernel::System::DFRemoteDB;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Ticket::ColumnFilter',
+    'Config',
+    'Cache',
+    'DB',
+    'DynamicFieldValue',
+    'Log',
+    'Main',
+    'Ticket::ColumnFilter',
 );
 
 =head1 NAME
@@ -49,8 +49,8 @@ sub new {
     bless( $Self, $Type );
 
     # create additional objects
-    $Self->{ConfigObject}            = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    $Self->{ConfigObject}            = $Kernel::OM->Get('Config');
+    $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('DynamicFieldValue');
 
     # get the fields config
     $Self->{FieldTypeConfig} = $Self->{ConfigObject}->Get('DynamicFields::Driver') || {};
@@ -82,7 +82,7 @@ sub new {
 
             # check if module can be loaded
             if (
-                !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Extension->{Module} )
+                !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
                 )
             {
                 die "Can't load dynamic fields backend module"
@@ -215,7 +215,7 @@ sub _ValueLookup {
     if ( $DynamicFieldConfig->{Config}->{CacheTTL} ) {
         $Self->{CacheType} = 'DynamicField_RemoteDB_' . $DynamicFieldConfig->{Name};
 
-        my $Value = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Value = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => "ValueLookup::$Key",
         );
@@ -270,7 +270,7 @@ sub _ValueLookup {
 
     # cache request
     if ( $DynamicFieldConfig->{Config}->{CacheTTL} ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             Key   => "ValueLookup::$Key",
             Value => $Value,
@@ -622,7 +622,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         my @Data = $Param{ParamObject}->GetArray( Param => $FieldName );
@@ -1020,7 +1020,7 @@ sub SearchSQLGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Operators{ $Param{Operator} } ) {
         my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
@@ -1038,7 +1038,7 @@ sub SearchSQLGet {
         return $SQL;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         'Priority' => 'error',
         'Message'  => "Unsupported Operator $Param{Operator}",
     );
@@ -1292,7 +1292,7 @@ sub ColumnFilterValuesGet {
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
 
     # get column filter values from database
-    my $ColumnFilterValues = $Kernel::OM->Get('Kernel::System::Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
+    my $ColumnFilterValues = $Kernel::OM->Get('Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
         TicketIDs => $Param{TicketIDs},
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',
@@ -1321,7 +1321,7 @@ sub _GetPossibleValues {
         # set cache type
         $Self->{CacheType} = 'DynamicField_RemoteDB_' . $Param{DynamicFieldConfig}->{Name};
 
-        $PossibleValues = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        $PossibleValues = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => "GetPossibleValues",
         );
@@ -1376,7 +1376,7 @@ sub _GetPossibleValues {
 
     # cache request
     if ( $Param{DynamicFieldConfig}->{Config}->{CacheTTL} && $Param{DynamicFieldConfig}->{Config}->{CachePossibleValues} ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             Key   => "GetPossibleValues",
             Value => $PossibleValues,

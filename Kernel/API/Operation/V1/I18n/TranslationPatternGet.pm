@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationPatternGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::I18n::TranslationPatternGet');
 
     return $Self;
 }
@@ -125,7 +125,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get the pattern data
-    my @PatternList = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+    my @PatternList = $Kernel::OM->Get('Translation')->PatternGet(
         ID     => $Param{Data}->{PatternID},
         IncludeAvailableLanguages => $Param{Data}->{include}->{AvailableLanguages} ? 1 : 0,
         UserID => $Self->{Authorization}->{UserID}

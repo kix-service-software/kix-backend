@@ -15,8 +15,8 @@ use utf8;
 use vars (qw($Self));
 use File::Path qw(mkpath rmtree);
 
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
@@ -26,7 +26,7 @@ $ConfigObject->Set(
 # copy all
 # discard main + config
 
-my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+my $DBObject = $Kernel::OM->Get('DB');
 
 my $HomeDir = $ConfigObject->Get('Home');
 
@@ -70,7 +70,7 @@ if ( !-e $OpenSSLBin ) {
     }
 }
 
-my $SMIMEObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+my $SMIMEObject = $Kernel::OM->Get('Crypt::SMIME');
 
 if ( !$SMIMEObject ) {
     print STDERR "NOTICE: No SMIME support!\n";
@@ -128,11 +128,11 @@ if ( !$SMIMEObject ) {
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 my $Random = $Helper->GetRandomID();
 
 # get existing certificates
@@ -241,7 +241,7 @@ wpStC0yiqNRd1/r/wkihHv57xSScBPkpdu2Q9RBY36dJ
         <Column Name="change_time" Required="true" Type="DATE"/>
         <Column Name="change_by" Required="true" Type="INTEGER"/>
     </Table>';
-    my @XMLARRAY = $Kernel::OM->Get('Kernel::System::XML')->XMLParse( String => $XMLLoginTable );
+    my @XMLARRAY = $Kernel::OM->Get('XML')->XMLParse( String => $XMLLoginTable );
     my @SQL = $DBObject->SQLProcessor( Database => \@XMLARRAY );
     my @SQLPost = $DBObject->SQLProcessorPost( Database => \@XMLARRAY );
 
@@ -290,7 +290,7 @@ my $FileLocation;
 
 $ConfigObject->Set(
     Key   => "Contact::AuthModule10",
-    Value => 'Kernel::System::ContactAuth::DB',
+    Value => 'ContactAuth::DB',
 );
 $ConfigObject->Set(
     Key   => "Contact::AuthModule::DB::Table10",
@@ -310,7 +310,7 @@ $ConfigObject->Set(
 );
 my %ContactConfig = (
     Name   => 'Database Backend',
-    Module => 'Kernel::System::Contact::DB',
+    Module => 'Contact::DB',
     Params => {
         Table => $TableName,
     },
@@ -358,7 +358,7 @@ my $Return = $ConfigObject->Set(
     Value => \%ContactConfig,
 );
 
-my $AuthObject = $Kernel::OM->Get('Kernel::System::ContactAuth');
+my $AuthObject = $Kernel::OM->Get('ContactAuth');
 
 # login check
 $DBObject->Prepare(
@@ -395,7 +395,7 @@ $Self->Is(
 );
 
 # get Contact-List
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $ContactObject = $Kernel::OM->Get('Contact');
 my %List               = $ContactObject->CustomerSearch(
     CustomerID => 'unittest_customer_id',
     Valid      => 1,

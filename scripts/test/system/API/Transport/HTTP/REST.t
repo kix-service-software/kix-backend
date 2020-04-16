@@ -13,21 +13,21 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 # skip SSL certificate verification
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         SkipSSLVerify => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # add web service to be used (empty config)
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
 $Self->Is(
-    'Kernel::System::API::Webservice',
+    'API::Webservice',
     ref $WebserviceObject,
     "Create web service object",
 );
@@ -1146,9 +1146,9 @@ my @Tests = (
 );
 
 # create requester object
-my $RequesterObject = $Kernel::OM->Get('Kernel::API::Requester');
+my $RequesterObject = $Kernel::OM->Get('API::Requester');
 $Self->Is(
-    'Kernel::API::Requester',
+    'API::Requester',
     ref $RequesterObject,
     "Create requester object",
 );
@@ -1267,7 +1267,7 @@ for my $Test (@Tests) {
 );
 
 # Get JSON object;
-my $JSONObject = $Kernel::OM->Get('Kernel::System::JSON');
+my $JSONObject = $Kernel::OM->Get('JSON');
 
 TEST:
 for my $Test (@Tests) {
@@ -1291,7 +1291,7 @@ for my $Test (@Tests) {
     }
 
     # perform request
-    my %Response = $Kernel::OM->Get('Kernel::System::WebUserAgent')->Request(
+    my %Response = $Kernel::OM->Get('WebUserAgent')->Request(
         Type => 'GET',
         URL  => $BaseURL
             . $Test->{WebserviceConfig}->{Provider}->{Transport}->{Config}->{RouteOperationMapping}->{TestSimple}

@@ -15,21 +15,21 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::Article::StorageSwitch');
-my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Article::StorageSwitch');
+my $TicketObject  = $Kernel::OM->Get('Ticket');
 
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 # make sure ticket is created in ArticleStorageDB
 $HelperObject->ConfigSettingChange(
     Valid => 1,
     Key   => 'Ticket::StorageModule',
-    Value => 'Kernel::System::Ticket::ArticleStorageDB',
+    Value => 'Ticket::ArticleStorageDB',
 );
 
 # create isolated time environment during test
 $HelperObject->FixedTimeSet(
-    $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime( String => '2000-10-20 00:00:00' ),
+    $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2000-10-20 00:00:00' ),
 );
 
 # create test ticket with attachments

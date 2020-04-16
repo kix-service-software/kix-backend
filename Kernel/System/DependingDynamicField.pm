@@ -14,9 +14,9 @@ use warnings;
 use Kernel::Language;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Cache',
+    'DB',
+    'Log',
+    'Cache',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create a DependingDynamicField object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $DependingDynamicFieldObject = $Kernel::OM->Get('Kernel::System::DependingDynamicField');
+    my $DependingDynamicFieldObject = $Kernel::OM->Get('DependingDynamicField');
 
 =cut
 
@@ -51,9 +51,9 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{CacheObject} = $Kernel::OM->Get('Kernel::System::Cache');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
+    $Self->{LogObject} = $Kernel::OM->Get('Log');
+    $Self->{CacheObject} = $Kernel::OM->Get('Cache');
 
     $Self->{CacheType} = 'DependingDynamicField';
 

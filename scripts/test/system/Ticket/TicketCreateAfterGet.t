@@ -15,22 +15,22 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $QueueObject   = $Kernel::OM->Get('Kernel::System::Queue');
-my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
-my $SLAObject     = $Kernel::OM->Get('Kernel::System::SLA');
-my $StateObject   = $Kernel::OM->Get('Kernel::System::State');
-my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
-my $TimeObject    = $Kernel::OM->Get('Kernel::System::Time');
-my $TypeObject    = $Kernel::OM->Get('Kernel::System::Type');
-my $UserObject    = $Kernel::OM->Get('Kernel::System::User');
+my $QueueObject   = $Kernel::OM->Get('Queue');
+my $ServiceObject = $Kernel::OM->Get('Service');
+my $SLAObject     = $Kernel::OM->Get('SLA');
+my $StateObject   = $Kernel::OM->Get('State');
+my $TicketObject  = $Kernel::OM->Get('Ticket');
+my $TimeObject    = $Kernel::OM->Get('Time');
+my $TypeObject    = $Kernel::OM->Get('Type');
+my $UserObject    = $Kernel::OM->Get('User');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set fixed time
 $Helper->FixedTimeSet();

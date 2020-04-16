@@ -15,10 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $EncodeObject = $Kernel::OM->Get('Encode');
 
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Value = 'Testvalue';
 $ConfigObject->Set(

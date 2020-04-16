@@ -105,7 +105,7 @@ remove token (invalidate)
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
+    my $Result = $Kernel::OM->Get('Token')->RemoveToken(
         Token => $Param{Data}->{Token}
     );
 

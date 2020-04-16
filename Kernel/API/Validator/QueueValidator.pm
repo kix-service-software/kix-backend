@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'QueueID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+        $Found = $Kernel::OM->Get('Queue')->QueueLookup(
             QueueID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'Queue' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+        $Found = $Kernel::OM->Get('Queue')->QueueLookup(
             Queue => $Param{Data}->{$Param{Attribute}},
         );        
     }

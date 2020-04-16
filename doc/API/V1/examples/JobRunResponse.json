@@ -1,0 +1,13 @@
+{
+    "JobRun": {
+        "CreateBy": 1,
+        "EndTime": "2019-11-25 16:55:26",
+        "Filter": {},
+        "ID": 1,
+        "JobID": 293,
+        "Logs": [],
+        "StartTime": "2019-11-25 16:55:26",
+        "State": "finished",
+        "StateID": 2
+      }
+}

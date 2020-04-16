@@ -21,10 +21,10 @@ use File::Find qw();
 use File::Basename;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Encode',
+    'Log',
+    'Main',
 );
 
 sub new {
@@ -35,7 +35,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $TempDir = $ConfigObject->Get('TempDir') || $ConfigObject->Get('Home').'/var/tmp';
     $Self->{CacheDirectory} = $TempDir . '/CacheFileStorable';
@@ -46,7 +46,7 @@ sub new {
             ## no critic
             if ( !mkdir( $Directory, 0770 ) ) {
                 ## use critic
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't create directory '$Directory': $!",
                 );
@@ -66,7 +66,7 @@ sub Set {
 
     for my $Needed (qw(Type Key Value TTL)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -90,14 +90,14 @@ sub Set {
         File::Path::mkpath( $CacheDirectory, 0, 0770 );    ## no critic
 
         if ( !-e $CacheDirectory ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't create directory '$CacheDirectory': $!",
             );
             return;
         }
     }
-    my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
         Directory  => $CacheDirectory,
         Filename   => $Filename,
         Content    => \$Dump,
@@ -116,7 +116,7 @@ sub Get {
     # check needed stuff
     for my $Needed (qw(Type Key)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -126,7 +126,7 @@ sub Get {
 
     my ( $Filename, $CacheDirectory ) = $Self->_GetFilenameAndCacheDirectory(%Param);
 
-    my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Directory       => $CacheDirectory,
         Filename        => $Filename,
         Type            => 'Local',
@@ -153,7 +153,7 @@ sub Delete {
     # check needed stuff
     for my $Needed (qw(Type Key)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -163,7 +163,7 @@ sub Delete {
 
     my ( $Filename, $CacheDirectory ) = $Self->_GetFilenameAndCacheDirectory(%Param);
 
-    return $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
+    return $Kernel::OM->Get('Main')->FileDelete(
         Directory       => $CacheDirectory,
         Filename        => $Filename,
         Type            => 'Local',
@@ -175,7 +175,7 @@ sub CleanUp {
     my ( $Self, %Param ) = @_;
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my @TypeList = $MainObject->DirectoryRead(
         Directory => $Self->{CacheDirectory},
@@ -223,7 +223,7 @@ sub CleanUp {
         # exist anymore, it was probably just another process deleting it.
         my $Success = unlink $CacheFile;
         if ( !$Success && $! != POSIX::ENOENT ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't remove file $CacheFile: $!",
             );
@@ -248,7 +248,7 @@ sub _GetFilenameAndCacheDirectory {
 
     for my $Needed (qw(Type Key)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -257,7 +257,7 @@ sub _GetFilenameAndCacheDirectory {
     }
 
     my $Filename = $Param{Key};
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Filename );
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$Filename );
     $Filename = Digest::MD5::md5_hex($Filename);
 
     my $CacheDirectory = $Self->{CacheDirectory} . '/' . $Param{Type};

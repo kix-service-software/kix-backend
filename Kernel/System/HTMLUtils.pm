@@ -19,9 +19,9 @@ use MIME::Base64;
 use HTML::Truncate;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
+    'Config',
+    'Encode',
+    'Log',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
 =cut
 
@@ -75,7 +75,7 @@ sub ToAscii {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -84,7 +84,7 @@ sub ToAscii {
     }
 
     # turn on utf8 flag (bug#10970, bug#11596 and bug#12097)
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Param{String} );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Param{String} );
 
     # get length of line for forcing line breakes
     my $LineLength = $Self->{'Ticket::Frontend::TextAreaNote'} || 78;
@@ -583,7 +583,7 @@ sub ToHTML {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -621,7 +621,7 @@ sub DocumentComplete {
     # check needed stuff
     for (qw(String Charset)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -631,7 +631,7 @@ sub DocumentComplete {
 
     return $Param{String} if $Param{String} =~ /<html>/i;
 
-    my $Css = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::RichText::DefaultCSS')
+    my $Css = $Kernel::OM->Get('Config')->Get('Frontend::RichText::DefaultCSS')
         || 'font-size: 12px; font-family:Courier,monospace,fixed;';
 
     # Use the HTML5 doctype because it is compatible with HTML4 and causes the browsers
@@ -659,7 +659,7 @@ sub DocumentStrip {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -701,7 +701,7 @@ sub DocumentCleanup {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -962,7 +962,7 @@ sub Safety {
     # check needed stuff
     for (qw(String)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1194,21 +1194,21 @@ sub EmbeddedImagesExtract {
     my ( $Self, %Param ) = @_;
 
     if ( ref $Param{DocumentRef} ne 'SCALAR' || !defined ${ $Param{DocumentRef} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need DocumentRef!"
         );
         return;
     }
     if ( ref $Param{AttachmentsRef} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need AttachmentsRef!"
         );
         return;
     }
 
-    my $FQDN = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
     ${ $Param{DocumentRef} } =~ s{(src=")(data:image/)(png|gif|jpg|jpeg|bmp)(;base64,)(.+?)(")}{
 
         my $Base64String = $5;
@@ -1266,7 +1266,7 @@ sub HTMLTruncate {
     for my $Needed (qw(String Chars)) {
 
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -1293,7 +1293,7 @@ sub HTMLTruncate {
     };
 
     if ( !$HTMLTruncateObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not create HTMLTruncateObject: $@",
         );
@@ -1318,7 +1318,7 @@ sub HTMLTruncate {
     my $Result;
     if ( !eval { $Result = $HTMLTruncateObject->truncate( $Safe{String} ) } ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Truncating string failed: ' . $@,
         );

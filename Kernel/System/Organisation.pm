@@ -14,9 +14,9 @@ use warnings;
 use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $OrganisationObject = $Kernel::OM->Get('Kernel::System::Organisation');
+    my $OrganisationObject = $Kernel::OM->Get('Organisation');
 
 =cut
 
@@ -51,12 +51,12 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $MainObject   = $Kernel::OM->Get('Main');
 
     # load generator customer preferences module
     my $GeneratorModule = $ConfigObject->Get('OrganisationPreferences')->{Module}
-        || 'Kernel::System::Organisation::Preferences::DB';
+        || 'Organisation::Preferences::DB';
 
     if ( $MainObject->Require($GeneratorModule) ) {
         $Self->{PreferencesObject} = $GeneratorModule->new();
@@ -71,7 +71,7 @@ sub new {
     );
 
     $Self->{Lower} = '';
-    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -103,7 +103,7 @@ sub OrganisationAdd {
     # check needed stuff
     for (qw(Number Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -111,7 +111,7 @@ sub OrganisationAdd {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => "INSERT INTO organisation "
              . "(number, name, street, zip, city, country, "
              . "url, comments, valid_id, create_time, create_by, change_time, change_by) "
@@ -125,14 +125,14 @@ sub OrganisationAdd {
     );
 
     # log notice
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message =>
             "Organisation: '$Param{Name}/$Param{Number}' created successfully ($Param{UserID})!",
     );
 
     # find ID of new item
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id FROM organisation WHERE number = ?',
         Bind  => [ 
             \$Param{Number} 
@@ -142,12 +142,12 @@ sub OrganisationAdd {
 
     # fetch the result
     my $OrgID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $OrgID = $Row[0];
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );    
 
@@ -162,7 +162,7 @@ sub OrganisationAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Organisation',
         ObjectID  => $OrgID,
@@ -206,7 +206,7 @@ sub OrganisationGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID!"
         );
@@ -215,14 +215,14 @@ sub OrganisationGet {
 
     # check cache
     my $CacheKey = "OrganisationGet::$Param{ID}";
-    my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Data = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Data} if ref $Data eq 'HASH';
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id, number, name, street, zip, city, country, url, comments, valid_id, '
              . 'create_time, create_by, change_time, change_by FROM organisation WHERE id = ?',
         Bind  => [ \$Param{ID} ],
@@ -231,7 +231,7 @@ sub OrganisationGet {
 
     # fetch the result
     my %Organisation;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Organisation{ID}         = $Row[0];
         $Organisation{Number}     = $Row[1];
         $Organisation{Name}       = $Row[2];
@@ -250,14 +250,14 @@ sub OrganisationGet {
 
     # check item
     if ( !$Organisation{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Organisation with ID $Param{ID} not found in database!",
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -288,7 +288,7 @@ sub OrganisationLookup {
 
     # check needed stuff
     if ( !$Param{Number} && !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Number or ID!'
         );
@@ -296,13 +296,13 @@ sub OrganisationLookup {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{Number} ) {
 
         # check cache
         my $CacheKey = 'OrganisationLookup::ID::' . $Param{Number};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -325,7 +325,7 @@ sub OrganisationLookup {
 
         if ( !$ID ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No ID found for organisation number '$Param{Number}'!",
                 );
@@ -334,7 +334,7 @@ sub OrganisationLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -351,7 +351,7 @@ sub OrganisationLookup {
 
         # check cache
         my $CacheKey = 'OrganisationLookup::Number::' . $Param{ID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -372,7 +372,7 @@ sub OrganisationLookup {
 
         if ( !$Number ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No organisation number found for ID '$Param{ID}'!",
                 );
@@ -381,7 +381,7 @@ sub OrganisationLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -418,7 +418,7 @@ sub OrganisationUpdate {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -431,7 +431,7 @@ sub OrganisationUpdate {
         ID => $Param{ID} 
     );
     if ( !%Organisation ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such organisation with ID $Param{ID}!",
         );
@@ -456,7 +456,7 @@ sub OrganisationUpdate {
     return 1 if !$ChangeRequired;
 
     # update role in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE organisation SET number = ?, name = ?, street = ?, '
             . 'zip = ?, city = ?, country = ?, url = ?, comments = ?, valid_id = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
@@ -469,7 +469,7 @@ sub OrganisationUpdate {
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );    
 
@@ -484,7 +484,7 @@ sub OrganisationUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Organisation',
         ObjectID  => $Param{ID},
@@ -536,7 +536,7 @@ sub OrganisationSearch {
 
     # check cache
     my $CacheKey = "OrganisationSearch::${Valid}::" . ( $Param{Limit} || 0) . "::" . ( $Param{Search} || '' ) . "::" . ( $Param{Number} || '' ) . "::" . ( $Param{Name} || '' );
-    my $Data = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Data = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -549,7 +549,7 @@ sub OrganisationSearch {
     if ($Valid) {
 
         # get valid object
-        my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+        my $ValidObject = $Kernel::OM->Get('Valid');
 
         $SQL .= "valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
     }
@@ -623,7 +623,7 @@ sub OrganisationSearch {
     }
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT id, name FROM organisation " . ($SQL ? "WHERE $SQL" : ''),
         Bind  => \@Bind,
         Limit => $Param{Limit},
@@ -631,12 +631,12 @@ sub OrganisationSearch {
 
     # fetch the result
     my %List;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $List{$Row[0]} = $Row[1];
     }
 
     # cache request
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%List,
@@ -662,7 +662,7 @@ sub OrganisationDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -671,18 +671,18 @@ sub OrganisationDelete {
     }
 
     # get database object
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM organisation WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
    
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Organisation',
         ObjectID  => $Param{ID},
@@ -706,7 +706,7 @@ sub GetPreferences {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!'
         );
@@ -716,7 +716,7 @@ sub GetPreferences {
     # check if user exists
     my %User = $Self->OrganisationGet( OrganisationNumber => $Param{UserID} );
     if ( !%User ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such user '$Param{UserID}'!",
         );
@@ -749,7 +749,7 @@ sub SetPreferences {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!'
         );
@@ -759,7 +759,7 @@ sub SetPreferences {
     # check if user exists
     my %User = $Self->OrganisationGet( OrganisationNumber => $Param{UserID} );
     if ( !%User ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such user '$Param{UserID}'!",
         );
@@ -792,7 +792,7 @@ sub SetPreferences {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Customer.Preference',
         ObjectID  => $Param{UserID}.'::'.$Param{Key},

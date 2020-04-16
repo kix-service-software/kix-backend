@@ -17,9 +17,9 @@ use Digest::MD5 qw(md5_hex);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Log',
 );
 
 our $DisableWarnings = 0;
@@ -77,7 +77,7 @@ sub PatternGet {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -107,7 +107,7 @@ sub _PatternGet {
     my ( $Self, %Param ) = @_;
 
     if ( !IsArrayRefWithData($Param{IDs}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need IDs!"
         );
@@ -118,7 +118,7 @@ sub _PatternGet {
 
     # check cache
     my $CacheKey = "PatternGet::" . $IDStrg . "::" . $Param{IncludeAvailableLanguages};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -126,13 +126,13 @@ sub _PatternGet {
 
     my @BindRefList = map { \$_ } @{$Param{IDs}};
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id, value, create_time, create_by, change_time, change_by FROM translation_pattern WHERE id IN ('.(join( ',', map { '?' } @{$Param{IDs}})).')',
         Bind => \@BindRefList
     );
 
     # fetch the result
-    my $Result = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'ID', 'Value', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ],
     );
 
@@ -143,12 +143,12 @@ sub _PatternGet {
     # add array of available languages if requests
     if ( $Param{IncludeAvailableLanguages} ) {
         my @BindRefList = map { \$_->{ID} } @{$Result};
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        return if !$Kernel::OM->Get('DB')->Prepare(
             SQL  => 'SELECT pattern_id, language FROM translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Result})).') ORDER by language',
             Bind => \@BindRefList
         );
         # fetch the result
-        my $LanguageData = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        my $LanguageData = $Kernel::OM->Get('DB')->FetchAllArrayRef(
             Columns => [ 'PatternID', 'Language' ],
         );
 
@@ -171,7 +171,7 @@ sub _PatternGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -195,18 +195,18 @@ sub PatternList {
 
     # check cache
     my $CacheKey = "PatternList";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id, value FROM translation_pattern'
     );
 
     # fetch the result
-    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'ID', 'Value' ],
     );
 
@@ -219,7 +219,7 @@ sub PatternList {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -246,7 +246,7 @@ sub PatternExistsCheck {
     # check needed stuff
     for (qw(Value)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -256,7 +256,7 @@ sub PatternExistsCheck {
 
     # check cache
     my $CacheKey = "PatternExistsCheck::$Param{Value}";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -265,20 +265,20 @@ sub PatternExistsCheck {
     # generate MD5 sum of value
     my $MD5 = Digest::MD5::md5_hex($Param{Value});
 
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id FROM translation_pattern WHERE value_md5= ?',
         Bind => [ \$MD5 ] 
     );
 
     # fetch the result
     my $PatternID;
-    while (my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray()) {
+    while (my @Row = $Kernel::OM->Get('DB')->FetchrowArray()) {
         $PatternID = $Row[0];
     }
 
     if ( $PatternID ) {
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -306,7 +306,7 @@ sub PatternAdd {
     # check needed stuff
     for (qw(Value UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -319,7 +319,7 @@ sub PatternAdd {
         Value => $Param{Value}
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An identical pattern already exists!"
         );
@@ -330,7 +330,7 @@ sub PatternAdd {
     my $MD5 = Digest::MD5::md5_hex($Param{Value});
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO translation_pattern '
             . '(value, value_md5, create_time, create_by, change_time, change_by) '
             . 'VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
@@ -340,25 +340,25 @@ sub PatternAdd {
     );
 
     # get new Pattern id
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT id FROM translation_pattern WHERE value_md5= ?',
         Bind  => [ \$MD5 ],
         Limit => 1,
     );
 
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ID = $Row[0];
     }
     return if !$ID;
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Translation.Pattern',
         ObjectID  => $ID,
@@ -385,7 +385,7 @@ sub PatternUpdate {
     # check needed stuff
     for (qw(ID Value UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -398,7 +398,7 @@ sub PatternUpdate {
         Value => $Param{Value}
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An identical Pattern already exists!"
         );
@@ -409,7 +409,7 @@ sub PatternUpdate {
     my $MD5 = Digest::MD5::md5_hex($Param{Value});
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE translation_pattern SET value = ?, value_md5= ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
             \$Param{Value}, \$MD5, \$Param{UserID}, \$Param{ID}
@@ -417,12 +417,12 @@ sub PatternUpdate {
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Translation.Pattern',
         ObjectID  => $Param{ID},
@@ -448,7 +448,7 @@ sub PatternDelete {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -457,24 +457,24 @@ sub PatternDelete {
     }
 
     # delete assigned languages
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM translation_language WHERE pattern_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete pattern
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM translation_pattern WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Translation.Pattern',
         ObjectID  => $Param{ID},
@@ -503,7 +503,7 @@ sub TranslationLanguageAdd {
     # check needed stuff
     for (qw(PatternID Value Language UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -518,7 +518,7 @@ sub TranslationLanguageAdd {
         ID => $Param{PatternID},
     );
     if ( !%Pattern ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "PatternID $Param{PatternID} doesn't exist!"
         );
@@ -531,14 +531,14 @@ sub TranslationLanguageAdd {
         Language  => $Param{Language},
     );
     if ( %TranslationLanguage ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "This translation language already exists!"
         );
         return;
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO translation_language '
             . '(value, language, is_default, pattern_id, create_time, create_by, change_time, change_by) '
             . 'VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
@@ -549,12 +549,12 @@ sub TranslationLanguageAdd {
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Translation.Language',
         ObjectID  => $Param{PatternID}.'::'.$Param{Language},
@@ -587,7 +587,7 @@ sub TranslationLanguageGet {
     # check needed stuff
     for (qw(PatternID Language)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -617,7 +617,7 @@ sub _TranslationLanguageGet {
     my ( $Self, %Param ) = @_;
 
     if ( !IsArrayRefWithData($Param{PatternIDs}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need IDs!"
         );
@@ -628,7 +628,7 @@ sub _TranslationLanguageGet {
 
     # check cache
     my $CacheKey = "TranslationLanguageGet::" . ($IDStrg || '') . "::$Param{Language}";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -636,18 +636,18 @@ sub _TranslationLanguageGet {
 
     my @BindRefList = map { \$_ } ( $Param{Language}, @{$Param{PatternIDs}} );
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT pattern_id, language, value, is_default, create_time, create_by, change_time, change_by FROM translation_language WHERE language = ? AND pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
         Bind => \@BindRefList
     );
 
     # fetch the result
-    my $Result = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'PatternID', 'Language', 'Value', 'IsDefault', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ],
     );
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -679,7 +679,7 @@ sub TranslationLanguageList {
     # check needed stuff
     for (qw(PatternID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -707,7 +707,7 @@ sub _TranslationLanguageList {
     my ( $Self, %Param ) = @_;
 
     if ( !IsArrayRefWithData($Param{PatternIDs}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need PatternIDs!"
         );
@@ -718,7 +718,7 @@ sub _TranslationLanguageList {
 
     # check cache
     my $CacheKey = "TranslationLanguageList::$IDStrg";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -726,13 +726,13 @@ sub _TranslationLanguageList {
 
     my @BindRefList = map { \$_ } ( @{$Param{PatternIDs}} );
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT pattern_id, language, value FROM translation_language WHERE pattern_id IN ('.(join( ',', map { '?' } @{$Param{PatternIDs}})).')',
         Bind  => \@BindRefList,
     );
 
     # fetch the result
-    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'PatternID', 'Language', 'Value' ],
     );
 
@@ -748,7 +748,7 @@ sub _TranslationLanguageList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -778,7 +778,7 @@ sub TranslationLanguageUpdate {
     # check needed stuff
     for (qw(PatternID Language UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -792,7 +792,7 @@ sub TranslationLanguageUpdate {
         Language  => $Param{Language}
     );
     if ( !%Translation ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Translation language $Param{Language} doesn't exist for given pattern!"
         );
@@ -802,7 +802,7 @@ sub TranslationLanguageUpdate {
     $Param{IsDefault} = $Param{IsDefault} || 0;
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE translation_language SET value = ?, is_default = ?, change_time = current_timestamp, change_by = ? WHERE pattern_id = ? AND language = ?',
         Bind => [
             \$Param{Value}, \$Param{IsDefault}, \$Param{UserID}, 
@@ -811,12 +811,12 @@ sub TranslationLanguageUpdate {
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Translation.Language',
         ObjectID  => $Param{PatternID}.'::'.$Param{Language},
@@ -842,7 +842,7 @@ sub TranslationLanguageDelete {
     # check needed stuff
     for (qw(PatternID Language)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -850,18 +850,18 @@ sub TranslationLanguageDelete {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM translation_language WHERE pattern_id = ? AND language = ?',
         Bind => [ \$Param{PatternID}, \$Param{Language} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Translation.Language',
         ObjectID  => $Param{PatternID}.'::'.$Param{Language},
@@ -899,18 +899,18 @@ sub TranslationList {
 
     # check cache
     my $CacheKey = "TranslationList";
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT tp.value, tl.language, tl.value FROM translation_pattern tp, translation_language tl WHERE tl.pattern_id = tp.id ORDER BY tp.value'
     );
 
     # fetch the result
-    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'Pattern', 'Language', 'Value' ],
     );
 
@@ -926,7 +926,7 @@ sub TranslationList {
         @TranslationList = values %Result;
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -953,7 +953,7 @@ sub CleanUp {
     # check needed stuff
     for (qw(UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -962,22 +962,22 @@ sub CleanUp {
     }
 
     # delete languages
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM translation_language',
     );
 
     # delete patterns
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM translation_pattern',
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Translation.Pattern',
     );
@@ -1006,7 +1006,7 @@ sub ImportPO {
     # check needed stuff
     for (qw(Language)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1015,7 +1015,7 @@ sub ImportPO {
     }
 
     if ( !$Param{File} && !$Param{Content} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need File or Content!"
         );
@@ -1023,7 +1023,7 @@ sub ImportPO {
     }
 
     if ( $Param{File} && $Param{Content} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need File OR Content, not both!"
         );
@@ -1032,12 +1032,12 @@ sub ImportPO {
 
     if ( $Param{Content} ) {
         # store content in temp file
-        my ($FH, $Filename) = $Kernel::OM->Get('Kernel::System::FileTemp')->TempFile(
+        my ($FH, $Filename) = $Kernel::OM->Get('FileTemp')->TempFile(
             Suffix => '.po'
         );
 
         if ( !$Filename ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create temporary file!"
             );
@@ -1045,18 +1045,18 @@ sub ImportPO {
         }
 
         # set UTF8 flag
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput(
+        $Kernel::OM->Get('Encode')->EncodeInput(
             \$Param{Content}
         );
 
-        my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        my $Result = $Kernel::OM->Get('Main')->FileWrite(
             Location  => $Filename,
             Content   => \$Param{Content},
             Mode      => 'binmode'
         );
 
         if ( !$Result ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to write content to temporary file!"
             );
@@ -1074,7 +1074,7 @@ sub ImportPO {
     }
 
     if ( IsHashRefWithData($Items) ) {
-        my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+        my $EncodeObject = $Kernel::OM->Get('Encode');
 
         foreach my $MsgId ( sort keys %{$Items} ) {
             $CountTotal++;
@@ -1104,7 +1104,7 @@ sub ImportPO {
                     UserID => $Param{UserID},
                 );
                 if ( !$PatternID ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Unable to add translation pattern for $MsgId!"
                     );
@@ -1132,7 +1132,7 @@ sub ImportPO {
                         UserID    => $Param{UserID},
                     );
                     if ( !$Result ) {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => "Unable to update translation language '$Param{Language}' for PatternID $PatternID!"
                         );
@@ -1149,7 +1149,7 @@ sub ImportPO {
                     UserID    => $Param{UserID},
                 );
                 if ( !$Result ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Unable to create translation language '$Param{Language}' for PatternID $PatternID!"
                     );
@@ -1161,7 +1161,7 @@ sub ImportPO {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 

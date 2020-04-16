@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Contact',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -35,7 +35,7 @@ sub Run {
     # check needed stuff
     for (qw(TicketID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -44,7 +44,7 @@ sub Run {
     }
 
     # get ticket data
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Param{TicketID},
         DynamicFields => 0,
     );
@@ -53,7 +53,7 @@ sub Run {
     return if !$Ticket{ContactID};
 
     # get user data
-    my %CustomerData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+    my %CustomerData = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $Param{UserID},
     );
 

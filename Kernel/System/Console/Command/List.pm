@@ -18,8 +18,8 @@ use Kernel::System::Console;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
+    'Config',
+    'Main',
 );
 
 sub Configure {
@@ -31,8 +31,8 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $ProductName    = $Kernel::OM->Get('Kernel::Config')->Get('ProductName');
-    my $ProductVersion = $Kernel::OM->Get('Kernel::Config')->Get('Version');
+    my $ProductName    = $Kernel::OM->Get('Config')->Get('ProductName');
+    my $ProductVersion = $Kernel::OM->Get('Config')->Get('Version');
 
     my $UsageText = "<green>$ProductName</green> (<yellow>$ProductVersion</yellow>)\n\n";
     $UsageText .= "<yellow>Usage:</yellow>\n";
@@ -49,10 +49,10 @@ sub Run {
     my $PreviousCommandNameSpace = '';
 
     COMMAND:
-    for my $Command ( $Kernel::OM->Get('Kernel::System::Console')->CommandList() ) {
+    for my $Command ( $Kernel::OM->Get('Console')->CommandList() ) {
 
         # KIXCore-capeIT
-        if ( $Kernel::OM->Get('Kernel::System::Main')->Require( $Command, Silent => 1 ) ) {
+        if ( $Kernel::OM->Get('Main')->Require( $Command, Silent => 1 ) ) {
 
             # EO KIXCore-capeIT
 

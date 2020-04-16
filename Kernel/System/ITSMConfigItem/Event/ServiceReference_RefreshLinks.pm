@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::ITSMCIAttributCollectionUtils',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log'
+    'ITSMCIAttributCollectionUtils',
+    'ITSMConfigItem',
+    'LinkObject',
+    'Log'
 );
 
 sub new {
@@ -25,10 +25,10 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{CIACUtilsObject}  = $Kernel::OM->Get('Kernel::System::ITSMCIAttributCollectionUtils');
-    $Self->{ConfigItemObject} = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-    $Self->{LinkObject}       = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}        = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{CIACUtilsObject}  = $Kernel::OM->Get('ITSMCIAttributCollectionUtils');
+    $Self->{ConfigItemObject} = $Kernel::OM->Get('ITSMConfigItem');
+    $Self->{LinkObject}       = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}        = $Kernel::OM->Get('Log');
 
     return $Self;
 }

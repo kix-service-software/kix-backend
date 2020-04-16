@@ -154,7 +154,7 @@ sub Run {
     my $MailFilter = $Self->_Trim( Data => $Param{Data}->{MailFilter} );
 
     # check if another filter with name already exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->NameExistsCheck(
+    my $Exists = $Kernel::OM->Get('PostMaster::Filter')->NameExistsCheck(
         Name => $MailFilter->{Name},
         ID   => $Param{Data}->{MailFilterID}
     );
@@ -174,7 +174,7 @@ sub Run {
     }
 
     # get "old" data of MailFilter
-    my %MailFilterData = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->FilterGet(
+    my %MailFilterData = $Kernel::OM->Get('PostMaster::Filter')->FilterGet(
         ID     => $Param{Data}->{MailFilterID},
         UserID => $Self->{Authorization}->{UserID},
     );
@@ -185,7 +185,7 @@ sub Run {
     $Self->_PrepareFilter( Filter => $MailFilter );
 
     # update MailFilter
-    my $Success = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->FilterUpdate(
+    my $Success = $Kernel::OM->Get('PostMaster::Filter')->FilterUpdate(
         ID             => $Param{Data}->{MailFilterID},
         Name           => $MailFilter->{Name} || $MailFilterData{Name},
         ValidID        => $MailFilter->{ValidID} || $MailFilterData{ValidID},

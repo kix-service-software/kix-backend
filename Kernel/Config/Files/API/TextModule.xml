@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TextModuleGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TextModule::TextModuleGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TextModuleID</Item>
                 <Item Key="ResponseSchema">TextModuleResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TextModuleSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TextModule::TextModuleSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TextModuleCollectionResponse</Item>
                 <Item Key="CacheType">API_textmodules</Item>                
@@ -31,6 +33,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TextModuleCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TextModule::TextModuleCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TextModulePostRequest</Item>
                 <Item Key="ResponseSchema">TextModulePostPatchResponse</Item>
@@ -42,6 +45,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TextModuleUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TextModule::TextModuleUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">TextModulePatchRequest</Item>
                 <Item Key="ResponseSchema">TextModulePostPatchResponse</Item>
@@ -53,6 +57,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TextModuleDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TextModule::TextModuleDelete</Item>
                 <Item Key="APIVersion">V1</Item>
             </Hash>
         </Setting>
@@ -63,6 +68,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TextModuleCategorySearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TextModule::TextModuleCategorySearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">TextModule</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

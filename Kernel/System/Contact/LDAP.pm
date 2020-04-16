@@ -15,11 +15,11 @@ use Net::LDAP;
 use Net::LDAP::Util qw(escape_filter_value);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'Cache',
+    'Encode',
+    'Log',
+    'Time',
 );
 
 sub new {
@@ -44,7 +44,7 @@ sub new {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # params
     if ( $Self->{ContactMap}->{Params}->{Params} ) {
@@ -64,7 +64,7 @@ sub new {
         $Self->{Host} = $Self->{ContactMap}->{Params}->{Host};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Contact->Params->Host in Kernel/Config.pm',
         );
@@ -76,7 +76,7 @@ sub new {
         $Self->{BaseDN} = $Self->{ContactMap}->{Params}->{BaseDN};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Contact->Params->BaseDN in Kernel/Config.pm',
         );
@@ -88,7 +88,7 @@ sub new {
         $Self->{SScope} = $Self->{ContactMap}->{Params}->{SSCOPE};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Contact->Params->SSCOPE in Kernel/Config.pm',
         );
@@ -107,7 +107,7 @@ sub new {
         $Self->{CustomerKey} = $Self->{ContactMap}->{CustomerKey};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Contact->CustomerKey in Kernel/Config.pm',
         );
@@ -119,7 +119,7 @@ sub new {
         $Self->{CustomerID} = $Self->{ContactMap}->{CustomerID};
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Contact->CustomerID in Kernel/Config.pm',
         );
@@ -147,7 +147,7 @@ sub new {
 
     # create cache object, but only if CacheTTL is set in customer config
     if ( $Self->{ContactMap}->{CacheTTL} ) {
-        $Self->{CacheObject} = $Kernel::OM->Get('Kernel::System::Cache');
+        $Self->{CacheObject} = $Kernel::OM->Get('Cache');
     }
 
     # get valid filter if used
@@ -175,7 +175,7 @@ sub _Connect {
             die "Can't connect to $Self->{Host}: $@";
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't connect to $Self->{Host}: $@",
             );
@@ -195,7 +195,7 @@ sub _Connect {
     }
 
     if ( $Result->code() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'First bind failed! ' . $Result->error(),
         );
@@ -211,7 +211,7 @@ sub CustomerName {
 
     # check needed stuff
     if ( !$Param{UserLogin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserLogin!'
         );
@@ -249,7 +249,7 @@ sub CustomerName {
     );
 
     if ( $Result->code() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Search failed! ' . $Result->error(),
         );
@@ -295,7 +295,7 @@ sub CustomerSearch {
     # check needed stuff
     # KIX4OTRS-capeIT
     #if ( !$Param{Search} && !$Param{UserLogin} && !$Param{PostMasterSearch} ) {
-    #    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    #    $Kernel::OM->Get('Log')->Log(
     #        Priority => 'error',
     #        Message  => 'Need Search, UserLogin or PostMasterSearch!'
     #    );
@@ -309,7 +309,7 @@ sub CustomerSearch {
         && !$Param{CustomerID}
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Search, UserLogin, PostMasterSearch, CustomerID or SearchFields!'
         );
@@ -410,7 +410,7 @@ sub CustomerSearch {
 
         # fallback, if no individual mapping
         else {
-            $SearchFurtherFields = $Kernel::OM->Get('Kernel::Config')->Get('FurtherSearchFields::Mapping');
+            $SearchFurtherFields = $Kernel::OM->Get('Config')->Get('FurtherSearchFields::Mapping');
         }
 
         $Filter = "(&$Filter";
@@ -488,13 +488,13 @@ sub CustomerSearch {
             # Result code 4 (LDAP_SIZELIMIT_EXCEEDED) is normal if there
             # are more items in LDAP than search limit defined in KIX or
             # in LDAP server. Avoid spamming logs with such errors.
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => 'LDAP size limit exceeded (' . $Result->error() . ').',
             );
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Search failed! ' . $Result->error(),
             );
@@ -599,7 +599,7 @@ sub ContactList {
 
     # log ldap errors
     if ( $Result->code() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Result->error(),
         );
@@ -721,13 +721,13 @@ sub CustomerIDList {
             # Result code 4 (LDAP_SIZELIMIT_EXCEEDED) is normal if there
             # are more items in LDAP than search limit defined in KIX or
             # in LDAP server. Avoid spamming logs with such errors.
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => 'LDAP size limit exceeded (' . $Result->error() . ').',
             );
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Search failed! ' . $Result->error(),
             );
@@ -784,7 +784,7 @@ sub CustomerIDs {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need User!'
         );
@@ -869,7 +869,7 @@ sub ContactGet {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need User!'
         );
@@ -910,7 +910,7 @@ sub ContactGet {
 
     # log ldap errors
     if ( $Result->code() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Result->error(),
         );
@@ -986,7 +986,7 @@ sub ContactGet {
                 filter => $Filter,
             );
             if ( $Result->code ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Search failed! ($GroupDN) filter='$Filter' " . $Result->error,
                 );
@@ -1022,7 +1022,7 @@ sub ContactGet {
 
     # add last login timestamp
     if ( $Preferences{UserLastLogin} ) {
-        $Preferences{UserLastLoginTimestamp} = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        $Preferences{UserLastLoginTimestamp} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $Preferences{UserLastLogin},
         );
     }
@@ -1045,14 +1045,14 @@ sub ContactAdd {
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Customer backend is read only!'
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => 'Not supported for this module!'
     );
@@ -1065,14 +1065,14 @@ sub ContactUpdate {
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Customer backend is read only!'
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => 'Not supported for this module!'
     );
@@ -1087,14 +1087,14 @@ sub SetPassword {
 
     # check ro/rw
     if ( $Self->{ReadOnly} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Customer backend is read only!'
         );
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => 'Not supported for this module!'
     );
@@ -1129,7 +1129,7 @@ sub SetPreferences {
 
     # check needed params
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!'
         );
@@ -1151,7 +1151,7 @@ sub GetPreferences {
 
     # check needed params
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!'
         );
@@ -1176,7 +1176,7 @@ sub _ConvertFrom {
         return $Text;
     }
 
-    return $Kernel::OM->Get('Kernel::System::Encode')->Convert(
+    return $Kernel::OM->Get('Encode')->Convert(
         Text => $Text,
         From => $Self->{SourceCharset},
         To   => 'utf-8',
@@ -1189,7 +1189,7 @@ sub _ConvertTo {
     return if !defined $Text;
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     if ( !$Self->{SourceCharset} ) {
         $EncodeObject->EncodeInput( \$Text );

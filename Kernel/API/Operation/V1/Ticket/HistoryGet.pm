@@ -60,7 +60,7 @@ sub new {
 
     # Get mapping of history types to readable strings
     my %HistoryTypes;
-    my %HistoryTypeConfig = %{ $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::HistoryTypes') // {} };
+    my %HistoryTypeConfig = %{ $Kernel::OM->Get('Config')->Get('Ticket::Frontend::HistoryTypes') // {} };
     foreach my $Entry ( sort keys %HistoryTypeConfig ) {
         %HistoryTypes = (
             %HistoryTypes,
@@ -149,7 +149,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @HistoryList = $TicketObject->HistoryGet(
         TicketID => $Param{Data}->{TicketID},
@@ -168,7 +168,7 @@ sub Run {
         if ( $HistoryItem->{Name} && $HistoryItem->{Name} =~ m/^%%/x ) {
             $HistoryItem->{Name} =~ s/^%%//xg;
             my @Values = split( /%%/x, $HistoryItem->{Name} );
-            $HistoryItem->{Name} = $Kernel::OM->Get('Kernel::Language')->Translate(
+            $HistoryItem->{Name} = $Kernel::OM->Get('Language')->Translate(
                 $Self->{HistoryTypes}->{ $HistoryItem->{HistoryType} },
                 @Values,
             );

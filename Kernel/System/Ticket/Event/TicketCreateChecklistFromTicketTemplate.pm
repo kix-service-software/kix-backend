@@ -12,14 +12,14 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::Link',
-    'Kernel::System::Log',
-    'Kernel::System::SystemAddress',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
+    'Config',
+    'Contact',
+    'Link',
+    'Log',
+    'SystemAddress',
+    'State',
+    'Ticket',
+    'User',
 );
 
 =item new()
@@ -36,9 +36,9 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{ParamObject}  = $Kernel::OM->Get('Kernel::System::Web::Request');
-    $Self->{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{ParamObject}  = $Kernel::OM->Get('WebRequest');
+    $Self->{TicketObject} = $Kernel::OM->Get('Ticket');
 
     return $Self;
 }
@@ -67,7 +67,7 @@ sub Run {
 
         # get checklist config
         my $KIXSidebarChecklistConfig
-            = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Frontend::KIXSidebarChecklist');
+            = $Kernel::OM->Get('Config')->Get('Ticket::Frontend::KIXSidebarChecklist');
 
         my %TicketTemplateData = $Self->{TicketObject}->TicketTemplateGet(
             ID => $Param{DefaultSet}

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketTypeUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketTypeUpdate');
 
     return $Self;
 }
@@ -125,7 +125,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if tickettype exists 
-    my %TicketTypeData = $Kernel::OM->Get('Kernel::System::Type')->TypeGet(
+    my %TicketTypeData = $Kernel::OM->Get('Type')->TypeGet(
         ID => $Param{Data}->{TypeID},
     );
     
@@ -141,7 +141,7 @@ sub Run {
     );
 
     # check if tickettype exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
+    my $Exists = $Kernel::OM->Get('Type')->NameExistsCheck(
         Name => $TicketType->{Name},
         ID   => $Param{Data}->{TypeID},
     );
@@ -153,7 +153,7 @@ sub Run {
     }
 
     # update tickettype
-    my $Success = $Kernel::OM->Get('Kernel::System::Type')->TypeUpdate(
+    my $Success = $Kernel::OM->Get('Type')->TypeUpdate(
         ID      => $Param{Data}->{TypeID},
         Name    => $TicketType->{Name} || $TicketTypeData{Name},
         Comment => exists $TicketType->{Comment} ? $TicketType->{Comment} : $TicketTypeData{Comment},

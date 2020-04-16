@@ -110,7 +110,7 @@ sub Run {
     foreach my $MailAccountID ( @{$Param{Data}->{MailAccountID}} ) {
 
         # delete MailAccount	    
-        my $Success = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountDelete(
+        my $Success = $Kernel::OM->Get('MailAccount')->MailAccountDelete(
             ID     => $MailAccountID,
             UserID => $Self->{Authorization}->{UserID},
         );

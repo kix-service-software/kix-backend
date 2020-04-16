@@ -15,9 +15,9 @@ use utf8;
 use vars (qw($Self));
 
 # do not really send emails
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 # Check that long references and in-reply-to headers are correctly split across lines.
@@ -57,7 +57,7 @@ my @Tests = (
 );
 
 for my $Test (@Tests) {
-    my ( $Header, $Body ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
+    my ( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
         From       => 'john.smith@example.com',
         To         => 'john.smith2@example.com',
         Subject    => 'some subject',
@@ -89,12 +89,12 @@ for my $Test (@Tests) {
 #
 # Check header security
 #
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'Secure::DisableBanner',
     Value => 0,
 );
 
-my ( $Header, $Body ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
+my ( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
     From    => 'john.smith@example.com',
     To      => 'john.smith2@example.com',
     Subject => 'some subject',
@@ -106,8 +106,8 @@ my ( $Header, $Body ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
 my ($XMailerHeader)    = $$Header =~ m{^X-Mailer:\s+(.*?)$}ixms;
 my ($XPoweredByHeader) = $$Header =~ m{^X-Powered-By:\s+(.*?)$}ixms;
 
-my $Product = $Kernel::OM->Get('Kernel::Config')->Get('Product');
-my $Version = $Kernel::OM->Get('Kernel::Config')->Get('Version');
+my $Product = $Kernel::OM->Get('Config')->Get('Product');
+my $Version = $Kernel::OM->Get('Config')->Get('Version');
 
 $Self->Is(
     $XMailerHeader,
@@ -121,12 +121,12 @@ $Self->Is(
     "Default X-Powered-By header",
 );
 
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'Secure::DisableBanner',
     Value => 1,
 );
 
-( $Header, $Body ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
+( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
     From     => 'john.smith@example.com',
     To       => 'john.smith2@example.com',
     Subject  => 'some subject',

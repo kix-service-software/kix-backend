@@ -105,7 +105,7 @@ EOF
 
     # Convert original value to UTF-8 (if needed).
     if ( $Test->{ContentType} =~ m{UTF-8}mxsi ) {
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Test->{Value} );
+        $Kernel::OM->Get('Encode')->EncodeInput( \$Test->{Value} );
     }
 
     $Self->Is(

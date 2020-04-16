@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 use CGI;
-use Kernel::System::Web::Request;
+use Kernel::System::WebRequest;
 
 {
     local %ENV = (
@@ -24,7 +24,7 @@ use Kernel::System::Web::Request;
     );
 
     CGI->initialize_globals();
-    my $Request = Kernel::System::Web::Request->new();
+    my $Request = Kernel::System::WebRequest->new();
 
     my @ParamNames = $Request->GetParamNames();
     $Self->IsDeeply(
@@ -69,7 +69,7 @@ use Kernel::System::Web::Request;
     open STDIN, '<:utf8', \$PostData;    ## no critic
 
     CGI->initialize_globals();
-    my $Request = Kernel::System::Web::Request->new();
+    my $Request = Kernel::System::WebRequest->new();
 
     my @ParamNames = $Request->GetParamNames();
     $Self->IsDeeply(

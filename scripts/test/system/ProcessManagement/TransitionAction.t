@@ -17,11 +17,11 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject           = $Kernel::OM->Get('Kernel::Config');
-my $TransitionActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction');
+my $ConfigObject           = $Kernel::OM->Get('Config');
+my $TransitionActionObject = $Kernel::OM->Get('ProcessManagement::TransitionAction');
 
 # define needed variables
-my $RandomID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->GetRandomID();
+my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
 # TransitionActionGet() tests
 my @Tests = (
@@ -30,7 +30,7 @@ my @Tests = (
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -44,7 +44,7 @@ my @Tests = (
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -60,7 +60,7 @@ my @Tests = (
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -84,7 +84,7 @@ my @Tests = (
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::NotExistingModule',
+                Module => 'ProcessManagement::TransitionAction::NotExistingModule',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -100,7 +100,7 @@ my @Tests = (
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -117,7 +117,7 @@ my @Tests = (
             'TA1' . $RandomID => {
                 Name =>
                     'äöüßÄÖÜ€исáéíúóúÁÉÍÓÚñÑ-カスタ-用迎使用-Язык',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Junk',
                 },
@@ -174,7 +174,7 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -188,7 +188,7 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -204,7 +204,7 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -220,7 +220,7 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -236,7 +236,7 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::NotExisiting',
+                Module => 'ProcessManagement::TransitionAction::NotExisiting',
                 Config => {
                     Queue => 'Misc',
                 },
@@ -252,14 +252,14 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
             },
             'TA2' . $RandomID => {
                 Name   => 'Customer Set',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketCustomerSet',
+                Module => 'ProcessManagement::TransitionAction::TicketCustomerSet',
                 Config => {
                     Param1 => 1,
                 },
@@ -267,7 +267,7 @@ for my $Test (@Tests) {
             'TA3' . $RandomID => {
                 Name => 'Article Create',
                 Module =>
-                    'Kernel::System::ProcessManagement::TransitionAction::TicketArticleCreate',
+                    'ProcessManagement::TransitionAction::TicketArticleCreate',
                 Config => {
                     Param1 => 1,
                 },
@@ -283,14 +283,14 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
             },
             'TA2' . $RandomID => {
                 Name   => 'Customer Set',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketCustomerSet',
+                Module => 'ProcessManagement::TransitionAction::TicketCustomerSet',
                 Config => {
                     Param1 => 1,
                 },
@@ -298,7 +298,7 @@ for my $Test (@Tests) {
             'TA3' . $RandomID => {
                 Name => 'Article Create',
                 Module =>
-                    'Kernel::System::ProcessManagement::TransitionAction::TicketArticleCreate',
+                    'ProcessManagement::TransitionAction::TicketArticleCreate',
                 Config => {
                     Param1 => 1,
                 },
@@ -317,14 +317,14 @@ for my $Test (@Tests) {
         TransitionActions => {
             'TA1' . $RandomID => {
                 Name   => 'Queue Move',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet',
+                Module => 'ProcessManagement::TransitionAction::TicketQueueSet',
                 Config => {
                     Queue => 'Misc',
                 },
             },
             'TA2' . $RandomID => {
                 Name   => 'Customer Set',
-                Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketCustomerSet',
+                Module => 'ProcessManagement::TransitionAction::TicketCustomerSet',
                 Config => {
                     Param1 => 1,
                 },
@@ -332,7 +332,7 @@ for my $Test (@Tests) {
             'TA3' . $RandomID => {
                 Name => 'Article Create',
                 Module =>
-                    'Kernel::System::ProcessManagement::TransitionAction::TicketArticleCreate',
+                    'ProcessManagement::TransitionAction::TicketArticleCreate',
                 Config => {
                     Param1 => 1,
                 },

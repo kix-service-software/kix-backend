@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Organisation::OrganisationUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Organisation::OrganisationUpdate');
 
     return $Self;
 }
@@ -125,7 +125,7 @@ sub Run {
     );
 
     # check Organisation exists
-    my %OrganisationData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+    my %OrganisationData = $Kernel::OM->Get('Organisation')->OrganisationGet(
         ID => $Param{Data}->{OrganisationID},
     );
     if ( !%OrganisationData ) {
@@ -136,7 +136,7 @@ sub Run {
 
     # check if Number already exists
     if ( IsStringWithData($Organisation->{Number}) ) {
-        my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+        my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
             Number => $Organisation->{Number},
         );
         if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {        
@@ -149,7 +149,7 @@ sub Run {
 
     # check if Name already exists
     if ( IsStringWithData($Organisation->{Name}) ) {
-        my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+        my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
             Name => $Organisation->{Name},
         );
         if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {        
@@ -161,7 +161,7 @@ sub Run {
     }
     
     # update Organisation
-    my $Success = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationUpdate(
+    my $Success = $Kernel::OM->Get('Organisation')->OrganisationUpdate(
         %OrganisationData,
         %{$Organisation},
         ID     => $Param{Data}->{OrganisationID},

@@ -15,15 +15,15 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CacheInternal',
-    'Kernel::System::CSV',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Queue',
-    'Kernel::System::State',
-    'Kernel::System::Type',
-    'Kernel::System::XML',
+    'Config',
+    'CacheInternal',
+    'CSV',
+    'Log',
+    'Main',
+    'Queue',
+    'State',
+    'Type',
+    'XML',
 );
 
 =head1 NAME
@@ -46,7 +46,7 @@ create a TextModule object. Do not     'it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TextModuleObject = $Kernel::OM->Get('Kernel::System::TextModuleField');
+    my $TextModuleObject = $Kernel::OM->Get('TextModuleField');
 
 =cut
 
@@ -58,16 +58,16 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{CacheObject}  = $Kernel::OM->Get('Kernel::System::Cache');
-    $Self->{CSVObject}    = $Kernel::OM->Get('Kernel::System::CSV');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{MainObject}   = $Kernel::OM->Get('Kernel::System::Main');
-    $Self->{QueueObject}  = $Kernel::OM->Get('Kernel::System::Queue');
-    $Self->{StateObject}  = $Kernel::OM->Get('Kernel::System::State');
-    $Self->{TypeObject}   = $Kernel::OM->Get('Kernel::System::Type');
-    $Self->{XMLObject}    = $Kernel::OM->Get('Kernel::System::XML');
+    $Self->{DBObject}     = $Kernel::OM->Get('DB');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{CacheObject}  = $Kernel::OM->Get('Cache');
+    $Self->{CSVObject}    = $Kernel::OM->Get('CSV');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
+    $Self->{MainObject}   = $Kernel::OM->Get('Main');
+    $Self->{QueueObject}  = $Kernel::OM->Get('Queue');
+    $Self->{StateObject}  = $Kernel::OM->Get('State');
+    $Self->{TypeObject}   = $Kernel::OM->Get('Type');
+    $Self->{XMLObject}    = $Kernel::OM->Get('XML');
 
     # extension modules
     if ( $Self->{ConfigObject}->Get('TextModule::CustomModules') ) {
@@ -163,7 +163,7 @@ sub TextModuleAdd {
         }
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'TextModule',
             ObjectID  => $ID,
@@ -317,7 +317,7 @@ sub TextModuleUpdate {
         );
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'TextModule',
             ObjectID  => $Param{ID},
@@ -365,7 +365,7 @@ sub TextModuleDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'TextModule',
         ObjectID  => $Param{ID},

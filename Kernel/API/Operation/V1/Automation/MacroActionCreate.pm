@@ -128,7 +128,7 @@ sub Run {
     );
 
     # check if macro exists
-    my %Macro = $Kernel::OM->Get('Kernel::System::Automation')->MacroGet(
+    my %Macro = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
     );
 
@@ -139,7 +139,7 @@ sub Run {
     }
 
     # create macro
-    my $MacroActionID = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionAdd(
+    my $MacroActionID = $Kernel::OM->Get('Automation')->MacroActionAdd(
         MacroID    => $Param{Data}->{MacroID},
         Type       => $MacroAction->{Type},
         Parameters => $MacroAction->{Parameters},

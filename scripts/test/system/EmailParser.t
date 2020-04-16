@@ -17,9 +17,9 @@ use vars (qw($Self));
 use Kernel::System::EmailParser;
 
 # get main object
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 # test #1
 my @Array = ();

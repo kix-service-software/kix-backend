@@ -42,7 +42,7 @@ my @Tests = (
 
 for my $Test (@Tests) {
 
-    my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Internal::BashCompletion');
+    my $CommandObject = $Kernel::OM->Get('Console::Command::Internal::BashCompletion');
 
     my ( $Result, $ExitCode );
 

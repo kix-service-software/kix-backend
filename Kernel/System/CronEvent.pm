@@ -18,8 +18,8 @@ use Schedule::Cron::Events;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create a CronEvent object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
+    my $CronEventObject = $Kernel::OM->Get('CronEvent');
 
 =cut
 
@@ -74,7 +74,7 @@ sub NextEventGet {
 
     # check needed params
     if ( !$Param{Schedule} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Schedule!",
         );
@@ -83,7 +83,7 @@ sub NextEventGet {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $StartTime = $Param{StartTime} || $TimeObject->SystemTime();
 
@@ -134,7 +134,7 @@ sub NextEventList {
     # check needed params
     for my $Needed (qw(Schedule StopTime)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -144,14 +144,14 @@ sub NextEventList {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $StartTime = $Param{StartTime} || $TimeObject->SystemTime();
 
     return if !$StartTime;
 
     if ( $StartTime > $Param{StopTime} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "StartTime must be lower than or equals to StopTime",
         );
@@ -215,7 +215,7 @@ sub PreviousEventGet {
 
     # check needed params
     if ( !$Param{Schedule} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Schedule!",
         );
@@ -224,7 +224,7 @@ sub PreviousEventGet {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $StartTime = $Param{StartTime} || $TimeObject->SystemTime();
 
@@ -274,7 +274,7 @@ sub _Init {
     # check needed params
     for my $Needed (qw(Schedule StartTime)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -293,7 +293,7 @@ sub _Init {
         my $LastDayOfMonth = $MonthLastDay[ $Month - 1 ];
 
         if ( $DayMonth > $LastDayOfMonth ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Schedule: $Param{Schedule} is invalid",
             );
@@ -313,7 +313,7 @@ sub _Init {
 
     # error handling
     if ($@) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Schedule: $Param{Schedule} is invalid:",
         );
@@ -322,7 +322,7 @@ sub _Init {
 
     # check cron object
     if ( !$CronObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not create new Schedule::Cron::Events object!",
         );

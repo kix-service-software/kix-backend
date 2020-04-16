@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::Log',
+    'ITSMConfigItem',
+    'Log',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $DoHistoryObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::Event::DoHistory');
+    my $DoHistoryObject = $Kernel::OM->Get('ITSMConfigItem::Event::DoHistory');
 
 =cut
 
@@ -79,7 +79,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Data Event UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -110,7 +110,7 @@ sub Run {
 
     # error handling
     if ( !exists $Dispatcher{ $Param{Event} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'non existant history type: ' . $Param{Event},
         );
@@ -138,7 +138,7 @@ sub _ConfigItemDelete {
     my ( $Self, %Param ) = @_;
 
     # delete history
-    $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->HistoryDelete(
+    $Kernel::OM->Get('ITSMConfigItem')->HistoryDelete(
         ConfigItemID => $Param{ConfigItemID},
     );
 
@@ -155,7 +155,7 @@ sub _HistoryAdd {
     my ( $Self, %Param ) = @_;
 
     # add history entry
-    $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->HistoryAdd(
+    $Kernel::OM->Get('ITSMConfigItem')->HistoryAdd(
         %Param,
     );
 

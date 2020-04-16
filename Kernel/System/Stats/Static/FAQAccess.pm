@@ -16,10 +16,10 @@ use warnings;
 use Date::Pcalc qw(Days_in_Month);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::FAQ',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'FAQ',
+    'Log',
+    'Time',
 );
 
 sub new {
@@ -39,8 +39,8 @@ sub Param {
     my @Params = ();
 
     # get current time
-    my ( $s, $m, $h, $D, $M, $Y ) = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2Date(
-        SystemTime => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
+    my ( $s, $m, $h, $D, $M, $Y ) = $Kernel::OM->Get('Time')->SystemTime2Date(
+        SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
     );
     $D = sprintf( "%02d", $D );
     $M = sprintf( "%02d", $M );
@@ -121,7 +121,7 @@ sub Run {
     # check needed stuff
     for my $ParamName (qw(StartYear StartMonth StartDay EndYear EndMonth EndDay)) {
         if ( !$Param{$ParamName} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $ParamName!",
             );
@@ -146,7 +146,7 @@ sub Run {
     my $EndDate   = "$Param{EndYear}-$Param{EndMonth}-$EndDay 23:59:59";
 
     # get FAQ object
-    my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
+    my $FAQObject = $Kernel::OM->Get('FAQ');
 
     # get a count of all FAQ articles
     my $Top10ItemIDsRef = $FAQObject->FAQTop10Get(
@@ -174,7 +174,7 @@ sub Run {
         );
         my $VoteResult = sprintf(
             "%0."
-                . $Kernel::OM->Get('Kernel::Config')->Get(
+                . $Kernel::OM->Get('Config')->Get(
                 "FAQ::Explorer::ItemList::VotingResultDecimalPlaces"
                 )
                 . "f",

@@ -89,7 +89,7 @@ sub ProviderProcessRequest {
         };
     }
 
-    my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
+    my $ParamObject = $Kernel::OM->Get('WebRequest');
 
     my %Result;
     for my $ParamName ( $ParamObject->GetParamNames() ) {
@@ -205,7 +205,7 @@ sub RequesterPerformRequest {
 
     # use custom protocol handler to avoid sending out real network requests
     LWP::Protocol::implementor(
-        testhttp => 'Kernel::API::Transport::HTTP::Test::CustomHTTPProtocol'
+        testhttp => 'API::Transport::HTTP::Test::CustomHTTPProtocol'
     );
     my $UserAgent = LWP::UserAgent->new();
     my $Response = $UserAgent->post( 'testhttp://localhost.local/', Content => $Param{Data} );

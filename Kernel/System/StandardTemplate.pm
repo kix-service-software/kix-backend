@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Valid',
+    'Cache',
+    'DB',
+    'Log',
+    'Valid',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
+    my $StandardTemplateObject = $Kernel::OM->Get('StandardTemplate');
 
 =cut
 
@@ -75,7 +75,7 @@ sub StandardTemplateAdd {
     # check needed stuff
     for (qw(Name ValidID Template ContentType UserID TemplateType)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -85,7 +85,7 @@ sub StandardTemplateAdd {
 
     # check if a standard template with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A standard template with name '$Param{Name}' already exists!"
         );
@@ -93,7 +93,7 @@ sub StandardTemplateAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Do(
@@ -118,12 +118,12 @@ sub StandardTemplateAdd {
     }
 
     # clear queue cache, due to Queue <-> Template relations
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Queue',
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'StandardTemplate',
         ObjectID  => $ID,
@@ -163,7 +163,7 @@ sub StandardTemplateGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -171,7 +171,7 @@ sub StandardTemplateGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -218,7 +218,7 @@ sub StandardTemplateDelete {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -226,7 +226,7 @@ sub StandardTemplateDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete queue<->std template relation
     return if !$DBObject->Do(
@@ -247,12 +247,12 @@ sub StandardTemplateDelete {
     );
 
     # clear queue cache, due to Queue <-> Template relations
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Queue',
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'StandardTemplate',
         ObjectID  => $Param{ID},
@@ -283,7 +283,7 @@ sub StandardTemplateUpdate {
     # check needed stuff
     for (qw(ID Name ValidID TemplateType ContentType UserID TemplateType)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -299,7 +299,7 @@ sub StandardTemplateUpdate {
         )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A standard template with name '$Param{Name}' already exists!"
         );
@@ -307,7 +307,7 @@ sub StandardTemplateUpdate {
     }
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE standard_template
             SET name = ?, text = ?, content_type = ?, comments = ?, valid_id = ?,
@@ -320,12 +320,12 @@ sub StandardTemplateUpdate {
     );
 
     # clear queue cache, due to Queue <-> Template relations
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Queue',
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'StandardTemplate',
         ObjectID  => $Param{ID},
@@ -355,7 +355,7 @@ sub StandardTemplateLookup {
 
     # check needed stuff
     if ( !$Param{StandardTemplate} && !$Param{StandardTemplateID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no StandardTemplate or StandardTemplateID!'
         );
@@ -387,7 +387,7 @@ sub StandardTemplateLookup {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL  => $SQL,
@@ -402,7 +402,7 @@ sub StandardTemplateLookup {
 
     # check if data exists
     if ( !exists $Self->{"StandardTemplate$Suffix"} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no \$$Suffix!"
         );
@@ -464,7 +464,7 @@ sub StandardTemplateList {
 
     if ($Valid) {
         $SQL .= ' WHERE valid_id IN (' . join ', ',
-            $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet() . ')';
+            $Kernel::OM->Get('Valid')->ValidIDsGet() . ')';
     }
 
     my @Bind;
@@ -480,7 +480,7 @@ sub StandardTemplateList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL  => $SQL,
@@ -510,7 +510,7 @@ sub NameExistsCheck {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM standard_template WHERE name = ?',

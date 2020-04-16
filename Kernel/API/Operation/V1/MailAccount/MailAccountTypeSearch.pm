@@ -83,7 +83,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get backends
-    my %BackendList = $Kernel::OM->Get('Kernel::System::MailAccount')->MailAccountBackendList();
+    my %BackendList = $Kernel::OM->Get('MailAccount')->MailAccountBackendList();
 
     if ( IsHashRefWithData(\%BackendList) ) {
         my @TypeList = sort keys %BackendList;

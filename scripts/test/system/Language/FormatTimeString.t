@@ -80,17 +80,17 @@ for my $Test (@Tests) {
 
     # discard language object
     $Kernel::OM->ObjectsDiscard(
-        Objects => ['Kernel::Language'],
+        Objects => ['Language'],
     );
 
     # get language object
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::Language' => {
+        'Language' => {
             UserTimeZone => $Test->{UserTimeZone},
             UserLanguage => 'de',
         },
     );
-    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+    my $LanguageObject = $Kernel::OM->Get('Language');
 
     $LanguageObject->{ $Test->{DateFormatName} } = $Test->{DateFormat};
 

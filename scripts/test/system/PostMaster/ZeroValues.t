@@ -17,22 +17,22 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
 
 # create a dynamic field
 my $FieldName = 'Text' . $RandomID;
-my $FieldID   = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldAdd(
+my $FieldID   = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
     Name       => $FieldName,
     Label      => $FieldName . "_test",
     FieldOrder => 9991,
@@ -159,8 +159,8 @@ for my $Test (@Tests) {
     );
 
     # new/clear ticket object
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Return[1],

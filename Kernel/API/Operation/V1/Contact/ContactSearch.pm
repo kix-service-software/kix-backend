@@ -88,9 +88,11 @@ sub Run {
         foreach my $SearchType ( keys %{ $Self->{Search}->{Contact} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
                 next if ( 
-                    !($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} =~ m/^(PrimaryOrganisationID|OrganisationID|AssignedUserID|UserID)$/)
-                    && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|UserLogin|Login)$/
+                    !($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} =~ m/^(PrimaryOrganisationID|AssignedUserID|UserID)$/)
+                    && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|Login|OrganisationIDs)$/
                 );
+                next if ($SearchItem->{Operator} eq 'IN' && $SearchItem->{Field} ne 'OrganisationIDs');
+
                 if (!$ContactSearch{$SearchType}) {
                     $ContactSearch{$SearchType} = [];
                 }
@@ -104,26 +106,31 @@ sub Run {
         foreach my $SearchType ( keys %ContactSearch ) {
             my %SearchTypeResult;
             foreach my $SearchItem ( @{ $ContactSearch{$SearchType} } ) {
-                my $Value = $SearchItem->{Value};
-
-                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
-                    $Value = '*' . $Value . '*';
-                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
-                    $Value = $Value . '*';
-                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
-                    $Value = '*' . $Value;
-                }
 
                 my %SearchResult;
 
                 # perform Contact search
                 if ( $SearchItem->{Field} eq 'Fulltext' ) {
-                    %SearchResult = $Self->_DoFulltextSearch( Search => $Value );
+                    %SearchResult = $Self->_DoFulltextSearch( Search => $SearchItem->{Value} );
                 } else {
+                    my $Value = $SearchItem->{Value};
+
+                    if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
+                        $Value = '*' . $Value . '*';
+                    } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                        $Value = $Value . '*';
+                    } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                        $Value = '*' . $Value;
+                    }
+
                     my %SearchParam;
 
-                    if ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationID)$/ ) {
+                    if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Login' ) {
+                        $SearchParam{LoginEquals} = $Value;
+                    } elsif ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationIDs)$/ ) {
                         $SearchParam{ $SearchItem->{Field} } = $Value;
+                    } elsif ($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Email') {
+                        $SearchParam{EmailEquals} = $Value;
                     } elsif ($SearchItem->{Field} eq 'Email') {
                         $SearchParam{PostMasterSearch} = $Value;
                     } elsif ($SearchItem->{Field} eq 'PrimaryOrganisationID') {
@@ -134,7 +141,7 @@ sub Run {
                         $SearchParam{Search} = $Value;
                     }
 
-                    %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+                    %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                         %SearchParam,
                         Valid => 0
                     );
@@ -174,7 +181,7 @@ sub Run {
     }
     else {
         # get contact list
-        %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactList(
+        %ContactList = $Kernel::OM->Get('Contact')->ContactList(
             Valid => 0
         );
     }
@@ -223,16 +230,29 @@ sub _DoFulltextSearch {
             # split on AND
             my @AndCombinedGroups = split( /\+|\&/, $OrCombined );
             for my $AndSearchString (@AndCombinedGroups) {
-                my %SearchResult = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+
+                $AndSearchString = '*' . $AndSearchString . '*';
+                my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                     Search => $AndSearchString,
                     Valid  => 0
+                );
+                my %LoginResult = $Kernel::OM->Get('Contact')->ContactSearch(
+                    Login => $AndSearchString,
+                    Valid  => 0
+                );
+
+                # search and login are OR combined
+                %SearchResult = (
+                    %SearchResult,
+                    %LoginResult
                 );
 
                 if ( !%AndResult ) {
                     %AndResult = %SearchResult;
                 }
                 else {
-                    # remove all IDs from type result that we don't have in this search
+
+                    # remove all IDs from last result that we don't have in this search
                     foreach my $Key ( keys %AndResult ) {
                         delete $AndResult{$Key} if !exists $SearchResult{$Key};
                     }

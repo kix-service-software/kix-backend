@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform FAQCategory search
-    my $FAQCategoryList = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryList(
+    my $FAQCategoryList = $Kernel::OM->Get('FAQ')->CategoryList(
         UserID => $Self->{Authorization}->{UserID},
     );
 

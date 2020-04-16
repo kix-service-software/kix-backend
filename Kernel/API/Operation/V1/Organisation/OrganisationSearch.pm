@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Organisation search
-    my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+    my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
         Valid  => 0,
     );
 

@@ -19,14 +19,14 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::StandardTemplate',
-    'Kernel::System::SysConfig',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'Main',
+    'StandardTemplate',
+    'SysConfig',
+    'Valid',
 );
 
 =head1 NAME
@@ -49,7 +49,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+    my $QueueObject = $Kernel::OM->Get('Queue');
 
 =cut
 
@@ -66,9 +66,9 @@ sub new {
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     # load generator preferences module
-    my $GeneratorModule = $Kernel::OM->Get('Kernel::Config')->Get('Queue::PreferencesModule')
+    my $GeneratorModule = $Kernel::OM->Get('Config')->Get('Queue::PreferencesModule')
         || 'Kernel::System::Queue::PreferencesDB';
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require($GeneratorModule) ) {
+    if ( $Kernel::OM->Get('Main')->Require($GeneratorModule) ) {
         $Self->{PreferencesObject} = $GeneratorModule->new();
     }
 
@@ -114,7 +114,7 @@ sub GetQueuesForEmailAddress {
 
     # check needed stuff
     if ( !$Param{AddressID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need AddressID!',
         );
@@ -122,7 +122,7 @@ sub GetQueuesForEmailAddress {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => 'SELECT id, name FROM queue '
@@ -153,7 +153,7 @@ sub GetSystemAddress {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my %Address;
     my $QueueID = $Param{QueueID} || $Self->{QueueID};
@@ -198,7 +198,7 @@ sub QueueStandardTemplateMemberAdd {
     # check needed stuff
     for my $Argument (qw(QueueID StandardTemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -207,7 +207,7 @@ sub QueueStandardTemplateMemberAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete existing relation
     return if !$DBObject->Do(
@@ -219,7 +219,7 @@ sub QueueStandardTemplateMemberAdd {
 
     # return if relation is not active
     if ( !$Param{Active} ) {
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
         );
         return 1;
@@ -234,12 +234,12 @@ sub QueueStandardTemplateMemberAdd {
         Bind => [ \$Param{QueueID}, \$Param{StandardTemplateID}, \$Param{UserID}, \$Param{UserID} ],
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Queue.StandardTemplate',
         ObjectID  => $Param{QueueID}.'::'.$Param{StandardTemplateID},
@@ -289,7 +289,7 @@ sub QueueStandardTemplateMemberList {
 
     # check needed stuff
     if ( !$Param{QueueID} && !$Param{StandardTemplateID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no StandardTemplateID or QueueID!',
         );
@@ -297,8 +297,8 @@ sub QueueStandardTemplateMemberList {
     }
 
     # get needed objects
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
-    my $DBObject    = $Kernel::OM->Get('Kernel::System::DB');
+    my $ValidObject = $Kernel::OM->Get('Valid');
+    my $DBObject    = $Kernel::OM->Get('DB');
 
     my $TemplateTypes = $Param{TemplateTypes} || '0';
 
@@ -308,7 +308,7 @@ sub QueueStandardTemplateMemberList {
 
         # check if this result is present (in cache)
         $CacheKey = "StandardTemplates::$Param{QueueID}::$TemplateTypes";
-        my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -339,7 +339,7 @@ sub QueueStandardTemplateMemberList {
         }
 
         # store std templates (in cache)
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -353,7 +353,7 @@ sub QueueStandardTemplateMemberList {
 
         # check if this result is present (in cache)
         $CacheKey = "Queues::$Param{StandardTemplateID}";
-        my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -378,7 +378,7 @@ sub QueueStandardTemplateMemberList {
         }
 
         # store queues (in cache)
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -407,8 +407,8 @@ sub GetAllQueues {
     my $Type = $Param{Type} || 'ro';
 
     # get needed objects
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
-    my $DBObject    = $Kernel::OM->Get('Kernel::System::DB');
+    my $ValidObject = $Kernel::OM->Get('Valid');
+    my $DBObject    = $Kernel::OM->Get('DB');
 
     # fetch all queues
     my $CacheKey;
@@ -416,7 +416,7 @@ sub GetAllQueues {
         $CacheKey = "GetAllQueues::UserID::${Type}::$Param{UserID}";
 
         # check cache
-        my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -432,7 +432,7 @@ sub GetAllQueues {
         $CacheKey = "GetAllQueues::ContactID::${Type}::$Param{ContactID}";
 
         # check cache
-        my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -448,7 +448,7 @@ sub GetAllQueues {
         $CacheKey = 'GetAllQueues';
 
         # check cache
-        my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -466,7 +466,7 @@ sub GetAllQueues {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -489,7 +489,7 @@ sub GetAllSubQueues {
 
     # check needed stuff
     if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need QueueID!'
         );
@@ -498,14 +498,14 @@ sub GetAllSubQueues {
 
     # check cache
     my $CacheKey = 'GetAllSubQueues::' . $Param{QueueID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # search all custom queues
     return if !$DBObject->Prepare(
@@ -520,7 +520,7 @@ sub GetAllSubQueues {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -547,7 +547,7 @@ sub QueueLookup {
 
     # check needed stuff
     if ( !$Param{Queue} && !$Param{QueueID} && !$Param{SystemAddressID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Queue or QueueID or SystemAddressID!'
         );
@@ -586,7 +586,7 @@ sub QueueLookup {
 
     # check if data exists
     if ( !$ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no $Key for $Value!",
         );
@@ -635,7 +635,7 @@ sub QueueAdd {
 
     for (qw(Name SystemAddressID ValidID UserID FollowUpID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -649,7 +649,7 @@ sub QueueAdd {
 
     # check queue name
     if ( $Param{Name} =~ /::$/i ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid Queue name '$Param{Name}'!",
         );
@@ -658,7 +658,7 @@ sub QueueAdd {
 
     # check if a queue with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A queue with name '$Param{Name}' already exists!"
         );
@@ -666,8 +666,8 @@ sub QueueAdd {
     }
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $DBObject     = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Do(
         SQL => 'INSERT INTO queue (name, unlock_timeout, system_address_id, '
@@ -698,7 +698,7 @@ sub QueueAdd {
     }
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -713,7 +713,7 @@ sub QueueAdd {
     {
 
         # get standard template object
-        my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
+        my $StandardTemplateObject = $Kernel::OM->Get('StandardTemplate');
 
         ST:
         for my $ST ( @{$StandardTemplate2QueueByCreating} ) {
@@ -749,7 +749,7 @@ sub QueueAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Queue',
         ObjectID  => $QueueID,
@@ -792,7 +792,7 @@ sub QueueGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID or Name!'
         );
@@ -815,7 +815,7 @@ sub QueueGet {
     }
 
     # check cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -839,7 +839,7 @@ sub QueueGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL   => $SQL,
@@ -871,7 +871,7 @@ sub QueueGet {
 
     # check if data exists
     if ( !%Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no $Key for $Value!",
         );
@@ -887,7 +887,7 @@ sub QueueGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -929,7 +929,7 @@ sub QueueUpdate {
         )
     {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -959,7 +959,7 @@ sub QueueUpdate {
 
     # check queue name
     if ( $Param{Name} =~ /::$/i ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid Queue name '$Param{Name}'!",
         );
@@ -978,7 +978,7 @@ sub QueueUpdate {
         )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A queue with name '$Param{Name}' already exists!"
         );
@@ -986,7 +986,7 @@ sub QueueUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     return if !$DBObject->Do(
@@ -1019,7 +1019,7 @@ sub QueueUpdate {
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -1046,7 +1046,7 @@ sub QueueUpdate {
                 );
 
                 # reset cache
-                $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+                $Kernel::OM->Get('Cache')->CleanUp(
                     Type => $Self->{CacheType},
                 );
             }
@@ -1054,7 +1054,7 @@ sub QueueUpdate {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},
@@ -1064,7 +1064,7 @@ sub QueueUpdate {
     #return 1 if !$Param{CheckSysConfig};
 
     # check all SysConfig options and correct them automatically if necessary
-    #$Kernel::OM->Get('Kernel::System::SysConfig')->ConfigItemCheckAll();
+    #$Kernel::OM->Get('SysConfig')->ConfigItemCheckAll();
 
     return 1;
 }
@@ -1093,20 +1093,20 @@ sub QueueList {
 
     # check cache
     my $CacheKey = 'QueueList::' . $Valid;
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     if ($Valid) {
         return if !$DBObject->Prepare(
             SQL => "SELECT id, name FROM queue WHERE valid_id IN "
-                . "( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )",
+                . "( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )",
         );
     }
     else {
@@ -1122,7 +1122,7 @@ sub QueueList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1155,7 +1155,7 @@ sub QueuePreferencesSet {
         'QueueGetName::' . $Name,
     );
     for my $CacheKey (@CacheKeys) {
-        $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+        $Kernel::OM->Get('Cache')->Delete(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -1164,7 +1164,7 @@ sub QueuePreferencesSet {
     my $Result = $Self->{PreferencesObject}->QueuePreferencesSet(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Queue.Preference',
         ObjectID  => $Param{QueueID}.'::'.$Param{Key},
@@ -1214,7 +1214,7 @@ sub NameExistsCheck {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM queue WHERE name = ?',
         Bind => [ \$Param{Name} ],
@@ -1241,7 +1241,7 @@ sub QueueDelete {
     # check needed stuff
     for (qw(QueueID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1250,19 +1250,19 @@ sub QueueDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM queue WHERE id = ?',
         Bind => [ \$Param{QueueID} ],
     );
 
     # reset cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},

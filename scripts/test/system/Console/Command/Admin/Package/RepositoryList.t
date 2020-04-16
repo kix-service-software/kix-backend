@@ -15,20 +15,20 @@ use utf8;
 use vars (qw($Self));
 
 my %List;
-if ( $Kernel::OM->Get('Kernel::Config')->Get('Package::RepositoryList') ) {
-    %List = %{ $Kernel::OM->Get('Kernel::Config')->Get('Package::RepositoryList') };
+if ( $Kernel::OM->Get('Config')->Get('Package::RepositoryList') ) {
+    %List = %{ $Kernel::OM->Get('Config')->Get('Package::RepositoryList') };
 }
-%List = ( %List, $Kernel::OM->Get('Kernel::System::Package')->PackageOnlineRepositories() );
+%List = ( %List, $Kernel::OM->Get('Package')->PackageOnlineRepositories() );
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::Package::RepositoryList');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Package::RepositoryList');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ExitCode = $CommandObject->Execute();
 

@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get command list
-    my @CommandList = $Kernel::OM->Get('Kernel::System::Console')->CommandList();
+    my @CommandList = $Kernel::OM->Get('Console')->CommandList();
 
 	# get already prepared Command data from CommandGet operation
     if ( IsArrayRefWithData(\@CommandList) ) {  	

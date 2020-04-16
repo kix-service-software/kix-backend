@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQCategoryUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQCategoryUpdate');
 
     return $Self;
 }
@@ -124,7 +124,7 @@ sub Run {
     );
 
     # check if FAQCategory exists 
-    my %FAQCategoryData = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryGet(
+    my %FAQCategoryData = $Kernel::OM->Get('FAQ')->CategoryGet(
         CategoryID  => $Param{Data}->{FAQCategoryID},
         UserID      => 1
     );
@@ -136,7 +136,7 @@ sub Run {
     }
 
     # check for duplicated
-    my $Exists = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDuplicateCheck(
+    my $Exists = $Kernel::OM->Get('FAQ')->CategoryDuplicateCheck(
         CategoryID => $Param{Data}->{FAQCategoryID},
         Name       => $FAQCategory->{Name},
         ParentID   => $FAQCategory->{ParentID},
@@ -150,7 +150,7 @@ sub Run {
     }
 
     # update FAQCategory
-    my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryUpdate(
+    my $Success = $Kernel::OM->Get('FAQ')->CategoryUpdate(
         CategoryID => $Param{Data}->{FAQCategoryID},
         Name       => $FAQCategory->{Name} || $FAQCategoryData{Name},
         Comment    => exists $FAQCategory->{Comment} ? $FAQCategory->{Comment} : $FAQCategoryData{Comment},

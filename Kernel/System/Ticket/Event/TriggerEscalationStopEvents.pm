@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -34,7 +34,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Event UserID Config)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -43,7 +43,7 @@ sub Run {
     }
     for my $Needed (qw(OldTicketData TicketID)) {
         if ( !$Param{Data}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed in Data!"
             );
@@ -52,7 +52,7 @@ sub Run {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get the current escalation status
     my %Ticket = $TicketObject->TicketGet(

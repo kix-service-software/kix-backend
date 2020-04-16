@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 # define permission bit values
@@ -69,7 +69,7 @@ sub PermissionTypeList {
     my $CacheKey = 'PermissionTypeList::' . $Valid;
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -81,17 +81,17 @@ sub PermissionTypeList {
         $SQL .= ' WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL => $SQL,
     );
 
     my %Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{$Row[0]} = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
@@ -129,7 +129,7 @@ sub PermissionTypeGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -138,13 +138,13 @@ sub PermissionTypeGet {
 
     # check cache
     my $CacheKey = 'PermissionTypeGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => "SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM permission_type WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -152,7 +152,7 @@ sub PermissionTypeGet {
     my %Result;
     
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
             ID         => $Row[0],
             Name       => $Row[1],
@@ -167,7 +167,7 @@ sub PermissionTypeGet {
     
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "PermissionType with ID $Param{ID} not found!",
         );
@@ -175,7 +175,7 @@ sub PermissionTypeGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -201,7 +201,7 @@ sub PermissionTypeLookup {
     # check needed stuff
     for (qw(Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -213,13 +213,13 @@ sub PermissionTypeLookup {
     my $CacheKey = 'PermissionTypeLookup::' . $Param{Name};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => 'SELECT id FROM permission_type WHERE name = ?',
         Bind => [ 
             \$Param{Name},
@@ -227,13 +227,13 @@ sub PermissionTypeLookup {
     );
 
     my $Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result = $Row[0];
     }
 
     if ( $Result ) {
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             Key   => $CacheKey,
             Value => $Result,
@@ -262,7 +262,7 @@ sub PermissionLookup {
     # check needed stuff
     for (qw(RoleID TypeID Target)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -274,13 +274,13 @@ sub PermissionLookup {
     my $CacheKey = 'PermissionLookup::' . $Param{RoleID}.'::'.$Param{TypeID}.'::'.$Param{Target};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => 'SELECT id FROM role_permission WHERE role_id = ? AND type_id = ? AND target = ?',
         Bind => [ 
             \$Param{RoleID}, \$Param{TypeID}, \$Param{Target},
@@ -288,13 +288,13 @@ sub PermissionLookup {
     );
 
     my $Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result = $Row[0];
     }
 
     if ( $Result ) {
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             Key   => $CacheKey,
             Value => $Result,
@@ -336,7 +336,7 @@ sub PermissionGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -345,13 +345,13 @@ sub PermissionGet {
 
     # check cache
     my $CacheKey = 'PermissionGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => "SELECT id, role_id, type_id, target, value, is_required, comments, create_time, create_by, change_time, change_by FROM role_permission WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -359,7 +359,7 @@ sub PermissionGet {
     my %Result;
     
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
             ID         => $Row[0],
             RoleID     => $Row[1],
@@ -377,7 +377,7 @@ sub PermissionGet {
     
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Permission with ID $Param{ID} not found!",
         );
@@ -385,7 +385,7 @@ sub PermissionGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -417,7 +417,7 @@ sub PermissionAdd {
     # check needed stuff
     for my $Needed (qw(RoleID TypeID Target UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -426,7 +426,7 @@ sub PermissionAdd {
     }
 
     if ( !defined $Param{Value} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Value!"
         );
@@ -442,7 +442,7 @@ sub PermissionAdd {
         Target => $Param{Target}
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A permission with the same type and target already exists for this role.",
         );
@@ -450,7 +450,7 @@ sub PermissionAdd {
     }
 
     if ( !$Self->ValidatePermission(%Param) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The permission target is invalid.",
         );
@@ -458,7 +458,7 @@ sub PermissionAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert
     return if !$DBObject->Do(
@@ -485,10 +485,10 @@ sub PermissionAdd {
     }
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Role.Permission',
         ObjectID  => $Param{RoleID}.'::'.$ID,
@@ -519,7 +519,7 @@ sub PermissionUpdate {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -539,7 +539,7 @@ sub PermissionUpdate {
         Target => $Param{Target} || $Data{Target},
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A permission with the same type and target already exists for this role.",
         );
@@ -552,7 +552,7 @@ sub PermissionUpdate {
         Value  => defined $Param{Value} ? $Param{Value} : $Data{Value},
     );
     if ( !$ValidationResult ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The permission target doesn't match the possible ones for type PropertyValue.",
         );
@@ -579,7 +579,7 @@ sub PermissionUpdate {
     $Param{TypeID} ||= $Data{TypeID};
 
     # update role in database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE role_permission SET type_id = ?, target = ?, value = ?, is_required = ?, comments = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
@@ -589,10 +589,10 @@ sub PermissionUpdate {
     );
 
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Role.Permission',
         ObjectID  => $Data{RoleID}.'::'.$Param{ID},
@@ -625,7 +625,7 @@ sub PermissionList {
     # check needed stuff
     for (qw(RoleID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -637,24 +637,24 @@ sub PermissionList {
     my $CacheKey = 'PermissionList::' . $Param{RoleID};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => 'SELECT id FROM role_permission WHERE role_id = ?',
         Bind => [ \$Param{RoleID} ]
     );
 
     my @Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Row[0]);
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \@Result,
@@ -680,7 +680,7 @@ sub PermissionDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -694,16 +694,16 @@ sub PermissionDelete {
     );
 
     # get database object
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM role_permission WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
    
     # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Role.Permission',
         ObjectID  => $Data{RoleID}.'::'.$Param{ID},
@@ -738,7 +738,7 @@ sub PermissionListForObject {
     # check needed stuff
     foreach my $Key ( qw(Target ObjectID ObjectIDAttr) ) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -749,7 +749,7 @@ sub PermissionListForObject {
     # prepare relevant PropertyValue patterns
     my %RelevantPropertyValuePermissions;
     if ( IsArrayRefWithData($Param{RelevantPropertyValuePermissions}) ) {
-        my $Config = $Kernel::OM->Get('Kernel::Config')->Get('Permission::PropertyValue');
+        my $Config = $Kernel::OM->Get('Config')->Get('Permission::PropertyValue');
         if ( IsHashRefWithData($Config) ) {
             foreach my $Key ( @{$Param{RelevantPropertyValuePermissions}} ) {
                 foreach my $Pattern ( values %{$Config->{$Key}} ) {
@@ -764,12 +764,12 @@ sub PermissionListForObject {
     my %PermissionTypeList = reverse $Self->PermissionTypeList();
 
     # get all relevant permissions
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => "SELECT id FROM role_permission WHERE type_id IN (SELECT id FROM permission_type WHERE name IN ('Object', 'PropertyValue'))",
     );
 
     my @PermissionIDs;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@PermissionIDs, $Row[0]);
     }
 
@@ -781,7 +781,7 @@ sub PermissionListForObject {
         );
 
         if ( !%Permission ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to get permission ID $ID!"
             );
@@ -870,7 +870,7 @@ sub GetReadablePermissionValue {
     # check needed stuff
     for (qw(Value)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );

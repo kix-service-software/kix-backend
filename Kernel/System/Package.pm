@@ -26,17 +26,17 @@ use Kernel::Language qw(Translatable);
 use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
+    'Config',
+    'Cache',
 #rbo - T2016121190001552 - removed CloudServices
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::JSON',
-    'Kernel::System::Loader',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::XML',
+    'DB',
+    'Encode',
+    'JSON',
+    'Loader',
+    'Log',
+    'Main',
+    'Time',
+    'XML',
 );
 
 =head1 NAME
@@ -59,7 +59,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+    my $PackageObject = $Kernel::OM->Get('Package');
 
 =cut
 
@@ -71,8 +71,8 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{MainObject}   = $Kernel::OM->Get('Kernel::System::Main');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{MainObject}   = $Kernel::OM->Get('Main');
 
     $Self->{PackageMap} = {
         Name            => 'SCALAR',
@@ -160,7 +160,7 @@ sub RepositoryList {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $Cache = $CacheObject->Get(
@@ -170,7 +170,7 @@ sub RepositoryList {
     return @{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get repository list
     $DBObject->Prepare(
@@ -242,7 +242,7 @@ sub RepositoryGet {
     # check needed stuff
     for my $Needed (qw(Name Version)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -251,7 +251,7 @@ sub RepositoryGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = $Param{Name} . $Param{Version};
@@ -263,7 +263,7 @@ sub RepositoryGet {
     return ${$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get repository
     $DBObject->Prepare(
@@ -281,7 +281,7 @@ sub RepositoryGet {
     if ( !$Package ) {
 
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "No such package: $Param{Name}-$Param{Version}!",
             );
@@ -318,7 +318,7 @@ sub RepositoryAdd {
 
     # check needed stuff
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'String not defined!',
         );
@@ -332,21 +332,21 @@ sub RepositoryAdd {
     my %Structure = $Self->PackageParse(%Param);
 
     if ( !IsHashRefWithData( \%Structure ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Invalid Package!',
         );
         return;
     }
     if ( !$Structure{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name!',
         );
         return;
     }
     if ( !$Structure{Version} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Version!',
         );
@@ -362,7 +362,7 @@ sub RepositoryAdd {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ($PackageExists) {
         $DBObject->Do(
@@ -388,12 +388,12 @@ sub RepositoryAdd {
     );
 
     # cleanup cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'RepositoryList',
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'PackageManagement.Repository',
         ObjectID  => $Structure{Name}->{Content},
@@ -418,7 +418,7 @@ sub RepositoryRemove {
 
     # check needed stuff
     if ( !defined $Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Name not defined!',
         );
@@ -433,13 +433,13 @@ sub RepositoryRemove {
         push @Bind, \$Param{Version};
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => \@Bind
     );
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # cleanup cache
     $CacheObject->CleanUp(
@@ -450,7 +450,7 @@ sub RepositoryRemove {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'PackageManagement.Repository',
         ObjectID  => $Param{Name},
@@ -475,7 +475,7 @@ sub PackageInstall {
 
     # check needed stuff
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'String not defined!',
         );
@@ -491,7 +491,7 @@ sub PackageInstall {
     # check if package is already installed
     if ( $Self->PackageIsInstalled( Name => $Structure{Name}->{Content} ) ) {
         if ( !$Param{Force} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => 'Package already installed, try upgrade!',
             );
@@ -547,7 +547,7 @@ sub PackageInstall {
         }
     }
     if ( !$FileCheckOk && !$Param{Force} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'File conflict, can\'t install package!',
         );
@@ -594,7 +594,7 @@ sub PackageInstall {
     );
 
     # update package status
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE package_repository SET install_status = \''
             . Translatable('installed') . '\''
             . ' WHERE name = ? AND version = ?',
@@ -627,10 +627,10 @@ sub PackageInstall {
         );
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         KeepTypes => ['XMLParse'],
     );
-    $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
+    $Kernel::OM->Get('Loader')->CacheDelete();
 
     # trigger event
     $Self->EventHandler(
@@ -644,7 +644,7 @@ sub PackageInstall {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'PackageManagement.Package',
         ObjectID  => $Structure{Name}->{Content},
@@ -666,7 +666,7 @@ sub PackageReinstall {
 
     # check needed stuff
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'String not defined!',
         );
@@ -723,10 +723,10 @@ sub PackageReinstall {
         );
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         KeepTypes => ['XMLParse'],
     );
-    $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
+    $Kernel::OM->Get('Loader')->CacheDelete();
 
     # trigger event
     $Self->EventHandler(
@@ -740,7 +740,7 @@ sub PackageReinstall {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'PackageManagement.Package',
         ObjectID  => $Structure{Name}->{Content},
@@ -764,7 +764,7 @@ sub PackageUpgrade {
 
     # check needed stuff
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'String not defined!',
         );
@@ -787,7 +787,7 @@ sub PackageUpgrade {
         }
     }
     if ( !$Installed ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Package is not installed, can\'t upgrade!',
         );
@@ -845,7 +845,7 @@ sub PackageUpgrade {
     if ( !$CheckVersion ) {
 
         if ( $Structure{Version}->{Content} eq $InstalledVersion ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Can't upgrade, package '$Structure{Name}->{Content}-$InstalledVersion' already installed!",
@@ -854,7 +854,7 @@ sub PackageUpgrade {
             return if !$Param{Force};
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Can't upgrade, installed package '$InstalledVersion' is newer as '$Structure{Version}->{Content}'!",
@@ -878,7 +878,7 @@ sub PackageUpgrade {
     return if !$Self->RepositoryAdd( String => $Param{String} );
 
     # update package status
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE package_repository SET install_status = \''
             . Translatable('installed') . '\''
             . ' WHERE name = ? AND version = ?',
@@ -1138,10 +1138,10 @@ sub PackageUpgrade {
         );
     }
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         KeepTypes => ['XMLParse'],
     );
-    $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
+    $Kernel::OM->Get('Loader')->CacheDelete();
 
     # trigger event
     $Self->EventHandler(
@@ -1155,7 +1155,7 @@ sub PackageUpgrade {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'PackageManagement.Package',
         ObjectID  => $Structure{Name}->{Content},
@@ -1177,7 +1177,7 @@ sub PackageUninstall {
 
     # check needed stuff
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'String not defined!'
         );
@@ -1243,10 +1243,10 @@ sub PackageUninstall {
     # install config
     $Self->{ConfigObject} = Kernel::Config->new( %{$Self} );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         KeepTypes => ['XMLParse'],
     );
-    $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
+    $Kernel::OM->Get('Loader')->CacheDelete();
 
     # trigger event
     $Self->EventHandler(
@@ -1260,7 +1260,7 @@ sub PackageUninstall {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'PackageManagement.Package',
         ObjectID  => $Structure{Name}->{Content},
@@ -1295,7 +1295,7 @@ sub PackageOnlineRepositories {
 
     return if !$XML;
 
-    my @XMLARRAY = $Kernel::OM->Get('Kernel::System::XML')->XMLParse( String => $XML );
+    my @XMLARRAY = $Kernel::OM->Get('XML')->XMLParse( String => $XML );
 
     my %List;
     my $Name = '';
@@ -1343,7 +1343,7 @@ sub PackageOnlineList {
     # check needed stuff
     for my $Needed (qw(URL Lang)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -1361,7 +1361,7 @@ sub PackageOnlineList {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = $Param{URL} . '-' . $Param{Lang};
@@ -1381,10 +1381,10 @@ sub PackageOnlineList {
         my $XML = $Self->_Download( URL => $Param{URL} . '/otrs.xml' );
         return if !$XML;
 
-        my @XMLARRAY = $Kernel::OM->Get('Kernel::System::XML')->XMLParse( String => $XML );
+        my @XMLARRAY = $Kernel::OM->Get('XML')->XMLParse( String => $XML );
 
         if ( !@XMLARRAY ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => Translatable('Unable to parse repository index document.'),
             );
@@ -1448,7 +1448,7 @@ sub PackageOnlineList {
         # check result structure
         return if !IsHashRefWithData($ListResult);
 
-        my $CurrentFramework = $Kernel::OM->Get('Kernel::Config')->Get('Version');
+        my $CurrentFramework = $Kernel::OM->Get('Config')->Get('Version');
         FRAMEWORKVERSION:
         for my $FrameworkVersion ( sort keys %{$ListResult} ) {
             my $FrameworkVersionMatch = $FrameworkVersion;
@@ -1494,7 +1494,7 @@ sub PackageOnlineList {
 
     # return if there are packages, just not for this framework version
     if ( @Packages && !$PackageForRequestedFramework ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 Translatable(
@@ -1606,7 +1606,7 @@ sub PackageOnlineGet {
     # check needed stuff
     for my $Needed (qw(File Source)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -1637,7 +1637,7 @@ sub DeployCheck {
     # check needed stuff
     for my $Needed (qw(Name Version)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -1665,7 +1665,7 @@ sub DeployCheck {
         if ( !-e $LocalFile ) {
 
             if ( $Param{Log} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "$Param{Name}-$Param{Version}: No such file: $LocalFile!",
                 );
@@ -1685,8 +1685,8 @@ sub DeployCheck {
 
                 if ( ${$Content} ne $File->{Content} ) {
 
-                    if ( $Param{Log} && !$Kernel::OM->Get('Kernel::Config')->Get('Package::AllowLocalModifications') ) {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    if ( $Param{Log} && !$Kernel::OM->Get('Config')->Get('Package::AllowLocalModifications') ) {
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => "$Param{Name}-$Param{Version}: $LocalFile is different!",
                         );
@@ -1699,7 +1699,7 @@ sub DeployCheck {
             else {
 
                 if ( $Param{Log} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Can't read $LocalFile!",
                     );
@@ -1786,7 +1786,7 @@ sub PackageBuild {
     # check needed stuff
     for my $Needed (qw(Name Version Vendor License Description)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -1892,7 +1892,7 @@ sub PackageBuild {
     if ( !$Param{Type} ) {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         my $Time = $TimeObject->SystemTime2TimeStamp(
             SystemTime => $TimeObject->SystemTime(),
@@ -2060,7 +2060,7 @@ sub PackageParse {
 
     # check needed stuff
     if ( !defined $Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'String not defined!',
         );
@@ -2070,7 +2070,7 @@ sub PackageParse {
     # create checksum
     my $CookedString = ref $Param{String} ? ${ $Param{String} } : $Param{String};
 
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$CookedString );
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$CookedString );
 
     # create checksum
     my $Checksum = $Self->{MainObject}->MD5sum(
@@ -2078,7 +2078,7 @@ sub PackageParse {
     );
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     if ($Checksum) {
@@ -2093,14 +2093,14 @@ sub PackageParse {
     }
 
     # get xml object
-    my $XMLObject = $Kernel::OM->Get('Kernel::System::XML');
+    my $XMLObject = $Kernel::OM->Get('XML');
 
     my @XMLARRAY = eval {
         $XMLObject->XMLParse(%Param);
     };
 
     if ( !IsArrayRefWithData( \@XMLARRAY ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid XMLParse in PackageParse()!",
         );
@@ -2170,7 +2170,7 @@ sub PackageParse {
 
                 next FILECHECK if $Tag->{Location} !~ m{ $FileNotAllowed }xms;
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Invalid file/location '$Tag->{Location}' in PackageParse()!",
                 );
@@ -2225,7 +2225,7 @@ sub PackageParse {
 
     # check if a structure is present
     if ( !%Package ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid package structure in PackageParse()!",
         );
@@ -2265,7 +2265,7 @@ sub PackageExport {
     # check needed stuff
     for my $Needed (qw(String Home)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -2307,7 +2307,7 @@ sub PackageIsInstalled {
 
     # check needed stuff
     if ( !$Param{String} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need String (PackageString) or Name (Name of the package)!',
         );
@@ -2320,7 +2320,7 @@ sub PackageIsInstalled {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     $DBObject->Prepare(
         SQL => "SELECT name FROM package_repository "
@@ -2378,7 +2378,7 @@ sub PackageInstallDefaultFiles {
 
         next LOCATION if !$@;
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $@,
         );
@@ -2409,7 +2409,7 @@ sub PackageFileGetMD5Sum {
 
     for my $Needed (qw(Name Version)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -2417,7 +2417,7 @@ sub PackageFileGetMD5Sum {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = $Param{Name} . $Param{Version};
@@ -2474,7 +2474,7 @@ sub _Download {
 
     # check needed stuff
     if ( !defined $Param{URL} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'URL not defined!',
         );
@@ -2499,7 +2499,7 @@ sub _Database {
 
     # check needed stuff
     if ( !defined $Param{Database} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Database not defined!',
         );
@@ -2507,7 +2507,7 @@ sub _Database {
     }
 
     if ( ref $Param{Database} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need array ref in Database param!',
         );
@@ -2515,7 +2515,7 @@ sub _Database {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my @SQL = $DBObject->SQLProcessor(
         Database => $Param{Database},
@@ -2542,7 +2542,7 @@ sub _Code {
     # check needed stuff
     for my $Needed (qw(Code Type Structure)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -2552,7 +2552,7 @@ sub _Code {
 
     # check format
     if ( ref $Param{Code} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need array ref in Code param!',
         );
@@ -2587,7 +2587,7 @@ sub _Code {
         print STDERR "Code: $Code->{Content}\n";
 
         if ( !eval $Code->{Content} . "\n1;" ) {    ## no critic
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Code: $@",
             );
@@ -2603,7 +2603,7 @@ sub _OSCheck {
 
     # check needed stuff
     if ( !defined $Param{OS} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'OS not defined!',
         );
@@ -2612,7 +2612,7 @@ sub _OSCheck {
 
     # check format
     if ( ref $Param{OS} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need array ref in OS param!',
         );
@@ -2639,7 +2639,7 @@ sub _OSCheck {
 
     my $PossibleOS = join ', ', @TestedOS;
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => "Sorry, can't install/upgrade package, because OS of package "
             . "($PossibleOS) does not match your OS ($CurrentOS)!",
@@ -2664,7 +2664,7 @@ sub _CheckFramework {
 
     # check needed stuff
     if ( !defined $Param{Framework} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Framework not defined!',
         );
@@ -2673,7 +2673,7 @@ sub _CheckFramework {
 
     # check format
     if ( ref $Param{Framework} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need array ref in Framework param!',
         );
@@ -2806,7 +2806,7 @@ sub _CheckFramework {
     return 1 if $FWCheck;
     return   if $Param{NoLog};
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => "Sorry, can't install/upgrade package, because the framework version required"
             . " by the package ($PossibleFramework) does not match your Framework ($CurrentFramework)!",
@@ -2838,7 +2838,7 @@ sub _CheckVersion {
     # check needed stuff
     for my $Needed (qw(VersionNew VersionInstalled Type)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -2849,7 +2849,7 @@ sub _CheckVersion {
     # check Type
     if ( $Param{Type} ne 'Min' && $Param{Type} ne 'Max' ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Invalid Type!',
         );
@@ -2913,7 +2913,7 @@ sub _CheckPackageRequired {
 
     # check needed stuff
     if ( !defined $Param{PackageRequired} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'PackageRequired not defined!',
         );
@@ -2947,7 +2947,7 @@ sub _CheckPackageRequired {
         }
 
         if ( !$Installed ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Sorry, can't install package, because package "
                     . "$Package->{Content} v$Package->{Version} is required!",
@@ -2963,7 +2963,7 @@ sub _CheckPackageRequired {
 
         next PACKAGE if $VersionCheck;
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Sorry, can't install package, because "
                 . "package $Package->{Content} v$Package->{Version} is required!",
@@ -2979,7 +2979,7 @@ sub _CheckModuleRequired {
 
     # check needed stuff
     if ( !defined $Param{ModuleRequired} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'ModuleRequired not defined!',
         );
@@ -3005,7 +3005,7 @@ sub _CheckModuleRequired {
                 $InstalledVersion = $Module->{Content}->VERSION;    ## no critic
             }
             if ( !$Installed ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Sorry, can't install package, because module "
                         . "$Module->{Content} v$Module->{Version} is required "
@@ -3029,7 +3029,7 @@ sub _CheckModuleRequired {
             );
 
             if ( !$Ok ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Sorry, can't install package, because module "
                         . "$Module->{Content} v$Module->{Version} is required and "
@@ -3049,7 +3049,7 @@ sub _CheckPackageDepends {
 
     # check needed stuff
     if ( !defined $Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Name not defined!',
         );
@@ -3067,7 +3067,7 @@ sub _CheckPackageDepends {
         {
             for my $Module ( @{ $Local->{PackageRequired} } ) {
                 if ( $Param{Name} eq $Module->{Content} && !$Param{Force} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message =>
                             "Sorry, can't uninstall package $Param{Name}, "
@@ -3087,7 +3087,7 @@ sub _PackageFileCheck {
 
     # check needed stuff
     if ( !defined $Param{Structure} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Structure not defined!',
         );
@@ -3110,7 +3110,7 @@ sub _PackageFileCheck {
 
                 next FILEOLD if $FileNew->{Location} ne $FileOld->{Location};
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't install/upgrade package, file $FileNew->{Location} already "
                         . "used in package $Package->{Name}->{Content}-$Package->{Version}->{Content}!",
@@ -3130,7 +3130,7 @@ sub _FileInstall {
     # check needed stuff
     for my $Needed (qw(File)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -3139,7 +3139,7 @@ sub _FileInstall {
     }
     for my $Item (qw(Location Content Permission)) {
         if ( !defined $Param{File}->{$Item} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Item not defined in File!",
             );
@@ -3151,7 +3151,7 @@ sub _FileInstall {
 
     # check Home
     if ( !-e $Home ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such home directory: $Home!",
         );
@@ -3215,7 +3215,7 @@ sub _FileInstall {
                 print STDERR "Notice: Create Directory $DirectoryCurrent!\n";
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't create directory: $DirectoryCurrent: $!",
                 );
@@ -3242,7 +3242,7 @@ sub _FileRemove {
     # check needed stuff
     for my $Needed (qw(File)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed not defined!",
             );
@@ -3251,7 +3251,7 @@ sub _FileRemove {
     }
     for my $Item (qw(Location)) {
         if ( !defined $Param{File}->{$Item} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Item not defined in File!",
             );
@@ -3263,7 +3263,7 @@ sub _FileRemove {
 
     # check Home
     if ( !-e $Home ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such home directory: $Home!",
         );
@@ -3276,7 +3276,7 @@ sub _FileRemove {
 
     # check if file exists
     if ( !-e $RealFile ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such file: $RealFile!",
         );
@@ -3299,7 +3299,7 @@ sub _FileRemove {
     # then do not remove it!
     my %File = $Self->_ReadDistArchive( Home => $Home );
     if ( $File{ $Param{File}->{Location} } && ( !-e "$RealFile.backup" && !-e "$RealFile.save" ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't remove file $RealFile, because it a framework file and no "
                 . "other one exists!",
@@ -3309,7 +3309,7 @@ sub _FileRemove {
 
     # remove old file
     if ( !$Self->{MainObject}->FileDelete( Location => $RealFile ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't remove file $RealFile: $!!",
         );
@@ -3344,7 +3344,7 @@ sub _ReadDistArchive {
 
     # check if ARCHIVE exists
     if ( !-e "$Home/ARCHIVE" ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such file: $Home/ARCHIVE!",
         );
@@ -3371,7 +3371,7 @@ sub _ReadDistArchive {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't open $Home/ARCHIVE: $!",
         );
@@ -3392,7 +3392,7 @@ sub _FileSystemCheck {
 
     # check Home
     if ( !-e $Home ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such home directory: $Home!",
         );
@@ -3414,7 +3414,7 @@ sub _FileSystemCheck {
         );
 
         if ( !$Write ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ERROR: Need write permissions for directory $Home$Filepath\n"
                     . " Try: $Home/bin/otrs.SetPermissions.pl!",
@@ -3468,7 +3468,7 @@ sub _PackageUninstallMerged {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Name (Name of the package)!',
         );
@@ -3479,7 +3479,7 @@ sub _PackageUninstallMerged {
 
     # check Home
     if ( !-e $Home ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such home directory: $Home!",
         );
@@ -3533,7 +3533,7 @@ sub _PackageUninstallMerged {
 
                             # remove old file
                             if ( !$Self->{MainObject}->FileDelete( Location => $SavedFile ) ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => 'error',
                                     Message  => "Can't remove file $SavedFile: $!!",
                                 );
@@ -3550,7 +3550,7 @@ sub _PackageUninstallMerged {
 
                 # remove old file
                 if ( !$Self->{MainObject}->FileDelete( Location => $RealFile ) ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Can't remove file $RealFile: $!!",
                     );
@@ -3566,10 +3566,10 @@ sub _PackageUninstallMerged {
         Name => $Param{Name},
     );
 
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         KeepTypes => ['XMLParse'],
     );
-    $Kernel::OM->Get('Kernel::System::Loader')->CacheDelete();
+    $Kernel::OM->Get('Loader')->CacheDelete();
 
     return $PackageRemove;
 }
@@ -3579,7 +3579,7 @@ sub _MergedPackages {
 
     # check needed stuff
     if ( !defined $Param{Structure}->{PackageMerge} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'PackageMerge not defined!',
         );
@@ -3638,7 +3638,7 @@ sub _MergedPackages {
 
         # merged package shouldn't be newer than the known mergeable target version
         elsif ( !$CheckTargetVersion ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Sorry, can't install package, because package "
                     . "$Package->{Name} v$InstalledVersion newer than required v$TargetVersion!",
@@ -3746,7 +3746,7 @@ sub _CheckDBMerged {
 
     # check needed stuff
     if ( !defined $Param{Database} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Database not defined!',
         );
@@ -3755,7 +3755,7 @@ sub _CheckDBMerged {
     }
 
     if ( ref $Param{Database} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need array ref in Database param!',
         );
@@ -3821,7 +3821,7 @@ sub RepositoryCloudList {
     my ( $Self, %Param ) = @_;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = "Repository::List::From::Cloud";

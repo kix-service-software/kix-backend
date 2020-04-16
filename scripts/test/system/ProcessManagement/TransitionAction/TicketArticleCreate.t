@@ -18,11 +18,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define variables
 my $UserID     = 1;
@@ -30,12 +30,12 @@ my $ModuleName = 'TicketArticleCreate';
 
 # set user details
 my $TestUserLogin = $Helper->TestUserCreate();
-my $TestUserID    = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $TestUserID    = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # ----------------------------------------
 # Create a test ticket
@@ -58,7 +58,7 @@ $Self->True(
     "TicketCreate() - $TicketID",
 );
 
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -136,7 +136,7 @@ $Self->True(
 );
 
 # set dynamic field values
-my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
     Name => $TextFieldName,
@@ -570,7 +570,7 @@ for my $Test (@Tests) {
     # make a deep copy to avoid changing the definition
     my $OrigTest = Storable::dclone($Test);
 
-    my $Success = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketArticleCreate')->Run(
+    my $Success = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketArticleCreate')->Run(
         %{ $Test->{Config} },
         ProcessEntityID          => 'P1',
         ActivityEntityID         => 'A1',
@@ -601,7 +601,7 @@ for my $Test (@Tests) {
 
             if (
                 $OrigTest->{Config}->{Config}->{$Attribute} eq '<KIX_TICKET_NotExisting>'
-                && $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('Type') eq 'oracle'
+                && $Kernel::OM->Get('DB')->GetDatabaseFunction('Type') eq 'oracle'
                 )
             {
                 $Article{$Attribute} //= '';
@@ -616,7 +616,7 @@ for my $Test (@Tests) {
             my $ExpectedValue = $Test->{Config}->{Config}->{$Attribute};
 
             if ( $Attribute eq 'From' && !defined $Test->{Config}->{Config}->{$Attribute} ) {
-                my %UserContact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                my %UserContact = $Kernel::OM->Get('Contact')->ContactGet(
                     UserID => $UserID,
                 );
                 $ExpectedValue = "$UserContact{FullName} <$UserContact{Email}>";

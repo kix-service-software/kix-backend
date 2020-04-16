@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::JobUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::JobUpdate');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     );
 
     # check if Job exists 
-    my %JobData = $Kernel::OM->Get('Kernel::System::Automation')->JobGet(
+    my %JobData = $Kernel::OM->Get('Automation')->JobGet(
         ID => $Param{Data}->{JobID},
     );
 
@@ -142,7 +142,7 @@ sub Run {
 
     # check if job with the same name already exists
     if ( $Job->{Name} ) {
-        my $JobID = $Kernel::OM->Get('Kernel::System::Automation')->JobLookup(
+        my $JobID = $Kernel::OM->Get('Automation')->JobLookup(
             Name => $Job->{Name},
         );
         if ( $JobID && $JobID != $Param{Data}->{JobID} ) {
@@ -154,7 +154,7 @@ sub Run {
     }
 
     # update Job
-    my $Success = $Kernel::OM->Get('Kernel::System::Automation')->JobUpdate(
+    my $Success = $Kernel::OM->Get('Automation')->JobUpdate(
         ID       => $Param{Data}->{JobID},    
         Type     => $Job->{Type} || $JobData{Type},
         Name     => $Job->{Name} || $JobData{Name},
@@ -171,13 +171,13 @@ sub Run {
     }
 
     if ( $Job->{Exec} ) {
-        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->JobExecute(
+        my $Success = $Kernel::OM->Get('Automation')->JobExecute(
             ID     => $Param{Data}->{JobID},
             UserID => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {
-            my $LogMessage = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error', 
                 What => 'Message',
             );

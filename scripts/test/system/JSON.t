@@ -15,7 +15,7 @@ use utf8;
 use vars qw( $Self %Param );
 
 # get needed objects
-my $JSONObject = $Kernel::OM->Get('Kernel::System::JSON');
+my $JSONObject = $Kernel::OM->Get('JSON');
 
 # Tests for JSON encode method
 my @Tests = (

@@ -123,19 +123,19 @@ sub Run {
     );
 
     # check if tickettype exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Type')->NameExistsCheck(
+    my $Exists = $Kernel::OM->Get('Type')->NameExistsCheck(
         Name => $TicketType->{Name},
     );
     
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create TicketType. TicketType with the name '$TicketType->{Name}' already exists.",
+            Message => "Cannot create TicketType. TicketType with the name '$TicketType->{Name}' already exists.",
         );
     }
 
     # create tickettype
-    my $TicketTypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
+    my $TicketTypeID = $Kernel::OM->Get('Type')->TypeAdd(
         Name    => $TicketType->{Name},
         Comment => $TicketType->{Comment},
         ValidID => $TicketType->{ValidID} || 1,

@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform FAQHistory search (at the moment without any search filters - instead we do filtering in the API)
-    my $HistoryIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQHistoryList(
+    my $HistoryIDs = $Kernel::OM->Get('FAQ')->FAQHistoryList(
         ItemID => $Param{Data}->{FAQArticleID},
         UserID => $Self->{Authorization}->{UserID},
     );

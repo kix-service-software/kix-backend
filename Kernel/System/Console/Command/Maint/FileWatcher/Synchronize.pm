@@ -19,8 +19,8 @@ use lib dirname($Bin) . "/Kernel/cpan-lib";
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Document::FS',
-    'Kernel::System::Log',
+    'Document::FS',
+    'Log',
 );
 
 sub Configure {
@@ -35,8 +35,8 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # create common objects
-    $Self->{LogObject}        = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{FileSystemObject} = $Kernel::OM->Get('Kernel::System::Document::FS');
+    $Self->{LogObject}        = $Kernel::OM->Get('Log');
+    $Self->{FileSystemObject} = $Kernel::OM->Get('Document::FS');
 
     $Self->{LogObject}->Log( Priority => 'notice', Message => "FileWatcher started." );
 

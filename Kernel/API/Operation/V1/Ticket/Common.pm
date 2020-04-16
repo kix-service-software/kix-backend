@@ -63,7 +63,7 @@ sub ValidateCustomerService {
     my %ServiceData;
 
     # get service object
-    my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
+    my $ServiceObject = $Kernel::OM->Get('Service');
 
     # check for Service name sent
     if (
@@ -94,7 +94,7 @@ sub ValidateCustomerService {
 
     # return false if service is not valid
     if (
-        $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $ServiceData{ValidID} )
+        $Kernel::OM->Get('Valid')->ValidLookup( ValidID => $ServiceData{ValidID} )
         ne 'valid'
         )
     {
@@ -143,7 +143,7 @@ sub ValidateServiceSLA {
     my %SLAData;
 
     # get SLA object
-    my $SLAObject = $Kernel::OM->Get('Kernel::System::SLA');
+    my $SLAObject = $Kernel::OM->Get('SLA');
 
     # check for SLA name sent
     if (
@@ -177,7 +177,7 @@ sub ValidateServiceSLA {
 
     # return false if SLA is not valid
     if (
-        $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup( ValidID => $SLAData{ValidID} )
+        $Kernel::OM->Get('Valid')->ValidLookup( ValidID => $SLAData{ValidID} )
         ne 'valid'
         )
     {
@@ -192,7 +192,7 @@ sub ValidateServiceSLA {
         && !$Param{ServiceID}
         )
     {
-        $ServiceID = $Kernel::OM->Get('Kernel::System::Service')->ServiceLookup( Name => $Param{Service} )
+        $ServiceID = $Kernel::OM->Get('Service')->ServiceLookup( Name => $Param{Service} )
             || 0;
     }
     else {
@@ -270,7 +270,7 @@ sub ValidatePendingTime {
     }
 
     # try to convert pending time to a SystemTime
-    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->Date2SystemTime(
+    my $SystemTime = $Kernel::OM->Get('Time')->Date2SystemTime(
         %{ $Param{PendingTime} },
         Second => 0,
     );
@@ -340,7 +340,7 @@ sub ValidateDynamicFieldValue {
     # get dynamic field config
     my $DynamicFieldConfig = $Self->{DynamicFieldLookup}->{ $Param{Name} };
 
-    my $ValueType = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueValidate(
+    my $ValueType = $Kernel::OM->Get('DynamicField::Backend')->ValueValidate(
         DynamicFieldConfig => $DynamicFieldConfig,
         Value              => $Param{Value},
         UserID             => 1,
@@ -426,7 +426,7 @@ sub SetDynamicFieldValue {
     }
 
     # get the dynamic fields
-    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => [ 'Ticket', 'Article' ],
     );
@@ -458,6 +458,13 @@ sub SetDynamicFieldValue {
     # get dynamic field config
     my $DynamicFieldConfig = $Self->{DynamicFieldLookup}->{ $Param{Name} };
 
+    if ( !$DynamicFieldConfig ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "SetDynamicFieldValue() no matching dynamic field found for \"$Param{Name}\"!"
+        );
+    }
+
     my $ObjectID;
     if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
         $ObjectID = $Param{TicketID} || '';
@@ -473,7 +480,7 @@ sub SetDynamicFieldValue {
         );
     }
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueSet(
+    my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
         DynamicFieldConfig => $DynamicFieldConfig,
         ObjectID           => $ObjectID,
         Value              => $Param{Value},
@@ -522,7 +529,7 @@ sub _CheckTicket {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     if ( defined $Ticket->{Articles} ) {
 
@@ -626,7 +633,7 @@ sub _CheckArticle {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check Article->TimeUnit
     # TimeUnit could be required or not depending on sysconfig option
@@ -779,7 +786,7 @@ sub _CheckDynamicField {
     my ( $Self, %Param ) = @_;
 
     # get the dynamic fields
-    my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => [ 'Ticket', 'Article' ],
     );

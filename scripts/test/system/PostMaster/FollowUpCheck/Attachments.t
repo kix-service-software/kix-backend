@@ -17,7 +17,7 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
@@ -26,20 +26,20 @@ $ConfigObject->Set(
     Key   => 'PostMaster::CheckFollowUpModule',
     Value => {
         '0400-Attachments' => {
-            Module => 'Kernel::System::PostMaster::FollowUpCheck::Attachments',
+            Module => 'PostMaster::FollowUpCheck::Attachments',
             }
         }
 );
 
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->FixedTimeSet();
 
 my $AgentAddress    = 'agent@example.com';

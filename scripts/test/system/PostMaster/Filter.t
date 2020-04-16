@@ -13,15 +13,15 @@ use utf8;
 use vars (qw($Self));
 
 # get priority object
-my $FilterObject = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
+my $FilterObject = $Kernel::OM->Get('PostMaster::Filter');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # general tests for Filter
 my @Tests = (

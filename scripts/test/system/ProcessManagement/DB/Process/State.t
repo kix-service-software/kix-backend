@@ -17,7 +17,7 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get state objects
-my $StateObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process::State');
+my $StateObject = $Kernel::OM->Get('ProcessManagement::DB::Process::State');
 
 my $LocalStateList = $StateObject->{StateList};
 

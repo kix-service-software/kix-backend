@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub Configure {
@@ -33,7 +33,7 @@ sub Run {
     $Self->Print("<yellow>Listing system daemons...</yellow>\n");
 
     # get daemon modules from SysConfig
-    my $DaemonModuleConfig = $Kernel::OM->Get('Kernel::Config')->Get('DaemonModules') || {};
+    my $DaemonModuleConfig = $Kernel::OM->Get('Config')->Get('DaemonModules') || {};
 
     MODULE:
     for my $Module ( sort keys %{$DaemonModuleConfig} ) {

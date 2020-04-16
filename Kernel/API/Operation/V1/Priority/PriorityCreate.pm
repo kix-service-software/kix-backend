@@ -125,19 +125,19 @@ sub Run {
     my $PriorityID;
      	
     # check if Priority exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+    my $Exists = $Kernel::OM->Get('Priority')->PriorityLookup(
         Priority => $Priority->{Name},
     );
     
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create Priority. Priority with the name '$Priority->{Name}' already exists.",
+            Message => "Cannot create Priority. Priority with the name '$Priority->{Name}' already exists.",
         );
     }
 
     # create Priority
-    $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityAdd(
+    $PriorityID = $Kernel::OM->Get('Priority')->PriorityAdd(
         Name    => $Priority->{Name},
         Comment => $Priority->{Comment},
         ValidID => $Priority->{ValidID} || 1,

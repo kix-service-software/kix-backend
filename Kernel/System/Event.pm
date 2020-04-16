@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
+    'Config',
+    'DynamicField',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $EventObject = $Kernel::OM->Get('Kernel::System::Event');
+    my $EventObject = $Kernel::OM->Get('Event');
 
 =cut
 
@@ -73,7 +73,7 @@ sub EventList {
 
     my %ObjectTypes = map { $_ => 1 } @{ $Param{ObjectTypes} || [] };
 
-    my %EventConfig = %{ $Kernel::OM->Get('Kernel::Config')->Get('Events') || {} };
+    my %EventConfig = %{ $Kernel::OM->Get('Config')->Get('Events') || {} };
 
     my %Result;
     for my $ObjectType ( sort keys %EventConfig ) {
@@ -87,7 +87,7 @@ sub EventList {
     if ( !%ObjectTypes || $ObjectTypes{'Ticket'} ) {
 
         # get dynamic field object
-        my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+        my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
         my $DynamicFields = $DynamicFieldObject->DynamicFieldList(
             Valid      => 1,

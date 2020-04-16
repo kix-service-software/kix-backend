@@ -14,7 +14,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Search');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Search');
 
 my $ExitCode = $CommandObject->Execute();
 

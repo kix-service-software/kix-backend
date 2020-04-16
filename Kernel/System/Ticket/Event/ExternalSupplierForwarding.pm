@@ -11,11 +11,11 @@ package Kernel::System::Ticket::Event::ExternalSupplierForwarding;
 use strict;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Ticket',
-    'Kernel::System::Log',
-    'Kernel::System::Queue',
-    'Kernel::System::AsynchronousExecutor::ExternalSupplierForwarding',
+    'Config',
+    'Ticket',
+    'Log',
+    'Queue',
+    'AsynchronousExecutor::ExternalSupplierForwarding',
 );
 
 sub new {
@@ -32,19 +32,19 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     #check required params...
     foreach (qw( Data Event Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
     for (qw(TicketID)) {
         if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "Need $_ in Data!" );
             return;
         }
@@ -52,10 +52,10 @@ sub Run {
 
     # get configuration
     my $FwdQueueRef =
-        $Kernel::OM->Get('Kernel::Config')->Get('ExternalSupplierForwarding::ForwardQueues');
+        $Kernel::OM->Get('Config')->Get('ExternalSupplierForwarding::ForwardQueues');
     my $FwdQueueNames = keys( %{$FwdQueueRef} );
     my $RelevantFwdChannelsRef =
-        $Kernel::OM->Get('Kernel::Config')
+        $Kernel::OM->Get('Config')
         ->Get('ExternalSupplierForwarding::RelevantFwdChannels');
 
     #get ticket data...
@@ -117,7 +117,7 @@ sub Run {
         #-----------------------------------------------------------------------
         # get relevant mail addresses...
         my $DestMailAdress = $FwdQueueRef->{ $Ticket{Queue} };
-        my %FromAddress    = $Kernel::OM->Get('Kernel::System::Queue')->GetSystemAddress(
+        my %FromAddress    = $Kernel::OM->Get('Queue')->GetSystemAddress(
             QueueID => $Ticket{QueueID},
         );
 
@@ -131,16 +131,16 @@ sub Run {
             FirstArticleFlag => $FirstArticleFlag || '',
         );
         my $Success
-            = $Kernel::OM->Get('Kernel::System::AsynchronousExecutor::ExternalSupplierForwarding')
+            = $Kernel::OM->Get('AsynchronousExecutor::ExternalSupplierForwarding')
             ->AsyncCall(
-            ObjectName     => 'Kernel::System::AsynchronousExecutor::ExternalSupplierForwarding',
+            ObjectName     => 'AsynchronousExecutor::ExternalSupplierForwarding',
             FunctionName   => 'Run',
             FunctionParams => \%JobParam,
             Attempts       => 1,
             MaximumParallelInstances => 1,
             );
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'ExternalSupplierForwarding - could not add AsyncCall',
             );

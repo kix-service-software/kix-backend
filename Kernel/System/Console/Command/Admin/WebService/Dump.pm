@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::API::Webservice',
-    'Kernel::System::Main',
-    'Kernel::System::YAML',
+    'API::Webservice',
+    'Main',
+    'YAML',
 );
 
 sub Configure {
@@ -45,7 +45,7 @@ sub Configure {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    my $WebServiceList = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceList();
+    my $WebServiceList = $Kernel::OM->Get('API::Webservice')->WebserviceList();
     my %WebServiceListReverse = reverse %{$WebServiceList};
 
     my $WebServiceName = $Self->GetOption('name');
@@ -63,7 +63,7 @@ sub Run {
     $Self->Print("<yellow>Dumping web service...</yellow>\n");
 
     my $WebService =
-        $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
+        $Kernel::OM->Get('API::Webservice')->WebserviceGet(
         ID => $Self->{WebServiceID},
         );
 
@@ -74,12 +74,12 @@ sub Run {
     }
 
     # dump config as string
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Dump( Data => $WebService->{Config} );
+    my $Config = $Kernel::OM->Get('YAML')->Dump( Data => $WebService->{Config} );
 
     my $TargetPath = $Self->GetOption('target-path');
 
     # write configuration in a file
-    my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
         Location => $TargetPath,
         Content  => \$Config,
         Mode     => 'utf8',

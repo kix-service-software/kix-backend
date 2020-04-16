@@ -81,7 +81,7 @@ sub Run {
     # check required parameters
     foreach my $Key ( qw(Object ObjectID UserID) ) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -90,18 +90,18 @@ sub Run {
     }
 
     # check if the requested object is supported
-    my %PossibleObjects = $Kernel::OM->Get('Kernel::System::LinkObject')->PossibleObjectsList(
+    my %PossibleObjects = $Kernel::OM->Get('LinkObject')->PossibleObjectsList(
         Object => $Param{Object}
     );
     return if !%PossibleObjects;
 
     # perform Link search
-    my $LinkListSource = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
+    my $LinkListSource = $Kernel::OM->Get('LinkObject')->LinkSearch(
         SourceObject => $Param{Object},
         SourceKey    => $Param{ObjectID},
         UserID       => $Param{UserID},
     );
-    my $LinkListTarget = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkSearch(
+    my $LinkListTarget = $Kernel::OM->Get('LinkObject')->LinkSearch(
         TargetObject => $Param{Object},
         TargetKey    => $Param{ObjectID},
         UserID       => $Param{UserID},

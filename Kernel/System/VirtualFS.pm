@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'DB',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $VirtualFSObject = $Kernel::OM->Get('Kernel::System::VirtualFS');
+    my $VirtualFSObject = $Kernel::OM->Get('VirtualFS');
 
 =cut
 
@@ -52,10 +52,10 @@ sub new {
     bless( $Self, $Type );
 
     # load backend
-    $Self->{BackendDefault} = $Kernel::OM->Get('Kernel::Config')->Get('VirtualFS::Backend')
-        || 'Kernel::System::VirtualFS::DB';
+    $Self->{BackendDefault} = $Kernel::OM->Get('Config')->Get('VirtualFS::Backend')
+        || 'VirtualFS::DB';
 
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( $Self->{BackendDefault} ) ) {
+    if ( !$Kernel::OM->Get('Main')->Require( $Self->{BackendDefault} ) ) {
         return;
     }
 
@@ -104,7 +104,7 @@ sub Read {
     # check needed stuff
     for (qw(Filename Mode)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -116,7 +116,7 @@ sub Read {
     my ( $FileID, $BackendKey, $Backend ) = $Self->_FileLookup( $Param{Filename} );
     if ( !$BackendKey ) {
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such file '$Param{Filename}'!",
             );
@@ -125,7 +125,7 @@ sub Read {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get preferences
     my %Preferences;
@@ -142,7 +142,7 @@ sub Read {
     # load backend (if not default)
     if ( !$Self->{Backend}->{$Backend} ) {
 
-        return if !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend);
+        return if !$Kernel::OM->Get('Main')->Require($Backend);
 
         $Self->{Backend}->{$Backend} = $Backend->new();
 
@@ -188,7 +188,7 @@ sub Write {
     # check needed stuff
     for (qw(Filename Content Mode)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -199,7 +199,7 @@ sub Write {
     # lookup
     my ($FileID) = $Self->_FileLookup( $Param{Filename} );
     if ($FileID) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "File already exists '$Param{Filename}'!",
         );
@@ -207,7 +207,7 @@ sub Write {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert
     return if !$DBObject->Do(
@@ -219,7 +219,7 @@ sub Write {
     ($FileID) = $Self->_FileLookup( $Param{Filename} );
 
     if ( !$FileID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to store '$Param{Filename}'!",
         );
@@ -281,7 +281,7 @@ sub Delete {
     # check needed stuff
     for (qw(Filename)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -293,7 +293,7 @@ sub Delete {
     my ( $FileID, $BackendKey, $Backend ) = $Self->_FileLookup( $Param{Filename} );
     if ( !$FileID ) {
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such file '$Param{Filename}'!",
             );
@@ -304,7 +304,7 @@ sub Delete {
     # load backend (if not default)
     if ( !$Self->{Backend}->{$Backend} ) {
 
-        return if !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend);
+        return if !$Kernel::OM->Get('Main')->Require($Backend);
 
         $Self->{Backend}->{$Backend} = $Backend->new();
 
@@ -312,7 +312,7 @@ sub Delete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete preferences
     return if !$DBObject->Do(
@@ -374,7 +374,7 @@ sub Find {
 
     # check needed stuff
     if ( !$Param{Filename} && !$Param{Preferences} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename or/and Preferences!',
         );
@@ -382,7 +382,7 @@ sub Find {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get like escape string needed for some databases (e.g. oracle)
     my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
@@ -488,7 +488,7 @@ sub _FileLookup {
     my ( $Self, $Filename ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # lookup
     return if !$DBObject->Prepare(

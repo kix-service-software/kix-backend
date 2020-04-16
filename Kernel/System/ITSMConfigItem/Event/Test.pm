@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 sub new {
@@ -23,7 +23,7 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{LogObject}   = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{LogObject}   = $Kernel::OM->Get('Log');
 
     my @keyarr = keys(%Param);
 

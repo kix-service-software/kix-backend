@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::SystemAddress',
-    'Kernel::System::Valid',
+    'DB',
+    'Log',
+    'SystemAddress',
+    'Valid',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AutoResponseSchema = $Kernel::OM->Get('Kernel::System::AutoResponse');
+    my $AutoResponseSchema = $Kernel::OM->Get('AutoResponse');
 
 =cut
 
@@ -77,7 +77,7 @@ sub AutoResponseAdd {
     # check needed stuff
     for my $Argument (qw(Name ValidID Response ContentType AddressID TypeID UserID Subject)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -89,7 +89,7 @@ sub AutoResponseAdd {
     return if !$Self->_NameExistsCheck( Name => $Param{Name} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # insert into database
     return if !$DBObject->Do(
@@ -130,7 +130,7 @@ sub AutoResponseAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'AutoResponse',
         ObjectID  => $ID,
@@ -154,7 +154,7 @@ sub AutoResponseGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!',
         );
@@ -162,7 +162,7 @@ sub AutoResponseGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # select
     return if !$DBObject->Prepare(
@@ -224,7 +224,7 @@ sub AutoResponseUpdate {
     # check needed stuff
     for my $Argument (qw(ID Name ValidID Response AddressID ContentType UserID Subject)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -239,7 +239,7 @@ sub AutoResponseUpdate {
     );
 
     # update the database
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE auto_response
             SET name = ?, text0 = ?, comments = ?, text1 = ?, type_id = ?,
@@ -254,7 +254,7 @@ sub AutoResponseUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'AutoResponse',
         ObjectID  => $Param{ID},
@@ -301,7 +301,7 @@ sub AutoResponseGetByTypeQueueID {
     # check needed stuff
     for my $Argument (qw(QueueID Type)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -310,14 +310,14 @@ sub AutoResponseGetByTypeQueueID {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL query
     return if !$DBObject->Prepare(
         SQL => "
             SELECT ar.text0, ar.text1, ar.content_type, ar.system_address_id
             FROM auto_response_type art, auto_response ar, queue_auto_response qar
-            WHERE ar.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} )
+            WHERE ar.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )
                 AND qar.queue_id = ?
                 AND art.id = ar.type_id
                 AND qar.auto_response_id = ar.id
@@ -342,7 +342,7 @@ sub AutoResponseGetByTypeQueueID {
     return if !%Data;
 
     # get sender attributes
-    my %Address = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressGet(
+    my %Address = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
         ID => $Data{SystemAddressID},
     );
 
@@ -372,7 +372,7 @@ sub AutoResponseWithoutQueue {
     my ( $Self, %Param ) = @_;
 
     # get DB object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my %QueueData;
 
@@ -383,7 +383,7 @@ sub AutoResponseWithoutQueue {
              FROM queue q
              LEFT OUTER JOIN queue_auto_response qar on q.id = qar.queue_id
              WHERE qar.queue_id IS NULL '
-            . "AND q.valid_id IN (${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())})"
+            . "AND q.valid_id IN (${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())})"
     );
 
     # fetch the result
@@ -413,7 +413,7 @@ Return example:
 sub AutoResponseList {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::DB')->GetTableData(
+    return $Kernel::OM->Get('DB')->GetTableData(
         What  => 'id, name, id',
         Valid => 0,
         Clamp => 1,
@@ -442,7 +442,7 @@ Return example:
 sub AutoResponseTypeList {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::DB')->GetTableData(
+    return $Kernel::OM->Get('DB')->GetTableData(
         What  => 'id, name',
         Valid => 1,
         Clamp => 1,
@@ -470,7 +470,7 @@ sub AutoResponseQueue {
     # check needed stuff
     for my $Argument (qw(QueueID AutoResponseIDs UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -479,7 +479,7 @@ sub AutoResponseQueue {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # store queue:auto response relations
     return if !$DBObject->Do(
@@ -527,7 +527,7 @@ sub _NameExistsCheck {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM auto_response WHERE name = ?',
@@ -543,7 +543,7 @@ sub _NameExistsCheck {
     }
 
     if ($Flag) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An Auto-Response with name '$Param{Name}' already exists!",
         );

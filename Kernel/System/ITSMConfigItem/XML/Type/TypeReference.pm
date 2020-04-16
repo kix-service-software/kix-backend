@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Type'
+    'Type'
 );
 
 =head1 NAME
@@ -33,7 +33,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::TypeReference');
+    my $XMLTypeDummyBackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::TypeReference');
 
 =cut
 
@@ -44,7 +44,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{TypeObject} = $Kernel::OM->Get('Kernel::System::Type');
+    $Self->{TypeObject} = $Kernel::OM->Get('Type');
 
     return $Self;
 }

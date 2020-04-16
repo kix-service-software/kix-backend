@@ -85,7 +85,7 @@ sub Run {
     
     my @ExecPlanDataList;
          	
-    my %ExecPlanList = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanList(
+    my %ExecPlanList = $Kernel::OM->Get('Automation')->ExecPlanList(
         Valid => 0,
     );
    

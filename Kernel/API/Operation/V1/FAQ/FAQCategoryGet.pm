@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQCategory::FAQCategoryGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQCategory::FAQCategoryGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
 
         # get the FAQCategory data
-        my %FAQCategory = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryGet(
+        my %FAQCategory = $Kernel::OM->Get('FAQ')->CategoryGet(
             CategoryID => $FAQCategoryID,
             UserID     => $Self->{Authorization}->{UserID},
         );
@@ -147,7 +147,7 @@ sub Run {
 
         # include SubCategories if requested
         if ( $Param{Data}->{include}->{SubCategories} ) {
-            $FAQCategory{SubCategories} = $Kernel::OM->Get('Kernel::System::FAQ')->CategorySearch(
+            $FAQCategory{SubCategories} = $Kernel::OM->Get('FAQ')->CategorySearch(
                 ParentID => $FAQCategoryID,
                 UserID   => $Self->{Authorization}->{UserID},
             );
@@ -161,7 +161,7 @@ sub Run {
 
         # include Articles if requested
         if ( $Param{Data}->{include}->{Articles} ) {
-            my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
+            my @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
                 CategoryIDs => [ $FAQCategoryID ],
                 UserID       => $Self->{Authorization}->{UserID},
             );

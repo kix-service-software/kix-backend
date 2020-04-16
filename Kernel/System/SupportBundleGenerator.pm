@@ -16,15 +16,15 @@ use warnings;
 use Archive::Tar;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CSV',
-    'Kernel::System::JSON',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Package',
-    'Kernel::System::Registration',
-    'Kernel::System::SupportDataCollector',
-    'Kernel::System::Time',
+    'Config',
+    'CSV',
+    'JSON',
+    'Log',
+    'Main',
+    'Package',
+    'Registration',
+    'SupportDataCollector',
+    'Time',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SupportBundleGeneratorObject = $Kernel::OM->Get('Kernel::System::SupportBundleGenerator');
+    my $SupportBundleGeneratorObject = $Kernel::OM->Get('SupportBundleGenerator');
 
 =cut
 
@@ -57,10 +57,10 @@ sub new {
     bless( $Self, $Type );
 
     # cleanup the Home variable (remove tailing "/")
-    $Self->{Home} = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    $Self->{Home} = $Kernel::OM->Get('Config')->Get('Home');
     $Self->{Home} =~ s{\/\z}{};
 
-    $Self->{RandomID} = $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString(
+    $Self->{RandomID} = $Kernel::OM->Get('Main')->GenerateRandomString(
         Length     => 8,
         Dictionary => [ 0 .. 9, 'a' .. 'f' ],
     );
@@ -91,25 +91,13 @@ Returns:
 sub Generate {
     my ( $Self, %Param ) = @_;
 
-    if ( !-e $Self->{Home} . '/ARCHIVE' ) {
-        my $Message = $Self->{Home} . '/ARCHIVE: Is missing, can not continue!';
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => $Message,
-        );
-        return {
-            Success => 0,
-            Message => $Message,
-        };
-    }
-
     my %SupportFiles;
 
     # get the list of installed packages
     ( $SupportFiles{PackageListContent}, $SupportFiles{PackageListFilename} ) = $Self->GeneratePackageList();
     if ( !$SupportFiles{PackageListFilename} ) {
-        my $Message = 'Can not generate the list of installed packages!';
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        my $Message = 'Cannot generate the list of installed packages!';
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
         );
@@ -123,8 +111,8 @@ sub Generate {
     ( $SupportFiles{RegistrationInfoContent}, $SupportFiles{RegistrationInfoFilename} )
         = $Self->GenerateRegistrationInfo();
     if ( !$SupportFiles{RegistrationInfoFilename} ) {
-        my $Message = 'Can not get the registration information!';
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        my $Message = 'Cannot get the registration information!';
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
         );
@@ -137,8 +125,8 @@ sub Generate {
     # get the support data
     ( $SupportFiles{SupportDataContent}, $SupportFiles{SupportDataFilename} ) = $Self->GenerateSupportData();
     if ( !$SupportFiles{SupportDataFilename} ) {
-        my $Message = 'Can not collect the support data!';
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        my $Message = 'Cannot collect the support data!';
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
         );
@@ -152,8 +140,8 @@ sub Generate {
     ( $SupportFiles{CustomFilesArchiveContent}, $SupportFiles{CustomFilesArchiveFilename} )
         = $Self->GenerateCustomFilesArchive();
     if ( !$SupportFiles{CustomFilesArchiveFilename} ) {
-        my $Message = 'Can not generate the custom files archive!';
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        my $Message = 'Cannot generate the custom files archive!';
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
         );
@@ -164,7 +152,7 @@ sub Generate {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # save and create archive
     my $TempDir = $ConfigObject->Get('TempDir') . '/SupportBundle';
@@ -186,7 +174,7 @@ sub Generate {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my @List;
     for my $Key (qw(PackageList RegistrationInfo SupportData CustomFilesArchive)) {
@@ -209,7 +197,7 @@ sub Generate {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     ## no critic
     my ( $s, $m, $h, $D, $M, $Y, $wd, $yd, $dst ) = $TimeObject->SystemTime2Date(
@@ -239,11 +227,11 @@ sub Generate {
     # remove temporary directory
     rmdir $TempDir;
 
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require('Compress::Zlib') ) {
+    if ( $Kernel::OM->Get('Main')->Require('Compress::Zlib') ) {
         my $GzTar = Compress::Zlib::memGzip($TmpTar);
 
         # log info
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => 'Download Compress::Zlib end',
         );
@@ -259,7 +247,7 @@ sub Generate {
     }
 
     # log info
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => 'Download no Compress::Zlib end',
     );
@@ -291,7 +279,7 @@ sub GenerateCustomFilesArchive {
     my ( $Self, %Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $TempDir = $ConfigObject->Get('TempDir') . '/SupportBundle';
 
@@ -335,7 +323,7 @@ sub GenerateCustomFilesArchive {
     my $Config = $TarObject->get_content( $HomeWithoutSlash . '/Kernel/Config.pm' );
 
     if ( !$Config ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Kernel/Config.pm was not found in the modified files!",
         );
@@ -358,7 +346,7 @@ sub GenerateCustomFilesArchive {
     if ( !$Write ) {
 
         # log info
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't write $CustomFilesArchive: $!",
         );
@@ -370,7 +358,7 @@ sub GenerateCustomFilesArchive {
     if ( !open( $TARFH, '<', $CustomFilesArchive ) ) {    ## no critic
 
         # log info
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't read $CustomFilesArchive: $!",
         );
@@ -381,11 +369,11 @@ sub GenerateCustomFilesArchive {
     my $TmpTar = do { local $/; <$TARFH> };
     close $TARFH;
 
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require('Compress::Zlib') ) {
+    if ( $Kernel::OM->Get('Main')->Require('Compress::Zlib') ) {
         my $GzTar = Compress::Zlib::memGzip($TmpTar);
 
         # log info
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Compression of $CustomFilesArchive end",
         );
@@ -394,7 +382,7 @@ sub GenerateCustomFilesArchive {
     }
 
     # log info
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "$CustomFilesArchive was not compressed",
     );
@@ -417,10 +405,10 @@ Returns:
 sub GeneratePackageList {
     my ( $Self, %Param ) = @_;
 
-    my @PackageList = $Kernel::OM->Get('Kernel::System::Package')->RepositoryList( Result => 'Short' );
+    my @PackageList = $Kernel::OM->Get('Package')->RepositoryList( Result => 'Short' );
 
     # get csv object
-    my $CSVObject = $Kernel::OM->Get('Kernel::System::CSV');
+    my $CSVObject = $Kernel::OM->Get('CSV');
 
     my $CSVContent = '';
     for my $Package (@PackageList) {
@@ -458,7 +446,7 @@ Returns:
 sub GenerateRegistrationInfo {
     my ( $Self, %Param ) = @_;
 
-    my %RegistrationInfo = $Kernel::OM->Get('Kernel::System::Registration')->RegistrationDataGet(
+    my %RegistrationInfo = $Kernel::OM->Get('Registration')->RegistrationDataGet(
         Extended => 1,
     );
 
@@ -485,7 +473,7 @@ sub GenerateRegistrationInfo {
         %Data = %RegistrationInfo;
     }
 
-    my $JSONContent = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+    my $JSONContent = $Kernel::OM->Get('JSON')->Encode(
         Data => \%Data,
     );
 
@@ -507,9 +495,9 @@ Returns:
 sub GenerateSupportData {
     my ( $Self, %Param ) = @_;
 
-    my %SupportData = $Kernel::OM->Get('Kernel::System::SupportDataCollector')->Collect();
+    my %SupportData = $Kernel::OM->Get('SupportDataCollector')->Collect();
 
-    my $JSONContent = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+    my $JSONContent = $Kernel::OM->Get('JSON')->Encode(
         Data => \%SupportData,
     );
 
@@ -520,7 +508,7 @@ sub _GetMD5SumLookup {
     my ( $Self, %Param ) = @_;
 
     # generate a MD5 Sum lookup table from framework ARCHIVE
-    my $FileList = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $FileList = $Kernel::OM->Get('Main')->FileRead(
         Location        => $Self->{Home} . '/ARCHIVE',
         Mode            => 'utf8',
         Type            => 'Local',
@@ -535,7 +523,7 @@ sub _GetMD5SumLookup {
     }
 
     # get package object
-    my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+    my $PackageObject = $Kernel::OM->Get('Package');
 
     # get a list of packages installed
     my @PackagesList = $PackageObject->RepositoryList(
@@ -562,7 +550,7 @@ sub _GetCustomFileList {
     # check needed stuff
     for my $Needed (qw(Directory)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -571,7 +559,7 @@ sub _GetCustomFileList {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # article directory
     my $ArticleDir = $ConfigObject->Get('ArticleDir');
@@ -632,7 +620,7 @@ sub _GetCustomFileList {
             # do not include if file is not readable
             next FILE if !-r $File;
 
-            my $MD5Sum = $Kernel::OM->Get('Kernel::System::Main')->MD5sum(
+            my $MD5Sum = $Kernel::OM->Get('Main')->MD5sum(
                 Filename => $File,
             );
 

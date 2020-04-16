@@ -18,7 +18,7 @@ use Kernel::System::ObjectManager;
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # set timezone variables
 $ConfigObject->Set(
@@ -30,20 +30,20 @@ $ConfigObject->Set(
     Value => 1,
 );
 
-my $StatsObject               = $Kernel::OM->Get('Kernel::System::Stats');
-my $QueueObject               = $Kernel::OM->Get('Kernel::System::Queue');
-my $TicketObject              = $Kernel::OM->Get('Kernel::System::Ticket');
-my $TimeObject                = $Kernel::OM->Get('Kernel::System::Time');
-my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $StatsObject               = $Kernel::OM->Get('Stats');
+my $QueueObject               = $Kernel::OM->Get('Queue');
+my $TicketObject              = $Kernel::OM->Get('Ticket');
+my $TimeObject                = $Kernel::OM->Get('Time');
+my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -354,7 +354,7 @@ continue {
 
 # set the language to 'en' before the StatsRun
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::Language' => {
+    'Language' => {
         UserLanguage => 'en',
     },
 );
@@ -377,7 +377,7 @@ my $UpdateSuccess = $StatsObject->StatsUpdate(
         Description  => 'some Description',
         Object       => 'Ticket',
         Format       => 'CSV',
-        ObjectModule => 'Kernel::System::Stats::Dynamic::Ticket',
+        ObjectModule => 'Stats::Dynamic::Ticket',
         StatType     => 'dynamic',
         Cache        => 1,
         Valid        => 1,
@@ -409,7 +409,7 @@ $UpdateSuccess = $StatsObject->StatsUpdate(
         Description  => 'some Description',
         Object       => 'TicketList',
         Format       => 'CSV',
-        ObjectModule => 'Kernel::System::Stats::Dynamic::TicketList',
+        ObjectModule => 'Stats::Dynamic::TicketList',
         StatType     => 'dynamic',
         Cache        => 1,
         Valid        => 1,
@@ -3069,11 +3069,11 @@ for my $Test (@Tests) {
     if ( $Test->{Language} ) {
 
         $Kernel::OM->ObjectsDiscard(
-            Objects => ['Kernel::Language'],
+            Objects => ['Language'],
         );
 
         $Kernel::OM->ObjectParamAdd(
-            'Kernel::Language' => {
+            'Language' => {
                 UserLanguage => $Test->{Language},
             },
         );
@@ -3141,7 +3141,7 @@ continue {
 
 # to get the system default language in the next test
 $Kernel::OM->ObjectsDiscard(
-    Objects => ['Kernel::Language'],
+    Objects => ['Language'],
 );
 
 # cleanup is done by RestoreDatabase.

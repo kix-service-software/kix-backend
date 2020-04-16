@@ -45,7 +45,7 @@ sub obsolete__TicketChecklistUpdate {
     # check needed stuff
     for my $Needed (qw(ItemString TicketID State)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketChecklistUpdate: Need $Needed!" );
             return;
         }
@@ -63,8 +63,8 @@ sub obsolete__TicketChecklistUpdate {
     );
 
     # db quote
-    $Param{TicketID} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{TicketID}, 'Integer' );
-    $Param{State} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{State} );
+    $Param{TicketID} = $Kernel::OM->Get('DB')->Quote( $Param{TicketID}, 'Integer' );
+    $Param{State} = $Kernel::OM->Get('DB')->Quote( $Param{State} );
 
     my $Position = 1;
     my %NewItemDataHash;
@@ -175,7 +175,7 @@ sub TicketChecklistItemStateUpdate {
     # check needed stuff
     for my $Needed (qw(ItemID State)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log(
                 Priority => 'error',
                 Message  => "TicketChecklistItemStateUpdate: Need $Needed!"
@@ -190,17 +190,17 @@ sub TicketChecklistItemStateUpdate {
     );
 
     # db quote
-    $Param{ItemID} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{ItemID}, 'Integer' );
-    $Param{State} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{State} );
+    $Param{ItemID} = $Kernel::OM->Get('DB')->Quote( $Param{ItemID}, 'Integer' );
+    $Param{State} = $Kernel::OM->Get('DB')->Quote( $Param{State} );
 
     # update
-    return 0 if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return 0 if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE kix_ticket_checklist SET state = ? WHERE id = ?',
         Bind => [ \$Param{State}, \$Param{ItemID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Checklist',
         ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
@@ -226,7 +226,7 @@ sub TicketChecklistItemUpdate {
     # check needed stuff
     for my $Needed (qw(ItemID Text State Position)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketChecklistItemUpdate: Need $Needed!" );
             return;
         }
@@ -238,19 +238,19 @@ sub TicketChecklistItemUpdate {
     );
 
     # db quote
-    $Param{ItemID}   = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{ItemID},   'Integer' );
-    $Param{Position} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{Position}, 'Integer' );
-    $Param{State}    = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{State} );
-    $Param{Text}     = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{Text} );
+    $Param{ItemID}   = $Kernel::OM->Get('DB')->Quote( $Param{ItemID},   'Integer' );
+    $Param{Position} = $Kernel::OM->Get('DB')->Quote( $Param{Position}, 'Integer' );
+    $Param{State}    = $Kernel::OM->Get('DB')->Quote( $Param{State} );
+    $Param{Text}     = $Kernel::OM->Get('DB')->Quote( $Param{Text} );
 
     # update
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'UPDATE kix_ticket_checklist SET task = ?, position = ?, state = ? WHERE id = ?',
         Bind => [ \$Param{Text}, \$Param{Position}, \$Param{State}, \$Param{ItemID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Checklist',
         ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
@@ -277,17 +277,17 @@ sub TicketChecklistItemCreate {
     # check needed stuff
     for my $Needed (qw(TicketID State Text)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketChecklistItemCreate: Need $Needed!" );
             return;
         }
     }
 
     # db quote
-    $Param{Item} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{Item} );
+    $Param{Item} = $Kernel::OM->Get('DB')->Quote( $Param{Item} );
 
     # insert action
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL =>
             'INSERT INTO kix_ticket_checklist (ticket_id, task, state, position) '
             . ' VALUES (?, ?, ?, ?)',
@@ -295,19 +295,19 @@ sub TicketChecklistItemCreate {
     );
 
     # get inserted id
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT id FROM kix_ticket_checklist WHERE task = ?',
         Bind  => [ \$Param{Text} ],
         Limit => 1,
     );
 
     my $ID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ID = $Row[0];
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Checklist',
         ObjectID  => $Param{TicketID}.'::'.$ID,
@@ -331,7 +331,7 @@ sub TicketChecklistItemDelete {
 
     # check needed stuff
     if ( !defined( $Param{ItemID} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => "TicketChecklistItemDelete: Need ItemID!" );
         return;
     }
@@ -342,16 +342,16 @@ sub TicketChecklistItemDelete {
     );
 
     # db quote
-    $Param{ItemID} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{ItemID}, 'Integer' );
+    $Param{ItemID} = $Kernel::OM->Get('DB')->Quote( $Param{ItemID}, 'Integer' );
 
     # update
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM kix_ticket_checklist WHERE id = ?',
         Bind => [ \$Param{ItemID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Checklist',
         ObjectID  => $ChecklistItem{TicketID}.'::'.$Param{ItemID},
@@ -376,14 +376,14 @@ sub TicketChecklistGet {
     # check needed stuff
     for my $Needed (qw(TicketID)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketChecklistGet: Need $Needed!" );
             return;
         }
     }
 
     # fetch the result
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id, task, state, position'
             . ' FROM kix_ticket_checklist'
             . ' WHERE ticket_id = ? ORDER BY position',
@@ -393,7 +393,7 @@ sub TicketChecklistGet {
     # get checklist items
     my %Checklist;
 
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         my %TempHash;
         $TempHash{ID}       = $Row[0];
         $TempHash{Text}     = $Row[1];
@@ -423,14 +423,14 @@ sub TicketChecklistItemGet {
     # check needed stuff
     for my $Needed (qw(ItemID)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')
+            $Kernel::OM->Get('Log')
                 ->Log( Priority => 'error', Message => "TicketChecklistItemGet: Need $Needed!" );
             return;
         }
     }
 
     # fetch the result
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id, ticket_id, task, state, position'
             . ' FROM kix_ticket_checklist'
             . ' WHERE id = ?',
@@ -440,7 +440,7 @@ sub TicketChecklistItemGet {
     # get checklist item
     my %ChecklistItem;
 
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ChecklistItem{ID}       = $Row[0];
         $ChecklistItem{TicketID} = $Row[1];
         $ChecklistItem{Text}     = $Row[2];

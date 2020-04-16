@@ -12,8 +12,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Document',
-    'Kernel::System::Log',
+    'Document',
+    'Log',
 );
 
 =head1 NAME
@@ -36,7 +36,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LinkObjectDocumentObject = $Kernel::OM->Get('Kernel::System::LinkObject::Document');
+    my $LinkObjectDocumentObject = $Kernel::OM->Get('LinkObject::Document');
 
 =cut
 
@@ -48,8 +48,8 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{DocumentObject} = $Kernel::OM->Get('Kernel::System::Document');
-    $Self->{LogObject}      = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{DocumentObject} = $Kernel::OM->Get('Document');
+    $Self->{LogObject}      = $Kernel::OM->Get('Log');
 
     return $Self;
 }

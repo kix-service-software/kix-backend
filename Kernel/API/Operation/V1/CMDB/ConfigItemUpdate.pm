@@ -126,7 +126,7 @@ sub Run {
     }
 
     # get config item data
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID}
     );
 
@@ -154,7 +154,7 @@ sub Run {
     }
 
     # update config item
-    my $ConfigItemID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemUpdate(        
+    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemUpdate(        
         ConfigItemID   => $Param{Data}->{ConfigItemID},
         %{$ConfigItem},
         UserID  => $Self->{Authorization}->{UserID},

@@ -17,13 +17,13 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $HelperObject     = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
-my $ValidationObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionValidation::ValidateDemo');
+my $HelperObject     = $Kernel::OM->Get('UnitTest::Helper');
+my $ValidationObject = $Kernel::OM->Get('ProcessManagement::TransitionValidation::ValidateDemo');
 
 # sanity check
 $Self->Is(
     ref $ValidationObject,
-    'Kernel::System::ProcessManagement::TransitionValidation::ValidateDemo',
+    'ProcessManagement::TransitionValidation::ValidateDemo',
     "ValidationObject created successfully",
 );
 

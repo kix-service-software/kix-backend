@@ -17,15 +17,15 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # Get config object.
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # Get helper object.
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # Create a new dynamic field name.
 my $DynamicFieldName = 'UnitTestDF' . $Helper->GetRandomNumber();
@@ -86,7 +86,7 @@ my %Process = (
     'Process::TransitionAction' => {
         TA1 => {
             Name   => 'Create Copy',
-            Module => 'Kernel::System::ProcessManagement::TransitionAction::TicketCreate',
+            Module => 'ProcessManagement::TransitionAction::TicketCreate',
             Config => {
                 Channel           => 'phone',
                 Body              => 'Ticket Copy',
@@ -143,7 +143,7 @@ for my $ProcessPart ( sort keys %Process ) {
 }
 
 # Get dynamic field object.
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 # Add new dynamic field.
 my $DynamicFieldID = $DynamicFieldObject->DynamicFieldAdd(
@@ -169,7 +169,7 @@ $Self->IsNot(
 my $RandomID = $Helper->GetRandomID();
 
 # Get ticket object.
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # Create tickets.
 my %TicketTemplate = (
@@ -240,7 +240,7 @@ my $ActivityIDDynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
 );
 
 # Get dynamic field backend object
-my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 # Enroll Tickets into process
 for my $TicketID ( $TicketID1, $TicketID2 ) {
@@ -268,11 +268,11 @@ for my $TicketID ( $TicketID1, $TicketID2 ) {
 
 # Discard ticket object to perform all handlers
 $Kernel::OM->ObjectsDiscard(
-    Objects => [ 'Kernel::System::Ticket', ],
+    Objects => [ 'Ticket', ],
 );
 
 # Get ticket object.
-$TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+$TicketObject = $Kernel::OM->Get('Ticket');
 
 # Search for tickets (should be only one of each)
 for my $Counter ( 1, 2 ) {
@@ -309,11 +309,11 @@ for my $TicketID ( $TicketID1, $TicketID2 ) {
 
 # Discard ticket object to perform all handlers
 $Kernel::OM->ObjectsDiscard(
-    Objects => [ 'Kernel::System::Ticket', ],
+    Objects => [ 'Ticket', ],
 );
 
 # Get ticket object.
-$TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+$TicketObject = $Kernel::OM->Get('Ticket');
 
 # Search for tickets (should be two of each)
 for my $Counter ( 1, 2 ) {

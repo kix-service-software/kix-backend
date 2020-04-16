@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::SupportDataCollector',
+    'SupportDataCollector',
 );
 
 sub Configure {
@@ -32,7 +32,7 @@ sub Run {
 
     $Self->Print("<yellow>Collecting asynchronous support data...</yellow>\n");
 
-    my %Result = $Kernel::OM->Get('Kernel::System::SupportDataCollector')->CollectAsynchronous();
+    my %Result = $Kernel::OM->Get('SupportDataCollector')->CollectAsynchronous();
 
     if ( !$Result{Success} ) {
         $Self->PrintError("Asynchronous data collection was not successful.");

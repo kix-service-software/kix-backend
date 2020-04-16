@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "ObjectIcon" : {
-         "$ref" : "#/definitions/_ObjectIcon_json"
+         "$ref" : "#/definitions/ObjectIcon_json-0bcc26d3cd"
       }
    },
    "required" : [
       "ObjectIcon"
    ],
    "definitions" : {
-      "_ObjectIcon_json" : {
+      "ObjectIcon_json-0bcc26d3cd" : {
          "$id" : "#ObjectIcon",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The object icon object.",

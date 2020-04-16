@@ -15,20 +15,20 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 $Self->True(
@@ -36,7 +36,7 @@ $Self->True(
     "Set Email Test backend with true",
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 # testing ArticleSend, especially for bug#8828 (attachments)
 # create a ticket first

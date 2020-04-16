@@ -16,17 +16,17 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::Job::Common);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
 
-Kernel::System::Automation::Job::Ticket - job type ticket for automation lib
+Kernel::System::Automation::Job::Ticket - job type for automation lib
 
 =head1 SYNOPSIS
 
@@ -55,9 +55,9 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Filter UserID)) {
+    for (qw(UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -72,7 +72,7 @@ sub Run {
         @TicketIDs = $Param{Data}->{TicketID};
     }
     else {
-        @TicketIDs = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+        @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
             Result => 'ARRAY'
         );
     }
@@ -81,7 +81,7 @@ sub Run {
     if ( IsHashRefWithData($Param{Filter}) ) {
 
         # get dynamic fields
-        my $DynamicFieldList = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             Valid      => 1,
             ObjectType => ['Ticket'],
         );
@@ -94,14 +94,14 @@ sub Run {
 
         my @Result;
         foreach my $TicketID ( sort @TicketIDs ) {
-            my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+            my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                 TicketID      => $TicketID,
                 UserID        => $Param{UserID},
                 DynamicFields => 1
             );
 
             if ( !%Ticket ) {
-                $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+                $Kernel::OM->Get('Automation')->LogError(
                     Referrer => $Self,
                     Message  => "Ticket with ID $TicketID not found!",
                     UserID   => $Param{UserID},
@@ -136,7 +136,7 @@ sub _Filter {
     }
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     KEY:
     for my $Key ( sort keys %{ $Param{Filter} } ) {
@@ -149,7 +149,7 @@ sub _Filter {
 
         my %Article;
         if ( $Param{Data}->{ArticleID} ) {
-            %Article = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleGet(
+            %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
                 ArticleID     => $Param{Data}->{ArticleID},
                 UserID        => $Param{UserID},
                 DynamicFields => 0,

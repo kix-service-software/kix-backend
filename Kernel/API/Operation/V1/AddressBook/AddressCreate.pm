@@ -121,19 +121,19 @@ sub Run {
     );        
    
     # check if Address exists
-    my %AddressList = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressList(
+    my %AddressList = $Kernel::OM->Get('AddressBook')->AddressList(
         Search => $Address->{EmailAddress},
     );
 
     if ( IsHashRefWithData(\%AddressList) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create address book entry. Another address with same email address already exists.",
+            Message => "Cannot create address book entry. Another address with same email address already exists.",
         );
     }
 
     # create AddressBook
-    my $AddressID = $Kernel::OM->Get('Kernel::System::AddressBook')->AddressAdd(
+    my $AddressID = $Kernel::OM->Get('AddressBook')->AddressAdd(
         EmailAddress => $Address->{EmailAddress},
     );
 

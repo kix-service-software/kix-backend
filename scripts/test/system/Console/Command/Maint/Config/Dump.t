@@ -14,7 +14,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Config::Dump');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Config::Dump');
 
 my ( $Result, $ExitCode );
 
@@ -34,7 +34,7 @@ chomp $Result;
 
 $Self->Is(
     $Result,
-    $Kernel::OM->Get('Kernel::Config')->Get('Home'),
+    $Kernel::OM->Get('Config')->Get('Home'),
     "Result",
 );
 

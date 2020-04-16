@@ -19,23 +19,23 @@ use Kernel::System::VariableCheck qw(:all);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Language',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Lock',
-    'Kernel::System::Log',
-    'Kernel::System::Priority',
-    'Kernel::System::Queue',
-    'Kernel::System::Service',
-    'Kernel::System::SLA',
-    'Kernel::System::State',
-    'Kernel::System::Stats',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::Type',
-    'Kernel::System::User',
+    'Config',
+    'Language',
+    'DB',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Lock',
+    'Log',
+    'Priority',
+    'Queue',
+    'Service',
+    'SLA',
+    'State',
+    'Stats',
+    'Ticket',
+    'Time',
+    'Type',
+    'User',
 );
 
 sub new {
@@ -46,7 +46,7 @@ sub new {
     bless( $Self, $Type );
 
     # get the dynamic fields for ticket object
-    $Self->{DynamicField} = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    $Self->{DynamicField} = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => ['Ticket'],
     );
@@ -74,13 +74,13 @@ sub GetObjectAttributes {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $ConfigObject   = $Kernel::OM->Get('Kernel::Config');
-    my $UserObject     = $Kernel::OM->Get('Kernel::System::User');
-    my $QueueObject    = $Kernel::OM->Get('Kernel::System::Queue');
-    my $TicketObject   = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $StateObject    = $Kernel::OM->Get('Kernel::System::State');
-    my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
-    my $LockObject     = $Kernel::OM->Get('Kernel::System::Lock');
+    my $ConfigObject   = $Kernel::OM->Get('Config');
+    my $UserObject     = $Kernel::OM->Get('User');
+    my $QueueObject    = $Kernel::OM->Get('Queue');
+    my $TicketObject   = $Kernel::OM->Get('Ticket');
+    my $StateObject    = $Kernel::OM->Get('State');
+    my $PriorityObject = $Kernel::OM->Get('Priority');
+    my $LockObject     = $Kernel::OM->Get('Lock');
 
     my $ValidAgent = 0;
     if (
@@ -135,7 +135,7 @@ sub GetObjectAttributes {
     my %OrderBy = map { $_ => $TicketAttributes{$_} } grep { $_ ne 'Number' } keys %TicketAttributes;
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # remove non sortable (and orderable) Dynamic Fields
     DYNAMICFIELD:
@@ -488,13 +488,13 @@ sub GetObjectAttributes {
     if ( $ConfigObject->Get('Ticket::Service') ) {
 
         # get service list
-        my %Service = $Kernel::OM->Get('Kernel::System::Service')->ServiceList(
+        my %Service = $Kernel::OM->Get('Service')->ServiceList(
             KeepChildren => $ConfigObject->Get('Ticket::Service::KeepChildren'),
             UserID       => 1,
         );
 
         # get sla list
-        my %SLA = $Kernel::OM->Get('Kernel::System::SLA')->SLAList(
+        my %SLA = $Kernel::OM->Get('SLA')->SLAList(
             UserID => 1,
         );
 
@@ -528,7 +528,7 @@ sub GetObjectAttributes {
     if ( $ConfigObject->Get('Ticket::Type') ) {
 
         # get ticket type list
-        my %Type = $Kernel::OM->Get('Kernel::System::Type')->TypeList(
+        my %Type = $Kernel::OM->Get('Type')->TypeList(
             UserID => 1,
         );
 
@@ -584,7 +584,7 @@ sub GetObjectAttributes {
         push @ObjectAttributes, @ObjectAttributeAdd;
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $ConfigObject->Get('Stats::CustomerIDAsMultiSelect') ) {
 
@@ -798,7 +798,7 @@ sub GetStatTable {
     my $SortedAttributesRef = $Self->_SortedAttributes();
     my $Preview             = $Param{Preview};
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if a enumeration is requested
     my $AddEnumeration = 0;
@@ -846,7 +846,7 @@ sub GetStatTable {
     }
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     my %DynamicFieldRestrictions;
     for my $ParameterName ( sort keys %{ $Param{Restrictions} } ) {
@@ -912,7 +912,7 @@ sub GetStatTable {
     }
 
     # get state object
-    my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+    my $StateObject = $Kernel::OM->Get('State');
 
     # OlderTicketsExclude for historic searches
     # takes tickets that were closed before the
@@ -926,7 +926,7 @@ sub GetStatTable {
     my %StateList = $StateObject->StateList( UserID => 1 );
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # UnixTimeStart & End:
     # The Time periode the historic search is executed
@@ -935,7 +935,7 @@ sub GetStatTable {
     my $UnixTimeStart = 0;
     my $UnixTimeEnd   = $TimeObject->SystemTime();
 
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Ticket::ArchiveSystem') ) {
+    if ( $Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         $Param{Restrictions}->{SearchInArchive} ||= '';
         if ( $Param{Restrictions}->{SearchInArchive} eq 'AllTickets' ) {
             $Param{Restrictions}->{ArchiveFlags} = [ 'y', 'n' ];
@@ -949,7 +949,7 @@ sub GetStatTable {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     if ( !$Preview && $Param{Restrictions}->{HistoricTimeRangeTimeNewerDate} ) {
 
@@ -992,7 +992,7 @@ sub GetStatTable {
 
     # Map the CustomerID search parameter to CustomerIDRaw search parameter for the
     #   exact search match, if the 'Stats::CustomerIDAsMultiSelect' is active.
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('Stats::CustomerIDAsMultiSelect') ) {
+    if ( $Kernel::OM->Get('Config')->Get('Stats::CustomerIDAsMultiSelect') ) {
         $Param{Restrictions}->{CustomerIDRaw} = $Param{Restrictions}->{CustomerID};
     }
 
@@ -1308,7 +1308,7 @@ sub GetStatTable {
                 && $Ticket{$Attribute} =~ /(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})/
                 )
             {
-                $Ticket{$Attribute} = $Kernel::OM->Get('Kernel::System::Stats')->_AddTimeZone(
+                $Ticket{$Attribute} = $Kernel::OM->Get('Stats')->_AddTimeZone(
                     TimeStamp => $Ticket{$Attribute},
                     TimeZone  => $Param{TimeZone},
                 );
@@ -1350,7 +1350,7 @@ sub GetHeaderLine {
     my @HeaderLine;
 
     # get language object
-    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+    my $LanguageObject = $Kernel::OM->Get('Language');
 
     ATTRIBUTE:
     for my $Attribute ( @{$SortedAttributesRef} ) {
@@ -1364,10 +1364,10 @@ sub ExportWrapper {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $UserObject     = $Kernel::OM->Get('Kernel::System::User');
-    my $QueueObject    = $Kernel::OM->Get('Kernel::System::Queue');
-    my $StateObject    = $Kernel::OM->Get('Kernel::System::State');
-    my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
+    my $UserObject     = $Kernel::OM->Get('User');
+    my $QueueObject    = $Kernel::OM->Get('Queue');
+    my $StateObject    = $Kernel::OM->Get('State');
+    my $PriorityObject = $Kernel::OM->Get('Priority');
 
     # wrap ids to used spelling
     for my $Use (qw(UseAsValueSeries UseAsRestriction UseAsXvalue)) {
@@ -1423,10 +1423,10 @@ sub ImportWrapper {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $UserObject     = $Kernel::OM->Get('Kernel::System::User');
-    my $QueueObject    = $Kernel::OM->Get('Kernel::System::Queue');
-    my $StateObject    = $Kernel::OM->Get('Kernel::System::State');
-    my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
+    my $UserObject     = $Kernel::OM->Get('User');
+    my $QueueObject    = $Kernel::OM->Get('Queue');
+    my $StateObject    = $Kernel::OM->Get('State');
+    my $PriorityObject = $Kernel::OM->Get('Priority');
 
     # wrap used spelling to ids
     for my $Use (qw(UseAsValueSeries UseAsRestriction UseAsXvalue)) {
@@ -1444,7 +1444,7 @@ sub ImportWrapper {
                         $ID->{Content} = $QueueObject->QueueLookup( Queue => $ID->{Content} );
                     }
                     else {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => "Import: Can' find the queue $ID->{Content}!"
                         );
@@ -1465,7 +1465,7 @@ sub ImportWrapper {
                         $ID->{Content} = $State{ID};
                     }
                     else {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => "Import: Can' find state $ID->{Content}!"
                         );
@@ -1487,7 +1487,7 @@ sub ImportWrapper {
                         $ID->{Content} = $PriorityIDs{ $ID->{Content} };
                     }
                     else {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => "Import: Can' find priority $ID->{Content}!"
                         );
@@ -1511,7 +1511,7 @@ sub ImportWrapper {
                         );
                     }
                     else {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message  => "Import: Can' find user $ID->{Content}!"
                         );
@@ -1530,7 +1530,7 @@ sub _TicketAttributes {
     my $Self = shift;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my %TicketAttributes = (
         Number       => 'Number',                             # only a counter for a better readability
@@ -1773,7 +1773,7 @@ sub _OrderByIsValueOfTicketSearchSort {
     );
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # cycle trought the Dynamic Fields
     DYNAMICFIELD:

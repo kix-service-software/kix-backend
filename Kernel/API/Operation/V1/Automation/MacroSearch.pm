@@ -85,7 +85,7 @@ sub Run {
 
     my @MacroDataList;
 
-    my %MacroList = $Kernel::OM->Get('Kernel::System::Automation')->MacroList(
+    my %MacroList = $Kernel::OM->Get('Automation')->MacroList(
         Valid => 0,
     );
 

@@ -1,0 +1,149 @@
+{
+   "$id" : "#JobRunResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for job run GET request.",
+   "type" : "object",
+   "properties" : {
+      "JobRun" : {
+         "$ref" : "#/definitions/JobRun_json-d0783c2145"
+      }
+   },
+   "required" : [
+      "JobRun"
+   ],
+   "definitions" : {
+      "JobRunLog_json-7ddb9237e5" : {
+         "$id" : "#JobRun",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The job run object.",
+         "type" : "object",
+         "properties" : {
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "JobID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MacroActionID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "MacroID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Message" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Priority" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "RunID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "JobID",
+            "Priority",
+            "RunID"
+         ]
+      },
+      "JobRun_json-d0783c2145" : {
+         "$id" : "#JobRun",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The job run object.",
+         "type" : "object",
+         "properties" : {
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "EndTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filter" : {
+               "type" : "object",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "JobID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Logs" : {
+               "description" : "execution logs of this run - added via include \"Logs\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/JobRunLog_json-7ddb9237e5"
+               },
+               "readOnly" : true
+            },
+            "StartTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "State" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "StateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "StartTime",
+            "ID",
+            "JobID",
+            "State",
+            "StateID"
+         ]
+      }
+   }
+}

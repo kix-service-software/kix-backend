@@ -16,10 +16,10 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CacheInternal',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'CacheInternal',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create a CustomerPortalGroup object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $CustomerPortalGroupObject = $Kernel::OM->Get('Kernel::System::CustomerPortalGroup');
+    my $CustomerPortalGroupObject = $Kernel::OM->Get('CustomerPortalGroup');
 
 =cut
 
@@ -54,10 +54,10 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{CacheObject}  = $Kernel::OM->Get('Kernel::System::Cache');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{DBObject}     = $Kernel::OM->Get('DB');
+    $Self->{CacheObject}  = $Kernel::OM->Get('Cache');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
 
     return $Self;
 }

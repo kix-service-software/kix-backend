@@ -15,10 +15,10 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CacheInternal',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'CacheInternal',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create a AddressBook object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AddressBookObject = $Kernel::OM->Get('Kernel::System::AddressBook');
+    my $AddressBookObject = $Kernel::OM->Get('AddressBook');
 
 =cut
 
@@ -53,10 +53,10 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
-    $Self->{DBObject}     = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{CacheObject}  = $Kernel::OM->Get('Kernel::System::Cache');
-    $Self->{LogObject}    = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
+    $Self->{DBObject}     = $Kernel::OM->Get('DB');
+    $Self->{CacheObject}  = $Kernel::OM->Get('Cache');
+    $Self->{LogObject}    = $Kernel::OM->Get('Log');
     $Self->{CacheType} = 'AddressBook';
     
     return $Self;
@@ -87,7 +87,7 @@ sub AddressGet {
    
     # check cache
     my $CacheKey = 'AddressGet::' . $Param{AddressID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -111,7 +111,7 @@ sub AddressGet {
     
     # no data found...
     if ( !%Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "AddressBook '$Param{AddressID}' not found!",
         );
@@ -119,7 +119,7 @@ sub AddressGet {
     }
     
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -184,7 +184,7 @@ sub AddressAdd {
         }
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event      => 'CREATE',
             Namespace  => 'AddressBook',
             ObjectID   => $ID,
@@ -208,7 +208,7 @@ sub AddressUpdate {
     # check needed stuff
     for my $Needed (qw(AddressID EmailAddress)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -219,7 +219,7 @@ sub AddressUpdate {
     my $EmailLower = $Param{EmailAddress};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # update address in database
     return if !$DBObject->Do(
@@ -235,7 +235,7 @@ sub AddressUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'AddressBook',
         ObjectID  => $Param{AddressID},
@@ -265,7 +265,7 @@ sub Empty {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'AddressBook',
     );
@@ -349,7 +349,7 @@ sub AddressDelete {
     # check needed stuff
     for (qw(AddressID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -358,7 +358,7 @@ sub AddressDelete {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM addressbook WHERE id = ?',
         Bind => [ \$Param{AddressID} ],
@@ -370,7 +370,7 @@ sub AddressDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'AddressBook',
         ObjectID  => $Param{AddressID},

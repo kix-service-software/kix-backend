@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Service',
+    'Config',
+    'Log',
+    'Service',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LinkObjectServiceObject = $Kernel::OM->Get('Kernel::System::LinkObject::Service');
+    my $LinkObjectServiceObject = $Kernel::OM->Get('LinkObject::Service');
 
 =cut
 
@@ -70,7 +70,7 @@ sub LinkListWithData {
     # check needed stuff
     for my $Argument (qw(LinkList UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -80,7 +80,7 @@ sub LinkListWithData {
 
     # check link list
     if ( ref $Param{LinkList} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'LinkList must be a hash reference!',
         );
@@ -95,7 +95,7 @@ sub LinkListWithData {
             for my $ServiceID ( sort keys %{ $Param{LinkList}->{$LinkType}->{$Direction} } ) {
 
                 # get service data
-                my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
+                my %ServiceData = $Kernel::OM->Get('Service')->ServiceGet(
                     ServiceID     => $ServiceID,
                     IncidentState => 1,
                     UserID        => $Param{UserID},
@@ -139,7 +139,7 @@ sub ObjectDescriptionGet {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -156,7 +156,7 @@ sub ObjectDescriptionGet {
     return %Description if $Param{Mode} && $Param{Mode} eq 'Temporary';
 
     # get service
-    my %Service = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
+    my %Service = $Kernel::OM->Get('Service')->ServiceGet(
         ServiceID     => $Param{Key},
         IncidentState => 0,
         UserID        => 1,
@@ -200,7 +200,7 @@ sub ObjectSearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -217,7 +217,7 @@ sub ObjectSearch {
     }
 
     # search the services
-    my @ServiceIDs = $Kernel::OM->Get('Kernel::System::Service')->ServiceSearch(
+    my @ServiceIDs = $Kernel::OM->Get('Service')->ServiceSearch(
         %{ $Param{SearchParams} },
         %Search,
         Limit  => 50,
@@ -229,7 +229,7 @@ sub ObjectSearch {
     for my $ServiceID (@ServiceIDs) {
 
         # get service data
-        my %ServiceData = $Kernel::OM->Get('Kernel::System::Service')->ServiceGet(
+        my %ServiceData = $Kernel::OM->Get('Service')->ServiceGet(
             ServiceID     => $ServiceID,
             IncidentState => 1,
             UserID        => $Param{UserID},
@@ -274,7 +274,7 @@ sub LinkAddPre {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -315,7 +315,7 @@ sub LinkAddPost {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -356,7 +356,7 @@ sub LinkDeletePre {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -397,7 +397,7 @@ sub LinkDeletePost {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -408,7 +408,7 @@ sub LinkDeletePost {
     # update the current incident state type from CIs of the service
     # in order to ensure that the dynamic incident calculation is reset after
     # unlinking a CI which has been in an incident state
-    $Kernel::OM->Get('Kernel::System::Service')->ServicePreferencesSet(
+    $Kernel::OM->Get('Service')->ServicePreferencesSet(
         ServiceID => $Param{Key},
         Key       => 'CurInciStateTypeFromCIs',
         Value     => '',

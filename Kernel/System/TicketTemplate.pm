@@ -1,11 +1,9 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
+# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file LICENSE-AGPL for license information (AGPL). If you
-# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Kernel::System::TicketTemplate;
@@ -16,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Main',
-    'Kernel::System::Log',
-    'Kernel::System::SysConfig',
-    'Kernel::System::JSON'
+    'Config',
+    'Cache',
+    'Main',
+    'Log',
+    'SysConfig',
+    'JSON'
 );
 
 =head1 NAME
@@ -44,7 +42,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketTemplateObject = $Kernel::OM->Get('Kernel::System::TicketTemplate');
+    my $TicketTemplateObject = $Kernel::OM->Get('TicketTemplate');
 
 =cut
 
@@ -75,9 +73,9 @@ Returns all available ticket templates
 sub TicketTemplateList {
     my ($Self, %Param) = @_;
 
-    my $TemplateDefinitionsJSON = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Template::Definitions');
+    my $TemplateDefinitionsJSON = $Kernel::OM->Get('Config')->Get('Ticket::Template::Definitions');
 
-    my $TemplateDefinitions = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+    my $TemplateDefinitions = $Kernel::OM->Get('JSON')->Decode(
         Data => $TemplateDefinitionsJSON
     );
 
@@ -102,7 +100,7 @@ sub TicketTemplateGet {
 
     # check needed stuff
     if (!$Param{Name}) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message => "TicketTemplateGet: Need Name!");
         return;
@@ -119,7 +117,7 @@ sub TicketTemplateGet {
     }
 
     if (!%Result) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message => "TicketTemplateGet: No template with name '$Param{Name}' found!");
         return;

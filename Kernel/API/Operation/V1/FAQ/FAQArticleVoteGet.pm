@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticle::FAQArticleVoteGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQArticle::FAQArticleVoteGet');
 
     return $Self;
 }
@@ -133,7 +133,7 @@ sub Run {
     foreach my $VoteID ( @{$Param{Data}->{FAQVoteID}} ) {
 
         # get the FAQArticle data
-        my %Vote = $Kernel::OM->Get('Kernel::System::FAQ')->VoteGet(
+        my %Vote = $Kernel::OM->Get('FAQ')->VoteGet(
             VoteID     => $VoteID,
             UserID     => $Self->{Authorization}->{UserID},
         );

@@ -16,18 +16,18 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $GenericAgentObject = $Kernel::OM->Get('Kernel::System::GenericAgent');
-my $QueueObject        = $Kernel::OM->Get('Kernel::System::Queue');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
-my $TimeObject         = $Kernel::OM->Get('Kernel::System::Time');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $GenericAgentObject = $Kernel::OM->Get('GenericAgent');
+my $QueueObject        = $Kernel::OM->Get('Queue');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
+my $TimeObject         = $Kernel::OM->Get('Time');
 
 # make use to disable EstalationStopEvents modules
 $ConfigObject->Set(
@@ -53,7 +53,7 @@ my $CheckNumEvents = sub {
                 Escalation => 1,
                 Queue      => $Param{QueueName},
                 New        => {
-                    Module => 'Kernel::System::GenericAgent::TriggerEscalationStartEvents',
+                    Module => 'GenericAgent::TriggerEscalationStartEvents',
                 },
             },
             UserID => 1,
@@ -104,7 +104,7 @@ for my $Hours ( sort keys %WorkingHours ) {
     my $StartingTimeStamp  = $TimeObject->SystemTime2TimeStamp( SystemTime => $StartingSystemTime );
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # use a calendar with the same business hours for every day so that the UT runs correctly
     # on every day of the week and outside usual business hours.
@@ -183,8 +183,8 @@ for my $Hours ( sort keys %WorkingHours ) {
         $HelperObject->FixedTimeAddSeconds(1);
 
         # renew object because of transaction
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-        $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+        $TicketObject = $Kernel::OM->Get('Ticket');
 
         my %Ticket = $TicketObject->TicketGet( TicketID => $TicketID );
 
@@ -384,8 +384,8 @@ for my $Hours ( sort keys %WorkingHours ) {
         }
 
         # renew object because of transaction
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-        $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+        $TicketObject = $Kernel::OM->Get('Ticket');
 
         $CheckNumEvents->(
             GenericAgentObject => $GenericAgentObject,
@@ -443,8 +443,8 @@ for my $Hours ( sort keys %WorkingHours ) {
         );
 
         # renew object because of transaction
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-        $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+        $TicketObject = $Kernel::OM->Get('Ticket');
 
         $CheckNumEvents->(
             GenericAgentObject => $GenericAgentObject,

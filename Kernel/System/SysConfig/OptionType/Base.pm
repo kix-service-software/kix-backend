@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -35,7 +35,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $OptionTypeObject = $Kernel::OM->Get('Kernel::System::SysConfig::OptionType::xyz');
+    my $OptionTypeObject = $Kernel::OM->Get('SysConfig::OptionType::xyz');
 
 =cut
 
@@ -68,15 +68,15 @@ sub ValidateSetting {
     # check needed stuff
     for (qw(Type Setting)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
     if ( !$Self->{OptionTypeModules}->{$Param{Type}} ) {
         my $Backend = 'Kernel::System::SysConfig::OptionType::' . $Param{Type};
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
             );        
@@ -84,7 +84,7 @@ sub ValidateSetting {
 
         my $BackendObject = $Backend->new( %{$Self} );
         if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
             );        
@@ -95,7 +95,7 @@ sub ValidateSetting {
 
     # check type
     if ( !$Self->{OptionTypeModules}->{$Param{Type}} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Item has unknown type \"$Param{Type}\".",
         );            

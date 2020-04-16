@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $ServiceID ( @{$Param{Data}->{ServiceID}} ) {
 
-        my $ResultTicketSearch = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(        
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
@@ -133,7 +133,7 @@ sub Run {
         }
       
         # delete Service	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Service')->ServiceDelete(
+        my $Success = $Kernel::OM->Get('Service')->ServiceDelete(
             ServiceID  => $ServiceID,
             UserID     => $Self->{Authorization}->{UserID},
         );

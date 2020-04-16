@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -35,7 +35,7 @@ sub Run {
     # check needed stuff
     for (qw(TicketID UserID Type)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -47,7 +47,7 @@ sub Run {
     return if $Param{Type} ne 'ro';
 
     # get ticket data, return access if current user is watcher
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketWatchGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketWatchGet(
         TicketID => $Param{TicketID},
     );
 

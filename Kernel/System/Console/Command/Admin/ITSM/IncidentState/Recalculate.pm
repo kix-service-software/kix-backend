@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::Service',
+    'GeneralCatalog',
+    'ITSMConfigItem',
+    'Service',
 );
 
 sub Configure {
@@ -35,7 +35,7 @@ sub Run {
     $Self->Print("<yellow>Recalculating the incident state of config items...</yellow>\n\n");
 
     # get class list
-    my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     );
 
@@ -43,7 +43,7 @@ sub Run {
     my @ValidClassIDs = sort keys %{$ClassList};
 
     # get all config items ids form all valid classes
-    my $ConfigItemsIDsRef = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
+    my $ConfigItemsIDsRef = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
         ClassIDs => \@ValidClassIDs,
     );
 
@@ -56,7 +56,7 @@ sub Run {
     CONFIGITEM:
     for my $ConfigItemID ( @{$ConfigItemsIDsRef} ) {
 
-        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->CurInciStateRecalc(
+        my $Success = $Kernel::OM->Get('ITSMConfigItem')->CurInciStateRecalc(
             ConfigItemID => $ConfigItemID,
         );
 
@@ -75,7 +75,7 @@ sub Run {
     $Self->Print("\n<green>Ready. Recalculated $Count config items.</green>\n\n");
 
     # get service object
-    my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
+    my $ServiceObject = $Kernel::OM->Get('Service');
 
     # get list of all services (valid and invalid)
     my %ServiceList = $ServiceObject->ServiceList(

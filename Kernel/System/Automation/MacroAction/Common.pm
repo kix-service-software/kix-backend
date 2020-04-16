@@ -16,13 +16,13 @@ use utf8;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Main',
-    'Kernel::System::Queue',
-    'Kernel::System::TemplateGenerator',
-    'Kernel::System::Ticket',
-    'Kernel::System::Log',
+    'Config',
+    'Encode',
+    'Main',
+    'Queue',
+    'TemplateGenerator',
+    'Ticket',
+    'Log',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $MacroActionObject = $Kernel::OM->Get('Kernel::System::Automation::MacroAction::Common');
+    my $MacroActionObject = $Kernel::OM->Get('Automation::MacroAction::Common');
 
 =cut
 
@@ -125,7 +125,7 @@ sub AddOption {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Name!',
         );
@@ -153,7 +153,7 @@ sub ValidateConfig {
 
     # check needed stuff
     if ( !$Param{Config} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Config!',
         );
@@ -166,7 +166,7 @@ sub ValidateConfig {
         next if !$Self->{Definition}->{Options}->{$Option}->{Required};
 
         if ( !exists $Param{Config}->{$Option} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Required parameter \"$Option\" missing!",
             );

@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::MailAccount',
-    'Kernel::System::PID',
+    'Log',
+    'MailAccount',
+    'PID',
 );
 
 sub Configure {
@@ -51,7 +51,7 @@ sub Configure {
 sub PreRun {
     my ($Self) = @_;
 
-    my $PIDObject = $Kernel::OM->Get('Kernel::System::PID');
+    my $PIDObject = $Kernel::OM->Get('PID');
 
     my $PIDCreated = $PIDObject->PIDCreate(
         Name  => $Self->Name(),
@@ -68,7 +68,7 @@ sub PreRun {
     my $Name  = $Self->Name();
 
     if ($Debug) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "KIX email handle ($Name) started.",
         );
@@ -82,7 +82,7 @@ sub Run {
 
     $Self->Print("<yellow>Fetching incoming mails from mail accounts...</yellow>\n\n");
 
-    my $MailAccountObject = $Kernel::OM->Get('Kernel::System::MailAccount');
+    my $MailAccountObject = $Kernel::OM->Get('MailAccount');
     my $MailAccountID     = $Self->GetOption('mail-account-id');
 
     my %List = $MailAccountObject->MailAccountList( Valid => 1 );
@@ -129,13 +129,13 @@ sub PostRun {
     my $Name  = $Self->Name();
 
     if ($Debug) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "KIX email handle ($Name) stopped.",
         );
     }
 
-    return $Kernel::OM->Get('Kernel::System::PID')->PIDDelete( Name => $Self->Name() );
+    return $Kernel::OM->Get('PID')->PIDDelete( Name => $Self->Name() );
 }
 
 1;

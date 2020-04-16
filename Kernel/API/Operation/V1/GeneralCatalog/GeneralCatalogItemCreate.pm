@@ -126,7 +126,7 @@ sub Run {
         Data => $Param{Data}->{GeneralCatalogItem}
     );
 
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogItem->{Class},
     );
 
@@ -134,13 +134,13 @@ sub Run {
     	if ( $ItemList->{$Item} eq $GeneralCatalogItem->{Name} ) {
 	        return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
-                Message => "Can not create GeneralCatalog item. GeneralCatalog item with the name '$GeneralCatalogItem->{Name}' already exists.",
+                Message => "Cannot create GeneralCatalog item. GeneralCatalog item with the name '$GeneralCatalogItem->{Name}' already exists.",
 	        );    		
     	}
     }
 
     # create GeneralCatalog
-    my $GeneralCatalogItemID = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemAdd(
+    my $GeneralCatalogItemID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
         Class    => $GeneralCatalogItem->{Class},
         Name     => $GeneralCatalogItem->{Name},
         Comment  => $GeneralCatalogItem->{Comment} || '',

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::GeneralCatalogClassUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::GeneralCatalogClassUpdate');
 
     return $Self;
 }
@@ -123,7 +123,7 @@ sub Run {
     );
 
     # check if Class exists 
-    my %ClassList = map { $_ => 1 } sort @{ $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassList() };
+    my %ClassList = map { $_ => 1 } sort @{ $Kernel::OM->Get('GeneralCatalog')->ClassList() };
 
     if ( !%ClassList || !$ClassList{$Param{Data}->{GeneralCatalogClass}} ) {
         return $Self->_Error(
@@ -132,7 +132,7 @@ sub Run {
     }
 
     # update GeneralCatalog
-    my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ClassRename(
+    my $Success = $Kernel::OM->Get('GeneralCatalog')->ClassRename(
         ClassOld => $Param{Data}->{GeneralCatalogClass},
         ClassNew => $Param{Data}->{Name},
         UserID   => $Self->{Authorization}->{UserID},                        

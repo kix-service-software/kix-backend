@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform pattern search
-    my %PatternList = $Kernel::OM->Get('Kernel::System::Translation')->PatternList(
+    my %PatternList = $Kernel::OM->Get('Translation')->PatternList(
         UserID    => $Self->{Authorization}->{UserID}
     );
 

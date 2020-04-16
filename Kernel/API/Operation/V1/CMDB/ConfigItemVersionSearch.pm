@@ -122,7 +122,7 @@ sub Run {
     }
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
@@ -133,7 +133,7 @@ sub Run {
     }
     
     # get ConfigItem versions
-    my $VersionList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionList(
+    my $VersionList = $Kernel::OM->Get('ITSMConfigItem')->VersionList(
         ConfigItemID => $Param{Data}->{ConfigItemID},
         UserID       => $Self->{Authorization}->{UserID},
     );

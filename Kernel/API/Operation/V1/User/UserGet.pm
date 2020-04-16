@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::User::UserGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::User::UserGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $UserID ( @{$Param{Data}->{UserID}} ) {
 
         # get the user data
-        my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %UserData = $Kernel::OM->Get('User')->GetUserData(
             UserID        => $UserID,
             NoPreferences => 1
         );
@@ -158,7 +158,7 @@ sub Run {
 
         #FIXME: workaoround KIX2018-3308###########
         $Self->AddCacheDependency(Type => 'Contact');
-        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $UserID,
         );
         $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
@@ -171,7 +171,7 @@ sub Run {
         if ($Param{Data}->{include}->{Contact}) {
             # $Self->AddCacheDependency( Type => 'Contact' );
             $UserData{Contact} = undef;
-            # my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+            # my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             #         UserID => $UserID,
             # );
             $UserData{Contact} = (%ContactData) ? \%ContactData : undef;

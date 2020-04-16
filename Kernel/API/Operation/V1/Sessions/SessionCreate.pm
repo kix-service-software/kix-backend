@@ -127,18 +127,18 @@ sub Run {
 
     if ( defined $Param{Data}->{UserType} ) {
         # check submitted data
-        $User = $Kernel::OM->Get('Kernel::System::Auth')->Auth(
+        $User = $Kernel::OM->Get('Auth')->Auth(
             User         => $Param{Data}->{UserLogin} || '',
             UsageContext => $Param{Data}->{UserType},
             Pw           => $PostPw,
         );
         if ( $User ) {
-            $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+            $UserID = $Kernel::OM->Get('User')->UserLookup(
                 UserLogin => $Param{Data}->{UserLogin},
             );
 
             # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
-            my $HasPermission = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
+            my $HasPermission = $Kernel::OM->Get('User')->CheckResourcePermission(
                 UserID              => $UserID,
                 UsageContext        => $Param{Data}->{UserType},
                 Target              => '/auth',
@@ -161,7 +161,7 @@ sub Run {
     }    
 
     # create new token
-    my $Token = $Kernel::OM->Get('Kernel::System::Token')->CreateToken(
+    my $Token = $Kernel::OM->Get('Token')->CreateToken(
         Payload => {
             UserID      => $UserID,
             UserType    => $Param{Data}->{UserType},

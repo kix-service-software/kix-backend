@@ -57,7 +57,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketUpdate');
 
     return $Self;
 }
@@ -153,7 +153,7 @@ sub Run {
     );
 
     # get ticket
-    my %TicketData = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %TicketData = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{Data}->{TicketID}
     );
 
@@ -227,7 +227,7 @@ sub _TicketUpdate {
     my $Ticket = $Param{Ticket};
 
     # get database object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     my $OwnerID;
     if ( $Ticket->{Owner} && !$Ticket->{OwnerID} ) {
@@ -252,7 +252,7 @@ sub _TicketUpdate {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get current ticket data
     my %TicketData = $TicketObject->TicketGet(
@@ -354,7 +354,7 @@ sub _TicketUpdate {
         my $StateID;
 
         # get state object
-        my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+        my $StateObject = $Kernel::OM->Get('State');
 
         if ( $Ticket->{StateID} ) {
             $StateID = $Ticket->{StateID};

@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get the user data
-    my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Self->{Authorization}->{UserID}
     );
 

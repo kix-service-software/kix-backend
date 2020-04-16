@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
+    'Role',
 );
 
 sub Configure {
@@ -37,31 +37,24 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'type',
-        Description => 'The new type of the permission.',
+        Description => 'The new type of the permission (Resource, PropertyValue, Property).',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'target',
-        Description => 'The new target of the permission.',
+        Description => 'The new target of the permission (i.e. "/tickets/*").',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'value',
-        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY). You can combine different values by using a comma and plus or minus sign to add or remove the permission, i.e. +READ,-UPDATE.',
+        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY,NONE). You can combine different values by using a comma and plus or minus sign to add or remove the permission, i.e. +READ,-UPDATE.',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'required',
-        Description => 'Set this permission as required. This only has effect when multiple attribute value permissions are defined for one object',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/(yes|no)/smx,
     );
     $Self->AddOption(
         Name        => 'comment',
@@ -83,20 +76,20 @@ sub PreRun {
     $Self->{PermissionType} = $Self->GetOption('type');
 
     # check PermissionID
-    my %Permission = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet( ID => $Self->{PermissionID} );
+    my %Permission = $Kernel::OM->Get('Role')->PermissionGet( ID => $Self->{PermissionID} );
     if ( !%Permission ) {
         die "Permission with ID $Self->{PermissionID} does not exist.\n";
     }
     $Self->{Permission} = \%Permission;
 
     # check role
-    $Self->{RoleID} = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup( Role => $Self->{RoleName} );
+    $Self->{RoleID} = $Kernel::OM->Get('Role')->RoleLookup( Role => $Self->{RoleName} );
     if ( !$Self->{RoleID} ) {
         die "Role $Self->{RoleName} does not exist.\n";
     }
 
     # check if given PermissionID belongs to given role
-    my %PermissionIDs = map {$_ => 1} $Kernel::OM->Get('Kernel::System::Role')->PermissionList(
+    my %PermissionIDs = map {$_ => 1} $Kernel::OM->Get('Role')->PermissionList(
         RoleID  => $Self->{RoleID},
         UserID  => 1,
     );
@@ -106,7 +99,7 @@ sub PreRun {
 
     # check permission type
     if ( $Self->{PermissionType} ) {
-        $Self->{PermissionTypeID} = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
+        $Self->{PermissionTypeID} = $Kernel::OM->Get('Role')->PermissionTypeLookup( Name => $Self->{PermissionType} );
         if ( !$Self->{PermissionTypeID} ) {
             die "Permission type $Self->{PermissionType} does not exist.\n";
         }
@@ -153,7 +146,7 @@ sub Run {
         $Value = 0 if $Value < 0;
     }
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Role')->PermissionUpdate(
+    my $Result = $Kernel::OM->Get('Role')->PermissionUpdate(
         ID         => $Self->{PermissionID},
         TypeID     => $Self->{PermissionTypeID} || $Self->{Permission}->{TypeID},
         Target     => $Self->GetOption('target') || $Self->{Permission}->{Target},

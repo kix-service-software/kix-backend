@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">TicketTemplateGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::TicketTemplate::TicketTemplateGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">TypeID</Item>
                 <Item Key="ResponseSchema">TicketTemplateResponse</Item>

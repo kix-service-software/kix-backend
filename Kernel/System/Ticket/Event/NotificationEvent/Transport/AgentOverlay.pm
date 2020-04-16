@@ -16,13 +16,13 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Ticket::Event::NotificationEvent::Transport::Base);
 
 our @ObjectDependencies = (
-    'Kernel::Output::HTML::Layout',
-    'Kernel::System::AgentOverlay',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::Web::Request',
+    'Output::HTML::Layout',
+    'AgentOverlay',
+    'HTMLUtils',
+    'Log',
+    'Ticket',
+    'Time',
+    'WebRequest',
 );
 
 =head1 NAME
@@ -45,7 +45,7 @@ create a notification transport object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new('');
-    my $TransportObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent::Transport::AgentOverlay');
+    my $TransportObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent::Transport::AgentOverlay');
 
 =cut
 
@@ -65,7 +65,7 @@ sub SendNotification {
     # check needed stuff
     for my $Needed (qw(TicketID UserID Notification Recipient)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need $Needed!',
             );
@@ -82,7 +82,7 @@ sub SendNotification {
     if ($Recipient{Type} eq 'Customer') {
         my $Message = "Transportation to customer not implemented!";
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => $Message,
         );
@@ -93,9 +93,9 @@ sub SendNotification {
     return if !$Recipient{UserID};
 
     # get objects
-    my $AgentOverlayObject = $Kernel::OM->Get('Kernel::System::AgentOverlay');
-    my $HTMLUtilsObject    = $Kernel::OM->Get('Kernel::System::HTMLUtils');
-    my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $AgentOverlayObject = $Kernel::OM->Get('AgentOverlay');
+    my $HTMLUtilsObject    = $Kernel::OM->Get('HTMLUtils');
+    my $TicketObject       = $Kernel::OM->Get('Ticket');
 
     # prepare subject
     if (!$Param{Notification}->{Data}->{RecipientSubject}) {
@@ -116,7 +116,7 @@ sub SendNotification {
     $Message =~ s/\n/\\n/g;
 
     # prepare decay
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
     my $Decay = $TimeObject->SystemTime() + ($Param{Notification}->{Data}->{RecipientDecay}->[0] * 60);
     if ($Param{Notification}->{Data}->{RecipientBusinessTime}->[0]) {
 
@@ -150,7 +150,7 @@ sub SendNotification {
     if ( !$Success ) {
         my $Message = "Could not add overlay for user_id $Recipient{UserID}!";
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
         );
@@ -166,7 +166,7 @@ sub GetTransportRecipients {
 
     for my $Needed (qw(Notification)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed",
             );
@@ -193,7 +193,7 @@ sub TransportSettingsDisplayGet {
     $Param{RecipientPopup}         = ($Param{RecipientPopup} || 0) ? 'checked=checked' : '';
 
     # get layout object
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
+    my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
     my %SubjectSelection = (
         0 => 'Without Ticketnumber',
@@ -221,7 +221,7 @@ sub TransportParamSettingsGet {
 
     for my $Needed (qw(GetParam)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed",
             );
@@ -229,7 +229,7 @@ sub TransportParamSettingsGet {
     }
 
     # get param object
-    my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
+    my $ParamObject = $Kernel::OM->Get('WebRequest');
 
     PARAMETER:
     for my $Parameter (qw(RecipientDecay RecipientBusinessTime RecipientPopup RecipientSubject)) {

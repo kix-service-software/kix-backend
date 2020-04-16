@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ConsoleFile::ConsoleCommandGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ConsoleFile::ConsoleCommandGet');
 
     return $Self;
 }
@@ -124,7 +124,7 @@ sub Run {
     foreach my $Command ( @{ $Param{Data}->{Command} } ) {
 
         # execute the command
-        my %CommandData = $Kernel::OM->Get('Kernel::System::Console')->CommandGet(
+        my %CommandData = $Kernel::OM->Get('Console')->CommandGet(
             Command => $Command,
         );
 

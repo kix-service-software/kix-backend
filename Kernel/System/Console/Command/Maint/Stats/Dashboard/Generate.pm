@@ -16,11 +16,11 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::PID',
-    'Kernel::System::User',
-    'Kernel::System::JSON',
-    'Kernel::System::Main',
-    'Kernel::System::Stats',
+    'PID',
+    'User',
+    'JSON',
+    'Main',
+    'Stats',
 );
 
 sub Configure {
@@ -54,7 +54,7 @@ sub Configure {
 sub PreRun {
     my ($Self) = @_;
 
-    my $PIDCreated = $Kernel::OM->Get('Kernel::System::PID')->PIDCreate(
+    my $PIDCreated = $Kernel::OM->Get('PID')->PIDCreate(
         Name  => $Self->Name(),
         Force => $Self->GetOption('force-pid'),
         TTL   => 60 * 60 * 6,
@@ -76,7 +76,7 @@ sub Run {
     my $StatNumber = $Self->GetOption('number');
 
     # get the list of stats that can be used in agent dashboards
-    my $Stats = $Kernel::OM->Get('Kernel::System::Stats')->StatsListGet(
+    my $Stats = $Kernel::OM->Get('Stats')->StatsListGet(
         UserID => 1,
     );
 
@@ -92,7 +92,7 @@ sub Run {
 
         # now find out all users which have this statistic enabled in their dashboard
         my $DashboardActiveSetting = 'UserDashboard' . ( 1000 + $StatID ) . "-Stats";
-        my %UsersWithActivatedWidget = $Kernel::OM->Get('Kernel::System::User')->SearchPreferences(
+        my %UsersWithActivatedWidget = $Kernel::OM->Get('User')->SearchPreferences(
             Key   => $DashboardActiveSetting,
             Value => 1,
         );
@@ -105,7 +105,7 @@ sub Run {
         for my $UserID ( sort keys %UsersWithActivatedWidget ) {
 
             # ignore invalid users
-            my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            my %UserData = $Kernel::OM->Get('User')->GetUserData(
                 UserID        => $UserID,
                 Valid         => 1,
                 NoOutOfOffice => 1,
@@ -117,18 +117,18 @@ sub Run {
 
             my $UserGetParam = {};
             if ( $UserData{$UserWidgetConfigSetting} ) {
-                $UserGetParam = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+                $UserGetParam = $Kernel::OM->Get('JSON')->Decode(
                     Data => $UserData{$UserWidgetConfigSetting},
                 );
             }
 
             if ( $Self->GetOption('debug') ) {
                 print STDERR "DEBUG: user statistic configuration data:\n";
-                print STDERR $Kernel::OM->Get('Kernel::System::Main')->Dump($UserGetParam);
+                print STDERR $Kernel::OM->Get('Main')->Dump($UserGetParam);
             }
 
             # now run the stat to fill the cache with the current parameters
-            my $Result = $Kernel::OM->Get('Kernel::System::Stats')->StatsResultCacheCompute(
+            my $Result = $Kernel::OM->Get('Stats')->StatsResultCacheCompute(
                 StatID       => $StatID,
                 UserGetParam => $UserGetParam,
                 UserID       => $UserID
@@ -147,7 +147,7 @@ sub Run {
 sub PostRun {
     my ($Self) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::PID')->PIDDelete( Name => $Self->Name() );
+    return $Kernel::OM->Get('PID')->PIDDelete( Name => $Self->Name() );
 }
 
 1;

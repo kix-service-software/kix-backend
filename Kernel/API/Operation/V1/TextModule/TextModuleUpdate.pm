@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TextModuleUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TextModuleUpdate');
 
     return $Self;
 }
@@ -82,7 +82,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     # get system LanguageIDs
-    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
+    my $Languages = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');
     my @LanguageIDs = sort keys %{$Languages};
 
     return {
@@ -143,7 +143,7 @@ sub Run {
     );
     
     # check if TextModule exists 
-    my %TextModuleData = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleGet(
+    my %TextModuleData = $Kernel::OM->Get('TextModule')->TextModuleGet(
         ID     => $Param{Data}->{TextModuleID},
         UserID => $Self->{Authorization}->{UserID},
     );
@@ -156,7 +156,7 @@ sub Run {
 
     if ( $TextModule->{Name} ) {
         # check if TextModule exists
-        my $ExistingProfileIDs = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleList(
+        my $ExistingProfileIDs = $Kernel::OM->Get('TextModule')->TextModuleList(
             Name        => $TextModule->{Name},
         );
         
@@ -168,7 +168,7 @@ sub Run {
     }
 
     # update TextModule
-    my $Success = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleUpdate(
+    my $Success = $Kernel::OM->Get('TextModule')->TextModuleUpdate(
         ID                 => $Param{Data}->{TextModuleID},
         Name               => $TextModule->{Name} || $TextModuleData{Name},
         Text               => $TextModule->{Text} || $TextModuleData{Text},

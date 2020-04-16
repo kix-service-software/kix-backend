@@ -16,14 +16,14 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::User',
-    'Kernel::System::YAML',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'Main',
+    'Time',
+    'User',
+    'YAML',
 );
 
 =head1 NAME
@@ -46,7 +46,7 @@ create a ACL object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ACLObject = $Kernel::OM->Get('Kernel::System::ACL::DB::ACL');
+    my $ACLObject = $Kernel::OM->Get('ACL::DB::ACL');
 
 =cut
 
@@ -58,11 +58,11 @@ sub new {
     bless( $Self, $Type );
 
     # get the cache TTL (in seconds)
-    $Self->{CacheTTL} = int( $Kernel::OM->Get('Kernel::Config')->Get('ACL::CacheTTL') || 3600 );
+    $Self->{CacheTTL} = int( $Kernel::OM->Get('Config')->Get('ACL::CacheTTL') || 3600 );
 
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -98,7 +98,7 @@ sub ACLAdd {
     # check needed stuff
     for my $Key (qw(Name ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -107,7 +107,7 @@ sub ACLAdd {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     # define Description field if not present
     $Param{Description} //= '';
@@ -118,7 +118,7 @@ sub ACLAdd {
     if ( $Param{ConfigMatch} ) {
 
         if ( !IsHashRefWithData( $Param{ConfigMatch} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ConfigMatch needs to be a valid hash with data!",
             );
@@ -132,7 +132,7 @@ sub ACLAdd {
     if ( $Param{ConfigChange} ) {
 
         if ( !IsHashRefWithData( $Param{ConfigChange} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ConfigChange needs to be a valid hash with data!",
             );
@@ -144,7 +144,7 @@ sub ACLAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if ACL with this name already exists
     return if !$DBObject->Prepare(
@@ -162,7 +162,7 @@ sub ACLAdd {
     }
 
     if ($ACLExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The Name:$Param{Name} already exists for an ACL!"
         );
@@ -195,7 +195,7 @@ sub ACLAdd {
     return if !$ID;
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ACLEditor_ACL',
     );
 
@@ -228,7 +228,7 @@ sub ACLDelete {
     # check needed stuff
     for my $Key (qw(ID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -245,7 +245,7 @@ sub ACLDelete {
     return if !IsHashRefWithData($ACL);
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete ACL
     return if !$DBObject->Do(
@@ -254,7 +254,7 @@ sub ACLDelete {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ACLEditor_ACL',
     );
 
@@ -302,7 +302,7 @@ sub ACLGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID or Name!'
         );
@@ -310,7 +310,7 @@ sub ACLGet {
     }
 
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -327,7 +327,7 @@ sub ACLGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Cache = $CacheObject->Get(
         Type => 'ACLEditor_ACL',
@@ -336,7 +336,7 @@ sub ACLGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     if ( $Param{ID} ) {
@@ -363,7 +363,7 @@ sub ACLGet {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
@@ -397,7 +397,7 @@ sub ACLGet {
     return if !$Data{ID};
 
     # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     # convert UserIDs outside of fetchrowArray, otherwise UserLooukup will rise some warnings
     my $CreateUser = $UserObject->UserLookup( UserID => $Data{CreateBy} );
@@ -442,7 +442,7 @@ sub ACLUpdate {
     # check needed stuff
     for my $Key (qw(ID Name ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -459,7 +459,7 @@ sub ACLUpdate {
     for my $Key (qw(ConfigMatch ConfigChange)) {
 
         if ( $Param{$Key} && !IsHashRefWithData( $Param{$Key} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Key needs to be a valid hash with data!",
             );
@@ -468,7 +468,7 @@ sub ACLUpdate {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     if ( $Param{ConfigMatch} && IsHashRefWithData( $Param{ConfigMatch} ) ) {
         $ConfigMatch = $YAMLObject->Dump( Data => $Param{ConfigMatch} );
@@ -481,7 +481,7 @@ sub ACLUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if Name already exists
     return if !$DBObject->Prepare(
@@ -499,7 +499,7 @@ sub ACLUpdate {
     }
 
     if ($ACLExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The Name:$Param{Name} already exists for a different ACL!",
         );
@@ -563,7 +563,7 @@ sub ACLUpdate {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ACLEditor_ACL',
     );
 
@@ -599,7 +599,7 @@ sub ACLList {
 
     # check needed
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!"
         );
@@ -615,7 +615,7 @@ sub ACLList {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = 'ACLList::ValidIDs::' . $ValidIDsStrg;
@@ -626,7 +626,7 @@ sub ACLList {
     return $Cache if ref $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = '
             SELECT id, name
@@ -700,7 +700,7 @@ sub ACLListGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -716,7 +716,7 @@ sub ACLListGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = 'ACLListGet::ValidIDs::' . $ValidIDsStrg;
@@ -727,7 +727,7 @@ sub ACLListGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = '
             SELECT id
@@ -788,7 +788,7 @@ sub ACLsNeedSync {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = '
         SELECT COUNT(*)
@@ -813,7 +813,7 @@ Reset synchronization information for ACLs.
 sub ACLsNeedSyncReset {
     my ( $Self, %Param ) = @_;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do( SQL => 'DELETE FROM acl_sync' );
+    return if !$Kernel::OM->Get('DB')->Do( SQL => 'DELETE FROM acl_sync' );
 
     return 1;
 }
@@ -838,7 +838,7 @@ sub ACLDump {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -851,7 +851,7 @@ sub ACLDump {
 
     if ( $Param{ResultType} eq 'FILE' ) {
         if ( !$Param{Location} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need Location for ResultType \'FILE\'!',
             );
@@ -906,7 +906,7 @@ sub ACLDump {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ACLEditor_ACL',
     );
 
@@ -926,15 +926,15 @@ sub ACLDump {
     }
 
     # get current time for the file comment
-    my $CurrentTime = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+    my $CurrentTime = $Kernel::OM->Get('Time')->CurrentTimestamp();
 
     # get user data of the current user to use for the file comment
-    my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %User = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Param{UserID},
     );
 
     # remove home from location path to show in file comment
-    my $Home     = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home     = $Kernel::OM->Get('Config')->Get('Home');
     my $Location = $Param{Location};
     $Location =~ s{$Home\/}{}xmsg;
 
@@ -959,7 +959,7 @@ EOF
 
     $Output = $FileStart . $Output . $FileEnd;
 
-    my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
         Location => $Param{Location},
         Content  => \$Output,
         Mode     => 'utf8',
@@ -999,7 +999,7 @@ sub ACLImport {
 
         # check needed stuff
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -1010,7 +1010,7 @@ sub ACLImport {
         }
     }
 
-    my $ACLData = $Kernel::OM->Get('Kernel::System::YAML')->Load( Data => $Param{Content} );
+    my $ACLData = $Kernel::OM->Get('YAML')->Load( Data => $Param{Content} );
 
     if ( ref $ACLData ne 'ARRAY' ) {
         return {
@@ -1166,7 +1166,7 @@ sub _ACLItemOutput {
         $Output .= "# Comment: $Param{Comment}\n";
     }
 
-    $Output .= $Kernel::OM->Get('Kernel::System::Main')->Dump(
+    $Output .= $Kernel::OM->Get('Main')->Dump(
         $Param{Value},
     );
 

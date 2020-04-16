@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SearchProfileUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SearchProfileUpdate');
 
     return $Self;
 }
@@ -132,7 +132,7 @@ sub Run {
     );
     
     # check if SearchProfile exists 
-    my %SearchProfileData = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileGet(
+    my %SearchProfileData = $Kernel::OM->Get('SearchProfile')->SearchProfileGet(
         ID     => $Param{Data}->{SearchProfileID},
         UserID => $Self->{Authorization}->{UserID},
     );
@@ -159,7 +159,7 @@ sub Run {
 
     if ( $SearchProfile->{Name} ) {
         # check if SearchProfile exists
-        my @ExistingProfileIDs = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+        my @ExistingProfileIDs = $Kernel::OM->Get('SearchProfile')->SearchProfileList(
             Type        => $SearchProfileData{Type},
             Name        => $SearchProfile->{Name},
             UserType    => $SearchProfileData{UserType},
@@ -175,7 +175,7 @@ sub Run {
     }
 
     # update SearchProfile
-    my $Success = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileUpdate(
+    my $Success = $Kernel::OM->Get('SearchProfile')->SearchProfileUpdate(
         ID                  => $Param{Data}->{SearchProfileID},
         Name                => $SearchProfile->{Name} || '',
         SubscribedProfileID => $SearchProfile->{SubscribedProfileID} || '',

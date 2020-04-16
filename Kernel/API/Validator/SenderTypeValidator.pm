@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'SenderTypeID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
+        $Found = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
             SenderTypeID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'SenderType' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
+        $Found = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
             SenderType => $Param{Data}->{$Param{Attribute}},
         );      
     }

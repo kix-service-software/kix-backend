@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform SenderType search
-    my %SenderTypeList = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeList(
+    my %SenderTypeList = $Kernel::OM->Get('Ticket')->ArticleSenderTypeList(
         Result => 'HASH',
     );
 

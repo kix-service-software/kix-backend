@@ -24,11 +24,11 @@ sub ArticleStorageInit {
     my ( $Self, %Param ) = @_;
 
     # ArticleDataDir
-    $Self->{ArticleDataDir} = $Kernel::OM->Get('Kernel::Config')->Get('ArticleDir')
+    $Self->{ArticleDataDir} = $Kernel::OM->Get('Config')->Get('ArticleDir')
         || die 'Got no ArticleDir!';
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # create ArticleContentPath
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $TimeObject->SystemTime2Date(
@@ -45,7 +45,7 @@ sub ArticleDelete {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -58,13 +58,13 @@ sub ArticleDelete {
         ArticleID => $Param{ArticleID}
     );
 
-    my $DynamicFieldListArticle = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+    my $DynamicFieldListArticle = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         ObjectType => 'Article',
         Valid      => 0,
     );
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # delete dynamicfield values for this article
     DYNAMICFIELD:
@@ -107,7 +107,7 @@ sub ArticleDelete {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete article flags
     return if !$DBObject->Do(
@@ -134,7 +134,7 @@ sub ArticleDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -149,7 +149,7 @@ sub ArticleDeletePlain {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -163,13 +163,13 @@ sub ArticleDeletePlain {
     );
 
     # delete attachments
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM article_plain WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Plain',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -186,7 +186,7 @@ sub ArticleDeletePlain {
     my $File = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt";
     if ( -f $File ) {
         if ( !unlink $File ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't remove: $File: $!!",
             );
@@ -203,7 +203,7 @@ sub ArticleDeleteAttachment {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -217,13 +217,13 @@ sub ArticleDeleteAttachment {
     );
 
     # delete attachments
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM article_attachment WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -241,7 +241,7 @@ sub ArticleDeleteAttachment {
 
     if ( -e $Path ) {
 
-        my @List = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        my @List = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $Path,
             Filter    => "*",
         );
@@ -252,7 +252,7 @@ sub ArticleDeleteAttachment {
 
                 if ( !unlink $File ) {
 
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Can't remove: $File: $!!",
                     );
@@ -270,7 +270,7 @@ sub ArticleWritePlain {
     # check needed stuff
     for (qw(ArticleID Email UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -279,12 +279,12 @@ sub ArticleWritePlain {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # encode attachment if it's a postgresql backend!!!
     if ( !$DBObject->GetDatabaseFunction('DirectBlob') ) {
 
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Param{Email} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{Email} );
 
         $Param{Email} = encode_base64( $Param{Email} );
     }
@@ -306,7 +306,7 @@ sub ArticleWriteAttachment {
     # check needed stuff
     for (qw(Content Filename ContentType ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -347,12 +347,12 @@ sub ArticleWriteAttachment {
     $Param{Filesize} = bytes::length( $Param{Content} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # encode attachment if it's a postgresql backend!!!
     if ( !$DBObject->GetDatabaseFunction('DirectBlob') ) {
 
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Param{Content} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{Content} );
 
         $Param{Content} = encode_base64( $Param{Content} );
     }
@@ -384,7 +384,7 @@ sub ArticleWriteAttachment {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
@@ -398,7 +398,7 @@ sub ArticlePlain {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ArticleID!"
         );
@@ -410,7 +410,7 @@ sub ArticlePlain {
     $Param{ArticleID} =~ s/\0//g;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # can't open article, try database
     return if !$DBObject->Prepare(
@@ -443,7 +443,7 @@ sub ArticlePlain {
     if ( -f "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt" ) {
 
         # read whole article
-        my $Data = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+        my $Data = $Kernel::OM->Get('Main')->FileRead(
             Directory => "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/",
             Filename  => 'plain.txt',
             Mode      => 'binmode',
@@ -455,7 +455,7 @@ sub ArticlePlain {
     }
 
     # log info
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => "No plain article (article id $Param{ArticleID}) in database!",
     );
@@ -467,7 +467,7 @@ sub ArticleAttachmentIndexRaw {
 
     # check ArticleContentPath
     if ( !$Self->{ArticleContentPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleContentPath!'
         );
@@ -476,7 +476,7 @@ sub ArticleAttachmentIndexRaw {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID!'
         );
@@ -487,7 +487,7 @@ sub ArticleAttachmentIndexRaw {
     my $Counter = 0;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # try database
     return if !$DBObject->Prepare(
@@ -564,7 +564,7 @@ sub ArticleAttachmentIndexRaw {
     }
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # try fs (if there is no index in fs)
     my @List = $MainObject->DirectoryRead(
@@ -690,7 +690,7 @@ sub ArticleAttachment {
     # check needed stuff
     for (qw(ArticleID FileID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -712,7 +712,7 @@ sub ArticleAttachment {
     my %Data = %{ $Index{ $Param{FileID} } };
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # try database
     return if !$DBObject->Prepare(
@@ -788,7 +788,7 @@ sub ArticleAttachment {
     my $Counter = 0;
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     my @List = $MainObject->DirectoryRead(
         Directory => "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}",
@@ -799,7 +799,7 @@ sub ArticleAttachment {
     if (@List) {
 
         # get encode object
-        my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+        my $EncodeObject = $Kernel::OM->Get('Encode');
 
         FILENAME:
         for my $Filename (@List) {
@@ -910,7 +910,7 @@ sub ArticleAttachment {
     }
 
     if ( !$Data{Content} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "No article attachment (article id $Param{ArticleID}, file id $Param{FileID}) in database!",
@@ -927,7 +927,7 @@ sub _ArticleDeleteDirectory {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -940,7 +940,7 @@ sub _ArticleDeleteDirectory {
     my $Path = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}";
     if ( -d $Path ) {
         if ( !rmdir $Path ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't remove: $Path: $!!",
             );

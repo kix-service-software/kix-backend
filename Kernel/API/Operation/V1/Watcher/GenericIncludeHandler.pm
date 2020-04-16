@@ -76,7 +76,7 @@ sub Run {
     # check required parameters
     foreach my $Key ( qw(Object ObjectID UserID) ) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -85,7 +85,7 @@ sub Run {
     }
 
     # perform watcher search
-    my @WatcherList = $Kernel::OM->Get('Kernel::System::Watcher')->WatcherList(
+    my @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
         Object   => $Param{Object},
         ObjectID => $Param{ObjectID},
         UserID   => $Param{UserID},

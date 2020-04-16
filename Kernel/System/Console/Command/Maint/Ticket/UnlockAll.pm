@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Lock',
-    'Kernel::System::Ticket',
+    'DB',
+    'Lock',
+    'Ticket',
 );
 
 sub Configure {
@@ -34,23 +34,23 @@ sub Run {
 
     $Self->Print("<yellow>Unlocking all tickets...</yellow>\n");
 
-    my @ViewableLockIDs = $Kernel::OM->Get('Kernel::System::Lock')->LockViewableLock( Type => 'ID' );
+    my @ViewableLockIDs = $Kernel::OM->Get('Lock')->LockViewableLock( Type => 'ID' );
 
     my @Tickets;
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "
             SELECT st.tn, st.id
             FROM ticket st
             WHERE st.ticket_lock_id NOT IN ( ${\(join ', ', @ViewableLockIDs)} ) ",
     );
 
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push @Tickets, \@Row;
     }
     for (@Tickets) {
         my @Row = @{$_};
         $Self->Print(" Unlocking ticket id $Row[0]... ");
-        my $Unlock = $Kernel::OM->Get('Kernel::System::Ticket')->LockSet(
+        my $Unlock = $Kernel::OM->Get('Ticket')->LockSet(
             TicketID => $Row[1],
             Lock     => 'unlock',
             UserID   => 1,

@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Cache',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+    my $ValidObject = $Kernel::OM->Get('Valid');
 
 =cut
 
@@ -69,14 +69,14 @@ sub ValidList {
 
     # read cache
     my $CacheKey = 'ValidList';
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get list from database
     return if !$DBObject->Prepare( SQL => 'SELECT id, name FROM valid' );
@@ -88,7 +88,7 @@ sub ValidList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -117,7 +117,7 @@ sub ValidLookup {
 
     # check needed stuff
     if ( !$Param{Valid} && !$Param{ValidID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Valid or ValidID!',
         );
@@ -144,7 +144,7 @@ sub ValidLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No $Key for $Value found!",
         );

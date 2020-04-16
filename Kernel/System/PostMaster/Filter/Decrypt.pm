@@ -16,10 +16,10 @@ use warnings;
 use Kernel::System::EmailParser;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Crypt::PGP',
-    'Kernel::System::Crypt::SMIME',
+    'Config',
+    'Log',
+    'Crypt::PGP',
+    'Crypt::SMIME',
 );
 
 sub new {
@@ -43,7 +43,7 @@ sub Run {
     # Check needed stuff.
     for my $Needed (qw(JobConfig GetParam)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need $Needed!',
             );
@@ -121,10 +121,10 @@ sub _DecryptPGP {
     my $ContentType = $Param{ContentType} || '';
 
     # Check if PGP is active
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     if ( !$ConfigObject->Get('PGP') ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'PGP is not activated',
         );
@@ -141,10 +141,10 @@ sub _DecryptPGP {
     }
 
     # PGP crypt object
-    my $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+    my $CryptObject = $Kernel::OM->Get('Crypt::PGP');
 
     if ( !$CryptObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Not possible to create crypt object',
         );
@@ -174,10 +174,10 @@ sub _DecryptSMIME {
     my $ContentType = $Param{ContentType} || '';
 
     # Check if SMIME is active
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     if ( !$ConfigObject->Get('SMIME') ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'SMIME is not activated',
         );
@@ -194,10 +194,10 @@ sub _DecryptSMIME {
     }
 
     # SMIME crypt object
-    my $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+    my $CryptObject = $Kernel::OM->Get('Crypt::SMIME');
 
     if ( !$CryptObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Not possible to create crypt object',
         );

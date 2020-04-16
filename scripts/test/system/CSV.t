@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $CSVObject = $Kernel::OM->Get('Kernel::System::CSV');
+my $CSVObject = $Kernel::OM->Get('CSV');
 
 my $CSV = $CSVObject->Array2CSV(
     WithHeader => [ 'Title', 'Example' ],

@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform keyword search
-    my %KeywordList = $Kernel::OM->Get('Kernel::System::FAQ')->KeywordList(
+    my %KeywordList = $Kernel::OM->Get('FAQ')->KeywordList(
         UserID => $Self->{Authorization}->{UserID},
     );
     my @KeywordArray = sort keys %KeywordList;

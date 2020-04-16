@@ -31,7 +31,7 @@ my $InvokerObject;
 $InvokerObject = Kernel::API::Invoker->new();
 $Self->IsNot(
     ref $InvokerObject,
-    'Kernel::API::Invoker',
+    'API::Invoker',
     'Invoker::new() constructor failure, no arguments',
 );
 
@@ -42,7 +42,7 @@ $InvokerObject = Kernel::API::Invoker->new(
 );
 $Self->IsNot(
     ref $InvokerObject,
-    'Kernel::API::Invoker',
+    'API::Invoker',
     'Invoker::new() constructor failure, no InvokerType',
 );
 
@@ -54,7 +54,7 @@ $InvokerObject = Kernel::API::Invoker->new(
 );
 $Self->IsNot(
     ref $InvokerObject,
-    'Kernel::API::Invoker',
+    'API::Invoker',
     'Invoker::new() constructor failure, no InvokerType',
 );
 
@@ -67,7 +67,7 @@ $InvokerObject = Kernel::API::Invoker->new(
 );
 $Self->IsNot(
     ref $InvokerObject,
-    'Kernel::API::Invoker',
+    'API::Invoker',
     'Invoker::new() constructor failure, wrong InvokerType',
 );
 
@@ -79,7 +79,7 @@ $InvokerObject = Kernel::API::Invoker->new(
 );
 $Self->IsNot(
     ref $InvokerObject,
-    'Kernel::API::Invoker',
+    'API::Invoker',
     'Invoker::new() constructor failure, wrong InvokerType',
 );
 
@@ -92,7 +92,7 @@ $InvokerObject = Kernel::API::Invoker->new(
 );
 $Self->Is(
     ref $InvokerObject,
-    'Kernel::API::Invoker',
+    'API::Invoker',
     'InvokerObject was correctly instantiated',
 );
 

@@ -15,13 +15,13 @@ use utf8;
 use vars (qw($Self));
 
 # do not really send emails
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 # get test email backed object
-my $TestBackendObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestBackendObject = $Kernel::OM->Get('Email::Test');
 
 my $Success = $TestBackendObject->CleanUp();
 $Self->True(
@@ -36,7 +36,7 @@ $Self->IsDeeply(
 );
 
 # get email object
-my $EmailObject = $Kernel::OM->Get('Kernel::System::Email');
+my $EmailObject = $Kernel::OM->Get('Email');
 
 for ( 1 .. 2 ) {
 

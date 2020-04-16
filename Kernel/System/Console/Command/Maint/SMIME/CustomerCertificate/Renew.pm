@@ -16,10 +16,10 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CheckItem',
-    'Kernel::System::Crypt::SMIME',
-    'Kernel::System::Contact',
+    'Config',
+    'CheckItem',
+    'Crypt::SMIME',
+    'Contact',
 );
 
 sub Configure {
@@ -35,7 +35,7 @@ sub Run {
 
     $Self->Print("<yellow>Renewing existing customer SMIME certificates...</yellow>\n");
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $StopExecution;
     if ( !$ConfigObject->Get('SMIME') ) {
@@ -52,7 +52,7 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    my $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+    my $CryptObject = $Kernel::OM->Get('Crypt::SMIME');
     if ( !$CryptObject ) {
         $Self->PrintError("SMIME environment its not working!\n");
         $Self->Print("<red>Fail.</red>\n");
@@ -61,7 +61,7 @@ sub Run {
 
     my ( $ListOfCertificates, $EmailsFromCertificates ) = $Self->_GetCurrentData();
 
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my $ContactObject = $Kernel::OM->Get('Contact');
 
     EMAIL:
     for my $Email ( sort keys %{$EmailsFromCertificates} ) {
@@ -109,7 +109,7 @@ sub Run {
 sub _GetCurrentData {
     my ( $Self, %Param ) = @_;
 
-    my $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+    my $CryptObject = $Kernel::OM->Get('Crypt::SMIME');
 
     # Get all existing certificates.
     my @CertList = $CryptObject->CertificateList();
@@ -133,7 +133,7 @@ sub _GetCurrentData {
         # all SMIME certificates must have an Email Attribute
         next CERTIFICATE if !$CertificateAttributes{Email};
 
-        my $ValidEmail = $Kernel::OM->Get('Kernel::System::CheckItem')->CheckEmail(
+        my $ValidEmail = $Kernel::OM->Get('CheckItem')->CheckEmail(
             Address => $CertificateAttributes{Email},
         );
 

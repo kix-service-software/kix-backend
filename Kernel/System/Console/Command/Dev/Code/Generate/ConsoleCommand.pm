@@ -19,9 +19,9 @@ use File::Basename ();
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Main',
-    'Kernel::Output::HTML::Layout',
+    'Config',
+    'Main',
+    'Output::HTML::Layout',
 );
 
 sub Configure {
@@ -59,7 +59,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my $CommandName = $Self->GetArgument('name');
-    my $Home        = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home        = $Kernel::OM->Get('Config')->Get('Home');
 
     my $TargetHome      = $Home;
     my $ModuleDirectory = $Self->GetOption('module-directory');
@@ -73,7 +73,7 @@ sub Run {
     my $SkeletonFilePM = __FILE__;
     $SkeletonFilePM =~ s{ConsoleCommand\.pm$}{ConsoleCommand/ConsoleCommand.pm.skel}xms;
 
-    my $SkeletonTemplatePM = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $SkeletonTemplatePM = $Kernel::OM->Get('Main')->FileRead(
         Location => $SkeletonFilePM,
     );
     if ( !$SkeletonTemplatePM || !${$SkeletonTemplatePM} ) {
@@ -81,7 +81,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $SkeletonPM = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->Output(
+    my $SkeletonPM = $Kernel::OM->Get('Output::HTML::Layout')->Output(
         Template => ${$SkeletonTemplatePM},
         Data     => {
             CommandPath => $CommandPathPM,
@@ -101,7 +101,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $SuccessPM = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $SuccessPM = $Kernel::OM->Get('Main')->FileWrite(
         Location => $TargetLocationPM,
         Content  => \$SkeletonPM,
     );
@@ -120,7 +120,7 @@ sub Run {
     my $SkeletonFileUT = __FILE__;
     $SkeletonFileUT =~ s{ConsoleCommand\.pm$}{ConsoleCommand/ConsoleCommand.t.skel}xms;
 
-    my $SkeletonTemplateUT = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $SkeletonTemplateUT = $Kernel::OM->Get('Main')->FileRead(
         Location => $SkeletonFileUT,
     );
     if ( !$SkeletonTemplateUT || !${$SkeletonTemplateUT} ) {
@@ -128,7 +128,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $SkeletonUT = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->Output(
+    my $SkeletonUT = $Kernel::OM->Get('Output::HTML::Layout')->Output(
         Template => ${$SkeletonTemplateUT},
         Data     => {
             CommandPath => $CommandPathUT,
@@ -148,7 +148,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $SuccessUT = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $SuccessUT = $Kernel::OM->Get('Main')->FileWrite(
         Location => $TargetLocationUT,
         Content  => \$SkeletonUT,
     );

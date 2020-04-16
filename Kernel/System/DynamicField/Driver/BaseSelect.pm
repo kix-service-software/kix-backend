@@ -18,10 +18,10 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Ticket::ColumnFilter',
-    'Kernel::System::Log',
+    'DB',
+    'DynamicFieldValue',
+    'Ticket::ColumnFilter',
+    'Log',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ Date common functions.
 sub ValueGet {
     my ( $Self, %Param ) = @_;
 
-    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+    my $DFValue = $Kernel::OM->Get('DynamicFieldValue')->ValueGet(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
         ObjectID => $Param{ObjectID},
     );
@@ -73,7 +73,7 @@ sub ValueSet {
     }    
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     my $Success;
 
@@ -88,7 +88,7 @@ sub ValueSet {
         );
 
         if (!$Valid) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "The value for the field is invalid!"
             );
@@ -135,7 +135,7 @@ sub ValueValidate {
 
         my $CountMin = $Param{DynamicFieldConfig}->{Config}->{CountMin};
         if ($CountMin && scalar(@Values) < $CountMin) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message => "At least $CountMin values must be selected."
             );
@@ -144,7 +144,7 @@ sub ValueValidate {
 
         my $CountMax = $Param{DynamicFieldConfig}->{Config}->{CountMax};
         if ($CountMax && $CountMax > 1 && scalar(@Values) > $CountMax) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message => "A maximum of $CountMax values can be selected."
             );
@@ -152,7 +152,7 @@ sub ValueValidate {
         }
 
         if((!$CountMax || 1 == $CountMax || 0 == $CountMax) && scalar(@Values) > 1) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message => "A maximum of 1 value can be selected. (Singleselect)"
             );
@@ -161,7 +161,7 @@ sub ValueValidate {
     }
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     my $Success;
     for my $Item (@Values) {
@@ -191,7 +191,7 @@ sub SearchSQLGet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Operators{ $Param{Operator} } ) {
         my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
@@ -209,7 +209,7 @@ sub SearchSQLGet {
         return $SQL;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         'Priority' => 'error',
         'Message'  => "Unsupported Operator $Param{Operator}",
     );
@@ -410,7 +410,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         $Value = $Param{ParamObject}->GetParam( Param => $FieldName );
@@ -745,7 +745,7 @@ sub StatsFieldParameterBuild {
     my $Values = $Param{DynamicFieldConfig}->{Config}->{PossibleValues};
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text,',
     );
@@ -857,7 +857,7 @@ sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',
     );
@@ -1032,7 +1032,7 @@ sub ColumnFilterValuesGet {
     my $SelectionData = $FieldConfig->{PossibleValues};
 
     # get column filter values from database
-    my $ColumnFilterValues = $Kernel::OM->Get('Kernel::System::Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
+    my $ColumnFilterValues = $Kernel::OM->Get('Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
         TicketIDs => $Param{TicketIDs},
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',

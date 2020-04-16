@@ -16,10 +16,10 @@ use warnings;
 use Kernel::System::VariableCheck qw( :all );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
 );
 
 sub new {
@@ -29,7 +29,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{ConfigObject} = $Kernel::OM->Get('Kernel::Config');
+    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
 
     # preferences table data
     $Self->{PreferencesTable} = $Self->{ConfigObject}->Get('PreferencesTable')
@@ -60,7 +60,7 @@ sub SetPreferences {
     # check needed stuff
     for (qw(UserID Key)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -77,7 +77,7 @@ sub SetPreferences {
         push @Values, ($Param{Value} // '');
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete old data
     return if !$DBObject->Do(
@@ -100,12 +100,12 @@ sub SetPreferences {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $Param{UserID},
@@ -120,7 +120,7 @@ sub GetPreferences {
     # check needed stuff
     for (qw(UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -129,13 +129,13 @@ sub GetPreferences {
     }
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $Self->{CachePrefix} . $Param{UserID},
     );
     return %{$Cache} if $Cache;
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get preferences
     return if !$DBObject->Prepare(
@@ -165,7 +165,7 @@ sub GetPreferences {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $Self->{CachePrefix} . $Param{UserID},
@@ -181,7 +181,7 @@ sub DeletePreferences {
     # check needed stuff
     for (qw(UserID Key)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -189,7 +189,7 @@ sub DeletePreferences {
         }
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete old data
     return if !$DBObject->Do(
@@ -201,12 +201,12 @@ sub DeletePreferences {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $Param{UserID},
@@ -221,7 +221,7 @@ sub SearchPreferences {
     my $Key   = $Param{Key}   || '';
     my $Value = $Param{Value} || '';
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $Lower = '';
     if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {

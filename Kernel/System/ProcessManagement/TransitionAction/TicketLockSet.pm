@@ -19,8 +19,8 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketLockSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketLockSet');
+    my $TicketLockSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketLockSet');
 
 =cut
 
@@ -105,7 +105,7 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{LockID} && !$Param{Config}->{Lock} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No Lock or LockID configured!",
         );
@@ -133,7 +133,7 @@ sub Run {
     {
 
         # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $Success = $TicketObject->TicketLockSet(
             TicketID => $Param{Ticket}->{TicketID},
@@ -142,7 +142,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket LockID '
@@ -171,7 +171,7 @@ sub Run {
         )
     {
         # get ticket object
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $Success = $TicketObject->TicketLockSet(
             TicketID => $Param{Ticket}->{TicketID},
@@ -180,7 +180,7 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . 'Ticket Lock '
@@ -191,7 +191,7 @@ sub Run {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . "Couldn't update Ticket Lock - can't find valid Lock parameter!",

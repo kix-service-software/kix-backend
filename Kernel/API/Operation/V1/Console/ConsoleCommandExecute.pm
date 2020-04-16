@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ConsoleFile::ConsoleCommandExecute');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ConsoleFile::ConsoleCommandExecute');
 
     return $Self;
 }
@@ -153,7 +153,7 @@ sub Run {
     print STDERR $Execute->{Command} . "   :" . Data::Dumper::Dumper($Execute);
 
     # execute the command
-    $ExitCode = $Kernel::OM->Get('Kernel::System::Console')->Run(
+    $ExitCode = $Kernel::OM->Get('Console')->Run(
         $Execute->{Command},
         IsArrayRefWithData( $Execute->{Parameters} ) ? @{ $Execute->{Parameters} } : (),
     );

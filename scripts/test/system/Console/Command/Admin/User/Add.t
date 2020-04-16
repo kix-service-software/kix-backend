@@ -14,19 +14,19 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::User::Add');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::User::Add');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $UserName = 'user' . $Helper->GetRandomID();
 
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );

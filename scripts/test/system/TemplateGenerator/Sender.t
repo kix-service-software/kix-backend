@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
@@ -23,23 +23,23 @@ $ConfigObject->Set(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
 # create template generator after the dynamic field are created as it gathers all DF in the
 # constructor
-my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
+my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
 my $TestContactID = $Helper->TestContactCreate(
     Language => 'en',
 );
 
-my $ContactObject = $Kernel::OM->Get('Kernel::System::User');
+my $ContactObject = $Kernel::OM->Get('User');
 
 my %TestContact = $ContactObject->ContactGet(
     ID => $TestContactID,
@@ -49,7 +49,7 @@ my %TestContact = $ContactObject->ContactGet(
 my $SystemAddressEmail    = $Helper->GetRandomID() . '@example.com';
 my $SystemAddressRealname = "KIX-Team";
 
-my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
+my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
 
 my $SystemAddressID = $SystemAddressObject->SystemAddressAdd(
     Name     => $SystemAddressEmail,
@@ -62,7 +62,7 @@ my $SystemAddressID = $SystemAddressObject->SystemAddressAdd(
 my %SystemAddressData = $SystemAddressObject->SystemAddressGet( ID => $SystemAddressID );
 
 my $QueueRand = $Helper->GetRandomID();
-my $QueueID   = $Kernel::OM->Get('Kernel::System::Queue')->QueueAdd(
+my $QueueID   = $Kernel::OM->Get('Queue')->QueueAdd(
     Name                => $QueueRand,
     ValidID             => 1,
     GroupID             => 1,

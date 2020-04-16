@@ -15,15 +15,15 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
@@ -32,7 +32,7 @@ $ConfigObject->Set(
 
 $ConfigObject->Set(
     Key   => 'Ticket::StorageModule',
-    Value => 'Kernel::System::Ticket::ArticleStorageDB',
+    Value => 'Ticket::ArticleStorageDB',
 );
 
 my $UserID = 1;
@@ -44,7 +44,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     my $RandomID = $Helper->GetRandomID();
 
     # Make sure that the TicketObject gets recreated for each loop.
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
     $ConfigObject->Set(
         Key   => 'Ticket::IndexModule',
@@ -52,7 +52,7 @@ for my $Module ( 'RuntimeDB', 'StaticDB' ) {
     );
 
     # create test ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     $Self->True(
         $TicketObject->isa("Kernel::System::Ticket::IndexAccelerator::$Module"),

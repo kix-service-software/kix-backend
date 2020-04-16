@@ -111,7 +111,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform FAQVote search (at the moment without any filters - we do filtering in the API)
-    my $VoteIDs = $Kernel::OM->Get('Kernel::System::FAQ')->VoteSearch(
+    my $VoteIDs = $Kernel::OM->Get('FAQ')->VoteSearch(
         ItemID => $Param{Data}->{FAQArticleID},
         UserID => $Self->{Authorization}->{UserID},
     );

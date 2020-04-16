@@ -86,7 +86,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
     
     # perform FAQArticleAttachment search
-    my @AttachmentList = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentIndex(
+    my @AttachmentList = $Kernel::OM->Get('FAQ')->AttachmentIndex(
         ItemID => $Param{Data}->{FAQArticleID},
         UserID => $Self->{Authorization}->{UserID},
     );

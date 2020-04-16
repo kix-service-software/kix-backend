@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -35,7 +35,7 @@ sub Run {
     # check needed stuff
     for (qw(Data Event Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -44,7 +44,7 @@ sub Run {
     }
     for (qw(TicketID)) {
         if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_ in Data!"
             );
@@ -53,7 +53,7 @@ sub Run {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # read pending state types from config
     my $PendingReminderStateType =
@@ -63,7 +63,7 @@ sub Run {
         $ConfigObject->Get('Ticket::PendingAutoStateType:') || 'pending auto';
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket
     my %Ticket = $TicketObject->TicketGet(

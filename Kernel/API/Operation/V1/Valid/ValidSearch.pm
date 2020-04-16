@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Valid search
-    my %ValidList = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
 
 	# get already prepared Valid data from ValidGet operation
     if ( IsHashRefWithData(\%ValidList) ) {  	

@@ -14,8 +14,8 @@ use warnings;
 use Carp ();
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
+    'Config',
+    'Encode',
 );
 
 =head1 NAME
@@ -38,11 +38,11 @@ create a log object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::SysConfigChangeLog' => {
+        'SysConfigChangeLog' => {
             LogPrefix => 'InstallScriptX',  # not required, but highly recommend
         },
     );
-    my $SysConfigChangeLogObject = $Kernel::OM->Get('Kernel::System::SysConfigChangeLog');
+    my $SysConfigChangeLogObject = $Kernel::OM->Get('SysConfigChangeLog');
 
 =cut
 
@@ -57,7 +57,7 @@ sub new {
         Carp::confess('$Kernel::OM is not defined, please initialize your object manager')
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     $Self->{ProductVersion} = $ConfigObject->Get('Product') . ' ';
     $Self->{ProductVersion} .= $ConfigObject->Get('Version');
 
@@ -70,7 +70,6 @@ sub new {
 
     # load log backend
     # KIX4OTRS-capeIT
-    # my $GenericModule = $ConfigObject->Get('LogModule') || 'Kernel::System::Log::SysLog';
     my $GenericModule = $ConfigObject->Get('SysConfigChangeLog::LogModule')
         || 'Kernel::System::SysConfigChangeLog::SysLog';
 

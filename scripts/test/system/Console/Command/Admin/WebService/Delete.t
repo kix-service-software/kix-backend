@@ -16,16 +16,16 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $WebService = 'webservice' . $Helper->GetRandomID();
 
 # create a base web service
-my $WebServiceID = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice')->WebserviceAdd(
+my $WebServiceID = $Kernel::OM->Get('GenericInterface::Webservice')->WebserviceAdd(
     Name   => $WebService,
     Config => {
         Debugger => {
@@ -71,7 +71,7 @@ my @Tests = (
 );
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::WebService::Delete');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::WebService::Delete');
 
 for my $Test (@Tests) {
 

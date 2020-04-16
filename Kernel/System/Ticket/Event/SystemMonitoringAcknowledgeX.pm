@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
+    'Config',
+    'Log',
+    'Ticket',
+    'User',
 );
 
 use LWP::UserAgent;
@@ -32,7 +32,7 @@ sub new {
     bless( $Self, $Type );
 
     # get config object
-    $Self->{ConfigObject}       = $Kernel::OM->Get('Kernel::Config');
+    $Self->{ConfigObject}       = $Kernel::OM->Get('Config');
 
     # get correct dynamic fields
     $Self->{Fhost}    = $Self->{ConfigObject}->Get('Tool::Acknowledge::DynamicField::Host');
@@ -46,7 +46,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Data Event Config)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -56,7 +56,7 @@ sub Run {
     }
 
     if ( !$Param{Data}->{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Data->{TicketID}!",
         );
@@ -73,7 +73,7 @@ sub Run {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No DynamicField for acknowledge registration exists.",
         );
@@ -81,7 +81,7 @@ sub Run {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # check if it's a system-monitoring related ticket
     my %Ticket = $TicketObject->TicketGet(
@@ -112,7 +112,7 @@ sub Run {
         $DFHost = $DynamicFieldTicketTextPrefix . $DFHost
     }
     if (!$DFHost) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "No defined DynamicFieldHost!",
         );
@@ -123,7 +123,7 @@ sub Run {
     $Self->{Fhost} = "DynamicField_$DFHost";
 
     if ( !$Ticket{ $Self->{Fhost} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "No Nagios Ticket!",
         );
@@ -168,7 +168,7 @@ sub Run {
     return 1 if ( !$Type || $Type eq '' );
 
     # agent lookup
-    my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+    my %User = $Kernel::OM->Get('User')->GetUserData(
         UserID => $Param{UserID},
         Cached => 1,                # not required -> 0|1 (default 0)
     );
@@ -193,7 +193,7 @@ sub Run {
         );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unknown Nagios acknowledge type ($Type)!",
         );
@@ -229,7 +229,7 @@ sub _Pipe {
     # check needed stuff
     for my $Needed (qw(Ticket User)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -305,7 +305,7 @@ sub _HTTP {
     # check needed stuff
     for my $Needed (qw(Ticket User)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -374,7 +374,7 @@ sub _HTTP {
     $Request->authorization_basic( $User, $Pw );
     my $Response = $UserAgent->request($Request);
     if ( !$Response->is_success() ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't request $URL: " . $Response->status_line(),
         );

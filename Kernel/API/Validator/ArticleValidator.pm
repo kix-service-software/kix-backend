@@ -103,7 +103,7 @@ sub Validate {
     my $Found;
     if ( $Param{Attribute} eq 'ArticleID' ) {
         if ( $Param{Data}->{$Param{Attribute}} =~ /\d+/ ) {
-            $Found = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleExists(
+            $Found = $Kernel::OM->Get('Ticket')->ArticleExists(
                 ArticleID => $Param{Data}->{$Param{Attribute}},
             );        
         }

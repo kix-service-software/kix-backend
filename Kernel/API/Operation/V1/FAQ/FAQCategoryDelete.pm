@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
 
-        my @ArticleIDs = $Kernel::OM->Get('Kernel::System::FAQ')->FAQSearch(
+        my @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
             CategoryIDs => [ $FAQCategoryID ],
             UserID      => $Self->{Authorization}->{UserID},
         );
@@ -122,7 +122,7 @@ sub Run {
         }
 
         # delete FAQCategory        
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->CategoryDelete(
+        my $Success = $Kernel::OM->Get('FAQ')->CategoryDelete(
             CategoryID => $FAQCategoryID,
             UserID     => $Self->{Authorization}->{UserID},
         );

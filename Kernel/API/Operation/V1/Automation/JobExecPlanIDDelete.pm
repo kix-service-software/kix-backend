@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $ExecPlanID ( @{$Param{Data}->{ExecPlanID}} ) {
 
-        my $Found = $Kernel::OM->Get('Kernel::System::Automation')->ExecPlanLookup(
+        my $Found = $Kernel::OM->Get('Automation')->ExecPlanLookup(
             ID => $ExecPlanID,
         );
 
@@ -121,7 +121,7 @@ sub Run {
         }
 
         # unassign ExecPlan from Job 
-        my $Success = $Kernel::OM->Get('Kernel::System::Automation')->JobExecPlanDelete(
+        my $Success = $Kernel::OM->Get('Automation')->JobExecPlanDelete(
             JobID      => $Param{Data}->{JobID},
             ExecPlanID => $ExecPlanID,
             UserID     => $Self->{Authorization}->{UserID},

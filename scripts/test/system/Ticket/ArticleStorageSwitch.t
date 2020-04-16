@@ -23,27 +23,27 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
     $Kernel::OM->ObjectsDiscard();
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $MainObject   = $Kernel::OM->Get('Main');
 
     # get helper object
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::UnitTest::Helper' => {
+        'UnitTest::Helper' => {
             RestoreDatabase  => 1,
             UseTmpArticleDir => 1,
         },
     );
-    my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+    my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
     $ConfigObject->Set(
         Key   => 'Ticket::StorageModule',
-        Value => 'Kernel::System::Ticket::' . $SourceBackend,
+        Value => 'Ticket::' . $SourceBackend,
     );
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     $Self->True(
-        $TicketObject->isa( 'Kernel::System::Ticket::' . $SourceBackend ),
+        $TicketObject->isa( 'Ticket::' . $SourceBackend ),
         "TicketObject loaded the correct backend",
     );
 

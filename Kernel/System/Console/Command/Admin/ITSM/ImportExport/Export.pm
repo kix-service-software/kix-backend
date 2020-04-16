@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::ImportExport',
+    'Main',
+    'ImportExport',
 );
 
 sub Configure {
@@ -47,7 +47,7 @@ sub Run {
     my $TemplateID = $Self->GetOption('template-number');
 
     # get template data
-    my $TemplateData = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateGet(
+    my $TemplateData = $Kernel::OM->Get('ImportExport')->TemplateGet(
         TemplateID => $TemplateID,
         UserID     => 1,
     );
@@ -62,7 +62,7 @@ sub Run {
     $Self->Print( "<yellow>" . ( '=' x 69 ) . "</yellow>\n" );
 
     # export data
-    my $Result = $Kernel::OM->Get('Kernel::System::ImportExport')->Export(
+    my $Result = $Kernel::OM->Get('ImportExport')->Export(
         TemplateID => $TemplateID,
         UserID     => 1,
     );
@@ -88,7 +88,7 @@ sub Run {
         my $FileContent = join "\n", @{ $Result->{DestinationContent} };
 
         # save destination content to file
-        my $Success = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+        my $Success = $Kernel::OM->Get('Main')->FileWrite(
             Location => $DestinationFile,
             Content  => \$FileContent,
         );

@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Cache',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -58,7 +58,7 @@ sub VoteAdd {
     # check needed stuff
     for my $Argument (qw(CreatedBy ItemID IP Interface UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -67,7 +67,7 @@ sub VoteAdd {
         }
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Do(
         SQL => '
@@ -97,12 +97,12 @@ sub VoteAdd {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Vote',
         ObjectID  => $Param{ItemID},
@@ -132,7 +132,7 @@ sub VoteDelete {
     # check needed stuff
     for my $Argument (qw(VoteID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -146,7 +146,7 @@ sub VoteDelete {
         UserID => 1,
     );
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             DELETE FROM faq_voting
             WHERE id = ?',
@@ -154,12 +154,12 @@ sub VoteDelete {
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Vote',
         ObjectID  => $Vote{ItemID}.'::'.$Param{VoteID},
@@ -197,7 +197,7 @@ sub VoteGet {
     # check needed stuff
     for my $Argument (qw(VoteID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -207,7 +207,7 @@ sub VoteGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL   => 'SELECT id, created_by, item_id, interface, ip, created, rate
@@ -258,7 +258,7 @@ sub VoteSearch {
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -268,7 +268,7 @@ sub VoteSearch {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => '
@@ -311,7 +311,7 @@ sub ItemVoteDataGet {
     # check needed stuff
     for my $Argument (qw(ItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -321,7 +321,7 @@ sub ItemVoteDataGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = 'ItemVoteDataGet::' . $Param{ItemID};
@@ -333,7 +333,7 @@ sub ItemVoteDataGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get vote from db
     return if !$DBObject->Prepare(

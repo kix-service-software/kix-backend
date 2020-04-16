@@ -17,7 +17,7 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # to enable debugging (normally is not needed)
 # $ConfigObject->Set(
@@ -33,10 +33,10 @@ my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
 #     Value => {},
 # );
 
-my $TransitionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Transition');
+my $TransitionObject = $Kernel::OM->Get('ProcessManagement::Transition');
 
 # define needed variables
-my $RandomID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->GetRandomID();
+my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
 # ------------------------------------------------------------ #
 # define general tests
@@ -1117,7 +1117,7 @@ my @Tests = (
                                 Queue => {
                                     Type => 'Module',
                                     Match =>
-                                        'Kernel::System::ProcessManagement::TransitionValidation::ValidateDemo',
+                                        'ProcessManagement::TransitionValidation::ValidateDemo',
                                 },
                             },
                         },
@@ -1161,7 +1161,7 @@ my @Tests = (
                                 Queue => {
                                     Type => 'Module',
                                     Match =>
-                                        'Kernel::System::ProcessManagement::TransitionValidation::ValidateDemo',
+                                        'ProcessManagement::TransitionValidation::ValidateDemo',
                                 },
                             },
                         },
@@ -1205,7 +1205,7 @@ my @Tests = (
                                 Queue => {
                                     Type => 'Module',
                                     Match =>
-                                        'Kernel::System::ProcessManagement::TransitionValidation::UnkownModule',
+                                        'ProcessManagement::TransitionValidation::UnkownModule',
                                 },
                             },
                         },

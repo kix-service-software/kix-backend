@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'DB',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -37,7 +37,7 @@ create a LinkGraph object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LinkGraphObject = $Kernel::OM->Get('Kernel::System::LinkGraphField');
+    my $LinkGraphObject = $Kernel::OM->Get('LinkGraphField');
 
 =cut
 
@@ -49,9 +49,9 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{DBObject}   = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{LogObject}  = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TimeObject} = $Kernel::OM->Get('Kernel::System::Time');
+    $Self->{DBObject}   = $Kernel::OM->Get('DB');
+    $Self->{LogObject}  = $Kernel::OM->Get('Log');
+    $Self->{TimeObject} = $Kernel::OM->Get('Time');
     return $Self;
 }
 

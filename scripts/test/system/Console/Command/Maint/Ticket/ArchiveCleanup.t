@@ -16,20 +16,20 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Ticket::ArchiveCleanup');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::ArchiveCleanup');
 
 my $ExitCode = $CommandObject->Execute();
 
 # just check exit code
 $Self->Is(
     $ExitCode,
-    $Kernel::OM->Get('Kernel::Config')->Get('Ticket::ArchiveSystem') ? 0 : 1,
+    $Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ? 0 : 1,
     "Maint::Ticket::ArchiveCleanup exit code",
 );
 

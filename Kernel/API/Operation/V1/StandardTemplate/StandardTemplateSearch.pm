@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform StandardTemplate search
-    my %StandardTemplateList = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateList();
+    my %StandardTemplateList = $Kernel::OM->Get('StandardTemplate')->StandardTemplateList();
 
 	# get already prepared StandardTemplate data from StandardTemplateGet operation
     if ( IsHashRefWithData(\%StandardTemplateList) ) {  	

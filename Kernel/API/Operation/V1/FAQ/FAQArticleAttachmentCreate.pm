@@ -136,7 +136,7 @@ sub Run {
     );
 
     # create Attachment
-    my $AttachmentID = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentAdd(
+    my $AttachmentID = $Kernel::OM->Get('FAQ')->AttachmentAdd(
         ItemID      => $Param{Data}->{FAQArticleID},
         Content     => MIME::Base64::decode_base64($Attachment->{Content}),
         ContentType => $Attachment->{ContentType},

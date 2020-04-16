@@ -12,8 +12,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::Config',
+    'Log',
+    'Config',
 );
 
 sub new {
@@ -32,17 +32,17 @@ sub Run {
     #get required params...
     for (qw(Config Acl)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
     return 1 if !$Param{TicketID};
 
-    my $FwdQueueRef   = $Kernel::OM->Get('Kernel::Config')->Get('ExternalSupplierForwarding::ForwardQueues');
+    my $FwdQueueRef   = $Kernel::OM->Get('Config')->Get('ExternalSupplierForwarding::ForwardQueues');
     my @FwdQueueNames = keys( %{$FwdQueueRef} );
 
-    my $FwdFaxQueueRef = $Kernel::OM->Get('Kernel::Config')->Get('ExternalSupplierForwarding::ForwardFaxQueues');
+    my $FwdFaxQueueRef = $Kernel::OM->Get('Config')->Get('ExternalSupplierForwarding::ForwardFaxQueues');
     my @FwdFaxQueueNames = keys( %{$FwdFaxQueueRef} );
 
     my @ExcludedQueues = ( @FwdQueueNames, @FwdFaxQueueNames );

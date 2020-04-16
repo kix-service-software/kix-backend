@@ -14,17 +14,17 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::CheckItem',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'CheckItem',
+    'DB',
+    'Log',
+    'Main',
+    'Time',
+    'Valid',
 
     # KIXCore-capeIT
-    'Kernel::System::KIXUtils',
+    'KIXUtils',
 
     # EO KIXCore-capeIT
 );
@@ -49,7 +49,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LinkObject = $Kernel::OM->Get('Kernel::System::LinkObject');
+    my $LinkObject = $Kernel::OM->Get('LinkObject');
 
 =cut
 
@@ -89,7 +89,7 @@ sub PossibleTypesList {
     # check needed stuff
     for my $Argument (qw(Object1 Object2)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -167,7 +167,7 @@ sub PossibleObjectsList {
     # check needed stuff
     for my $Argument (qw(Object)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -227,8 +227,8 @@ sub PossibleLinkList {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $ConfigObject    = $Kernel::OM->Get('Kernel::Config');
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $ConfigObject    = $Kernel::OM->Get('Config');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # get possible link list
     my $PossibleLinkListRef = $ConfigObject->Get('LinkObject::PossibleLink') || {};
@@ -256,7 +256,7 @@ sub PossibleLinkList {
             next ARGUMENT if $Value && $Value !~ m{ :: }xms && $Value !~ m{ \s }xms;
 
             # log the error
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "The $Argument '$Value' is invalid in SysConfig (LinkObject::PossibleLink)!",
@@ -273,7 +273,7 @@ sub PossibleLinkList {
     my $BackendLocation = $ConfigObject->Get('Home') . '/Kernel/System/LinkObject/';
 
     # KIXCore-capeIT
-    my @KIXPackages = $Kernel::OM->Get('Kernel::System::KIXUtils')
+    my @KIXPackages = $Kernel::OM->Get('KIXUtils')
         ->GetRegisteredCustomPackages( Result => 'ARRAY' );
     # EO KIXCore-capeIT
 
@@ -293,7 +293,7 @@ sub PossibleLinkList {
             my $Found = 0;
             for my $CurrPrefix (@KIXPackages) {
                 my $CheckBackendLocation =
-                    $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/"
+                    $Kernel::OM->Get('Config')->Get('Home') . "/"
                     . $CurrPrefix
                     . '/Kernel/System/LinkObject/';
                 if ( -e $CheckBackendLocation . $Object . '.pm' ) {
@@ -328,7 +328,7 @@ sub PossibleLinkList {
         next POSSIBLELINK if $TypeList{$Type};
 
         # log the error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The LinkType '$Type' is invalid in SysConfig (LinkObject::PossibleLink)!",
         );
@@ -361,7 +361,7 @@ sub LinkAdd {
     # check needed stuff
     for my $Argument (qw(SourceObject SourceKey TargetObject TargetKey Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -371,7 +371,7 @@ sub LinkAdd {
 
     # check if source and target are the same object
     if ( $Param{SourceObject} eq $Param{TargetObject} && $Param{SourceKey} eq $Param{TargetKey} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Impossible to link object with itself!',
         );
@@ -389,7 +389,7 @@ sub LinkAdd {
 
         next OBJECT if $Param{ $Object . 'ID' };
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid $Object is given!",
         );
@@ -405,7 +405,7 @@ sub LinkAdd {
 
     # check if wanted link type is possible
     if ( !$PossibleTypesList{ $Param{Type} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Not possible to create a '$Param{Type}' link between $Param{SourceObject} and $Param{TargetObject}!",
@@ -420,7 +420,7 @@ sub LinkAdd {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if link already exists in database
     return if !$DBObject->Prepare(
@@ -465,7 +465,7 @@ sub LinkAdd {
             && $Existing{SourceKey} eq $Param{SourceKey};
 
         # log error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Link already exists between these two objects in opposite direction!',
         );
@@ -504,7 +504,7 @@ sub LinkAdd {
             next TYPE if $TypeGroupCheck;
 
             # existing link type is in a type group with the new link
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Another Link already exists within the same type group!',
             );
@@ -514,12 +514,12 @@ sub LinkAdd {
     }
 
     # get backend of source object
-    my $BackendSourceObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Param{SourceObject} );
+    my $BackendSourceObject = $Kernel::OM->Get( 'LinkObject::' . $Param{SourceObject} );
 
     return if !$BackendSourceObject;
 
     # get backend of target object
-    my $BackendTargetObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Param{TargetObject} );
+    my $BackendTargetObject = $Kernel::OM->Get( 'LinkObject::' . $Param{TargetObject} );
 
     return if !$BackendTargetObject;
 
@@ -575,7 +575,7 @@ sub LinkAdd {
     }
 
     # invalidate cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -598,7 +598,7 @@ sub LinkAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Link',
         ObjectID  => $LinkID,
@@ -625,7 +625,7 @@ sub LinkCleanup {
     # check needed stuff
     for my $Argument (qw(Age)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -634,7 +634,7 @@ sub LinkCleanup {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get current time
     my $Now = $TimeObject->SystemTime();
@@ -645,7 +645,7 @@ sub LinkCleanup {
     );
 
     # delete the link
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             DELETE FROM link_relation
             WHERE create_time < ?',
@@ -655,7 +655,7 @@ sub LinkCleanup {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Link',
     );
@@ -686,7 +686,7 @@ sub LinkDelete {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -695,7 +695,7 @@ sub LinkDelete {
     if ( !$Param{LinkID} ) {
         for my $Argument (qw(Object1 Key1 Object2 Key2 Type)) {
             if ( !$Param{$Argument} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $Argument!",
                 );
@@ -711,7 +711,7 @@ sub LinkDelete {
         );
 
         if ( !%Link ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No link with ID $Param{LinkID} found!",
             );
@@ -735,7 +735,7 @@ sub LinkDelete {
 
         next OBJECT if $Param{ $Object . 'ID' };
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid $Object is given!",
         );
@@ -750,7 +750,7 @@ sub LinkDelete {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get the existing link
     return if !$DBObject->Prepare(
@@ -798,7 +798,7 @@ sub LinkDelete {
 
         next OBJECT if $Existing{$Object};
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid $Object is given!",
         );
@@ -807,12 +807,12 @@ sub LinkDelete {
     }
 
     # get backend of source object
-    my $BackendSourceObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Existing{SourceObject} );
+    my $BackendSourceObject = $Kernel::OM->Get( 'LinkObject::' . $Existing{SourceObject} );
 
     return if !$BackendSourceObject;
 
     # get backend of target object
-    my $BackendTargetObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Existing{TargetObject} );
+    my $BackendTargetObject = $Kernel::OM->Get( 'LinkObject::' . $Existing{TargetObject} );
 
     return if !$BackendTargetObject;
 
@@ -874,12 +874,12 @@ sub LinkDelete {
     );
 
     # invalidate cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Link',
         ObjectID  => $Param{LinkID} || $Existing{ID},
@@ -906,7 +906,7 @@ sub LinkDeleteAll {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1008,7 +1008,7 @@ sub LinkList {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1041,7 +1041,7 @@ sub LinkList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get links where the given object is the source
     return if !$DBObject->Prepare(
@@ -1238,7 +1238,7 @@ sub LinkListWithData {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1259,7 +1259,7 @@ sub LinkListWithData {
 
         # check if backend object can be loaded
         if (
-            !$Kernel::OM->Get('Kernel::System::Main')->Require( 'Kernel::System::LinkObject::' . $Object )
+            !$Kernel::OM->Get('Main')->Require( 'LinkObject::' . $Object )
             )
         {
             delete $LinkList->{$Object};
@@ -1267,7 +1267,7 @@ sub LinkListWithData {
         }
 
         # get backend object
-        my $BackendObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Object );
+        my $BackendObject = $Kernel::OM->Get( 'LinkObject::' . $Object );
 
         # check backend object
         if ( !$BackendObject ) {
@@ -1356,7 +1356,7 @@ sub LinkSearch {
     # check needed stuff
     for my $Argument (qw(UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1373,7 +1373,7 @@ sub LinkSearch {
                  .($Param{TargetKey}||'').'::'
                  .($Param{Type}||'').'::'
                  .($Param{Limit}||'');
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -1420,7 +1420,7 @@ sub LinkSearch {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = 'SELECT id FROM link_relation';
     if ( @SQLWhere ) {
@@ -1441,7 +1441,7 @@ sub LinkSearch {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1473,7 +1473,7 @@ sub LinkGet {
     # check needed stuff
     for my $Argument (qw(LinkID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1483,14 +1483,14 @@ sub LinkGet {
 
     # check cache
     my $CacheKey = 'LinkGet::'.$Param{LinkID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get links where the given object is the source
     return if !$DBObject->Prepare(
@@ -1531,7 +1531,7 @@ sub LinkGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1571,7 +1571,7 @@ sub LinkKeyList {
     # check needed stuff
     for my $Argument (qw(Object1 Key1 Object2 UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1643,7 +1643,7 @@ sub LinkKeyListWithData {
     # check needed stuff
     for my $Argument (qw(Object1 Key1 Object2 UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -1706,7 +1706,7 @@ sub ObjectLookup {
 
     # check needed stuff
     if ( !$Param{ObjectID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ObjectID or Name!',
         );
@@ -1717,14 +1717,14 @@ sub ObjectLookup {
 
         # check cache
         my $CacheKey = 'ObjectLookup::ObjectID::' . $Param{ObjectID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
         return $Cache if $Cache;
 
         # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('DB');
 
         # ask the database
         return if !$DBObject->Prepare(
@@ -1744,7 +1744,7 @@ sub ObjectLookup {
 
         # check the name
         if ( !$Name ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Link object id '$Param{ObjectID}' not found in the database!",
             );
@@ -1752,7 +1752,7 @@ sub ObjectLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -1765,15 +1765,15 @@ sub ObjectLookup {
 
         # check cache
         my $CacheKey = 'ObjectLookup::Name::' . $Param{Name};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
         return $Cache if $Cache;
 
         # get needed object
-        my $DBObject        = $Kernel::OM->Get('Kernel::System::DB');
-        my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+        my $DBObject        = $Kernel::OM->Get('DB');
+        my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
         # investigate the object id
         my $ObjectID;
@@ -1804,7 +1804,7 @@ sub ObjectLookup {
 
             # check if name is valid
             if ( !$Param{Name} || $Param{Name} =~ m{ :: }xms || $Param{Name} =~ m{ \s }xms ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Invalid object name '$Param{Name}' is given!",
                 );
@@ -1821,7 +1821,7 @@ sub ObjectLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -1855,7 +1855,7 @@ sub TypeLookup {
 
     # check needed stuff
     if ( !$Param{TypeID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TypeID or Name!',
         );
@@ -1864,7 +1864,7 @@ sub TypeLookup {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!'
         );
@@ -1875,14 +1875,14 @@ sub TypeLookup {
 
         # check cache
         my $CacheKey = 'TypeLookup::TypeID::' . $Param{TypeID};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
         return $Cache if $Cache;
 
         # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('DB');
 
         # ask the database
         return if !$DBObject->Prepare(
@@ -1899,7 +1899,7 @@ sub TypeLookup {
 
         # check the name
         if ( !$Name ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Link type id '$Param{TypeID}' not found in the database!",
             );
@@ -1907,7 +1907,7 @@ sub TypeLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -1919,7 +1919,7 @@ sub TypeLookup {
     else {
 
         # get check item object
-        my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+        my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
         # cleanup the given name
         $CheckItemObject->StringClean(
@@ -1928,14 +1928,14 @@ sub TypeLookup {
 
         # check cache
         my $CacheKey = 'TypeLookup::Name::' . $Param{Name};
-        my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
         return $Cache if $Cache;
 
         # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('DB');
 
         # investigate the type id
         my $TypeID;
@@ -1958,7 +1958,7 @@ sub TypeLookup {
 
             # check if name is valid
             if ( !$Param{Name} || $Param{Name} =~ m{ :: }xms || $Param{Name} =~ m{ \s }xms ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Invalid type name '$Param{Name}' is given!",
                 );
@@ -1977,7 +1977,7 @@ sub TypeLookup {
 
         # check the type id
         if ( !$TypeID ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Link type '$Param{Name}' not found in the database!",
             );
@@ -1985,7 +1985,7 @@ sub TypeLookup {
         }
 
         # set cache
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -2023,7 +2023,7 @@ sub TypeGet {
     # check needed stuff
     for my $Argument (qw(TypeID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2033,14 +2033,14 @@ sub TypeGet {
 
     # check cache
     my $CacheKey = 'TypeGet::TypeID::' . $Param{TypeID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return if !$DBObject->Prepare(
@@ -2064,11 +2064,11 @@ sub TypeGet {
     }
 
     # get config of all types
-    my $ConfiguredTypes = $Kernel::OM->Get('Kernel::Config')->Get('LinkObject::Type');
+    my $ConfiguredTypes = $Kernel::OM->Get('Config')->Get('LinkObject::Type');
 
     # check the config
     if ( !$ConfiguredTypes->{ $Type{Name} } ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Linktype '$Type{Name}' does not exist!",
         );
@@ -2080,7 +2080,7 @@ sub TypeGet {
     $Type{TargetName} = $ConfiguredTypes->{ $Type{Name} }->{TargetName} || '';
 
     # get check item object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # clean the names
     ARGUMENT:
@@ -2093,7 +2093,7 @@ sub TypeGet {
 
         next ARGUMENT if $Type{$Argument};
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "The $Argument '$Type{$Argument}' is invalid in SysConfig (LinkObject::Type)!",
@@ -2105,7 +2105,7 @@ sub TypeGet {
     $Type{Pointed} = $Type{SourceName} ne $Type{TargetName} ? 1 : 0;
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -2139,11 +2139,11 @@ sub TypeList {
     my ( $Self, %Param ) = @_;
 
     # get type list
-    my $TypeListRef = $Kernel::OM->Get('Kernel::Config')->Get('LinkObject::Type') || {};
+    my $TypeListRef = $Kernel::OM->Get('Config')->Get('LinkObject::Type') || {};
     my %TypeList = %{$TypeListRef};
 
     # get check item object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # prepare the type list
     TYPE:
@@ -2203,11 +2203,11 @@ sub TypeGroupList {
     my ( $Self, %Param ) = @_;
 
     # get possible type groups
-    my $TypeGroupListRef = $Kernel::OM->Get('Kernel::Config')->Get('LinkObject::TypeGroup') || {};
+    my $TypeGroupListRef = $Kernel::OM->Get('Config')->Get('LinkObject::TypeGroup') || {};
     my %TypeGroupList = %{$TypeGroupListRef};
 
     # get check item object
-    my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
+    my $CheckItemObject = $Kernel::OM->Get('CheckItem');
 
     # prepare the possible link list
     TYPEGROUP:
@@ -2228,7 +2228,7 @@ sub TypeGroupList {
             next TYPE if $Type && $Type !~ m{ :: }xms && $Type !~ m{ \s }xms;
 
             # log the error
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "The Argument '$Type' is invalid in SysConfig (LinkObject::TypeGroup)!",
@@ -2258,7 +2258,7 @@ sub TypeGroupList {
             next TYPE if $TypeList{$Type};
 
             # log the error
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "The LinkType '$Type' is invalid in SysConfig (LinkObject::TypeGroup)!",
@@ -2291,7 +2291,7 @@ sub PossibleType {
     # check needed stuff
     for my $Argument (qw(Type1 Type2)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2333,7 +2333,7 @@ sub ObjectPermission {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2342,7 +2342,7 @@ sub ObjectPermission {
     }
 
     # get backend object
-    my $BackendObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Param{Object} );
+    my $BackendObject = $Kernel::OM->Get( 'LinkObject::' . $Param{Object} );
 
     return   if !$BackendObject;
     return 1 if !$BackendObject->can('ObjectPermission');
@@ -2376,7 +2376,7 @@ sub ObjectDescriptionGet {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2385,7 +2385,7 @@ sub ObjectDescriptionGet {
     }
 
     # get backend object
-    my $BackendObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Param{Object} );
+    my $BackendObject = $Kernel::OM->Get( 'LinkObject::' . $Param{Object} );
 
     return if !$BackendObject;
 
@@ -2429,7 +2429,7 @@ sub ObjectSearch {
     # check needed stuff
     for my $Argument (qw(Object UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -2438,7 +2438,7 @@ sub ObjectSearch {
     }
 
     # get backend object
-    my $BackendObject = $Kernel::OM->Get( 'Kernel::System::LinkObject::' . $Param{Object} );
+    my $BackendObject = $Kernel::OM->Get( 'LinkObject::' . $Param{Object} );
 
     return if !$BackendObject;
 

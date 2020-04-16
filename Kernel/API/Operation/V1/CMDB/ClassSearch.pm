@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get IDs of CI classes from General Catalog
-    my $ItemList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class   => 'ITSM::ConfigItem::Class',
         Valid   => 0
     );

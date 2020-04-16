@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
+    'Log',
+    'Ticket',
+    'User',
 );
 
 =head1 NAME
@@ -157,7 +157,7 @@ sub Run {
 
     # if "From" is not set use current user
     if ( !$Param{Config}->{From} ) {
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $Param{UserID},
         );
         if (IsHashRefWithData(\%Contact)) {
@@ -174,10 +174,10 @@ sub Run {
     $Param{Config}->{HistoryComment} = $Param{Config}->{HistoryComment} || 'Added during job execution.';
 
     if ( $Param{Config}->{Channel} ) {
-        my $ChannelID = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $Param{Config}->{Channel} );
+        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup( Name => $Param{Config}->{Channel} );
 
         if ( !$ChannelID ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find channel with name \"$Param{Config}->{Channel}\"!",
                 UserID   => $Param{UserID}
@@ -187,10 +187,10 @@ sub Run {
     }
 
     if ( $Param{Config}->{SenderType} ) {
-        my $SenderTypeID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup( SenderType => $Param{Config}->{SenderType} );
+        my $SenderTypeID = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup( SenderType => $Param{Config}->{SenderType} );
 
         if ( !$SenderTypeID ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find sender type with name \"$Param{Config}->{SenderType}\"!",
                 UserID   => $Param{UserID}
@@ -198,14 +198,14 @@ sub Run {
             return;
         }
     }
-    $Param{Config}->{Body} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    $Param{Config}->{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 1,
         Text     => $Param{Config}->{Body},
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
     );
-    $Param{Config}->{Subject} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    $Param{Config}->{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{Subject},
         TicketID => $Param{TicketID},
@@ -213,14 +213,14 @@ sub Run {
         UserID   => $Param{UserID},
     );
 
-    my $ArticleID = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleCreate(
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         %{ $Param{Config} },
         TicketID => $Param{TicketID},
         UserID   => $Param{UserID},
     );
 
     if ( !$ArticleID ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - creating new article failed!",
             UserID   => $Param{UserID}
@@ -248,7 +248,7 @@ sub ValidateConfig {
     return if !$Self->SUPER::ValidateConfig(%Param);
 
     if ( $Param{Config}->{TimeUnits} && !IsNumber( $Param{Config}->{TimeUnits} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Validation of parameter \"TimeUnits\" failed."
         );

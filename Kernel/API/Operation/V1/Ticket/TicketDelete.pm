@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketDelete');
 
     return $Self;
 }
@@ -112,7 +112,7 @@ perform TicketDelete Operation. This will return the deleted TicketID. The ticke
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # unlock the ticket
     $TicketObject->TicketLockSet(

@@ -15,8 +15,8 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+my $ConfigObject  = $Kernel::OM->Get('Config');
+my $PackageObject = $Kernel::OM->Get('Package');
 
 # get KIX Version
 my $KIXVersion = $ConfigObject->Get('Version');
@@ -109,7 +109,7 @@ if ( !$DeveloperSystem ) {
 
     # the modifications has to be at DB level, otherwise a .save file will be generated for the
     # framework file, and we are trying to prevent it
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE package_repository
             SET content = ?
@@ -120,7 +120,7 @@ if ( !$DeveloperSystem ) {
     my $Content = 'Test 12345678';
 
     # now create an .save file for the framework file, content doesn't matter as it will be deleted
-    my $Write = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+    my $Write = $Kernel::OM->Get('Main')->FileWrite(
         Location   => $Home . '/bin/otrs.CheckSum.pl.save',
         Content    => \$Content,
         Mode       => 'binmode',
@@ -173,7 +173,7 @@ if ( !$DeveloperSystem ) {
 }
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

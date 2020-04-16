@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'DB',
+    'Log',
 );
 
 sub ArticleIndexBuild {
@@ -29,7 +29,7 @@ sub ArticleIndexDelete {
 
     for my $Needed (qw(ArticleID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -39,7 +39,7 @@ sub ArticleIndexDelete {
 
     # Make sure any stale entries from a previously used StaticDB are cleaned up,
     #   they might otherwise prevent the ticket from being deleted.
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM article_search WHERE id = ?',
         Bind => [ \$Param{ArticleID} ],
     );
@@ -59,7 +59,7 @@ sub ArticleIndexDeleteTicket {
 #     # check needed stuff
 #     for (qw(Data)) {
 #         if ( !$Param{$_} ) {
-#             $Kernel::OM->Get('Kernel::System::Log')->Log(
+#             $Kernel::OM->Get('Log')->Log(
 #                 Priority => 'error',
 #                 Message  => "Need $_!"
 #             );
@@ -91,7 +91,7 @@ sub ArticleIndexDeleteTicket {
 #     # check needed stuff
 #     for (qw(Data)) {
 #         if ( !$Param{$_} ) {
-#             $Kernel::OM->Get('Kernel::System::Log')->Log(
+#             $Kernel::OM->Get('Log')->Log(
 #                 Priority => 'error',
 #                 Message  => "Need $_!"
 #             );
@@ -108,7 +108,7 @@ sub ArticleIndexDeleteTicket {
 #     );
 
 #     # get database object
-#     my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+#     my $DBObject = $Kernel::OM->Get('DB');
 
 #     my $SQLExt      = '';
 #     my $FullTextSQL = '';

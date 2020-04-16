@@ -79,7 +79,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     # get system LanguageIDs
-    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
+    my $Languages = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');
     my @LanguageIDs = sort keys %{$Languages};
 
     return {
@@ -141,7 +141,7 @@ sub Run {
     );
 
     # check if TextModule exists
-    my $ExistingTextModuleIDs = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleList(
+    my $ExistingTextModuleIDs = $Kernel::OM->Get('TextModule')->TextModuleList(
         Name => $TextModule->{Name},
     );
 
@@ -153,7 +153,7 @@ sub Run {
     }
     
     # create TextModule
-    my $TextModuleID = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleAdd(
+    my $TextModuleID = $Kernel::OM->Get('TextModule')->TextModuleAdd(
         Name               => $TextModule->{Name},
         Text               => $TextModule->{Text} || '',
         Category           => $TextModule->{Category} || '',

@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get PID object
-my $PIDObject = $Kernel::OM->Get('Kernel::System::PID');
+my $PIDObject = $Kernel::OM->Get('PID');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set fixed time
 $Helper->FixedTimeSet();
@@ -111,7 +111,7 @@ $Self->True(
 
 # 2 manually modify the PID host
 my $RandomID = $Helper->GetRandomID();
-$UpdateSuccess = $Kernel::OM->Get('Kernel::System::DB')->Do(
+$UpdateSuccess = $Kernel::OM->Get('DB')->Do(
     SQL => '
         UPDATE process_id
         SET process_host = ?

@@ -13,16 +13,16 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 # skip SSL certificate verification
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         SkipSSLVerify => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -187,7 +187,7 @@ my $CreateQueryString = sub {
         }
     }
 
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$QueryString );
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$QueryString );
     return $QueryString;
 };
 
@@ -205,8 +205,8 @@ if ( $ConfigObject->Get('UnitTestPlackServerPort') ) {
 }
 
 # get objects
-my $WebserviceObject = $Kernel::OM->Get('Kernel::System::API::Webservice');
-my $ProviderObject   = $Kernel::OM->Get('Kernel::API::Provider');
+my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
+my $ProviderObject   = $Kernel::OM->Get('API::Provider');
 
 for my $Test (@Tests) {
 
@@ -284,7 +284,7 @@ for my $Test (@Tests) {
 
                 # reset CGI object from previous runs
                 CGI::initialize_globals();
-                $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Web::Request'] );
+                $Kernel::OM->ObjectsDiscard( Objects => ['WebRequest'] );
 
                 $ProviderObject->Run();
             }
@@ -423,7 +423,7 @@ for my $RequestMethod (qw(get post)) {
 }
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

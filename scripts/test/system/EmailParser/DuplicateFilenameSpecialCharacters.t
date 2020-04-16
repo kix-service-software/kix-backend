@@ -16,10 +16,10 @@ use vars (qw($Self));
 
 use Kernel::System::EmailParser;
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 # test for bug#1970
-my $FileContent = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+my $FileContent = $Kernel::OM->Get('Main')->FileRead(
     Location => "$Home/scripts/test/system/sample/EmailParser/DuplicateFilenameSpecialCharacters.box",
     Result   => 'ARRAY',
 );

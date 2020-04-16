@@ -15,23 +15,23 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set user options
 my $UserLogin = $Helper->TestUserCreate(
     Groups => ['admin'],
 ) || die "Did not get test user";
 
-my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $UserID = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $UserLogin,
 );
 

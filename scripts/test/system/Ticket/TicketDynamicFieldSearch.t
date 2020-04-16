@@ -15,23 +15,23 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
 $Self->Is(
     ref $BackendObject,
-    'Kernel::System::DynamicField::Backend',
+    'DynamicField::Backend',
     'Backend object was created successfully',
 );
 

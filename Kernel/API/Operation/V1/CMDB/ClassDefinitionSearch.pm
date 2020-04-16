@@ -116,7 +116,7 @@ sub Run {
     );
 
     # check if ClassID exists in GeneralCatalog
-    my $ItemData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+    my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID  => $Param{Data}->{ClassID},
     );
 
@@ -127,7 +127,7 @@ sub Run {
     }
 
     # get definitions for given class
-    my $DefinitionList = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionList(
+    my $DefinitionList = $Kernel::OM->Get('ITSMConfigItem')->DefinitionList(
         ClassID => $Param{Data}->{ClassID}
     );
 

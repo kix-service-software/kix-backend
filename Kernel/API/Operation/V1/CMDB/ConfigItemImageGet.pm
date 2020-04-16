@@ -130,7 +130,7 @@ sub Run {
     }
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
@@ -143,7 +143,7 @@ sub Run {
     my @ImageList;
     foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
 
-        my %Image = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ImageGet(
+        my %Image = $Kernel::OM->Get('ITSMConfigItem')->ImageGet(
             ConfigItemID => $Param{Data}->{ConfigItemID},
             ImageID      => $ImageID,
         );

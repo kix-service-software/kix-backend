@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $StatsObject  = $Kernel::OM->Get('Kernel::System::Stats');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $StatsObject  = $Kernel::OM->Get('Stats');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # try to get an invalid stat
 my $StatInvalid = $StatsObject->StatsGet( StatID => 1111 );
@@ -81,7 +81,7 @@ $Update = $StatsObject->StatsUpdate(
         Description  => 'some Description',
         Object       => 'Ticket',
         Format       => 'CSV',
-        ObjectModule => 'Kernel::System::Stats::Dynamic::Ticket',
+        ObjectModule => 'Stats::Dynamic::Ticket',
         Permission   => '1',
         StatType     => 'dynamic',
         SumCol       => '1',
@@ -174,7 +174,7 @@ $Self->Is(
 );
 
 my $ObjectBehaviours = $StatsObject->GetObjectBehaviours(
-    ObjectModule => 'Kernel::System::Stats::Dynamic::Ticket'
+    ObjectModule => 'Stats::Dynamic::Ticket'
 );
 
 $Self->IsDeeply(
@@ -186,7 +186,7 @@ $Self->IsDeeply(
 );
 
 $ObjectBehaviours = $StatsObject->GetObjectBehaviours(
-    ObjectModule => 'Kernel::System::Stats::Dynamic::Ticket'
+    ObjectModule => 'Stats::Dynamic::Ticket'
 );
 
 $Self->IsDeeply(
@@ -456,7 +456,7 @@ my ( $Result, $ExitCode );
 {
     local *STDOUT;
     open STDOUT, '>:utf8', \$Result;    ## no critic
-    my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Stats::Generate');
+    my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Stats::Generate');
     $ExitCode = $CommandObject->Execute( '--number', $Stat4->{StatNumber}, '--target-directory', "$Home/var/tmp/" );
 }
 

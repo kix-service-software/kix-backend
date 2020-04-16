@@ -62,7 +62,7 @@ sub _CheckSearchProfile {
 
     my $SearchProfile = $Param{SearchProfile};
 
-    my $SearchProfileObject = $Kernel::OM->Get('Kernel::System::SearchProfile');
+    my $SearchProfileObject = $Kernel::OM->Get('SearchProfile');
 
     if ( $SearchProfile->{SubscribedProfileID} && IsArrayRefWithData($SearchProfile->{Categories}) ) {
         return $Self->_Error(
@@ -80,7 +80,7 @@ sub _CheckSearchProfile {
 
     if ( $SearchProfile->{SubscribedProfileID} ) {
         # check if the the profille can be subscribed to the given ID
-        my @SubscribableProfileIDs = $Kernel::OM->Get('Kernel::System::SearchProfile')->SearchProfileList(
+        my @SubscribableProfileIDs = $Kernel::OM->Get('SearchProfile')->SearchProfileList(
             OnlySubscribable => 1,
         );
         my %SubscribableProfiles = map { $_ => 1 } @SubscribableProfileIDs;
