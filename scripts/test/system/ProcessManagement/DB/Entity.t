@@ -17,15 +17,15 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get entity object
-my $EntityObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity');
+my $EntityObject = $Kernel::OM->Get('ProcessManagement::DB::Entity');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define needed variable
 my $UserID = 1;
@@ -116,7 +116,7 @@ for my $Test (@Tests) {
         );
 
         my $EntityPrefix
-            = $Kernel::OM->Get('Kernel::Config')->Get('Process::Entity::Prefix')->{ $Test->{Config}->{EntityType} };
+            = $Kernel::OM->Get('Config')->Get('Process::Entity::Prefix')->{ $Test->{Config}->{EntityType} };
 
         my $Match;
         if ( $EntityID =~ m{\A $Test->{Config}->{EntityType} - [0-9a-f]{32}? \z}smx ) {

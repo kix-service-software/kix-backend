@@ -19,10 +19,10 @@ use Kernel::Language qw(Translatable);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::AuthSession',
-    'Kernel::System::SystemData',
-    'Kernel::System::Time',
+    'Config',
+    'AuthSession',
+    'SystemData',
+    'Time',
 );
 
 sub GetDisplayPath {
@@ -89,10 +89,10 @@ sub RunAsynchronous {
     my $Self = shift;
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get system time
-    my $SystemTimeNow = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $SystemTimeNow = $Kernel::OM->Get('Time')->SystemTime();
 
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
         SystemTime => $SystemTimeNow + 3600,
@@ -154,7 +154,7 @@ sub RunAsynchronous {
     }
 
     # get AuthSession object
-    my $AuthSessionObject = $Kernel::OM->Get('Kernel::System::AuthSession');
+    my $AuthSessionObject = $Kernel::OM->Get('AuthSession');
 
     # delete the old session ids
     my @Expired = $AuthSessionObject->GetExpiredSessionIDs();
@@ -165,7 +165,7 @@ sub RunAsynchronous {
     }
 
     # get the session active time
-    my $SessionActiveTime = $Kernel::OM->Get('Kernel::Config')->Get('SessionActiveTime') || 60 * 10;
+    my $SessionActiveTime = $Kernel::OM->Get('Config')->Get('SessionActiveTime') || 60 * 10;
 
     # get all sessions
     my @Sessions = $AuthSessionObject->GetAllSessionIDs();

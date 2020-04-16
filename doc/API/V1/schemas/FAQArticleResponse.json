@@ -1,0 +1,317 @@
+{
+   "$id" : "#FAQArticleResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for execution FAQ article GET request.",
+   "type" : "object",
+   "properties" : {
+      "FAQArticle" : {
+         "$ref" : "#/definitions/FAQArticle_json-9b318568c2"
+      }
+   },
+   "required" : [
+      "FAQArticle"
+   ],
+   "definitions" : {
+      "FAQArticle_json-9b318568c2" : {
+         "$id" : "#FAQArticle",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ article object.",
+         "type" : "object",
+         "properties" : {
+            "Approved" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Attachments" : {
+               "description" : "added via include \"Attachments\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+               },
+               "readOnly" : true
+            },
+            "CategoryID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Changed" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CustomerVisible" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Field1" : {
+               "description" : "symptom",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field2" : {
+               "description" : "problem",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field3" : {
+               "description" : "solution",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field4" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field5" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field6" : {
+               "description" : "comment",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "History" : {
+               "description" : "added via include \"History\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+               },
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Keywords" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Number" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Title" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Votes" : {
+               "description" : "added via include \"Votes\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Approved",
+            "CategoryID",
+            "Changed",
+            "ChangedBy",
+            "ContentType",
+            "Created",
+            "CreatedBy",
+            "CustomerVisible",
+            "Field1",
+            "Field2",
+            "Field3",
+            "Field4",
+            "Field5",
+            "Field6",
+            "ID",
+            "Keywords",
+            "Language",
+            "Name",
+            "Number",
+            "Title",
+            "ValidID"
+         ]
+      },
+      "FAQAttachment_json-ec8b67bcc9" : {
+         "$id" : "#FAQAttachment",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ attachment object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Changed" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Content" : {
+               "description" : "added via include \"Content\"",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Disposition" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Changed",
+            "ChangedBy",
+            "ContentType",
+            "Created",
+            "CreatedBy",
+            "Filename",
+            "Filesize",
+            "FilesizeRaw",
+            "ID"
+         ]
+      },
+      "FAQHistory_json-b505629552" : {
+         "$id" : "#FAQHistory",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ history object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Created",
+            "CreatedBy",
+            "ID",
+            "Name"
+         ]
+      },
+      "FAQVote_json-a6c5d69008" : {
+         "$id" : "#FAQVote",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ vote object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IPAddress" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Interface" : {
+               "description" : "if rating is from \"agent\" or \"customer\" interface",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Rating" : {
+               "description" : "an integer from 1 to 5",
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Created",
+            "CreatedBy",
+            "ID",
+            "IPAddress",
+            "Interface",
+            "Rating"
+         ]
+      }
+   }
+}

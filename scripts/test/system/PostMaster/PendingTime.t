@@ -17,17 +17,17 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-my $TimeObject   = $Kernel::OM->Get('Kernel::System::Time');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $TicketObject = $Kernel::OM->Get('Ticket');
+my $TimeObject   = $Kernel::OM->Get('Time');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 $Helper->FixedTimeSet();
 
@@ -272,7 +272,7 @@ for my $Test (@Tests) {
         Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
         Value => {
             %{$Test},
-            Module => 'Kernel::System::PostMaster::Filter::Match',
+            Module => 'PostMaster::Filter::Match',
         },
     );
 

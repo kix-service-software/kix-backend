@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQCategory::FAQArticleAttachmentGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQCategory::FAQArticleAttachmentGet');
 
     return $Self;
 }
@@ -125,7 +125,7 @@ sub Run {
     foreach my $AttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
         # get the FAQCategory data
-        my %Attachment = $Kernel::OM->Get('Kernel::System::FAQ')->AttachmentGet(
+        my %Attachment = $Kernel::OM->Get('FAQ')->AttachmentGet(
             FileID => $AttachmentID,
             ItemID => $Param{Data}->{FAQArticleID},
             UserID => $Self->{Authorization}->{UserID},
@@ -138,7 +138,7 @@ sub Run {
         }
 
         # add ID to result
-        $Attachment{ID} = $AttachmentID;
+        $Attachment{ID} = 0 + $AttachmentID;
 
         if ( !$Param{Data}->{include}->{Content} ) {
             delete $Attachment{Content};
@@ -148,7 +148,7 @@ sub Run {
         }
 
         # rename ItemID to ArticleID
-        $Attachment{ArticleID} = $Attachment{ItemID};
+        $Attachment{ArticleID} = 0 + $Attachment{ItemID};
         delete $Attachment{ItemID};
 
         # rename Filesize to FilesizeRaw

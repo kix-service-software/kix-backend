@@ -13,10 +13,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Organisation',
-    'Kernel::System::ImportExport',
-    'Kernel::System::Log',
+    'Config',
+    'Organisation',
+    'ImportExport',
+    'Log',
 );
 
 =head1 NAME
@@ -89,12 +89,12 @@ sub ObjectAttributesGet {
 
     # check needed object
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => 'Need UserID!' );
         return;
     }
 
-    my %Validlist = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my %Validlist = $Kernel::OM->Get('Valid')->ValidList();
 
     my $Attributes = [
         {
@@ -153,7 +153,7 @@ sub MappingObjectAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -162,13 +162,13 @@ sub MappingObjectAttributesGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     my @ElementList = qw{};
-    my @Map = @{ $Kernel::OM->Get('Kernel::Config')->{ $ObjectData->{OrganisationBackend} }->{'Map'} };
+    my @Map = @{ $Kernel::OM->Get('Config')->{ $ObjectData->{OrganisationBackend} }->{'Map'} };
 
     for my $CurrAttributeMapping (@Map) {
         my $CurrAttribute = {
@@ -234,7 +234,7 @@ sub SearchAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -243,7 +243,7 @@ sub SearchAttributesGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -268,7 +268,7 @@ sub ExportDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -277,14 +277,14 @@ sub ExportDataGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -292,7 +292,7 @@ sub ExportDataGet {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -300,7 +300,7 @@ sub ExportDataGet {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -313,7 +313,7 @@ sub ExportDataGet {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -321,7 +321,7 @@ sub ExportDataGet {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for the template id $Param{TemplateID}",
             );
@@ -332,14 +332,14 @@ sub ExportDataGet {
     }
 
     # list organisations...
-    my %OrganisationSearch = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationSearch(
+    my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
         Valid => 0,
     );
     my @ExportData;
 
     for my $OrgID (keys %OrganisationSearch) {
 
-        my %OrganisationData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        my %OrganisationData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $OrgID
         );
 
@@ -347,7 +347,7 @@ sub ExportDataGet {
 
         # prepare validity...
         if ( $OrganisationData{ValidID} ) {
-            $OrganisationData{Valid} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+            $OrganisationData{Valid} = $Kernel::OM->Get('Valid')->ValidLookup(
                 ValidID => $OrganisationData{ValidID},
             );
         }
@@ -385,7 +385,7 @@ sub ImportDataSave {
     # check needed stuff
     for my $Argument (qw(TemplateID ImportDataRow UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -395,7 +395,7 @@ sub ImportDataSave {
 
     # check import data row
     if ( ref $Param{ImportDataRow} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'ImportDataRow must be an array reference',
         );
@@ -403,14 +403,14 @@ sub ImportDataSave {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -418,7 +418,7 @@ sub ImportDataSave {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -426,7 +426,7 @@ sub ImportDataSave {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -446,7 +446,7 @@ sub ImportDataSave {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -454,7 +454,7 @@ sub ImportDataSave {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for template id $Param{TemplateID}",
             );
@@ -495,14 +495,14 @@ sub ImportDataSave {
         else {
             # Sanitize country if it isn't found in KIX to increase the chance it will
             # Note that standardizing against the ISO 3166-1 list might be a better approach...
-            my $CountryList = $Kernel::OM->Get('Kernel::System::ReferenceData')->CountryList();
+            my $CountryList = $Kernel::OM->Get('ReferenceData')->CountryList();
             if ( exists $CountryList->{ $Param{ImportDataRow}->[$Counter] } ) {
                 $NewOrganisationData{ $MappingObjectData->{Key} } = $Param{ImportDataRow}->[$Counter];
             }
             else {
                 $NewOrganisationData{ $MappingObjectData->{Key} } =
                     join( '', map { ucfirst lc } split /(\s+)/, $Param{ImportDataRow}->[$Counter] );
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => "Country '$Param{ImportDataRow}->[$Counter]' "
                         . "not found - save as '$NewOrganisationData{ $MappingObjectData->{Key} }'.",
@@ -528,7 +528,7 @@ sub ImportDataSave {
     my %OrganisationData = ();
 
     my $OrganisationKey;
-    my $OrganisationBackend = $Kernel::OM->Get('Kernel::Config')->Get($ObjectData->{OrganisationBackend});
+    my $OrganisationBackend = $Kernel::OM->Get('Config')->Get($ObjectData->{OrganisationBackend});
     if ( $OrganisationBackend && $OrganisationBackend->{OrganisationKey} && $OrganisationBackend->{Map} ) {
         for my $Entry ( @{ $OrganisationBackend->{Map} } ) {
             next if ( $Entry->{Label} ne $OrganisationBackend->{OrganisationKey} );
@@ -542,7 +542,7 @@ sub ImportDataSave {
     }
 
     if ( $NewOrganisationData{$OrganisationKey} ) {
-        %OrganisationData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+        %OrganisationData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $NewOrganisationData{$OrganisationKey}
         );
     }
@@ -556,7 +556,7 @@ sub ImportDataSave {
 
     # lookup Valid-ID...
     if ( !$NewOrganisationData{ValidID} && $NewOrganisationData{Valid} ) {
-        $NewOrganisationData{ValidID} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        $NewOrganisationData{ValidID} = $Kernel::OM->Get('Valid')->ValidLookup(
             Valid => $NewOrganisationData{Valid}
         );
     }
@@ -582,13 +582,13 @@ sub ImportDataSave {
     my $ReturnCode = "";    # Created | Changed | Failed
 
     if ($NewOrg) {
-        $Result = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+        $Result = $Kernel::OM->Get('Organisation')->OrganisationAdd(
             %OrganisationData,
             UserID => $Param{UserID},
         );
 
         if ( !$Result ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ImportDataSave: adding Organisation ("
                     . "Organisation "
@@ -610,14 +610,14 @@ sub ImportDataSave {
             && $OrganisationData{Source} eq $ObjectData->{OrganisationBackend}
             )
         {
-            $Result = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationUpdate(
+            $Result = $Kernel::OM->Get('Organisation')->OrganisationUpdate(
                 %OrganisationData,
                 Source => $ObjectData->{OrganisationBackend},
                 UserID => $Param{UserID},
             );
 
             if ( !$Result ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "ImportDataSave: updating Organisation "
                         . $OrganisationData{ID}
@@ -645,10 +645,10 @@ sub ImportDataSave {
                 )
             {
                 $BackendRef{ $OrganisationData{Source} } =
-                    $Kernel::OM->Get('Kernel::System::Organisation')->{ $OrganisationData{Source} };
-                delete( $Kernel::OM->Get('Kernel::System::Organisation')->{ $OrganisationData{Source} } );
+                    $Kernel::OM->Get('Organisation')->{ $OrganisationData{Source} };
+                delete( $Kernel::OM->Get('Organisation')->{ $OrganisationData{Source} } );
 
-                %OrganisationData = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationGet(
+                %OrganisationData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                     ID => $NewOrganisationData{$OrganisationKey}
                 );
             }
@@ -665,7 +665,7 @@ sub ImportDataSave {
                 )
             {
                 $OrganisationData{ID} = $NewOrganisationData{$OrganisationKey};
-                $Result = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationUpdate(
+                $Result = $Kernel::OM->Get('Organisation')->OrganisationUpdate(
                     %OrganisationData,
                     UserID => $Param{UserID},
                 );
@@ -675,7 +675,7 @@ sub ImportDataSave {
 
             # create new entry...
             else {
-                $Result = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+                $Result = $Kernel::OM->Get('Organisation')->OrganisationAdd(
                     %OrganisationData,
                     UserID => $Param{UserID},
                 );
@@ -685,7 +685,7 @@ sub ImportDataSave {
 
             # check for errors...
             if ( !$Result ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "ImportDataSave: forcing Organisation "
                         . $OrganisationData{ID}
@@ -699,12 +699,12 @@ sub ImportDataSave {
 
             # restore organisation data backend refs...
             for my $CurrKey ( keys(%BackendRef) ) {
-                $Kernel::OM->Get('Kernel::System::Organisation')->{$CurrKey} = $BackendRef{$CurrKey};
+                $Kernel::OM->Get('Organisation')->{$CurrKey} = $BackendRef{$CurrKey};
             }
 
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "ImportDataSave: updating Organisation "
                     . $OrganisationData{ID}

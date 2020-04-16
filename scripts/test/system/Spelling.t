@@ -17,7 +17,7 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $SpellCheckerBin = $ConfigObject->Get('SpellCheckerBin');
 
@@ -118,12 +118,12 @@ for my $Test (@Tests) {
         "Setting new value for SpellCheckerBin config item",
     );
 
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Spelling'] );
-    my $SpellingObject = $Kernel::OM->Get('Kernel::System::Spelling');
+    $Kernel::OM->ObjectsDiscard( Objects => ['Spelling'] );
+    my $SpellingObject = $Kernel::OM->Get('Spelling');
 
     $Self->Is(
         ref $SpellingObject,
-        'Kernel::System::Spelling',
+        'Spelling',
         "$Test->{Name} - Spelling object creation",
     );
 

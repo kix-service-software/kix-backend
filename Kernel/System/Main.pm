@@ -22,8 +22,8 @@ use Storable;
 use Fcntl qw(:flock);
 
 our @ObjectDependencies = (
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
+    'Encode',
+    'Log',
 );
 
 =head1 NAME
@@ -46,7 +46,7 @@ create new object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
 =cut
 
@@ -65,7 +65,7 @@ sub new {
 require/load a module
 
     my $Loaded = $MainObject->Require(
-        'Kernel::System::Example',
+        'Example',
         Silent => 1,                # optional, no log entry if module was not found
     );
 
@@ -75,7 +75,7 @@ sub Require {
     my ( $Self, $Module, %Param ) = @_;
 
     if ( !$Module ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need module!',
         );
@@ -112,7 +112,7 @@ sub Require {
         # EO KIXCore-capeIT
 
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
                 # KIXCore-capeIT
@@ -137,7 +137,7 @@ sub Require {
                 $Message = "Module could not be loaded (no read permissions on $File)";
             }
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
                 Message  => $Message,
@@ -160,7 +160,7 @@ calling package, if not already present (this check is needed
 for persistent environments).
 
     my $Loaded = $MainObject->RequireBaseClass(
-        'Kernel::System::Example',
+        'Example',
     );
 
 =cut
@@ -199,7 +199,7 @@ sub Die {
     $Message = $Message || 'Died!';
 
     # log message
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Caller   => 1,
         Priority => 'error',
         Message  => $Message,
@@ -228,7 +228,7 @@ sub FilenameCleanUp {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{Filename} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename!',
         );
@@ -238,7 +238,7 @@ sub FilenameCleanUp {
     my $Type = lc( $Param{Type} || 'local' );
 
     if ( $Type eq 'md5' ) {
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Param{Filename} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{Filename} );
         $Param{Filename} = md5_hex( $Param{Filename} );
     }
 
@@ -329,7 +329,7 @@ sub FileRead {
         $Param{Location} =~ s{//}{/}xmsg;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename and Directory or Location!',
         );
@@ -339,7 +339,7 @@ sub FileRead {
     # check if file exists
     if ( !-e $Param{Location} ) {
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "File '$Param{Location}' doesn't exist!"
             );
@@ -356,7 +356,7 @@ sub FileRead {
     # return if file can not open
     if ( !open $FH, $Mode, $Param{Location} ) {    ## no critic
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't open '$Param{Location}': $!",
             );
@@ -367,7 +367,7 @@ sub FileRead {
     # lock file (Shared Lock)
     if ( !flock $FH, LOCK_SH ) {
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't lock '$Param{Location}': $!",
             );
@@ -444,7 +444,7 @@ sub FileWrite {
         $Param{Location} =~ s/\/\//\//g;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename and Directory or Location!',
         );
@@ -469,7 +469,7 @@ sub FileWrite {
     # return if file can not open
     my $FH;
     if ( !open $FH, $Mode, $Param{Location} ) {    ## no critic
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't write '$Param{Location}': $!",
         );
@@ -478,7 +478,7 @@ sub FileWrite {
 
     # lock file (Exclusive Lock)
     if ( !flock $FH, LOCK_EX ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't lock '$Param{Location}': $!",
         );
@@ -491,7 +491,7 @@ sub FileWrite {
     if ( !$Param{Mode} || lc $Param{Mode} eq 'binmode' ) {
 
         # make sure, that no utf8 stamp exists (otherway perl will do auto convert to iso)
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( $Param{Content} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( $Param{Content} );
 
         # set file handle to binmode
         binmode $FH;
@@ -556,7 +556,7 @@ sub FileDelete {
         $Param{Location} =~ s/\/\//\//g;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename and Directory or Location!',
         );
@@ -565,7 +565,7 @@ sub FileDelete {
     # check if file exists
     if ( !-e $Param{Location} ) {
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "File '$Param{Location}' doesn't exist!"
             );
@@ -576,7 +576,7 @@ sub FileDelete {
     # delete file
     if ( !unlink( $Param{Location} ) ) {
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't delete '$Param{Location}': $!",
             );
@@ -642,7 +642,7 @@ sub FileStat {
         $Param{Location} =~ s{//}{/}xmsg;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename and Directory or Location!',
         );
@@ -652,7 +652,7 @@ sub FileStat {
     # check if file exists
     if ( !-e $Param{Location} ) {
         if ( !$Param{DisableWarnings} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "File '$Param{Location}' doesn't exist!"
             );
@@ -664,7 +664,7 @@ sub FileStat {
     my $Stat = stat( $Param{Location} );
 
     if ( !$Stat ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot stat file '$Param{Location}': $!"
         );
@@ -697,7 +697,7 @@ sub MD5sum {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{Filename} && !$Param{String} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename or String!',
         );
@@ -706,7 +706,7 @@ sub MD5sum {
 
     # check if file exists
     if ( $Param{Filename} && !-e $Param{Filename} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "File '$Param{Filename}' doesn't exist!",
         );
@@ -719,7 +719,7 @@ sub MD5sum {
         # open file
         my $FH;
         if ( !open $FH, '<', $Param{Filename} ) {    ## no critic
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't read '$Param{Filename}': $!",
             );
@@ -734,7 +734,7 @@ sub MD5sum {
     }
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # md5sum string
     if ( !ref $Param{String} ) {
@@ -748,7 +748,7 @@ sub MD5sum {
         return md5_hex( ${ $Param{String} } );
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => "Need a SCALAR reference like 'String => \$Content' in String param.",
     );
@@ -784,7 +784,7 @@ sub Dump {
 
     # check needed data
     if ( !defined $Data ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need \$String in Dump()!"
         );
@@ -796,7 +796,7 @@ sub Dump {
         $Type = 'binary';
     }
     if ( $Type !~ /^ascii/ && $Type ne 'binary' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid Type '$Type'!"
         );
@@ -901,7 +901,7 @@ sub DirectoryRead {
     # check needed params
     for my $Needed (qw(Directory Filter)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => "Needed $Needed: $!",
                 Priority => 'error',
             );
@@ -911,7 +911,7 @@ sub DirectoryRead {
 
     # if directory doesn't exists stop
     if ( !-d $Param{Directory} && !$Param{Silent} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "Directory doesn't exist: $Param{Directory}: $!",
             Priority => 'error',
         );
@@ -920,7 +920,7 @@ sub DirectoryRead {
 
     # check Filter param
     if ( ref $Param{Filter} ne '' && ref $Param{Filter} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => 'Filter param need to be scalar or array ref!',
             Priority => 'error',
         );
@@ -986,7 +986,7 @@ sub DirectoryRead {
     return if !@GlobResults;
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # compose normalize every name in the file list
     my @Results;
@@ -1138,7 +1138,7 @@ sub _Dump {
         return;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => "Unknown ref '" . ref( ${$Data} ) . "'!",
     );

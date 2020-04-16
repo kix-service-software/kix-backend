@@ -16,10 +16,10 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::PID',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
+    'Config',
+    'PID',
+    'Ticket',
+    'Time',
 );
 
 sub Configure {
@@ -72,13 +72,13 @@ sub Configure {
     $Self->AdditionalHelp(<<"EOF");
 The <green>$Name</green> command migrates article data from one storage backend to another on the fly, for example from DB to FS:
 
- <green>otrs.console.pl $Self->{Name} --target ArticleStorageFS</green>
+ <green>kix.Console.pl $Self->{Name} --target ArticleStorageFS</green>
 
 You can specify limits for the tickets migrated with <yellow>--tickets-closed-before-date</yellow> and <yellow>--tickets-closed-before-days</yellow>.
 
 To reduce load on the database for a running system, you can use the <yellow>--micro-sleep</yellow> parameter. The command will pause for the specified amount of microseconds after each ticket.
 
- <green>otrs.console.pl $Self->{Name} --target ArticleStorageFS --micro-sleep 1000</green>
+ <green>kix.Console.pl $Self->{Name} --target ArticleStorageFS --micro-sleep 1000</green>
 EOF
     return;
 }
@@ -86,7 +86,7 @@ EOF
 sub PreRun {
     my ($Self) = @_;
 
-    my $PIDCreated = $Kernel::OM->Get('Kernel::System::PID')->PIDCreate(
+    my $PIDCreated = $Kernel::OM->Get('PID')->PIDCreate(
         Name  => $Self->Name(),
         Force => $Self->GetOption('force-pid'),
         TTL   => 60 * 60 * 24 * 3,
@@ -104,7 +104,7 @@ sub Run {
     my ($Self) = @_;
 
     # disable ticket events
-    $Kernel::OM->Get('Kernel::Config')->{'Ticket::EventModulePost'} = {};
+    $Kernel::OM->Get('Config')->{'Ticket::EventModulePost'} = {};
 
     # extended input validation
     my %SearchParams;
@@ -118,8 +118,8 @@ sub Run {
     elsif ( $Self->GetOption('tickets-closed-before-days') ) {
         my $Seconds = $Self->GetOption('tickets-closed-before-days') * 60 * 60 * 24;
 
-        my $TimeStamp = $Kernel::OM->Get('Kernel::System::Time')->SystemTime() - $Seconds;
-        $TimeStamp = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+        my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime() - $Seconds;
+        $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $TimeStamp,
         );
 
@@ -129,7 +129,7 @@ sub Run {
         );
     }
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @TicketIDs = $TicketObject->TicketSearch(
         %SearchParams,
@@ -180,7 +180,7 @@ sub Run {
 sub PostRun {
     my ($Self) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::PID')->PIDDelete( Name => $Self->Name() );
+    return $Kernel::OM->Get('PID')->PIDDelete( Name => $Self->Name() );
 }
 
 1;

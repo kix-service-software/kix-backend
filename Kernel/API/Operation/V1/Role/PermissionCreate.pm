@@ -78,7 +78,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my %PermissionTypes = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeList(
+    my %PermissionTypes = $Kernel::OM->Get('Role')->PermissionTypeList(
         Valid => 1
     );
 
@@ -140,7 +140,7 @@ sub Run {
     );
 
     # check if role exists 
-    my $Rolename = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+    my $Rolename = $Kernel::OM->Get('Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
     );
   
@@ -151,7 +151,7 @@ sub Run {
     }
 
     # check for duplicate
-    my $Exists = $Kernel::OM->Get('Kernel::System::Role')->PermissionLookup(
+    my $Exists = $Kernel::OM->Get('Role')->PermissionLookup(
         RoleID       => $Param{Data}->{RoleID},
         TypeID       => $Permission->{TypeID},
         Target       => $Permission->{Target},
@@ -165,7 +165,7 @@ sub Run {
     }
 
     # validate permission
-    my $ValidationResult = $Kernel::OM->Get('Kernel::System::Role')->ValidatePermission(
+    my $ValidationResult = $Kernel::OM->Get('Role')->ValidatePermission(
         %{$Permission}
     );
     if ( !$ValidationResult ) {
@@ -176,7 +176,7 @@ sub Run {
     }
 
     # create Permission
-    my $PermissionID = $Kernel::OM->Get('Kernel::System::Role')->PermissionAdd(
+    my $PermissionID = $Kernel::OM->Get('Role')->PermissionAdd(
         RoleID     => $Param{Data}->{RoleID},
         TypeID     => $Permission->{TypeID},
         Target     => $Permission->{Target},

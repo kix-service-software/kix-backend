@@ -16,7 +16,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub GetDisplayPath {
@@ -28,7 +28,7 @@ sub Run {
 
     $Self->AddResultInformation(
         Label => Translatable('KIX Version'),
-        Value => $Kernel::OM->Get('Kernel::Config')->Get('Version'),
+        Value => $Kernel::OM->Get('Config')->Get('Version'),
     );
 
     return $Self->GetResults();

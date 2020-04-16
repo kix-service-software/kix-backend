@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $DynamicFieldSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::DynamicFieldSet');
+    my $DynamicFieldSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::DynamicFieldSet');
 
 =cut
 
@@ -117,8 +117,8 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     for my $CurrentDynamicField ( sort keys %{ $Param{Config} } ) {
 
@@ -129,7 +129,7 @@ sub Run {
 
         # check if we have a valid DynamicField
         if ( !IsHashRefWithData($DynamicFieldConfig) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . "Can't get DynamicField config for DynamicField: '$CurrentDynamicField'!",
@@ -147,7 +147,7 @@ sub Run {
 
         # check if everything went right
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . "Can't set value '"

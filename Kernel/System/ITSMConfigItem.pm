@@ -29,17 +29,17 @@ use Storable;
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Cache',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Service',
-    'Kernel::System::User',
-    'Kernel::System::VirtualFS',
-    'Kernel::System::XML',
+    'Config',
+    'DB',
+    'Cache',
+    'GeneralCatalog',
+    'LinkObject',
+    'Log',
+    'Main',
+    'Service',
+    'User',
+    'VirtualFS',
+    'XML',
 );
 
 =head1 NAME
@@ -62,7 +62,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ConfigItem');
+    my $ConfigItemObject = $Kernel::OM->Get('ConfigItem');
 
 =cut
 
@@ -94,17 +94,17 @@ sub new {
     # contained in @ISA as initially set, but not methods contained in this very
     # file, unless SUPER is used.
     if (
-        !$Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules')
-        || ref( $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules') ) ne 'HASH'
+        !$Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules')
+        || ref( $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') ) ne 'HASH'
         )
     {
         die "Got no ITSMConfigItem::CustomModules! Please check your SysConfig! Error occured";
     }
-    my %CustomModules = %{ $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CustomModules') };
+    my %CustomModules = %{ $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') };
     for my $CustModKey ( sort( keys(%CustomModules) ) ) {
         next if ( !$CustomModules{$CustModKey} );
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( $CustomModules{$CustModKey} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Main')->Require( $CustomModules{$CustModKey} ) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't load ITSMConfigItem custom module "
                     . $CustomModules{$CustModKey} . " ($@)!",
@@ -150,7 +150,7 @@ sub ConfigItemCount {
 
     # check needed stuff
     if ( !$Param{ClassID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ClassID!',
         );
@@ -158,7 +158,7 @@ sub ConfigItemCount {
     }
 
     my $CacheKey = 'ConfigItemCount::'.$Param{ClassID}.'::'.$Param{IncludePostproductive};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -167,7 +167,7 @@ sub ConfigItemCount {
     # get state list
     my @Functionality = ( 'preproductive', 'productive' );
     push( @Functionality, 'postproductive' ) if ( $Param{IncludePostproductive} );
-    my $StateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $StateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class       => 'ITSM::ConfigItem::DeploymentState',
         Preferences => {
             Functionality => \@Functionality,
@@ -180,7 +180,7 @@ sub ConfigItemCount {
     my $DeplStateString = join q{, }, keys %{$StateList};
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "SELECT COUNT(id) FROM configitem WHERE class_id = ? AND "
             . "cur_depl_state_id IN ( $DeplStateString )",
         Bind  => [ \$Param{ClassID} ],
@@ -189,12 +189,12 @@ sub ConfigItemCount {
 
     # fetch the result
     my $Count = 0;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Count = $Row[0];
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -221,7 +221,7 @@ sub ConfigItemResultList {
 
     # check needed stuff
     if ( !$Param{ClassID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ClassID!',
         );
@@ -229,14 +229,14 @@ sub ConfigItemResultList {
     }
 
     my $CacheKey = 'ConfigItemResultList::'.$Param{ClassID}.'::'.$Param{Start}.'::'.$Param{Limit};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # get state list
-    my $StateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $StateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class       => 'ITSM::ConfigItem::DeploymentState',
         Preferences => {
             Functionality => [ 'preproductive', 'productive' ],
@@ -247,7 +247,7 @@ sub ConfigItemResultList {
     my $DeplStateString = join q{, }, keys %{$StateList};
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "SELECT id FROM configitem "
             . "WHERE class_id = ? AND cur_depl_state_id IN ( $DeplStateString ) "
             . "ORDER BY change_time DESC",
@@ -258,7 +258,7 @@ sub ConfigItemResultList {
 
     # fetch the result
     my @ConfigItemIDList;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push @ConfigItemIDList, $Row[0];
     }
 
@@ -276,7 +276,7 @@ sub ConfigItemResultList {
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -299,6 +299,7 @@ A hashref with the following keys is returned:
 
     $ConfigItem{ConfigItemID}
     $ConfigItem{Number}
+    $ConfigItem{Name}
     $ConfigItem{ClassID}
     $ConfigItem{Class}
     $ConfigItem{LastVersionID}
@@ -320,7 +321,7 @@ sub ConfigItemGet {
 
     # check needed stuff
     if ( !$Param{ConfigItemID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ConfigItemID!',
         );
@@ -334,7 +335,7 @@ sub ConfigItemGet {
 
     # check if result is already cached
     my $CacheKey    = 'ConfigItemGet::ConfigItemID::' . $Param{ConfigItemID};
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
     my $Cache       = $CacheObject->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -342,8 +343,8 @@ sub ConfigItemGet {
     return Storable::dclone($Cache) if $Cache;
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
-        SQL => 'SELECT id, configitem_number, class_id, last_version_id, '
+    $Kernel::OM->Get('DB')->Prepare(
+        SQL => 'SELECT id, configitem_number, name, class_id, last_version_id, '
             . 'cur_depl_state_id, cur_inci_state_id, '
             . 'create_time, create_by, change_time, change_by '
             . 'FROM configitem WHERE id = ?',
@@ -353,22 +354,23 @@ sub ConfigItemGet {
 
     # fetch the result
     my %ConfigItem;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ConfigItem{ConfigItemID}   = $Row[0];
         $ConfigItem{Number}         = $Row[1];
-        $ConfigItem{ClassID}        = $Row[2];
-        $ConfigItem{LastVersionID}  = $Row[3];
-        $ConfigItem{CurDeplStateID} = $Row[4];
-        $ConfigItem{CurInciStateID} = $Row[5];
-        $ConfigItem{CreateTime}     = $Row[6];
-        $ConfigItem{CreateBy}       = $Row[7];
-        $ConfigItem{ChangeTime}     = $Row[8];
-        $ConfigItem{ChangeBy}       = $Row[9];
+        $ConfigItem{Name}           = $Row[2];
+        $ConfigItem{ClassID}        = $Row[3];
+        $ConfigItem{LastVersionID}  = $Row[4];
+        $ConfigItem{CurDeplStateID} = $Row[5];
+        $ConfigItem{CurInciStateID} = $Row[6];
+        $ConfigItem{CreateTime}     = $Row[7];
+        $ConfigItem{CreateBy}       = $Row[8];
+        $ConfigItem{ChangeTime}     = $Row[9];
+        $ConfigItem{ChangeBy}       = $Row[10];
     }
 
     # check config item
     if ( !$ConfigItem{ConfigItemID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such ConfigItemID ($Param{ConfigItemID})!",
         );
@@ -376,7 +378,7 @@ sub ConfigItemGet {
     }
 
     # get class list
-    my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     );
 
@@ -385,7 +387,7 @@ sub ConfigItemGet {
     return \%ConfigItem if !$ConfigItem{CurDeplStateID} || !$ConfigItem{CurInciStateID};
 
     # get deployment state functionality
-    my $DeplState = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+    my $DeplState = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID => $ConfigItem{CurDeplStateID},
     );
 
@@ -393,7 +395,7 @@ sub ConfigItemGet {
     $ConfigItem{CurDeplStateType} = $DeplState->{Functionality};
 
     # get incident state functionality
-    my $InciState = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+    my $InciState = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID => $ConfigItem{CurInciStateID},
     );
 
@@ -429,7 +431,7 @@ sub ConfigItemAdd {
     # check needed stuff
     for my $Argument (qw(ClassID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -438,7 +440,7 @@ sub ConfigItemAdd {
     }
 
     # get class list
-    my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     );
 
@@ -448,7 +450,7 @@ sub ConfigItemAdd {
     # check the class id
     if ( !$ClassList->{ $Param{ClassID} } ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No valid class id given!',
         );
@@ -467,7 +469,7 @@ sub ConfigItemAdd {
         UserID => $Param{UserID},
     );
     if ( ( ref($Result) eq 'HASH' ) && ( $Result->{Error} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Pre-ConfigItemAdd refused CI creation.",
         );
@@ -489,7 +491,7 @@ sub ConfigItemAdd {
         );
 
         if ($Exists) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Config item number already exists!',
             );
@@ -500,13 +502,13 @@ sub ConfigItemAdd {
 
         # create config item number
         $Param{Number} = $Self->ConfigItemNumberCreate(
-            Type    => $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::NumberGenerator'),
+            Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
             ClassID => $Param{ClassID},
         );
     }
 
     # insert new config item
-    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Success = $Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO configitem '
             . '(configitem_number, class_id, create_time, create_by, change_time, change_by) '
             . 'VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)',
@@ -516,7 +518,7 @@ sub ConfigItemAdd {
     return if !$Success;
 
     # find id of new item
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id FROM configitem WHERE '
             . 'configitem_number = ? AND class_id = ? ORDER BY id DESC',
         Bind  => [ \$Param{Number}, \$Param{ClassID} ],
@@ -525,12 +527,12 @@ sub ConfigItemAdd {
 
     # fetch the result
     my $ConfigItemID;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ConfigItemID = $Row[0];
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -566,7 +568,7 @@ sub ConfigItemUpdate {
     # check needed stuff
     for my $Argument (qw(ConfigItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -576,7 +578,7 @@ sub ConfigItemUpdate {
 
     if ($Param{DeplStateID}) {
         # update current incident state
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE configitem SET cur_depl_state_id = ? WHERE id = ?',
             Bind => [ \$Param{InciStateID}, \$Param{ConfigItemID} ],
         );
@@ -584,14 +586,14 @@ sub ConfigItemUpdate {
 
     if ($Param{InciStateID}) {
         # update current incident state
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE configitem SET cur_inci_state_id = ? WHERE id = ?',
             Bind => [ \$Param{InciStateID}, \$Param{ConfigItemID} ],
         );
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -626,7 +628,7 @@ sub ConfigItemDelete {
     # check needed stuff
     for my $Argument (qw(ConfigItemID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -652,7 +654,7 @@ sub ConfigItemDelete {
         UserID => $Param{UserID},
     );
     if ( ( ref($Result) eq 'HASH' ) && ( $Result->{Error} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Pre-ConfigItemDelete refused CI deletion.",
         );
@@ -668,7 +670,7 @@ sub ConfigItemDelete {
     #---------------------------------------------------------------------------
 
     # delete all links to this config item first, before deleting the versions
-    return if !$Kernel::OM->Get('Kernel::System::LinkObject')->LinkDeleteAll(
+    return if !$Kernel::OM->Get('LinkObject')->LinkDeleteAll(
         Object => 'ConfigItem',
         Key    => $Param{ConfigItemID},
         UserID => $Param{UserID},
@@ -697,7 +699,7 @@ sub ConfigItemDelete {
         );
 
         if ( !$DeletionSuccess ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unknown problem when deleting attachment $Filename of ConfigItem "
                     . "$Param{ConfigItemID}. Please check the VirtualFS backend for stale "
@@ -721,13 +723,13 @@ sub ConfigItemDelete {
     );
 
     # delete config item
-    my $Success = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    my $Success = $Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM configitem WHERE id = ?',
         Bind => [ \$Param{ConfigItemID} ],
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -754,7 +756,7 @@ sub ConfigItemAttachmentAdd {
     # check needed stuff
     for my $Needed (qw(ConfigItemID Filename Content ContentType UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -764,7 +766,7 @@ sub ConfigItemAttachmentAdd {
     }
 
     # write to virtual fs
-    my $Success = $Kernel::OM->Get('Kernel::System::VirtualFS')->Write(
+    my $Success = $Kernel::OM->Get('VirtualFS')->Write(
         Filename    => "ConfigItem/$Param{ConfigItemID}/$Param{Filename}",
         Mode        => 'binary',
         Content     => \$Param{Content},
@@ -780,7 +782,7 @@ sub ConfigItemAttachmentAdd {
     if ($Success) {
 
         # clear cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
         );
 
@@ -797,7 +799,7 @@ sub ConfigItemAttachmentAdd {
         );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot add attachment for config item $Param{ConfigItemID}",
         );
@@ -826,7 +828,7 @@ sub ConfigItemAttachmentDelete {
     # check needed stuff
     for my $Needed (qw(ConfigItemID Filename UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -839,7 +841,7 @@ sub ConfigItemAttachmentDelete {
     my $Filename = 'ConfigItem/' . $Param{ConfigItemID} . '/' . $Param{Filename};
 
     # delete file
-    my $Success = $Kernel::OM->Get('Kernel::System::VirtualFS')->Delete(
+    my $Success = $Kernel::OM->Get('VirtualFS')->Delete(
         Filename => $Filename,
     );
 
@@ -847,7 +849,7 @@ sub ConfigItemAttachmentDelete {
     if ($Success) {
 
         # clear cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
         );
 
@@ -864,7 +866,7 @@ sub ConfigItemAttachmentDelete {
         );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot delete attachment $Filename!",
         );
@@ -905,7 +907,7 @@ sub ConfigItemAttachmentGet {
     # check needed stuff
     for my $Argument (qw(ConfigItemID Filename)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -917,7 +919,7 @@ sub ConfigItemAttachmentGet {
     my $Filename = 'ConfigItem/' . $Param{ConfigItemID} . '/' . $Param{Filename};
 
     # find all attachments of this config item
-    my @Attachments = $Kernel::OM->Get('Kernel::System::VirtualFS')->Find(
+    my @Attachments = $Kernel::OM->Get('VirtualFS')->Find(
         Filename    => $Filename,
         Preferences => {
             ConfigItemID => $Param{ConfigItemID},
@@ -926,7 +928,7 @@ sub ConfigItemAttachmentGet {
 
     # return error if file does not exist
     if ( !@Attachments ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "No such attachment ($Filename)!",
             Priority => 'error',
         );
@@ -934,7 +936,7 @@ sub ConfigItemAttachmentGet {
     }
 
     # get data for attachment
-    my %AttachmentData = $Kernel::OM->Get('Kernel::System::VirtualFS')->Read(
+    my %AttachmentData = $Kernel::OM->Get('VirtualFS')->Read(
         Filename => $Filename,
         Mode     => 'binary',
     );
@@ -973,7 +975,7 @@ sub ConfigItemAttachmentList {
 
     # check needed stuff
     if ( !$Param{ConfigItemID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ConfigItemID!',
         );
@@ -982,14 +984,14 @@ sub ConfigItemAttachmentList {
     }
 
     my $CacheKey = 'ConfigItemAttachmentList::'.$Param{ConfigItemID};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return @{$Cache} if $Cache;
 
     # find all attachments of this config item
-    my @Attachments = $Kernel::OM->Get('Kernel::System::VirtualFS')->Find(
+    my @Attachments = $Kernel::OM->Get('VirtualFS')->Find(
         Preferences => {
             ConfigItemID => $Param{ConfigItemID},
         },
@@ -1002,7 +1004,7 @@ sub ConfigItemAttachmentList {
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1030,7 +1032,7 @@ sub ConfigItemAttachmentExists {
     # check needed stuff
     for my $Needed (qw(Filename ConfigItemID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -1039,7 +1041,7 @@ sub ConfigItemAttachmentExists {
         }
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::VirtualFS')->Find(
+    return if !$Kernel::OM->Get('VirtualFS')->Find(
         Filename => 'ConfigItem/' . $Param{ConfigItemID} . '/' . $Param{Filename},
     );
 
@@ -1131,29 +1133,16 @@ sub ConfigItemSearchExtended {
         last CONFIGITEMPARAM;
     }
 
-    # special handling for config item number
+    # configitem search is required if Number or Name is given
+    # special handling for config item number and name
     # number 0 is allowed but not the empty string
-    if ( defined $Param{Number} && $Param{Number} ne '' ) {
+    if ( (defined $Param{Number} && $Param{Number} ne '') || $Param{Name} ) {
         $RequiredSearch{ConfigItem} = 1;
     }
 
-    # version search is required if Name, What or PreviousVersionSearch is given
-    if (
-        ( defined $Param{Name} && $Param{Name} ne '' )
-        || ( defined $Param{What} && $Param{What} ne '' )
-        || $Param{PreviousVersionSearch}
-        )
-    {
+    # version search is required if What or PreviousVersionSearch is given
+    if ( ( defined $Param{What} && $Param{What} ne '' ) || $Param{PreviousVersionSearch} ) {
         $RequiredSearch{Version} = 1;
-    }
-
-    # version search is also required if sorting by name (fix for bug #7072)
-    ORDERBY:
-    for my $OrderBy ( @{ $Param{OrderBy} } ) {
-        if ( $OrderBy eq 'Name' ) {
-            $RequiredSearch{Version} = 1;
-            last ORDERBY;
-        }
     }
 
     # xml version search is required if What is given
@@ -1259,6 +1248,7 @@ return a config item list as an array reference
 
     my $ConfigItemIDs = $ConfigItemObject->ConfigItemSearch(
         Number       => 'The ConfigItem Number',  # (optional)
+        Name         => 'some name',              # (optional)
         ClassIDs     => [9, 8, 7, 6],             # (optional)
         DeplStateIDs => [1, 2, 3, 4],             # (optional)
         InciStateIDs => [1, 2, 3, 4],             # (optional)
@@ -1313,7 +1303,7 @@ sub ConfigItemSearch {
         }
 
         if ( ref $Param{$Argument} ne 'ARRAY' ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Argument must be an array reference!",
             );
@@ -1325,6 +1315,7 @@ sub ConfigItemSearch {
     my %OrderByTable = (
         ConfigItemID => 'id',
         Number       => 'configitem_number',
+        Name         => 'name',
         ClassID      => 'class_id',
         DeplStateID  => 'cur_depl_state_id',
         InciStateID  => 'cur_inci_state_id',
@@ -1352,12 +1343,10 @@ sub ConfigItemSearch {
     ORDERBY:
     for my $OrderBy ( @{ $Param{OrderBy} } ) {
 
-        next ORDERBY if $OrderBy eq 'Name';
-
         if ( !$OrderBy || !$OrderByTable{$OrderBy} || $OrderBySeen{$OrderBy} ) {
 
             # found an error
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "OrderBy contains invalid value '$OrderBy' "
                     . 'or the value is used more than once!',
@@ -1378,7 +1367,7 @@ sub ConfigItemSearch {
         next DIRECTION if $Direction eq 'Down';
 
         # found an error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "OrderByDirection can only contain 'Up' or 'Down'!",
         );
@@ -1391,15 +1380,13 @@ sub ConfigItemSearch {
     }
 
     # get like escape string needed for some databases (e.g. oracle)
-    my $LikeEscapeString = $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('LikeEscapeString');
+    my $LikeEscapeString = $Kernel::OM->Get('DB')->GetDatabaseFunction('LikeEscapeString');
 
     # assemble the ORDER BY clause
     my @SQLOrderBy;
     my $Count = 0;
     ORDERBY:
     for my $OrderBy ( @{ $Param{OrderBy} } ) {
-
-        next ORDERBY if $OrderBy eq 'Name';
 
         # set the default order direction
         my $Direction = 'DESC';
@@ -1433,7 +1420,7 @@ sub ConfigItemSearch {
     if ( defined $Param{Number} && $Param{Number} ne '' ) {
 
         # quote
-        $Param{Number} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{Number} );
+        $Param{Number} = $Kernel::OM->Get('DB')->Quote( $Param{Number} );
 
         if ( $Param{UsingWildcards} ) {
 
@@ -1445,6 +1432,23 @@ sub ConfigItemSearch {
         }
         else {
             push @SQLWhere, "LOWER(configitem_number) = LOWER('$Param{Number}')";
+        }
+    }
+    if ( defined $Param{Name} && $Param{Name} ne '' ) {
+
+        # quote
+        $Param{Name} = $Kernel::OM->Get('DB')->Quote( $Param{Name} );
+
+        if ( $Param{UsingWildcards} ) {
+
+            # prepare like string
+            $Self->_PrepareLikeString( \$Param{Name} );
+
+            push @SQLWhere,
+                "LOWER(name) LIKE LOWER('$Param{Name}') $LikeEscapeString";
+        }
+        else {
+            push @SQLWhere, "LOWER(name) = LOWER('$Param{Name}')";
         }
     }
 
@@ -1463,7 +1467,7 @@ sub ConfigItemSearch {
         next ARRAYPARAM if !$Param{$ArrayParam};
 
         if ( ref $Param{$ArrayParam} ne 'ARRAY' ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$ArrayParam must be an array reference!",
             );
@@ -1474,7 +1478,7 @@ sub ConfigItemSearch {
 
         # quote as integer
         for my $OneParam ( @{ $Param{$ArrayParam} } ) {
-            $OneParam = $Kernel::OM->Get('Kernel::System::DB')->Quote( $OneParam, 'Integer' );
+            $OneParam = $Kernel::OM->Get('DB')->Quote( $OneParam, 'Integer' );
         }
 
         # create string
@@ -1499,7 +1503,7 @@ sub ConfigItemSearch {
         next TIMEPARAM if !$Param{$TimeParam};
 
         if ( $Param{$TimeParam} !~ m{ \A \d\d\d\d-\d\d-\d\d \s \d\d:\d\d:\d\d \z }xms ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid date format found!",
             );
@@ -1507,7 +1511,7 @@ sub ConfigItemSearch {
         }
 
         # quote
-        $Param{$TimeParam} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$TimeParam} );
+        $Param{$TimeParam} = $Kernel::OM->Get('DB')->Quote( $Param{$TimeParam} );
 
         push @SQLWhere, "$TimeParams{ $TimeParam } '$Param{ $TimeParam }'";
     }
@@ -1517,7 +1521,7 @@ sub ConfigItemSearch {
 
     # set limit
     if ( $Param{Limit} ) {
-        $Param{Limit} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{Limit}, 'Integer' );
+        $Param{Limit} = $Kernel::OM->Get('DB')->Quote( $Param{Limit}, 'Integer' );
     }
 
     my $SQL = "SELECT id FROM configitem $WhereString ";
@@ -1530,14 +1534,14 @@ sub ConfigItemSearch {
     }
 
     # ask database
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Limit => $Param{Limit},
     );
 
     # fetch the result
     my @ConfigItemList;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push @ConfigItemList, $Row[0];
     }
 
@@ -1567,7 +1571,7 @@ sub ConfigItemLookup {
 
     # check for needed stuff
     if ( !$Key ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ConfigItemID or ConfigItemNumber!',
         );
@@ -1575,7 +1579,7 @@ sub ConfigItemLookup {
     }
 
     my $CacheKey = 'ConfigItemLookup::'.($Param{ConfigItemID}||'').'::'.($Param{ConfigItemNumber}||'');
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -1589,19 +1593,19 @@ sub ConfigItemLookup {
     }
 
     # fetch the requested value
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Bind  => [ \$Param{$Key} ],
         Limit => 1,
     );
 
     my $Value;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Value = $Row[0];
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1644,7 +1648,7 @@ sub UniqueNameCheck {
     # check for needed stuff
     for my $Needed (qw(ConfigItemID Name ClassID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Missing parameter $Needed!",
             );
@@ -1658,7 +1662,7 @@ sub UniqueNameCheck {
         && ( IsStringWithData( $Param{ConfigItemID} ) && $Param{ConfigItemID} ne 'NEW' )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The ConfigItemID parameter needs to be an integer or 'NEW'",
         );
@@ -1667,7 +1671,7 @@ sub UniqueNameCheck {
 
     # check Name param for valid format
     if ( !IsStringWithData( $Param{Name} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The Name parameter needs to be a string!",
         );
@@ -1676,7 +1680,7 @@ sub UniqueNameCheck {
 
     # check ClassID param for valid format
     if ( !IsInteger( $Param{ClassID} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The ClassID parameter needs to be an integer",
         );
@@ -1684,13 +1688,13 @@ sub UniqueNameCheck {
     }
 
     # get class list
-    my $ClassList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     );
 
     # check class list for validity
     if ( !IsHashRefWithData($ClassList) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to retrieve a valid class list!",
         );
@@ -1702,25 +1706,25 @@ sub UniqueNameCheck {
 
     # check class for validity
     if ( !IsStringWithData($Class) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unable to determine a config item class using the given ClassID!",
         );
         return;
     }
-    elsif ( $Kernel::OM->Get('Kernel::Config')->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+    elsif ( $Kernel::OM->Get('Config')->{Debug} > 0 ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "Resolved ClassID $Param{ClassID} to class $Class",
         );
     }
 
     # get the uniqueness scope from SysConfig
-    my $Scope = $Kernel::OM->Get('Kernel::Config')->Get('UniqueCIName::UniquenessCheckScope');
+    my $Scope = $Kernel::OM->Get('Config')->Get('UniqueCIName::UniquenessCheckScope');
 
     # check scope for validity
     if ( !IsStringWithData($Scope) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The configuration of UniqueCIName::UniquenessCheckScope is invalid!",
         );
@@ -1728,7 +1732,7 @@ sub UniqueNameCheck {
     }
 
     if ( $Scope ne 'global' && $Scope ne 'class' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "UniqueCIName::UniquenessCheckScope is $Scope, but must be either "
                 . "'global' or 'class'!",
@@ -1736,8 +1740,8 @@ sub UniqueNameCheck {
         return;
     }
 
-    if ( $Kernel::OM->Get('Kernel::Config')->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+    if ( $Kernel::OM->Get('Config')->{Debug} > 0 ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "The scope for checking the uniqueness is $Scope",
         );
@@ -1781,7 +1785,7 @@ sub CurInciStateRecalc {
 
     # check needed stuff
     if ( !$Param{ConfigItemID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ConfigItemID!',
         );
@@ -1789,7 +1793,7 @@ sub CurInciStateRecalc {
     }
 
     # get incident link types and directions from config
-    my $IncidentLinkTypeDirection = $Kernel::OM->Get('Kernel::Config')->Get('ITSM::Core::IncidentLinkTypeDirection');
+    my $IncidentLinkTypeDirection = $Kernel::OM->Get('Config')->Get('ITSM::Core::IncidentLinkTypeDirection');
 
     # to store the new incident state for CIs
     # calculated from all incident link types
@@ -1838,7 +1842,7 @@ sub CurInciStateRecalc {
             my $InciStateType = $ScannedConfigItemIDs{$ConfigItemID}->{Type};
 
             # find all linked services of this CI
-            my %LinkedServiceIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
+            my %LinkedServiceIDs = $Kernel::OM->Get('LinkObject')->LinkKeyList(
                 Object1   => 'ConfigItem',
                 Key1      => $ConfigItemID,
                 Object2   => 'Service',
@@ -1870,7 +1874,7 @@ sub CurInciStateRecalc {
     }
 
     # get the incident state list of warnings
-    my $WarnStateList = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $WarnStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class       => 'ITSM::Core::IncidentState',
         Preferences => {
             Functionality => 'warning',
@@ -1879,7 +1883,7 @@ sub CurInciStateRecalc {
     my %ReverseWarnStateList = reverse %{$WarnStateList};
     my @SortedWarnList       = sort keys %ReverseWarnStateList;
     my $WarningStateID       = $ReverseWarnStateList{Warning} || $ReverseWarnStateList{ $SortedWarnList[0] };
-    my $CacheObject          = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject          = $Kernel::OM->Get('Cache');
 
     # set the new current incident state for CIs
     CONFIGITEMID:
@@ -1908,7 +1912,7 @@ sub CurInciStateRecalc {
         }
 
         # update current incident state
-        $Kernel::OM->Get('Kernel::System::DB')->Do(
+        $Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE configitem SET cur_inci_state_id = ? WHERE id = ?',
             Bind => [ \$CurInciStateID, \$ConfigItemID ],
         );
@@ -1988,7 +1992,7 @@ sub CurInciStateRecalc {
         }
 
         # update the current incident state type from CIs of the service
-        $Kernel::OM->Get('Kernel::System::Service')->ServicePreferencesSet(
+        $Kernel::OM->Get('Service')->ServicePreferencesSet(
             ServiceID => $ServiceID,
             Key       => 'CurInciStateTypeFromCIs',
             Value     => $CurInciStateTypeFromCIs,
@@ -1997,7 +2001,7 @@ sub CurInciStateRecalc {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
@@ -2514,7 +2518,7 @@ sub CountLinkedObjects {
     my $LinkObject = $Self->{LinkObject} || undef;
 
     if ( !$LinkObject ) {
-        $LinkObject = $Kernel::OM->Get('Kernel::System::LinkObject');
+        $LinkObject = $Kernel::OM->Get('LinkObject');
     }
 
     return '' if !$LinkObject;
@@ -2558,7 +2562,7 @@ sub GetAssignedConfigItemsForObject {
 
     for ( qw(ObjectType Object) ) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2567,23 +2571,23 @@ sub GetAssignedConfigItemsForObject {
     }
 
     if ( !IsHashRefWithData( $Param{Object} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Object is no hash ref!"
         );
         return;
     }
 
-    my $MappingString = $Kernel::OM->Get('Kernel::Config')->Get('AssignedConfigItemsMapping') || '';
+    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedConfigItemsMapping') || '';
 
     if ( IsStringWithData($MappingString) ) {
 
-        my $Mapping = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
             Data => $MappingString
         );
 
         if ( !IsHashRefWithData($Mapping) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid JSON for sysconfig option 'AssignedConfigItemsMapping'."
             );
@@ -2594,7 +2598,7 @@ sub GetAssignedConfigItemsForObject {
                 next CICLASS if ( !IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{$CIClass} ) );
 
                 # get class
-                my $ClassItemRef = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemGet(
+                my $ClassItemRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
                     Class => 'ITSM::ConfigItem::Class',
                     Name  => $CIClass,
                 );
@@ -2607,7 +2611,7 @@ sub GetAssignedConfigItemsForObject {
                 );
 
                 if ( !$XMLDefinition->{DefinitionID} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "No Definition definied for class $CIClass!",
                     );
@@ -2695,7 +2699,7 @@ sub GetAssignedConfigItemsForObject {
                 }
             }
         } else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'info',
                 Message  => "'$Param{ObjectType}' not contained in 'AssignedConfigItemsMapping'."
             );
@@ -2809,7 +2813,7 @@ sub _FindInciConfigItems {
     for my $LinkType ( sort keys %{ $Param{IncidentLinkTypeDirection} } ) {
 
         # find all linked config items (childs)
-        my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
+        my %LinkedConfigItemIDs = $Kernel::OM->Get('LinkObject')->LinkKeyList(
             Object1 => 'ConfigItem',
             Key1    => $Param{ConfigItemID},
             Object2 => 'ConfigItem',
@@ -2897,7 +2901,7 @@ sub _FindWarnConfigItems {
 
     # KIX4OTRS-capeIT
     $Self->{Direction} =
-        $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::CILinkDirection') || 'Both';
+        $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CILinkDirection') || 'Both';
 
     # EO KIX4OTRS-capeIT
 
@@ -2905,7 +2909,7 @@ sub _FindWarnConfigItems {
     $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}++;
 
     # find all linked config items
-    my %LinkedConfigItemIDs = $Kernel::OM->Get('Kernel::System::LinkObject')->LinkKeyList(
+    my %LinkedConfigItemIDs = $Kernel::OM->Get('LinkObject')->LinkKeyList(
         Object1   => 'ConfigItem',
         Key1      => $Param{ConfigItemID},
         Object2   => 'ConfigItem',
@@ -2953,7 +2957,7 @@ sub _PrepareLikeString {
     return if ref $Value ne 'SCALAR';
 
     # Quote
-    ${$Value} = $Kernel::OM->Get('Kernel::System::DB')->Quote( ${$Value}, 'Like' );
+    ${$Value} = $Kernel::OM->Get('DB')->Quote( ${$Value}, 'Like' );
 
     # replace * with %
     ${$Value} =~ s{ \*+ }{%}xmsg;

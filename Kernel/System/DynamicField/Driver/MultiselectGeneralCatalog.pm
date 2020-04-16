@@ -16,11 +16,11 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseSelect);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::GeneralCatalog',
+    'Config',
+    'DynamicFieldValue',
+    'Log',
+    'Main',
+    'GeneralCatalog',
 );
 
 =head1 NAME
@@ -66,8 +66,8 @@ sub new {
     my $DynamicFieldDriverExtensions
 
        # KIX4OTRS-capeIT
-       # = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Extension::Driver::Multiselect');
-        = $Kernel::OM->Get('Kernel::Config')
+       # = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::Multiselect');
+        = $Kernel::OM->Get('Config')
         ->Get('DynamicFields::Extension::Driver::MultiselectGeneralCatalog');
 
     # EO KIX4OTRS-capeIT
@@ -86,7 +86,7 @@ sub new {
 
             # check if module can be loaded
             if (
-                !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Extension->{Module} )
+                !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
                 )
             {
                 die "Can't load dynamic fields backend module"
@@ -121,7 +121,7 @@ sub ValueIsDifferent {
 sub ValueGet {
     my ( $Self, %Param ) = @_;
 
-    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+    my $DFValue = $Kernel::OM->Get('DynamicFieldValue')->ValueGet(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
         ObjectID => $Param{ObjectID},
     );
@@ -148,7 +148,7 @@ sub ValueSet {
     if ( !$Param{DynamicFieldConfig}->{Config}->{GeneralCatalogClass} ) {
 
         # EO KIX4OTRS-capeIT
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
 
             # KIX4OTRS-capeIT
@@ -170,11 +170,11 @@ sub ValueSet {
     }
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     # KIX4OTRS-capeIT
     # get dynamic field value object
-    my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
     # EO KIX4OTRS-capeIT
 
@@ -214,7 +214,7 @@ sub ValueValidate {
     }
 
     # get dynamic field value object
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
     my $Success;
     for my $Item (@Values) {
@@ -299,7 +299,7 @@ sub EditFieldRender {
 
     # set PossibleValues
     # my $PossibleValues = $FieldConfig->{PossibleValues};
-    my $PossibleValues = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $PossibleValues = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogClass,
     );
 
@@ -432,7 +432,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         my @Data = $Param{ParamObject}->GetArray( Param => $FieldName );
@@ -491,7 +491,7 @@ sub EditFieldValueValidate {
 
         # get possible values list
         # my $PossibleValues = $Param{DynamicFieldConfig}->{Config}->{PossibleValues};
-        my $PossibleValues = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+        my $PossibleValues = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class => $GeneralCatalogClass,
         );
 
@@ -549,7 +549,7 @@ sub DisplayValueRender {
 
     # get real values
     # my $PossibleValues = $Param{DynamicFieldConfig}->{Config}->{PossibleValues};
-    my $PossibleValues = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $PossibleValues = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogClass,
     );
 
@@ -630,7 +630,7 @@ sub DisplayValueRender {
     }
 
     # get specific field settings
-    my $FieldConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Driver')->{Multiselect} || {};
+    my $FieldConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::Driver')->{Multiselect} || {};
 
     # set new line separator
     my $ItemSeparator = $FieldConfig->{ItemSeparator} || ', ';
@@ -697,7 +697,7 @@ sub SearchFieldRender {
 
     # set PossibleValues
     # my $SelectionData = $FieldConfig->{PossibleValues};
-    my $SelectionData = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $SelectionData = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogClass,
     );
 
@@ -762,7 +762,7 @@ sub SearchFieldParameterBuild {
     my $GeneralCatalogClass = $Param{DynamicFieldConfig}->{Config}->{GeneralCatalogClass};
 
     # set PossibleValues
-    my $PossibleValues = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $PossibleValues = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogClass,
     );
 
@@ -825,14 +825,14 @@ sub StatsFieldParameterBuild {
 
     # set PossibleValues
     # my $Values = $Param{DynamicFieldConfig}->{Config}->{PossibleValues};
-    my $Values = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $Values = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogClass,
     );
 
     # EO KIX4OTRS-capeIT
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text,',
     );
@@ -977,7 +977,7 @@ sub PossibleValuesGet {
     my $GeneralCatalogClass = $Param{DynamicFieldConfig}->{Config}->{GeneralCatalogClass};
 
     # set PossibleValues
-    my $DefinedPossibleValues = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->ItemList(
+    my $DefinedPossibleValues = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogClass,
     );
 
@@ -1016,7 +1016,7 @@ sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',
     );

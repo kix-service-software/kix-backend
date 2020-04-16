@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::PID',
+    'DB',
+    'PID',
 );
 
 sub Configure {
@@ -43,11 +43,11 @@ sub Configure {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    if ( $Kernel::OM->Get('Kernel::System::DB')->{'DB::Type'} ne 'mysql' ) {
+    if ( $Kernel::OM->Get('DB')->{'DB::Type'} ne 'mysql' ) {
         die "This script can only be run on mysql databases.\n";
     }
 
-    my $PIDCreated = $Kernel::OM->Get('Kernel::System::PID')->PIDCreate(
+    my $PIDCreated = $Kernel::OM->Get('PID')->PIDCreate(
         Name  => $Self->Name(),
         Force => $Self->GetOption('force-pid'),
         TTL   => 60 * 60 * 24 * 3,
@@ -73,18 +73,18 @@ sub Run {
     }
 
     # Get all tables that have MyISAM
-    $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL => "SHOW TABLE STATUS WHERE ENGINE = 'MyISAM'",
     );
 
     my @Tables;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push @Tables, $Row[0];
     }
 
     # Turn off foreign key checks.
     if (@Tables) {
-        my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
+        my $Result = $Kernel::OM->Get('DB')->Do(
             SQL => "SET foreign_key_checks = 0",
         );
         if ( !$Result ) {
@@ -105,7 +105,7 @@ sub Run {
     # Now convert the tables.
     for my $Table (@Tables) {
         $Self->Print("  Changing table <yellow>$Table</yellow> to engine InnoDB...\n");
-        my $Result = $Kernel::OM->Get('Kernel::System::DB')->Do(
+        my $Result = $Kernel::OM->Get('DB')->Do(
             SQL => "ALTER TABLE $Table ENGINE = InnoDB",
         );
         if ( !$Result ) {
@@ -121,7 +121,7 @@ sub Run {
 sub PostRun {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::PID')->PIDDelete( Name => $Self->Name() );
+    return $Kernel::OM->Get('PID')->PIDDelete( Name => $Self->Name() );
 }
 
 1;

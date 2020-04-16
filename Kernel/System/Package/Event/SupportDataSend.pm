@@ -16,10 +16,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::Log',
-    'Kernel::System::SystemData',
-    'Kernel::System::Time',
+    'Cache',
+    'Log',
+    'SystemData',
+    'Time',
 );
 
 sub new {
@@ -38,7 +38,7 @@ sub Run {
     # check needed stuff
     for (qw(Data Event Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -47,7 +47,7 @@ sub Run {
     }
 
     # get system data object
-    my $SystemDataObject = $Kernel::OM->Get('Kernel::System::SystemData');
+    my $SystemDataObject = $Kernel::OM->Get('SystemData');
 
     my $RegistrationState = $SystemDataObject->SystemDataGet(
         Key => 'Registration::State',
@@ -64,13 +64,13 @@ sub Run {
     return 1 if $SupportDataSending ne 'Yes';
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => 'SupportDataCollector',
         Key  => 'DataCollect',
     );
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # calculate next update time for 1 hour
     my $NewUpdateSeconds    = 3600;

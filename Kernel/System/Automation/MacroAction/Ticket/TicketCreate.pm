@@ -19,15 +19,15 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::ArticleCreate);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::State',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'DynamicField',
+    'DynamicField::Backend',
+    'LinkObject',
+    'Log',
+    'State',
+    'Ticket',
+    'Time',
+    'User',
 );
 
 =head1 NAME
@@ -171,32 +171,42 @@ sub Run {
     for my $Attribute ( qw(Organisation Contact Lock Owner Priority Responsible State Title Team Type) ) {
         if ( defined $Param{Config}->{$Attribute} ) {
             if ( $Attribute eq 'Owner' || $Attribute eq 'Responsible' ) {
-                my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+                my $UserID = $Kernel::OM->Get('User')->UserLookup(
                     UserLogin => $Param{Config}->{$Attribute},
                 );
                 $TicketParam{$Attribute . 'ID'} = $UserID;
             } elsif ($Attribute eq 'Organisation') {
-                my $OrganisationID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationLookup(
+                my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                     Number => $Param{Config}->{Organisation},
                     Silent => 1
                 );
                 $TicketParam{'OrganisationID'} = $OrganisationID || $Param{Config}->{Organisation};
             } elsif ($Attribute eq 'Contact') {
-                my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
-                    Login  => $Param{Config}->{Contact},
-                    Silent => 1
-                );
-                $TicketParam{'ContactID'} = $ContactID || $Param{Config}->{Contact};
+                my $ContactID;
+                
+                if ($Param{Config}->{Contact} =~ /\d+/) {
+                    $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                        ID  => $Param{Config}->{Contact},
+                        Silent => 1
+                    );
+                } elsif ( index($Param{Config}->{Contact}, '@') != -1 ) {
+                    $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                        Email  => $Param{Config}->{Contact},
+                        Silent => 1
+                    );
+                }
+
                 if (!$TicketParam{OrganisationID}) {
                     if ($ContactID) {
-                        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                             ID => $ContactID
                         );
                         $TicketParam{OrganisationID} = $Contact{PrimaryOrganisationID};
-                    } else {
-                        $TicketParam{OrganisationID} = $TicketParam{'ContactID'};
                     }
                 }
+
+                $TicketParam{'ContactID'} = $ContactID || $Param{Config}->{Contact};
+
             } else {
                 $TicketParam{$Attribute} = $Param{Config}->{$Attribute}
             }
@@ -211,9 +221,9 @@ sub Run {
         $TicketParam{Lock} = 'unlock';
     }
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    $TicketParam{Title} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    $TicketParam{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $TicketParam{Title},
         TicketID => $Param{TicketID},
@@ -232,7 +242,7 @@ sub Run {
     );
 
     if ( !$TicketID ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't create new ticket!",
             UserID   => $Param{UserID}
@@ -241,7 +251,7 @@ sub Run {
     }
 
     # get state information
-    my %StateData = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+    my %StateData = $Kernel::OM->Get('State')->StateGet(
         Name => $TicketParam{State},
     );
 
@@ -280,7 +290,7 @@ sub Run {
         }
     }
     $ArticleParam{Subject} = $TicketParam{Title};
-    $ArticleParam{Body} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    $ArticleParam{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 1,
         Text     => $ArticleParam{Body},
         TicketID => $Param{TicketID},
@@ -302,7 +312,7 @@ sub Run {
     $Self->{Definition}->{Options} = $TicketDef;
 
     if ( !$ArticleBackendResult ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Couldn't create Article on Ticket: $TicketID!",
         );
@@ -328,13 +338,13 @@ sub ValidateConfig {
 
     return if !$Self->SUPER::ValidateConfig(%Param);
 
-    my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+    my %State = $Kernel::OM->Get('State')->StateGet(
         Name => $Param{Config}->{State}
     );
 
     if (%State) {
         if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Validation of parameter \"PendingTimeDiff\" failed!"
             );
@@ -349,13 +359,13 @@ sub _CheckTicketParams {
     my ( $Self, %Param ) = @_;
 
     # if ($Param{Contact}) {
-    #     my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactLookup(
+    #     my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
     #         Login  => $Param{Contact},
     #         Silent => 1
     #     );
 
     #     if ( !$ContactID ) {
-    #         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+    #         $Kernel::OM->Get('Automation')->LogError(
     #             Referrer => $Self,
     #             Message  => "Couldn't create new ticket - can't find contact with login \"$Param{Contact}\"!",
     #             UserID   => $Param{UserID}
@@ -365,12 +375,12 @@ sub _CheckTicketParams {
     # }
 
     if ($Param{Lock}) {
-        my $LockID = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
+        my $LockID = $Kernel::OM->Get('Lock')->LockLookup(
             Lock => $Param{Lock},
         );
 
         if ( !$LockID ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - can't find lock state \"$Param{Lock}\"!",
                 UserID   => $Param{UserID}
@@ -380,13 +390,13 @@ sub _CheckTicketParams {
     }
 
     # if ($Param{Organisation}) {
-    #     my $OrganisationID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationLookup(
+    #     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
     #         Number => $Param{Organisation},
     #         Silent => 1
     #     );
 
     #     if ( !$OrganisationID ) {
-    #         $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+    #         $Kernel::OM->Get('Automation')->LogError(
     #             Referrer => $Self,
     #             Message  => "Couldn't create new ticket - can't find organisation with number \"$Param{Organisation}\"!",
     #             UserID   => $Param{UserID}
@@ -397,12 +407,12 @@ sub _CheckTicketParams {
 
     for my $UserType ( qw(Owner Responsible) ) {
         if ($Param{$UserType}) {
-            my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+            my $UserID = $Kernel::OM->Get('User')->UserLookup(
                 UserLogin => $Param{$UserType},
             );
 
             if ( !$UserID ) {
-                $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+                $Kernel::OM->Get('Automation')->LogError(
                     Referrer => $Self,
                     Message  => "Couldn't create new ticket - can't find user with login \"$Param{$UserType}\"!",
                     UserID   => $Param{UserID}
@@ -413,12 +423,12 @@ sub _CheckTicketParams {
     }
 
     if ($Param{Priority}) {
-        my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+        my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
             Priority => $Param{Priority}
         );
 
         if ( !$PriorityID ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - can't find ticket priority \"$Param{Priority}\"!",
                 UserID   => $Param{UserID}
@@ -428,12 +438,12 @@ sub _CheckTicketParams {
     }
 
     if ($Param{State}) {
-        my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet(
+        my %State = $Kernel::OM->Get('State')->StateGet(
             Name => $Param{State}
         );
 
         if ( !%State ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - can't find ticket state \"$Param{State}\"!",
                 UserID   => $Param{UserID}
@@ -442,7 +452,7 @@ sub _CheckTicketParams {
         }
 
         if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{PendingTimeDiff} ) ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - \"PendingTimeDiff\" value ($Param{PendingTimeDiff}) is not valid!",
                 UserID   => $Param{UserID}
@@ -452,12 +462,12 @@ sub _CheckTicketParams {
     }
 
     if ($Param{Team}) {
-        my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+        my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
             Queue => $Param{Team}
         );
 
         if ( !$QueueID ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - can't find ticket team \"$Param{Team}\"!",
                 UserID   => $Param{UserID}
@@ -467,12 +477,12 @@ sub _CheckTicketParams {
     }
 
     if ($Param{Type}) {
-        my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
+        my $TypeID = $Kernel::OM->Get('Type')->TypeLookup(
             Type => $Param{Type},
         );
 
         if ( !$TypeID ) {
-            $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+            $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - can't find ticket type \"$Param{Type}\"!",
                 UserID   => $Param{UserID}

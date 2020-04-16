@@ -16,15 +16,15 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
-    'Kernel::System::ProcessManagement::Activity',
-    'Kernel::System::ProcessManagement::ActivityDialog',
-    'Kernel::System::ProcessManagement::Transition',
-    'Kernel::System::ProcessManagement::TransitionAction',
-    'Kernel::System::Ticket',
+    'Config',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
+    'ProcessManagement::Activity',
+    'ProcessManagement::ActivityDialog',
+    'ProcessManagement::Transition',
+    'ProcessManagement::TransitionAction',
+    'Ticket',
 );
 
 =head1 NAME
@@ -47,7 +47,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Process');
+    my $ProcessObject = $Kernel::OM->Get('ProcessManagement::Process');
 
 =cut
 
@@ -107,7 +107,7 @@ sub ProcessGet {
 
     for my $Needed (qw(ProcessEntityID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -115,10 +115,10 @@ sub ProcessGet {
         }
     }
 
-    my $Process = $Kernel::OM->Get('Kernel::Config')->Get('Process');
+    my $Process = $Kernel::OM->Get('Config')->Get('Process');
 
     if ( !IsHashRefWithData($Process) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Process config!',
         );
@@ -126,7 +126,7 @@ sub ProcessGet {
     }
 
     if ( !IsHashRefWithData( $Process->{ $Param{ProcessEntityID} } ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No Data for Process '$Param{ProcessEntityID}' found!",
         );
@@ -161,7 +161,7 @@ sub ProcessList {
 
     for my $Needed (qw(ProcessState)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -170,18 +170,18 @@ sub ProcessList {
     }
 
     if ( !IsArrayRefWithData( $Param{ProcessState} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need at least one ProcessState!',
         );
         return;
     }
 
-    my $Processes = $Kernel::OM->Get('Kernel::Config')->Get('Process');
+    my $Processes = $Kernel::OM->Get('Config')->Get('Process');
     if ( !IsHashRefWithData($Processes) ) {
 
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need Process config!',
             );
@@ -209,7 +209,7 @@ sub ProcessList {
     }
 
     # get activity dialog object
-    my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::ActivityDialog');
+    my $ActivityDialogObject = $Kernel::OM->Get('ProcessManagement::ActivityDialog');
 
     # otherwise return only processes where the initial activity dialog matches given interface
     my %ReducedProcessList;
@@ -261,7 +261,7 @@ sub ProcessStartpointGet {
 
     for my $Needed (qw(ProcessEntityID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -274,7 +274,7 @@ sub ProcessStartpointGet {
     # include FadeAway processes so they will be listed as available processes to continue working
     #    with them
     if ( $Process->{State} ne 'Active' && $Process->{State} ne 'FadeAway' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't get 'StartActivity' for Process '$Param{ProcessEntityID}', State"
                 . " is '$Process->{State}'!",
@@ -283,7 +283,7 @@ sub ProcessStartpointGet {
     }
 
     if ( !$Process->{StartActivity} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No 'StartActivity' for Process '$Param{ProcessEntityID}' found!",
         );
@@ -291,7 +291,7 @@ sub ProcessStartpointGet {
     }
 
     if ( !$Process->{StartActivity} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No 'StartActivity' for Process '$Param{ProcessEntityID}' found!",
         );
@@ -299,7 +299,7 @@ sub ProcessStartpointGet {
     }
 
     if ( !$Process->{StartActivityDialog} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No 'StartActivityDialog' for Process '$Param{ProcessEntityID}' found!",
         );
@@ -353,7 +353,7 @@ sub ProcessTransition {
 
     for my $Needed (qw(ProcessEntityID ActivityEntityID TicketID UserID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -364,7 +364,7 @@ sub ProcessTransition {
     my %Data;
 
     # Get Ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # Get Ticket Data
     %Data = $TicketObject->TicketGet(
@@ -375,7 +375,7 @@ sub ProcessTransition {
 
     # Check if we got a Ticket
     if ( !IsHashRefWithData( \%Data ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid TicketID: $Param{TicketID}!",
         );
@@ -391,7 +391,7 @@ sub ProcessTransition {
     my $Process = $Self->ProcessGet( ProcessEntityID => $Param{ProcessEntityID} );
 
     if ( !$Process->{State} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't process Transition for Process '$Param{ProcessEntityID}', can't"
                 . " get State out of the config!",
@@ -400,7 +400,7 @@ sub ProcessTransition {
     }
 
     if ( $Process->{State} eq 'Inactive' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't process Transition for Process '$Param{ProcessEntityID}',"
                 . " ProcessState is '$Process->{State}'!",
@@ -416,7 +416,7 @@ sub ProcessTransition {
         || !IsHashRefWithData( $Process->{Path} )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Path for ProcessEntityID $Param{ProcessEntityID}!",
         );
@@ -427,7 +427,7 @@ sub ProcessTransition {
     # if it hasn't we got nothing to do -> print debuglog if desired and return
     if ( !IsHashRefWithData( $Process->{Path}{ $Param{ActivityEntityID} } ) ) {
         if ( $Self->{Debug} > 0 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => 'No Path configured for Process with ID: '
                     . "$Param{ProcessEntityID} and ActivityEntityID: $Param{ActivityEntityID}!",
@@ -441,7 +441,7 @@ sub ProcessTransition {
     my %Transitions = %{ $Process->{Path}{ $Param{ActivityEntityID} } };
 
     # get transition object
-    my $TransitionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Transition');
+    my $TransitionObject = $Kernel::OM->Get('ProcessManagement::Transition');
 
     # Handle all possible TransitionEntityID's for the Process->Path's->ActivityEntityID down to
     # Transition.pm's TransitionCheck for validation
@@ -455,7 +455,7 @@ sub ProcessTransition {
     # no check was successful -> return nothing
     if ( !$TransitionEntityID || !length $TransitionEntityID ) {
         if ( $Self->{Debug} > 0 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => 'No Transition matched for TicketID: '
                     . "$Param{TicketID} ProcessEntityID: $Param{ProcessEntityID} "
@@ -466,7 +466,7 @@ sub ProcessTransition {
     }
 
     # get activity object
-    my $ActivityObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity');
+    my $ActivityObject = $Kernel::OM->Get('ProcessManagement::Activity');
 
     # If we have a Transition without valid FutureActivitySet we have to complain
     if (
@@ -480,7 +480,7 @@ sub ProcessTransition {
         )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Target Activity for Process with "
                 . "ProcessEntityID: $Param{ProcessEntityID} ActivityEntityID:"
@@ -494,7 +494,7 @@ sub ProcessTransition {
     # { TransitionEntityID => FutureActivityEntityID }
     if ( $Param{CheckOnly} ) {
         if ( $Self->{Debug} > 0 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => "Transition with ID $TransitionEntityID matched for "
                     . "TicketID: $Param{TicketID} ProcessEntityID: $Param{ProcessEntityID} "
@@ -513,7 +513,7 @@ sub ProcessTransition {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Failed setting ActivityEntityID of Ticket: $Param{TicketID} to "
                 . $Transitions{$TransitionEntityID}{ActivityEntityID}
@@ -537,7 +537,7 @@ sub ProcessTransition {
 
     # if we have Transition Action and it isn't an array return
     if ( !IsArrayRefWithData( $Transitions{$TransitionEntityID}{TransitionAction} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Defective Process configuration: 'TrasitionAction' must be an array in "
                 . "Process: $Param{ProcessEntityID} -> Path -> "
@@ -547,14 +547,14 @@ sub ProcessTransition {
     }
 
     # get transition action object
-    my $TransitionActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction');
+    my $TransitionActionObject = $Kernel::OM->Get('ProcessManagement::TransitionAction');
 
     my $TransitionActions = $TransitionActionObject->TransitionActionList(
         TransitionActionEntityID => $Transitions{$TransitionEntityID}{TransitionAction},
     );
 
     if ( !IsArrayRefWithData($TransitionActions) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Getting TransitionActionList for Process: $Param{ProcessEntityID},"
                 . " Transition: $TransitionEntityID failed.",
@@ -618,7 +618,7 @@ sub ProcessTicketActivitySet {
 
     for my $Needed (qw(ProcessEntityID ActivityEntityID TicketID UserID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -627,7 +627,7 @@ sub ProcessTicketActivitySet {
     }
 
     # get activity object
-    my $ActivityObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::Activity');
+    my $ActivityObject = $Kernel::OM->Get('ProcessManagement::Activity');
 
     # check on valid ActivityEntityID
     my $Success = $ActivityObject->ActivityGet(
@@ -636,7 +636,7 @@ sub ProcessTicketActivitySet {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Process->ProcessTicketActivitySet called on "
                 . "non existing ActivityEntityID: $Param{ActivityEntityID}!",
@@ -648,7 +648,7 @@ sub ProcessTicketActivitySet {
     my $Process = $Self->ProcessGet( ProcessEntityID => $Param{ProcessEntityID} );
 
     if ( !$Process->{State} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't set ActivitySet for Process '$Param{ProcessEntityID}', cat get"
                 . " State out of the config!",
@@ -657,7 +657,7 @@ sub ProcessTicketActivitySet {
     }
 
     if ( $Process->{State} eq 'Inactive' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't set ActivitySet for Process '$Param{ProcessEntityID}', State is"
                 . " '$Process->{State}'!",
@@ -667,9 +667,9 @@ sub ProcessTicketActivitySet {
 
     # Get DynamicField Name that's used for storing the ActivityEntityID per ticket
     my $DynamicFieldTicketActivityEntityID
-        = $Kernel::OM->Get('Kernel::Config')->Get('Process::DynamicFieldProcessManagementActivityID');
+        = $Kernel::OM->Get('Config')->Get('Process::DynamicFieldProcessManagementActivityID');
     if ( !$DynamicFieldTicketActivityEntityID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need DynamicFieldProcessManagementActivityID config "
                 . "for storing of ActivityEntityID on TicketID: $Param{TicketID}!",
@@ -678,8 +678,8 @@ sub ProcessTicketActivitySet {
     }
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # get the dynamic fields for this screen
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
@@ -692,7 +692,7 @@ sub ProcessTicketActivitySet {
 
     # if the DynamicField isn't there, return 0 and log
     if ( !IsHashRefWithData( $DynamicFieldConfig[0] ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "DynamicField: $DynamicFieldTicketActivityEntityID not configured!",
         );
@@ -737,7 +737,7 @@ sub ProcessTicketProcessSet {
 
     for my $Needed (qw(ProcessEntityID TicketID UserID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -749,7 +749,7 @@ sub ProcessTicketProcessSet {
     my $Process = $Self->ProcessGet( ProcessEntityID => $Param{ProcessEntityID} );
 
     if ( !$Process->{State} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't set Process '$Param{ProcessEntityID}' for TicketID"
                 . " '$Param{TicketID}', cat get State out of the config!",
@@ -758,7 +758,7 @@ sub ProcessTicketProcessSet {
     }
 
     if ( $Process->{State} ne 'Active' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't set Process '$Param{ProcessEntityID}' for TicketID"
                 . " '$Param{TicketID}', State is '$Process->{State}'!",
@@ -768,10 +768,10 @@ sub ProcessTicketProcessSet {
 
     # Get DynamicField Name that's used for storing the ActivityEntityID per ticket
     my $DynamicFieldTicketProcessID
-        = $Kernel::OM->Get('Kernel::Config')->Get('Process::DynamicFieldProcessManagementProcessID');
+        = $Kernel::OM->Get('Config')->Get('Process::DynamicFieldProcessManagementProcessID');
 
     if ( !$DynamicFieldTicketProcessID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need DynamicFieldProcessManagementProcessID config "
                 . "for storing of ProcesID on TicketID: $Param{TicketID}!",
@@ -780,8 +780,8 @@ sub ProcessTicketProcessSet {
     }
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # get the dynamic fields for this screen
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
@@ -794,7 +794,7 @@ sub ProcessTicketProcessSet {
 
     # if the DynamicField isn't there, return 0 and log
     if ( !IsHashRefWithData( $DynamicFieldConfig[0] ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "DynamicField: $DynamicFieldTicketProcessID not configured!",
         );

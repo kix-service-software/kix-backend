@@ -62,7 +62,7 @@ sub _CheckMailFilter {
 
     my $MailFilter = $Param{MailFilter};
 
-    my $XHeaders     = $Kernel::OM->Get('Kernel::Config')->Get('PostmasterX-Header') || [];
+    my $XHeaders     = $Kernel::OM->Get('Config')->Get('PostmasterX-Header') || [];
     my %MatchHeaders = ();
     my %SetHeaders   = ();
     for my $Header ( @{$XHeaders} ) {

@@ -7,7 +7,7 @@
       "Permission" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Permission_json"
+            "$ref" : "#/definitions/Permission_json-eb3fca7920"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Permission"
    ],
    "definitions" : {
-      "_Permission_json" : {
+      "Permission_json-eb3fca7920" : {
          "$id" : "#Permission",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",

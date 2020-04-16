@@ -14,12 +14,12 @@ use warnings;
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::SystemMaintenance',
-    'Kernel::System::Time',
+    'Config',
+    'Contact',
+    'Log',
+    'Main',
+    'SystemMaintenance',
+    'Time',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ContactAuthObject = $Kernel::OM->Get('Kernel::System::ContactAuth');
+    my $ContactAuthObject = $Kernel::OM->Get('ContactAuth');
 
 =cut
 
@@ -54,8 +54,8 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $MainObject   = $Kernel::OM->Get('Main');
 
     # load auth modules
     SOURCE:
@@ -120,8 +120,8 @@ sub Auth {
     my ( $Self, %Param ) = @_;
 
     # get customer user object
-    my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my $ConfigObject       = $Kernel::OM->Get('Config');
+    my $ContactObject = $Kernel::OM->Get('Contact');
 
     # use all 11 backends and return on first auth
     my $UserID;
@@ -191,7 +191,7 @@ sub Auth {
     # check if user is valid
     my %ContactData = $ContactObject->ContactGet( ID => $UserID );
     if ( defined $ContactData{ValidID} && $ContactData{ValidID} ne 1 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Contact: '$ContactData{User}' is set to invalid, can't login!",
         );
@@ -209,7 +209,7 @@ sub Auth {
 
     # on system maintenance customers
     # shouldn't be allowed get into the system
-    my $ActiveMaintenance = $Kernel::OM->Get('Kernel::System::SystemMaintenance')->SystemMaintenanceIsActive();
+    my $ActiveMaintenance = $Kernel::OM->Get('SystemMaintenance')->SystemMaintenanceIsActive();
 
     # check if system maintenance is active
     if ($ActiveMaintenance) {
@@ -224,7 +224,7 @@ sub Auth {
     # last login preferences update
     $ContactObject->SetPreferences(
         Key    => 'UserLastLogin',
-        Value  => $Kernel::OM->Get('Kernel::System::Time')->SystemTime(),
+        Value  => $Kernel::OM->Get('Time')->SystemTime(),
         ContactID => $ContactData{ID},
     );
 

@@ -18,23 +18,23 @@ use List::Util qw(first);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Contact',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Email',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::JSON',
-    'Kernel::System::Log',
-    'Kernel::System::NotificationEvent',
-    'Kernel::System::Role',
-    'Kernel::System::Queue',
-    'Kernel::System::SystemAddress',
-    'Kernel::System::TemplateGenerator',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'Contact',
+    'DB',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Email',
+    'HTMLUtils',
+    'JSON',
+    'Log',
+    'NotificationEvent',
+    'Role',
+    'Queue',
+    'SystemAddress',
+    'TemplateGenerator',
+    'Ticket',
+    'Time',
+    'User',
 );
 
 sub new {
@@ -53,7 +53,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -62,7 +62,7 @@ sub Run {
     }
 
     if ( !$Param{Data}->{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TicketID in Data!',
         );
@@ -70,7 +70,7 @@ sub Run {
     }
 
     # get objects
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # return if no notification is active
     return 1 if $TicketObject->{SendNoNotification};
@@ -84,7 +84,7 @@ sub Run {
     return 1 if !$TicketExists;
 
     # get notification event object
-    my $NotificationEventObject = $Kernel::OM->Get('Kernel::System::NotificationEvent');
+    my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
     # check if event is affected
     my @IDs = $NotificationEventObject->NotificationEventCheck(
@@ -102,7 +102,7 @@ sub Run {
     );
 
     # get dynamic field objects
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
     # get dynamic fields
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
@@ -146,7 +146,7 @@ sub Run {
 
                 # get article, it is needed for the correct behavior of the
                 # StripPlainBodyAsAttachment flag into the ArticleAttachmentIndex function
-                my %Article = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleGet(
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
                     ArticleID     => $Param{Data}->{ArticleID},
                     UserID        => $Param{UserID},
                     DynamicFields => 0,
@@ -194,7 +194,7 @@ sub Run {
         my @NotificationBundle;
 
         # get template generator object;
-        my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
+        my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
         # parse all notification tags for each user
         for my $Recipient (@RecipientUsers) {
@@ -207,7 +207,7 @@ sub Run {
                 UserID                => $Param{UserID},
             );
 
-            my $UserNotificationTransport = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            my $UserNotificationTransport = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Recipient->{Preferences}->{NotificationTransport},
             );
 
@@ -219,7 +219,7 @@ sub Run {
         }
 
         # get config object
-        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+        my $ConfigObject = $Kernel::OM->Get('Config');
 
         # get notification transport config
         my %TransportConfig = %{ $ConfigObject->Get('Notification::Transport') || {} };
@@ -246,7 +246,7 @@ sub Run {
             };
 
             if ( !$TransportObject ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Could not create a new $TransportConfig{$Transport}->{Module} object!",
                 );
@@ -255,7 +255,7 @@ sub Run {
             }
 
             if ( ref $TransportObject ne $TransportConfig{$Transport}->{Module} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "$TransportConfig{$Transport}->{Module} object is invalid",
                 );
@@ -374,7 +374,7 @@ sub Run {
             # check for errors
             if ( !$UpdateToSuccess ) {
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Could not update To field for Article: $Param{Data}->{ArticleID}.",
                 );
@@ -397,7 +397,7 @@ sub _NotificationFilter {
     my %Notification = %{ $Param{Notification} };
 
     # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     KEY:
     for my $Key ( sort keys %{ $Notification{Data} } ) {
@@ -410,7 +410,7 @@ sub _NotificationFilter {
 
         my %Article;
         if ( $Param{Data}->{ArticleID} ) {
-            %Article = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleGet(
+            %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
                 ArticleID     => $Param{Data}->{ArticleID},
                 UserID        => $Param{UserID},
                 DynamicFields => 0,
@@ -513,8 +513,8 @@ sub _RecipientsGet {
     my %Ticket       = %{ $Param{Ticket} };
 
     # get needed objects
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my @RecipientUserIDs;
     my @RecipientUsers;
@@ -531,8 +531,8 @@ sub _RecipientsGet {
     if ( $Notification{Data}->{Recipients} ) {
 
         # get needed objects
-        my $QueueObject        = $Kernel::OM->Get('Kernel::System::Queue');
-        my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+        my $QueueObject        = $Kernel::OM->Get('Queue');
+        my $ContactObject = $Kernel::OM->Get('Contact');
 
         # KIX4OTRS-capeIT
         my @LinkedAgents = ();
@@ -541,7 +541,7 @@ sub _RecipientsGet {
         if ( %SelectedRecipientTypes ) {
 
             # get linked persons
-            my @LinkedRecipients = $Kernel::OM->Get('Kernel::System::Web::Request')->GetArray( Param => 'LinkedPersonToInform' );
+            my @LinkedRecipients = $Kernel::OM->Get('WebRequest')->GetArray( Param => 'LinkedPersonToInform' );
 
             my @RecipientType = ();
             for my $LinkedRecipient ( @LinkedRecipients ) {
@@ -602,14 +602,15 @@ sub _RecipientsGet {
 
                     # check each valid user if he has READ permission on /tickets
                     my @UserIDs;
-                    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+                    my %UserList = $Kernel::OM->Get('User')->UserList(
                         Valid => 1,
                         Short => 1,
                     );
                     foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
+                        my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                             UserID              => $UserID,
                             Target              => '/tickets/' . $Ticket{TicketID},
+                            UsageContect        => 'Agent',
                             RequestedPermission => 'READ'
                         );
                         if ( $Granted ) {
@@ -623,14 +624,15 @@ sub _RecipientsGet {
 
                     # check each valid user if he has UPDATE permission on /tickets
                     my @UserIDs;
-                    my %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+                    my %UserList = $Kernel::OM->Get('User')->UserList(
                         Valid => 1,
                         Short => 1,
                     );
                     foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
+                        my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                             UserID              => $UserID,
                             Target              => '/tickets/' . $Ticket{TicketID},
+                            UsageContext        => 'Agent',
                             RequestedPermission => 'UPDATE'
                         );
                         if ( $Granted ) {
@@ -733,7 +735,7 @@ sub _RecipientsGet {
                     && !$Ticket{ContactID}
                     )
                 {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'info',
                         Message  => 'Send no customer notification because no customer is set!',
                     );
@@ -785,7 +787,7 @@ sub _RecipientsGet {
         RECIPIENT:
         for my $RoleID ( @{ $Notification{Data}->{RecipientRoles} } ) {
 
-            my @RoleMemberList = $Kernel::OM->Get('Kernel::System::Role')->RoleUserList(
+            my @RoleMemberList = $Kernel::OM->Get('Role')->RoleUserList(
                 RoleID => $RoleID,
             );
 
@@ -803,7 +805,7 @@ sub _RecipientsGet {
     }
 
     # get needed objects
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     my %SkipRecipients;
     if ( IsArrayRefWithData( $Param{Data}->{SkipRecipients} ) ) {
@@ -831,7 +833,7 @@ sub _RecipientsGet {
     @RecipientUserIDs = sort keys %TempRecipientUserIDs;
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get current time-stamp
     my $Time = $TimeObject->SystemTime();
@@ -883,6 +885,7 @@ sub _RecipientsGet {
         my ($Granted) = $UserObject->CheckResourcePermission(
             UserID              => $User{UserID},
             Target              => '/tickets/' . $Ticket{TicketID},
+            UsageContext        => 'Agent',
             RequestedPermission => 'READ'
         );
         next RECIPIENT if !$Granted;
@@ -905,7 +908,7 @@ sub _SendRecipientNotification {
     # check needed stuff
     for my $Needed (qw(TicketID UserID Notification Recipient Event Transport TransportObject)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -913,7 +916,7 @@ sub _SendRecipientNotification {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # check if the notification needs to be sent just one time per day
     if ( 
@@ -939,7 +942,7 @@ sub _SendRecipientNotification {
         if ( $LastNotificationHistory && $LastNotificationHistory->{CreateTime} ) {
 
             # get time object
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             # get last notification date
             my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
@@ -1009,7 +1012,7 @@ sub _SendRecipientNotification {
 
     if ( !$EventData{Event} || !$EventData{Data} || !$EventData{UserID} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not trigger notification post send event",
         );
@@ -1037,9 +1040,9 @@ sub _ArticleToUpdate {
     return 1 if $Param{UserID} eq 1;
 
     # get needed objects
-    my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
-    my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+    my $DBObject   = $Kernel::OM->Get('DB');
+    my $UserObject = $Kernel::OM->Get('User');
+    my $ContactObject = $Kernel::OM->Get('Contact');
 
     # not update if its not a note article
     return 1 if $Param{Channel} ne 'note';

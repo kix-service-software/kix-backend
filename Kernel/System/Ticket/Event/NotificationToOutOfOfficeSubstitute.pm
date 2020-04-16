@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::Log',
-    'Kernel::System::Email',
-    'Kernel::System::Time',
-    'Kernel::System::User',
+    'Config',
+    'HTMLUtils',
+    'Log',
+    'Email',
+    'Time',
+    'User',
 );
 
 =item new()
@@ -36,12 +36,12 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{ConfigObject}    = $Kernel::OM->Get('Kernel::Config');
-    $Self->{HTMLUtilsObject} = $Kernel::OM->Get('Kernel::System::HTMLUtils');
-    $Self->{LogObject}       = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{SendmailObject}  = $Kernel::OM->Get('Kernel::System::Email');
-    $Self->{TimeObject}      = $Kernel::OM->Get('Kernel::System::Time');
-    $Self->{UserObject}      = $Kernel::OM->Get('Kernel::System::User');
+    $Self->{ConfigObject}    = $Kernel::OM->Get('Config');
+    $Self->{HTMLUtilsObject} = $Kernel::OM->Get('HTMLUtils');
+    $Self->{LogObject}       = $Kernel::OM->Get('Log');
+    $Self->{SendmailObject}  = $Kernel::OM->Get('Email');
+    $Self->{TimeObject}      = $Kernel::OM->Get('Time');
+    $Self->{UserObject}      = $Kernel::OM->Get('User');
 
     return $Self;
 }

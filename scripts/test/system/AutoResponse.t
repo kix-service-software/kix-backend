@@ -15,18 +15,18 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject        = $Kernel::OM->Get('Kernel::Config');
-my $AutoResponseObject  = $Kernel::OM->Get('Kernel::System::AutoResponse');
-my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
-my $QueueObject         = $Kernel::OM->Get('Kernel::System::Queue');
+my $ConfigObject        = $Kernel::OM->Get('Config');
+my $AutoResponseObject  = $Kernel::OM->Get('AutoResponse');
+my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
+my $QueueObject         = $Kernel::OM->Get('Queue');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 # get random id
 my $RandomID = $HelperObject->GetRandomID();
@@ -52,14 +52,14 @@ $Self->True(
 # add system address
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
     Value => '0',
 );
 
-my $ContactID = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname  => 'John',
     Lastname   => 'Doe',
     PrimaryOrganisationID  => 1,
@@ -203,7 +203,7 @@ $Self->Is(
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create a new ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -242,7 +242,7 @@ $Self->True(
     "First article created."
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 my $CleanUpSuccess  = $TestEmailObject->CleanUp();
 $Self->True(
     $CleanUpSuccess,

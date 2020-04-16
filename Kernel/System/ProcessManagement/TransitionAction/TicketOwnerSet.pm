@@ -19,8 +19,8 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketOwnerSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketOwnerSet');
+    my $TicketOwnerSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketOwnerSet');
 
 =cut
 
@@ -107,7 +107,7 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{OwnerID} && !$Param{Config}->{Owner} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No Owner or OwnerID configured!",
         );
@@ -121,7 +121,7 @@ sub Run {
         && $Param{Config}->{Owner} ne $Param{Ticket}->{Owner}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketOwnerSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketOwnerSet(
             TicketID => $Param{Ticket}->{TicketID},
             NewUser  => $Param{Config}->{Owner},
             UserID   => $Param{UserID},
@@ -132,7 +132,7 @@ sub Run {
         && $Param{Config}->{OwnerID} ne $Param{Ticket}->{OwnerID}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketOwnerSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketOwnerSet(
             TicketID  => $Param{Ticket}->{TicketID},
             NewUserID => $Param{Config}->{OwnerID},
             UserID    => $Param{UserID},
@@ -152,7 +152,7 @@ sub Run {
         else {
             $CustomMessage = "OwnerID: $Param{Config}->{OwnerID},";
         }
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . 'Ticket owner could not be updated to '

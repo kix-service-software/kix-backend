@@ -16,8 +16,8 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
+    'Config',
+    'DB',
 );
 
 sub GetDisplayPath {
@@ -115,14 +115,14 @@ sub Run {
                     LEFT JOIN dynamic_field_value dfv ON df.id = dfv.field_id
                     RIGHT JOIN ticket t ON t.id = dfv.object_id
                 WHERE df.name = '"
-                . $Kernel::OM->Get('Kernel::Config')->Get("Process::DynamicFieldProcessManagementProcessID") . "'",
+                . $Kernel::OM->Get('Config')->Get("Process::DynamicFieldProcessManagementProcessID") . "'",
             Identifier => 'ProcessTickets',
             Label      => Translatable("Process Tickets"),
         },
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my %Counts;
     CHECK:

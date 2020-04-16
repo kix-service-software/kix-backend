@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Priority',
+    'Log',
+    'Ticket',
+    'Priority',
 );
 
 =head1 NAME
@@ -71,7 +71,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
@@ -87,7 +87,7 @@ sub Run {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't delete ticket $Param{TicketID}!",
             UserID   => $Param{UserID}

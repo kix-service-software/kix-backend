@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 sub new {
@@ -36,7 +36,7 @@ sub Send {
     # check needed stuff
     for (qw(Header Body ToArray)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -60,7 +60,7 @@ sub Send {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$ToString' from '$Param{From}'.",
         );

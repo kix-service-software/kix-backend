@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::User',
+    'Log',
+    'Ticket',
+    'User',
 );
 
 =head1 NAME
@@ -44,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketArticleCreateObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketArticleCreate');
+    my $TicketArticleCreateObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketArticleCreate');
 
 =cut
 
@@ -150,7 +150,7 @@ sub Run {
 
     # check Channel
     if ( $Param{Config}->{Channel} =~ m{\A email }msxi ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . "Channel $Param{Config}->{Channel} is not supported",
@@ -159,13 +159,13 @@ sub Run {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # If "From" is not set
     if ( !$Param{Config}->{From} ) {
 
         # Get current user data
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $Param{UserID},
         );
 
@@ -179,7 +179,7 @@ sub Run {
     );
 
     if ( !$ArticleID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . "Couldn't create article for Ticket: "

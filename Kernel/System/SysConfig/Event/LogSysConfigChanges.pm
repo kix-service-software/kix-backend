@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::SysConfigChangeLog',
-    'Kernel::System::User',
+    'Log',
+    'SysConfigChangeLog',
+    'User',
 );
 
 =head1 NAME
@@ -37,7 +37,7 @@ create a SysConfig::Event::LogSysConfigChanges object. Do not use it directly, i
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SysConfigEventLogSysConfigChangesObject = $Kernel::OM->Get('Kernel::System::SysConfig::Event::LogSysConfigChanges');
+    my $SysConfigEventLogSysConfigChangesObject = $Kernel::OM->Get('SysConfig::Event::LogSysConfigChanges');
 
 =cut
 
@@ -49,9 +49,9 @@ sub new {
     bless( $Self, $Type );
 
     # get needed objects
-    $Self->{LogObject}                = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{UserObject}               = $Kernel::OM->Get('Kernel::System::User');
-    $Self->{SysConfigChangeLogObject} = $Kernel::OM->Get('Kernel::System::SysConfigChangeLog');
+    $Self->{LogObject}                = $Kernel::OM->Get('Log');
+    $Self->{UserObject}               = $Kernel::OM->Get('User');
+    $Self->{SysConfigChangeLogObject} = $Kernel::OM->Get('SysConfigChangeLog');
 
     return $Self;
 }

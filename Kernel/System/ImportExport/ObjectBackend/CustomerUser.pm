@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::ImportExport',
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
-    'Kernel::Config'
+    'ImportExport',
+    'Contact',
+    'Log',
+    'Config'
 );
 
 =head1 NAME
@@ -88,13 +88,13 @@ sub ObjectAttributesGet {
 
     # check needed object
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')
+        $Kernel::OM->Get('Log')
             ->Log( Priority => 'error', Message => 'Need UserID!' );
         return;
     }
 
-    my %CSList    = $Kernel::OM->Get('Kernel::System::Contact')->CustomerSourceList();
-    my %Validlist = $Kernel::OM->Get('Kernel::System::Valid')->ValidList();
+    my %CSList    = $Kernel::OM->Get('Contact')->CustomerSourceList();
+    my %Validlist = $Kernel::OM->Get('Valid')->ValidList();
 
     my $Attributes = [
         {
@@ -220,7 +220,7 @@ sub MappingObjectAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -229,14 +229,14 @@ sub MappingObjectAttributesGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     my @ElementList = qw{};
     my @Map =
-        @{ $Kernel::OM->Get('Kernel::Config')->{ $ObjectData->{CustomerBackend} }->{'Map'} };
+        @{ $Kernel::OM->Get('Config')->{ $ObjectData->{CustomerBackend} }->{'Map'} };
 
     for my $CurrAttributeMapping (@Map) {
         my $CurrAttribute = {
@@ -311,7 +311,7 @@ sub SearchAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -320,7 +320,7 @@ sub SearchAttributesGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -345,7 +345,7 @@ sub ExportDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -354,14 +354,14 @@ sub ExportDataGet {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -369,7 +369,7 @@ sub ExportDataGet {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -377,7 +377,7 @@ sub ExportDataGet {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -390,7 +390,7 @@ sub ExportDataGet {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -398,7 +398,7 @@ sub ExportDataGet {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for the template id $Param{TemplateID}",
             );
@@ -409,7 +409,7 @@ sub ExportDataGet {
     }
 
     # search the customer users...
-    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+    my %ContactList = $Kernel::OM->Get('Contact')->ContactSearch(
         Search => '*',
         Valid  => 0,
     );
@@ -418,13 +418,13 @@ sub ExportDataGet {
 
     for my $ContactID (keys %ContactList) {
 
-        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $ContactID,
         );
 
         # prepare validity...
         if ( $ContactData{ValidID} ) {
-            $ContactData{Valid} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+            $ContactData{Valid} = $Kernel::OM->Get('Valid')->ValidLookup(
                 ValidID => $ContactData{ValidID},
             );
         }
@@ -475,7 +475,7 @@ sub ImportDataSave {
     # check needed stuff
     for my $Argument (qw(TemplateID ImportDataRow UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -485,7 +485,7 @@ sub ImportDataSave {
 
     # check import data row
     if ( ref $Param{ImportDataRow} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'ImportDataRow must be an array reference',
         );
@@ -493,14 +493,14 @@ sub ImportDataSave {
     }
 
     # get object data
-    my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+    my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
 
     # check object data
     if ( !$ObjectData || ref $ObjectData ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No object data found for the template id $Param{TemplateID}",
         );
@@ -508,7 +508,7 @@ sub ImportDataSave {
     }
 
     # get the mapping list
-    my $MappingList = $Kernel::OM->Get('Kernel::System::ImportExport')->MappingList(
+    my $MappingList = $Kernel::OM->Get('ImportExport')->MappingList(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -516,7 +516,7 @@ sub ImportDataSave {
     # check the mapping list
     if ( !$MappingList || ref $MappingList ne 'ARRAY' || !@{$MappingList} ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid mapping list found for the template id $Param{TemplateID}",
         );
@@ -536,7 +536,7 @@ sub ImportDataSave {
 
         # get mapping object data
         my $MappingObjectData =
-            $Kernel::OM->Get('Kernel::System::ImportExport')->MappingObjectDataGet(
+            $Kernel::OM->Get('ImportExport')->MappingObjectDataGet(
             MappingID => $MappingID,
             UserID    => $Param{UserID},
             );
@@ -544,7 +544,7 @@ sub ImportDataSave {
         # check mapping object data
         if ( !$MappingObjectData || ref $MappingObjectData ne 'HASH' ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No valid mapping list found for template id $Param{TemplateID}",
             );
@@ -586,14 +586,14 @@ sub ImportDataSave {
         else {
             # Sanitize country if it isn't found in KIX to increase the chance it will
             # Note that standardizing against the ISO 3166-1 list might be a better approach...
-            my $CountryList = $Kernel::OM->Get('Kernel::System::ReferenceData')->CountryList();
+            my $CountryList = $Kernel::OM->Get('ReferenceData')->CountryList();
             if ( exists $CountryList->{$Param{ImportDataRow}->[$Counter]} ) {
                 $NewContactData{ $MappingObjectData->{Key} } = $Param{ImportDataRow}->[$Counter];
             } 
             else {
                 $NewContactData{ $MappingObjectData->{Key} } = 
                     join ('', map { ucfirst lc } split /(\s+)/, $Param{ImportDataRow}->[$Counter]);
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message  => "Country '$Param{ImportDataRow}->[$Counter]' "
                         . "not found - save as '$NewContactData{ $MappingObjectData->{Key} }'.",
@@ -619,7 +619,7 @@ sub ImportDataSave {
     my %ContactData = ();
 
     my $ContactKey;
-    my $CustomerBackend = $Kernel::OM->Get('Kernel::Config')->Get($ObjectData->{CustomerBackend} || $ObjectData->{ContactBackend});
+    my $CustomerBackend = $Kernel::OM->Get('Config')->Get($ObjectData->{CustomerBackend} || $ObjectData->{ContactBackend});
     if ( $CustomerBackend && $CustomerBackend->{CustomerKey} && $CustomerBackend->{Map} ) {
         for my $Entry ( @{ $CustomerBackend->{Map} } ) {
             next if ( $Entry->{Label} ne $CustomerBackend->{CustomerKey} );
@@ -633,7 +633,7 @@ sub ImportDataSave {
     }
 
     if ( $NewContactData{$ContactKey} ) {
-        %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $NewContactData{$ContactKey}
         );
     }
@@ -645,19 +645,19 @@ sub ImportDataSave {
 
     #---------------------------------------------------------------------------
     # (1) Preprocess data...
-    my $DefaultCustomerID = $Kernel::OM->Get('Kernel::Config')->Get(
+    my $DefaultCustomerID = $Kernel::OM->Get('Config')->Get(
         'ContactImport::DefaultCustomerID'
     ) || 'DefaultCustomerID';
-    my $DefaultEmailAddress = $Kernel::OM->Get('Kernel::Config')->Get(
+    my $DefaultEmailAddress = $Kernel::OM->Get('Config')->Get(
         'ContactImport::DefaultEmailAddress'
     ) || 'dummy@localhost';
-    my $EmailDomainCustomerIDMapping = $Kernel::OM->Get('Kernel::Config')->Get(
+    my $EmailDomainCustomerIDMapping = $Kernel::OM->Get('Config')->Get(
         'ContactImport::EMailDomainCustomerIDMapping'
     );
 
     # lookup Valid-ID...
     if ( !$NewContactData{ValidID} && $NewContactData{Valid} ) {
-        $NewContactData{ValidID} = $Kernel::OM->Get('Kernel::System::Valid')->ValidLookup(
+        $NewContactData{ValidID} = $Kernel::OM->Get('Valid')->ValidLookup(
             Valid => $NewContactData{Valid}
         );
     }
@@ -739,14 +739,14 @@ sub ImportDataSave {
 
         # set defaults
         delete $ContactData{ID};
-        $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+        $Result = $Kernel::OM->Get('Contact')->ContactAdd(
             %ContactData,
             Source => $ObjectData->{CustomerBackend} || $ObjectData->{ContactBackend},
             UserID => $Param{UserID},
         );
 
         if ( !$Result ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ImportDataSave: adding Contact ("
                     . "CustomerEmail "
@@ -770,14 +770,14 @@ sub ImportDataSave {
             && $ContactData{Source} eq $ObjectData->{CustomerBackend}
             )
         {
-            $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+            $Result = $Kernel::OM->Get('Contact')->ContactUpdate(
                 Source => $ObjectData->{CustomerBackend},
                 %ContactData,
                 UserID => $Param{UserID},
             );
 
             if ( !$Result ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "ImportDataSave: updating Contact ("
                         . "CustomerEmail "
@@ -806,10 +806,10 @@ sub ImportDataSave {
                 )
             {
                 $BackendRef{ $ContactData{Source} } =
-                    $Kernel::OM->Get('Kernel::System::Contact')->{ $ContactData{Source} };
-                delete( $Kernel::OM->Get('Kernel::System::Contact')->{ $ContactData{Source} } );
+                    $Kernel::OM->Get('Contact')->{ $ContactData{Source} };
+                delete( $Kernel::OM->Get('Contact')->{ $ContactData{Source} } );
 
-                %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+                %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                     ID => $NewContactData{$ContactKey}
                 );
             }
@@ -826,7 +826,7 @@ sub ImportDataSave {
                 )
             {
                 $ContactData{ID} = $NewContactData{$ContactKey};
-                $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactUpdate(
+                $Result = $Kernel::OM->Get('Contact')->ContactUpdate(
                     %ContactData,
                     Source => $ObjectData->{CustomerBackend},
                     UserID => $Param{UserID},
@@ -837,7 +837,7 @@ sub ImportDataSave {
 
             # create new entry...
             else {
-                $Result = $Kernel::OM->Get('Kernel::System::Contact')->ContactAdd(
+                $Result = $Kernel::OM->Get('Contact')->ContactAdd(
                     %ContactData,
                     Source => $ObjectData->{CustomerBackend},
                     UserID => $Param{UserID},
@@ -848,7 +848,7 @@ sub ImportDataSave {
 
             # check for errors...
             if ( !$Result ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "ImportDataSave: forcing Contact ("
                         . "CustomerEmail "
@@ -863,12 +863,12 @@ sub ImportDataSave {
 
             # restore customer user data backend refs...
             for my $CurrKey ( keys(%BackendRef) ) {
-                $Kernel::OM->Get('Kernel::System::Contact')->{$CurrKey} = $BackendRef{$CurrKey};
+                $Kernel::OM->Get('Contact')->{$CurrKey} = $BackendRef{$CurrKey};
             }
 
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "ImportDataSave: updating Contact ("
                     . "CustomerEmail "

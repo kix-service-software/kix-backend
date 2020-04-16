@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Lock" : {
-         "$ref" : "#/definitions/_Lock_json"
+         "$ref" : "#/definitions/Lock_json-e5e85df3b3"
       }
    },
    "required" : [
       "Lock"
    ],
    "definitions" : {
-      "_Lock_json" : {
+      "Lock_json-e5e85df3b3" : {
          "$id" : "#Lock",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket lock object.",

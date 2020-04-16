@@ -1,0 +1,56 @@
+{
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "#JobRun",
+   "type": "object",
+   "description": "The job run object.",
+   "properties": {
+      "CreateBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "StartTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "EndTime": {
+        "type": "string",
+        "readOnly": true
+      },
+      "Filter": {
+        "type": "object",
+        "readOnly": true
+      },
+      "ID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "JobID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "Logs": {
+        "type": "array",
+        "description": "execution logs of this run - added via include \"Logs\"",
+        "readOnly": true,
+        "item": {
+          "$ref": "JobRunLog.json"
+        }
+      },
+      "State": {
+         "type": "string",
+         "readOnly": true
+      },
+      "StateID": {
+         "type": "integer",
+         "readOnly": true
+      }
+   },
+   "required" : [
+      "CreateBy",
+      "StartTime",
+      "ID",
+      "JobID",
+      "State",
+      "StateID"
+   ]
+}

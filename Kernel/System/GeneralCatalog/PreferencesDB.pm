@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'DB',
+    'Log',
 );
 
 =head1 NAME
@@ -39,7 +39,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $GeneralCatalogPreferencesDBObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog::PreferencesDB');
+    my $GeneralCatalogPreferencesDBObject = $Kernel::OM->Get('GeneralCatalog::PreferencesDB');
 
 =cut
 
@@ -77,7 +77,7 @@ sub GeneralCatalogPreferencesSet {
     # check needed stuff
     for my $Needed (qw(ItemID Key Value)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -86,7 +86,7 @@ sub GeneralCatalogPreferencesSet {
     }
 
     # delete old data
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => "DELETE FROM $Self->{PreferencesTable} WHERE "
             . "$Self->{PreferencesTableGcID} = ? AND $Self->{PreferencesTableKey} = ?",
         Bind => [
@@ -96,7 +96,7 @@ sub GeneralCatalogPreferencesSet {
     );
 
     # insert new data
-    return $Kernel::OM->Get('Kernel::System::DB')->Do(
+    return $Kernel::OM->Get('DB')->Do(
         SQL => "INSERT INTO $Self->{PreferencesTable} ($Self->{PreferencesTableGcID}, "
             . " $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue}) "
             . " VALUES (?, ?, ?)",
@@ -124,7 +124,7 @@ sub GeneralCatalogPreferencesGet {
     # check needed stuff
     for my $Needed (qw(ItemID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -133,19 +133,19 @@ sub GeneralCatalogPreferencesGet {
     }
 
     # check if queue preferences are available
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('GeneralCatalogPreferences') ) {
+    if ( !$Kernel::OM->Get('Config')->Get('GeneralCatalogPreferences') ) {
         return;
     }
 
     # get preferences
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => "SELECT $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue} "
             . " FROM $Self->{PreferencesTable} WHERE $Self->{PreferencesTableGcID} = ?",
         Bind => [ \$Param{ItemID} ],
     );
 
     my %Data;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Data{ $Row[0] } = $Row[1];
     }
 

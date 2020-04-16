@@ -15,8 +15,8 @@ use base qw(Kernel::System::Console::BaseCommand);
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::ImportExport::ITSMConfigItemCSVMappingAutoCreate',
-    'Kernel::System::GeneralCatalog'
+    'ImportExport::ITSMConfigItemCSVMappingAutoCreate',
+    'GeneralCatalog'
 );
 
 sub Configure {
@@ -38,8 +38,8 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $AutoCreateObject     = $Kernel::OM->Get('Kernel::System::ImportExport::ITSMConfigItemCSVMappingAutoCreate');
-    my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+    my $AutoCreateObject     = $Kernel::OM->Get('ImportExport::ITSMConfigItemCSVMappingAutoCreate');
+    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
     my $ClassName = $Self->GetOption('class');
 

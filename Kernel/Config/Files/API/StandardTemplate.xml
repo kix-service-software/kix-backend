@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">StandardTemplateGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::StandardTemplate::StandardTemplateGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">StandardTemplate</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -18,6 +19,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">StandardTemplateSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::StandardTemplate::StandardTemplateSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">StandardTemplate</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -29,6 +31,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">StandardTemplateCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::StandardTemplate::StandardTemplateCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">StandardTemplate</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -40,6 +43,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">StandardTemplateUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::StandardTemplate::StandardTemplateUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">StandardTemplate</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
@@ -51,6 +55,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">StandardTemplateDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::StandardTemplate::StandardTemplateDelete</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="Controller">StandardTemplate</Item>
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>

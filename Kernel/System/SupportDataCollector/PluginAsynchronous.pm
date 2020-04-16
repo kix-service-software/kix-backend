@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::JSON',
-    'Kernel::System::SystemData',
+    'JSON',
+    'SystemData',
 );
 
 use base qw(Kernel::System::SupportDataCollector::PluginBase);
@@ -25,14 +25,14 @@ sub _GetAsynchronousData {
 
     my $Identifier = Scalar::Util::blessed($Self);
 
-    my $AsynchronousDataString = $Kernel::OM->Get('Kernel::System::SystemData')->SystemDataGet(
+    my $AsynchronousDataString = $Kernel::OM->Get('SystemData')->SystemDataGet(
         Key => $Identifier,
     );
 
     return if !defined $AsynchronousDataString;
 
     # get asynchronous data as array ref
-    my $AsynchronousData = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+    my $AsynchronousData = $Kernel::OM->Get('JSON')->Decode(
         Data => $AsynchronousDataString,
     ) || [];
 
@@ -48,12 +48,12 @@ sub _StoreAsynchronousData {
 
     my $CurrentAsynchronousData = $Self->_GetAsynchronousData();
 
-    my $AsynchronousDataString = $Kernel::OM->Get('Kernel::System::JSON')->Encode(
+    my $AsynchronousDataString = $Kernel::OM->Get('JSON')->Encode(
         Data => $Param{Data},
     );
 
     # get system data object
-    my $SystemDataObject = $Kernel::OM->Get('Kernel::System::SystemData');
+    my $SystemDataObject = $Kernel::OM->Get('SystemData');
 
     if ( !defined $CurrentAsynchronousData ) {
 

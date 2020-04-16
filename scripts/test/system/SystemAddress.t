@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
+my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
 
 # add SystemAddress
 my $SystemAddressEmail    = $Helper->GetRandomID() . '@example.com';

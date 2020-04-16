@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationPatternDelete');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::I18n::TranslationPatternDelete');
 
     return $Self;
 }
@@ -120,7 +120,7 @@ sub Run {
     foreach my $PatternID ( @{$Param{Data}->{PatternID}} ) {
 
         # get the pattern data
-        my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+        my %PatternData = $Kernel::OM->Get('Translation')->PatternGet(
             ID     => $PatternID,
             UserID => $Self->{Authorization}->{UserID}
         );
@@ -133,7 +133,7 @@ sub Run {
         }
 
         # delete the translation
-        my $Success = $Kernel::OM->Get('Kernel::System::Translation')->PatternDelete(
+        my $Success = $Kernel::OM->Get('Translation')->PatternDelete(
             ID     => $PatternID,
             UserID => $Self->{Authorization}->{UserID}
         );

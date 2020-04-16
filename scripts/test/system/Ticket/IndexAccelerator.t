@@ -18,25 +18,25 @@ use vars (qw($Self));
 for my $Module ( 'RuntimeDB', 'StaticDB' ) {
 
     # make sure that the TicketObject gets recreated for each loop.
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
     # get helper object
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::UnitTest::Helper' => {
+        'UnitTest::Helper' => {
             RestoreDatabase => 1,
         },
     );
-    my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+    my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-    my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup( Queue => 'Junk' );
+    my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup( Queue => 'Junk' );
 
-    $Kernel::OM->Get('Kernel::Config')->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Ticket::IndexModule',
         Value => "Kernel::System::Ticket::IndexAccelerator::$Module",
     );
 
     # create test ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     $Self->True(
         $TicketObject->isa("Kernel::System::Ticket::IndexAccelerator::$Module"),

@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::DynamicFieldConfigUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::DynamicFieldConfigUpdate');
 
     return $Self;
 }
@@ -136,7 +136,7 @@ sub Run {
     }   
 
     # check if DynamicField exists 
-    my $DynamicFieldData = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+    my $DynamicFieldData = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
         ID => $Param{Data}->{DynamicFieldID},
     );
   
@@ -147,7 +147,7 @@ sub Run {
     }
     
     # update DynamicField
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldUpdate(
+    my $Success = $Kernel::OM->Get('DynamicField')->DynamicFieldUpdate(
         ID         => $Param{Data}->{DynamicFieldID},
         Name       => $DynamicFieldData->{Name},
         Label      => $DynamicFieldData->{Label},

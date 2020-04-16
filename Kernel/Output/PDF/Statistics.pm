@@ -18,11 +18,11 @@ use warnings;
 use List::Util qw( first );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::Output::HTML::Layout',
-    'Kernel::System::Log',
-    'Kernel::System::PDF',
-    'Kernel::System::User',
+    'Config',
+    'Output::HTML::Layout',
+    'Log',
+    'PDF',
+    'User',
 );
 
 use Kernel::Language qw(Translatable);
@@ -42,7 +42,7 @@ sub GeneratePDF {
 
     for my $Needed (qw(Stat Title HeadArrayRef StatArray)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Need $Needed!"
             );
@@ -55,9 +55,9 @@ sub GeneratePDF {
     my $Stat         = $Param{Stat};
     my @StatArray    = @{ $Param{StatArray} // [] };
 
-    my $PDFObject    = $Kernel::OM->Get('Kernel::System::PDF');
-    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $PDFObject    = $Kernel::OM->Get('PDF');
+    my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $Page = $LayoutObject->{LanguageObject}->Translate('Page');
     my $Time = $LayoutObject->{Time};

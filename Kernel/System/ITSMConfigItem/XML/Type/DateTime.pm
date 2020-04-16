@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME
@@ -35,7 +35,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $XMLTypeDateTimeBackendObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::XML::Type::DateTime');
+    my $XMLTypeDateTimeBackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::DateTime');
 
 =cut
 
@@ -79,7 +79,7 @@ sub StatsAttributeCreate {
     # check needed stuff
     for my $Argument (qw(Key Name Item)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -196,12 +196,12 @@ sub ValidateValue {
     }
 
     # convert the raw data to a system time format
-    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Value,
     );
 
     # convert it back to a standard time stamp
-    my $TimeStamp = $Kernel::OM->Get('Kernel::System::Time')->SystemTime2TimeStamp(
+    my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $SystemTime,
     );
 

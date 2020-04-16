@@ -17,16 +17,16 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -34,7 +34,7 @@ my %Jobs     = %{ $ConfigObject->Get('PostMaster::PreFilterModule') };
 
 # create a dynamic field
 my $FieldName = 'ExternalTNRecognition' . $RandomID;
-my $FieldID   = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldAdd(
+my $FieldID   = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
     Name       => $FieldName,
     Label      => $FieldName . "_test",
     FieldOrder => 9991,
@@ -69,7 +69,7 @@ Some Content in Body',
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => 'externalsystem@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -93,7 +93,7 @@ Some Content in Body',
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -115,7 +115,7 @@ Some Content in Body',
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -137,7 +137,7 @@ Some Content in Body',
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -159,7 +159,7 @@ Some Content in Body',
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Report-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -183,7 +183,7 @@ Some Content in Body',
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -205,7 +205,7 @@ Some Content in Body Incident-' . $ExternalTicketID . '7',
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -227,7 +227,7 @@ Some Content in Body Incident-' . $ExternalTicketID,
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '0',
@@ -249,7 +249,7 @@ Some Content in Body Incident-' . $ExternalTicketID,
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Report-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -273,7 +273,7 @@ Some Content in Body Incident-' . $ExternalTicketID,
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident-(\\d.*)\\s*',
             SearchInBody      => '1',
@@ -298,7 +298,7 @@ Some Content in Body Incident#/' . $ExternalTicketID,
             Channel           => 'note',
             DynamicFieldName  => $FieldName,
             FromAddressRegExp => '\\s*@example.com',
-            Module            => 'Kernel::System::PostMaster::Filter::ExternalTicketNumberRecognition',
+            Module            => 'PostMaster::Filter::ExternalTicketNumberRecognition',
             Name              => 'Some Description',
             NumberRegExp      => '\\s*Incident\#\/(\\d.*)\\s*',
             SearchInBody      => '1',

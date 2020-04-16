@@ -16,11 +16,11 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::YAML',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'YAML',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TransitionActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
+    my $TransitionActionObject = $Kernel::OM->Get('ProcessManagement::DB::TransitionAction');
 
 =cut
 
@@ -55,11 +55,11 @@ sub new {
     bless( $Self, $Type );
 
     # get the cache TTL (in seconds)
-    $Self->{CacheTTL} = int( $Kernel::OM->Get('Kernel::Config')->Get('Process::CacheTTL') || 3600 );
+    $Self->{CacheTTL} = int( $Kernel::OM->Get('Config')->Get('Process::CacheTTL') || 3600 );
 
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -92,7 +92,7 @@ sub TransitionActionAdd {
     # check needed stuff
     for my $Key (qw(EntityID Name Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -101,7 +101,7 @@ sub TransitionActionAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if EntityID already exists
     return if !$DBObject->Prepare(
@@ -119,7 +119,7 @@ sub TransitionActionAdd {
     }
 
     if ($EntityExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The EntityID:$Param{EntityID} already exists for a transition action!"
         );
@@ -128,7 +128,7 @@ sub TransitionActionAdd {
 
     # check config valid format (at least it must contain another config hash inside)
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config needs to be a valid Hash reference!",
         );
@@ -136,7 +136,7 @@ sub TransitionActionAdd {
     }
     for my $Needed (qw(Module Config)) {
         if ( !$Param{Config}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed in Config!",
             );
@@ -146,14 +146,14 @@ sub TransitionActionAdd {
 
     # check config formats
     if ( !IsStringWithData( $Param{Config}->{Module} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config Module must be a non empty String!",
         );
         return;
     }
     if ( ref $Param{Config}->{Config} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config Config must be a Hash!",
         );
@@ -161,7 +161,7 @@ sub TransitionActionAdd {
     }
 
     # dump layout and config as string
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Dump( Data => $Param{Config} );
+    my $Config = $Kernel::OM->Get('YAML')->Dump( Data => $Param{Config} );
 
     # Make sure the resulting string has the UTF-8 flag. YAML only sets it if
     #   part of the data already had it.
@@ -189,7 +189,7 @@ sub TransitionActionAdd {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_TransitionAction',
     );
 
@@ -217,7 +217,7 @@ sub TransitionActionDelete {
     # check needed stuff
     for my $Key (qw(ID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -233,13 +233,13 @@ sub TransitionActionDelete {
     return if !IsHashRefWithData($TransitionAction);
 
     # delete transition action
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM pm_transition_action WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_TransitionAction',
     );
 
@@ -274,7 +274,7 @@ sub TransitionActionGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{EntityID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID or EntityID!'
         );
@@ -282,7 +282,7 @@ sub TransitionActionGet {
     }
 
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -290,7 +290,7 @@ sub TransitionActionGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey;
@@ -308,7 +308,7 @@ sub TransitionActionGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     if ( $Param{ID} ) {
@@ -333,7 +333,7 @@ sub TransitionActionGet {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
@@ -387,7 +387,7 @@ sub TransitionActionUpdate {
     # check needed stuff
     for my $Key (qw(ID EntityID Name Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -396,7 +396,7 @@ sub TransitionActionUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if EntityID already exists
     return if !$DBObject->Prepare(
@@ -414,7 +414,7 @@ sub TransitionActionUpdate {
     }
 
     if ($EntityExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The EntityID:$Param{Name} already exists for a TransitionAction!",
         );
@@ -423,7 +423,7 @@ sub TransitionActionUpdate {
 
     # check config valid format (at least it must contain another config hash)
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config needs to be a valid Hash reference!",
         );
@@ -431,7 +431,7 @@ sub TransitionActionUpdate {
     }
     for my $Needed (qw(Module Config)) {
         if ( !$Param{Config}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed in Config!",
             );
@@ -441,14 +441,14 @@ sub TransitionActionUpdate {
 
     # check config formats
     if ( !IsStringWithData( $Param{Config}->{Module} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config->Config must be a non empty string!",
         );
         return;
     }
     if ( ref $Param{Config}->{Config} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config->Config must be a Hash!",
         );
@@ -456,7 +456,7 @@ sub TransitionActionUpdate {
     }
 
     # dump layout and config as string
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Dump( Data => $Param{Config} );
+    my $Config = $Kernel::OM->Get('YAML')->Dump( Data => $Param{Config} );
 
     # Make sure the resulting string has the UTF-8 flag. YAML only sets it if
     #   part of the data already had it.
@@ -501,7 +501,7 @@ sub TransitionActionUpdate {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_TransitionAction',
     );
 
@@ -538,7 +538,7 @@ sub TransitionActionList {
 
     # check needed
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!"
         );
@@ -552,7 +552,7 @@ sub TransitionActionList {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey = 'TransitionActionList::UseEntities::' . $UseEntities;
     my $Cache    = $CacheObject->Get(
@@ -562,7 +562,7 @@ sub TransitionActionList {
     return $Cache if ref $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = '
             SELECT id, entity_id, name
@@ -627,7 +627,7 @@ sub TransitionActionListGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -635,7 +635,7 @@ sub TransitionActionListGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = 'TransitionActionListGet';
@@ -647,7 +647,7 @@ sub TransitionActionListGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(

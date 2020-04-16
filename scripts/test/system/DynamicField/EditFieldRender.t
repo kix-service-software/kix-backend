@@ -19,10 +19,10 @@ use Kernel::Output::HTML::Layout;
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $Helper          = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
-my $DFBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-my $ParamObject     = $Kernel::OM->Get('Kernel::System::Web::Request');
-my $TimeObject      = $Kernel::OM->Get('Kernel::System::Time');
+my $Helper          = $Kernel::OM->Get('UnitTest::Helper');
+my $DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+my $ParamObject     = $Kernel::OM->Get('WebRequest');
+my $TimeObject      = $Kernel::OM->Get('Time');
 
 # use a fixed year to compare the time selection results
 $Helper->FixedTimeSet(
@@ -3084,7 +3084,7 @@ for my $Test (@Tests) {
             # create a new CGI object to simulate a web request
             my $WebRequest = CGI->new( $Test->{Config}->{CGIParam} );
 
-            my $LocalParamObject = Kernel::System::Web::Request->new(
+            my $LocalParamObject = Kernel::System::WebRequest->new(
                 WebRequest => $WebRequest,
             );
 

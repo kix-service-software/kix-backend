@@ -16,9 +16,9 @@ use warnings;
 use Kernel::System::EmailParser;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Crypt::SMIME',
-    'Kernel::System::Log',
+    'Config',
+    'Crypt::SMIME',
+    'Log',
 );
 
 sub new {
@@ -42,7 +42,7 @@ sub Run {
     # Check needed stuff.
     for my $Needed (qw(JobConfig GetParam)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need $Needed!',
             );
@@ -50,14 +50,14 @@ sub Run {
         }
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     return 1 if !$ConfigObject->Get('SMIME');
     return 1 if !$ConfigObject->Get('SMIME::FetchFromCustomer');
 
     my $CryptObject;
     eval {
-        $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+        $CryptObject = $Kernel::OM->Get('Crypt::SMIME');
     };
     return 1 if !$CryptObject;
 

@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -41,7 +41,7 @@ sub Run {
     # check needed stuff
     for (qw(TicketID InmailUserID GetParam Tn AutoResponseType)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -51,7 +51,7 @@ sub Run {
     my %GetParam = %{ $Param{GetParam} };
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket data
     my %Ticket = $TicketObject->TicketGet(
@@ -120,8 +120,8 @@ sub Run {
     }
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # dynamic fields
     my $DynamicFieldList =
@@ -197,7 +197,7 @@ sub Run {
     }
 
     # write log
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "Reject FollowUp Article to Ticket [$Param{Tn}] created "
             . "(TicketID=$Param{TicketID}, ArticleID=$ArticleID). $Comment"

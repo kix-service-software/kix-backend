@@ -22,62 +22,62 @@ local $Kernel::OM = Kernel::System::ObjectManager->new();
 # that way we know there are no cyclic references in the constructors
 
 my @Objects = (
-    'Kernel::Config',
-    'Kernel::Language',
-    'Kernel::Output::HTML::Layout',
-    'Kernel::System::ACL::DB::ACL',
-    'Kernel::System::Auth',
-    'Kernel::System::AuthSession',
-    'Kernel::System::AutoResponse',
-    'Kernel::System::Cache',
-    'Kernel::System::CheckItem',
-    'Kernel::System::CSV',
-    'Kernel::System::ContactAuth',
-    'Kernel::System::Contact',
-    'Kernel::System::Daemon::SchedulerDB',
-    'Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker',
-    'Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor',
-    'Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::Cron',
-    'Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Email',
-    'Kernel::System::Encode',
-    'Kernel::System::Environment',
-    'Kernel::System::FileTemp',
-    'Kernel::System::Automation',
-    'Kernel::System::GenericInterface::DebugLog',
-    'Kernel::System::GenericInterface::Webservice',
-    'Kernel::System::Group',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::JSON',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Loader',
-    'Kernel::System::Lock',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Organisation',
-    'Kernel::System::Package',
-    'Kernel::System::PDF',
-    'Kernel::System::PID',
-    'Kernel::System::Priority',
-    'Kernel::System::Queue',
-    'Kernel::System::Service',
-    'Kernel::System::SLA',
-    'Kernel::System::StandardTemplate',
-    'Kernel::System::State',
-    'Kernel::System::SysConfig',
-    'Kernel::System::SystemAddress',
-    'Kernel::System::Ticket',
-    'Kernel::System::Time',
-    'Kernel::System::Type',
-    'Kernel::System::UnitTest',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
-    'Kernel::System::Web::Request',
-    'Kernel::System::XML',
-    'Kernel::System::YAML',
+    'Config',
+    'Language',
+    'Output::HTML::Layout',
+    'ACL::DB::ACL',
+    'Auth',
+    'AuthSession',
+    'AutoResponse',
+    'Cache',
+    'CheckItem',
+    'CSV',
+    'ContactAuth',
+    'Contact',
+    'Daemon::SchedulerDB',
+    'Daemon::DaemonModules::SchedulerTaskWorker',
+    'Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor',
+    'Daemon::DaemonModules::SchedulerTaskWorker::Cron',
+    'Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface',
+    'DB',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Email',
+    'Encode',
+    'Environment',
+    'FileTemp',
+    'Automation',
+    'GenericInterface::DebugLog',
+    'GenericInterface::Webservice',
+    'Group',
+    'HTMLUtils',
+    'JSON',
+    'LinkObject',
+    'Loader',
+    'Lock',
+    'Log',
+    'Main',
+    'Organisation',
+    'Package',
+    'PDF',
+    'PID',
+    'Priority',
+    'Queue',
+    'Service',
+    'SLA',
+    'StandardTemplate',
+    'State',
+    'SysConfig',
+    'SystemAddress',
+    'Ticket',
+    'Time',
+    'Type',
+    'UnitTest',
+    'User',
+    'Valid',
+    'WebRequest',
+    'XML',
+    'YAML',
 );
 
 my %AllObjects;
@@ -105,9 +105,9 @@ for my $ObjectName ( sort keys %AllObjects ) {
 }
 
 my %SomeObjects = (
-    'Kernel::Config'         => $Kernel::OM->Get('Kernel::Config'),
-    'Kernel::System::DB'     => $Kernel::OM->Get('Kernel::System::DB'),
-    'Kernel::System::Ticket' => $Kernel::OM->Get('Kernel::System::Ticket'),
+    'Config'         => $Kernel::OM->Get('Config'),
+    'DB'     => $Kernel::OM->Get('DB'),
+    'Ticket' => $Kernel::OM->Get('Ticket'),
 );
 
 for my $ObjectName ( sort keys %SomeObjects ) {
@@ -115,19 +115,19 @@ for my $ObjectName ( sort keys %SomeObjects ) {
 }
 
 $Kernel::OM->ObjectsDiscard(
-    Objects => ['Kernel::System::DB'],
+    Objects => ['DB'],
 );
 
 $Self->True(
-    !$SomeObjects{'Kernel::System::DB'},
+    !$SomeObjects{'DB'},
     'ObjectDiscard discarded Kernel::System::DB',
 );
 $Self->True(
-    !$SomeObjects{'Kernel::System::Ticket'},
+    !$SomeObjects{'Ticket'},
     'ObjectDiscard discarded Kernel::System::Ticket, because it depends on Kernel::System::DB',
 );
 $Self->True(
-    $SomeObjects{'Kernel::Config'},
+    $SomeObjects{'Config'},
     'ObjectDiscard did not discard Kernel::Config',
 );
 
@@ -194,7 +194,7 @@ $Self->True(
 );
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

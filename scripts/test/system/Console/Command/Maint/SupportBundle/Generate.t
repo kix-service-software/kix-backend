@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # cleanup from previous tests
-my @SupportFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+my @SupportFiles = $Kernel::OM->Get('Main')->DirectoryRead(
     Directory => '/var/tmp',
     Filter    => 'SupportBundle_*.tar.gz',
 );
@@ -32,9 +32,9 @@ foreach my $File (@SupportFiles) {
 }
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::SupportBundle::Generate');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::SupportBundle::Generate');
 
-my $TargetDirectory = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/var/tmp";
+my $TargetDirectory = $Kernel::OM->Get('Config')->Get('Home') . "/var/tmp";
 
 my $ExitCode = $CommandObject->Execute( '--target-directory', $TargetDirectory );
 
@@ -44,7 +44,7 @@ $Self->Is(
     "Maint::SupportBundle::Generate exit code",
 );
 
-@SupportFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+@SupportFiles = $Kernel::OM->Get('Main')->DirectoryRead(
     Directory => $TargetDirectory,
     Filter    => 'SupportBundle_*.tar.gz',
 );

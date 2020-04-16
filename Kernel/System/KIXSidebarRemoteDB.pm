@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
-    'Kernel::System::KIXSBRemoteDB',
-    'Kernel::System::Log'
+    'Cache',
+    'KIXSBRemoteDB',
+    'Log'
 );
 
 sub new {
@@ -24,7 +24,7 @@ sub new {
     my $Self = {%Param};
     bless( $Self, $Type );
 
-    $Self->{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{LogObject} = $Kernel::OM->Get('Log');
 
     return $Self;
 }
@@ -51,7 +51,7 @@ sub KIXSidebarRemoteDBSearch {
     }
 
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::KIXSBRemoteDB' => {
+        'KIXSBRemoteDB' => {
             DatabaseDSN   => $Param{DatabaseDSN},
             DatabaseUser  => $Param{DatabaseUser},
             DatabasePw    => $Param{DatabasePw} || '',
@@ -59,7 +59,7 @@ sub KIXSidebarRemoteDBSearch {
             Type          => $Param{DatabaseType},
         },
     );
-    my $KIXSBRemoteDBObject = $Kernel::OM->Get('Kernel::System::KIXSBRemoteDB');
+    my $KIXSBRemoteDBObject = $Kernel::OM->Get('KIXSBRemoteDB');
 
     my @List;
 
@@ -198,7 +198,7 @@ sub KIXSidebarRemoteDBSearch {
 
     # check cache
     if ( $Param{DatabaseCacheTTL} ) {
-        $Self->{CacheObject} = $Kernel::OM->Get('Kernel::System::Cache');
+        $Self->{CacheObject} = $Kernel::OM->Get('Cache');
 
         # set CacheType and CacheKey
         $Self->{CacheType} = "KIXSidebarRemoteDB";

@@ -7,7 +7,7 @@
       "StateType" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_StateType_json"
+            "$ref" : "#/definitions/StateType_json-53b95ce3af"
          }
       }
    },
@@ -15,7 +15,7 @@
       "StateType"
    ],
    "definitions" : {
-      "_StateType_json" : {
+      "StateType_json-53b95ce3af" : {
          "$id" : "#StateType",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The state type object.",

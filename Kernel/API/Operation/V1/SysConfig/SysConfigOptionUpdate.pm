@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfigOptionUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SysConfigOptionUpdate');
 
     return $Self;
 }
@@ -123,12 +123,12 @@ sub Run {
     my $SysConfigOption = $Param{Data}->{SysConfigOption};    
 
     # get option
-    my %OptionData = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
+    my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
         Name => $Param{Data}->{Option},
     );
 
     # update option
-    my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
+    my $Success = $Kernel::OM->Get('SysConfig')->OptionUpdate(
         %OptionData,
         Value   => exists $SysConfigOption->{Value} ? $SysConfigOption->{Value} : $OptionData{Value},
         ValidID => exists $SysConfigOption->{ValidID} ? $SysConfigOption->{ValidID} : $OptionData{ValidID},

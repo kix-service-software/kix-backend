@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',

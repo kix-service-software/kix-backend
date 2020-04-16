@@ -102,12 +102,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'SLAID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+        $Found = $Kernel::OM->Get('SLA')->SLALookup(
             SLAID => $Param{Data}->{$Param{Attribute}},
         );        
     }
     elsif ( $Param{Attribute} eq 'SLA' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+        $Found = $Kernel::OM->Get('SLA')->SLALookup(
             Name => $Param{Data}->{$Param{Attribute}},
         );        
     }

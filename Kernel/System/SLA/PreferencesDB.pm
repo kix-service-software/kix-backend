@@ -14,10 +14,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
 );
 
 sub new {
@@ -52,7 +52,7 @@ sub SLAPreferencesSet {
     # check needed stuff
     for (qw(SLAID Key Value)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -60,7 +60,7 @@ sub SLAPreferencesSet {
         }
     }
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete old data
     return if !$DBObject->Do(
@@ -78,7 +78,7 @@ sub SLAPreferencesSet {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => $Self->{CacheType},
         Key  => $Self->{CachePrefix} . $Param{SLAID},
     );
@@ -92,7 +92,7 @@ sub SLAPreferencesGet {
     # check needed stuff
     for (qw(SLAID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -101,16 +101,16 @@ sub SLAPreferencesGet {
     }
 
     # check if service preferences are available
-    return if !$Kernel::OM->Get('Kernel::Config')->Get('SLAPreferences');
+    return if !$Kernel::OM->Get('Config')->Get('SLAPreferences');
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $Self->{CachePrefix} . $Param{SLAID},
     );
     return %{$Cache} if $Cache;
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get preferences
     return if !$DBObject->Prepare(
@@ -125,7 +125,7 @@ sub SLAPreferencesGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $Self->{CachePrefix} . $Param{SLAID},

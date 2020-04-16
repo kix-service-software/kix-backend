@@ -28,8 +28,8 @@ and cause wrong test failures.
 =cut
 
 # Get list of installed config XML files
-my $Directory   = $Kernel::OM->Get('Kernel::Config')->Get('Home') . "/Kernel/Config/Files/";
-my @ConfigFiles = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+my $Directory   = $Kernel::OM->Get('Config')->Get('Home') . "/Kernel/Config/Files/";
+my @ConfigFiles = $Kernel::OM->Get('Main')->DirectoryRead(
     Directory => $Directory,
     Filter    => "*.xml",
 );
@@ -57,11 +57,11 @@ for my $ConfigFile (@ConfigFiles) {
 }
 
 my $DefaultConfig = {};
-bless $DefaultConfig, 'Kernel::Config::Defaults';
+bless $DefaultConfig, 'Config::Defaults';
 $DefaultConfig->Kernel::Config::Defaults::LoadDefaults();
 
 my $ZZZAAutoConfig = {};
-bless $ZZZAAutoConfig, 'Kernel::Config::Files::ZZZAAuto';
+bless $ZZZAAutoConfig, 'Config::Files::ZZZAAuto';
 Kernel::Config::Files::ZZZAAuto->Load($ZZZAAutoConfig);
 
 # These entries are hashes

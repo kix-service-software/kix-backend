@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::StandardTemplate::StandardTemplateGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::StandardTemplate::StandardTemplateGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $TemplateID ( @{$Param{Data}->{StandardTemplateID}} ) {
 
         # get the StandardTemplate data
-        my %StandardTemplateData = $Kernel::OM->Get('Kernel::System::StandardTemplate')->StandardTemplateGet(
+        my %StandardTemplateData = $Kernel::OM->Get('StandardTemplate')->StandardTemplateGet(
             ID => $TemplateID,
         );
 

@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::PostMaster',
+    'Log',
+    'Main',
+    'PostMaster',
 );
 
 sub Configure {
@@ -54,7 +54,7 @@ sub PreRun {
     my $Name = $Self->Name();
 
     if ( $Self->GetOption('debug') ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "KIX email handle ($Name) started.",
         );
@@ -67,7 +67,7 @@ sub Run {
     my $Debug = $Self->GetOption('debug');
 
     if ($Debug) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "Trying to read email from STDIN...",
         );
@@ -76,7 +76,7 @@ sub Run {
     # get email from SDTIN
     my @Email = <STDIN>;
     if ( !@Email ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no email on STDIN!',
         );
@@ -84,7 +84,7 @@ sub Run {
     }
 
     if ($Debug) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "Email with " . ( scalar @Email ) . " lines successfully read from STDIN.",
         );
@@ -96,7 +96,7 @@ sub Run {
     # bounce
     eval {
         $Kernel::OM->ObjectParamAdd(
-            'Kernel::System::PostMaster' => {
+            'PostMaster' => {
                 Email   => \@Email,
                 Trusted => $Self->GetOption('untrusted') ? 0 : 1,
                 Debug   => $Debug,
@@ -104,19 +104,19 @@ sub Run {
         );
 
         if ($Debug) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => "Processing email...",
             );
         }
 
-        my @Return = $Kernel::OM->Get('Kernel::System::PostMaster')->Run(
+        my @Return = $Kernel::OM->Get('PostMaster')->Run(
             Queue => $Self->GetOption('target-queue'),
         );
 
         if ($Debug) {
-            my $Dump = $Kernel::OM->Get('Kernel::System::Main')->Dump( \@Return );
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            my $Dump = $Kernel::OM->Get('Main')->Dump( \@Return );
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => "Email processing completed, return data: $Dump",
             );
@@ -136,7 +136,7 @@ sub Run {
         # EX_TEMPFAIL delivery for about four days, then bounce the
         # message.)
         my $Message = $@;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Message,
         );
@@ -152,7 +152,7 @@ sub PostRun {
     my $Name = $Self->Name();
 
     if ( $Self->GetOption('debug') ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "KIX email handle ($Name) stopped.",
         );

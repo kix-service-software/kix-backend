@@ -16,9 +16,9 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TransitionActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction');
+    my $TransitionActionObject = $Kernel::OM->Get('ProcessManagement::TransitionAction');
 
 =cut
 
@@ -71,7 +71,7 @@ sub new {
           'CreateTime' => '07-02-2012 13:37:00',
           'ChangeBy'   => '3',
           'ChangeTime' => '08-02-2012 13:37:00',
-          'Module'     => 'Kernel::System::ProcessManagement::TransitionAction::QueueMove',
+          'Module'     => 'ProcessManagement::TransitionAction::QueueMove',
           'Config'     => {
             # Config hash including all parameters
             # that can submitted to that module
@@ -85,7 +85,7 @@ sub TransitionActionGet {
 
     for my $Needed (qw(TransitionActionEntityID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -93,10 +93,10 @@ sub TransitionActionGet {
         }
     }
 
-    my $TransitionAction = $Kernel::OM->Get('Kernel::Config')->Get('Process::TransitionAction');
+    my $TransitionAction = $Kernel::OM->Get('Config')->Get('Process::TransitionAction');
 
     if ( !IsHashRefWithData($TransitionAction) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TransitionAction config!',
         );
@@ -104,7 +104,7 @@ sub TransitionActionGet {
     }
 
     if ( !IsHashRefWithData( $TransitionAction->{ $Param{TransitionActionEntityID} } ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No Data for TransitionAction '$Param{TransitionActionEntityID}' found!",
         );
@@ -113,12 +113,12 @@ sub TransitionActionGet {
 
     if (
         !$TransitionAction->{ $Param{TransitionActionEntityID} }{Module}
-        || !$Kernel::OM->Get('Kernel::System::Main')->Require(
+        || !$Kernel::OM->Get('Main')->Require(
             $TransitionAction->{ $Param{TransitionActionEntityID} }{Module}
         )
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Module for TransitionAction: $Param{TransitionActionEntityID} missing or"
                 . " not found!",
@@ -147,7 +147,7 @@ sub TransitionActionGet {
           'ChangeBy'                 => '3',
           'CreateTime'               => '25-04-2012 13:37:00',
           'ChangeTime'               => '24-04-2012 13:37:00',
-          'Module'                   => 'Kernel::System::ProcessManagement::TransitionAction::QueueMove',
+          'Module'                   => 'ProcessManagement::TransitionAction::QueueMove',
           'Config'                   => {
                                             # Config hash including all parameters
                                             # that can submitted to that module
@@ -160,7 +160,7 @@ sub TransitionActionGet {
           'ChangeBy'                 => '3',
           'CreateTime'               => '25-04-2012 13:37:00',
           'ChangeTime'               => '24-04-2012 13:37:00',
-          'Module'                   => 'Kernel::System::ProcessManagement::TransitionAction::StatusUpdate',
+          'Module'                   => 'ProcessManagement::TransitionAction::StatusUpdate',
           'Config'                   => {
                                             # Config hash including all parameters
                                             # that can submitted to that module
@@ -173,7 +173,7 @@ sub TransitionActionGet {
           'ChangeBy'                 => '3',
           'CreateTime'               => '25-04-2012 13:37:00',
           'ChangeTime'               => '24-04-2012 13:37:00',
-          'Module'                   => 'Kernel::System::ProcessManagement::TransitionAction::NotifyOwner',
+          'Module'                   => 'ProcessManagement::TransitionAction::NotifyOwner',
           'Config'                   => {
                                             # Config hash including all parameters
                                             # that can submitted to that module
@@ -188,7 +188,7 @@ sub TransitionActionList {
 
     for my $Needed (qw(TransitionActionEntityID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -197,19 +197,19 @@ sub TransitionActionList {
     }
 
     if ( !IsArrayRefWithData( $Param{TransitionActionEntityID} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No TransitionActionEntityID Array submitted calling TransitionActionList!',
         );
         return;
     }
 
-    my $TransitionAction = $Kernel::OM->Get('Kernel::Config')->Get('Process::TransitionAction');
+    my $TransitionAction = $Kernel::OM->Get('Config')->Get('Process::TransitionAction');
 
     my $TransitionActionConfigs;
     for my $TransitionActionEntityID ( @{ $Param{TransitionActionEntityID} } ) {
         if ( !IsHashRefWithData( $TransitionAction->{$TransitionActionEntityID} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No Data for TransitionAction '$TransitionActionEntityID'"
                     . " found!",
@@ -219,12 +219,12 @@ sub TransitionActionList {
 
         if (
             !$TransitionAction->{$TransitionActionEntityID}{Module}
-            || !$Kernel::OM->Get('Kernel::System::Main')->Require(
+            || !$Kernel::OM->Get('Main')->Require(
                 $TransitionAction->{$TransitionActionEntityID}{Module}
             )
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Module for TransitionAction: $TransitionActionEntityID"
                     . " missing or not found!",

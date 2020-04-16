@@ -18,7 +18,7 @@ use base qw(
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 =head1 NAME

@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Package',
+    'Package',
 );
 
 sub Configure {
@@ -42,7 +42,7 @@ sub Run {
     my $Filepath = $Self->GetArgument('search-path');
 
     PACKAGE:
-    for my $Package ( $Kernel::OM->Get('Kernel::System::Package')->RepositoryList() ) {
+    for my $Package ( $Kernel::OM->Get('Package')->RepositoryList() ) {
 
         # Just show if PackageIsVisible flag is enabled.
         if (

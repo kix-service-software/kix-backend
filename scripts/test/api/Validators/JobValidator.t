@@ -16,7 +16,7 @@ use Kernel::API::Debugger;
 use Kernel::API::Validator::JobValidator;
 
 # get Job object
-my $AutomationObject = $Kernel::OM->Get('Kernel::System::Automation');
+my $AutomationObject = $Kernel::OM->Get('Automation');
 
 my $DebuggerObject = Kernel::API::Debugger->new(
     DebuggerConfig   => {
@@ -35,11 +35,11 @@ my $ValidatorObject = Kernel::API::Validator::JobValidator->new(
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $NameRandom  = $Helper->GetRandomID();
 

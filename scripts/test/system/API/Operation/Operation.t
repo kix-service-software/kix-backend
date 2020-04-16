@@ -18,11 +18,11 @@ use Kernel::API::Operation;
 # get helper object
 # skip SSL certificate verification
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         SkipSSLVerify => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $DebuggerObject = Kernel::API::Debugger->new(
     DebuggerConfig => {
@@ -40,7 +40,7 @@ my $OperationObject;
 $OperationObject = Kernel::API::Operation->new();
 $Self->IsNot(
     ref $OperationObject,
-    'Kernel::API::Operation',
+    'API::Operation',
     'Operation::new() fail check, no arguments',
 );
 
@@ -52,7 +52,7 @@ $OperationObject = Kernel::API::Operation->new(
 );
 $Self->IsNot(
     ref $OperationObject,
-    'Kernel::API::Operation',
+    'API::Operation',
     'Operation::new() fail check, no OperationType',
 );
 
@@ -64,7 +64,7 @@ $OperationObject = Kernel::API::Operation->new(
 );
 $Self->IsNot(
     ref $OperationObject,
-    'Kernel::API::Operation',
+    'API::Operation',
     'Operation::new() fail check, wrong OperationType',
 );
 
@@ -75,7 +75,7 @@ $OperationObject = Kernel::API::Operation->new(
 );
 $Self->IsNot(
     ref $OperationObject,
-    'Kernel::API::Operation',
+    'API::Operation',
     'Operation::new() fail check, no WebserviceID',
 );
 
@@ -88,7 +88,7 @@ $OperationObject = Kernel::API::Operation->new(
 );
 $Self->Is(
     ref $OperationObject,
-    'Kernel::API::Operation',
+    'API::Operation',
     'Operation::new() success',
 );
 

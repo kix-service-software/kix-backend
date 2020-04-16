@@ -15,18 +15,18 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $ContactObject = $Kernel::OM->Get('Contact');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -46,7 +46,7 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'Ticket::EventModulePost###950-DynamicFieldFromContact',
     Value => {
-        Module => 'Kernel::System::Ticket::Event::DynamicFieldFromContact',
+        Module => 'Ticket::Event::DynamicFieldFromContact',
         Event  => '(TicketCreate|TicketCustomerUpdate)',
     },
 );

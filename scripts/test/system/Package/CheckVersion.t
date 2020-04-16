@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get package object
-my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+my $PackageObject = $Kernel::OM->Get('Package');
 
 my @Tests = (
 

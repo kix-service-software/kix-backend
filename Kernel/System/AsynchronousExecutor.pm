@@ -16,8 +16,8 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Scheduler',
+    'Log',
+    'Scheduler',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ background using the separate process OTRS Scheduler Daemon.
 creates a scheduler daemon task to execute a function asynchronously.
 
     my $Success = $Object->AsyncCall(
-        ObjectName               => 'Kernel::System::Ticket',   # optional, if not given the object is used from where
+        ObjectName               => 'Ticket',   # optional, if not given the object is used from where
                                                                 # this function was called
         FunctionName             => 'MyFunction',               # the name of the function to execute
         FunctionParams           => \%MyParams,                 # a ref with the required parameters for the function
@@ -63,7 +63,7 @@ sub AsyncCall {
     my $FunctionName = $Param{FunctionName};
 
     if ( !IsStringWithData($FunctionName) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Function needs to be a non empty string!",
         );
@@ -80,7 +80,7 @@ sub AsyncCall {
 
     # check if is possible to create the object
     if ( !$LocalObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not create $ObjectName object!",
         );
@@ -90,7 +90,7 @@ sub AsyncCall {
 
     # check if object reference is the same as expected
     if ( ref $LocalObject ne $ObjectName ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$ObjectName object is not valid!",
         );
@@ -99,7 +99,7 @@ sub AsyncCall {
 
     # check if the object can execute the function
     if ( !$LocalObject->can($FunctionName) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$ObjectName can not execute $FunctionName()!",
         );
@@ -107,7 +107,7 @@ sub AsyncCall {
     }
 
     if ( $Param{FunctionParams} && !ref $Param{FunctionParams} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "FunctionParams needs to be a hash or list reference.",
         );
@@ -118,7 +118,7 @@ sub AsyncCall {
     my $TaskName = substr "$ObjectName-$FunctionName()", 0, 255;
 
     # create a new task
-    my $TaskID = $Kernel::OM->Get('Kernel::System::Scheduler')->TaskAdd(
+    my $TaskID = $Kernel::OM->Get('Scheduler')->TaskAdd(
         Type                     => 'AsynchronousExecutor',
         Name                     => $TaskName,
         Attempts                 => $Param{Attempts} || 1,
@@ -131,7 +131,7 @@ sub AsyncCall {
     );
 
     if ( !$TaskID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not create new AsynchronousExecutor: '$TaskName' task!",
         );

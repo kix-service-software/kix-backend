@@ -16,12 +16,12 @@ use warnings;
 use base qw(Kernel::System::Daemon::DaemonModules::BaseTaskWorker);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::GenericInterface::Requester',
-    'Kernel::System::Daemon::SchedulerDB',
-    'Kernel::System::GenericInterface::Webservice',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'GenericInterface::Requester',
+    'Daemon::SchedulerDB',
+    'GenericInterface::Webservice',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -42,7 +42,7 @@ This task handler executes scheduler tasks delegated by asynchronous invoker con
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TaskHandlerObject = $Kernel::OM-Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface');
+    my $TaskHandlerObject = $Kernel::OM-Get('Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface');
 
 =cut
 
@@ -99,7 +99,7 @@ sub Run {
         print "    $Self->{WorkerName} executes task: $Param{TaskName}\n";
     }
 
-    my $Result = $Kernel::OM->Get('Kernel::GenericInterface::Requester')->Run(
+    my $Result = $Kernel::OM->Get('GenericInterface::Requester')->Run(
         WebserviceID => $TaskData{WebserviceID},
         Invoker      => $TaskData{Invoker},
         Asynchronous => 1,
@@ -108,7 +108,7 @@ sub Run {
 
     if ( !$Result->{Success} ) {
 
-        my $Webservice = $Kernel::OM->Get('Kernel::System::GenericInterface::Webservice')->WebserviceGet(
+        my $Webservice = $Kernel::OM->Get('GenericInterface::Webservice')->WebserviceGet(
             ID => $Param{Data}->{WebserviceID},
         );
 
@@ -127,7 +127,7 @@ sub Run {
         # Check if task needs to be re-schedule in the future.
         if ( $Result->{Data}->{ReSchedule} ) {
 
-            my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+            my $TimeObject = $Kernel::OM->Get('Time');
 
             # Use the execution time from the return data (if nay).
             my $ExecutionTime = $Result->{Data}->{ExecutionTime} || 0;
@@ -139,7 +139,7 @@ sub Run {
                 );
 
                 if ( !$SystemTime ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message =>
                             "Invoker $Param{Data}->{Invoker} WebService: $WebServiceName returned future execution time: $ExecutionTime is invalid! falling back to default",
@@ -153,7 +153,7 @@ sub Run {
             if ( !$ExecutionTime ) {
 
                 # Get default time difference from config.
-                my $FutureTaskTimeDiff = abs( $Kernel::OM->Get('Kernel::Config')
+                my $FutureTaskTimeDiff = abs( $Kernel::OM->Get('Config')
                         ->Get('Daemon::SchedulerGenericInterfaceTaskManager::FutureTaskTimeDiff') || 300 );
 
                 # Calculate execution time in future.
@@ -167,7 +167,7 @@ sub Run {
             }
 
             # Create a new task (replica) that will be executed in the future.
-            my $TaskID = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB')->FutureTaskAdd(
+            my $TaskID = $Kernel::OM->Get('Daemon::SchedulerDB')->FutureTaskAdd(
                 ExecutionTime => $ExecutionTime,
                 Type          => 'GenericInterface',
                 Name          => $Param{TaskName},
@@ -176,7 +176,7 @@ sub Run {
             );
 
             if ( !$TaskID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Could not re-schedule a task in future for task $Param{TaskName}",
                 );

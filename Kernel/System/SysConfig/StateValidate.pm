@@ -14,8 +14,8 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::State',
+    'Log',
+    'State',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $StateValidateObject = $Kernel::OM->Get('Kernel::System::SysConfig::StateValidate');
+    my $StateValidateObject = $Kernel::OM->Get('SysConfig::StateValidate');
 
 =cut
 
@@ -70,7 +70,7 @@ sub Validate {
 
     # check needed stuff
     if ( !$Param{Data} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Data!",
         );
@@ -78,7 +78,7 @@ sub Validate {
     }
 
     # get list of all valid states
-    my %States = $Kernel::OM->Get('Kernel::System::State')->StateList(
+    my %States = $Kernel::OM->Get('State')->StateList(
         UserID => 1,
         Valid  => 1,
     );
@@ -128,7 +128,7 @@ sub Validate {
             # get the reference type
             my $RefType = ref $Param{Data};
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Data must be a scalar or a hash, but it is a $RefType!",
             );
@@ -168,7 +168,7 @@ sub GetAutoCorrectValue {
     }
 
     # get list of all valid states
-    my %States = $Kernel::OM->Get('Kernel::System::State')->StateList(
+    my %States = $Kernel::OM->Get('State')->StateList(
         UserID => 1,
         Valid  => 1,
     );
@@ -235,7 +235,7 @@ sub GetAutoCorrectValue {
         # get the reference type
         my $RefType = ref $Param{Data};
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Data must be a scalar or a hash, but it is a $RefType!",
         );
@@ -259,7 +259,7 @@ sub _GetAutoCorrectValue {
     my ( $Self, %Param ) = @_;
 
     # get list of all valid states
-    my %States = $Kernel::OM->Get('Kernel::System::State')->StateList(
+    my %States = $Kernel::OM->Get('State')->StateList(
         UserID => 1,
         Valid  => 1,
     );

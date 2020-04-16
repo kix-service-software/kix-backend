@@ -14,13 +14,13 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
-    'Kernel::System::Valid',
+    'Config',
+    'DB',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
+    'Time',
+    'Valid',
 );
 
 =head1 NAME
@@ -162,7 +162,7 @@ sub FAQSearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
         );
@@ -186,7 +186,7 @@ sub FAQSearch {
         }
 
         if ( ref $Param{$Argument} ne 'ARRAY' ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Argument must be an array reference!",
             );
@@ -214,7 +214,7 @@ sub FAQSearch {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # quote id array elements
     ARGUMENT:
@@ -224,7 +224,7 @@ sub FAQSearch {
         if ( !IsArrayRefWithData( $Param{$Key} ) ) {
 
             # log error
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "The given param '$Key' is invalid or an empty array reference!",
             );
@@ -237,7 +237,7 @@ sub FAQSearch {
             if ( !defined $DBObject->Quote( $Element, 'Integer' ) ) {
 
                 # log error
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "The given param '$Element' in '$Key' is invalid!",
                 );
@@ -263,7 +263,7 @@ sub FAQSearch {
     if ( $ParamCheckString =~ m/DynamicField_/smx ) {
 
         # Check all configured FAQ dynamic fields
-        $FAQDynamicFields = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldListGet(
+        $FAQDynamicFields = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             ObjectType => 'FAQ',
         );
 
@@ -285,7 +285,7 @@ sub FAQSearch {
         {
 
             # found an error
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "OrderBy contains invalid value '$OrderBy' "
                     . 'or the value is used more than once!',
@@ -308,7 +308,7 @@ sub FAQSearch {
         next DIRECTION if $Direction eq 'Down';
 
         # found an error
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "OrderByDirection can only contain 'Up' or 'Down'!",
         );
@@ -325,7 +325,7 @@ sub FAQSearch {
     my $Ext = '';
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # full-text search
     if ( $Param{What} && $Param{What} ne '*' ) {
@@ -446,7 +446,7 @@ sub FAQSearch {
     if ( !defined $Param{ValidIDs} ) {
 
         # get the valid ids
-        my @ValidIDs = $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet();
+        my @ValidIDs = $Kernel::OM->Get('Valid')->ValidIDsGet();
 
         $Param{ValidIDs} = \@ValidIDs;
     }
@@ -562,7 +562,7 @@ sub FAQSearch {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # search for create and change times
     # remember current time to prevent searches for future timestamps
@@ -604,7 +604,7 @@ sub FAQSearch {
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemCreateTimeOlderDate}'!",
             );
@@ -615,7 +615,7 @@ sub FAQSearch {
             String => $Param{ItemCreateTimeOlderDate},
         );
         if ( !$Time ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Search not executed due to invalid time '"
@@ -637,7 +637,7 @@ sub FAQSearch {
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemCreateTimeNewerDate}'!",
             );
@@ -648,7 +648,7 @@ sub FAQSearch {
             String => $Param{ItemCreateTimeNewerDate},
         );
         if ( !$Time ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Search not executed due to invalid time '"
@@ -704,7 +704,7 @@ sub FAQSearch {
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemChangeTimeOlderDate}'!",
             );
@@ -715,7 +715,7 @@ sub FAQSearch {
             String => $Param{ItemChangeTimeOlderDate},
         );
         if ( !$Time ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Search not executed due to invalid time '"
@@ -737,7 +737,7 @@ sub FAQSearch {
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
             )
         {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemChangeTimeNewerDate}'!",
             );
@@ -748,7 +748,7 @@ sub FAQSearch {
             String => $Param{ItemChangeTimeNewerDate},
         );
         if ( !$Time ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Search not executed due to invalid time '"
@@ -778,7 +778,7 @@ sub FAQSearch {
     my $DynamicFieldJoinCounter = 1;
 
     # get dynamic field back-end object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     DYNAMIC_FIELD:
     for my $DynamicField ( @{$FAQDynamicFields} ) {
@@ -814,7 +814,7 @@ sub FAQSearch {
                     UserID             => $Param{UserID},
                 );
                 if ( !$ValidateSuccess ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message =>
                             "Search not executed due to invalid value '"
@@ -1045,7 +1045,7 @@ sub _InConditionGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{TableColumn} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TableColumn!",
         );
@@ -1053,7 +1053,7 @@ sub _InConditionGet {
     }
 
     if ( !IsArrayRefWithData( $Param{IDRef} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need IDRef!",
         );
@@ -1064,10 +1064,10 @@ sub _InConditionGet {
     my @SortedIDs = sort { $a <=> $b } @{ $Param{IDRef} };
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # Error out if some values were not integers.
-    @SortedIDs = map { $Kernel::OM->Get('Kernel::System::DB')->Quote( $_, 'Integer' ) } @SortedIDs;
+    @SortedIDs = map { $Kernel::OM->Get('DB')->Quote( $_, 'Integer' ) } @SortedIDs;
     return if scalar @SortedIDs != scalar @{ $Param{IDRef} };
 
     # split IN statement with more than 900 elements in more statements combined with OR

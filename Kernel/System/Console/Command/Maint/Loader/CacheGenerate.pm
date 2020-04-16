@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Loader',
+    'Config',
+    'Loader',
 );
 
 sub Configure {
@@ -34,15 +34,15 @@ sub Run {
     $Self->Print("<yellow>Generating loader cache files...</yellow>\n");
 
     # Force loader also on development systems where it might be turned off.
-    $Kernel::OM->Get('Kernel::Config')->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Loader::Enabled::JS',
         Value => 1,
     );
-    $Kernel::OM->Get('Kernel::Config')->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Loader::Enabled::CSS',
         Value => 1,
     );
-    my @FrontendModules = $Kernel::OM->Get('Kernel::System::Loader')->CacheGenerate();
+    my @FrontendModules = $Kernel::OM->Get('Loader')->CacheGenerate();
     if ( !@FrontendModules ) {
         $Self->PrintError("Loader cache files could not be generated.");
         return $Self->ExitCodeError();

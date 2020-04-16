@@ -18,22 +18,22 @@ use Kernel::System::VariableCheck qw(:all);
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # check schema - each table must have a primary or at least an unique constraint (needed for Percona clusters)
 
-my $XMLFile = $Kernel::OM->Get('Kernel::Config')->Get('Home').'/scripts/database/kix-schema.xml';
+my $XMLFile = $Kernel::OM->Get('Config')->Get('Home').'/scripts/database/kix-schema.xml';
 
 $Self->True(
     (-f $XMLFile),
     'Schema file exists',
 );
 
-my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+my $Content = $Kernel::OM->Get('Main')->FileRead(
     Location => $XMLFile,
 );
 

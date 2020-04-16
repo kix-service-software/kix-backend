@@ -15,9 +15,9 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -36,7 +36,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw( Data Event Config UserID )) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -46,13 +46,13 @@ sub Run {
     }
 
     # only run for StaticDB
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-    return 1 if ( !$TicketObject->isa('Kernel::System::Ticket::IndexAccelerator::StaticDB') );
+    my $TicketObject = $Kernel::OM->Get('Ticket');
+    return 1 if ( !$TicketObject->isa('Ticket::IndexAccelerator::StaticDB') );
 
     # only run if we have the correct data
     for my $Needed (qw(Queue OldQueue)) {
         if ( !IsHashRefWithData( $Param{Data}->{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Needed in Data is missing or invalid!"
             );

@@ -16,9 +16,9 @@ use warnings;
 use Time::Piece;
 
 our @ObjectDependencies = (
-    'Kernel::Language',
-    'Kernel::System::DB',
-    'Kernel::System::Time',
+    'Language',
+    'DB',
+    'Time',
 );
 
 sub new {
@@ -45,7 +45,7 @@ sub Param {
     my $Self = shift;
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get current time
     my ( $s, $m, $h, $D, $M, $Y ) = $TimeObject->SystemTime2Date(
@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get language object
-    my $LanguageObject = $Kernel::OM->Get('Kernel::Language');
+    my $LanguageObject = $Kernel::OM->Get('Language');
 
     my $Year  = $Param{Year};
     my $Month = $Param{Month};
@@ -101,7 +101,7 @@ sub Run {
 
     # first take epoch for 12:00 on the 1st of given month
     # create Time::Piece object for this time
-    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->Date2SystemTime(
+    my $SystemTime = $Kernel::OM->Get('Time')->Date2SystemTime(
         Year   => $Param{Year},
         Month  => $Param{Month},
         Day    => 1,
@@ -156,7 +156,7 @@ sub _GetHistoryTypes {
     my $Self = shift;
 
     my $SQL      = 'SELECT id, name FROM ticket_history_type WHERE valid_id = 1';
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     $DBObject->Prepare( SQL => $SQL );
 
     my %Stats;
@@ -175,7 +175,7 @@ sub _GetDBDataPerDay {
     my $SQL   = 'SELECT count(*) FROM ticket_history '
         . 'WHERE history_type_id = ? AND create_time >= ? AND create_time <= ?';
 
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     $DBObject->Prepare(
         SQL  => $SQL,
         Bind => [ \$Param{StateID}, \$Start, \$End ]

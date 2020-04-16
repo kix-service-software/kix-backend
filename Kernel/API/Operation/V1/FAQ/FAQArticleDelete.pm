@@ -113,7 +113,7 @@ sub Run {
     foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
    
         # delete FAQArticle        
-        my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQDelete(
+        my $Success = $Kernel::OM->Get('FAQ')->FAQDelete(
             ItemID     => $FAQArticleID,
             UserID => $Self->{Authorization}->{UserID},
         );

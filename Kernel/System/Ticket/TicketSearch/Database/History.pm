@@ -16,8 +16,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -93,7 +93,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -123,7 +123,7 @@ sub Search {
     if ( $Param{Search}->{Field} =~ /(Change|Close)Time/ ) {
 
         # convert to unix time
-        my $Value = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+        my $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $Param{Search}->{Value},
         );
 
@@ -136,7 +136,7 @@ sub Search {
         );
 
         if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );
@@ -145,13 +145,13 @@ sub Search {
 
         if ( $Param{Search}->{Field} eq 'CloseTime' ) {
             # get close state ids
-            my @List = $Kernel::OM->Get('Kernel::System::State')->StateGetStatesByType(
+            my @List = $Kernel::OM->Get('State')->StateGetStatesByType(
                 StateType => ['closed'],
                 Result    => 'ID',
             );
             my @StateID = ( 
-                $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'NewTicket' ),
-                $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup( Type => 'StateUpdate' )
+                $Kernel::OM->Get('Ticket')->HistoryTypeLookup( Type => 'NewTicket' ),
+                $Kernel::OM->Get('Ticket')->HistoryTypeLookup( Type => 'StateUpdate' )
             );
             if (@StateID) {
                 if ( $Param{BoolOperator} eq 'OR') {
@@ -159,17 +159,13 @@ sub Search {
                     push( @SQLWhere, 'th_left.state_id IN ('.(join(', ', sort @List)).')' );
                     push( @SQLWhere, 'th_right.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th_right.state_id IN ('.(join(', ', sort @List)).')' );
+                    push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
+                    push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
                 } else {
                     push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)).')' );
+                    push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
                 }
-            }
-        } else {
-            if ( $Param{BoolOperator} eq 'OR') {
-                push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
-                push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
-            } else {
-                push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
             }
         }
     }
@@ -192,7 +188,7 @@ sub Search {
             }
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unsupported Operator $Param{Search}->{Operator}!",
             );
@@ -200,7 +196,7 @@ sub Search {
         }
 
         # lookup history type id
-        my $HistoryTypeID = $Kernel::OM->Get('Kernel::System::Ticket')->HistoryTypeLookup(
+        my $HistoryTypeID = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
             Type => 'NewTicket',
         );
         if ( $Param{BoolOperator} eq 'OR') {

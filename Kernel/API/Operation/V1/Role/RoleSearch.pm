@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Role search
-    my %RoleList = $Kernel::OM->Get('Kernel::System::Role')->RoleList(
+    my %RoleList = $Kernel::OM->Get('Role')->RoleList(
         Result => 'HASH',
     );
 

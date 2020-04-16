@@ -16,8 +16,8 @@ use warnings;
 use Carp ();
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
+    'Config',
+    'Encode',
 );
 
 =head1 NAME
@@ -40,11 +40,11 @@ create a log object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::Log' => {
+        'Log' => {
             LogPrefix => 'InstallScriptX',  # not required, but highly recommend
         },
     );
-    my $LogObject = $Kernel::OM->Get('Kernel::System::Log');
+    my $LogObject = $Kernel::OM->Get('Log');
 
 =cut
 
@@ -66,7 +66,7 @@ sub new {
         Carp::confess('$Kernel::OM is not defined, please initialize your object manager')
     }
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
         
     $Self->{ProductVersion} = $ConfigObject->Get('Product') . ' ';
     $Self->{ProductVersion} .= $ConfigObject->Get('Version');
@@ -298,7 +298,7 @@ sub GetLog {
     $String =~ s{\0}{}smxg;
 
     # encode the string
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$String );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$String );
 
     return $String;
 }

@@ -138,7 +138,7 @@ sub Run {
         Data => $Param{Data}->{Attachment}
     );
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket data
     my %Ticket = $TicketObject->TicketGet(

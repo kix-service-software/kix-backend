@@ -16,9 +16,9 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::API::Webservice',
-    'Kernel::System::Main',
-    'Kernel::System::YAML',
+    'API::Webservice',
+    'Main',
+    'YAML',
 );
 
 sub Configure {
@@ -51,7 +51,7 @@ sub PreRun {
         die "Source file $SourcePath does not exist / is not readable.\n";
     }
 
-    my $List             = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceList();
+    my $List             = $Kernel::OM->Get('API::Webservice')->WebserviceList();
     my %WebServiceLookup = reverse %{$List};
 
     my $Name = $Self->GetOption('name');
@@ -68,7 +68,7 @@ sub Run {
     $Self->Print("<yellow>Creating web service...</yellow>\n");
 
     # read config
-    my $Content = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Location => $Self->GetOption('source-path'),
     );
     if ( !$Content ) {
@@ -76,7 +76,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Load( Data => ${$Content} );
+    my $Config = $Kernel::OM->Get('YAML')->Load( Data => ${$Content} );
 
     if ( !$Config ) {
         $Self->PrintError('Could not parse YAML source.');
@@ -84,7 +84,7 @@ sub Run {
     }
 
     # add new web service
-    my $ID = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceAdd(
+    my $ID = $Kernel::OM->Get('API::Webservice')->WebserviceAdd(
         Name    => $Self->GetOption('name'),
         Config  => $Config,
         ValidID => 1,

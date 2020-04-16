@@ -63,7 +63,7 @@ sub new {
 
     # check DebuggerConfig - we need a hash ref with at least one entry
     if ( !IsHashRefWithData( $Param{DebuggerConfig} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need DebuggerConfig!',
         );
@@ -77,7 +77,7 @@ sub new {
     # check for mandatory values
     for my $Needed (qw(WebserviceID CommunicationType DebugThreshold)) {
         if ( !IsStringWithData( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -89,7 +89,7 @@ sub new {
 
     # check correct DebugThreshold
     if ( $Self->{DebugThreshold} !~ /^(debug|info|notice|error)/i ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'DebugThreshold is not allowed.',
         );
@@ -99,7 +99,7 @@ sub new {
 
     # check correct CommunicationType
     if ( lc $Self->{CommunicationType} !~ /^(provider|requester)/i ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'CommunicationType is not allowed.',
         );
@@ -112,7 +112,7 @@ sub new {
 
     # remote IP optional
     if ( defined $Param{RemoteIP} && !IsStringWithData( $Param{RemoteIP} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need RemoteIP address!'
         );
@@ -122,8 +122,8 @@ sub new {
     $Self->{RemoteIP} = $Param{RemoteIP};
 
     # communication ID MD5 (system time + random #)
-    my $CurrentTime = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
-    my $MD5String   = $Kernel::OM->Get('Kernel::System::Main')->MD5sum(
+    my $CurrentTime = $Kernel::OM->Get('Time')->SystemTime();
+    my $MD5String   = $Kernel::OM->Get('Main')->MD5sum(
         String => $CurrentTime . int( rand(1000000) ),
     );
     $Self->{CommunicationID} = $MD5String;
@@ -150,7 +150,7 @@ sub DebugLog {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{Summary} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Summary!',
         );
@@ -163,7 +163,7 @@ sub DebugLog {
 
     # check correct DebugLevel
     if ( $Param{DebugLevel} !~ /^(debug|info|notice|error)/i ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'DebugLevel is not allowed.',
         );
@@ -180,7 +180,7 @@ sub DebugLog {
     # create log message
     my $DataString = '';
     if ( IsHashRefWithData( $Param{Data} ) ) {
-        $DataString = $Kernel::OM->Get('Kernel::System::Main')->Dump( $Param{Data} );
+        $DataString = $Kernel::OM->Get('Main')->Dump( $Param{Data} );
     }
     elsif ( IsStringWithData( $Param{Data} ) ) {
         $DataString = $Param{Data};
@@ -194,7 +194,7 @@ sub DebugLog {
         if ( $DebugLevels{ $Param{DebugLevel} } >= $DebugLevels{ $Self->{DebugThreshold} } ) {
 
             # call AddLog function
-            $Kernel::OM->Get('Kernel::System::API::DebugLog')->LogAdd(
+            $Kernel::OM->Get('API::DebugLog')->LogAdd(
                 CommunicationID   => $Self->{CommunicationID},
                 CommunicationType => $Self->{CommunicationType},
                 RemoteIP          => $Self->{RemoteIP},
@@ -215,7 +215,7 @@ EOF
 
     if ( $Param{DebugLevel} eq 'error' ) {
         $LogMessage =~ s/\n//g;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $LogMessage,
         );

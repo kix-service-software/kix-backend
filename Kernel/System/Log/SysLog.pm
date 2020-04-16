@@ -16,8 +16,8 @@ use warnings;
 use Sys::Syslog qw();
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
+    'Config',
+    'Encode',
 );
 
 sub new {
@@ -28,7 +28,7 @@ sub new {
     bless( $Self, $Type );
 
     # set syslog facility
-    $Self->{SysLogFacility} = $Kernel::OM->Get('Kernel::Config')->Get('LogModule::SysLog::Facility') || 'user';
+    $Self->{SysLogFacility} = $Kernel::OM->Get('Config')->Get('LogModule::SysLog::Facility') || 'user';
 
     return $Self;
 }
@@ -37,8 +37,8 @@ sub Log {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # prepare data for byte output
     if ( $ConfigObject->Get('LogModule::SysLog::Charset') =~ m/^utf-?8$/ ) {

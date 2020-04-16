@@ -127,19 +127,19 @@ sub Run {
     );
 
     # check if SystemAddress exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressLookup(
+    my $Exists = $Kernel::OM->Get('SystemAddress')->SystemAddressLookup(
         Name => $SystemAddress->{Name},
     );
 
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create SystemAddress. SystemAddress with the name '$SystemAddress->{Name}' already exists.",
+            Message => "Cannot create SystemAddress. SystemAddress with the name '$SystemAddress->{Name}' already exists.",
         );
     }
 
     # create SystemAddress
-    my $SystemAddressID = $Kernel::OM->Get('Kernel::System::SystemAddress')->SystemAddressAdd(
+    my $SystemAddressID = $Kernel::OM->Get('SystemAddress')->SystemAddressAdd(
         Name     => $SystemAddress->{Name},
         Comment  => $SystemAddress->{Comment} || '',
         ValidID  => $SystemAddress->{ValidID} || 1,

@@ -82,7 +82,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform MailFilter search
-    my %MailFilterList = $Kernel::OM->Get('Kernel::System::PostMaster::Filter')->FilterList();
+    my %MailFilterList = $Kernel::OM->Get('PostMaster::Filter')->FilterList();
 
     # get already prepared MailFilter data from MailFilterGet operation
     if ( IsHashRefWithData( \%MailFilterList ) ) {

@@ -16,7 +16,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
+    'Config',
 );
 
 sub GetDisplayPath {
@@ -27,7 +27,7 @@ sub Run {
     my $Self = shift;
 
     # Get the configured SystemID
-    my $SystemID = $Kernel::OM->Get('Kernel::Config')->Get('SystemID');
+    my $SystemID = $Kernel::OM->Get('Config')->Get('SystemID');
 
     # Does the SystemID contain non-digits?
     if ( $SystemID !~ /^\d+$/ ) {

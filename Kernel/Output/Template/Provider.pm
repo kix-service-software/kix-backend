@@ -18,20 +18,18 @@ use base qw (Template::Provider);
 use Scalar::Util qw();
 use Template::Constants;
 
-use Kernel::Output::Template::Document;
-
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'Cache',
+    'Encode',
+    'Log',
+    'Main',
 );
 
 ## no critic qw(ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions Subroutines::ProhibitUnusedPrivateSubroutines RegularExpressions::ProhibitComplexRegexes)
 
 # Force the use of our own document class.
-$Template::Provider::DOCUMENT = 'Kernel::Output::Template::Document';
+$Template::Provider::DOCUMENT = $Kernel::OM->GetModuleFor('Output::Template::Document');
 
 =head1 NAME
 
@@ -57,6 +55,9 @@ references.
 sub KIXInit {
     my ( $Self, %Param ) = @_;
 
+    # required the document handler
+    $Kernel::OM->Get('Main')->Require($Template::Provider::DOCUMENT) || die "Unable to require document handler!";
+
     # Don't fetch LayoutObject via ObjectManager as there might be several instances involved
     #   at this point (for example in LinkObject there is an own LayoutObject to avoid block
     #   name collisions).
@@ -72,13 +73,13 @@ sub KIXInit {
     $Self->{CacheType} = 'TemplateProvider';
 
     # caching can be disabled for debugging reasons
-    $Self->{CachingEnabled} = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::TemplateCache') // 1;
+    $Self->{CachingEnabled} = $Kernel::OM->Get('Config')->Get('Frontend::TemplateCache') // 1;
 
     # Pre-compute the list of not cacheable Templates. If a pre-output filter is
     #   registered for a particular or for all templates, the template cannot be
     #   cached any more.
     #
-    $Self->{FilterElementPre} = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::Output::FilterElementPre');
+    $Self->{FilterElementPre} = $Kernel::OM->Get('Config')->Get('Frontend::Output::FilterElementPre');
 
     my %UncacheableTemplates;
 
@@ -98,7 +99,7 @@ sub KIXInit {
 
         if ( !%TemplateList ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
                     "Please add a template list to output filter $FilterConfig->{Module} to improve performance.",
@@ -108,7 +109,7 @@ sub KIXInit {
         }
         elsif ( $TemplateList{ALL} ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => <<"EOF",
 $FilterConfig->{Module} wants to operate on ALL templates.
@@ -175,7 +176,7 @@ sub _fetch {
         my $CacheKey       = $self->_compiled_filename($name) . '::' . $template_mtime;
 
         # Is there an up-to-date compiled version in the cache?
-        my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $self->{CacheType},
             Key  => $CacheKey,
         );
@@ -309,7 +310,7 @@ sub _compile {
             my $CacheKey = $compfile . '::' . $data->{time};
 
             if ( $self->{CachingEnabled} ) {
-                $Kernel::OM->Get('Kernel::System::Cache')->Set(
+                $Kernel::OM->Get('Cache')->Set(
                     Type  => $self->{CacheType},
                     TTL   => 60 * 60 * 24,
                     Key   => $CacheKey,
@@ -374,7 +375,7 @@ sub _PreProcessTemplateContent {
     my $Content = $Param{Content};
 
     # Make sure the template is treated as utf8.
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Content );
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Content );
 
     my $TemplateFileWithoutTT = substr( $Param{TemplateFile}, 0, -3 );
 
@@ -391,7 +392,7 @@ sub _PreProcessTemplateContent {
                 # Load the template via the provider.
                 # We'll use SUPER::load here because we don't need the preprocessing twice.
                 my $TemplateContent = ($Self->SUPER::load($1))[0];
-                $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput(\$TemplateContent);
+                $Kernel::OM->Get('Encode')->EncodeInput(\$TemplateContent);
 
                 # Remove commented lines already here because of problems when the InsertTemplate tag
                 #   is not on the beginning of the line.
@@ -421,7 +422,7 @@ sub _PreProcessTemplateContent {
 
             if ( !%TemplateList ) {
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "Please add a template list to output filter $FilterConfig->{Module} to improve performance.",
@@ -431,7 +432,7 @@ sub _PreProcessTemplateContent {
             }
             elsif ( $TemplateList{ALL} ) {
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => <<"EOF",
 $FilterConfig->{Module} wants to operate on ALL templates.
@@ -458,7 +459,7 @@ EOF
             next FILTER if !$Match;
 
             # check filter construction
-            next FILTER if !$Kernel::OM->Get('Kernel::System::Main')->Require( $FilterConfig->{Module} );
+            next FILTER if !$Kernel::OM->Get('Main')->Require( $FilterConfig->{Module} );
 
             # create new instance
             my $Object = $FilterConfig->{Module}->new(

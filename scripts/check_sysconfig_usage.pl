@@ -22,16 +22,16 @@ use Kernel::System::ObjectManager;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::Log' => {
+    'Log' => {
         LogPrefix => 'check_sysconfig_usage',
     },
 );
 
-my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
-my $MainObject      = $Kernel::OM->Get('Kernel::System::Main');
+my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+my $MainObject      = $Kernel::OM->Get('Main');
 
 my @FileList = $MainObject->DirectoryRead(
-    Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home'),
+    Directory => $Kernel::OM->Get('Config')->Get('Home'),
     Filter    => [ '*.pm', '*.pl', '*.t' ],
     Recursive => 1,
 );
@@ -147,7 +147,7 @@ $HTML .= '</tbody></table></body></html>';
 
 print $HTML;
 
-$Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+$Kernel::OM->Get('Main')->FileWrite(
     Location => './sysconfig_usage.csv',
     Content  => \(join("\n", @Rows))
 );

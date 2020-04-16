@@ -135,19 +135,19 @@ sub Run {
     );
 
     # check if SLA exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::SLA')->SLALookup(
+    my $Exists = $Kernel::OM->Get('SLA')->SLALookup(
         Name => $SLA->{Name},
     );
     
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create SLA. SLA with the name '$SLA->{Name}' already exists.",
+            Message => "Cannot create SLA. SLA with the name '$SLA->{Name}' already exists.",
         );
     }
 
     # create sla
-    my $SLAID = $Kernel::OM->Get('Kernel::System::SLA')->SLAAdd(
+    my $SLAID = $Kernel::OM->Get('SLA')->SLAAdd(
         Name                    => $SLA->{Name},
         Comment                 => $SLA->{Comment} || '',
         ValidID                 => $SLA->{ValidID} || 1,

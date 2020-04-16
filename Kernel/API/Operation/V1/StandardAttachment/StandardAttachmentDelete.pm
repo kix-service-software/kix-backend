@@ -109,19 +109,19 @@ sub Run {
     # start loop
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
-        my %Result = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentStandardTemplateMemberList(
+        my %Result = $Kernel::OM->Get('StdAttachment')->StdAttachmentStandardTemplateMemberList(
             AttachmentID => $AttachmentID,
         );
 
         if ( IsHashRefWithData(\%Result) ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
-                Message => 'Can not delete StandardAttachment. The StandardAttachment has been assigned to at least one StandardTemplate.',
+                Message => 'Cannot delete StandardAttachment. The StandardAttachment has been assigned to at least one StandardTemplate.',
             );
         }
 
         # delete StandardAttachment	    
-        my $Success = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentDelete(
+        my $Success = $Kernel::OM->Get('StdAttachment')->StdAttachmentDelete(
             ID     => $AttachmentID,
             UserID => $Self->{Authorization}->{UserID},
         );

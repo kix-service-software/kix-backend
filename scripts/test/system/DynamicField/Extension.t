@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # theres is not really needed to add the dynamic fields for this test, we can define a static
 # set of configurations
@@ -225,7 +225,7 @@ $ConfigObject->Set(
 );
 
 # get a new backend object including the extension registrations from the config object
-my $DFBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+my $DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 my @Behaviors = (qw(Dummy1 Dummy2));
 my %Functions = (

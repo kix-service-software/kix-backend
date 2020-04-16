@@ -16,14 +16,14 @@ use vars qw($Self);
 use Kernel::System::FAQ;
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $FAQObject   = $Kernel::OM->Get('Kernel::System::FAQ');
-my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+my $FAQObject   = $Kernel::OM->Get('FAQ');
+my $CacheObject = $Kernel::OM->Get('Cache');
 
 my $FAQID = $FAQObject->FAQAdd(
     Title       => 'Some Text',
@@ -151,7 +151,7 @@ $Self->True(
     "FAQAdd() - 2",
 );
 
-my $Home            = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home            = $Kernel::OM->Get('Config')->Get('Home');
 my @AttachmentTests = (
     {
         File => 'FAQ-Test1.pdf',
@@ -164,7 +164,7 @@ my @AttachmentTests = (
 );
 
 # get main object
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
 for my $AttachmentTest (@AttachmentTests) {
     my $ContentSCALARRef = $MainObject->FileRead(
@@ -1017,7 +1017,7 @@ $Self->True(
 );
 
 my $InterfaceStates = $FAQObject->StateTypeList(
-    Types  => $Kernel::OM->Get('Kernel::Config')->Get('FAQ::Agent::StateTypes'),
+    Types  => $Kernel::OM->Get('Config')->Get('FAQ::Agent::StateTypes'),
     UserID => 1,
 );
 

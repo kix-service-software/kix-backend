@@ -18,8 +18,8 @@ use Time::HiRes();
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Ticket',
+    'Config',
+    'Ticket',
 );
 
 sub Configure {
@@ -43,9 +43,9 @@ sub Run {
     $Self->Print("<yellow>Rebuilding article search index...</yellow>\n");
 
     # disable ticket events
-    $Kernel::OM->Get('Kernel::Config')->{'Ticket::EventModulePost'} = {};
+    $Kernel::OM->Get('Config')->{'Ticket::EventModulePost'} = {};
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get all tickets
     my @TicketIDs = $TicketObject->TicketSearch(

@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
+    'Role',
 );
 
 sub Configure {
@@ -31,7 +31,7 @@ sub Run {
     $Self->Print("<yellow>Listing roles...</yellow>\n");
 
     # get all roles
-    my %Roles = $Kernel::OM->Get('Kernel::System::Role')->RoleList(
+    my %Roles = $Kernel::OM->Get('Role')->RoleList(
         Valid => 0,
     );
 
@@ -45,7 +45,7 @@ sub Run {
     $Self->Print("------ -------------------------------------------------- ----------------------- -------- --------------------------------------------------------------------------------\n");
 
     foreach my $ID ( sort { $Roles{$a} cmp $Roles{$b} } keys %Roles ) {
-        my %Role = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+        my %Role = $Kernel::OM->Get('Role')->RoleGet(
             ID => $ID
         );
 

@@ -20,14 +20,14 @@ use Time::HiRes qw(sleep);
 use base qw(Kernel::System::Daemon::BaseDaemon);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Daemon::SchedulerDB',
-    'Kernel::System::Cache',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Storable',
-    'Kernel::System::Time',
+    'Config',
+    'DB',
+    'Daemon::SchedulerDB',
+    'Cache',
+    'Log',
+    'Main',
+    'Storable',
+    'Time',
 );
 
 =head1 NAME
@@ -58,13 +58,13 @@ sub new {
     bless $Self, $Type;
 
     # Get objects in constructor to save performance.
-    $Self->{ConfigObject}      = $Kernel::OM->Get('Kernel::Config');
-    $Self->{CacheObject}       = $Kernel::OM->Get('Kernel::System::Cache');
-    $Self->{TimeObject}        = $Kernel::OM->Get('Kernel::System::Time');
-    $Self->{MainObject}        = $Kernel::OM->Get('Kernel::System::Main');
-    $Self->{DBObject}          = $Kernel::OM->Get('Kernel::System::DB');
-    $Self->{StorableObject}    = $Kernel::OM->Get('Kernel::System::Storable');
-    $Self->{SchedulerDBObject} = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+    $Self->{ConfigObject}      = $Kernel::OM->Get('Config');
+    $Self->{CacheObject}       = $Kernel::OM->Get('Cache');
+    $Self->{TimeObject}        = $Kernel::OM->Get('Time');
+    $Self->{MainObject}        = $Kernel::OM->Get('Main');
+    $Self->{DBObject}          = $Kernel::OM->Get('DB');
+    $Self->{StorableObject}    = $Kernel::OM->Get('Storable');
+    $Self->{SchedulerDBObject} = $Kernel::OM->Get('Daemon::SchedulerDB');
 
     # Disable in memory cache to be clusterable.
     $Self->{CacheObject}->Configure(
@@ -77,7 +77,7 @@ sub new {
 
     # Check NodeID, if does not match is impossible to continue.
     if ( $Self->{NodeID} !~ m{ \A \d+ \z }xms && $Self->{NodeID} > 0 && $Self->{NodeID} < 1000 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "NodeID '$Self->{NodeID}' is invalid!",
         );
@@ -178,12 +178,12 @@ sub Run {
             );
 
             # Disable in memory cache because many processes runs at the same time.
-            $Kernel::OM->Get('Kernel::System::Cache')->Configure(
+            $Kernel::OM->Get('Cache')->Configure(
                 CacheInMemory  => 0,
                 CacheInBackend => 1,
             );
 
-            my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+            my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
             # Try to lock the task.
             my $LockSucess = $SchedulerDBObject->TaskLock(
@@ -208,7 +208,7 @@ sub Run {
                 my $TaskName = $Task{Name} || '';
                 my $TaskType = $Task{Type} || '';
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Task $TaskType $TaskName ($TaskID) was deleted due missing task data!",
                 );
@@ -216,7 +216,7 @@ sub Run {
                 exit 1;
             }
 
-            my $TaskHandlerModule = 'Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::' . $Task{Type};
+            my $TaskHandlerModule = 'Daemon::DaemonModules::SchedulerTaskWorker::' . $Task{Type};
 
             my $TaskHandlerObject;
             eval {
@@ -240,7 +240,7 @@ sub Run {
                 my $TaskName = $Task{Name} || '';
                 my $TaskType = $Task{Type} || '';
 
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Task $TaskType $TaskName ($TaskID) was deleted due missing handler object!",
                 );
@@ -266,7 +266,7 @@ sub Run {
 
         # Check if fork was not possible.
         if ( $PID < 0 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not create a child process (worker) for task id $TaskID!",
             );
@@ -342,7 +342,7 @@ sub _WorkerPIDsCheck {
 
         if ( !-e $Self->{PIDDir} ) {
 
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't create directory '$Self->{PIDDir}': $!",
             );

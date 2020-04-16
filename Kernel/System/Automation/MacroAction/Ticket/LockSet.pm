@@ -19,9 +19,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
-    'Kernel::System::Lock'
+    'Log',
+    'Ticket',
+    'Lock'
 );
 
 =head1 NAME
@@ -79,7 +79,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID => $Param{TicketID},
@@ -89,7 +89,7 @@ sub Run {
         return;
     }
 
-    my $Lock = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    my $Lock = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{Lock},
         TicketID => $Param{TicketID},
@@ -98,12 +98,12 @@ sub Run {
     );
 
     # set the new lock
-    my $LockID = $Kernel::OM->Get('Kernel::System::Lock')->LockLookup(
+    my $LockID = $Kernel::OM->Get('Lock')->LockLookup(
         Lock => $Lock,
     );
 
     if ( !$LockID ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - can't find lock state \"$Param{Config}->{Lock}\"!",
             UserID   => $Param{UserID}
@@ -123,7 +123,7 @@ sub Run {
     );
 
     if ( !$Success ) {
-        $Kernel::OM->Get('Kernel::System::Automation')->LogError(
+        $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't update ticket $Param{TicketID} - setting the lock state \"$Param{Config}->{Lock}\" failed!",
             UserID   => $Param{UserID}

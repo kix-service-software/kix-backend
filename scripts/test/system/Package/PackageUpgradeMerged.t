@@ -15,9 +15,9 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-my $DBObject      = $Kernel::OM->Get('Kernel::System::DB');
-my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+my $ConfigObject  = $Kernel::OM->Get('Config');
+my $DBObject      = $Kernel::OM->Get('DB');
+my $PackageObject = $Kernel::OM->Get('Package');
 
 # get KIX Version
 my $KIXVersion = $ConfigObject->Get('Version');
@@ -169,28 +169,28 @@ my $MainPackageTwo = '<?xml version="1.0" encoding="utf-8" ?>
       </DatabaseUpgrade>
       <CodeUpgrade Type="merge" Version="2.0.3"><![CDATA[
             my $Content = "test";
-            $Kernel::OM->Get(\'Kernel::System::Main\')->FileWrite(
+            $Kernel::OM->Get(\'Main\')->FileWrite(
                 Location => "' . $TmpDir . '/test1",
                 Content  => \$Content,
             );
       ]]></CodeUpgrade>
       <CodeUpgrade Type="merge" Version="2.0.2"><![CDATA[
             my $Content = "test";
-            $Kernel::OM->Get(\'Kernel::System::Main\')->FileWrite(
+            $Kernel::OM->Get(\'Main\')->FileWrite(
                 Location => "' . $TmpDir . '/test2",
                 Content  => \$Content,
             );
       ]]></CodeUpgrade>
       <CodeUpgrade Type="merge" Version="2.0.1"><![CDATA[
             my $Content = "test";
-            $Kernel::OM->Get(\'Kernel::System::Main\')->FileWrite(
+            $Kernel::OM->Get(\'Main\')->FileWrite(
                 Location => "' . $TmpDir . '/test3",
                 Content  => \$Content,
             );
       ]]></CodeUpgrade>
       <CodeUpgrade Type="merge"><![CDATA[
             my $Content = "test";
-            $Kernel::OM->Get(\'Kernel::System::Main\')->FileWrite(
+            $Kernel::OM->Get(\'Main\')->FileWrite(
                 Location => "' . $TmpDir . '/test4",
                 Content  => \$Content,
             );
@@ -411,7 +411,7 @@ my $MainPackageFour = '<?xml version="1.0" encoding="utf-8" ?>
     </DatabaseUninstall>
     <CodeInstall %LabelReplace%><![CDATA[
         my $Content = "test";
-        $Kernel::OM->Get(\'Kernel::System::Main\')->FileWrite(
+        $Kernel::OM->Get(\'Main\')->FileWrite(
             Location => "' . $TmpDir . '/test5",
             Content  => \$Content,
         );
@@ -714,7 +714,7 @@ $PackageFour = '<?xml version="1.0" encoding="utf-8" ?>
 
   <CodeUpgrade Type="post" Version="4.0.2"><![CDATA[
         my $Content = "test";
-        $Kernel::OM->Get(\'Kernel::System::Main\')->FileWrite(
+        $Kernel::OM->Get(\'Main\')->FileWrite(
             Location => "' . $TmpDir . '/test1",
             Content  => \$Content,
         );
@@ -757,7 +757,7 @@ $PackageObject->PackageUninstall( String => $PackageFour );
 unlink $TmpDir . '/test1';
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

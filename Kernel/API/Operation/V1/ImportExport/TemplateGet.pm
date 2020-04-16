@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ImportExport::TemplateGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ImportExport::TemplateGet');
 
     return $Self;
 }
@@ -129,7 +129,7 @@ sub Run {
     foreach my $TemplateID ( @{$Param{Data}->{TemplateID}} ) {
 
         # get the Template data
-        my $TemplateDataRef = $Kernel::OM->Get('Kernel::System::ImportExport')->TemplateGet(
+        my $TemplateDataRef = $Kernel::OM->Get('ImportExport')->TemplateGet(
             TemplateID => $TemplateID,
             UserID     => $Self->{Authorization}->{UserID},
         );
@@ -146,7 +146,7 @@ sub Run {
 
         # get object data if included
         if ( $Param{Data}->{include}->{ObjectData} ) {
-            my $ObjectData = $Kernel::OM->Get('Kernel::System::ImportExport')->ObjectDataGet(
+            my $ObjectData = $Kernel::OM->Get('ImportExport')->ObjectDataGet(
                 TemplateID => $TemplateID,
                 UserID     => $Self->{Authorization}->{UserID},
             );

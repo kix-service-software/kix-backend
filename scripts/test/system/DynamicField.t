@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $DBObject           = $Kernel::OM->Get('Kernel::System::DB');
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DBObject           = $Kernel::OM->Get('DB');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomNumber();
 my $UserID   = 1;

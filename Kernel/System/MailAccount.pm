@@ -14,11 +14,11 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Valid',
+    'Config',
+    'DB',
+    'Log',
+    'Main',
+    'Valid',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $MailAccountObject = $Kernel::OM->Get('Kernel::System::MailAccount');
+    my $MailAccountObject = $Kernel::OM->Get('MailAccount');
 
 =cut
 
@@ -80,7 +80,7 @@ sub MailAccountAdd {
     # check needed stuff
     for (qw(Login Password Host ValidID Trusted DispatchingBy QueueID UserID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$_ not defined!"
             );
@@ -89,7 +89,7 @@ sub MailAccountAdd {
     }
     for (qw(Login Password Host Type ValidID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -102,7 +102,7 @@ sub MailAccountAdd {
         $Param{QueueID} = 0;
     }
     elsif ( $Param{DispatchingBy} eq 'Queue' && !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need QueueID for dispatching!"
         );
@@ -121,7 +121,7 @@ sub MailAccountAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Do(
@@ -147,7 +147,7 @@ sub MailAccountAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'MailAccount',
         ObjectID  => $ID,
@@ -173,7 +173,7 @@ sub MailAccountGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID!"
         );
@@ -181,7 +181,7 @@ sub MailAccountGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -260,7 +260,7 @@ sub MailAccountUpdate {
     # check needed stuff
     for (qw(ID Login Password Host Type ValidID Trusted DispatchingBy QueueID UserID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -273,7 +273,7 @@ sub MailAccountUpdate {
         $Param{QueueID} = 0;
     }
     elsif ( $Param{DispatchingBy} eq 'Queue' && !$Param{QueueID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need QueueID for dispatching!"
         );
@@ -291,7 +291,7 @@ sub MailAccountUpdate {
         $Param{IMAPFolder} = '';
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE mail_account SET login = ?, pw = ?, host = ?, account_type = ?, '
             . ' comments = ?, imap_folder = ?, trusted = ?, valid_id = ?, change_time = current_timestamp, '
             . ' change_by = ?, queue_id = ? WHERE id = ?',
@@ -303,7 +303,7 @@ sub MailAccountUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'MailAccount',
         ObjectID  => $Param{ID},
@@ -327,7 +327,7 @@ sub MailAccountDelete {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID!"
         );
@@ -335,13 +335,13 @@ sub MailAccountDelete {
     }
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM mail_account WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'MailAccount',
         ObjectID  => $Param{ID},
@@ -364,14 +364,14 @@ sub MailAccountList {
     my ( $Self, %Param ) = @_;
 
     # get valid object
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+    my $ValidObject = $Kernel::OM->Get('Valid');
 
     my $Where = $Param{Valid}
         ? 'WHERE valid_id IN ( ' . join ', ', $ValidObject->ValidIDsGet() . ' )'
         : '';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT id, host, login FROM mail_account $Where",
@@ -396,9 +396,9 @@ returns a list of usable backends
 sub MailAccountBackendList {
     my ( $Self, %Param ) = @_;
 
-    my $Directory = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/Kernel/System/MailAccount/';
+    my $Directory = $Kernel::OM->Get('Config')->Get('Home') . '/Kernel/System/MailAccount/';
 
-    my @List = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @List = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Directory,
         Filter    => '*.pm',
     );
@@ -444,7 +444,7 @@ sub MailAccountFetch {
     # check needed stuff
     for (qw(Login Password Host Type Trusted DispatchingBy QueueID UserID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -456,7 +456,7 @@ sub MailAccountFetch {
     my $GenericModule = "Kernel::System::MailAccount::$Param{Type}";
 
     # try to load module $GenericModule
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
+    if ( !$Kernel::OM->Get('Main')->Require($GenericModule) ) {
         return;
     }
 
@@ -487,7 +487,7 @@ sub MailAccountCheck {
     # check needed stuff
     for (qw(Login Password Host Type Timeout Debug)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -499,7 +499,7 @@ sub MailAccountCheck {
     my $GenericModule = "Kernel::System::MailAccount::$Param{Type}";
 
     # try to load module $GenericModule
-    if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule) ) {
+    if ( !$Kernel::OM->Get('Main')->Require($GenericModule) ) {
         return;
     }
 

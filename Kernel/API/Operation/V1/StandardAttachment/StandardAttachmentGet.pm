@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::StandardAttachment::StandardAttachmentGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::StandardAttachment::StandardAttachmentGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
         # get the StandardAttachment data
-        my %StandardAttachmentData = $Kernel::OM->Get('Kernel::System::StdAttachment')->StdAttachmentGet(
+        my %StandardAttachmentData = $Kernel::OM->Get('StdAttachment')->StdAttachmentGet(
             ID => $AttachmentID,
         );
 

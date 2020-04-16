@@ -127,7 +127,7 @@ sub Run {
     );
 
     # check if pattern exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::Translation')->PatternExistsCheck(
+    my $Exists = $Kernel::OM->Get('Translation')->PatternExistsCheck(
         Value  => $TranslationPattern->{Value},
         UserID => $Self->{Authorization}->{UserID}
     );
@@ -138,7 +138,7 @@ sub Run {
     }
     
     # create pattern
-    my $PatternID = $Kernel::OM->Get('Kernel::System::Translation')->PatternAdd(
+    my $PatternID = $Kernel::OM->Get('Translation')->PatternAdd(
         Value  => $TranslationPattern->{Value},
         UserID => $Self->{Authorization}->{UserID},
     );    

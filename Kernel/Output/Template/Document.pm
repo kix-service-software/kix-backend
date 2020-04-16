@@ -272,7 +272,7 @@ sub _PrecalculateBlockHookSubscriptions {
     # Only calculate once per LayoutObject
     return if defined $Context->{LayoutObject}->{_BlockHookSubscriptions};
 
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('Frontend::Template::GenerateBlockHooks') // {};
+    my $Config = $Kernel::OM->Get('Config')->Get('Frontend::Template::GenerateBlockHooks') // {};
 
     my %BlockHooks;
 

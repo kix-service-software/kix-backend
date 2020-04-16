@@ -15,10 +15,10 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Ticket',
-    'Kernel::System::Log',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
+    'Ticket',
+    'Log',
+    'DynamicField',
+    'DynamicField::Backend',
 );
 
 sub new {
@@ -28,7 +28,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{TicketObject}              = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{TicketObject}              = $Kernel::OM->Get('Ticket');
     $Self->{AllowedTicketSearchParams} = {
 
         #TicketID => '',
@@ -101,7 +101,7 @@ sub Run {
 
         # check validity
         if ( $Key !~ m/(.+)::(.+)/ ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => $CommonMessage
                     . "No valid string for search or update given (format: X::Y) for $Key.",
@@ -123,7 +123,7 @@ sub Run {
 
             # check if values for asttribute are given
             if ( !$Param{Config}->{$Key} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $CommonMessage . "No value for $Attribute given."
                 );
@@ -145,7 +145,7 @@ sub Run {
                     = { Equals => [ $Param{Config}->{$Key} ] };
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $CommonMessage
                         . "$Attribute is no valid search parameter! "
@@ -163,7 +163,7 @@ sub Run {
 
     # check if search parameters are given
     if ( !$TicketMethods{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No search parameters given!"
         );
@@ -179,16 +179,16 @@ sub Run {
 
     # check number of tickets found
     if ( !@TicketIDs ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => $CommonMessage . "Got no ticket IDs!"
         );
         return 0;
     }
-    elsif ( scalar(@TicketIDs) > ($Kernel::OM->Get('Kernel::Config')->Get('UpdateMultipleTickets::TicketSearchFoundThreshold') || 25) )
+    elsif ( scalar(@TicketIDs) > ($Kernel::OM->Get('Config')->Get('UpdateMultipleTickets::TicketSearchFoundThreshold') || 25) )
     {
         #too many tickets found, something wrong? no update...
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => $CommonMessage
                 . "too many tickets found. No update - check transaction "
@@ -214,13 +214,13 @@ sub Run {
                 $DFKey =~ s/DynamicField_//g;
 
                 # get required DynamicField config
-                my $DynamicFieldConfig = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+                my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                     Name => $DFKey,
                 );
 
                 # check if we have a valid DynamicField
                 if ( !IsHashRefWithData($DynamicFieldConfig) ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => $CommonMessage
                             . "Can't get DynamicField config for DynamicField: '$DFKey'!",
@@ -229,7 +229,7 @@ sub Run {
                 }
 
                 # try to set the configured value
-                $Success = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueSet(
+                $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
                     DynamicFieldConfig => $DynamicFieldConfig,
                     ObjectID           => $ID,
                     Value              => $TicketMethods{Update}->{$AttrKey},
@@ -310,7 +310,7 @@ sub Run {
 
             # check if everything went wrong
             if ( !$Success ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $CommonMessage
                         . "Can't set value '"

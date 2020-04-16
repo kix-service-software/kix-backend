@@ -13,15 +13,15 @@ use utf8;
 use vars (qw($Self));
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::Organisation::Add');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Organisation::Add');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomName = $Helper->GetRandomID();
 

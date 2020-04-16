@@ -12,11 +12,11 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::YAML',
+    'DB',
+    'Log',
+    'Main',
+    'Time',
+    'YAML',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create a debug log object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $WebserviceHistoryObject = $Kernel::OM->Get('Kernel::System::API::WebserviceHistory');
+    my $WebserviceHistoryObject = $Kernel::OM->Get('API::WebserviceHistory');
 
 =cut
 
@@ -74,7 +74,7 @@ sub WebserviceHistoryAdd {
     # check needed stuff
     for my $Key (qw(WebserviceID Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -83,17 +83,17 @@ sub WebserviceHistoryAdd {
     }
 
     # dump config as string
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Dump( Data => $Param{Config} );
+    my $Config = $Kernel::OM->Get('YAML')->Dump( Data => $Param{Config} );
 
     # md5 of content
-    my $MD5 = $Kernel::OM->Get('Kernel::System::Main')->MD5sum(
+    my $MD5 = $Kernel::OM->Get('Main')->MD5sum(
         String => $Param{WebserviceID}
             . $Param{Config}
-            . $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString( Length => 32 )
+            . $Kernel::OM->Get('Main')->GenerateRandomString( Length => 32 )
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Do(
@@ -144,7 +144,7 @@ sub WebserviceHistoryGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -152,7 +152,7 @@ sub WebserviceHistoryGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(
@@ -164,7 +164,7 @@ sub WebserviceHistoryGet {
     );
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
@@ -202,7 +202,7 @@ sub WebserviceHistoryUpdate {
     # check needed stuff
     for my $Key (qw(ID WebserviceID Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -211,10 +211,10 @@ sub WebserviceHistoryUpdate {
     }
 
     # dump config as string
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Dump( Data => $Param{Config} );
+    my $Config = $Kernel::OM->Get('YAML')->Dump( Data => $Param{Config} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Do(
@@ -246,7 +246,7 @@ sub WebserviceHistoryDelete {
     # check needed stuff
     for my $Key (qw(WebserviceID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -255,7 +255,7 @@ sub WebserviceHistoryDelete {
     }
 
     # sql
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'DELETE FROM api_webservice_config_history
                 WHERE config_id = ?',
         Bind => [ \$Param{WebserviceID} ],
@@ -280,7 +280,7 @@ sub WebserviceHistoryList {
     # check needed stuff
     for my $Key (qw(WebserviceID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -289,7 +289,7 @@ sub WebserviceHistoryList {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL =>

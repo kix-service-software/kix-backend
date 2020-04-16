@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Contact::ContactGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Contact::ContactGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
 
         # get the Contact data
-        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $ContactID,
         );
 
@@ -160,7 +160,7 @@ sub Run {
             # execute ticket searches
             my %TicketStats;
             # new tickets
-            $TicketStats{NewCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{NewCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -179,7 +179,7 @@ sub Run {
                 Result => 'COUNT',
             );
             # open tickets
-            $TicketStats{OpenCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{OpenCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -198,7 +198,7 @@ sub Run {
                 Result => 'COUNT',
             );
             # pending tickets
-            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -217,7 +217,7 @@ sub Run {
                 Result => 'COUNT',
             );
             # escalated tickets
-            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Kernel::System::Ticket')->TicketSearch(
+            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
                 Search => {
                     AND => [
                         {
@@ -229,7 +229,7 @@ sub Run {
                             Field    => 'EscalationTime',
                             Operator => 'LT',
                             DataType => 'NUMERIC',
-                            Value    => $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp(),
+                            Value    => $Kernel::OM->Get('Time')->CurrentTimestamp(),
                         },
                     ]
                 },
@@ -247,13 +247,16 @@ sub Run {
 
         #FIXME: workaround KIX2018-3308####################
         $Self->AddCacheDependency(Type => 'User');
-        my $UserData = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
-            Data          => {
-                UserID => $ContactData{AssignedUserID},
-            }
-        );
-        $ContactData{Login} = ($UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
+        my $UserData;
+        if ($ContactData{AssignedUserID}) {
+            $UserData = $Self->ExecOperation(
+                OperationType => 'V1::User::UserGet',
+                Data          => {
+                    UserID => $ContactData{AssignedUserID},
+                }
+            );
+        }
+        $ContactData{Login} = ($UserData && $UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
         #######################
 
         #comment back in when 3308 is resolved properly
@@ -287,7 +290,7 @@ sub Run {
                 $Self->AddCacheDependency(Type => 'User');
             }
 
-            my $ItemIDs = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->GetAssignedConfigItemsForObject(
+            my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
                 ObjectType => 'Contact',
                 Object     => \%CIContact
             );

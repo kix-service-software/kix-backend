@@ -109,7 +109,7 @@ sub Run {
     # start loop
     foreach my $ClassID ( @{$Param{Data}->{ClassID}} ) {
 
-        my $ConfigItemID = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearch(
+        my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
             ClassIDs     => [$ClassID],
         );
 	    
@@ -121,7 +121,7 @@ sub Run {
         } 
 	             	       
         # delete GeneralCatalog item	    
-        my $Success = $Kernel::OM->Get('Kernel::System::GeneralCatalog')->GeneralCatalogItemDelete(
+        my $Success = $Kernel::OM->Get('GeneralCatalog')->GeneralCatalogItemDelete(
             GeneralCatalogItemID => $ClassID,
             UserID               => $Self->{Authorization}->{UserID},
         );

@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::AddressBook',
-    'Kernel::System::Contact',
-    'Kernel::System::Log',
-    'Kernel::System::SystemAddress',
-    'Kernel::System::Ticket',
+    'Config',
+    'AddressBook',
+    'Contact',
+    'Log',
+    'SystemAddress',
+    'Ticket',
 );
 
 =item new()
@@ -34,12 +34,12 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{ConfigObject}        = $Kernel::OM->Get('Kernel::Config');
-    $Self->{AddressBookObject}   = $Kernel::OM->Get('Kernel::System::AddressBook');
-    $Self->{ContactObject}  = $Kernel::OM->Get('Kernel::System::Contact');
-    $Self->{LogObject}           = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{SystemAddressObject} = $Kernel::OM->Get('Kernel::System::SystemAddress');
-    $Self->{TicketObject}        = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{ConfigObject}        = $Kernel::OM->Get('Config');
+    $Self->{AddressBookObject}   = $Kernel::OM->Get('AddressBook');
+    $Self->{ContactObject}  = $Kernel::OM->Get('Contact');
+    $Self->{LogObject}           = $Kernel::OM->Get('Log');
+    $Self->{SystemAddressObject} = $Kernel::OM->Get('SystemAddress');
+    $Self->{TicketObject}        = $Kernel::OM->Get('Ticket');
 
     return $Self;
 }

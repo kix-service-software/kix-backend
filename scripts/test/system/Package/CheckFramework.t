@@ -15,8 +15,8 @@ use utf8;
 use vars (qw($Self));
 
 # get package object
-my $ConfigObject  = $Kernel::OM->Get('Kernel::Config');
-my $PackageObject = $Kernel::OM->Get('Kernel::System::Package');
+my $ConfigObject  = $Kernel::OM->Get('Config');
+my $PackageObject = $Kernel::OM->Get('Package');
 
 # Set Framework Version to 4.0.4
 $ConfigObject->Set(

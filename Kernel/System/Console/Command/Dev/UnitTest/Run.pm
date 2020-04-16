@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::UnitTest',
+    'Config',
+    'UnitTest',
 );
 
 sub Configure {
@@ -106,13 +106,13 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     $Kernel::OM->ObjectParamAdd(
-        'Kernel::System::UnitTest' => {
+        'UnitTest' => {
             Output => $Self->GetOption('output') || '',
             ANSI => $Self->{ANSI},
         },
     );
 
-    my $FunctionResult = $Kernel::OM->Get('Kernel::System::UnitTest')->Run(
+    my $FunctionResult = $Kernel::OM->Get('UnitTest')->Run(
         Name                   => $Self->GetOption('test')                       || '',
         Exclude                => $Self->GetOption('exclude')                    || '',
         Directory              => $Self->GetOption('directory')                  || '',

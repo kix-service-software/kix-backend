@@ -16,11 +16,11 @@ use warnings;
 use PDF::API2;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'Cache',
+    'Log',
+    'Main',
+    'Time',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $PDFObject = $Kernel::OM->Get('Kernel::System::PDF');
+    my $PDFObject = $Kernel::OM->Get('PDF');
 
 Please note that currently you should only create one PDF object per instance of
 this class.
@@ -56,7 +56,7 @@ sub new {
     bless( $Self, $Type );
 
     # read string width cache
-    $Self->{CacheStringWidth} = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    $Self->{CacheStringWidth} = $Kernel::OM->Get('Cache')->Get(
         Type => 'PDF',
         Key  => 'CacheStringWidth',
     ) || {};
@@ -91,19 +91,19 @@ sub DocumentNew {
 
     # check pdf object
     if ( $Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Can not create new Document!',
+            Message  => 'Cannot create new Document!',
         );
         return;
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get Product and Version
     my $PDFCreator = '';    # set to empty value if Secure::DisableBanner is active
-    if ( !$Kernel::OM->Get('Kernel::Config')->Get('Secure::DisableBanner') ) {
+    if ( !$Kernel::OM->Get('Config')->Get('Secure::DisableBanner') ) {
         $PDFCreator = $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version');
     }
 
@@ -121,15 +121,15 @@ sub DocumentNew {
 
     # check pdf object
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Can not create new Document: $!',
+            Message  => 'Cannot create new Document: $!',
         );
         return;
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # today
     my ( $NowSec, $NowMin, $NowHour, $NowDay, $NowMonth, $NowYear ) = $TimeObject->SystemTime2Date(
@@ -218,7 +218,7 @@ sub PageBlankNew {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Object!"
         );
@@ -276,9 +276,9 @@ sub PageBlankNew {
         return 1;
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
-        Message  => "Can not create new blank Page!"
+        Message  => "Cannot create new blank Page!"
     );
 
     return;
@@ -311,7 +311,7 @@ sub PageNew {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Object!"
         );
@@ -343,7 +343,7 @@ sub PageNew {
     # create a blank page
     $Self->PageBlankNew(%Data);
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page Object!"
         );
@@ -360,7 +360,7 @@ sub PageNew {
 
     # get logofile
     my $LogoFile = $Self->{Document}->{LogoFile}
-        || $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/var/logo-otrs.png';
+        || $Kernel::OM->Get('Config')->Get('Home') . '/var/logo-otrs.png';
 
     if (
         defined( $Param{LogoFile} )
@@ -569,14 +569,14 @@ sub DocumentOutput {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Object!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -681,7 +681,7 @@ sub Table {
     # check needed stuff
     for (qw(CellData)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -690,7 +690,7 @@ sub Table {
         }
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
@@ -698,7 +698,7 @@ sub Table {
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -807,7 +807,7 @@ sub Table {
         }
 
         # get maximum number of pages
-        my $MaxPages = $Kernel::OM->Get('Kernel::Config')->Get('PDF::MaxPages');
+        my $MaxPages = $Kernel::OM->Get('Config')->Get('PDF::MaxPages');
 
         if ( !$MaxPages || $MaxPages < 1 || $MaxPages > 1000 ) {
             $MaxPages = 100;
@@ -1002,7 +1002,7 @@ sub Table {
                     }
 
                     if ( $RowCounter > 100 ) {
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
                             Message =>
                                 "Too much row loops on page! Infinite Loop protection. Table Output aborted."
@@ -1016,7 +1016,7 @@ sub Table {
                 }
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No active cells! Table Output aborted."
                 );
@@ -1024,7 +1024,7 @@ sub Table {
             }
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Too much loops! Infinite Loop protection. Table Output aborted."
             );
@@ -1032,7 +1032,7 @@ sub Table {
         }
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Need array references of CellData, ColumnData and RowData! Table Output aborted."
@@ -1085,7 +1085,7 @@ sub Text {
     # check needed stuff
     for (qw(Text)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1093,14 +1093,14 @@ sub Text {
         }
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -1257,7 +1257,7 @@ sub Image {
     # check needed stuff
     for (qw(File Width Height)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1265,21 +1265,21 @@ sub Image {
         }
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
         return;
     }
     if ( !-e $Param{File} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "File $Param{File} not found!"
         );
@@ -1317,7 +1317,7 @@ sub Image {
             $ImageFile = $Self->{PDF}->image_png( $Param{File} );
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Imagetype of File $Param{File} not supported"
             );
@@ -1389,14 +1389,14 @@ sub HLine {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -1515,14 +1515,14 @@ sub PositionSet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -1646,14 +1646,14 @@ sub PositionGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -1679,14 +1679,14 @@ sub DimSet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -1715,14 +1715,14 @@ sub DimGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -1832,7 +1832,7 @@ sub _TableCalculate {
         )
     {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1845,21 +1845,21 @@ sub _TableCalculate {
         || ref( $Param{RowData} ) ne 'ARRAY'
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need array references of CellData, ColumnData and RowData!"
         );
         return;
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2194,7 +2194,7 @@ sub _TableBlockNextCalculate {
     # check needed stuff
     for (qw(CellData ColumnData)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2202,21 +2202,21 @@ sub _TableBlockNextCalculate {
         }
     }
     if ( ref $Param{CellData} ne 'ARRAY' || ref $Param{ColumnData} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need array references of CellData and ColumnData!"
         );
         return;
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2308,7 +2308,7 @@ sub _TableRowCalculate {
     # check needed stuff
     for (qw(CellData RowData ColumnData Row)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2321,21 +2321,21 @@ sub _TableRowCalculate {
         || ref( $Param{RowData} ) ne 'ARRAY'
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need array references of CellData, ColumnData and RowData!"
         );
         return;
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2431,7 +2431,7 @@ sub _TableCellOutput {
         )
     {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2439,14 +2439,14 @@ sub _TableCellOutput {
         }
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2561,7 +2561,7 @@ sub _TableCellOnCount {
     # check needed stuff
     for (qw(CellData)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2569,21 +2569,21 @@ sub _TableCellOnCount {
         }
     }
     if ( ref( $Param{CellData} ) ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need array references of CellData!"
         );
         return;
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2637,7 +2637,7 @@ sub _TextCalculate {
     # check needed stuff
     for (qw(Text Type Width Height Font FontSize Lead)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2645,14 +2645,14 @@ sub _TextCalculate {
         }
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2876,7 +2876,7 @@ sub _StringWidth {
     # check needed stuff
     for (qw(Text Font FontSize)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2886,7 +2886,7 @@ sub _StringWidth {
 
     # check document
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
@@ -2895,7 +2895,7 @@ sub _StringWidth {
 
     # check page
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2938,7 +2938,7 @@ sub _PrepareText {
     # check needed stuff
     for (qw(Text)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2946,14 +2946,14 @@ sub _PrepareText {
         }
     }
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -2987,14 +2987,14 @@ sub _CurPageNumberSet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3042,14 +3042,14 @@ sub _CurPageDimSet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3073,7 +3073,7 @@ sub _CurPageDimSet {
     # get default pagesize
     my $DefaultWidth  = 595;    # DIN A4
     my $DefaultHeight = 842;    # DIN A4
-    if ( $Kernel::OM->Get('Kernel::Config')->Get('PDF::PageSize') eq 'letter' ) {
+    if ( $Kernel::OM->Get('Config')->Get('PDF::PageSize') eq 'letter' ) {
         $DefaultWidth  = 612;
         $DefaultHeight = 792;
     }
@@ -3137,14 +3137,14 @@ sub _CurPageDimGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3179,14 +3179,14 @@ sub _CurPageDimCheck {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3228,14 +3228,14 @@ sub _CurPrintableDimSet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3336,14 +3336,14 @@ sub _CurPrintableDimGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3378,14 +3378,14 @@ sub _CurPrintableDimCheck {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3435,14 +3435,14 @@ sub _CurContentDimSet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3535,14 +3535,14 @@ sub _CurContentDimGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3577,14 +3577,14 @@ sub _CurContentDimCheck {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3625,14 +3625,14 @@ sub _CurPositionSet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3697,14 +3697,14 @@ sub _CurPositionGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Self->{PDF} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a PDF Document!"
         );
         return;
     }
     if ( !$Self->{Page} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need a Page!"
         );
@@ -3724,7 +3724,7 @@ sub DESTROY {
     my ( $Self, %Param ) = @_;
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => 'PDF',
         TTL   => 60 * 60 * 24 * 20,
         Key   => 'CacheStringWidth',

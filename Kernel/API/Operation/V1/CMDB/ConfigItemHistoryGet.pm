@@ -131,7 +131,7 @@ sub Run {
     }
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
@@ -144,7 +144,7 @@ sub Run {
     my @HistoryList;        
     foreach my $HistoryID ( @{$Param{Data}->{HistoryID}} ) {                 
 
-        my $HistoryItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->HistoryEntryGet(
+        my $HistoryItem = $Kernel::OM->Get('ITSMConfigItem')->HistoryEntryGet(
             HistoryEntryID => $HistoryID
         );
 

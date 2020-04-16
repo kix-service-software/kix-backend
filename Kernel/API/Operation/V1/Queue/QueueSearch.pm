@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Queue search
-    my %QueueList = $Kernel::OM->Get('Kernel::System::Queue')->QueueList(
+    my %QueueList = $Kernel::OM->Get('Queue')->QueueList(
         Valid => 0
     );
 

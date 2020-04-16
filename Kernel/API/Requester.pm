@@ -18,8 +18,8 @@ use Kernel::API::Transport;
 use Kernel::System::VariableCheck qw(IsHashRefWithData);
 
 our @ObjectDependencies = (
-    'Kernel::System::API::Webservice',
-    'Kernel::System::Log',
+    'API::Webservice',
+    'Log',
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create an object. Do not create it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $RequesterObject = $Kernel::OM->Get('Kernel::API::Requester');
+    my $RequesterObject = $Kernel::OM->Get('API::Requester');
 
 =cut
 
@@ -96,7 +96,7 @@ sub Run {
 
     for my $Needed (qw(WebserviceID Invoker Data)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Got no $Needed!",
             );
@@ -114,12 +114,12 @@ sub Run {
 
     my $WebserviceID = $Param{WebserviceID};
 
-    my $Webservice = $Kernel::OM->Get('Kernel::System::API::Webservice')->WebserviceGet(
+    my $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
         ID => $WebserviceID,
     );
 
     if ( !IsHashRefWithData($Webservice) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
                 "Could not load web service configuration for web service $Param{WebserviceID}",
@@ -145,7 +145,7 @@ sub Run {
         CommunicationType => 'Requester',
     );
 
-    if ( ref $DebuggerObject ne 'Kernel::API::Debugger' ) {
+    if ( ref $DebuggerObject ne 'API::Debugger' ) {
 
         return {
             Success      => 0,
@@ -174,7 +174,7 @@ sub Run {
     );
 
     # bail out if invoker init failed
-    if ( ref $InvokerObject ne 'Kernel::API::Invoker' ) {
+    if ( ref $InvokerObject ne 'API::Invoker' ) {
 
         return $DebuggerObject->Error(
             Summary => 'InvokerObject could not be initialized',
@@ -232,7 +232,7 @@ sub Run {
         );
 
         # if mapping init failed, bail out
-        if ( ref $MappingOutObject ne 'Kernel::API::Mapping' ) {
+        if ( ref $MappingOutObject ne 'API::Mapping' ) {
             $DebuggerObject->Error(
                 Summary => 'MappingOut could not be initialized',
                 Data    => $MappingOutObject,
@@ -268,7 +268,7 @@ sub Run {
     );
 
     # bail out if transport init failed
-    if ( ref $TransportObject ne 'Kernel::API::Transport' ) {
+    if ( ref $TransportObject ne 'API::Transport' ) {
 
         return $DebuggerObject->Error(
             Summary => 'TransportObject could not be initialized',
@@ -348,7 +348,7 @@ sub Run {
         );
 
         # if mapping init failed, bail out
-        if ( ref $MappingInObject ne 'Kernel::API::Mapping' ) {
+        if ( ref $MappingInObject ne 'API::Mapping' ) {
             $DebuggerObject->Error(
                 Summary => 'MappingOut could not be initialized',
                 Data    => $MappingInObject,

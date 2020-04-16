@@ -18,9 +18,9 @@ use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
+    'Config',
+    'Cache',
+    'DB',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $WatcherObject = $Kernel::OM->Get('Kernel::System::Watcher');
+    my $WatcherObject = $Kernel::OM->Get('Watcher');
 
 =cut
 
@@ -60,19 +60,15 @@ sub new {
     $Self->{CacheType} = 'Watcher';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
-    # get all type modules
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Kernel::Config')->Get('Home').'/Kernel/System/Watcher',
-        Filter    => '*.pm',
-    );
-    my @BackendList = map { my $Module = fileparse($_, '.pm'); $Module } @Files;
+
+    my $BackendList = $Kernel::OM->Get('Config')->{'Watcher::Backend'};
 
     # load backends
-    foreach my $Backend ( @BackendList ) {
-        my $Package = 'Kernel::System::Watcher::' . $Backend;
+    foreach my $Backend ( sort keys %{$BackendList} ) {
+        my $Package = $BackendList->{$Backend}->{Module};
 
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Package) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('Main')->Require($Package) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Package!"
             );        
@@ -80,7 +76,7 @@ sub new {
 
         my $BackendObject = $Package->new( %{$Self} );
         if ( !$BackendObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
             );        
@@ -109,7 +105,7 @@ sub WatcherGet {
     # check needed stuff
     for my $Needed (qw(ID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -151,7 +147,7 @@ sub WatcherList {
     my @BindObj;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = 'SELECT id, object, object_id, user_id, create_time, create_by, change_time, change_by FROM watcher WHERE 1=1';
 
@@ -189,7 +185,7 @@ sub WatcherList {
         foreach my $Row ( @{$Data || []} ) {
 
             # get user object
-            my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+            my $UserObject = $Kernel::OM->Get('User');
 
             my %UserData = $UserObject->GetUserData(
                 UserID => $Row->{UserID},
@@ -229,7 +225,7 @@ sub WatcherAdd {
     # check needed stuff
     for my $Needed (qw(Object ObjectID WatchUserID UserID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -238,7 +234,7 @@ sub WatcherAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # db access
     return if !$DBObject->Do(
@@ -273,12 +269,12 @@ sub WatcherAdd {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Watcher',
         ObjectID  => $Param{Object}.'::'.$Param{ObjectID}.'::'.$Param{WatchUserID},
@@ -311,7 +307,7 @@ sub WatcherDelete {
     # check needed stuff
     for my $Needed (qw(UserID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -321,7 +317,7 @@ sub WatcherDelete {
 
     # only one of these parameters is needed
     if ( !$Param{ID} && !$Param{WatchUserID} && !$Param{AllUsers} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID or WatchUserID or AllUsers param!"
         );
@@ -329,7 +325,7 @@ sub WatcherDelete {
     }
 
     # get user object
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $UserObject = $Kernel::OM->Get('User');
 
     if ( $Param{AllUsers} ) {
         my @Watchers = $Self->WatcherList(
@@ -337,13 +333,13 @@ sub WatcherDelete {
             ObjectID   => $Param{ObjectID},
         );
 
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'DELETE FROM watcher WHERE object = ? AND object_id = ?',
             Bind => [ \$Param{Object}, \$Param{ObjectID} ],
         );
 
         # delete cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
 
@@ -358,7 +354,7 @@ sub WatcherDelete {
             }
 
             # push client callback event
-            $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
                 Event     => 'DELETE',
                 Namespace => 'Watcher',
                 ObjectID  => $Param{Object}.'::'.$Param{ObjectID}.'::'.$WatchUserID,
@@ -370,13 +366,13 @@ sub WatcherDelete {
             ID => $Param{ID}
         );
 
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'DELETE FROM watcher WHERE id = ?',
             Bind => [ \$Param{ID} ],
         );
 
         # delete cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
 
@@ -389,20 +385,20 @@ sub WatcherDelete {
         }
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'DELETE',
             Namespace => 'Watcher',
             ObjectID  => $WatcherData{Object}.'::'.$WatcherData{ObjectID}.'::'.$WatcherData{WatchUserID},
         );
     }
     else {
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'DELETE FROM watcher WHERE object = ? AND object_id = ? AND user_id = ?',
             Bind => [ \$Param{Object}, \$Param{ObjectID}, \$Param{WatchUserID} ],
         );
 
         # delete cache
-        $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
 
@@ -414,7 +410,7 @@ sub WatcherDelete {
         }
 
         # push client callback event
-        $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'DELETE',
             Namespace => 'Watcher',
             ObjectID  => $Param{Object}.'::'.$Param{ObjectID}.'::'.$Param{WatchUserID},
@@ -442,7 +438,7 @@ sub WatcherTransfer {
     # check needed stuff
     for my $Needed (qw(Object SourceObjectID TargetObjectID)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -451,7 +447,7 @@ sub WatcherTransfer {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # transfer watchers from source to target
     my @SourceWatcherList = $Self->WatcherList(
@@ -482,17 +478,17 @@ sub WatcherTransfer {
     );    
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Watcher',
         ObjectID  => $Param{Object}.'::'.$Param{SourceObjectID},
     );
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Watcher',
         ObjectID  => $Param{Object}.'::'.$Param{TargetObjectID},

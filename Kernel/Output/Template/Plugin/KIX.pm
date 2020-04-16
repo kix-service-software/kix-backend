@@ -73,7 +73,7 @@ sub new {
     Scalar::Util::weaken($LayoutObject);
 
     my $ConfigFunction = sub {
-        return $Kernel::OM->Get('Kernel::Config')->Get(@_);
+        return $Kernel::OM->Get('Config')->Get(@_);
     };
 
     my $EnvFunction = sub {

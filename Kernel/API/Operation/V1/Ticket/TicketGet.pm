@@ -303,7 +303,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @TicketList;
 
@@ -344,7 +344,7 @@ sub Run {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
                 if ( $TicketRaw{$Attribute} ) {
-                    my $DynamicFieldConfig = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet(
+                    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                         Name => $1,
                     );
                     if ( IsHashRefWithData($DynamicFieldConfig) ) {
@@ -353,13 +353,13 @@ sub Run {
                         next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
 
                         # get prepared value
-                        my $DFPreparedValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ValueLookup(
+                        my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Key                => $TicketRaw{$Attribute},
                         );
 
                         # get display value string
-                        my $DisplayValue = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->DisplayValueRender(
+                        my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Value              => $TicketRaw{$Attribute}
                         );
@@ -388,13 +388,13 @@ sub Run {
                         }
 
                         # get html display value string
-                        my $DisplayValueHTML = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->HTMLDisplayValueRender(
+                        my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Value              => $TicketRaw{$Attribute},
                         );
 
                         # get short display value string
-                        my $DisplayValueShort = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->ShortDisplayValueRender(
+                        my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Value              => $TicketRaw{$Attribute}
                         );

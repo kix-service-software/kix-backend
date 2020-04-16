@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Ticket',
+    'Ticket',
 );
 
 sub Configure {
@@ -70,7 +70,7 @@ sub Run {
     for my $TicketNumber (@TicketNumbers) {
 
         # lookup ticket id
-        my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketIDLookup(
+        my $TicketID = $Kernel::OM->Get('Ticket')->TicketIDLookup(
             TicketNumber => $TicketNumber,
             UserID       => 1,
         );
@@ -88,7 +88,7 @@ sub Run {
     for my $TicketID (@TicketIDs) {
 
         # lookup ticket number
-        my $TicketNumber = $Kernel::OM->Get('Kernel::System::Ticket')->TicketNumberLookup(
+        my $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
             TicketID => $TicketID,
             UserID   => 1,
         );
@@ -108,7 +108,7 @@ sub Run {
     for my $TicketID (@DeleteTicketIDs) {
 
         # delete the ticket
-        my $True = $Kernel::OM->Get('Kernel::System::Ticket')->TicketDelete(
+        my $True = $Kernel::OM->Get('Ticket')->TicketDelete(
             TicketID => $TicketID,
             UserID   => 1,
         );

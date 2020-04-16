@@ -14,7 +14,7 @@ use utf8;
 
 use vars (qw($Self));
 
-my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
 
@@ -33,16 +33,16 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
     sleep $SleepTime;
 }
 
-my $Helper            = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+my $Helper            = $Kernel::OM->Get('UnitTest::Helper');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 $Self->Is(
     ref $SchedulerDBObject,
-    'Kernel::System::Daemon::SchedulerDB',
+    'Daemon::SchedulerDB',
     "Kernel::System::Daemon::SchedulerDB->new()",
 );
 
-my $TaskWorkerObject = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker');
+my $TaskWorkerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
 
 my $RunTasks = sub {
 
@@ -69,7 +69,7 @@ my $RunTasks = sub {
 $RunTasks->();
 
 # get cache object
-my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+my $CacheObject = $Kernel::OM->Get('Cache');
 
 # delete any cache
 $CacheObject->CleanUp(
@@ -79,7 +79,7 @@ $CacheObject->CleanUp(
 # freeze time
 $Helper->FixedTimeSet();
 
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 my $SystemTime = $TimeObject->SystemTime();
 
@@ -559,7 +559,7 @@ my $TaskName = 'UnitTest';
 my $TaskType = 'UnitTest';
 my $LockKey  = 12345678;
 
-$Kernel::OM->Get('Kernel::System::DB')->Do(
+$Kernel::OM->Get('DB')->Do(
     SQL => "
         INSERT INTO scheduler_recurrent_task
             (name, task_type, last_execution_time, lock_key, lock_time, create_time, change_time)

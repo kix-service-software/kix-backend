@@ -14,10 +14,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Console::Command::List',
-    'Kernel::System::Main',
-    'Kernel::System::Log',
+    'Config',
+    'Console::Command::List',
+    'Main',
+    'Log',
 );
 
 =head1 NAME
@@ -58,25 +58,25 @@ sub Run {
     my $CommandName;
 
     # always disable cache debugging
-    $Kernel::OM->Get('Kernel::Config')->Set(Key => 'Cache::Debug', Value => 0);
+    $Kernel::OM->Get('Config')->Set(Key => 'Cache::Debug', Value => 0);
 
     # Catch bash completion calls
     if ( $ENV{COMP_LINE} ) {
-        $CommandName = 'Kernel::System::Console::Command::Internal::BashCompletion';
+        $CommandName = 'Console::Command::Internal::BashCompletion';
         return $Kernel::OM->Get($CommandName)->Execute(@CommandlineArguments);
     }
 
     # If we don't have any arguments OR the first argument is an option and not a command name,
     #   show the overview screen instead.
     if ( !@CommandlineArguments || substr( $CommandlineArguments[0], 0, 2 ) eq '--' ) {
-        $CommandName = 'Kernel::System::Console::Command::List';
+        $CommandName = 'Console::Command::List';
         return $Kernel::OM->Get($CommandName)->Execute(@CommandlineArguments);
     }
 
     # Ok, let's try to find the command.
-    $CommandName = 'Kernel::System::Console::Command::' . $CommandlineArguments[0];
+    $CommandName = $Kernel::OM->GetModuleFor('Console::Command::' . $CommandlineArguments[0]);
 
-    if ( $Kernel::OM->Get('Kernel::System::Main')->Require( $CommandName, Silent => 1 ) ) {
+    if ( $Kernel::OM->Get('Main')->Require( $CommandName, Silent => 1 ) ) {
 
         # Regular case: everything was ok, execute command.
         # Remove first parameter (command itself) to not confuse further parsing
@@ -85,7 +85,7 @@ sub Run {
     }
 
     # If the command cannot be found/loaded, also show the overview screen.
-    my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::List');
+    my $CommandObject = $Kernel::OM->Get('Console::Command::List');
     $CommandObject->PrintError("Could not find $CommandName.\n\n");
     $CommandObject->Execute();
     return 127;    # EXIT_CODE_COMMAND_NOT_FOUND, see http://www.tldp.org/LDP/abs/html/exitcodes.html
@@ -117,7 +117,7 @@ sub CommandGet {
     # check needed stuff
     for (qw(Command)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -127,14 +127,14 @@ sub CommandGet {
 
     my $CommandName = $Param{Command};
     if ( $CommandName !~ /^Kernel::System::Console::Command::/ ) {
-        $CommandName = 'Kernel::System::Console::Command::' . $CommandName;
+        $CommandName = 'Console::Command::' . $CommandName;
     }
 
     # get command object
     my $CommandObject = $Kernel::OM->Get($CommandName);
 
     if ( !$CommandObject ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Console command $Param{Command} not found!"
         );
@@ -194,8 +194,8 @@ returns all available commands, sorted first by directory and then by file name.
 returns
 
     (
-        'Kernel::System::Command::Help',
-        'Kernel::System::Command::List',
+        'Command::Help',
+        'Command::List',
         ...
     )
 
@@ -204,7 +204,7 @@ returns
 sub CommandList {
     my ( $Self, %Param ) = @_;
 
-    my $Home = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my @Folders = ( $Home . '/Kernel/System/Console/Command' );
     foreach my $TmpDir (@INC) {
@@ -217,7 +217,7 @@ sub CommandList {
     my @CommandFiles = ();
     for my $CommandDirectory (@Folders) {
 
-        my @CommandFilesTmp = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+        my @CommandFilesTmp = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $CommandDirectory,
             Filter    => '*.pm',
             Recursive => 1,
@@ -260,11 +260,11 @@ sub FileList {
     my ( $Self, %Param ) = @_;
     my @FileList;
 
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
-    my $FileDir = $Kernel::OM->Get('Kernel::Config')->Get('Console::FilePath');
+    my $FileDir = $Kernel::OM->Get('Config')->Get('Console::FilePath');
 
-    my @Files = $Kernel::OM->Get('Kernel::System::Main')->DirectoryRead(
+    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $FileDir,
         Filter    => '*',
         Recursive => 1,
@@ -277,19 +277,19 @@ sub FileList {
         my $Filename = $File;
         $Filename =~ s{$FileDir/}{}g;
 
-        my $Stat = $Kernel::OM->Get('Kernel::System::Main')->FileStat(
+        my $Stat = $Kernel::OM->Get('Main')->FileStat(
             Location => $File,
         );
 
         if ( !$Stat ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to stat file $File!",
             );
             return;
         }
 
-        my $MD5sum = $Kernel::OM->Get('Kernel::System::Main')->MD5sum(
+        my $MD5sum = $Kernel::OM->Get('Main')->MD5sum(
             String => $Filename
         );
 
@@ -342,7 +342,7 @@ sub FileDelete {
     # check needed stuff
     for (qw(ID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -352,9 +352,9 @@ sub FileDelete {
 
     my %FileList = map { $_->{MD5sum} = $_ } $Self->FileList();
 
-    my $FileDir = $Kernel::OM->Get('Kernel::Config')->Get('Console::FilePath');
+    my $FileDir = $Kernel::OM->Get('Config')->Get('Console::FilePath');
 
-    my $Result = $Kernel::OM->Get('Kernel::System::Main')->FileDelete(
+    my $Result = $Kernel::OM->Get('Main')->FileDelete(
         Location => $FileDir.'/'.$FileList{$Param{ID}}->{Filename}
     );
 

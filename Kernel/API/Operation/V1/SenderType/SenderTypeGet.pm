@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SenderType::SenderTypeGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SenderType::SenderTypeGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $SenderTypeID ( @{$Param{Data}->{SenderTypeID}} ) {
 
         # get the SenderType data
-        my $SenderTypeName = $Kernel::OM->Get('Kernel::System::Ticket')->ArticleSenderTypeLookup(
+        my $SenderTypeName = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
             SenderTypeID => $SenderTypeID,
         );
 

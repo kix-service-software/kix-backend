@@ -16,7 +16,7 @@ use vars (qw($Self));
 use Kernel::System::ObjectManager;
 
 local $Kernel::OM = Kernel::System::ObjectManager->new(
-    'Kernel::System::PostMaster' => {
+    'PostMaster' => {
         Email => [],
     },
 );
@@ -24,7 +24,7 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 $Self->True( $Kernel::OM, 'Could build object manager' );
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $SkipCryptSMIME;
 if ( !$ConfigObject->Get('SMIME') ) {
@@ -42,19 +42,19 @@ if ( !$ConfigObject->Get('ChatEngine::Active') ) {
 }
 
 my $SkipCalendar;
-if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( 'Kernel::System::Calendar', Silent => 1 ) ) {
+if ( !$Kernel::OM->Get('Main')->Require( 'Calendar', Silent => 1 ) ) {
     $SkipCalendar = 1;
 }
 
 my $SkipTeam;
-if ( !$Kernel::OM->Get('Kernel::System::Main')->Require( 'Kernel::System::Calendar::Team', Silent => 1 ) ) {
+if ( !$Kernel::OM->Get('Main')->Require( 'Calendar::Team', Silent => 1 ) ) {
     $SkipTeam = 1;
 }
 
 my $Home = $ConfigObject->Get('Home');
 
 # get main object
-my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+my $MainObject = $Kernel::OM->Get('Main');
 
 my %OperationChecked;
 
@@ -85,8 +85,8 @@ for my $Directory ( sort @DirectoriesToSearch ) {
         $Module =~ s{$Home\/+}{}msx;
 
         # check if file contains a call to another module using Object manager
-        #    for example: $Kernel::OM->Get('Kernel::Config')->Get('Home');
-        #    the regular expression will match until $Kernel::OM->Get('Kernel::Config')->Get(
+        #    for example: $Kernel::OM->Get('Config')->Get('Home');
+        #    the regular expression will match until $Kernel::OM->Get('Config')->Get(
         #    including possible line returns
         #    for this example:
         #    $1 will contain Kernel::Config
@@ -102,14 +102,14 @@ for my $Directory ( sort @DirectoriesToSearch ) {
             next OPERATION if $OperationChecked{"$1->$2()"};
 
             # skip crypt object if it is not configured
-            next OPERATION if $1 eq 'Kernel::System::Crypt::SMIME'          && $SkipCryptSMIME;
-            next OPERATION if $1 eq 'Kernel::System::Crypt::PGP'            && $SkipCryptPGP;
-            next OPERATION if $1 eq 'Kernel::System::Chat'                  && $SkipChat;
-            next OPERATION if $1 eq 'Kernel::System::ChatChannel'           && $SkipChat;
-            next OPERATION if $1 eq 'Kernel::System::VideoChat'             && $SkipChat;
-            next OPERATION if $1 eq 'Kernel::System::Calendar'              && $SkipCalendar;
-            next OPERATION if $1 eq 'Kernel::System::Calendar::Appointment' && $SkipCalendar;
-            next OPERATION if $1 eq 'Kernel::System::Calendar::Team'        && $SkipTeam;
+            next OPERATION if $1 eq 'Crypt::SMIME'          && $SkipCryptSMIME;
+            next OPERATION if $1 eq 'Crypt::PGP'            && $SkipCryptPGP;
+            next OPERATION if $1 eq 'Chat'                  && $SkipChat;
+            next OPERATION if $1 eq 'ChatChannel'           && $SkipChat;
+            next OPERATION if $1 eq 'VideoChat'             && $SkipChat;
+            next OPERATION if $1 eq 'Calendar'              && $SkipCalendar;
+            next OPERATION if $1 eq 'Calendar::Appointment' && $SkipCalendar;
+            next OPERATION if $1 eq 'Calendar::Team'        && $SkipTeam;
 
             # load object
             my $Object = $Kernel::OM->Get("$1");
@@ -128,7 +128,7 @@ for my $Directory ( sort @DirectoriesToSearch ) {
 }
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

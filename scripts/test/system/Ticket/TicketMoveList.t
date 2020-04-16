@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # Get helper object.
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 # Get ticket object.
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # Create ticket.
 my $TicketID = $TicketObject->TicketCreate(
@@ -48,7 +48,7 @@ $Self->IsNot(
 my $RandomID = $HelperObject->GetRandomID();
 
 # Get Queue object.
-my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+my $QueueObject = $Kernel::OM->Get('Queue');
 
 # Create queues.
 my $QueueID1 = $QueueObject->QueueAdd(
@@ -87,14 +87,14 @@ $Self->IsNot(
 my $TestUserLogin = $HelperObject->TestUserCreate(
     Groups => [ 'admin', 'users' ],
 );
-my $TestUserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+my $TestUserID = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
 my $TestContactLogin = $HelperObject->TestContactCreate();
 
 # Cleanup and set ACLs.
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 $ConfigObject->Set(
     Key   => 'TicketAcl',

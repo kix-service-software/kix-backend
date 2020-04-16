@@ -17,16 +17,16 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase  => 1,
         UseTmpArticleDir => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
 
 my @DynamicfieldIDs;
 my @DynamicFieldUpdate;
@@ -54,7 +54,7 @@ my %NeededDynamicfields = (
 );
 
 # list available dynamic fields
-my $DynamicFields = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldList(
+my $DynamicFields = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
     Valid      => 0,
     ResultType => 'HASH',
 );
@@ -65,7 +65,7 @@ for my $FieldName ( sort keys %NeededDynamicfields ) {
     if ( !$DynamicFields->{$FieldName} ) {
 
         # create a dynamic field
-        my $FieldID = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldAdd(
+        my $FieldID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
             Name       => $FieldName,
             Label      => $FieldName . "_test",
             FieldOrder => 9991,
@@ -88,12 +88,12 @@ for my $FieldName ( sort keys %NeededDynamicfields ) {
     }
     else {
         my $DynamicField
-            = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldGet( ID => $DynamicFields->{$FieldName} );
+            = $Kernel::OM->Get('DynamicField')->DynamicFieldGet( ID => $DynamicFields->{$FieldName} );
 
         if ( $DynamicField->{ValidID} > 1 ) {
             push @DynamicFieldUpdate, $DynamicField;
             $DynamicField->{ValidID} = 1;
-            my $SuccessUpdate = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldUpdate(
+            my $SuccessUpdate = $Kernel::OM->Get('DynamicField')->DynamicFieldUpdate(
                 %{$DynamicField},
                 Reorder => 0,
                 UserID  => 1,
@@ -168,8 +168,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
     # use different ticket number generators
     for my $NumberModule (qw(AutoIncrement DateChecksum Date Random)) {
 
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::PostMaster::Filter'] );
-        my $PostMasterFilter = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
+        $Kernel::OM->ObjectsDiscard( Objects => ['PostMaster::Filter'] );
+        my $PostMasterFilter = $Kernel::OM->Get('PostMaster::Filter');
 
         $ConfigObject->Set(
             Key   => 'Ticket::NumberGenerator',
@@ -184,8 +184,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             );
 
             # Recreate Ticket object for every loop.
-            $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-            $Kernel::OM->Get('Kernel::System::Ticket');
+            $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+            $Kernel::OM->Get('Ticket');
 
             # add rand postmaster filter
             my $FilterRand1 = 'filter' . $Helper->GetRandomID();
@@ -328,8 +328,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 }
 
                 # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-                my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+                my $TicketObject = $Kernel::OM->Get('Ticket');
                 my %Ticket       = $TicketObject->TicketGet(
                     TicketID      => $Return[1],
                     DynamicFields => 1,
@@ -552,8 +552,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 );
 
                 # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-                $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+                $TicketObject = $Kernel::OM->Get('Ticket');
 
                 %Ticket = $TicketObject->TicketGet(
                     TicketID      => $Return[1],
@@ -692,8 +692,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 );
 
                 # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-                $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+                $TicketObject = $Kernel::OM->Get('Ticket');
 
                 %Ticket = $TicketObject->TicketGet(
                     TicketID      => $Return[1],
@@ -749,8 +749,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 );
 
                 # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-                $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+                $TicketObject = $Kernel::OM->Get('Ticket');
 
                 %Ticket = $TicketObject->TicketGet(
                     TicketID      => $Return[1],
@@ -862,8 +862,8 @@ my @Tests = (
     },
 );
 
-$Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::PostMaster::Filter'] );
-my $PostMasterFilter = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
+$Kernel::OM->ObjectsDiscard( Objects => ['PostMaster::Filter'] );
+my $PostMasterFilter = $Kernel::OM->Get('PostMaster::Filter');
 
 for my $Type (qw(Config DB)) {
     for my $Test (@Tests) {
@@ -881,7 +881,7 @@ for my $Type (qw(Config DB)) {
                 Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
                 Value => {
                     %{$Test},
-                    Module => 'Kernel::System::PostMaster::Filter::Match',
+                    Module => 'PostMaster::Filter::Match',
                 },
             );
         }
@@ -915,8 +915,8 @@ Some Content in Body
     );
 
     # new/clear ticket object
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Return[1],
@@ -1011,8 +1011,8 @@ Some Content in Body
     },
 );
 
-$Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::PostMaster::Filter'] );
-$PostMasterFilter = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
+$Kernel::OM->ObjectsDiscard( Objects => ['PostMaster::Filter'] );
+$PostMasterFilter = $Kernel::OM->Get('PostMaster::Filter');
 
 for my $Test (@Tests) {
     for my $Type (qw(Config DB)) {
@@ -1031,7 +1031,7 @@ for my $Test (@Tests) {
                 Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
                 Value => {
                     %{$Test},
-                    Module => 'Kernel::System::PostMaster::Filter::Match',
+                    Module => 'PostMaster::Filter::Match',
                 },
             );
         }
@@ -1057,8 +1057,8 @@ for my $Test (@Tests) {
         );
 
         # new/clear ticket object
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         my %Ticket = $TicketObject->TicketGet(
             TicketID      => $Return[1],
@@ -1104,7 +1104,7 @@ for my $Test (@Tests) {
 
 # revert changes to dynamic fields
 for my $DynamicField (@DynamicFieldUpdate) {
-    my $SuccessUpdate = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldUpdate(
+    my $SuccessUpdate = $Kernel::OM->Get('DynamicField')->DynamicFieldUpdate(
         Reorder => 0,
         UserID  => 1,
         %{$DynamicField},
@@ -1118,7 +1118,7 @@ for my $DynamicField (@DynamicFieldUpdate) {
 for my $DynamicFieldID (@DynamicfieldIDs) {
 
     # delete the dynamic field
-    my $FieldDelete = $Kernel::OM->Get('Kernel::System::DynamicField')->DynamicFieldDelete(
+    my $FieldDelete = $Kernel::OM->Get('DynamicField')->DynamicFieldDelete(
         ID     => $DynamicFieldID,
         UserID => 1,
     );
@@ -1130,7 +1130,7 @@ for my $DynamicFieldID (@DynamicfieldIDs) {
 
 # test X-KIX-(Owner|Responsible)
 my $Login = $Helper->TestUserCreate();
-my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup( UserLogin => $Login );
+my $UserID = $Kernel::OM->Get('User')->UserLookup( UserLogin => $Login );
 
 my %OwnerResponsibleTests = (
     Owner => {
@@ -1195,8 +1195,8 @@ for my $Test ( sort keys %OwnerResponsibleTests ) {
         $Test . ' Run() - NewTicket/TicketID',
     );
 
-    $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Return[1],

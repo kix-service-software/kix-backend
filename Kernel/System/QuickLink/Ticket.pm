@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'LinkObject',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -37,7 +37,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $QuickLinkTicketObject = $Kernel::OM->Get('Kernel::System::QuickLink::Ticket');
+    my $QuickLinkTicketObject = $Kernel::OM->Get('QuickLink::Ticket');
 
 =cut
 
@@ -49,9 +49,9 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{LinkObject} = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}  = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{TicketObject}  = $Kernel::OM->Get('Kernel::System::Ticket');
+    $Self->{LinkObject} = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}  = $Kernel::OM->Get('Log');
+    $Self->{TicketObject}  = $Kernel::OM->Get('Ticket');
 
     # return
     return $Self;

@@ -17,12 +17,12 @@ use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Valid',
+    'Config',
+    'DB',
+    'Encode',
+    'Log',
+    'Main',
+    'Valid',
 );
 
 sub new {
@@ -36,7 +36,7 @@ sub new {
     $Self->{Debug} = 0;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get user table
     $Self->{UserTable} = $ConfigObject->Get( 'DatabaseUserTable' . $Param{Count} )
@@ -56,7 +56,7 @@ sub GetOption {
 
     # check needed stuff
     if ( !$Param{What} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need What!"
         );
@@ -77,7 +77,7 @@ sub Auth {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need User!"
         );
@@ -93,14 +93,14 @@ sub Auth {
     my $Method;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     my $SQL = "SELECT $Self->{UserTableUserPW}, $Self->{UserTableUserID}, $Self->{UserTableUser} "
         . " FROM "
         . " $Self->{UserTable} "
         . " WHERE "
-        . " valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Kernel::System::Valid')->ValidIDsGet())} ) AND "
+        . " valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) AND "
         . " $Self->{UserTableUser} = '" . $DBObject->Quote($User) . "'";
     $DBObject->Prepare( SQL => $SQL );
 
@@ -111,8 +111,8 @@ sub Auth {
     }
 
     # get needed objects
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # crypt given pw
     my $CryptedPw = '';
@@ -167,9 +167,9 @@ sub Auth {
         elsif ( $GetPw =~ m{^BCRYPT:} ) {
 
             # require module, log errors if module was not found
-            if ( !$Kernel::OM->Get('Kernel::System::Main')->Require('Crypt::Eksblowfish::Bcrypt') )
+            if ( !$Kernel::OM->Get('Main')->Require('Crypt::Eksblowfish::Bcrypt') )
             {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "User: '$User' tried to authenticate with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
@@ -228,7 +228,7 @@ sub Auth {
 
     # just in case for debug!
     if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
                 "User: '$User' tried to authenticate with Pw: '$Pw' ($UserID/$Method/$CryptedPw/$GetPw/$Salt/$RemoteAddr)",
@@ -237,7 +237,7 @@ sub Auth {
 
     # just a note
     if ( !$Pw ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $User without Pw!!! (REMOTE_ADDR: $RemoteAddr)",
         );
@@ -247,7 +247,7 @@ sub Auth {
     # login note
     elsif ( ( ($GetPw) && ($User) && ($UserID) ) && $CryptedPw eq $GetPw ) {
 
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $User authentication ok (Method: $Method, REMOTE_ADDR: $RemoteAddr).",
         );
@@ -256,7 +256,7 @@ sub Auth {
 
     # just a note
     elsif ( ($UserID) && ($GetPw) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
                 "User: $User authentication with wrong Pw!!! (Method: $Method, REMOTE_ADDR: $RemoteAddr)"
@@ -266,7 +266,7 @@ sub Auth {
 
     # just a note
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $User doesn't exist or is invalid!!! (REMOTE_ADDR: $RemoteAddr)"
         );

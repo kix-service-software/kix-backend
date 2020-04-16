@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Cache',
+    'Cache',
 );
 
 sub new {
@@ -33,14 +33,14 @@ sub Send {
     my ( $Self, %Param ) = @_;
 
     # get already stored emails from cache
-    my $Emails = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Emails = $Kernel::OM->Get('Cache')->Get(
         Key  => $Self->{CacheKey},
         Type => $Self->{CacheType},
     ) // [];
 
     push @{$Emails}, \%Param;
 
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Key   => $Self->{CacheKey},
         Type  => $Self->{CacheType},
         Value => $Emails,
@@ -53,7 +53,7 @@ sub Send {
 sub EmailsGet {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    return $Kernel::OM->Get('Cache')->Get(
         Key  => $Self->{CacheKey},
         Type => $Self->{CacheType},
     ) // [];
@@ -62,7 +62,7 @@ sub EmailsGet {
 sub CleanUp {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    return $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 }

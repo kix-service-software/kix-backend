@@ -9,7 +9,6 @@
 # --
 
 package Kernel::System::DB;
-## nofilter(TidyAll::Plugin::OTRS::Perl::PODSpelling)
 
 use strict;
 use warnings;
@@ -20,11 +19,11 @@ use List::Util();
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
+    'Config',
+    'Encode',
+    'Log',
+    'Main',
+    'Time',
 );
 
 our $UseSlaveDB = 0;
@@ -50,7 +49,7 @@ Usually you do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Kernel::System::DB' => {
+        'DB' => {
             # if you don't supply the following parameters, the ones found in
             # Kernel/Config.pm are used instead:
             DatabaseDSN  => 'DBI:odbc:database=123;host=localhost;',
@@ -63,7 +62,7 @@ Usually you do not use it directly, instead use:
             },
         },
     );
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
 =cut
 
@@ -78,7 +77,7 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get config data
     $Self->{DSN}  = $Param{DatabaseDSN}  || $ConfigObject->Get('DatabaseDSN');
@@ -125,14 +124,14 @@ sub new {
     # load backend module
     if ( $Self->{'DB::Type'} ) {
         my $GenericModule = 'Kernel::System::DB::' . $Self->{'DB::Type'};
-        return if !$Kernel::OM->Get('Kernel::System::Main')->Require($GenericModule);
+        return if !$Kernel::OM->Get('Main')->Require($GenericModule);
         $Self->{Backend} = $GenericModule->new( %{$Self} );
 
         # set database functions
         $Self->{Backend}->LoadPreferences();
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => 'Unknown database type! Set option Database::Type in '
                 . 'Kernel/Config.pm to (mysql|postgresql|oracle|db2|mssql).',
@@ -192,7 +191,7 @@ sub Connect {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
             Message =>
@@ -209,7 +208,7 @@ sub Connect {
     );
 
     if ( !$Self->{dbh} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'Error',
             Message  => $DBI::errstr,
@@ -252,7 +251,7 @@ sub Disconnect {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
             Message  => 'DB.pm->Disconnect',
@@ -331,7 +330,7 @@ sub Quote {
     # quote integers
     if ( $Type eq 'Integer' ) {
         if ( $Text !~ m{\A [+-]? \d{1,16} \z}xms ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
                 Message  => "Invalid integer in query '$Text'!",
@@ -344,7 +343,7 @@ sub Quote {
     # quote numbers
     if ( $Type eq 'Number' ) {
         if ( $Text !~ m{ \A [+-]? \d{1,20} (?:\.\d{1,20})? \z}xms ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
                 Message  => "Invalid number in query '$Text'!",
@@ -359,7 +358,7 @@ sub Quote {
         return ${ $Self->{Backend}->Quote( \$Text, $Type ) };
     }
 
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Caller   => 1,
         Priority => 'error',
         Message  => "Invalid quote type '$Type'!",
@@ -407,7 +406,7 @@ sub Do {
 
     # check needed stuff
     if ( !$Param{SQL} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQL!',
         );
@@ -426,11 +425,12 @@ sub Do {
                 push @Array, $$Data;
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                use Data::Dumper;
+                $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper \$Param{Bind} : '',
+                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
@@ -444,7 +444,7 @@ sub Do {
     # - This avoids time inconsistencies of app and db server
     # - This avoids timestamp problems in Postgresql servers where
     #   the timestamp is sometimes 1 second off the perl timestamp.
-    my $Timestamp = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+    my $Timestamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
     $Param{SQL} =~ s{
         (?<= \s | \( | , )  # lookahead
         current_timestamp   # replace current_timestamp by 'yyyy-mm-dd hh:mm:ss'
@@ -457,7 +457,7 @@ sub Do {
     # debug
     if ( $Self->{Debug} > 0 ) {
         $Self->{DoCounter}++;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
             Message  => "DB.pm->Do ($Self->{DoCounter}) SQL: '$Param{SQL}'",
@@ -474,7 +474,7 @@ sub Do {
 
     # send sql to database
     if ( !$Self->{dbh}->do( $Param{SQL}, undef, @Array ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'error',
             Message  => "$DBI::errstr, SQL: '$Param{SQL}'",
@@ -491,7 +491,7 @@ sub _InitSlaveDB {
     # Run only once!
     return $Self->{SlaveDBObject} if $Self->{_InitSlaveDB}++;
 
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
     my $MasterDSN    = $ConfigObject->Get('DatabaseDSN');
 
     # Don't create slave if we are already in a slave, or if we are not in the master,
@@ -589,7 +589,7 @@ sub Prepare {
 
     # check needed stuff
     if ( !$Param{SQL} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQL!',
         );
@@ -640,7 +640,7 @@ sub Prepare {
     # debug
     if ( $Self->{Debug} > 1 ) {
         $Self->{PrepareCounter}++;
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
             Message  => "DB.pm->Prepare ($Self->{PrepareCounter}/" . time() . ") SQL: '$SQL'",
@@ -665,11 +665,11 @@ sub Prepare {
                 push @Array, $$Data;
             }
             else {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper \$Param{Bind} : '',
+                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
@@ -683,7 +683,7 @@ sub Prepare {
 
     # do
     if ( !( $Self->{Cursor} = $Self->{dbh}->prepare($SQL) ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'Error',
             Message  => "$DBI::errstr, SQL: '$SQL'",
@@ -692,7 +692,7 @@ sub Prepare {
     }
 
     if ( !$Self->{Cursor}->execute(@Array) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'Error',
             Message  => "$DBI::errstr, SQL: '$SQL'",
@@ -704,7 +704,7 @@ sub Prepare {
     if ( $Self->{SlowLog} ) {
         my $LogTimeTaken = time() - $LogTime;
         if ( $LogTimeTaken > 4 ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
                 Message  => "Slow ($LogTimeTaken s) SQL: '$SQL'",
@@ -766,7 +766,7 @@ sub FetchrowArray {
     }
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # e. g. set utf-8 flag
     my $Counter = 0;
@@ -806,7 +806,7 @@ sub FetchAllArrayRef {
 
     # check needed stuff
     if ( !IsArrayRefWithData($Param{Columns}) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Columns!',
         );
@@ -830,7 +830,7 @@ sub FetchAllArrayRef {
     my $Rows = $Self->{Cursor}->fetchall_arrayref();
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     my $DoEncode = $Self->{Backend}->{'DB::Encode'};
 
@@ -1233,7 +1233,7 @@ sub QueryCondition {
     # check needed stuff
     for (qw(Key Value)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1609,7 +1609,7 @@ sub QueryCondition {
             # if it's an AND condition
             if ( $Array[$Position] eq '&' && $Array[ $Position + 1 ] eq '&' ) {
                 if ( $SQL =~ m/ OR $/ ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message =>
                             "Invalid condition '$Param{Value}', simultaneous usage both AND and OR conditions!",
@@ -1624,7 +1624,7 @@ sub QueryCondition {
             # if it's an OR condition
             elsif ( $Array[$Position] eq '|' && $Array[ $Position + 1 ] eq '|' ) {
                 if ( $SQL =~ m/ AND $/ ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message =>
                             "Invalid condition '$Param{Value}', simultaneous usage both AND and OR conditions!",
@@ -1674,7 +1674,7 @@ sub QueryCondition {
 
     # check syntax
     if ( $Open != $Close ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Invalid condition '$Param{Value}', $Open open and $Close close!",
         );
@@ -1719,7 +1719,7 @@ sub QueryStringEscape {
     # check needed stuff
     for my $Key (qw(QueryString)) {
         if ( !defined $Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -1752,7 +1752,7 @@ sub Ping {
 
     # debug
     if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Caller   => 1,
             Priority => 'debug',
             Message  => 'DB.pm->Ping',
@@ -1818,7 +1818,7 @@ sub _TypeCheck {
         && $Tag->{Type} !~ /^(DATE|SMALLINT|BIGINT|INTEGER|DECIMAL|VARCHAR|LONGBLOB)$/i
         )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => "Unknown data type '$Tag->{Type}'!",
         );
@@ -1831,7 +1831,7 @@ sub _NameCheck {
     my ( $Self, $Tag ) = @_;
 
     if ( $Tag->{Name} && length $Tag->{Name} > 30 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => "Table names should not have more the 30 chars ($Tag->{Name})!",
         );

@@ -15,9 +15,9 @@ use MIME::Base64;
 use Digest::MD5 qw(md5_hex);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log'
+    'DB',
+    'Encode',
+    'Log'
 );
 
 =head1 NAME
@@ -40,7 +40,7 @@ create AttachmentStorageDB object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AttachmentStorageObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem::AttachmentStorage::DB');
+    my $AttachmentStorageObject = $Kernel::OM->Get('ITSMConfigItem::AttachmentStorage::DB');
 
 =cut
 
@@ -72,14 +72,14 @@ sub AttachmentAdd {
     #check required stuff...
     foreach (qw(AttDirID DataRef)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
     #encode attachment if it's a postgresql backend...
-    if ( !$Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('DirectBlob') ) {
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( $Param{DataRef} );
+    if ( !$Kernel::OM->Get('DB')->GetDatabaseFunction('DirectBlob') ) {
+        $Kernel::OM->Get('Encode')->EncodeOutput( $Param{DataRef} );
 
         #overwrite existing value instead of using another filesize of memory...
         ${ $Param{DataRef} } = encode_base64( ${ $Param{DataRef} } );
@@ -87,12 +87,12 @@ sub AttachmentAdd {
 
     #db quoting...
     foreach (qw( AttDirID)) {
-        $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_}, 'Integer' );
+        $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_}, 'Integer' );
     }
 
     #build sql...
     my $SQL = "";
-    if ( $Kernel::OM->Get('Kernel::System::DB')->{Backend}->{'DB::Type'} =~ /oracle/ ) {
+    if ( $Kernel::OM->Get('DB')->{Backend}->{'DB::Type'} =~ /oracle/ ) {
         $SQL = "INSERT INTO attachment_storage " .
             " (attachment_directory_id, data) " .
             " VALUES " .
@@ -108,24 +108,24 @@ sub AttachmentAdd {
 
     #run sql...
     my $DoResult = 0;
-    $DoResult = $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $DoResult = $Kernel::OM->Get('DB')->Do(
         SQL => $SQL, Bind => [ $Param{DataRef} ],    # AttDirID => $Param{AttDirID}
     );
 
     if ($DoResult) {
 
         #return ID...
-        $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+        $Kernel::OM->Get('DB')->Prepare(
             SQL => "SELECT id FROM attachment_storage WHERE " .
                 "attachment_directory_id = $Param{AttDirID}",
         );
-        while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $ID = $Row[0];
         }
         return $ID;
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message => "Failed to insert attachment data!"
         );
@@ -151,13 +151,13 @@ sub AttachmentGet {
 
     #check required stuff...
     if ( !$Param{ID} && !$Param{AttDirID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need AttDirID or ID!" );
+        $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need AttDirID or ID!" );
         return \%Data;
     }
 
     #db quoting...
     foreach (qw( AttDirID ID)) {
-        $Param{$_} = $Kernel::OM->Get('Kernel::System::DB')->Quote( $Param{$_}, 'Integer' );
+        $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_}, 'Integer' );
     }
 
     #build sql...
@@ -170,29 +170,29 @@ sub AttachmentGet {
 
     my $SQL = "SELECT id, attachment_directory_id FROM attachment_storage " . $WHERE;
 
-    if ( !$Kernel::OM->Get('Kernel::System::DB')->Prepare( SQL => $SQL, Encode => [ 0, 0, 1 ] ) ) {
+    if ( !$Kernel::OM->Get('DB')->Prepare( SQL => $SQL, Encode => [ 0, 0, 1 ] ) ) {
         return \%Data;
     }
 
-    my @Data = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray();
+    my @Data = $Kernel::OM->Get('DB')->FetchrowArray();
 
     if (@Data) {
         my $SQL = "SELECT data FROM attachment_storage " . $WHERE;
 
-        if ( !$Kernel::OM->Get('Kernel::System::DB')->Prepare( SQL => $SQL, Encode => [ 0 ] ) ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+        if ( !$Kernel::OM->Get('DB')->Prepare( SQL => $SQL, Encode => [ 0 ] ) ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Failed to prepare SQL for FetchrowArray!"
             );
             return \%Data;
         }
 
-        my @AttachData = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray();
+        my @AttachData = $Kernel::OM->Get('DB')->FetchrowArray();
 
         my $AttachDataRef = \$AttachData[0];
 
         if ( !$AttachDataRef ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Failed to FetchrowArray!"
             );
@@ -200,7 +200,7 @@ sub AttachmentGet {
         }
 
         #decode attachment if it's a postgresql backend...
-        if ( !$Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('DirectBlob') ) {
+        if ( !$Kernel::OM->Get('DB')->GetDatabaseFunction('DirectBlob') ) {
             ${$AttachDataRef} = decode_base64( ${$AttachDataRef} );
         }
 
@@ -236,7 +236,7 @@ sub AttachmentGetRealProperties {
 
     #check required stuff...
     if ( !$Param{AttDirID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log( Priority => 'error', Message => "Need AttDirID!" );
+        $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need AttDirID!" );
         return %RealProperties;
     }
 
@@ -249,7 +249,7 @@ sub AttachmentGetRealProperties {
 
     if ( defined $Data && $Data->{DataRef} ) {
         my $Content = ${ $Data->{DataRef} };
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput( \$Content );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$Content );
 
         $RealFileSize = bytes::length($Content);
         $RealMD5Sum   = md5_hex($Content);

@@ -12,9 +12,9 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::FAQ',
-    'Kernel::System::Log',
+    'Config',
+    'FAQ',
+    'Log',
 );
 
 =head1 NAME
@@ -37,7 +37,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $FAQObjectBackend = $Kernel::OM->Get('Kernel::System::LinkObject::FAQ');
+    my $FAQObjectBackend = $Kernel::OM->Get('LinkObject::FAQ');
 
 =cut
 
@@ -68,7 +68,7 @@ sub LinkListWithData {
     # check needed stuff
     for my $Argument (qw(LinkList UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -79,7 +79,7 @@ sub LinkListWithData {
 
     # check link list
     if ( ref $Param{LinkList} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'LinkList must be a hash reference!',
         );
@@ -88,7 +88,7 @@ sub LinkListWithData {
     }
 
     # get FAQ object
-    my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
+    my $FAQObject = $Kernel::OM->Get('FAQ');
 
     for my $LinkType ( sort keys %{ $Param{LinkList} } ) {
 
@@ -142,7 +142,7 @@ sub ObjectDescriptionGet {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -160,7 +160,7 @@ sub ObjectDescriptionGet {
     return %Description if $Param{Mode} && $Param{Mode} eq 'Temporary';
 
     # get FAQ
-    my %FAQ = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
+    my %FAQ = $Kernel::OM->Get('FAQ')->FAQGet(
         ItemID     => $Param{Key},
         ItemFields => 1,
         UserID     => $Param{UserID},
@@ -169,7 +169,7 @@ sub ObjectDescriptionGet {
     return if !%FAQ;
 
     # define description text
-    my $FAQHook         = $Kernel::OM->Get('Kernel::Config')->Get('FAQ::FAQHook');
+    my $FAQHook         = $Kernel::OM->Get('Config')->Get('FAQ::FAQHook');
     my $DescriptionText = "$FAQHook $FAQ{Number}";
 
     # create description
@@ -208,7 +208,7 @@ sub ObjectSearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -232,7 +232,7 @@ sub ObjectSearch {
     }
 
     # get FAQ object
-    my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
+    my $FAQObject = $Kernel::OM->Get('FAQ');
 
     # search the FAQs
     my @FAQIDs = $FAQObject->FAQSearch(
@@ -294,7 +294,7 @@ sub LinkAddPre {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -336,7 +336,7 @@ sub LinkAddPost {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -378,7 +378,7 @@ sub LinkDeletePre {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -420,7 +420,7 @@ sub LinkDeletePost {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );

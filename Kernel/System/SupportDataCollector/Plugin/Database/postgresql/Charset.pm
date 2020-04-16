@@ -18,7 +18,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::System::DB',
+    'DB',
 );
 
 sub GetDisplayPath {
@@ -29,7 +29,7 @@ sub Run {
     my $Self = shift;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $DBObject->GetDatabaseFunction('Type') !~ m{^postgresql} ) {
         return $Self->GetResults();

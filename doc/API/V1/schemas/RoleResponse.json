@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "Role" : {
-         "$ref" : "#/definitions/_Role_json"
+         "$ref" : "#/definitions/Role_json-03191ce16b"
       }
    },
    "required" : [
       "Role"
    ],
    "definitions" : {
-      "_Permission_json" : {
+      "Permission_json-0f9ebcd307" : {
          "$id" : "#Permission",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
@@ -70,7 +70,7 @@
             "Value"
          ]
       },
-      "_Role_json" : {
+      "Role_json-03191ce16b" : {
          "$id" : "#Role",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The role object.",
@@ -115,7 +115,7 @@
                "description" : "added via include \"Permissions\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/_Permission_json"
+                  "$ref" : "#/definitions/Permission_json-0f9ebcd307"
                },
                "readOnly" : true
             },

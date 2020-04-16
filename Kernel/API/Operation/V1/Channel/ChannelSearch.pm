@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Channel search
-    my %ChannelList = $Kernel::OM->Get('Kernel::System::Channel')->ChannelList();
+    my %ChannelList = $Kernel::OM->Get('Channel')->ChannelList();
 
 	# get already prepared Channel data from ChannelGet operation
     if ( IsHashRefWithData(\%ChannelList) ) {  	

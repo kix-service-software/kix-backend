@@ -21,13 +21,13 @@ use MIME::Words;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Crypt::PGP',
-    'Kernel::System::Crypt::SMIME',
-    'Kernel::System::Encode',
-    'Kernel::System::HTMLUtils',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'Crypt::PGP',
+    'Crypt::SMIME',
+    'Encode',
+    'HTMLUtils',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -50,7 +50,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $EmailObject = $Kernel::OM->Get('Kernel::System::Email');
+    my $EmailObject = $Kernel::OM->Get('Email');
 
 =cut
 
@@ -65,8 +65,8 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     # get configured backend module
-    my $GenericModule = $Kernel::OM->Get('Kernel::Config')->Get('SendmailModule')
-        || 'Kernel::System::Email::Sendmail';
+    my $GenericModule = $Kernel::OM->Get('Config')->Get('SendmailModule')
+        || 'Email::Sendmail';
 
     # get backend object
     $Self->{Backend} = $Kernel::OM->Get($GenericModule);
@@ -138,7 +138,7 @@ sub Send {
     # check needed stuff
     for (qw(Body Charset)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -146,7 +146,7 @@ sub Send {
         }
     }
     if ( !$Param{To} && !$Param{Cc} && !$Param{Bcc} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need To, Cc or Bcc!'
         );
@@ -160,7 +160,7 @@ sub Send {
     }
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check from
     if ( !$Param{From} ) {
@@ -180,7 +180,7 @@ sub Send {
     # get sign options for inline
     if ( $Param{Sign} && $Param{Sign}->{SubType} && $Param{Sign}->{SubType} eq 'Inline' ) {
 
-        my $CryptObject = $Kernel::OM->Get( 'Kernel::System::Crypt::' . $Param{Sign}->{Type} );
+        my $CryptObject = $Kernel::OM->Get( 'Crypt::' . $Param{Sign}->{Type} );
 
         return if !$CryptObject;
 
@@ -199,10 +199,10 @@ sub Send {
     # crypt inline
     if ( $Param{Crypt} && $Param{Crypt}->{Type} eq 'PGP' && $Param{Crypt}->{SubType} eq 'Inline' ) {
 
-        my $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+        my $CryptObject = $Kernel::OM->Get('Crypt::PGP');
 
         if ( !$CryptObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => 'Not possible to create crypt object',
                 Priority => 'error',
             );
@@ -272,7 +272,7 @@ sub Send {
 
         # add ascii body
         $Param{MimeType} = 'text/plain';
-        $Param{Body}     = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+        $Param{Body}     = $Kernel::OM->Get('HTMLUtils')->ToAscii(
             String => $Param{Body},
         );
 
@@ -318,7 +318,7 @@ sub Send {
     my $MessageID = $Header{'Message-ID'};
 
     # add date header
-    $Header{Date} = 'Date: ' . $Kernel::OM->Get('Kernel::System::Time')->MailTimeStamp();
+    $Header{Date} = 'Date: ' . $Kernel::OM->Get('Time')->MailTimeStamp();
 
     # add organisation header
     my $Organization = $ConfigObject->Get('Organization');
@@ -331,7 +331,7 @@ sub Send {
     }
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # build MIME::Entity, Data should be bytes, not utf-8
     # see http://bugs.otrs.org/show_bug.cgi?id=9832
@@ -493,10 +493,10 @@ sub Send {
     # get sign options for detached
     if ( $Param{Sign} && $Param{Sign}->{SubType} && $Param{Sign}->{SubType} eq 'Detached' ) {
 
-        my $CryptObject = $Kernel::OM->Get( 'Kernel::System::Crypt::' . $Param{Sign}->{Type} );
+        my $CryptObject = $Kernel::OM->Get( 'Crypt::' . $Param{Sign}->{Type} );
 
         if ( !$CryptObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => 'Not possible to create crypt object',
                 Priority => 'error',
             );
@@ -605,7 +605,7 @@ sub Send {
         && $Param{Crypt}->{SubType} eq 'Detached'
         )
     {
-        my $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::PGP');
+        my $CryptObject = $Kernel::OM->Get('Crypt::PGP');
 
         return if !$CryptObject;
 
@@ -651,10 +651,10 @@ sub Send {
     }
     elsif ( $Param{Crypt} && $Param{Crypt}->{Type} && $Param{Crypt}->{Type} eq 'SMIME' ) {
 
-        my $CryptObject = $Kernel::OM->Get('Kernel::System::Crypt::SMIME');
+        my $CryptObject = $Kernel::OM->Get('Crypt::SMIME');
 
         if ( !$CryptObject ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => 'Failed creation of crypt object',
                 Priority => 'error',
             );
@@ -758,7 +758,7 @@ sub Send {
 
     # debug
     if ( $Self->{Debug} > 1 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$To' from '$RealFrom'. Subject => '$Param{Subject}';",
         );
@@ -773,7 +773,7 @@ sub Send {
     );
 
     if ( !$Sent ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Message  => "Error sending message",
             Priority => 'info',
         );
@@ -782,7 +782,7 @@ sub Send {
 
     # don't push notification for email at the moment
     # # push client callback event
-    # $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    # $Kernel::OM->Get('ClientRegistration')->NotifyClients(
     #     Event     => 'CREATE',
     #     Namespace => 'Email',
     #     ObjectID  => $MessageID,
@@ -833,7 +833,7 @@ sub Bounce {
     # check needed stuff
     for (qw(From To Email)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -857,7 +857,7 @@ sub Bounce {
     $HeaderObject->replace( 'Resent-Message-ID', $MessageID );
     $HeaderObject->replace( 'Resent-To',         $Param{To} );
     $HeaderObject->replace( 'Resent-From',       $RealFrom );
-    $HeaderObject->replace( 'Resent-Date',       $Kernel::OM->Get('Kernel::System::Time')->MailTimeStamp() );
+    $HeaderObject->replace( 'Resent-Date',       $Kernel::OM->Get('Time')->MailTimeStamp() );
     my $Body         = $EmailObject->body();
     my $BodyAsString = '';
     for ( @{$Body} ) {
@@ -868,7 +868,7 @@ sub Bounce {
     # debug
     if ( $Self->{Debug} > 1 ) {
         my $OldMessageID = $HeaderObject->get('Message-ID') || '??';
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Bounced email to '$Param{To}' from '$RealFrom'. "
                 . "MessageID => '$OldMessageID';",
@@ -911,7 +911,7 @@ sub _EncodeMIMEWords {
 sub _MessageIDCreate {
     my ( $Self, %Param ) = @_;
 
-    my $FQDN = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
 
     return '<' . time() . '.' . rand(999999) . '@' . $FQDN . '>';
 }

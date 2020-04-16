@@ -81,7 +81,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform TicketState search
-    my %TicketStateList = $Kernel::OM->Get('Kernel::System::State')->StateList(
+    my %TicketStateList = $Kernel::OM->Get('State')->StateList(
         UserID => $Self->{Authorization}->{UserID},
         Valid => 0,
     );

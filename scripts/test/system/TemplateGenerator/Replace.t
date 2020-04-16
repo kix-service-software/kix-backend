@@ -15,18 +15,18 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-my $TicketObject       = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
+my $TicketObject       = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -97,7 +97,7 @@ for my $DynamicField (@DynamicFieldsToAdd) {
 
 # create template generator after the dynamic field are created as it gathers all DF in the
 # constructor
-my $TemplateGeneratorObject = $Kernel::OM->Get('Kernel::System::TemplateGenerator');
+my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
 my $TestContactID = $Helper->TestContactCreate(
     Language => 'en',
@@ -107,11 +107,11 @@ my $TestUserLogin = $Helper->TestUserCreate(
     Language => 'en',
 );
 
-my %TestUser = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+my %TestUser = $Kernel::OM->Get('User')->GetUserData(
     User => $TestUserLogin,
 );
 
-my %TestUserContact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+my %TestUserContact  = $Kernel::OM->Get('Contact')->ContactGet(
     UserID => $TestUser{UserID},
 );
 
@@ -119,11 +119,11 @@ my $TestUser2Login = $Helper->TestUserCreate(
     Language => 'en',
 );
 
-my %TestUser2 = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+my %TestUser2 = $Kernel::OM->Get('User')->GetUserData(
     User => $TestUserLogin,
 );
 
-my %TestUser2Contact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+my %TestUser2Contact  = $Kernel::OM->Get('Contact')->ContactGet(
     UserID => $TestUser2{UserID},
 );
 
@@ -131,11 +131,11 @@ my $TestUser3Login = $Helper->TestUserCreate(
     Language => 'en',
 );
 
-my %TestUser3 = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+my %TestUser3 = $Kernel::OM->Get('User')->GetUserData(
     User => $TestUserLogin,
 );
 
-my %TestUser3Contact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+my %TestUser3Contact  = $Kernel::OM->Get('Contact')->ContactGet(
     UserID => $TestUser3{UserID},
 );
 
@@ -143,11 +143,11 @@ my $TestUser4Login = $Helper->TestUserCreate(
     Language => 'en',
 );
 
-my %TestUser4 = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+my %TestUser4 = $Kernel::OM->Get('User')->GetUserData(
     User => $TestUserLogin,
 );
 
-my %TestUser4Contact  = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+my %TestUser4Contact  = $Kernel::OM->Get('Contact')->ContactGet(
     UserID => $TestUser4{UserID},
 );
 

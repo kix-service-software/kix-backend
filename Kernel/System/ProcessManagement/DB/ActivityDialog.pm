@@ -16,11 +16,11 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::YAML',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'YAML',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+    my $ActivityDialogObject = $Kernel::OM->Get('ProcessManagement::DB::ActivityDialog');
 
 =cut
 
@@ -55,11 +55,11 @@ sub new {
     bless( $Self, $Type );
 
     # get the cache TTL (in seconds)
-    $Self->{CacheTTL} = int( $Kernel::OM->Get('Kernel::Config')->Get('Process::CacheTTL') || 3600 );
+    $Self->{CacheTTL} = int( $Kernel::OM->Get('Config')->Get('Process::CacheTTL') || 3600 );
 
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -92,7 +92,7 @@ sub ActivityDialogAdd {
     # check needed stuff
     for my $Key (qw(EntityID Name Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -101,7 +101,7 @@ sub ActivityDialogAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if EntityID already exists
     return if !$DBObject->Prepare(
@@ -119,7 +119,7 @@ sub ActivityDialogAdd {
     }
 
     if ($EntityExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The EntityID:$Param{EntityID} already exists for an activity dialog!"
         );
@@ -129,7 +129,7 @@ sub ActivityDialogAdd {
     # check config valid format (at least it must contain the description short, fields and field
     # order)
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config needs to be a valid Hash reference!",
         );
@@ -137,7 +137,7 @@ sub ActivityDialogAdd {
     }
     for my $Needed (qw(DescriptionShort Fields FieldOrder)) {
         if ( !$Param{Config}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed in Config!",
             );
@@ -147,14 +147,14 @@ sub ActivityDialogAdd {
 
     # check config formats
     if ( ref $Param{Config}->{Fields} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config Fields must be a Hash!",
         );
         return;
     }
     if ( ref $Param{Config}->{FieldOrder} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config Fields must be an Array!",
         );
@@ -162,7 +162,7 @@ sub ActivityDialogAdd {
     }
 
     # dump layout and config as string
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Dump( Data => $Param{Config} );
+    my $Config = $Kernel::OM->Get('YAML')->Dump( Data => $Param{Config} );
 
     # Make sure the resulting string has the UTF-8 flag. YAML only sets it if
     #   part of the data already had it.
@@ -190,7 +190,7 @@ sub ActivityDialogAdd {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_ActivityDialog',
     );
 
@@ -218,7 +218,7 @@ sub ActivityDialogDelete {
     # check needed stuff
     for my $Key (qw(ID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -234,13 +234,13 @@ sub ActivityDialogDelete {
     return if !IsHashRefWithData($ActivityDialog);
 
     # delete activity dialog
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM pm_activity_dialog WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_ActivityDialog',
     );
 
@@ -275,7 +275,7 @@ sub ActivityDialogGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{EntityID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID or EntityID!'
         );
@@ -283,7 +283,7 @@ sub ActivityDialogGet {
     }
 
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -291,7 +291,7 @@ sub ActivityDialogGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey;
@@ -309,7 +309,7 @@ sub ActivityDialogGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     if ( $Param{ID} ) {
@@ -334,7 +334,7 @@ sub ActivityDialogGet {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
@@ -388,7 +388,7 @@ sub ActivityDialogUpdate {
     # check needed stuff
     for my $Key (qw(ID EntityID Name Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -397,7 +397,7 @@ sub ActivityDialogUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if EntityID already exists
     return if !$DBObject->Prepare(
@@ -415,7 +415,7 @@ sub ActivityDialogUpdate {
     }
 
     if ($EntityExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The EntityID:$Param{Name} already exists for an ActivityDialog!",
         );
@@ -424,7 +424,7 @@ sub ActivityDialogUpdate {
 
     # check config valid format (at least it must contain the description)
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config needs to be a valid Hash reference!",
         );
@@ -432,7 +432,7 @@ sub ActivityDialogUpdate {
     }
     for my $Needed (qw(DescriptionShort Fields FieldOrder)) {
         if ( !$Param{Config}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed in Config!",
             );
@@ -442,14 +442,14 @@ sub ActivityDialogUpdate {
 
     # check config formats
     if ( ref $Param{Config}->{Fields} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config Fields must be a Hash!",
         );
         return;
     }
     if ( ref $Param{Config}->{FieldOrder} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config Fields must be an Array!",
         );
@@ -457,7 +457,7 @@ sub ActivityDialogUpdate {
     }
 
     # dump layout and config as string
-    my $Config = $Kernel::OM->Get('Kernel::System::YAML')->Dump( Data => $Param{Config} );
+    my $Config = $Kernel::OM->Get('YAML')->Dump( Data => $Param{Config} );
 
     # Make sure the resulting string has the UTF-8 flag. YAML only sets it if
     #   part of the data already had it.
@@ -502,7 +502,7 @@ sub ActivityDialogUpdate {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_ActivityDialog',
     );
 
@@ -539,7 +539,7 @@ sub ActivityDialogList {
 
     # check needed
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!"
         );
@@ -553,7 +553,7 @@ sub ActivityDialogList {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey = 'ActivityDialogList::UseEntities::' . $UseEntities;
     my $Cache    = $CacheObject->Get(
@@ -563,7 +563,7 @@ sub ActivityDialogList {
     return $Cache if ref $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = '
             SELECT id, entity_id, name
@@ -628,7 +628,7 @@ sub ActivityDialogListGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -636,7 +636,7 @@ sub ActivityDialogListGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = 'ActivityDialogListGet';
@@ -648,7 +648,7 @@ sub ActivityDialogListGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql
     return if !$DBObject->Prepare(

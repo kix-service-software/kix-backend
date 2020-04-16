@@ -120,7 +120,7 @@ sub Run {
 
     foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {
 
-        my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+        my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
             ConfigItemID => $ConfigItemID,
         );
 
@@ -130,7 +130,7 @@ sub Run {
             );
         }     
 
-        my $Success = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemDelete(
+        my $Success = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemDelete(
             ConfigItemID => $ConfigItemID,
             UserID       => $Self->{Authorization}->{UserID}
         );

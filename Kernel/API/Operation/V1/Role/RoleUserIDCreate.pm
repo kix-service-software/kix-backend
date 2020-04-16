@@ -114,7 +114,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # create RoleUser
-    my $Success = $Kernel::OM->Get('Kernel::System::Role')->RoleUserAdd(
+    my $Success = $Kernel::OM->Get('Role')->RoleUserAdd(
         AssignUserID => $Param{Data}->{UserID},
         RoleID       => $Param{Data}->{RoleID},
         UserID       => $Self->{Authorization}->{UserID},

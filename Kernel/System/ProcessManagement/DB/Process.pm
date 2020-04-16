@@ -23,15 +23,15 @@ use Kernel::System::ProcessManagement::DB::TransitionAction;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::DynamicField',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
-    'Kernel::System::Time',
-    'Kernel::System::User',
-    'Kernel::System::YAML',
+    'Config',
+    'Cache',
+    'DB',
+    'DynamicField',
+    'Log',
+    'Main',
+    'Time',
+    'User',
+    'YAML',
 );
 
 =head1 NAME
@@ -54,7 +54,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
+    my $ProcessObject = $Kernel::OM->Get('ProcessManagement::DB::Process');
 
 =cut
 
@@ -73,11 +73,11 @@ sub new {
     $Self->{TransitionActionObject} = Kernel::System::ProcessManagement::DB::TransitionAction->new();
 
     # get the cache TTL (in seconds)
-    $Self->{CacheTTL} = int( $Kernel::OM->Get('Kernel::Config')->Get('Process::CacheTTL') || 3600 );
+    $Self->{CacheTTL} = int( $Kernel::OM->Get('Config')->Get('Process::CacheTTL') || 3600 );
 
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -113,7 +113,7 @@ sub ProcessAdd {
     # check needed stuff
     for my $Key (qw(EntityID Name StateEntityID Layout Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -122,7 +122,7 @@ sub ProcessAdd {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if EntityID already exists
     return if !$DBObject->Prepare(
@@ -140,7 +140,7 @@ sub ProcessAdd {
     }
 
     if ($EntityExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The EntityID:$Param{EntityID} already exists for a process!"
         );
@@ -149,14 +149,14 @@ sub ProcessAdd {
 
     # check config valid format (at least it must contain the description)
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config needs to be a valid Hash reference!",
         );
         return;
     }
     if ( !$Param{Config}->{Description} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Description in Config!",
         );
@@ -164,7 +164,7 @@ sub ProcessAdd {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     # dump layout and config as string
     my $Layout = $YAMLObject->Dump( Data => $Param{Layout} );
@@ -198,7 +198,7 @@ sub ProcessAdd {
     }
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_Process',
     );
 
@@ -226,7 +226,7 @@ sub ProcessDelete {
     # check needed stuff
     for my $Key (qw(ID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -242,13 +242,13 @@ sub ProcessDelete {
     return if !IsHashRefWithData($Process);
 
     # delete process
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM pm_process WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_Process',
     );
 
@@ -327,7 +327,7 @@ sub ProcessGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{EntityID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID or EntityID!'
         );
@@ -335,7 +335,7 @@ sub ProcessGet {
     }
 
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -375,7 +375,7 @@ sub ProcessGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Cache = $CacheObject->Get(
         Type => 'ProcessManagement_Process',
@@ -384,7 +384,7 @@ sub ProcessGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     if ( $Param{ID} ) {
@@ -411,7 +411,7 @@ sub ProcessGet {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     my %Data;
     while ( my @Data = $DBObject->FetchrowArray() ) {
@@ -594,7 +594,7 @@ sub ProcessUpdate {
     # check needed stuff
     for my $Key (qw(ID EntityID Name StateEntityID Layout Config UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!"
             );
@@ -603,7 +603,7 @@ sub ProcessUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if EntityID already exists
     return if !$DBObject->Prepare(
@@ -621,7 +621,7 @@ sub ProcessUpdate {
     }
 
     if ($EntityExists) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The EntityID:$Param{Name} already exists for a process!",
         );
@@ -630,14 +630,14 @@ sub ProcessUpdate {
 
     # check config valid format (at least it must contain the description)
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config needs to be a valid Hash reference!",
         );
         return;
     }
     if ( !$Param{Config}->{Description} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Description in Config!",
         );
@@ -645,7 +645,7 @@ sub ProcessUpdate {
     }
 
     # get yaml object
-    my $YAMLObject = $Kernel::OM->Get('Kernel::System::YAML');
+    my $YAMLObject = $Kernel::OM->Get('YAML');
 
     # dump layout and config as string
     my $Layout = $YAMLObject->Dump( Data => $Param{Layout} );
@@ -702,7 +702,7 @@ sub ProcessUpdate {
     );
 
     # delete cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_Process',
     );
 
@@ -741,7 +741,7 @@ sub ProcessList {
 
     # check needed
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!"
         );
@@ -763,7 +763,7 @@ sub ProcessList {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey = 'ProcessList::UseEntities::' . $UseEntities . '::StateEntityIDs::'
         . $StateEntityIDsStrg;
@@ -774,7 +774,7 @@ sub ProcessList {
     return $Cache if ref $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = '
             SELECT id, entity_id, name
@@ -854,7 +854,7 @@ sub ProcessListGet {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -862,7 +862,7 @@ sub ProcessListGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = 'ProcessListGet';
@@ -874,7 +874,7 @@ sub ProcessListGet {
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # SQL
     return if !$DBObject->Prepare(
@@ -1016,7 +1016,7 @@ Returns:
             'Name' => 'Queue Move',
             'CreateTime' => '2012-07-21 08:11:33',
             'ChangeTime' => '2012-07-21 08:11:33',
-            'Module' => 'Kernel::System::Process::Transition::Action::QueueMove',
+            'Module' => 'Process::Transition::Action::QueueMove',
             'Config' => {
               'NewOwner' => 'root@localhost',
               'TargetQueue' => 'Raw',
@@ -1127,7 +1127,7 @@ Returns:
             'Name' => 'Queue Move',
             'CreateTime' => '2012-07-21 08:11:33',
             'ChangeTime' => '2012-07-21 08:11:33',
-            'Module' => 'Kernel::System::Process::Transition::Action::QueueMove',
+            'Module' => 'Process::Transition::Action::QueueMove',
             'Config' => {
               'NewOwner' => 'root@localhost',
               'TargetQueue' => 'Raw',
@@ -1153,7 +1153,7 @@ sub ProcessDump {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -1167,7 +1167,7 @@ sub ProcessDump {
 
     if ( $Param{ResultType} eq 'FILE' ) {
         if ( !$Param{Location} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need Location for ResultType \'FILE\'!',
             );
@@ -1286,7 +1286,7 @@ sub ProcessDump {
 
     # delete cache (this will also delete the cache for display or hide AgentTicketProcess menu
     # item)
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'ProcessManagement_Process',
     );
 
@@ -1347,15 +1347,15 @@ sub ProcessDump {
         else {
 
             # get current time for the file comment
-            my $CurrentTime = $Kernel::OM->Get('Kernel::System::Time')->CurrentTimestamp();
+            my $CurrentTime = $Kernel::OM->Get('Time')->CurrentTimestamp();
 
             # get user data of the current user to use for the file comment
-            my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+            my %User = $Kernel::OM->Get('User')->GetUserData(
                 UserID => $Param{UserID},
             );
 
             # remove home from location path to show in file comment
-            my $Home     = $Kernel::OM->Get('Kernel::Config')->Get('Home');
+            my $Home     = $Kernel::OM->Get('Config')->Get('Home');
             my $Location = $Param{Location};
             $Location =~ s{$Home\/}{}xmsg;
 
@@ -1380,7 +1380,7 @@ EOF
 
             $Output = $FileStart . $Output . $FileEnd;
 
-            my $FileLocation = $Kernel::OM->Get('Kernel::System::Main')->FileWrite(
+            my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
                 Location => $Param{Location},
                 Content  => \$Output,
                 Mode     => 'utf8',
@@ -1419,7 +1419,7 @@ sub ProcessImport {
 
         # check needed stuff
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -1427,7 +1427,7 @@ sub ProcessImport {
         }
     }
 
-    my $ProcessData = $Kernel::OM->Get('Kernel::System::YAML')->Load( Data => $Param{Content} );
+    my $ProcessData = $Kernel::OM->Get('YAML')->Load( Data => $Param{Content} );
     if ( ref $ProcessData ne 'HASH' ) {
         return (
             Message =>
@@ -1450,7 +1450,7 @@ sub ProcessImport {
     }
 
     # get dynamic field object
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
     # get all present dynamic fields and check if the fields used in the config are beyond them
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldList(
@@ -1776,7 +1776,7 @@ sub ProcessImport {
 sub _ProcessItemOutput {
     my ( $Self, %Param ) = @_;
 
-    my $Output = $Kernel::OM->Get('Kernel::System::Main')->Dump(
+    my $Output = $Kernel::OM->Get('Main')->Dump(
         $Param{Value},
     );
 
@@ -1804,7 +1804,7 @@ sub _ImportedEntitiesUpdate {
     my $NewProcessEntityID = $EntityMapping{Process}->{ $Process->{EntityID} };
     if ( !$NewProcessEntityID ) {
         my $Message = "Could not find a entity mapping for Process: $Process->{EntityID}";
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => $Message,
         );
@@ -1822,7 +1822,7 @@ sub _ImportedEntitiesUpdate {
         my $NewActivityEntityID = $EntityMapping{Activities}->{$ActivityEntityID};
         if ( !$NewActivityEntityID ) {
             my $Message = "Could not find a entity mapping for Activity: $ActivityEntityID";
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'Error',
                 Message  => $Message,
             );
@@ -1853,7 +1853,7 @@ sub _ImportedEntitiesUpdate {
         if ( !$NewAttributeEntityID ) {
             my $Message = "Could not find a entity mapping for $Attribute: "
                 . "$Process->{Config}->{Start$Attribute}";
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'Error',
                 Message  => $Message,
             );
@@ -1873,7 +1873,7 @@ sub _ImportedEntitiesUpdate {
         my $NewActivityEntityID = $EntityMapping{Activities}->{$ActivityEntityID};
         if ( !$NewActivityEntityID ) {
             my $Message = "Could not find a entity mapping for Activity: $ActivityEntityID";
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'Error',
                 Message  => $Message,
             );
@@ -1897,7 +1897,7 @@ sub _ImportedEntitiesUpdate {
                     if ( !$NewTransitionActionEntityID ) {
                         my $Message = "Could not find a entity mapping for Transition Action: "
                             . "$TransitionActionEntityID";
-                        $Kernel::OM->Get('Kernel::System::Log')->Log(
+                        $Kernel::OM->Get('Log')->Log(
                             Priority => 'Error',
                             Message  => $Message,
                         );
@@ -1914,7 +1914,7 @@ sub _ImportedEntitiesUpdate {
                 if ( !$NewDestinationActivityEntityID ) {
                     my $Message = "Could not find a entity mapping for Activity: "
                         . "$Transition->{ActivityEntityID}";
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'Error',
                         Message  => $Message,
                     );
@@ -1929,7 +1929,7 @@ sub _ImportedEntitiesUpdate {
                 my $NewTransitionEntityID = $EntityMapping{Transitions}->{$TransitionEntityID};
                 if ( !$NewTransitionEntityID ) {
                     my $Message = "Could not find a entity mapping for Transition: $TransitionEntityID";
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'Error',
                         Message  => $Message,
                     );
@@ -1957,7 +1957,7 @@ sub _ImportedEntitiesUpdate {
         my $NewActivityEntityID = $EntityMapping{Activities}->{$ActivityEntityID};
         if ( !$NewActivityEntityID ) {
             my $Message = "Could not find a entity mapping for Activity: $ActivityEntityID";
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'Error',
                 Message  => $Message,
             );
@@ -1986,7 +1986,7 @@ sub _ImportedEntitiesUpdate {
             if ( !$NewActivityDialogEntityID ) {
                 my $Message = "Could not find a entity mapping for Activity Dialog: "
                     . "$ActivityDialogEntityID";
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'Error',
                     Message  => $Message,
                 );
@@ -2021,7 +2021,7 @@ sub _ImportedEntitiesUpdate {
             my $NewEntityID = $EntityMapping{ $PartNameMap{$PartName} }->{$CurrentEntityID};
             if ( !$NewEntityID ) {
                 my $Message = "Could not find a entity mapping for $PartName: $CurrentEntityID";
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'Error',
                     Message  => $Message,
                 );
@@ -2066,7 +2066,7 @@ sub _ProcessImportRollBack {
         );
         if ( !$Success ) {
             $Error = 1;
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Process: $ProcessEntityID could not be deleted",
             );
@@ -2092,7 +2092,7 @@ sub _ProcessImportRollBack {
             );
             if ( !$Success ) {
                 $Error = 1;
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "$Part: $PartEntityID could not be deleted",
                 );

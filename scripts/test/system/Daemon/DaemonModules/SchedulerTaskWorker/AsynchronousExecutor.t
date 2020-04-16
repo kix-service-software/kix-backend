@@ -16,16 +16,16 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # prevent mails send
-$Kernel::OM->Get('Kernel::Config')->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Email::DoNotSendEmail',
 );
 
 my @Tests = (
@@ -39,7 +39,7 @@ my @Tests = (
         Config => {
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::Ticket',
+                Object   => 'Ticket',
                 Function => 'TicketPriorityList',
                 Params   => {
                     TicketID => 1,
@@ -91,7 +91,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object => 'Kernel::System::Ticket',
+                Object => 'Ticket',
             },
         },
         Result => 0,
@@ -102,7 +102,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::Ticket',
+                Object   => 'Ticket',
                 Function => 'TicketPriorityList',
                 Params   => 1,
             },
@@ -115,7 +115,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::TicketWRONG',
+                Object   => 'TicketWRONG',
                 Function => 'TicketPriorityList',
                 Params   => {
                     TicketID => 1,
@@ -131,7 +131,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::Ticket',
+                Object   => 'Ticket',
                 Function => 'TicketPriorityListWRONG',
                 Params   => {
                     TicketID => 1,
@@ -147,7 +147,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::Ticket',
+                Object   => 'Ticket',
                 Function => 'TicketPriorityList',
                 Params   => {
                     TicketID => 1,
@@ -163,7 +163,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::Ticket',
+                Object   => 'Ticket',
                 Function => 'TicketPriorityList',
 
                 # this will coerce into a hash, but we need to test that array params work
@@ -181,7 +181,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::Ticket',
+                Object   => 'Ticket',
                 Function => 'TicketPriorityList',
                 Params   => {},
             },
@@ -194,7 +194,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Object   => 'Kernel::System::Ticket',
+                Object   => 'Ticket',
                 Function => 'TicketPriorityList',
             },
         },
@@ -204,7 +204,7 @@ my @Tests = (
 
 # get task handler objects
 my $TaskHandlerObject
-    = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor');
+    = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor');
 
 for my $Test (@Tests) {
 

@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::Contact',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
-    'Kernel::System::User',
+    'Contact',
+    'LinkObject',
+    'Log',
+    'User',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LinkObjectPersonObject = $Kernel::OM->Get('Kernel::System::LinkObject::Person');
+    my $LinkObjectPersonObject = $Kernel::OM->Get('LinkObject::Person');
 
 =cut
 
@@ -50,10 +50,10 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{ContactObject} = $Kernel::OM->Get('Kernel::System::Contact');
-    $Self->{LinkObject}         = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
-    $Self->{UserObject}         = $Kernel::OM->Get('Kernel::System::User');
+    $Self->{ContactObject} = $Kernel::OM->Get('Contact');
+    $Self->{LinkObject}         = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}          = $Kernel::OM->Get('Log');
+    $Self->{UserObject}         = $Kernel::OM->Get('User');
 
     return $Self;
 }

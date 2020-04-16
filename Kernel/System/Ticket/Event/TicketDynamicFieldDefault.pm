@@ -16,11 +16,11 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'DynamicField',
+    'DynamicField::Backend',
+    'Log',
+    'Ticket',
 );
 
 sub new {
@@ -39,7 +39,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Data Event Config UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -49,7 +49,7 @@ sub Run {
 
     # listen to all kinds of events
     if ( !$Param{Data}->{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TicketID in Data!",
         );
@@ -57,7 +57,7 @@ sub Run {
     }
 
     # get settings from sysconfig
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my $CacheKey = '_TicketDynamicFieldDefault::AlreadyProcessed';
 
@@ -82,8 +82,8 @@ sub Run {
     }
 
     # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # get the dynamic fields
     my $DynamicField = $DynamicFieldObject->DynamicFieldListGet(
@@ -92,7 +92,7 @@ sub Run {
     );
 
     # get settings from sysconfig
-    my $ConfigSettings = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::TicketDynamicFieldDefault');
+    my $ConfigSettings = $Kernel::OM->Get('Config')->Get('Ticket::TicketDynamicFieldDefault');
 
     # create a lookup table by name (since name is unique)
     my %DynamicFieldLookup;
@@ -129,10 +129,10 @@ sub Run {
             );
 
             if ( !$Success ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
-                        "Can not set value $Element->{Value} for dynamic field $Element->{Name}!"
+                        "Cannot set value $Element->{Value} for dynamic field $Element->{Name}!"
                 );
             }
         }

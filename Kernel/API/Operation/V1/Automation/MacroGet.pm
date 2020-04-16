@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Automation::MacroGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Automation::MacroGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $MacroID ( @{$Param{Data}->{MacroID}} ) {
 
 	    # get the Macro data
-	    my %MacroData = $Kernel::OM->Get('Kernel::System::Automation')->MacroGet(
+	    my %MacroData = $Kernel::OM->Get('Automation')->MacroGet(
 	        ID => $MacroID,
 	    );
 

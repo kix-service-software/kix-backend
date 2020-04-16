@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::MacroActionUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::MacroActionUpdate');
 
     return $Self;
 }
@@ -133,7 +133,7 @@ sub Run {
     );
 
     # check if macro exists
-    my %Macro = $Kernel::OM->Get('Kernel::System::Automation')->MacroGet(
+    my %Macro = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
     );
 
@@ -144,7 +144,7 @@ sub Run {
     }
 
     # check if MacroAction exists 
-    my %MacroActionData = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionGet(
+    my %MacroActionData = $Kernel::OM->Get('Automation')->MacroActionGet(
         ID => $Param{Data}->{MacroActionID},
     );
 
@@ -155,7 +155,7 @@ sub Run {
     }
 
     # update MacroAction
-    my $Success = $Kernel::OM->Get('Kernel::System::Automation')->MacroActionUpdate(
+    my $Success = $Kernel::OM->Get('Automation')->MacroActionUpdate(
         ID          => $Param{Data}->{MacroActionID},    
         Type        => $MacroAction->{Type} || $MacroActionData{Type},
         Name        => $MacroAction->{Name} || $MacroActionData{Name},

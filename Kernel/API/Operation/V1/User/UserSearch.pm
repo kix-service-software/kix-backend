@@ -120,7 +120,7 @@ sub Run {
     if ( IsHashRefWithData( \%UserSearch ) ) {
         foreach my $SearchType ( keys %UserSearch ) {
             my %SearchTypeResult;
-            foreach my $SearchItem ( @{ %UserSearch{$SearchType} } ) {
+            foreach my $SearchItem ( @{ $UserSearch{$SearchType} } ) {
 
                 my $Value = $SearchItem->{Value};
                 my %SearchParam;
@@ -133,14 +133,17 @@ sub Run {
                     $Value = '*' . $Value;
                 }
 
-                if ( $SearchItem->{Field} eq 'UserLogin' ) {
-                    $SearchParam{ $SearchItem->{Field} } = $Value;
+                if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'UserLogin' ) {
+                    $SearchParam{UserLoginEquals} = $Value;
+                }
+                elsif ( $SearchItem->{Field} eq 'UserLogin' ) {
+                    $SearchParam{UserLogin} = $Value;
                 } else {
                     $SearchParam{Search} = $Value;
                 }
 
                 # perform User search
-                my %SearchResult = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
+                my %SearchResult = $Kernel::OM->Get('User')->UserSearch(
                     %SearchParam,
                     Valid => 0
                 );
@@ -179,7 +182,7 @@ sub Run {
     }
     else {
         # perform User search without any search params
-        %UserList = $Kernel::OM->Get('Kernel::System::User')->UserList(
+        %UserList = $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
             Valid => 0
         );
@@ -198,7 +201,7 @@ sub Run {
                 my @AllowedUserIDs;
                 for my $UserID (@GetUserIDs) {
 
-                    my ($Granted) = $Kernel::OM->Get('Kernel::System::User')->CheckResourcePermission(
+                    my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                         UserID              => $UserID,
                         Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
                         RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission},

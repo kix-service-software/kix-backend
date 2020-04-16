@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Token',
+    'Token',
 );
 
 sub Configure {
@@ -102,7 +102,7 @@ sub Run {
 
     if ( $UserType eq 'Agent' ) {
         # lookup UserID
-        $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
+        $UserID = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $Self->GetOption('user'),
         );
     }
@@ -124,7 +124,7 @@ sub Run {
         @DeniedOperations = split(/,/, $DeniedOps);
     }
 
-    my $Token = $Kernel::OM->Get('Kernel::System::Token')->CreateToken(
+    my $Token = $Kernel::OM->Get('Token')->CreateToken(
         Payload => {
             UserID      => $UserID,
             UserType    => $UserType,

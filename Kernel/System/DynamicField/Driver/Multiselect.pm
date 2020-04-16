@@ -18,10 +18,10 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseSelect);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'DynamicFieldValue',
+    'Log',
+    'Main',
 );
 
 =head1 NAME
@@ -65,7 +65,7 @@ sub new {
 
     # get the Dynamic Field Backend custom extensions
     my $DynamicFieldDriverExtensions
-        = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Extension::Driver::Multiselect');
+        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::Multiselect');
 
     EXTENSION:
     for my $ExtensionKey ( sort keys %{$DynamicFieldDriverExtensions} ) {
@@ -81,7 +81,7 @@ sub new {
 
             # check if module can be loaded
             if (
-                !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Extension->{Module} )
+                !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
                 )
             {
                 die "Can't load dynamic fields backend module"
@@ -107,7 +107,7 @@ sub ValueSet {
 
     # check for valid possible values list
     if ( !$Param{DynamicFieldConfig}->{Config}->{PossibleValues} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need PossibleValues in DynamicFieldConfig!",
         );
@@ -304,7 +304,7 @@ sub EditFieldValueGet {
     # otherwise get dynamic field value from the web request
     elsif (
         defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'Kernel::System::Web::Request'
+        && ref $Param{ParamObject} eq 'WebRequest'
         )
     {
         my @Data = $Param{ParamObject}->GetArray( Param => $FieldName );
@@ -586,7 +586,7 @@ sub StatsFieldParameterBuild {
     my $Values = $Param{DynamicFieldConfig}->{Config}->{PossibleValues};
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text,',
     );
@@ -698,7 +698,7 @@ sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
     # get historical values from database
-    my $HistoricalValues = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->HistoricalValueGet(
+    my $HistoricalValues = $Kernel::OM->Get('DynamicFieldValue')->HistoricalValueGet(
         FieldID   => $Param{DynamicFieldConfig}->{ID},
         ValueType => 'Text',
     );

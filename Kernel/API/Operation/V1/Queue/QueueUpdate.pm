@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::QueueUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::QueueUpdate');
 
     return $Self;
 }
@@ -136,7 +136,7 @@ sub Run {
     );
 
     # check if Queue exists
-    my $QueueFullName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+    my $QueueFullName = $Kernel::OM->Get('Queue')->QueueLookup(
         QueueID => $Param{Data}->{QueueID},
     );
 
@@ -146,7 +146,7 @@ sub Run {
         );
     }
 
-    my %QueueData = $Kernel::OM->Get('Kernel::System::Queue')->QueueGet(
+    my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
         ID => $Param{Data}->{QueueID},
     );
 
@@ -154,7 +154,7 @@ sub Run {
     if ( $Queue->{Name} || exists $Queue->{ParentID} ) {
         if ( $Queue->{ParentID} ) {
             # ParentID given, create a new queue Name
-            my $ParentQueueName = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            my $ParentQueueName = $Kernel::OM->Get('Queue')->QueueLookup(
                 QueueID => $Queue->{ParentID},
             );
             if ( !$ParentQueueName ) {
@@ -183,7 +183,7 @@ sub Run {
     }
 
     # update Queue
-    my $Success = $Kernel::OM->Get('Kernel::System::Queue')->QueueUpdate(
+    my $Success = $Kernel::OM->Get('Queue')->QueueUpdate(
         QueueID             => $Param{Data}->{QueueID},
         Name                => $Queue->{Name} || $QueueData{Name},
         Calendar            => $Queue->{Calendar} || $QueueData{Calendar},

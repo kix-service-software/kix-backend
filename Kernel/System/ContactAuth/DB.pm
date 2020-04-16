@@ -15,11 +15,11 @@ use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Log',
-    'Kernel::System::Main',
+    'Config',
+    'DB',
+    'Encode',
+    'Log',
+    'Main',
 );
 
 sub new {
@@ -30,13 +30,13 @@ sub new {
     bless( $Self, $Type );
 
     # get database object
-    $Self->{DBObject} = $Kernel::OM->Get('Kernel::System::DB');
+    $Self->{DBObject} = $Kernel::OM->Get('DB');
 
     # Debug 0=off 1=on
     $Self->{Debug} = 0;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # config options
     $Self->{Table} = $ConfigObject->Get( 'Contact::AuthModule::DB::Table' . $Param{Count} )
@@ -76,7 +76,7 @@ sub GetOption {
 
     # check needed stuff
     if ( !$Param{What} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need What!"
         );
@@ -97,7 +97,7 @@ sub Auth {
 
     # check needed stuff
     if ( !$Param{User} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need User!"
         );
@@ -128,7 +128,7 @@ sub Auth {
 
     # check if user exists in auth table
     if ( !$UserID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Contact: No auth record in '$Self->{Table}' for '$User' "
                 . "(REMOTE_ADDR: $RemoteAddr)",
@@ -137,7 +137,7 @@ sub Auth {
     }
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     # crypt given pw
     my $CryptedPw = '';
@@ -186,9 +186,9 @@ sub Auth {
         elsif ( $GetPw =~ m{^BCRYPT:} ) {
 
             # require module, log errors if module was not found
-            if ( !$Kernel::OM->Get('Kernel::System::Main')->Require('Crypt::Eksblowfish::Bcrypt') )
+            if ( !$Kernel::OM->Get('Main')->Require('Crypt::Eksblowfish::Bcrypt') )
             {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message =>
                         "User: '$User' tried to authenticate with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
@@ -247,7 +247,7 @@ sub Auth {
 
     # just in case!
     if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Contact: '$User' tried to authenticate with Pw: '$Pw' "
                 . "($UserID/$CryptedPw/$GetPw/$Salt/$RemoteAddr)",
@@ -256,7 +256,7 @@ sub Auth {
 
     # just a note
     if ( !$Pw ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
                 "Contact: $User authentication without Pw!!! (REMOTE_ADDR: $RemoteAddr)",
@@ -266,7 +266,7 @@ sub Auth {
 
     # login note
     elsif ( ( $GetPw && $User && $UserID ) && $CryptedPw eq $GetPw ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Contact: $User Authentication ok (REMOTE_ADDR: $RemoteAddr).",
         );
@@ -275,7 +275,7 @@ sub Auth {
 
     # just a note
     elsif ( $UserID && $GetPw ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
                 "Contact: $User Authentication with wrong Pw!!! (REMOTE_ADDR: $RemoteAddr)"
@@ -285,7 +285,7 @@ sub Auth {
 
     # just a note
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
                 "Contact: $User doesn't exist or is invalid!!! (REMOTE_ADDR: $RemoteAddr)"

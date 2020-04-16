@@ -18,15 +18,15 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::CronEvent',
-    'Kernel::System::DB',
-    'Kernel::System::Encode',
-    'Kernel::System::Automation',
-    'Kernel::System::Log',
-    'Kernel::System::Storable',
-    'Kernel::System::Time',
+    'Config',
+    'Cache',
+    'CronEvent',
+    'DB',
+    'Encode',
+    'Automation',
+    'Log',
+    'Storable',
+    'Time',
 );
 
 =head1 NAME
@@ -49,7 +49,7 @@ create a scheduler database object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
+    my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 =cut
 
@@ -92,7 +92,7 @@ sub TaskAdd {
     # check needed stuff
     for my $Key (qw(Type Data)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -124,17 +124,17 @@ sub TaskAdd {
     $Param{Attempts} ||= 1;
 
     # serialize data as string
-    my $Data = $Kernel::OM->Get('Kernel::System::Storable')->Serialize(
+    my $Data = $Kernel::OM->Get('Storable')->Serialize(
         Data => $Param{Data},
     );
 
     # encode task data
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput($Data);
+    $Kernel::OM->Get('Encode')->EncodeOutput($Data);
     $Data = encode_base64($Data);
 
     # get needed objects
-    my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $DBObject   = $Kernel::OM->Get('DB');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $Identifier;
     TRY:
@@ -185,7 +185,7 @@ sub TaskAdd {
     );
 
     # delete task list cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => 'SchedulerDB',
         Key  => 'TaskListUnlocked',
     );
@@ -222,7 +222,7 @@ sub TaskGet {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TaskID!',
         );
@@ -230,7 +230,7 @@ sub TaskGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get task from database
     return if !$DBObject->Prepare(
@@ -243,7 +243,7 @@ sub TaskGet {
     );
 
     # get storable object
-    my $StorableObject = $Kernel::OM->Get('Kernel::System::Storable');
+    my $StorableObject = $Kernel::OM->Get('Storable');
 
     my %Task;
     while ( my @Data = $DBObject->FetchrowArray() ) {
@@ -257,7 +257,7 @@ sub TaskGet {
         if ( !$DataParam ) {
 
             # error log
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Task data is not in a correct storable format! TaskID: ' . $Param{TaskID},
             );
@@ -301,7 +301,7 @@ sub TaskDelete {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TaskID!',
         );
@@ -309,13 +309,13 @@ sub TaskDelete {
     }
 
     # delete task from the list
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM scheduler_task WHERE id = ?',
         Bind => [ \$Param{TaskID} ],
     );
 
     # delete task list cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => 'SchedulerDB',
         Key  => 'TaskListUnlocked',
     );
@@ -364,7 +364,7 @@ sub TaskList {
     $SQL .= ' ORDER BY id ASC';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return if !$DBObject->Prepare(
@@ -402,7 +402,7 @@ sub TaskListUnlocked {
     my ( $Self, %Param ) = @_;
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # read cache
     my $Cache = $CacheObject->Get(
@@ -414,7 +414,7 @@ sub TaskListUnlocked {
     return @{$Cache} if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return if !$DBObject->Prepare(
@@ -458,7 +458,7 @@ sub TaskLock {
     # check needed stuff
     for my $Key (qw(TaskID NodeID PID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -474,7 +474,7 @@ sub TaskLock {
     my $LockKey       = '1' . $LockKeyNodeID . abs($LockKeyPID);
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get locked task
     return if !$DBObject->Prepare(
@@ -545,7 +545,7 @@ sub TaskLock {
     }
 
     # delete list cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => 'SchedulerDB',
         Key  => 'TaskListUnlocked',
     );
@@ -567,7 +567,7 @@ sub TaskCleanup {
     my @List = $Self->TaskList();
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     TASKITEM:
     for my $TaskItem (@List) {
@@ -600,7 +600,7 @@ sub TaskCleanup {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not delete task $Task{Name}-$Task{Type} ($Task{TaskID})\n",
             );
@@ -622,7 +622,7 @@ sub TaskSummary {
     my ( $Self, %Param ) = @_;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return () if !$DBObject->Prepare(
@@ -648,7 +648,7 @@ sub TaskSummary {
     my @UnhandledTasks;
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $SystemTime = $TimeObject->SystemTime();
 
@@ -762,7 +762,7 @@ sub TaskLockUpdate {
 
     # check needed stuff
     if ( !IsArrayRefWithData( $Param{TaskIDs} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "TaskIDs is missing or invalid!",
         );
@@ -771,7 +771,7 @@ sub TaskLockUpdate {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my $TaskIDs = join ',', map { $DBObject->Quote( $_, 'Integer' ) } @{ $Param{TaskIDs} };
 
@@ -800,8 +800,8 @@ sub TaskUnlockExpired {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $DBObject   = $Kernel::OM->Get('DB');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # ask the database (get all worker tasks with a lock key different than 0)
     return if !$DBObject->Prepare(
@@ -827,7 +827,7 @@ sub TaskUnlockExpired {
             );
         }
         else {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Lock Update Time missing for task $Row[1]! ($Row[0])",
             );
@@ -852,7 +852,7 @@ sub TaskUnlockExpired {
     for my $Task (@List) {
 
         # unlock all the task that has been locked for more than 1 minute
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => '
                 UPDATE scheduler_task
                 SET lock_key = 0, lock_time = NULL, lock_update_time = NULL
@@ -894,7 +894,7 @@ sub FutureTaskAdd {
     # check needed stuff
     for my $Key (qw(ExecutionTime Type Data)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -904,12 +904,12 @@ sub FutureTaskAdd {
     }
 
     # check valid ExecutionTime
-    my $SystemTime = $Kernel::OM->Get('Kernel::System::Time')->TimeStamp2SystemTime(
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Param{ExecutionTime},
     );
 
     if ( !$SystemTime ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ExecutionTime is invalid!",
         );
@@ -939,17 +939,17 @@ sub FutureTaskAdd {
     $Param{Attempts} ||= 1;
 
     # serialize data as string
-    my $Data = $Kernel::OM->Get('Kernel::System::Storable')->Serialize(
+    my $Data = $Kernel::OM->Get('Storable')->Serialize(
         Data => $Param{Data},
     );
 
     # encode task data
-    $Kernel::OM->Get('Kernel::System::Encode')->EncodeOutput($Data);
+    $Kernel::OM->Get('Encode')->EncodeOutput($Data);
     $Data = encode_base64($Data);
 
     # get needed objects
-    my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $DBObject   = $Kernel::OM->Get('DB');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $Identifier;
     TRY:
@@ -1001,7 +1001,7 @@ sub FutureTaskAdd {
     );
 
     # delete future task list cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => 'SchedulerDB',
         Key  => 'FutureTaskListUnlocked',    # TODO FIXME
     );
@@ -1038,7 +1038,7 @@ sub FutureTaskGet {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TaskID!',
         );
@@ -1046,7 +1046,7 @@ sub FutureTaskGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get task from database
     return if !$DBObject->Prepare(
@@ -1058,7 +1058,7 @@ sub FutureTaskGet {
     );
 
     # get storable object
-    my $StorableObject = $Kernel::OM->Get('Kernel::System::Storable');
+    my $StorableObject = $Kernel::OM->Get('Storable');
 
     my %Task;
     while ( my @Data = $DBObject->FetchrowArray() ) {
@@ -1072,7 +1072,7 @@ sub FutureTaskGet {
         if ( !$DataParam ) {
 
             # error log
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Future task data is not in a correct storable format! TaskID: ' . $Param{TaskID},
             );
@@ -1116,7 +1116,7 @@ sub FutureTaskDelete {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TaskID!',
         );
@@ -1124,13 +1124,13 @@ sub FutureTaskDelete {
     }
 
     # delete task from the future list
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM scheduler_future_task WHERE id = ?',
         Bind => [ \$Param{TaskID} ],
     );
 
     # delete future task list cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type => 'SchedulerDB',
         Key  => 'FutureTaskListUnlocked',    # TODO FIXME
     );
@@ -1181,7 +1181,7 @@ sub FutureTaskList {
     $SQL .= ' ORDER BY id ASC';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return if !$DBObject->Prepare(
@@ -1221,7 +1221,7 @@ sub FutureTaskToExecute {
     # check needed stuff
     for my $Key (qw(NodeID PID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -1236,8 +1236,8 @@ sub FutureTaskToExecute {
     my $LockKey       = '1' . $LockKeyNodeID . $LockKeyPID;
 
     # get needed objects
-    my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $DBObject   = $Kernel::OM->Get('DB');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # get current time
     my $CurrentTime = $TimeObject->CurrentTimestamp();
@@ -1265,7 +1265,7 @@ sub FutureTaskToExecute {
     );
 
     # get storable object
-    my $StorableObject = $Kernel::OM->Get('Kernel::System::Storable');
+    my $StorableObject = $Kernel::OM->Get('Storable');
 
     # fetch the result
     my @FutureTaskList;
@@ -1280,7 +1280,7 @@ sub FutureTaskToExecute {
         if ( !$DataParam ) {
 
             # error log
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Future task data is not in a correct storable format! TaskID: ' . $Param{TaskID},
             );
@@ -1379,7 +1379,7 @@ sub CronTaskToExecute {
     # check needed stuff
     for my $Key (qw(NodeID PID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -1389,14 +1389,14 @@ sub CronTaskToExecute {
     }
 
     # get cron config
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('Daemon::SchedulerCronTaskManager::Task') || {};
+    my $Config = $Kernel::OM->Get('Config')->Get('Daemon::SchedulerCronTaskManager::Task') || {};
 
     # do noting if there are no cron tasks definitions in SysConfig
     return 1 if !IsHashRefWithData($Config);
 
     # get needed objects
-    my $TimeObject      = $Kernel::OM->Get('Kernel::System::Time');
-    my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
+    my $TimeObject      = $Kernel::OM->Get('Time');
+    my $CronEventObject = $Kernel::OM->Get('CronEvent');
 
     # get current time
     my $SystemTime = $TimeObject->SystemTime();
@@ -1412,7 +1412,7 @@ sub CronTaskToExecute {
         next CRONJOBKEY if !IsHashRefWithData($JobConfig);
 
         if ( !$JobConfig->{Module} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Config option Daemon::SchedulerCronTaskManager::Task###$CronjobKey is invalid."
                     . " Need 'Module' parameter!",
@@ -1421,7 +1421,7 @@ sub CronTaskToExecute {
         }
 
         if ( $JobConfig->{Module} && !$JobConfig->{Function} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Config option Daemon::SchedulerCronTaskManager::Task###$CronjobKey is invalid."
                     . " Need 'Function' parameter!",
@@ -1467,14 +1467,14 @@ sub CronTaskCleanup {
     my ( $Self, %Param ) = @_;
 
     # get cron config
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('Daemon::SchedulerCronTaskManager::Task') || {};
+    my $Config = $Kernel::OM->Get('Config')->Get('Daemon::SchedulerCronTaskManager::Task') || {};
 
     # do noting if there are no cron tasks definitions in SysConfig
     return 1 if !IsHashRefWithData($Config);
 
     # get needed objects
-    my $TimeObject      = $Kernel::OM->Get('Kernel::System::Time');
-    my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
+    my $TimeObject      = $Kernel::OM->Get('Time');
+    my $CronEventObject = $Kernel::OM->Get('CronEvent');
 
     my %CronJobLookup;
 
@@ -1518,7 +1518,7 @@ sub CronTaskCleanup {
         );
 
         if ( !$Success ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Task $Task->{Name}-$Task->{Type} ($Task->{TaskID}) could not be deleted!",
             );
@@ -1540,7 +1540,7 @@ sub CronTaskSummary {
     my ( $Self, %Param ) = @_;
 
     # get cron jobs from the SysConfig
-    my $Config = $Kernel::OM->Get('Kernel::Config')->Get('Daemon::SchedulerCronTaskManager::Task') || {};
+    my $Config = $Kernel::OM->Get('Config')->Get('Daemon::SchedulerCronTaskManager::Task') || {};
 
     my %TaskLookup;
 
@@ -1579,7 +1579,7 @@ sub AutomationTaskToExecute {
     # check needed stuff
     for my $Key (qw(NodeID PID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -1589,8 +1589,8 @@ sub AutomationTaskToExecute {
     }
 
     # get objects
-    my $AutomationObject = $Kernel::OM->Get('Kernel::System::Automation');
-    my $TimeObject       = $Kernel::OM->Get('Kernel::System::Time');
+    my $AutomationObject = $Kernel::OM->Get('Automation');
+    my $TimeObject       = $Kernel::OM->Get('Time');
 
     # get a list of automation jobs
     my %JobList = $AutomationObject->JobList();
@@ -1629,7 +1629,7 @@ sub AutomationTaskToExecute {
             PreviousEventTimestamp   => $TimeObject->SystemTime(),
             MaximumParallelInstances => 1,
             Data                     => {
-                Object   => 'Kernel::System::Automation',
+                Object   => 'Automation',
                 Function => 'JobExecute',
                 Params   => {
                     ID     => $JobID,
@@ -1654,7 +1654,7 @@ sub AutomationTaskSummary {
     my ( $Self, %Param ) = @_;
 
     # get automation object
-    my $AutomationObject = $Kernel::OM->Get('Kernel::System::Automation');
+    my $AutomationObject = $Kernel::OM->Get('Automation');
 
     # get a list of automation jobs from the DB
     my %JobList = $AutomationObject->JobList();
@@ -1707,7 +1707,7 @@ sub RecurrentTaskGet {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TaskID!',
         );
@@ -1715,7 +1715,7 @@ sub RecurrentTaskGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get task from database
     return if !$DBObject->Prepare(
@@ -1797,7 +1797,7 @@ sub RecurrentTaskList {
     $SQL .= ' ORDER BY id ASC';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return if !$DBObject->Prepare(
@@ -1839,7 +1839,7 @@ sub RecurrentTaskDelete {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TaskID!',
         );
@@ -1852,7 +1852,7 @@ sub RecurrentTaskDelete {
     );
 
     # delete task from the recurrent task list
-    $Kernel::OM->Get('Kernel::System::DB')->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM scheduler_recurrent_task WHERE id = ?',
         Bind => [ \$Param{TaskID} ],
     );
@@ -1862,7 +1862,7 @@ sub RecurrentTaskDelete {
 
         my $CacheKey = "$Task{Name}::$Task{Type}";
 
-        $Kernel::OM->Get('Kernel::System::Cache')->Delete(
+        $Kernel::OM->Get('Cache')->Delete(
             Type => 'SchedulerDBRecurrentTaskExecute',
             Key  => '$CacheKey',
         );
@@ -1899,7 +1899,7 @@ sub RecurrentTaskExecute {
     # check needed stuff
     for my $Key (qw(NodeID PID TaskName TaskType PreviousEventTimestamp Data)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Key!",
             );
@@ -1909,7 +1909,7 @@ sub RecurrentTaskExecute {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $CacheKey = "$Param{TaskName}::$Param{TaskType}";
 
@@ -1924,8 +1924,8 @@ sub RecurrentTaskExecute {
     return 1 if $Cache && $Cache eq $Param{PreviousEventTimestamp};
 
     # get needed objects
-    my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $DBObject   = $Kernel::OM->Get('DB');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # convert last previous event time-stamp
     my $PreviousEventTime = $TimeObject->SystemTime2TimeStamp(
@@ -2085,7 +2085,7 @@ sub RecurrentTaskExecute {
     return 1 if $TaskID;
 
     # error handling
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'error',
         Message  => "Could not create new scheduler recurrent task $Param{TaskName}!",
     );
@@ -2114,7 +2114,7 @@ sub RecurrentTaskSummary {
     # check needed stuff
     for my $Needed (qw(Type DisplayType TaskLookup)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -2124,7 +2124,7 @@ sub RecurrentTaskSummary {
     }
 
     if ( ref $Param{TaskLookup} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "TaskLookup is invalid!",
         );
@@ -2133,7 +2133,7 @@ sub RecurrentTaskSummary {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # ask the database
     return () if !$DBObject->Prepare(
@@ -2146,8 +2146,8 @@ sub RecurrentTaskSummary {
     );
 
     # get needed objects
-    my $TimeObject      = $Kernel::OM->Get('Kernel::System::Time');
-    my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
+    my $TimeObject      = $Kernel::OM->Get('Time');
+    my $CronEventObject = $Kernel::OM->Get('CronEvent');
 
     # fetch the result
     my @List;
@@ -2243,7 +2243,7 @@ sub RecurrentTaskWorkerInfoSet {
 
     # check needed stuff
     if ( !$Param{LastWorkerTaskID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need LastWorkerTaskID!",
         );
@@ -2254,7 +2254,7 @@ sub RecurrentTaskWorkerInfoSet {
     my $LastWorkerStatus = $Param{LastWorkerStatus} ? 1 : 0;
     my $LastWorkerRunningTime = $Param{LastWorkerRunningTime} // 0;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE scheduler_recurrent_task
             SET last_worker_status = ?, last_worker_running_time = ?, change_time = current_timestamp
@@ -2284,15 +2284,15 @@ sub RecurrentTaskUnlockExpired {
 
     # check needed stuff
     if ( !$Param{Type} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Type",
         );
     }
 
     # get needed objects
-    my $DBObject   = $Kernel::OM->Get('Kernel::System::DB');
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $DBObject   = $Kernel::OM->Get('DB');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     # ask the database (get all recurrent tasks for the given type with a lock key different than 0)
     return if !$DBObject->Prepare(
@@ -2334,7 +2334,7 @@ sub RecurrentTaskUnlockExpired {
     for my $Task (@List) {
 
         # unlock all the task that has been locked for more than 1 minute
-        return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => '
                 UPDATE scheduler_recurrent_task
                 SET lock_key = 0, lock_time = NULL, change_time = current_timestamp

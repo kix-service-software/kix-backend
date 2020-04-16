@@ -71,7 +71,7 @@ sub new {
     }
 
     # init all validators
-    my $ValidatorList = $Kernel::OM->Get('Kernel::Config')->Get('API::Validator::Module');
+    my $ValidatorList = $Kernel::OM->Get('Config')->Get('API::Validator::Module');
     
     foreach my $Validator (sort keys %{$ValidatorList}) {
         if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/ ) {
@@ -83,18 +83,16 @@ sub new {
             next;
         }
 
-        my $Backend = 'Kernel::API::Validator::' . $ValidatorList->{$Validator}->{Module};
-
-        if ( !$Kernel::OM->Get('Kernel::System::Main')->Require($Backend) ) {
+        if ( !$Kernel::OM->Get('Main')->Require($ValidatorList->{$Validator}->{Module}) ) {
             return $Self->_Error( 
                 Code    => 'Validator.InternalError',
-                Message => "Validator $Backend not found." 
+                Message => "Validator $ValidatorList->{$Validator}->{Module} not found." 
             );
         }
-        my $BackendObject = $Backend->new( %{$Self} );
+        my $BackendObject = $ValidatorList->{$Validator}->{Module}->new( %{$Self} );
 
         # if the backend constructor failed, it returns an error hash, pass it on in this case
-        if ( ref $BackendObject ne $Backend ) {
+        if ( ref $BackendObject ne $ValidatorList->{$Validator}->{Module} ) {
             return $BackendObject;
         }
 
@@ -115,6 +113,7 @@ sub new {
 validate given data hash using registered validator modules
 
     my $Result = $ValidatorObject->Validate(
+        ParentAttribute => '...',       # optional
         Data => {
             ...
         }
@@ -147,8 +146,9 @@ sub Validate {
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
             $Result = $Self->_ValidateAttribute(
-                Attribute => $Attribute,
-                Data      => $Param{Data},
+                ParentAttribute  => $Param{ParentAttribute},
+                Attribute        => $Attribute,
+                Data             => $Param{Data},
             );
             if ( !IsHashRefWithData($Result) || !$Result->{Success} ) {
                 last ATTRIBUTE;
@@ -159,7 +159,8 @@ sub Validate {
             if ( IsArrayRefWithData($Param{Data}->{$Attribute}) ) {
                 foreach my $Item ( @{$Param{Data}->{$Attribute}} ) {
                     my $ValidationResult = $Self->Validate(
-                        Data => $Item,
+                        ParentAttribute  => $Attribute,
+                        Data             => $Item,
                     );
                     if ( !IsHashRefWithData($ValidationResult) || !$ValidationResult->{Success} ) {
                         $Result = $ValidationResult;
@@ -169,7 +170,8 @@ sub Validate {
             }
             elsif ( IsHashRefWithData($Param{Data}->{$Attribute}) ) {
                 my $ValidationResult = $Self->Validate(
-                    Data => $Param{Data}->{$Attribute},
+                    ParentAttribute  => $Attribute,
+                    Data             => $Param{Data}->{$Attribute},
                 );
                 if ( !IsHashRefWithData($ValidationResult) || !$ValidationResult->{Success} ) {
                     $Result = $ValidationResult;
@@ -191,8 +193,7 @@ sub _ValidateAttribute {
     VALIDATOR:
     foreach my $Validator ( @{$Self->{Validators}->{$Param{Attribute}}} ) {
         my $ValidatorResult = $Validator->Validate(
-            Attribute => $Param{Attribute},
-            Data      => $Param{Data},
+            %Param,
         );
 
         if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {

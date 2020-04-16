@@ -234,7 +234,7 @@ sub _ReplacePlaceholders {
     my $Text = shift;
 
     if ( $Text =~ /__GET_RANDOM_STRING__/ ) {
-        my $RandomString = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->GetRandomID();
+        my $RandomString = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
         $Text =~ s/__GET_RANDOM_STRING__/$RandomString/g;
     }
 

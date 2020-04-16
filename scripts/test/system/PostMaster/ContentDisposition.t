@@ -17,18 +17,18 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $MainObject   = $Kernel::OM->Get('Kernel::System::Main');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $MainObject   = $Kernel::OM->Get('Main');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase  => 1,
         UseTmpArticleDir => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Tests = (
     {
@@ -145,7 +145,7 @@ for my $Test (@Tests) {
 
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',
-            Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
+            Value => 'Ticket::ArticleStorage' . $Backend,
         );
 
         my $Location = $ConfigObject->Get('Home')

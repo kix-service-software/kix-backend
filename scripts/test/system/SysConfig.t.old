@@ -16,7 +16,7 @@ use vars (qw($Self));
 
 use Kernel::Config;
 
-my $SysConfigObject = $Kernel::OM->Get('Kernel::System::SysConfig');
+my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
 #
 # ConfigItemUpdate

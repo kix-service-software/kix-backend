@@ -6,6 +6,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ValidGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Valid::ValidGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ValidID</Item>
                 <Item Key="ResponseSchema">ValidResponse</Item>
@@ -19,6 +20,7 @@
         <Setting>
             <Hash>
                 <Item Key="Name">ValidSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Valid::ValidSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ValidCollectionResponse</Item>
                 <Item Key="CacheType">API_valid</Item>                

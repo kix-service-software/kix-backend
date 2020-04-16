@@ -12,10 +12,10 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Kernel::System::ITSMConfigItem',
-    'Kernel::System::GeneralCatalog',
-    'Kernel::System::LinkObject',
-    'Kernel::System::Log',
+    'ITSMConfigItem',
+    'GeneralCatalog',
+    'LinkObject',
+    'Log',
 );
 
 =head1 NAME
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $QuickLinkPersonObject = $Kernel::OM->Get('Kernel::System::QuickLink::Person');
+    my $QuickLinkPersonObject = $Kernel::OM->Get('QuickLink::Person');
 
 =cut
 
@@ -50,10 +50,10 @@ sub new {
     bless( $Self, $Type );
 
     # create needed objects
-    $Self->{ConfigItemObject}     = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
-    $Self->{LinkObject}           = $Kernel::OM->Get('Kernel::System::LinkObject');
-    $Self->{LogObject}            = $Kernel::OM->Get('Kernel::System::Log');
+    $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
+    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{LinkObject}           = $Kernel::OM->Get('LinkObject');
+    $Self->{LogObject}            = $Kernel::OM->Get('Log');
 
     # return
     return $Self;

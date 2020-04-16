@@ -84,7 +84,7 @@ perform DynamicFieldObjectTypeSearch Operation. This will return a list of Dynam
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $ObjectTypeConfig = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::ObjectType');
+    my $ObjectTypeConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::ObjectType');
 
     if ( !IsHashRefWithData($ObjectTypeConfig) ) {
         return $Self->_Error(

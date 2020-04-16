@@ -218,13 +218,13 @@ sub ProviderProcessRequest {
         $ContentCharset = $2;
     }
     if ( $ContentCharset && $ContentCharset !~ m{ \A utf [-]? 8 \z }xmsi ) {
-        $Content = $Kernel::OM->Get('Kernel::System::Encode')->Convert2CharsetInternal(
+        $Content = $Kernel::OM->Get('Encode')->Convert2CharsetInternal(
             Text => $Content,
             From => $ContentCharset,
         );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Encode')->EncodeInput( \$Content );
+        $Kernel::OM->Get('Encode')->EncodeInput( \$Content );
     }
 
     # send received data to debugger
@@ -682,7 +682,7 @@ sub RequesterPerformRequest {
     my $XMLRequest = $SOAPResult->context()->transport()->proxy()->http_response()->request()->content();
 
     # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Kernel::System::Encode');
+    my $EncodeObject = $Kernel::OM->Get('Encode');
 
     $EncodeObject->EncodeInput( \$XMLRequest );
     $Self->{DebuggerObject}->Debug(
@@ -910,7 +910,7 @@ sub _Output {
     );
 
     # set keep-alive
-    my $ConfigKeepAlive = $Kernel::OM->Get('Kernel::Config')->Get('SOAP::Keep-Alive');
+    my $ConfigKeepAlive = $Kernel::OM->Get('Config')->Get('SOAP::Keep-Alive');
     my $Connection = $ConfigKeepAlive ? 'Keep-Alive' : 'close';
 
     # in the constructor of this module STDIN and STDOUT are set to binmode without any additional

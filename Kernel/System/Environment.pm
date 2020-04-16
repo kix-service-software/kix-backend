@@ -18,9 +18,9 @@ use ExtUtils::MakeMaker;
 use Sys::Hostname::Long;
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Main',
+    'Config',
+    'DB',
+    'Main',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create environment object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $EnvironmentObject = $Kernel::OM->Get('Kernel::System::Environment');
+    my $EnvironmentObject = $Kernel::OM->Get('Environment');
 
 =cut
 
@@ -89,7 +89,7 @@ sub OSInfoGet {
     my @Data = POSIX::uname();
 
     # get main object
-    my $MainObject = $Kernel::OM->Get('Kernel::System::Main');
+    my $MainObject = $Kernel::OM->Get('Main');
 
     # If used OS is a linux system
     my $OSName;
@@ -319,8 +319,8 @@ sub DBInfoGet {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $DBObject     = $Kernel::OM->Get('Kernel::System::DB');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $DBObject     = $Kernel::OM->Get('DB');
 
     # collect DB data
     my %EnvDB = (
@@ -357,7 +357,7 @@ sub KIXInfoGet {
     my ( $Self, %Param ) = @_;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # collect KIX data
     my %EnvData = (

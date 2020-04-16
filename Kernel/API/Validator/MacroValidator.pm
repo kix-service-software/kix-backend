@@ -102,7 +102,7 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'MacroID' ) {
-        $Found = $Kernel::OM->Get('Kernel::System::Automation')->MacroLookup(
+        $Found = $Kernel::OM->Get('Automation')->MacroLookup(
             ID => $Param{Data}->{$Param{Attribute}},
         );        
     }

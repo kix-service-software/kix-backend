@@ -5,14 +5,14 @@
    "type" : "object",
    "properties" : {
       "SenderType" : {
-         "$ref" : "#/definitions/_SenderType_json"
+         "$ref" : "#/definitions/SenderType_json-8f7329097c"
       }
    },
    "required" : [
       "SenderType"
    ],
    "definitions" : {
-      "_SenderType_json" : {
+      "SenderType_json-8f7329097c" : {
          "$id" : "#SenderType",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The sender type object.",

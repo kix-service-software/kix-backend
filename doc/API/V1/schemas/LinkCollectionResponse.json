@@ -7,7 +7,7 @@
       "Link" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_Link_json"
+            "$ref" : "#/definitions/Link_json-2c3e8d0577"
          }
       }
    },
@@ -15,7 +15,7 @@
       "Link"
    ],
    "definitions" : {
-      "_Link_json" : {
+      "Link_json-2c3e8d0577" : {
          "$id" : "#Link",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The link object.",

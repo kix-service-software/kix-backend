@@ -15,8 +15,8 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $DFBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-my $TimeObject      = $Kernel::OM->Get('Kernel::System::Time');
+my $DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+my $TimeObject      = $Kernel::OM->Get('Time');
 
 my $UserID = 1;
 

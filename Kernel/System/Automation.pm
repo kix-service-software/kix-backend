@@ -19,12 +19,12 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::User',
-    'Kernel::System::Valid',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
 );
 
 =head1 NAME
@@ -47,7 +47,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $AutomationObject = $Kernel::OM->Get('Kernel::System::Automation');
+    my $AutomationObject = $Kernel::OM->Get('Automation');
 
 =cut
 
@@ -87,7 +87,7 @@ sub ExecuteJobsForEvent {
     # check needed stuff
     for (qw(Type Event UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -184,7 +184,7 @@ sub _Log {
     # check needed stuff
     for (qw(Message Priority UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
             );
@@ -198,7 +198,7 @@ sub _Log {
     my $MacroActionID = $Self->{MacroActionID};        
     my $ObjectID      = $Self->{ObjectID};        
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?)',
         Bind => [
@@ -234,7 +234,7 @@ sub _Log {
     }
 
     # log in system log
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => $Param{Priority},
         Message  => "$Param{Message} (Job: $JobInfo, RunID: $RunID, Macro: $MacroInfo, MacroAction: $MacroActionInfo)",
     );

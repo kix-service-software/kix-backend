@@ -16,14 +16,14 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get mail account object
-my $MailAccountObject = $Kernel::OM->Get('Kernel::System::MailAccount');
+my $MailAccountObject = $Kernel::OM->Get('MailAccount');
 
 my $MailAccountAdd = $MailAccountObject->MailAccountAdd(
     Login         => 'mail',

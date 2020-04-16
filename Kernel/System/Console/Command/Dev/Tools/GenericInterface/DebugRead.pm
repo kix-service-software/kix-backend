@@ -17,7 +17,7 @@ use utf8;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::GenericInterface::DebugLog',
+    'GenericInterface::DebugLog',
 );
 
 sub Configure {
@@ -89,7 +89,7 @@ sub Run {
     my $WithData          = $Self->GetOption('with-data');
 
     # create needed objects
-    my $DebugLogObject = $Kernel::OM->Get('Kernel::System::GenericInterface::DebugLog');
+    my $DebugLogObject = $Kernel::OM->Get('GenericInterface::DebugLog');
 
     # search for log entries
     $Self->Print("Searching for DebugLog entries...\n\n");

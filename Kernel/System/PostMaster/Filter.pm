@@ -13,7 +13,7 @@ package Kernel::System::PostMaster::Filter;
 use strict;
 use warnings;
 
-our @ObjectDependencies = ( 'Kernel::System::DB', 'Kernel::System::Log', );
+our @ObjectDependencies = ( 'DB', 'Log', );
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $FilterObject = $Kernel::OM->Get('Kernel::System::PostMaster::Filter');
+    my $FilterObject = $Kernel::OM->Get('PostMaster::Filter');
 
 =cut
 
@@ -63,7 +63,7 @@ sub FilterNameLookup {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID!"
         );
@@ -71,7 +71,7 @@ sub FilterNameLookup {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'SELECT name FROM mail_filter WHERE id = ?',
         Bind => [ \$Param{ID} ]
@@ -98,7 +98,7 @@ sub FilterIDLookup {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Name!"
         );
@@ -106,7 +106,7 @@ sub FilterIDLookup {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM mail_filter WHERE name = ?',
         Bind => [ \$Param{Name} ]
@@ -133,12 +133,12 @@ sub FilterList {
     my ( $Self, %Param ) = @_;
 
     # get valid object
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+    my $ValidObject = $Kernel::OM->Get('Valid');
 
     my $Where = $Param{Valid} ? ' WHERE valid_id IN ( ' . join ', ', $ValidObject->ValidIDsGet() . ' )' : '';
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare( SQL => 'SELECT id, name FROM mail_filter' . $Where );
 
@@ -180,7 +180,7 @@ sub FilterAdd {
     # check needed stuff
     for (qw(Name StopAfterMatch ValidID UserID Match Set)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -188,7 +188,7 @@ sub FilterAdd {
         }
     }
     if ( !$Param{Name}) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid name given!"
         );
@@ -198,11 +198,11 @@ sub FilterAdd {
     $Param{Comment} = '' if ( !$Param{Comment} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if a filter with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A filter with name '$Param{Name}' already exists!"
         );
@@ -236,7 +236,7 @@ sub FilterAdd {
     return if !$Self->_addProperties( %Param, FilterID => $FilterID );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'MailFilter',
         ObjectID  => $FilterID
@@ -299,7 +299,7 @@ sub FilterUpdate {
     # check needed stuff
     for (qw(ID Name StopAfterMatch ValidID UserID Match Set)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -307,7 +307,7 @@ sub FilterUpdate {
         }
     }
     if ( !$Param{Name}) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No valid name given!"
         );
@@ -317,18 +317,18 @@ sub FilterUpdate {
     $Param{Comment} = '' if ( !$Param{Comment} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # check if a filter with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name}, ID => $Param{ID} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A filter with name '$Param{Name}' already exists!"
         );
         return;
     }
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE mail_filter SET name = ?, stop = ?, comments = ?, valid_id = ?, '
             . ' change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
@@ -349,7 +349,7 @@ sub FilterUpdate {
     return if !$Self->_addProperties( %Param, FilterID => $Param{ID} );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'MailFilter',
         ObjectID  => $Param{ID}
@@ -374,7 +374,7 @@ sub FilterDelete {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID or Name!"
         );
@@ -387,7 +387,7 @@ sub FilterDelete {
     return if !$Param{ID};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Do(
         SQL  => 'DELETE FROM mail_filter_properties WHERE filter_id = ?',
@@ -400,7 +400,7 @@ sub FilterDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'MailFilter',
         ObjectID  => $Param{ID}
@@ -449,7 +449,7 @@ sub FilterGet {
 
     # check needed stuff
     if ( !$Param{ID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID or Name!"
         );
@@ -457,7 +457,7 @@ sub FilterGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{ID} ) {
         return if !$DBObject->Prepare(
@@ -512,7 +512,7 @@ sub _addProperties {
     my %Not = %{ $Param{Not} || {} };
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     for my $Type (qw(Match Set)) {
         my %Data = %{ $Param{$Type} };

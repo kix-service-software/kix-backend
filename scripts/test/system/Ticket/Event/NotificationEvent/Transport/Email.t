@@ -15,16 +15,16 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
 
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # disable rich text editor
 my $Success = $ConfigObject->Set(
@@ -40,7 +40,7 @@ $Self->True(
 # use Test email backend
 $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::Test',
+    Value => 'Email::Test',
 );
 
 $Self->True(
@@ -59,7 +59,7 @@ $Self->True(
     "Disable Agent Self Notify On Action",
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 $Success = $TestEmailObject->CleanUp();
 $Self->True(
@@ -76,7 +76,7 @@ $Self->IsDeeply(
 # get a random id
 my $RandomID = $Helper->GetRandomID();
 
-my $RoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreate(
+my $RoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
     Name        => "ticket_read_$RandomID",
     Permissions => {
         Resource => [
@@ -89,22 +89,22 @@ my $RoleID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestRoleCreat
 );
 
 # create a new user for current test
-my $UserLogin = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->TestUserCreate(
+my $UserLogin = $Kernel::OM->Get('UnitTest::Helper')->TestUserCreate(
     Roles => ["ticket_read_$RandomID"],
 );
 
-my %UserData = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+my %UserData = $Kernel::OM->Get('User')->GetUserData(
     User => $UserLogin,
 );
 
 my $UserID = $UserData{UserID};
 
-my %UserContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+my %UserContactData = $Kernel::OM->Get('Contact')->ContactGet(
     UserID => $UserID,
 );
 
 # get ticket object
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # create ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -148,7 +148,7 @@ $Self->True(
 );
 
 # get dynamic field object
-my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
+my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
 # create a dynamic field
 my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
@@ -222,8 +222,8 @@ my @Tests = (
     },
 );
 
-my $NotificationEventObject      = $Kernel::OM->Get('Kernel::System::NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
+my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
 
 my $Count = 0;
 for my $Test (@Tests) {

@@ -88,8 +88,8 @@ my @Tests = (
 );
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 for my $Test (@Tests) {
 
@@ -112,10 +112,10 @@ for my $Test (@Tests) {
     );
 
     $Kernel::OM->ObjectsDiscard(
-        Objects => ['Kernel::System::Time'],
+        Objects => ['Time'],
     );
 
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $MailTimeStamp = $TimeObject->MailTimeStamp();
 

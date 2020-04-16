@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Role',
+    'Role',
 );
 
 sub Configure {
@@ -46,7 +46,7 @@ sub Run {
 
     $Self->Print("<yellow>Adding a new role...</yellow>\n");
 
-    my $RID = $Kernel::OM->Get('Kernel::System::Role')->RoleAdd(
+    my $RID = $Kernel::OM->Get('Role')->RoleAdd(
         Name    => $Self->GetOption('name'),
         Comment => $Self->GetOption('comment') || '',
         ValidID => 1,

@@ -82,7 +82,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Notification search
-    my %NotificationList = $Kernel::OM->Get('Kernel::System::NotificationEvent')->NotificationList(
+    my %NotificationList = $Kernel::OM->Get('NotificationEvent')->NotificationList(
         Details => 1,
         All     => 1
     );

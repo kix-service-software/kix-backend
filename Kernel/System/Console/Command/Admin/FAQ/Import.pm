@@ -16,11 +16,11 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::CSV',
-    'Kernel::System::DB',
-    'Kernel::System::FAQ',
-    'Kernel::System::Main',
+    'Config',
+    'CSV',
+    'DB',
+    'FAQ',
+    'Main',
 );
 
 sub Configure {
@@ -78,7 +78,7 @@ sub Run {
     $Self->Print("<yellow>Read File $SourcePath </yellow>\n\n");
 
     # read source file
-    my $CSVStringRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $CSVStringRef = $Kernel::OM->Get('Main')->FileRead(
         Location => $SourcePath,
         Result   => 'SCALAR',
         Mode     => 'binmode',
@@ -93,7 +93,7 @@ sub Run {
     my $Quote     = $Self->GetOption('quote')     || '"';
 
     # read CSV data
-    my $DataRef = $Kernel::OM->Get('Kernel::System::CSV')->CSV2Array(
+    my $DataRef = $Kernel::OM->Get('CSV')->CSV2Array(
         String    => $$CSVStringRef,
         Separator => $Separator,
         Quote     => $Quote,
@@ -105,10 +105,10 @@ sub Run {
     }
 
     # get FAQ object
-    my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
+    my $FAQObject = $Kernel::OM->Get('FAQ');
 
     # get all FAQ language ids
-    my $Languages = $Kernel::OM->Get('Kernel::Config')->Get('DefaultUsedLanguages');
+    my $Languages = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');
 
     my $LineCounter;
     my $SuccessCount    = 0;
@@ -138,7 +138,7 @@ sub Run {
         my $ParentID = 0;
 
         # get database object
-        my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+        my $DBObject = $Kernel::OM->Get('DB');
 
         for my $Category (@CategoryArray) {
 
@@ -178,7 +178,7 @@ sub Run {
         }
 
         # get config object
-        my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+        my $ConfigObject = $Kernel::OM->Get('Config');
 
         # set content type
         my $ContentType = 'text/plain';

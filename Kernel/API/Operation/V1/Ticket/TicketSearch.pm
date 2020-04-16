@@ -55,7 +55,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TicketSearch');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketSearch');
 
     return $Self;
 }
@@ -88,7 +88,7 @@ perform TicketSearch Operation. This will return a ticket list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @TicketIndex = $TicketObject->TicketSearch(
         Result     => 'ARRAY',

@@ -17,22 +17,22 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
 
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-my $QueueObject  = $Kernel::OM->Get('Kernel::System::Queue');
+my $TicketObject = $Kernel::OM->Get('Ticket');
+my $QueueObject  = $Kernel::OM->Get('Queue');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->FixedTimeSet();
 
 my $AgentAddress    = 'agent@example.com';

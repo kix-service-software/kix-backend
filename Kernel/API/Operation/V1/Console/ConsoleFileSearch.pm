@@ -84,7 +84,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get file list
-    my @FileList = $Kernel::OM->Get('Kernel::System::Console')->FileList();
+    my @FileList = $Kernel::OM->Get('Console')->FileList();
 
     # return result
     return $Self->_Success(

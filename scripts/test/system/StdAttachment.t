@@ -17,11 +17,11 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject           = $Kernel::OM->Get('Kernel::Config');
-my $HelperObject           = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
-my $MainObject             = $Kernel::OM->Get('Kernel::System::Main');
-my $StdAttachmentObject    = $Kernel::OM->Get('Kernel::System::StdAttachment');
-my $StandardTemplateObject = $Kernel::OM->Get('Kernel::System::StandardTemplate');
+my $ConfigObject           = $Kernel::OM->Get('Config');
+my $HelperObject           = $Kernel::OM->Get('UnitTest::Helper');
+my $MainObject             = $Kernel::OM->Get('Main');
+my $StdAttachmentObject    = $Kernel::OM->Get('StdAttachment');
+my $StandardTemplateObject = $Kernel::OM->Get('StandardTemplate');
 
 # file checks
 for my $File (qw(xls txt doc png pdf)) {

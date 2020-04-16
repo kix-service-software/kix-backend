@@ -81,7 +81,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get tickettype list 
-    my %TicketTypeList = $Kernel::OM->Get('Kernel::System::Type')->TypeList(
+    my %TicketTypeList = $Kernel::OM->Get('Type')->TypeList(
         Valid => 0
     );
 

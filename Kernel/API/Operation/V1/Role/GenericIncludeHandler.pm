@@ -75,7 +75,7 @@ sub Run {
 
     my @RelevantPropertyValuePermissions = split(/\s*,\s*/, ($Param{OperationConfig}->{RelevantPropertyValuePermissions} || ''));
 
-    my %Permissions = $Kernel::OM->Get('Kernel::System::Role')->PermissionListForObject(
+    my %Permissions = $Kernel::OM->Get('Role')->PermissionListForObject(
         RelevantPropertyValuePermissions => \@RelevantPropertyValuePermissions,
         Target        => $Param{RequestURI},
         ObjectID      => $Param{ObjectID},

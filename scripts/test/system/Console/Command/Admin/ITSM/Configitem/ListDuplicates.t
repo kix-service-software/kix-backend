@@ -15,15 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get command object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Admin::ITSM::Configitem::ListDuplicates');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::ITSM::Configitem::ListDuplicates');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $HelperObject = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
 # check command without any options
 my $ExitCode = $CommandObject->Execute();
@@ -45,7 +45,7 @@ $Self->Is(
 );
 
 # add test config item
-my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
 # get 'Hardware' catalog class IDs
 my $ConfigItemDataRef = $GeneralCatalogObject->ItemGet(
@@ -62,11 +62,11 @@ my $ProductionDeplStateDataRef = $GeneralCatalogObject->ItemGet(
 my $ProductionDeplStateID = $ProductionDeplStateDataRef->{ItemID};
 
 # get ConfigItem object
-my $ConfigItemObject = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
+my $ConfigItemObject = $Kernel::OM->Get('ITSMConfigItem');
 
 # create ConfigItem number
 my $ConfigItemNumber = $ConfigItemObject->ConfigItemNumberCreate(
-    Type    => $Kernel::OM->Get('Kernel::Config')->Get('ITSMConfigItem::NumberGenerator'),
+    Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
     ClassID => $HardwareConfigItemID,
 );
 

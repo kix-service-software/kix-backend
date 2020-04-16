@@ -122,7 +122,6 @@
    },
    "required" : [
       "Approved",
-      "Attachemnts",
       "CategoryID",
       "Changed",
       "ChangedBy",
@@ -136,14 +135,12 @@
       "Field4",
       "Field5",
       "Field6",
-      "History",
       "ID",
       "Keywords",
       "Language",
       "Name",
       "Number",
       "Title",
-      "ValidID",
-      "Votes"
+      "ValidID"
    ]
 }

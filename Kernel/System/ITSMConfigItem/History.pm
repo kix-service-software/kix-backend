@@ -61,7 +61,7 @@ sub HistoryGet {
     # check needed stuff
     for my $Needed (qw(ConfigItemID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -70,14 +70,14 @@ sub HistoryGet {
     }
 
     my $CacheKey = 'HistoryGet::'.$Param{ConfigItemID};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # fetch some data from history for given config item
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT ch.id, ch.configitem_id, ch.content, ch.type_id, '
             . 'ch.create_by, ch.create_time, cht.name '
             . 'FROM configitem_history ch, configitem_history_type cht '
@@ -88,7 +88,7 @@ sub HistoryGet {
 
     # save data from history in array
     my @Entries;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         my %Tmp = (
             HistoryEntryID => $Row[0],
             ConfigItemID   => $Row[1],
@@ -109,7 +109,7 @@ sub HistoryGet {
     );
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -148,7 +148,7 @@ sub HistoryEntryGet {
     # check needed stuff
     for my $Needed (qw(HistoryEntryID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -157,14 +157,14 @@ sub HistoryEntryGet {
     }
 
     my $CacheKey = 'HistoryEntryGet::'.$Param{HistoryEntryID};
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # fetch a single entry from history
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT ch.id, ch.configitem_id, ch.content, ch.type_id, '
             . 'ch.create_by, ch.create_time, cht.name '
             . 'FROM configitem_history ch, configitem_history_type cht '
@@ -174,7 +174,7 @@ sub HistoryEntryGet {
     );
 
     my %Entry;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
 
         %Entry = (
             HistoryEntryID => $Row[0],
@@ -194,7 +194,7 @@ sub HistoryEntryGet {
     );
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -224,7 +224,7 @@ sub HistoryAdd {
     # check needed stuff
     for my $Needed (qw(ConfigItemID UserID Comment)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -233,7 +233,7 @@ sub HistoryAdd {
     }
 
     if ( !( $Param{HistoryType} || $Param{HistoryTypeID} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need HistoryType or HistoryTypeID!',
         );
@@ -245,7 +245,7 @@ sub HistoryAdd {
         my $Id = $Self->HistoryTypeLookup( HistoryType => $Param{HistoryType} );
 
         if ( !$Id ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Invalid history type given!',
             );
@@ -260,7 +260,7 @@ sub HistoryAdd {
         my $Name = $Self->HistoryTypeLookup( HistoryTypeID => $Param{HistoryTypeID} );
 
         if ( !$Name ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Invalid history type id given!',
             );
@@ -276,7 +276,7 @@ sub HistoryAdd {
         );
 
         if ( !$Number ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Invalid config item id given!',
             );
@@ -305,12 +305,12 @@ sub HistoryAdd {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # insert history entry
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO configitem_history ( configitem_id, content, create_by, '
             . 'create_time, type_id ) VALUES ( ?, ?, ?, current_timestamp, ? )',
         Bind => [
@@ -322,7 +322,7 @@ sub HistoryAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'CMDB.ConfigItem.History',
         ObjectID  => $Param{ConfigItemID}.'::'.$Param{HistoryTypeID},
@@ -347,7 +347,7 @@ sub HistoryDelete {
     # check needed stuff
     for my $Needed (qw(ConfigItemID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -363,18 +363,18 @@ sub HistoryDelete {
     }
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # delete history for given config item
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM configitem_history WHERE configitem_id = ?',
         Bind => [ \$Param{ConfigItemID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.ConfigItem.History',
         ObjectID  => $Param{ConfigItemID},
@@ -399,7 +399,7 @@ sub HistoryEntryDelete {
     # check needed stuff
     for my $Needed (qw(HistoryEntryID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );
@@ -412,18 +412,18 @@ sub HistoryEntryDelete {
     );
 
     # clear cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
 
     # delete single entry
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM configitem_history WHERE id = ?',
         Bind => [ \$Param{HistoryEntryID} ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.ConfigItem.History',
         ObjectID  => $HistoryEntry->{ConfigItemID}.'::'.$Param{HistoryEntryID},
@@ -455,7 +455,7 @@ sub HistoryTypeLookup {
 
     # check for needed stuff
     if ( !$Key ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need HistoryTypeID or HistoryType!',
         );
@@ -463,7 +463,7 @@ sub HistoryTypeLookup {
     }
 
     my $CacheKey = 'HistoryTypeLookup::'.($Param{HistoryTypeID}||'').'::'.($Param{HistoryType}||'');
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -477,19 +477,19 @@ sub HistoryTypeLookup {
     }
 
     # fetch the requested value
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Bind  => [ \$Param{$Key} ],
         Limit => 1,
     );
 
     my $Value;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Value = $Row[0];
     }
 
     # cache the result
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -514,17 +514,17 @@ sub _EnrichHistoryEntries {
         ClassID => $ConfigItem->{ClassID},
     );
 
-    my $GeneralCatalogObject = $Kernel::OM->Get('Kernel::System::GeneralCatalog');
+    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
     # get more information about user who created history entries
     for my $Entry (@Entries) {
 
         # get user information
-        my %UserInfo = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %UserInfo = $Kernel::OM->Get('User')->GetUserData(
             UserID => $Entry->{CreateBy},
             Cached => 1,
         );
-        my %ContactData = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $Entry->{CreateBy},
             Cached => 1,
         );
@@ -609,7 +609,7 @@ sub _EnrichHistoryEntries {
             $Entry->{Comment} =~ s{ \A %% }{}xmsg;
             my @Values = split /%%/, $Entry->{Comment};
 
-            $Entry->{Comment} = $Kernel::OM->Get('Kernel::Language')->Translate(
+            $Entry->{Comment} = $Kernel::OM->Get('Language')->Translate(
                 'CIHistory::' . $Entry->{HistoryType},
                 @Values,
             );
@@ -628,7 +628,7 @@ sub _GetAttributeInfo {
     # check needed stuff
     for my $Argument (qw(Definition Path)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );

@@ -16,8 +16,8 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Log',
+    'DynamicFieldValue',
+    'Log',
 );
 
 =head1 NAME
@@ -35,7 +35,7 @@ Kernel::System::DynamicField::Driver::Base - common fields backend functions
 sub ValueGet {
     my ( $Self, %Param ) = @_;
 
-    my $DFValue = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueGet(
+    my $DFValue = $Kernel::OM->Get('DynamicFieldValue')->ValueGet(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
         ObjectID => $Param{ObjectID},
     );
@@ -84,7 +84,7 @@ sub ValueIsDifferent {
 sub ValueDelete {
     my ( $Self, %Param ) = @_;
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->ValueDelete(
+    my $Success = $Kernel::OM->Get('DynamicFieldValue')->ValueDelete(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
         ObjectID => $Param{ObjectID},
         UserID   => $Param{UserID},
@@ -96,7 +96,7 @@ sub ValueDelete {
 sub AllValuesDelete {
     my ( $Self, %Param ) = @_;
 
-    my $Success = $Kernel::OM->Get('Kernel::System::DynamicFieldValue')->AllValuesDelete(
+    my $Success = $Kernel::OM->Get('DynamicFieldValue')->AllValuesDelete(
         FieldID => $Param{DynamicFieldConfig}->{ID},
         UserID  => $Param{UserID},
     );
@@ -149,7 +149,7 @@ sub EditLabelRender {
     # check needed stuff
     for my $Needed (qw(DynamicFieldConfig FieldName)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -159,7 +159,7 @@ sub EditLabelRender {
 
     # check DynamicFieldConfig (general)
     if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The field configuration is invalid",
         );
@@ -169,7 +169,7 @@ sub EditLabelRender {
     # check DynamicFieldConfig (internally)
     for my $Needed (qw(Label)) {
         if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed in DynamicFieldConfig!"
             );

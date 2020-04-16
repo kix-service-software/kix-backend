@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Type',
+    'Type',
 );
 
 sub Configure {
@@ -41,7 +41,7 @@ sub Run {
 
     # add ticket type
     if (
-        !$Kernel::OM->Get('Kernel::System::Type')->TypeAdd(
+        !$Kernel::OM->Get('Type')->TypeAdd(
             UserID  => 1,
             ValidID => 1,
             Name    => $Self->GetOption('name'),

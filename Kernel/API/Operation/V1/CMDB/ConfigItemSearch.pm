@@ -143,7 +143,7 @@ sub Run {
 
                 if ( $SearchType eq 'OR' ) {
                     # perform search for every attribute
-                    my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+                    my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
                         UserID  => $Self->{Authorization}->{UserID},
                     );
@@ -159,7 +159,7 @@ sub Run {
 
             if ( $SearchType eq 'AND' ) {
                 # perform ConfigItem search
-                my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+                my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                     %SearchParam,
                     UserID  => $Self->{Authorization}->{UserID},
                 );
@@ -175,7 +175,7 @@ sub Run {
                 my %SearchTypeResultHash = map { $_ => 1 } @SearchTypeResult;
                 my @Result;
                 foreach my $ConfigItemID ( @ConfigItemList ) {
-                    push(@Result, $ConfigItemID) if !exists $SearchTypeResultHash{$ConfigItemID};
+                    push(@Result, $ConfigItemID) if $SearchTypeResultHash{$ConfigItemID};
                 }
                 @ConfigItemList = @Result;
             }
@@ -183,7 +183,7 @@ sub Run {
     }
     else {
         # perform ConfigItem search
-        my $SearchResult = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemSearchExtended(
+        my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
             UserID  => $Self->{Authorization}->{UserID},
         );
         @ConfigItemList = @{$SearchResult};

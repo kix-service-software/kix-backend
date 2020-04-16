@@ -18,8 +18,8 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
+    'Config',
+    'Log',
 );
 
 =head1 NAME
@@ -82,7 +82,7 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
         );
@@ -96,11 +96,11 @@ sub Search {
             @PriorityList = @{$Param{Search}->{Value}}
         }
         foreach my $Priority ( @PriorityList ) {
-            my $PriorityID = $Kernel::OM->Get('Kernel::System::Priority')->PriorityLookup(
+            my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
                 Priority => $Priority,
             );
             if ( !$PriorityID ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unknown priority $Priority!",
                 );
@@ -124,7 +124,7 @@ sub Search {
         push( @SQLWhere, 'st.ticket_priority_id IN ('.(join(',', @PriorityIDs)).')' );
     }
     else {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
         );

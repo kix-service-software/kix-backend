@@ -14,8 +14,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Main',
-    'Kernel::System::Package',
+    'Main',
+    'Package',
 );
 
 sub Configure {
@@ -29,19 +29,19 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Result = $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    my $Result = $Kernel::OM->Get('DB')->Prepare(
         SQL =>
             'SELECT id FROM package_repository pr1 WHERE id IN (SELECT id FROM package_repository WHERE name = pr1.name AND id < (SELECT MAX(id) FROM package_repository WHERE name = pr1.name))',
     );
 
     if ($Result) {
         my @IDs;
-        while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             push( @IDs, $Row[0] );
         }
 
         foreach my $ID (@IDs) {
-            $Result = $Kernel::OM->Get('Kernel::System::DB')->Prepare(
+            $Result = $Kernel::OM->Get('DB')->Prepare(
                 SQL  => 'DELETE FROM package_repository WHERE id = ?',
                 Bind => [ \$ID ],
             );

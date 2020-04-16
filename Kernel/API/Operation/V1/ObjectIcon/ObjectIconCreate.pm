@@ -133,7 +133,7 @@ sub Run {
     );        
    
     # check if ObjectIcon exists
-    my $ObjectIconList = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconList(
+    my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
         Object   => $ObjectIcon->{Object},
         ObjectID => $ObjectIcon->{ObjectID},        
     );
@@ -141,12 +141,12 @@ sub Run {
     if ( IsArrayRefWithData($ObjectIconList) ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
-            Message => "Can not create ObjectIcon. Another ObjectIcon with the same Object and ObjectID already exists.",
+            Message => "Cannot create ObjectIcon. Another ObjectIcon with the same Object and ObjectID already exists.",
         );
     }
 
     # create ObjectIcon
-    my $ObjectIconID = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconAdd(
+    my $ObjectIconID = $Kernel::OM->Get('ObjectIcon')->ObjectIconAdd(
         Object      => $ObjectIcon->{Object},
         ObjectID    => $ObjectIcon->{ObjectID},
         ContentType => $ObjectIcon->{ContentType},

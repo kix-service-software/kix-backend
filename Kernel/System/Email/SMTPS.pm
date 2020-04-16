@@ -18,7 +18,7 @@ use Net::SSLGlue::SMTP;
 use base qw(Kernel::System::Email::SMTP);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
+    'Log',
 );
 
 sub _Connect {
@@ -27,7 +27,7 @@ sub _Connect {
     # check needed stuff
     for (qw(MailHost FQDN)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );

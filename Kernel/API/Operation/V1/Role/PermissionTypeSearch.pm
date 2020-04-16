@@ -86,14 +86,14 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform permission search
-    my %PermissionTypeList = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeList();
+    my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
 
 	# get prepare 
     if ( IsHashRefWithData(\%PermissionTypeList) ) {  	
 
         my @Result;
         foreach my $TypeID ( sort keys %PermissionTypeList ) {
-            my %TypeData = $Kernel::OM->Get('Kernel::System::Role')->PermissionTypeGet(
+            my %TypeData = $Kernel::OM->Get('Role')->PermissionTypeGet(
                 ID => $TypeID,
             );
 

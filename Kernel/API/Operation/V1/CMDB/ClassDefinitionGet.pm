@@ -123,7 +123,7 @@ sub Run {
     my @DefinitionList;        
     foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {                 
 
-        my $DefinitionRef = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->DefinitionGet(
+        my $DefinitionRef = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
             DefinitionID => $DefinitionID,
         );
 

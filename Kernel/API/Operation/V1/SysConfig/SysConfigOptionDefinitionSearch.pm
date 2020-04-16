@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform SysConfig search
-    my %AllOptions = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGetAll();
+    my %AllOptions = $Kernel::OM->Get('SysConfig')->OptionGetAll();
 
     # prepare search if given
     if ( IsHashRefWithData( $Self->{Search}->{SysConfigOptionDefinition} ) ) {

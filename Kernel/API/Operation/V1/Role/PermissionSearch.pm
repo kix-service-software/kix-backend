@@ -113,7 +113,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if role exists 
-    my $Rolename = $Kernel::OM->Get('Kernel::System::Role')->RoleLookup(
+    my $Rolename = $Kernel::OM->Get('Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
     );
   
@@ -124,7 +124,7 @@ sub Run {
     }
 
     # perform permission search
-    my @PermissionList = $Kernel::OM->Get('Kernel::System::Role')->PermissionList(
+    my @PermissionList = $Kernel::OM->Get('Role')->PermissionList(
         RoleID => $Param{Data}->{RoleID}
     );
 

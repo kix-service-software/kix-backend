@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::ObjectIcon::ObjectIconGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::ObjectIcon::ObjectIconGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $ObjectIconID ( @{$Param{Data}->{ObjectIconID}} ) {
 
         # get the ObjectIcon data
-        my %ObjectIconData = $Kernel::OM->Get('Kernel::System::ObjectIcon')->ObjectIconGet(
+        my %ObjectIconData = $Kernel::OM->Get('ObjectIcon')->ObjectIconGet(
             ID => $ObjectIconID,             
         );
 

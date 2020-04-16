@@ -16,9 +16,9 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Config',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -41,7 +41,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LinkObjectTicketObject = $Kernel::OM->Get('Kernel::System::LinkObject::Ticket');
+    my $LinkObjectTicketObject = $Kernel::OM->Get('LinkObject::Ticket');
 
 =cut
 
@@ -73,7 +73,7 @@ sub LinkListWithData {
     # check needed stuff
     for my $Argument (qw(LinkList UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -83,7 +83,7 @@ sub LinkListWithData {
 
     # check link list
     if ( ref $Param{LinkList} ne 'HASH' ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'LinkList must be a hash reference!',
         );
@@ -91,11 +91,11 @@ sub LinkListWithData {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get config, which ticket state types should not be included in linked tickets overview
     my @IgnoreLinkedTicketStateTypes = @{
-        $Kernel::OM->Get('Kernel::Config')->Get('LinkObject::IgnoreLinkedTicketStateTypes')
+        $Kernel::OM->Get('Config')->Get('LinkObject::IgnoreLinkedTicketStateTypes')
             // []
     };
 
@@ -159,7 +159,7 @@ sub ObjectPermission {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -167,7 +167,7 @@ sub ObjectPermission {
         }
     }
 
-    return $Kernel::OM->Get('Kernel::System::Ticket')->TicketPermission(
+    return $Kernel::OM->Get('Ticket')->TicketPermission(
         Type     => 'ro',
         TicketID => $Param{Key},
         UserID   => $Param{UserID},
@@ -198,7 +198,7 @@ sub ObjectDescriptionGet {
     # check needed stuff
     for my $Argument (qw(Object Key UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -215,7 +215,7 @@ sub ObjectDescriptionGet {
     return %Description if $Param{Mode} && $Param{Mode} eq 'Temporary';
 
     # get ticket
-    my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Param{Key},
         UserID        => $Param{UserID},
         DynamicFields => 0,
@@ -223,8 +223,8 @@ sub ObjectDescriptionGet {
 
     return if !%Ticket;
 
-    my $ParamHook = $Kernel::OM->Get('Kernel::Config')->Get('Ticket::Hook') || 'Ticket#';
-    $ParamHook .= $Kernel::OM->Get('Kernel::Config')->Get('Ticket::HookDivider');
+    my $ParamHook = $Kernel::OM->Get('Config')->Get('Ticket::Hook') || 'Ticket#';
+    $ParamHook .= $Kernel::OM->Get('Config')->Get('Ticket::HookDivider');
 
     # create description
     %Description = (
@@ -263,7 +263,7 @@ sub ObjectSearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID!',
         );
@@ -302,7 +302,7 @@ sub ObjectSearch {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # search the tickets
     my @TicketIDs = $TicketObject->TicketSearch(
@@ -369,7 +369,7 @@ sub LinkAddPre {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -410,7 +410,7 @@ sub LinkAddPost {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -419,7 +419,7 @@ sub LinkAddPost {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     if ( $Param{SourceObject} && $Param{SourceObject} eq 'Ticket' && $Param{SourceKey} ) {
 
@@ -552,7 +552,7 @@ sub LinkDeletePre {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -593,7 +593,7 @@ sub LinkDeletePost {
     # check needed stuff
     for my $Argument (qw(Key Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
@@ -602,7 +602,7 @@ sub LinkDeletePost {
     }
 
     # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     if ( $Param{SourceObject} && $Param{SourceObject} eq 'Ticket' && $Param{SourceKey} ) {
 

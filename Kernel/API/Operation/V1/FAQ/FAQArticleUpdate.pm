@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::FAQArticleUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::FAQArticleUpdate');
 
     return $Self;
 }
@@ -142,7 +142,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if FAQArticle exists 
-    my %FAQArticleData = $Kernel::OM->Get('Kernel::System::FAQ')->FAQGet(
+    my %FAQArticleData = $Kernel::OM->Get('FAQ')->FAQGet(
         ItemID     => $Param{Data}->{FAQArticleID},
         ItemFields => 1,
         UserID     => $Self->{Authorization}->{UserID},
@@ -175,7 +175,7 @@ sub Run {
     $FAQArticle{Keywords} = IsArrayRefWithData($IncomingFAQArticle->{Keywords}) ? join(' ', @{$IncomingFAQArticle->{Keywords}}) : $FAQArticleData{Keywords};
 
     # update FAQArticle
-    my $Success = $Kernel::OM->Get('Kernel::System::FAQ')->FAQUpdate(
+    my $Success = $Kernel::OM->Get('FAQ')->FAQUpdate(
         ItemID      => $Param{Data}->{FAQArticleID},
         %FAQArticle,
         UserID      => $Self->{Authorization}->{UserID}

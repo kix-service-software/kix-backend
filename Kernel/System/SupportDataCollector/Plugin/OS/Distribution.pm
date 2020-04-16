@@ -18,7 +18,7 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::System::Environment',
+    'Environment',
 );
 
 sub GetDisplayPath {
@@ -28,7 +28,7 @@ sub GetDisplayPath {
 sub Run {
     my $Self = shift;
 
-    my %OSInfo = $Kernel::OM->Get('Kernel::System::Environment')->OSInfoGet();
+    my %OSInfo = $Kernel::OM->Get('Environment')->OSInfoGet();
 
     # if OSname starts with Unknown, test was not successful
     if ( $OSInfo{OSName} =~ /\A Unknown /xms ) {

@@ -125,7 +125,7 @@ If ACL modules are configured in the C<Ticket::Acl::Module> config key, they are
 during the call to C<TicketAcl>. The configuration of a module looks like this:
 
      $ConfigObject->{'Ticket::Acl::Module'}->{'TheName'} = {
-         Module => 'Kernel::System::Ticket::Acl::TheAclModule',
+         Module => 'Ticket::Acl::TheAclModule',
          Checks => ['Owner', 'Queue', 'SLA', 'Ticket'],
          ReturnType => 'Ticket',
          ReturnSubType => ['State', 'Service'],
@@ -155,7 +155,7 @@ sub TicketAcl {
 
     # check needed stuff
     if ( !$Param{UserID} && !$Param{ContactID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID or ContactID!',
         );
@@ -165,7 +165,7 @@ sub TicketAcl {
     # check needed stuff
     for my $Needed (qw(ReturnSubType ReturnType Data)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -181,7 +181,7 @@ sub TicketAcl {
     return if $Param{UserID} && $Param{UserID} == 1;
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $ACLs       = $ConfigObject->Get('TicketAcl');
     my $AclModules = $ConfigObject->Get('Ticket::Acl::Module');
@@ -271,7 +271,7 @@ sub TicketAcl {
 
         my $Module = $ApplicableAclModules{$ModuleName};
 
-        next MODULE if !$Kernel::OM->Get('Kernel::System::Main')->Require( $Module->{Module} );
+        next MODULE if !$Kernel::OM->Get('Main')->Require( $Module->{Module} );
 
         my $Generic = $Module->{Module}->new();
 
@@ -455,7 +455,7 @@ sub TicketAcl {
 
                                 # debug log
                                 if ( $Self->{ACLDebug} ) {
-                                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                    $Kernel::OM->Get('Log')->Log(
                                         Priority => $Self->{ACLDebugLogPriority},
                                         Message =>
                                             "TicketACL '$Acl' $PropertiesHash:'$Key->$Data' MatchedARRAY ($Item eq $MatchedArrayDataItem)",
@@ -477,7 +477,7 @@ sub TicketAcl {
 
                                 # debug
                                 if ( $Self->{ACLDebug} ) {
-                                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                    $Kernel::OM->Get('Log')->Log(
                                         Priority => $Self->{ACLDebugLogPriority},
                                         Message =>
                                             "TicketACL '$Acl' $PropertiesHash:'$Key->$Data' Matched ($Item eq $UsedChecks{$Key}->{$Data})",
@@ -540,7 +540,7 @@ sub TicketAcl {
         # debug log
         if ( $Match && $MatchTry ) {
             if ( $Self->{ACLDebug} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => $Self->{ACLDebugLogPriority},
                     Message =>
                         "TicketACL '$Acl' Matched for return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -575,12 +575,12 @@ sub TicketAcl {
 
                 # debug log
                 if ( $Self->{ADLDebug} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Used with Possible:'$Param{ReturnType}:$Param{ReturnSubType}'",
                     );
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Reset return data:'$Param{ReturnType}:$Param{ReturnSubType}''",
@@ -599,7 +599,7 @@ sub TicketAcl {
                         if ( $MatchResult->{Match} ) {
                             $NewTmpData{$ID} = $Data{$ID};
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' Possible param '$Data{$ID}' added to return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -608,7 +608,7 @@ sub TicketAcl {
                         }
                         else {
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' Possible param '$Data{$ID}' skipped from return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -633,7 +633,7 @@ sub TicketAcl {
 
                 # debug log
                 if ( $Self->{ACLDebug} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Used with PossibleAdd:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -652,7 +652,7 @@ sub TicketAcl {
                         if ( $MatchResult->{Match} ) {
                             $NewTmpData{$ID} = $Data{$ID};
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' PossibleAdd param '$Data{$ID}' added to return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -661,7 +661,7 @@ sub TicketAcl {
                         }
                         else {
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' PossibleAdd param '$Data{$ID}' skipped from return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -686,7 +686,7 @@ sub TicketAcl {
 
                 # debug log
                 if ( $Self->{ACLDebug} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Used with PossibleNot:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -708,7 +708,7 @@ sub TicketAcl {
                     }
                     if ( !$Match ) {
                         if ( $Self->{ACLDebug} ) {
-                            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                            $Kernel::OM->Get('Log')->Log(
                                 Priority => $Self->{ACLDebugLogPriority},
                                 Message =>
                                     "TicketACL '$Acl' PossibleNot param '$Data{$ID}' removed from return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -720,7 +720,7 @@ sub TicketAcl {
                     }
                     else {
                         if ( $Self->{ACLDebug} ) {
-                            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                            $Kernel::OM->Get('Log')->Log(
                                 Priority => $Self->{ACLDebugLogPriority},
                                 Message =>
                                     "TicketACL '$Acl' PossibleNot param '$Data{$ID}' leaved for return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -751,12 +751,12 @@ sub TicketAcl {
 
                 # debug log
                 if ( $Self->{ACLDebug} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Used with Possible:'$Param{ReturnType}:$Param{ReturnSubType}'",
                     );
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Reset return data:'$Param{ReturnType}:$Param{ReturnSubType}''",
@@ -775,7 +775,7 @@ sub TicketAcl {
                         if ( $MatchResult->{Match} ) {
                             $NewTmpData{$ID} = $Data{$ID};
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' Possible param '$Data{$ID}' added to return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -784,7 +784,7 @@ sub TicketAcl {
                         }
                         else {
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' Possible param '$Data{$ID}' skipped from return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -807,7 +807,7 @@ sub TicketAcl {
 
                 # debug log
                 if ( $Self->{ACLDebug} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Used with PossibleAdd:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -826,7 +826,7 @@ sub TicketAcl {
                         if ( $MatchResult->{Match} ) {
                             $NewTmpData{$ID} = $Data{$ID};
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' PossibleAdd param '$Data{$ID}' added to return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -835,7 +835,7 @@ sub TicketAcl {
                         }
                         else {
                             if ( $Self->{ACLDebug} ) {
-                                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                                $Kernel::OM->Get('Log')->Log(
                                     Priority => $Self->{ACLDebugLogPriority},
                                     Message =>
                                         "TicketACL '$Acl' PossibleAdd param '$Data{$ID}' skipped from return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -858,7 +858,7 @@ sub TicketAcl {
 
                 # debug log
                 if ( $Self->{ACLDebug} ) {
-                    $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => $Self->{ACLDebugLogPriority},
                         Message =>
                             "TicketACL '$Acl' Used with PossibleNot:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -880,7 +880,7 @@ sub TicketAcl {
                     }
                     if ( !$Match ) {
                         if ( $Self->{ACLDebug} ) {
-                            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                            $Kernel::OM->Get('Log')->Log(
                                 Priority => $Self->{ACLDebugLogPriority},
                                 Message =>
                                     "TicketACL '$Acl' PossibleNot param '$Data{$ID}' removed from return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -892,7 +892,7 @@ sub TicketAcl {
                     }
                     else {
                         if ( $Self->{ACLDebug} ) {
-                            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                            $Kernel::OM->Get('Log')->Log(
                                 Priority => $Self->{ACLDebugLogPriority},
                                 Message =>
                                     "TicketACL '$Acl' PossibleNot param '$Data{$ID}' leaved for return data:'$Param{ReturnType}:$Param{ReturnSubType}'",
@@ -923,7 +923,7 @@ sub TicketAcl {
                     if ( $Param{Action} ) {
 
                         # get screen configuration
-                        my $ScreenConfig = $Kernel::OM->Get('Kernel::Config')->Get(
+                        my $ScreenConfig = $Kernel::OM->Get('Config')->Get(
                             'Ticket::Frontend::' . $Param{Action}
                         );
 
@@ -1168,7 +1168,7 @@ sub _GetChecks {
     # EO KIX4OTRS-capeIT
 
     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # use ticket data if ticket id is given
     # do that always, even if $RequiredChecks{Ticket} is not that
@@ -1214,7 +1214,7 @@ sub _GetChecks {
     # check for ActivityDialogEntityID if set as parameter (ProcessManagement)
     if ( ( $CheckAll || $RequiredChecks{Process} ) && $Param{ActivityDialogEntityID} ) {
 
-        my $ActivityDialog = $Kernel::OM->Get('Kernel::System::ProcessManagement::ActivityDialog')->ActivityDialogGet(
+        my $ActivityDialog = $Kernel::OM->Get('ProcessManagement::ActivityDialog')->ActivityDialogGet(
             ActivityDialogEntityID => $Param{ActivityDialogEntityID},
             Interface              => $Interface,
         );
@@ -1228,7 +1228,7 @@ sub _GetChecks {
     # keep ticket type, if available
     if ( $Param{TypeID} ) {
         $Checks{Ticket}->{TypeID} = $Param{TypeID};
-        my $Type = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup( TypeID => $Param{TypeID} );
+        my $Type = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $Param{TypeID} );
         $Checks{Ticket}->{Type} = $Type;
     }
 
@@ -1287,11 +1287,11 @@ sub _GetChecks {
     # use user data
     if ( ( $CheckAll || $RequiredChecks{User} ) && $Param{UserID} ) {
 
-        my %User = $Kernel::OM->Get('Kernel::System::User')->GetUserData(
+        my %User = $Kernel::OM->Get('User')->GetUserData(
             UserID => $Param{UserID},
         );
 
-        my %RoleIDs = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+        my %RoleIDs = $Kernel::OM->Get('Role')->RoleGet(
             UserID => $Param{UserID},
         );
 
@@ -1303,8 +1303,8 @@ sub _GetChecks {
     }
 
     # get customer user objects
-    my $CustomerGroupObject = $Kernel::OM->Get('Kernel::System::CustomerGroup');
-    my $ContactObject  = $Kernel::OM->Get('Kernel::System::Contact');
+    my $CustomerGroupObject = $Kernel::OM->Get('CustomerGroup');
+    my $ContactObject  = $Kernel::OM->Get('Contact');
 
     # use customer user data
     if ( ( $CheckAll || $RequiredChecks{Contact} ) && $Param{ContactID} ) {
@@ -1395,7 +1395,7 @@ sub _GetChecks {
     if ( $CheckAll || $RequiredChecks{Queue} ) {
 
         # get queue object
-        my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+        my $QueueObject = $Kernel::OM->Get('Queue');
 
         if ( $Param{QueueID} ) {
             my %Queue = $QueueObject->QueueGet( ID => $Param{QueueID} );
@@ -1443,7 +1443,7 @@ sub _GetChecks {
         else {
 
             # get queue object
-            my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+            my $QueueObject = $Kernel::OM->Get('Queue');
 
             my %Queue = $QueueObject->QueueGet(
                 ID => $ChecksDatabase{Ticket}->{QueueID},
@@ -1457,7 +1457,7 @@ sub _GetChecks {
     if ( $CheckAll || $RequiredChecks{Service} ) {
 
         # get service object
-        my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
+        my $ServiceObject = $Kernel::OM->Get('Service');
 
         if ( $Param{ServiceID} ) {
             my %Service = $ServiceObject->ServiceGet(
@@ -1520,7 +1520,7 @@ sub _GetChecks {
     if ( $CheckAll || $RequiredChecks{Type} ) {
 
         # get type object
-        my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
+        my $TypeObject = $Kernel::OM->Get('Type');
 
         if ( $Param{TypeID} ) {
             my %Type = $TypeObject->TypeGet(
@@ -1600,7 +1600,7 @@ sub _GetChecks {
     if ( $CheckAll || $RequiredChecks{Priority} ) {
 
         # get priority object
-        my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
+        my $PriorityObject = $Kernel::OM->Get('Priority');
 
         # use priority data (if given)
         if ( $Param{NewPriorityID} && !$Param{PriorityID} ) {
@@ -1661,7 +1661,7 @@ sub _GetChecks {
         else {
 
             # get priority object
-            my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
+            my $PriorityObject = $Kernel::OM->Get('Priority');
 
             # get priority data from the ticket
             my %Priority = $PriorityObject->PriorityGet(
@@ -1676,7 +1676,7 @@ sub _GetChecks {
     if ( $CheckAll || $RequiredChecks{SLA} ) {
 
         # get sla object
-        my $SLAObject = $Kernel::OM->Get('Kernel::System::SLA');
+        my $SLAObject = $Kernel::OM->Get('SLA');
 
         if ( $Param{SLAID} ) {
             my %SLA = $SLAObject->SLAGet(
@@ -1732,7 +1732,7 @@ sub _GetChecks {
         # otherwise complete the data querying the database again
         else {
 
-            my %SLA = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
+            my %SLA = $Kernel::OM->Get('SLA')->SLAGet(
                 SLAID  => $ChecksDatabase{Ticket}->{SLAID},
                 UserID => 1,
             );
@@ -1741,7 +1741,7 @@ sub _GetChecks {
     }
 
     # get state object
-    my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+    my $StateObject = $Kernel::OM->Get('State');
 
     # use state data (if given)
     if ( $CheckAll || $RequiredChecks{State} ) {
@@ -1808,8 +1808,8 @@ sub _GetChecks {
     }
 
     # get needed objects
-    my $RoleObject = $Kernel::OM->Get('Kernel::System::Role');
-    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+    my $RoleObject = $Kernel::OM->Get('Role');
+    my $UserObject = $Kernel::OM->Get('User');
 
     # use owner data (if given)
     if ( $CheckAll || $RequiredChecks{Owner} ) {
@@ -2069,7 +2069,7 @@ sub _CompareMatchWithData {
     # check needed stuff
     for my $Needed (qw(Match Data)) {
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
             );

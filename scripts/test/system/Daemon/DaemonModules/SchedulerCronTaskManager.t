@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $Home   = $ConfigObject->Get('Home');
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
@@ -36,9 +36,9 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
 }
 
 # get needed objects
-my $TaskWorkerObject  = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker');
-my $SchedulerDBObject = $Kernel::OM->Get('Kernel::System::Daemon::SchedulerDB');
-my $Helper            = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $TaskWorkerObject  = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
+my $Helper            = $Kernel::OM->Get('UnitTest::Helper');
 
 my $RunTasks = sub {
 
@@ -76,7 +76,7 @@ $ConfigObject->Set(
 # freeze time
 $Helper->FixedTimeSet();
 
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
     SystemTime => $TimeObject->SystemTime(),
 );
@@ -157,8 +157,8 @@ my @Tests = (
 );
 
 # get needed objects
-my $TaskManagerObject = $Kernel::OM->Get('Kernel::System::Daemon::DaemonModules::SchedulerCronTaskManager');
-my $CacheObject       = $Kernel::OM->Get('Kernel::System::Cache');
+my $TaskManagerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerCronTaskManager');
+my $CacheObject       = $Kernel::OM->Get('Cache');
 
 TESTCASE:
 for my $Test (@Tests) {
@@ -366,7 +366,7 @@ my %TestJobNames = (
 );
 
 # get db object
-my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+my $DBObject = $Kernel::OM->Get('DB');
 
 my $SystemTime = $TimeObject->SystemTime();
 
@@ -468,7 +468,7 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
 }
 
 # cleanup cache
-$Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+$Kernel::OM->Get('Cache')->CleanUp();
 
 1;
 

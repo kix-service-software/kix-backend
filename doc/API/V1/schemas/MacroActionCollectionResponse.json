@@ -7,7 +7,7 @@
       "MacroAction" : {
          "type" : "array",
          "items" : {
-            "$ref" : "#/definitions/_MacroAction_json"
+            "$ref" : "#/definitions/MacroAction_json-4e1b752481"
          }
       }
    },
@@ -15,7 +15,7 @@
       "MacroAction"
    ],
    "definitions" : {
-      "_MacroAction_json" : {
+      "MacroAction_json-4e1b752481" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",

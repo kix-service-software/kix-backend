@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get time object
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 my $SystemTime = $TimeObject->SystemTime();
 
@@ -248,7 +248,7 @@ my @Tests = (
 );
 
 # get cron event object
-my $CronEventObject = $Kernel::OM->Get('Kernel::System::CronEvent');
+my $CronEventObject = $Kernel::OM->Get('CronEvent');
 
 for my $Test (@Tests) {
 

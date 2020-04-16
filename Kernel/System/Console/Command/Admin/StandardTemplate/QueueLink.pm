@@ -16,8 +16,8 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Queue',
-    'Kernel::System::StandardTemplate',
+    'Queue',
+    'StandardTemplate',
 );
 
 sub Configure {
@@ -47,7 +47,7 @@ sub PreRun {
 
     # check template
     $Self->{TemplateName} = $Self->GetOption('template-name');
-    $Self->{TemplateID}   = $Kernel::OM->Get('Kernel::System::StandardTemplate')
+    $Self->{TemplateID}   = $Kernel::OM->Get('StandardTemplate')
         ->StandardTemplateLookup( StandardTemplate => $Self->{TemplateName} );
     if ( !$Self->{TemplateID} ) {
         die "Standard template '$Self->{TemplateName}' does not exist.\n";
@@ -55,7 +55,7 @@ sub PreRun {
 
     # check queue
     $Self->{QueueName} = $Self->GetOption('queue-name');
-    $Self->{QueueID} = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup( Queue => $Self->{QueueName} );
+    $Self->{QueueID} = $Kernel::OM->Get('Queue')->QueueLookup( Queue => $Self->{QueueName} );
     if ( !$Self->{QueueID} ) {
         die "Queue '$Self->{QueueName}' does not exist.\n";
     }
@@ -69,7 +69,7 @@ sub Run {
     $Self->Print("<yellow>Trying to link template $Self->{TemplateName} to queue $Self->{QueueName}...</yellow>\n");
 
     if (
-        !$Kernel::OM->Get('Kernel::System::Queue')->QueueStandardTemplateMemberAdd(
+        !$Kernel::OM->Get('Queue')->QueueStandardTemplateMemberAdd(
             StandardTemplateID => $Self->{TemplateID},
             QueueID            => $Self->{QueueID},
             Active             => 1,

@@ -13,16 +13,16 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Kernel::Config');
-my $ContactObject = $Kernel::OM->Get('Kernel::System::Contact');
+my $ConfigObject       = $Kernel::OM->Get('Config');
+my $ContactObject = $Kernel::OM->Get('Contact');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Contact = 'customer' . $Helper->GetRandomID();
 
@@ -34,7 +34,7 @@ $ConfigObject->Set(
 
 my $OrgRand  = 'example-organisation' . $Helper->GetRandomID();
 
-my $OrgID = $Kernel::OM->Get('Kernel::System::Organisation')->OrganisationAdd(
+my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number => $OrgRand,
     Name   => $OrgRand,
     ValidID => 1,

@@ -131,7 +131,7 @@ sub Run {
     }
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->ConfigItemGet(
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
@@ -144,7 +144,7 @@ sub Run {
     my @VersionList;
 
     # get all versions of ConfigItem (it's cheaper than getting selected version by single requests)
-    my $Versions = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionZoomList(
+    my $Versions = $Kernel::OM->Get('ITSMConfigItem')->VersionZoomList(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
@@ -163,7 +163,7 @@ sub Run {
 
             # include Definition if requested
             if ( $Param{Data}->{include}->{Definition} ) {
-                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
                     VersionID  => $VersionID,
                 );
 
@@ -182,7 +182,7 @@ sub Run {
 
             # include XMLData if requested
             if ( $Param{Data}->{include}->{Data} ) {
-                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
                     VersionID  => $VersionID,
                     XMLDataGet => 1,
                 );
@@ -195,7 +195,7 @@ sub Run {
 
             # include XMLData if requested
             if ( $Param{Data}->{include}->{PreparedData} ) {
-                my $VersionData = $Kernel::OM->Get('Kernel::System::ITSMConfigItem')->VersionGet(
+                my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
                     VersionID  => $VersionID,
                     XMLDataGet => 1,
                 );
@@ -369,7 +369,7 @@ sub _GetDisplayValue {
     # check if we have already created an instance of this type
     if ( !$Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}} ) {
         # create module instance
-        my $Module = 'Kernel::System::ITSMConfigItem::XML::Type::'.$Param{Item}->{Input}->{Type};
+        my $Module = 'ITSMConfigItem::XML::Type::'.$Param{Item}->{Input}->{Type};
         my $Object = $Kernel::OM->Get($Module);
 
         if (ref $Object ne $Module) {

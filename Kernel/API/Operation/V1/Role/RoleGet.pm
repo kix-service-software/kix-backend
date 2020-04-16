@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::Role::RoleGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Role::RoleGet');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
         # get the Role data
-        my %RoleData = $Kernel::OM->Get('Kernel::System::Role')->RoleGet(
+        my %RoleData = $Kernel::OM->Get('Role')->RoleGet(
             ID => $RoleID,
         );
 

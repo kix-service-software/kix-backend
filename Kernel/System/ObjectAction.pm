@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config'
+    'Config'
 );
 
 =head1 NAME
@@ -35,7 +35,7 @@ create an object
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $LockObject = $Kernel::OM->Get('Kernel::System::Lock');
+    my $LockObject = $Kernel::OM->Get('Lock');
 
 =cut
 
@@ -59,7 +59,7 @@ sub ObjectActionList {
     # check needed stuff
     for my $Needed (qw(Object)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -73,11 +73,11 @@ sub ObjectActionList {
 sub _LoadObjectActions {
     my ( $Self, %Param ) = @_;
 
-    my $ConfigValue = $Kernel::OM->Get('Kernel::Config')->Get('ObjectActions::Definitions');
+    my $ConfigValue = $Kernel::OM->Get('Config')->Get('ObjectActions::Definitions');
 
     return if !$ConfigValue;
 
-    my $AllActions = $Kernel::OM->Get('Kernel::System::JSON')->Decode(        
+    my $AllActions = $Kernel::OM->Get('JSON')->Decode(        
         Data => $ConfigValue
     );
 

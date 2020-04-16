@@ -132,14 +132,14 @@ sub ArticleCreate {
     my ( $Self, %Param ) = @_;
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     my $ValidID = $Param{ValidID} || 1;
     my $IncomingTime = $TimeObject->SystemTime();
 
     # create ArticleContentPath
     if ( !$Self->{ArticleContentPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleContentPath!'
         );
@@ -148,9 +148,9 @@ sub ArticleCreate {
 
     # lookups if no ids are passed
     if ( $Param{Channel} && !$Param{ChannelID} ) {
-        $Param{ChannelID} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $Param{Channel} );
+        $Param{ChannelID} = $Kernel::OM->Get('Channel')->ChannelLookup( Name => $Param{Channel} );
     } elsif ( !$Param{Channel} && $Param{ChannelID} ) {
-        $Param{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( ID => $Param{ChannelID} );
+        $Param{Channel} = $Kernel::OM->Get('Channel')->ChannelLookup( ID => $Param{ChannelID} );
     }
     if ( $Param{SenderType} && !$Param{SenderTypeID} ) {
         $Param{SenderTypeID} = $Self->ArticleSenderTypeLookup( SenderType => $Param{SenderType} );
@@ -161,7 +161,7 @@ sub ArticleCreate {
     # check needed stuff
     for (qw(TicketID UserID ChannelID SenderTypeID HistoryType HistoryComment)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -173,7 +173,7 @@ sub ArticleCreate {
     if ( !$Param{ContentType} ) {
         for (qw(Charset MimeType)) {
             if ( !$Param{$_} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $_!"
                 );
@@ -185,7 +185,7 @@ sub ArticleCreate {
     else {
         for (qw(ContentType)) {
             if ( !$Param{$_} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $_!"
                 );
@@ -219,7 +219,7 @@ sub ArticleCreate {
     );
 
     # TODO: replace placeholder in subject
-    # $Param{Subject} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+    # $Param{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
     #     RichText => 0,
     #     Text     => $Param{Subject},
     #     TicketID => $Param{TicketID},
@@ -231,7 +231,7 @@ sub ArticleCreate {
     # }
 
     # get html utils object
-    my $HTMLUtilsObject = $Kernel::OM->Get('Kernel::System::HTMLUtils');
+    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
     # add 'no body' if there is no body there!
     my @AttachmentConvert;
@@ -240,7 +240,7 @@ sub ArticleCreate {
     } else {
 
         # replace placeholders
-        $Param{Body} = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->ReplacePlaceHolder(
+        $Param{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
             RichText => $Param{MimeType} =~ m/text\/html/i ? 1 : 0,
             Text     => $Param{Body},
             TicketID => $Param{TicketID},
@@ -324,7 +324,7 @@ sub ArticleCreate {
         # check needed stuff
         for (qw(TicketID UserID From Body Charset MimeType)) {
             if ( !$Param{$_} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $_!"
                 );
@@ -344,14 +344,14 @@ sub ArticleCreate {
         $Param{HistoryType} = $Param{HistoryType} || 'SendAnswer';
 
         if ( !$Param{Channel} && !$Param{ChannelID} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need Channel or ChannelID!',
             );
             return;
         }
         if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Need SenderType or SenderTypeID!',
             );
@@ -374,15 +374,15 @@ sub ArticleCreate {
         }
 
         # check for base64 images in body and process them
-        $Kernel::OM->Get('Kernel::System::HTMLUtils')->EmbeddedImagesExtract(
+        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
             DocumentRef    => \$Param{Body},
             AttachmentsRef => $Param{Attachment},
         );
 
         # create MessageID
-        my $Time      = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+        my $Time      = $Kernel::OM->Get('Time')->SystemTime();
         my $Random    = rand 999999;
-        my $FQDN      = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+        my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
         $Param{MessageID} = "<$Time.$Random\@$FQDN>";
     } else {
         $Param{CustomerVisible} = (defined $Param{CustomerVisible} && $Param{CustomerVisible} ne '') ? $Param{CustomerVisible} : 0;
@@ -401,17 +401,17 @@ sub ArticleCreate {
 
     # calculate MD5 of Message ID
     if ( $Param{MessageID} ) {
-        $Param{MD5} = $Kernel::OM->Get('Kernel::System::Main')->MD5sum( String => $Param{MessageID} );
+        $Param{MD5} = $Kernel::OM->Get('Main')->MD5sum( String => $Param{MessageID} );
     }
 
     # get database object
-    my $RandomString = $Kernel::OM->Get('Kernel::System::Main')->GenerateRandomString(
+    my $RandomString = $Kernel::OM->Get('Main')->GenerateRandomString(
         Length => 32,
     );
     my $ArticleInsertFingerprint = $$ . '-' . $RandomString . '-' . ( $Param{MessageID} // '' );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # if the original article body contains just one pasted picture and no text, at this point of
     # the code the body is an empty string, Oracle databases will transform the empty string value
@@ -456,7 +456,7 @@ sub ArticleCreate {
 
     # return if there is not article created
     if ( !$ArticleID ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't get ArticleID from insert (TicketID=$Param{TicketID}, MessageID=$Param{MessageID})!",
         );
@@ -526,8 +526,8 @@ sub ArticleCreate {
     );
 
     # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-    my $UserObject   = $Kernel::OM->Get('Kernel::System::User');
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $UserObject   = $Kernel::OM->Get('User');
 
     # unlock ticket if the owner is away (and the feature is enabled)
     if (
@@ -546,7 +546,7 @@ sub ArticleCreate {
                 Lock     => 'unlock',
                 UserID   => $Param{UserID},
             );
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message =>
                     "Ticket [$OldTicketData{TicketNumber}] unlocked, current owner is out of office!",
@@ -566,7 +566,7 @@ sub ArticleCreate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$ArticleID,
@@ -577,7 +577,7 @@ sub ArticleCreate {
         $Param{SenderType} = $Self->ArticleSenderTypeLookup( SenderTypeID => $Param{SenderTypeID} );
     }
     if ( !$Param{Channel} ) {
-        $Param{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( ID => $Param{ChannelID} );
+        $Param{Channel} = $Kernel::OM->Get('Channel')->ChannelLookup( ID => $Param{ChannelID} );
     }
 
     # reset unlock time if customer sent an update
@@ -728,7 +728,7 @@ sub ArticleCreate {
     if ( $Param{Channel} eq 'email' && $Param{SenderType} eq 'agent' ) {
 
         # prepare body and charset
-        my $Body = $Kernel::OM->Get('Kernel::Output::HTML::Layout')->RichTextDocumentComplete(
+        my $Body = $Kernel::OM->Get('Output::HTML::Layout')->RichTextDocumentComplete(
             String => $Param{HTMLBody} || $Param{Body},
         );        
 
@@ -736,7 +736,7 @@ sub ArticleCreate {
         $Charset =~ s/plain/html/i;
 
         # send mail
-        my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Kernel::System::Email')->Send(
+        my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Email')->Send(
             'Message-ID' => $Param{MessageID},
             %Param,
             MimeType => 'text/html',
@@ -746,11 +746,11 @@ sub ArticleCreate {
 
         # return if no mail was able to send
         if ( !$HeadRef || !$BodyRef ) {
-            my $Error = $Kernel::OM->Get('Kernel::System::Log')->GetLogEntry(
+            my $Error = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error',
                 What => 'Message',
             );
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Message  => "Impossible to send message to: $Param{'To'} (Error: $Error).",
                 Priority => 'error',
             );
@@ -773,7 +773,7 @@ sub ArticleCreate {
             UserID    => $Param{UserID}
         );
         if ( !$Plain ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to write plain article for ArticleID $ArticleID.",
             );
@@ -781,7 +781,7 @@ sub ArticleCreate {
         }
 
         # log
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "Sent email to '$Param{ToOrig}' from '$Param{From}'. HistoryType => $Param{HistoryType}, Subject => $Param{Subject};",
         );
@@ -816,7 +816,7 @@ sub ArticleGetTicketIDOfMessageID {
 
     # check needed stuff
     if ( !$Param{MessageID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need MessageID!'
         );
@@ -835,7 +835,7 @@ sub ArticleGetTicketIDOfMessageID {
     return $TicketIDs[0] if $Count == 1;
 
     # more than one found! that should not be, a message_id should be unique!
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "The MessageID '$Param{MessageID}' is in your database "
             . "more than one time! That should not be, a message_id should be unique!",
@@ -858,16 +858,16 @@ sub ArticleGetTicketIDsOfMessageID {
 
     # check needed stuff
     if ( !$Param{MessageID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need MessageID!'
         );
         return;
     }
-    my $MD5 = $Kernel::OM->Get('Kernel::System::Main')->MD5sum( String => $Param{MessageID} );
+    my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Param{MessageID} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     return if !$DBObject->Prepare(
@@ -898,7 +898,7 @@ sub ArticleGetContentPath {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID!'
         );
@@ -909,14 +909,14 @@ sub ArticleGetContentPath {
     my $CacheKey = 'ArticleGetContentPath::' . $Param{ArticleID};
 
     # check cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     return if !$DBObject->Prepare(
@@ -930,7 +930,7 @@ sub ArticleGetContentPath {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -955,8 +955,8 @@ sub ArticleSenderTypeList {
     my ( $Self, %Param ) = @_;
 
     # get needed objects
-    my $DBObject    = $Kernel::OM->Get('Kernel::System::DB');
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::Valid');
+    my $DBObject    = $Kernel::OM->Get('DB');
+    my $ValidObject = $Kernel::OM->Get('Valid');
 
     return if !$DBObject->Prepare(
         SQL => "SELECT id, name FROM article_sender_type WHERE "
@@ -997,7 +997,7 @@ sub ArticleSenderTypeLookup {
 
     # check needed stuff
     if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SenderType or SenderTypeID!',
         );
@@ -1017,14 +1017,14 @@ sub ArticleSenderTypeLookup {
     }
 
     # check cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # get data
     if ( $Param{SenderType} ) {
@@ -1048,7 +1048,7 @@ sub ArticleSenderTypeLookup {
 
     # check if data exists
     if ( !$Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no SenderType(ID) for $Key!",
         );
@@ -1056,7 +1056,7 @@ sub ArticleSenderTypeLookup {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1083,7 +1083,7 @@ sub ArticleLastCustomerArticle {
 
     # check needed stuff
     if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TicketID!"
         );
@@ -1146,7 +1146,7 @@ sub ArticleFirstArticle {
 
     # check needed stuff
     if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TicketID!"
         );
@@ -1186,7 +1186,7 @@ sub ArticleIndex {
 
     # check needed stuff
     if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TicketID!'
         );
@@ -1207,7 +1207,7 @@ sub ArticleIndex {
     my $CacheKey = 'ArticleIndex::' . $Param{TicketID} . '::' . ( $Param{SenderType} || 'ALL' );
 
     if ($UseCache) {
-        my $Cached = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        my $Cached = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
@@ -1219,7 +1219,7 @@ sub ArticleIndex {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # db query
     if ( $Param{SenderType} && $Param{CustomerVisible} ) {
@@ -1262,7 +1262,7 @@ sub ArticleIndex {
     }
 
     if ($UseCache) {
-        $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => $CacheKey,
@@ -1352,7 +1352,7 @@ sub ArticleContentIndex {
     # check needed stuff
     for (qw(TicketID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1503,7 +1503,7 @@ sub ArticleGet {
 
     # check needed stuff
     if ( !$Param{ArticleID} && !$Param{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID or TicketID!'
         );
@@ -1513,18 +1513,18 @@ sub ArticleGet {
     my $FetchDynamicFields = $Param{DynamicFields} ? 1 : 0;
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # channel lookup
     my $ChannelSQL = '';
     if ( $Param{Channel} && ref $Param{Channel} eq 'ARRAY' ) {
         for ( @{ $Param{Channel} } ) {
-            if ( $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $_ ) ) {
+            if ( $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ) ) {
                 if ($ChannelSQL) {
                     $ChannelSQL .= ',';
                 }
                 $ChannelSQL .= $DBObject->Quote(
-                    $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup( Name => $_ ),
+                    $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ),
                     'Integer',
                 );
             }
@@ -1644,7 +1644,7 @@ sub ArticleGet {
     }
 
     # get time object
-    my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
     return if !$DBObject->Prepare(
         SQL   => $SQL,
@@ -1715,8 +1715,8 @@ sub ArticleGet {
     if ($FetchDynamicFields) {
 
         # get dynamic field objects
-        my $DynamicFieldObject        = $Kernel::OM->Get('Kernel::System::DynamicField');
-        my $DynamicFieldBackendObject = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+        my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
         my $DynamicFieldArticleList = $DynamicFieldObject->DynamicFieldListGet(
             ObjectType => 'Article'
@@ -1749,7 +1749,7 @@ sub ArticleGet {
 
         # Log an error only if a specific article was requested and there is no filter active.
         if ( $Param{ArticleID} && !$ChannelSQL && !$SenderTypeSQL ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such article for ArticleID ($Param{ArticleID})!",
             );
@@ -1772,7 +1772,7 @@ sub ArticleGet {
         );
 
         # get article type
-        $Part->{Channel} = $Kernel::OM->Get('Kernel::System::Channel')->ChannelLookup(
+        $Part->{Channel} = $Kernel::OM->Get('Channel')->ChannelLookup(
             ID => $Part->{ChannelID},
         );
 
@@ -1842,7 +1842,7 @@ sub ArticleCount {
 
     # check needed stuff
     if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TicketID!'
         );
@@ -1863,7 +1863,7 @@ sub ArticleCount {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( defined $Param{UpToArticleID} ) {
 
@@ -1921,7 +1921,7 @@ sub ArticlePage {
 
     for my $Needed (qw(ArticleID TicketID RowsPerPage)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1950,7 +1950,7 @@ sub _ArticleGetId {
     # check needed stuff
     for (qw(TicketID MessageID From Subject IncomingTime)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1977,7 +1977,7 @@ sub _ArticleGetId {
     push @Bind, \$Param{IncomingTime};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # start query
     return if !$DBObject->Prepare(
@@ -2029,7 +2029,7 @@ sub ArticleUpdate {
     # check needed stuff
     for (qw(ArticleID UserID Key TicketID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2039,7 +2039,7 @@ sub ArticleUpdate {
 
     # check needed stuff
     if ( !defined $Param{Value} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Value!'
         );
@@ -2067,7 +2067,7 @@ sub ArticleUpdate {
     );
 
     # db update
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => "UPDATE article SET $Map{$Param{Key}} = ?, "
             . "change_time = current_timestamp, change_by = ? WHERE id = ?",
         Bind => [ \$Param{Value}, \$Param{UserID}, \$Param{ArticleID} ],
@@ -2086,7 +2086,7 @@ sub ArticleUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
@@ -2118,7 +2118,7 @@ sub ArticleBounce {
     # check needed stuff
     for (qw(TicketID ArticleID From To UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2127,15 +2127,15 @@ sub ArticleBounce {
     }
 
     # create message id
-    my $Time         = $Kernel::OM->Get('Kernel::System::Time')->SystemTime();
+    my $Time         = $Kernel::OM->Get('Time')->SystemTime();
     my $Random       = rand 999999;
-    my $FQDN         = $Kernel::OM->Get('Kernel::Config')->Get('FQDN');
+    my $FQDN         = $Kernel::OM->Get('Config')->Get('FQDN');
     my $NewMessageID = "<$Time.$Random.0\@$FQDN>";
     my $Email        = $Self->ArticlePlain( ArticleID => $Param{ArticleID} );
 
     # check if plain email exists
     if ( !$Email ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such plain article for ArticleID ($Param{ArticleID})!",
         );
@@ -2143,7 +2143,7 @@ sub ArticleBounce {
     }
 
     # pipe all into sendmail
-    return if !$Kernel::OM->Get('Kernel::System::Email')->Bounce(
+    return if !$Kernel::OM->Get('Email')->Bounce(
         'Message-ID' => $NewMessageID,
         From         => $Param{From},
         To           => $Param{To},
@@ -2171,7 +2171,7 @@ sub ArticleBounce {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
@@ -2206,7 +2206,7 @@ sub SendAutoResponse {
     # check needed stuff
     for (qw(TicketID UserID OrigHeader AutoResponseType)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2227,7 +2227,7 @@ sub SendAutoResponse {
     );
 
     # get auto default responses
-    my %AutoResponse = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->AutoResponse(
+    my %AutoResponse = $Kernel::OM->Get('TemplateGenerator')->AutoResponse(
         TicketID         => $Param{TicketID},
         AutoResponseType => $Param{AutoResponseType},
         OrigHeader       => $Param{OrigHeader},
@@ -2240,7 +2240,7 @@ sub SendAutoResponse {
     return if !$AutoResponse{SenderAddress};
 
     # send if notification should be sent (not for closed tickets)!?
-    my %State = $Kernel::OM->Get('Kernel::System::State')->StateGet( ID => $Ticket{StateID} );
+    my %State = $Kernel::OM->Get('State')->StateGet( ID => $Ticket{StateID} );
     if (
         $Param{AutoResponseType} eq 'auto reply'
         && ( $State{TypeName} eq 'closed' || $State{TypeName} eq 'removed' )
@@ -2271,7 +2271,7 @@ sub SendAutoResponse {
                 . "an auto-response (e. g. loop or precedence header)",
             CreateUserID => $Param{UserID},
         );
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "Sent no '$Param{AutoResponseType}' for Ticket ["
                 . "$Ticket{TicketNumber}] ($OrigHeader{From}) because the "
@@ -2286,7 +2286,7 @@ sub SendAutoResponse {
     }
 
     # get loop protection object
-    my $LoopProtectionObject = $Kernel::OM->Get('Kernel::System::PostMaster::LoopProtection');
+    my $LoopProtectionObject = $Kernel::OM->Get('PostMaster::LoopProtection');
 
     # create email parser object
     my $EmailParser = Kernel::System::EmailParser->new(
@@ -2309,7 +2309,7 @@ sub SendAutoResponse {
             );
 
             # log
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Sent no auto response to '$Address' because of invalid address.",
             );
@@ -2327,7 +2327,7 @@ sub SendAutoResponse {
             );
 
             # log
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Sent no '$Param{AutoResponseType}' for Ticket ["
                     . "$Ticket{TicketNumber}] ($Email) because of loop protection."
@@ -2341,7 +2341,7 @@ sub SendAutoResponse {
         }
 
         # check if sender is e. g. MAILER-DAEMON or Postmaster
-        my $NoAutoRegExp = $Kernel::OM->Get('Kernel::Config')->Get('SendNoAutoResponseRegExp');
+        my $NoAutoRegExp = $Kernel::OM->Get('Config')->Get('SendNoAutoResponseRegExp');
         if ( $Email =~ /$NoAutoRegExp/i ) {
 
             # add it to ticket history
@@ -2353,7 +2353,7 @@ sub SendAutoResponse {
             );
 
             # log
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'info',
                 Message  => "Sent no auto response to '$Email' because config"
                     . " option SendNoAutoResponseRegExp (/$NoAutoRegExp/i) matched.",
@@ -2370,7 +2370,7 @@ sub SendAutoResponse {
     # also send CC to customer user if customer user id is used and addresses do not match
     if ( $Ticket{ContactID} ) {
 
-        my %Contact = $Kernel::OM->Get('Kernel::System::Contact')->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $Ticket{ContactID},
         );
 
@@ -2404,7 +2404,7 @@ sub SendAutoResponse {
     }
 
     if ( !@AutoReplyAddresses && !$Cc ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => "No auto response addresses for Ticket [$Ticket{TicketNumber}]"
                 . " (TicketID=$Param{TicketID})."
@@ -2432,7 +2432,7 @@ sub SendAutoResponse {
     );
 
     # log
-    $Kernel::OM->Get('Kernel::System::Log')->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message  => "Sent auto response ($HistoryType) for Ticket [$Ticket{TicketNumber}]"
             . " (TicketID=$Param{TicketID}, ArticleID=$ArticleID) to '$AutoReplyAddresses'."
@@ -2472,7 +2472,7 @@ sub ArticleFlagSet {
     # check needed stuff
     for (qw(ArticleID Key Value UserID)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2486,7 +2486,7 @@ sub ArticleFlagSet {
     return 1 if defined $Flag{ $Param{Key} } && $Flag{ $Param{Key} } eq $Param{Value};
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # set flag
     return if !$DBObject->Do(
@@ -2523,7 +2523,7 @@ sub ArticleFlagSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article.Flag',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
@@ -2559,7 +2559,7 @@ sub ArticleFlagDelete {
     # check needed stuff
     for (qw(ArticleID Key)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2569,7 +2569,7 @@ sub ArticleFlagDelete {
 
     if ( !$Param{AllUsers} && !$Param{UserID} ) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need AllUsers or UserID!"
             );
@@ -2583,7 +2583,7 @@ sub ArticleFlagDelete {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{AllUsers} ) {
         return if !$DBObject->Do(
@@ -2624,7 +2624,7 @@ sub ArticleFlagDelete {
     }
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Flag',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
@@ -2650,7 +2650,7 @@ sub ArticleFlagGet {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2659,7 +2659,7 @@ sub ArticleFlagGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     return if !$DBObject->Prepare(
@@ -2704,7 +2704,7 @@ sub ArticleFlagsOfTicketGet {
     # check needed stuff
     for (qw(TicketID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -2713,7 +2713,7 @@ sub ArticleFlagsOfTicketGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
     return if !$DBObject->Prepare(
@@ -2750,7 +2750,7 @@ sub ArticleAccountedTimeGet {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID!'
         );
@@ -2758,7 +2758,7 @@ sub ArticleAccountedTimeGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # db query
     return if !$DBObject->Prepare(
@@ -2790,7 +2790,7 @@ sub ArticleAccountedTimeDelete {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID!'
         );
@@ -2798,7 +2798,7 @@ sub ArticleAccountedTimeDelete {
     }
 
     # db query
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM time_accounting WHERE article_id = ?',
         Bind => [ \$Param{ArticleID} ],
     );
@@ -2809,7 +2809,7 @@ sub ArticleAccountedTimeDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.AccountedTime',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -2978,7 +2978,7 @@ sub ArticleAttachmentIndex {
     # check needed stuff
     for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -3121,7 +3121,7 @@ sub ArticleExists {
 
     # check needed stuff
     if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ArticleID!'
         );
@@ -3129,7 +3129,7 @@ sub ArticleExists {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # db query
     return if !$DBObject->Prepare(
@@ -3152,7 +3152,7 @@ sub _HandleCustomerVisible {
     # check needed stuff
     for (qw(Ticket Article)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_"
             );
@@ -3184,7 +3184,7 @@ sub _HandleCustomerVisible {
     return 0 if (!scalar keys %ReceiverMailAddresses);
 
     # get mail addresses of contacts of organisation
-    my %ContactList = $Kernel::OM->Get('Kernel::System::Contact')->ContactSearch(
+    my %ContactList = $Kernel::OM->Get('Contact')->ContactSearch(
         OrganisationID => $Param{Ticket}->{OrganisationID},
         Valid          => 0
     );

@@ -19,8 +19,8 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::ProcessManagement::TransitionAction::Base);
 
 our @ObjectDependencies = (
-    'Kernel::System::Log',
-    'Kernel::System::Ticket',
+    'Log',
+    'Ticket',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $TicketQueueSetObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::TransitionAction::TicketQueueSet');
+    my $TicketQueueSetObject = $Kernel::OM->Get('ProcessManagement::TransitionAction::TicketQueueSet');
 
 =cut
 
@@ -107,7 +107,7 @@ sub Run {
     $Self->_ReplaceTicketAttributes(%Param);
 
     if ( !$Param{Config}->{QueueID} && !$Param{Config}->{Queue} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage . "No Queue or QueueID configured!",
         );
@@ -121,7 +121,7 @@ sub Run {
         && $Param{Config}->{Queue} ne $Param{Ticket}->{Queue}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketQueueSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketQueueSet(
             Queue    => $Param{Config}->{Queue},
             TicketID => $Param{Ticket}->{TicketID},
             UserID   => $Param{UserID},
@@ -132,7 +132,7 @@ sub Run {
         && $Param{Config}->{QueueID} ne $Param{Ticket}->{QueueID}
         )
     {
-        $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketQueueSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketQueueSet(
             QueueID  => $Param{Config}->{QueueID},
             TicketID => $Param{Ticket}->{TicketID},
             UserID   => $Param{UserID},
@@ -152,7 +152,7 @@ sub Run {
         else {
             $CustomMessage = "QueueID: $Param{Config}->{QueueID},";
         }
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $CommonMessage
                 . 'Ticket queue could not be updated to '

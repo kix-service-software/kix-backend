@@ -15,17 +15,17 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
-my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase  => 1,
         UseTmpArticleDir => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 my $UserID = 1;
 
 my @Tests = (
@@ -422,17 +422,17 @@ for my $Backend (qw(DB FS)) {
     for my $Test (@Tests) {
 
         # Make sure that the TicketObject gets recreated for each loop.
-        $Kernel::OM->ObjectsDiscard( Objects => ['Kernel::System::Ticket'] );
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',
-            Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
+            Value => 'Ticket::ArticleStorage' . $Backend,
         );
 
-        my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+        my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $Self->True(
-            $TicketObject->isa( 'Kernel::System::Ticket::ArticleStorage' . $Backend ),
+            $TicketObject->isa( 'Ticket::ArticleStorage' . $Backend ),
             "TicketObject loaded the correct backend",
         );
 

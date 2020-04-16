@@ -16,17 +16,17 @@ use vars (qw($Self));
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
-    'Kernel::System::UnitTest::Helper' => {
+    'UnitTest::Helper' => {
         RestoreDatabase => 1,
     },
 );
-my $Helper = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get needed object
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Ticket::Delete');
-my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::Delete');
+my $TicketObject  = $Kernel::OM->Get('Ticket');
 
-$Kernel::OM->Get('Kernel::System::Cache')->Configure(
+$Kernel::OM->Get('Cache')->Configure(
     CacheInMemory => 0,
 );
 
@@ -36,7 +36,7 @@ my $ContactID = $Helper->TestContactCreate();
 my @Tickets;
 for ( 1 .. 4 ) {
     my $TicketNumber = $TicketObject->TicketCreateNumber();
-    my $TicketID = $Kernel::OM->Get('Kernel::System::Ticket')->TicketCreate(
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
         TN        => $TicketNumber,
         Title     => 'Test ticket',
         Queue     => 'Junk',

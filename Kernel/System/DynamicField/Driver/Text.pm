@@ -18,9 +18,9 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseText);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DynamicFieldValue',
-    'Kernel::System::Main',
+    'Config',
+    'DynamicFieldValue',
+    'Main',
 );
 
 =head1 NAME
@@ -64,7 +64,7 @@ sub new {
 
     # get the Dynamic Field Backend custom extensions
     my $DynamicFieldDriverExtensions
-        = $Kernel::OM->Get('Kernel::Config')->Get('DynamicFields::Extension::Driver::Text');
+        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::Text');
 
     EXTENSION:
     for my $ExtensionKey ( sort keys %{$DynamicFieldDriverExtensions} ) {
@@ -80,7 +80,7 @@ sub new {
 
             # check if module can be loaded
             if (
-                !$Kernel::OM->Get('Kernel::System::Main')->RequireBaseClass( $Extension->{Module} )
+                !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
                 )
             {
                 die "Can't load dynamic fields backend module"

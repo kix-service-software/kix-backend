@@ -15,7 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+my $ConfigObject = $Kernel::OM->Get('Config');
 
 # set time zone to get correct references
 $ENV{TZ} = 'Europe/Berlin';
@@ -30,7 +30,7 @@ $ConfigObject->Set(
     Value => 'Europe/Berlin',
 );
 
-my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+my $TimeObject = $Kernel::OM->Get('Time');
 
 my $SystemTime = $TimeObject->TimeStamp2SystemTime( String => '2005-10-20T10:00:00Z' );
 $Self->Is(

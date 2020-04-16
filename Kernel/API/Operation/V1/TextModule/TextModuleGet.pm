@@ -59,7 +59,7 @@ sub new {
     }
 
     # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::TextModule::TextModuleGet');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TextModule::TextModuleGet');
 
     return $Self;
 }
@@ -131,7 +131,7 @@ sub Run {
     foreach my $TextModuleID ( @{$Param{Data}->{TextModuleID}} ) {
 
         # get the TextModule data
-        my %TextModuleData = $Kernel::OM->Get('Kernel::System::TextModule')->TextModuleGet(
+        my %TextModuleData = $Kernel::OM->Get('TextModule')->TextModuleGet(
             ID => $TextModuleID,
         );
 

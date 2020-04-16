@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::I18n::TranslationPatternUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::I18n::TranslationPatternUpdate');
 
     return $Self;
 }
@@ -130,7 +130,7 @@ sub Run {
     );
 
     # check if pattern exists
-    my %PatternData = $Kernel::OM->Get('Kernel::System::Translation')->PatternGet(
+    my %PatternData = $Kernel::OM->Get('Translation')->PatternGet(
         ID     => $Param{Data}->{PatternID},
     );
     if ( !%PatternData ) {
@@ -141,7 +141,7 @@ sub Run {
 
     # check if pattern already exists
     if ( IsStringWithData($TranslationPattern->{Value}) ) {
-        my $PatternID = $Kernel::OM->Get('Kernel::System::Translation')->PatternExistsCheck(
+        my $PatternID = $Kernel::OM->Get('Translation')->PatternExistsCheck(
             Value => $TranslationPattern->{Value},
         );
         if ( $PatternID && $PatternID != $Param{Data}->{PatternID} ) {        
@@ -152,7 +152,7 @@ sub Run {
     }
 
     # update Translation
-    my $Success = $Kernel::OM->Get('Kernel::System::Translation')->PatternUpdate(
+    my $Success = $Kernel::OM->Get('Translation')->PatternUpdate(
         ID     => $Param{Data}->{PatternID},
         Value  => $TranslationPattern->{Value} || $PatternData{Value},
         UserID => $Self->{Authorization}->{UserID}

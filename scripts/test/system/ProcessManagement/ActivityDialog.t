@@ -17,11 +17,11 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject         = $Kernel::OM->Get('Kernel::Config');
-my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::ActivityDialog');
+my $ConfigObject         = $Kernel::OM->Get('Config');
+my $ActivityDialogObject = $Kernel::OM->Get('ProcessManagement::ActivityDialog');
 
 # define needed variables
-my $RandomID = $Kernel::OM->Get('Kernel::System::UnitTest::Helper')->GetRandomID();
+my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
 # ActivityDialogGet() tests
 my @Tests = (

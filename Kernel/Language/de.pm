@@ -3582,9 +3582,9 @@ sub Data {
         'Need SourceObject and SourceKey!' => 'Benötige SourceObject und SourceKey!',
         'Please contact the admin.' => 'Bitte kontaktieren Sie einen Administrator.',
         'You need ro permission!' => 'Sie benötigen die ro-Berechtigung!',
-        'Can not delete link with %s!' => 'Kann Link mit %s nicht entfernen.',
-        'Can not create link with %s! Object already linked as %s.' => 'Kann Verknüpfung zu %s nicht erstellen! Objekt bereits verknüpft als %s.',
-        'Can not create link with %s!' => 'Kann Link mit %s nicht erstellen.',
+        'Cannot delete link with %s!' => 'Kann Link mit %s nicht entfernen.',
+        'Cannot create link with %s! Object already linked as %s.' => 'Kann Verknüpfung zu %s nicht erstellen! Objekt bereits verknüpft als %s.',
+        'Cannot create link with %s!' => 'Kann Link mit %s nicht erstellen.',
         'The object %s cannot link with other object!' => 'Objekt %s kann nicht mit anderen Objekten verknüpft werden!',
 
         # Perl Module: Kernel/Modules/AgentPreferences.pm
@@ -3629,7 +3629,7 @@ sub Data {
         'Ticket is locked by another agent and will be ignored!' => 'Ticket ist von einem anderen Agenten gesperrt und wird ignoriert!',
 
         # Perl Module: Kernel/Modules/AgentTicketCompose.pm
-        'Can not determine the ArticleType!' => 'Konnte Artikel-Typ nicht bestimmen!',
+        'Cannot determine the ArticleType!' => 'Konnte Artikel-Typ nicht bestimmen!',
 
         # Perl Module: Kernel/Modules/AgentTicketEmail.pm
         'No Subaction!' => 'Keine Subaktion!',

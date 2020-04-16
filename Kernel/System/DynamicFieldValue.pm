@@ -16,11 +16,11 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::Cache',
-    'Kernel::System::DB',
-    'Kernel::System::Log',
-    'Kernel::System::Time',
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'Time',
 );
 
 =head1 NAME
@@ -43,7 +43,7 @@ create a DynamicFieldValue object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
+    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
 =cut
 
@@ -86,7 +86,7 @@ sub ValueSet {
     # check needed stuff
     for my $Needed (qw(FieldID ObjectID Value)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -97,7 +97,7 @@ sub ValueSet {
     # return if no Value was provided
     if ( ref $Param{Value} ne 'ARRAY' || !$Param{Value}->[0] )
     {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Param{Value}!"
         );
@@ -160,7 +160,7 @@ sub ValueSet {
     );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     for my $Value (@Values) {
 
@@ -180,7 +180,7 @@ sub ValueSet {
     $Self->_DeleteFromCache(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
@@ -217,7 +217,7 @@ sub ValueGet {
     # check needed stuff
     for my $Needed (qw(FieldID ObjectID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -226,7 +226,7 @@ sub ValueGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     #
     # Special caching strategy: cache all fields of an object in one cache file.
@@ -250,7 +250,7 @@ sub ValueGet {
     }
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     # We'll populate cache with all object's dynamic fields to reduce
     # number of db accesses (only one db query for all dynamic fields till
@@ -286,7 +286,7 @@ sub ValueGet {
     }
 
     # get the cache TTL (in seconds)
-    my $CacheTTL = $Kernel::OM->Get('Kernel::Config')->Get('DynamicField::CacheTTL') || 60 * 60 * 12;
+    my $CacheTTL = $Kernel::OM->Get('Config')->Get('DynamicField::CacheTTL') || 60 * 60 * 12;
 
     # set cache
     $CacheObject->Set(
@@ -324,7 +324,7 @@ sub ValueDelete {
     # check needed stuff
     for my $Needed (qw(FieldID ObjectID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -333,7 +333,7 @@ sub ValueDelete {
     }
 
     # delete dynamic field value
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM dynamic_field_value WHERE field_id = ? AND object_id = ?',
         Bind => [ \$Param{FieldID}, \$Param{ObjectID} ],
     );
@@ -342,7 +342,7 @@ sub ValueDelete {
     $Self->_DeleteFromCache(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
@@ -370,7 +370,7 @@ sub AllValuesDelete {
     # check needed stuff
     for my $Needed (qw(FieldID UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -379,18 +379,18 @@ sub AllValuesDelete {
     }
 
     # delete dynamic field value
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM dynamic_field_value WHERE field_id = ?',
         Bind => [ \$Param{FieldID} ],
     );
 
     # Cleanup entire cache!
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'DynamicFieldValue',
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID},
@@ -425,7 +425,7 @@ sub ValueValidate {
     if ( $Value{ValueDateTime} ) {
 
         # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
+        my $TimeObject = $Kernel::OM->Get('Time');
 
         # convert the DateTime value to system time to check errors
         my $SystemTime = $TimeObject->TimeStamp2SystemTime(
@@ -449,7 +449,7 @@ sub ValueValidate {
     if ( $Value{ValueInt} ) {
 
         if ( $Value{ValueInt} !~ m{\A  -? \d+ \z}smx ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid Integer '$Value{ValueInt}'!"
             );
@@ -486,7 +486,7 @@ sub HistoricalValueGet {
     # check needed stuff
     for my $Needed (qw(FieldID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -503,7 +503,7 @@ sub HistoricalValueGet {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # check cache
     my $CacheKey = join '::', 'HistoricalValueGet::FieldID', $Param{FieldID}, 'ValueType',
@@ -518,7 +518,7 @@ sub HistoricalValueGet {
     return $Cache if ($Cache);
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
         SQL =>
@@ -548,7 +548,7 @@ sub HistoricalValueGet {
     }
 
     # get the cache TTL (in seconds)
-    my $CacheTTL = $Kernel::OM->Get('Kernel::Config')->Get('DynamicField::CacheTTL') || 60 * 60 * 12;
+    my $CacheTTL = $Kernel::OM->Get('Config')->Get('DynamicField::CacheTTL') || 60 * 60 * 12;
 
     # set cache
     $CacheObject->Set(
@@ -571,7 +571,7 @@ sub _DeleteFromCache {
     # check needed stuff
     for my $Needed (qw(FieldID ObjectID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -580,7 +580,7 @@ sub _DeleteFromCache {
     }
 
     # get cache object
-    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # Clear ValueGet cache
     $CacheObject->Delete(

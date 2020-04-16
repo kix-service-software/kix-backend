@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-11 13:20+0000\n"
-"PO-Revision-Date: 2019-12-12 12:02+0000\n"
-"Last-Translator: fwichmann <Felix.Wichmann@cape-it.de>\n"
+"POT-Creation-Date: 2020-03-26 15:02+0000\n"
+"PO-Revision-Date: 2020-03-12 15:24+0000\n"
+"Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
 "Language: de\n"
@@ -14,26 +14,25 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 3.9.1\n"
 
-# ticket priority
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "1 very low"
-msgstr "1 sehr niedrig"
+msgid "1 very high"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "2 low"
-msgstr "2 niedrig"
+msgid "2 high"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "3 normal"
 msgstr "3 normal"
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "4 high"
-msgstr "4 hoch"
+msgid "4 low"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "5 very high"
-msgstr "5 sehr hoch"
+msgid "5 very low"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Admin Tool"
@@ -41,7 +40,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Affected Asset"
-msgstr ""
+msgstr "Betroffenes Asset"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - FUP Notification (if locked)"
@@ -2638,14 +2637,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Create Article"
-msgstr "Artikel erstellen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Create Ticket"
-msgstr "Ticket erstellen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Date"
 msgstr ""
 
@@ -3450,10 +3441,6 @@ msgid ""
 "blacklist values can be separated by ;. Split multiple ticket data "
 "restrictions by |||."
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Delete Ticket"
-msgstr "Ticket löschen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Delete expired cache from core modules."
@@ -4454,18 +4441,6 @@ msgid "Registration of a execution plan type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a job type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a macro action type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a macro type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a supported permission of type PropertyValue."
 msgstr ""
 
@@ -4597,54 +4572,10 @@ msgid "Service view - show all tickets"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Contact"
-msgstr "Kontakt setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Dynamic Field"
-msgstr "Dynamisches Feld setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Set Dynamic Field, which contains allocation for system monitoring "
 "acknowledge."
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Lock"
-msgstr "Sperrstatus setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Organisation"
-msgstr "Kunde setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Owner"
-msgstr "Bearbeiter setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Priority"
-msgstr "Priorität setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Responsible"
-msgstr "Verantwortlichen setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set State"
-msgstr "Status setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Team"
-msgstr "Team setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Title"
-msgstr "Titel setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Type"
-msgstr "Typ setzen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4950,6 +4881,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Sunday"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Synchronisation"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -5881,6 +5816,14 @@ msgid "Create"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Create Article"
+msgstr "Artikel erstellen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Create Ticket"
+msgstr "Ticket erstellen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Create link between ticket and config item on DynamicFieldUpdate (This event "
 "only create links, links can only be deleted manually)."
@@ -6190,6 +6133,10 @@ msgid ""
 "Defines, which tickets of which ticket state types should not be listed in "
 "linked ticket lists."
 msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Deleted link to ticket \"%s\"."
@@ -6802,6 +6749,18 @@ msgid "Refresh interval"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Registration of a job type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Registration of a macro action type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Registration of a macro type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Removed subscription for user \"%s\"."
 msgstr ""
 
@@ -6898,6 +6857,50 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Service"
 msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Contact"
+msgstr "Kontakt setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Dynamic Field"
+msgstr "Dynamisches Feld setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Lock"
+msgstr "Sperrstatus setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Organisation"
+msgstr "Kunde setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Owner"
+msgstr "Bearbeiter setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Priority"
+msgstr "Priorität setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Responsible"
+msgstr "Verantwortlichen setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set State"
+msgstr "Status setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Team"
+msgstr "Team setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Title"
+msgstr "Titel setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set Type"
+msgstr "Typ setzen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -7627,6 +7630,19 @@ msgstr "nein"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+# ticket priority
+#~ msgid "1 very low"
+#~ msgstr "1 sehr niedrig"
+
+#~ msgid "2 low"
+#~ msgstr "2 niedrig"
+
+#~ msgid "4 high"
+#~ msgstr "4 hoch"
+
+#~ msgid "5 very high"
+#~ msgstr "5 sehr hoch"
 
 #~ msgid "ServiceRequest"
 #~ msgstr "Serviceanfrage"

@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Kernel::System::Token',
+    'Token',
 );
 
 sub Configure {
@@ -52,10 +52,10 @@ sub Run {
     }
 
     if ($All) {
-        my $Result = $Kernel::OM->Get('Kernel::System::Token')->CleanUp();
+        my $Result = $Kernel::OM->Get('Token')->CleanUp();
     }
     elsif ($Token) {
-        my $Result = $Kernel::OM->Get('Kernel::System::Token')->RemoveToken(
+        my $Result = $Kernel::OM->Get('Token')->RemoveToken(
             Token => $Token,
         );        
     }

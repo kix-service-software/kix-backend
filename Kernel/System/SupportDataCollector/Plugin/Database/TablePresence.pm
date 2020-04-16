@@ -18,10 +18,10 @@ use base qw(Kernel::System::SupportDataCollector::PluginBase);
 use Kernel::Language qw(Translatable);
 
 our @ObjectDependencies = (
-    'Kernel::Config',
-    'Kernel::System::DB',
-    'Kernel::System::Main',
-    'Kernel::System::XML',
+    'Config',
+    'DB',
+    'Main',
+    'XML',
 );
 
 sub GetDisplayPath {
@@ -32,7 +32,7 @@ sub Run {
     my $Self = shift;
 
     # table check
-    my $File = $Kernel::OM->Get('Kernel::Config')->Get('Home') . '/scripts/database/kix-schema.xml';
+    my $File = $Kernel::OM->Get('Config')->Get('Home') . '/scripts/database/kix-schema.xml';
     if ( !-f $File ) {
         $Self->AddResultProblem(
             Label   => Translatable('Table Presence'),
@@ -41,7 +41,7 @@ sub Run {
         );
     }
 
-    my $ContentRef = $Kernel::OM->Get('Kernel::System::Main')->FileRead(
+    my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
         Location => $File,
         Mode     => 'utf8',
     );
@@ -53,10 +53,10 @@ sub Run {
         );
     }
 
-    my @XMLHash = $Kernel::OM->Get('Kernel::System::XML')->XMLParse2XMLHash( String => ${$ContentRef} );
+    my @XMLHash = $Kernel::OM->Get('XML')->XMLParse2XMLHash( String => ${$ContentRef} );
 
     # get database object
-    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+    my $DBObject = $Kernel::OM->Get('DB');
 
     my @MissingTables;
     TABLE:

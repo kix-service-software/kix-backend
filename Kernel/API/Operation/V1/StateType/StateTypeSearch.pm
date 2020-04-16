@@ -85,7 +85,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform StateType search
-    my %StateTypeList = $Kernel::OM->Get('Kernel::System::State')->StateTypeList(
+    my %StateTypeList = $Kernel::OM->Get('State')->StateTypeList(
         UserID => $Self->{Authorization}->{UserID},
         Valid => 1,
     );

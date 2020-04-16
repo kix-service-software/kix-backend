@@ -16,9 +16,9 @@ use Kernel::System::Time;
 use Kernel::System::ObjectManager;
 
 $Self->Is(
-    $Kernel::OM->Get('Kernel::System::UnitTest'),
+    $Kernel::OM->Get('UnitTest'),
     $Self,
-    "Global OM returns $Self as 'Kernel::System::UnitTest'",
+    "Global OM returns $Self as 'UnitTest'",
 );
 
 local $Kernel::OM = Kernel::System::ObjectManager->new();
@@ -26,15 +26,15 @@ local $Kernel::OM = Kernel::System::ObjectManager->new();
 $Self->True( $Kernel::OM, 'Could build object manager' );
 
 $Self->False(
-    exists $Kernel::OM->{Objects}->{'Kernel::System::Time'},
-    'Kernel::System::Time was not loaded yet',
+    exists $Kernel::OM->{Objects}->{'Time'},
+    'Time was not loaded yet',
 );
 
 my $TimeObject = Kernel::System::Time->new();
 
 $Self->True(
     $Kernel::OM->ObjectInstanceRegister(
-        Package      => 'Kernel::System::Time',
+        Package      => 'Time',
         Object       => $TimeObject,
         Dependencies => [],
     ),
@@ -42,7 +42,7 @@ $Self->True(
 );
 
 $Self->Is(
-    $Kernel::OM->Get('Kernel::System::Time'),
+    $Kernel::OM->Get('Time'),
     $TimeObject,
     "OM returns the original TimeObject",
 );
@@ -55,7 +55,7 @@ $Self->True(
 );
 
 $Self->IsNot(
-    $Kernel::OM->Get('Kernel::System::Time'),
+    $Kernel::OM->Get('Time'),
     $TimeObject,
     "OM returns its own TimeObject",
 );

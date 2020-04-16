@@ -56,7 +56,7 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-    $Self->{Config} = $Kernel::OM->Get('Kernel::Config')->Get('API::Operation::V1::SysConfigOptionDefinitionUpdate');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::SysConfigOptionDefinitionUpdate');
 
     return $Self;
 }
@@ -80,7 +80,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my @SupportedTypes = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionTypeList();
+    my @SupportedTypes = $Kernel::OM->Get('SysConfig')->OptionTypeList();
 
     return {
         'Option' => {
@@ -142,7 +142,7 @@ sub Run {
     );
 
     # check if SysConfigOptionDefinition exists
-    my $Exists = $Kernel::OM->Get('Kernel::System::SysConfig')->Exists(
+    my $Exists = $Kernel::OM->Get('SysConfig')->Exists(
         Name => $Param{Data}->{Option},
     );
     
@@ -153,12 +153,12 @@ sub Run {
     }
 
     # get SysConfigOptionDefinition
-    my %OptionData = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionGet(
+    my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
         Name => $Param{Data}->{Option},
     );
 
     # update SysConfigOptionDefinition
-    my $Success = $Kernel::OM->Get('Kernel::System::SysConfig')->OptionUpdate(
+    my $Success = $Kernel::OM->Get('SysConfig')->OptionUpdate(
         %OptionData,
         %{$SysConfigOptionDefinition},
         Name   => $Param{Data}->{Option},

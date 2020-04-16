@@ -115,7 +115,7 @@ sub Run {
     foreach my $PermissionID ( @{$Param{Data}->{PermissionID}} ) {
 
         # check if permission exists and belongs to this role    
-        my %Permission = $Kernel::OM->Get('Kernel::System::Role')->PermissionGet(
+        my %Permission = $Kernel::OM->Get('Role')->PermissionGet(
             ID => $PermissionID,
         );
    
@@ -126,7 +126,7 @@ sub Run {
         }
 
         # delete permission	    
-        my $Success = $Kernel::OM->Get('Kernel::System::Role')->PermissionDelete(
+        my $Success = $Kernel::OM->Get('Role')->PermissionDelete(
             ID  => $PermissionID,
         );
 

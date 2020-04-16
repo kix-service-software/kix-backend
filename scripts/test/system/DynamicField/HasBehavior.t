@@ -293,7 +293,7 @@ for my $Test (@Tests) {
         }
 
         # call HasBehavior for each test for each known behavior
-        my $Success = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->HasBehavior(%Config);
+        my $Success = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(%Config);
 
         # if the test is a success then check the expected results with true
         if ($Success) {
