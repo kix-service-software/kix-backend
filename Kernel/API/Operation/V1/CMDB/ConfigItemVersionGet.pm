@@ -251,7 +251,7 @@ sub _PrepareData {
 
         # don't look at details if we don't have any value for this
         next if !$Data->{$ItemKey};
-        
+
         # ignore attribute if user is logged in as Customer and attribute should not be visible
         next if IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer' && !$DefItem->{CustomerVisible};
 
@@ -372,7 +372,7 @@ sub _GetDisplayValue {
         my $Module = 'ITSMConfigItem::XML::Type::'.$Param{Item}->{Input}->{Type};
         my $Object = $Kernel::OM->Get($Module);
 
-        if (ref $Object ne $Module) {
+        if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
             return;
         }
         $Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}} = $Object;
