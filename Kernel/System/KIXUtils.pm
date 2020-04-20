@@ -176,12 +176,6 @@ sub GetRegisteredCustomPackages {
         }
         close($FH);
     }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "KIX-Install: could not read <$KIXPackageFile> - using empty hash.",
-        );
-    }
 
     if ( $Param{Result} && $Param{Result} eq 'ARRAY' ) {
         my @Result = qw{};

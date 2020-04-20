@@ -11,9 +11,9 @@ use strict;
 use warnings;
 
 use File::Basename;
-use FindBin qw($RealBin);
-use lib dirname($RealBin).'/../../';
-use lib dirname($RealBin).'/../../Kernel/cpan-lib';
+use FindBin qw($Bin);
+use lib dirname($Bin).'/';
+use lib dirname($Bin).'/Kernel/cpan-lib';
 
 use Getopt::Std;
 use File::Path qw(mkpath);

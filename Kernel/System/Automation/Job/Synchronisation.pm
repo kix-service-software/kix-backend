@@ -65,7 +65,7 @@ sub Run {
     }
 
     # return dummy value to make sure the macros will be executed
-    return ('AnyObject');
+    return (1);
 }
 
 1;

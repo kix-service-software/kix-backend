@@ -55,7 +55,7 @@
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">V1::Watcher::GenericIncludeHandler</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Watcher::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx">V1::Watcher::WatcherList</Item>
                 <Item Key="CacheType">API_watchers</Item>
                 <Item Key="CacheTypeDependency">Watcher</Item>

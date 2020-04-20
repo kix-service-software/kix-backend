@@ -2458,6 +2458,7 @@
 <Table Name="configitem">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
     <Column Name="configitem_number" Required="true" Size="100" Type="VARCHAR" />
+    <Column Name="name" Required="false" Size="250" Type="VARCHAR" />
     <Column Name="class_id" Required="true" Type="INTEGER" />
     <Column Name="last_version_id" Required="false" Type="BIGINT" />
     <Column Name="cur_depl_state_id" Required="false" Type="INTEGER" />

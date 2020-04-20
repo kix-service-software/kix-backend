@@ -113,7 +113,7 @@ sub Run {
     # perform contact search
     my %ContactList = $Kernel::OM->Get('Contact')->ContactSearch(
         OrganisationID => $Param{Data}->{OrganisationID},
-        Valid      => 0,
+        Valid          => 0,
     );
 
     if (IsHashRefWithData(\%ContactList)) {

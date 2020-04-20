@@ -10350,7 +10350,7 @@ via the Preferences button after logging in.
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Time Based</Item>
-                <Item Key="Module">Kernel::System::Automation::TimeBased::EventBased</Item>
+                <Item Key="Module">Kernel::System::Automation::ExecPlan::TimeBased</Item>
             </Hash>
         </Setting>
     </ConfigItem>

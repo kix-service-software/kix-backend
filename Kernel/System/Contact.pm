@@ -877,6 +877,12 @@ to search contacts
         Valid          => 1,                    # (optional) default 1
     );
 
+    # search by multiple OrganisationIDs
+    my %List = $ContactObject->ContactSearch(
+        OrganisationIDs =>  [ 123, 456, 789 ]
+        Valid           => 1,                    # (optional) default 1
+    );
+
     #search by UserID
     my %List = $ContactObject->ContactSearch(
         UserID         => 123,
@@ -978,6 +984,14 @@ sub ContactSearch {
             push(@Bind, \$Email);
         }
     }
+    elsif ( $Param{OrganisationID} ) {
+        $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
+        if ( defined $Where ) {
+            $Where .= " AND ";
+        }
+        $Where .= "co.org_id = ?";
+        push(@Bind, \$Param{OrganisationID});
+    }    
     elsif ( $Param{OrganisationIDs} && IsArrayRefWithData($Param{OrganisationIDs}) ) {
         $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
         if ( defined $Where ) {
@@ -1044,7 +1058,10 @@ sub ContactSearch {
         push(@Bind, \$Param{LoginEquals});
     }
 
-    my $SQL = "SELECT DISTINCT c.id, c.email FROM contact c $Join WHERE 1=1 AND $Where";
+    my $SQL = "SELECT DISTINCT c.id, c.email FROM contact c $Join ";
+    if ( $Where ) {
+        $SQL .= "WHERE ".$Where;
+    }
 
     # ask database
     $Kernel::OM->Get('DB')->Prepare(

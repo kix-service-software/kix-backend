@@ -425,7 +425,7 @@ sub _CheckValue {
         my $Module = 'ITSMConfigItem::XML::Type::'.$Param{Input}->{Type};
         my $Object = $Kernel::OM->Get($Module);
 
-        if (ref $Object ne $Module) {
+        if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
             return $Self->_Error(
                 Code    => "Operation.InternalError",
                 Message => "Unable to create instance of attribute type module for parameter Version::Data::$Parent$ItemKey!",
@@ -513,7 +513,7 @@ sub ConvertDataToInternal {
                             my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
                             my $Object = $Kernel::OM->Get($Module);
 
-                            if (ref $Object ne $Module) {
+                            if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
                                 return $Self->_Error(
                                     Code    => "Operation.InternalError",
                                     Message => "Unable to create instance of attribute type module for parameter $RootKey!",
@@ -670,7 +670,7 @@ sub ConvertDataToExternal {
                                 my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
                                 my $Object = $Kernel::OM->Get($Module);
 
-                                if (ref $Object ne $Module) {
+                                if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
                                     return $Self->_Error(
                                         Code    => "Operation.InternalError",
                                         Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
@@ -713,7 +713,7 @@ sub ConvertDataToExternal {
                             my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
                             my $Object = $Kernel::OM->Get($Module);
 
-                            if (ref $Object ne $Module) {
+                            if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
                                 return $Self->_Error(
                                     Code    => "Operation.InternalError",
                                     Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",

@@ -30,31 +30,24 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'type',
-        Description => 'The type of the new permission.',
+        Description => 'The type of the new permission (Resource, PropertyValue, Property).',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'target',
-        Description => 'The target of the new permission.',
+        Description => 'The target of the new permission (i.e. "/tickets/*").',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'value',
-        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY). You can combine different values by using a comma, i.e. READ,UPDATE.',
+        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY,NONE). You can combine different values by using a comma, i.e. READ,UPDATE.',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'required',
-        Description => 'Set this permission as required. This only has effect when multiple attribute value permissions are defined for one object',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/(yes|no)/smx,
     );
     $Self->AddOption(
         Name        => 'comment',

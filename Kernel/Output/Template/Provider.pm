@@ -18,8 +18,6 @@ use base qw (Template::Provider);
 use Scalar::Util qw();
 use Template::Constants;
 
-use Kernel::Output::Template::Document;
-
 our @ObjectDependencies = (
     'Config',
     'Cache',
@@ -31,7 +29,7 @@ our @ObjectDependencies = (
 ## no critic qw(ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions Subroutines::ProhibitUnusedPrivateSubroutines RegularExpressions::ProhibitComplexRegexes)
 
 # Force the use of our own document class.
-$Template::Provider::DOCUMENT = 'Output::Template::Document';
+$Template::Provider::DOCUMENT = $Kernel::OM->GetModuleFor('Output::Template::Document');
 
 =head1 NAME
 
@@ -56,6 +54,9 @@ references.
 
 sub KIXInit {
     my ( $Self, %Param ) = @_;
+
+    # required the document handler
+    $Kernel::OM->Get('Main')->Require($Template::Provider::DOCUMENT) || die "Unable to require document handler!";
 
     # Don't fetch LayoutObject via ObjectManager as there might be several instances involved
     #   at this point (for example in LinkObject there is an own LayoutObject to avoid block
