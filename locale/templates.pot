@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-04-08 12:18+0000\n"
+"POT-Creation-Date: 2020-04-20 10:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4996,6 +4996,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines state names for which the SLA time is disabled. Is a ticket set to on of these states, the SLA-destination times are set to hold. The time a ticket stays in this state is not SLA-relevant."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the backend module for the watcher feature."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
