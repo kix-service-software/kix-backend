@@ -610,6 +610,7 @@ sub _RecipientsGet {
                         my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                             UserID              => $UserID,
                             Target              => '/tickets/' . $Ticket{TicketID},
+                            UsageContect        => 'Agent',
                             RequestedPermission => 'READ'
                         );
                         if ( $Granted ) {
@@ -631,6 +632,7 @@ sub _RecipientsGet {
                         my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                             UserID              => $UserID,
                             Target              => '/tickets/' . $Ticket{TicketID},
+                            UsageContext        => 'Agent',
                             RequestedPermission => 'UPDATE'
                         );
                         if ( $Granted ) {
@@ -883,6 +885,7 @@ sub _RecipientsGet {
         my ($Granted) = $UserObject->CheckResourcePermission(
             UserID              => $User{UserID},
             Target              => '/tickets/' . $Ticket{TicketID},
+            UsageContext        => 'Agent',
             RequestedPermission => 'READ'
         );
         next RECIPIENT if !$Granted;

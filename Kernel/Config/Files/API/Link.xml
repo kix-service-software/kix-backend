@@ -72,7 +72,7 @@
         <Description Translatable="1">Defines a generic include available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">V1::Link::GenericIncludeHandler</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Link::GenericIncludeHandler</Item>
                 <Item Key="IgnoreOperationRegEx">V1::Link::LinkGet</Item>
                 <Item Key="CacheType">API_links</Item>
                 <Item Key="CacheTypeDependency">LinkObject</Item>

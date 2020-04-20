@@ -175,7 +175,7 @@ sub Run {
                 my %SearchTypeResultHash = map { $_ => 1 } @SearchTypeResult;
                 my @Result;
                 foreach my $ConfigItemID ( @ConfigItemList ) {
-                    push(@Result, $ConfigItemID) if !exists $SearchTypeResultHash{$ConfigItemID};
+                    push(@Result, $ConfigItemID) if $SearchTypeResultHash{$ConfigItemID};
                 }
                 @ConfigItemList = @Result;
             }

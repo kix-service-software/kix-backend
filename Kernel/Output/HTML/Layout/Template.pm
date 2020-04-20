@@ -159,7 +159,7 @@ sub Output {
 
         my $Plugins = Template::Plugins->new(
             {
-                PLUGIN_BASE => 'Output::Template::Plugin',
+                PLUGIN_BASE => $Kernel::OM->GetModuleFor('Output::Template::Plugin'),
             }
         );
 

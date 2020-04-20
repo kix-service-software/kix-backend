@@ -113,6 +113,7 @@ sub new {
 validate given data hash using registered validator modules
 
     my $Result = $ValidatorObject->Validate(
+        ParentAttribute => '...',       # optional
         Data => {
             ...
         }
@@ -145,8 +146,9 @@ sub Validate {
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
             $Result = $Self->_ValidateAttribute(
-                Attribute => $Attribute,
-                Data      => $Param{Data},
+                ParentAttribute  => $Param{ParentAttribute},
+                Attribute        => $Attribute,
+                Data             => $Param{Data},
             );
             if ( !IsHashRefWithData($Result) || !$Result->{Success} ) {
                 last ATTRIBUTE;
@@ -157,7 +159,8 @@ sub Validate {
             if ( IsArrayRefWithData($Param{Data}->{$Attribute}) ) {
                 foreach my $Item ( @{$Param{Data}->{$Attribute}} ) {
                     my $ValidationResult = $Self->Validate(
-                        Data => $Item,
+                        ParentAttribute  => $Attribute,
+                        Data             => $Item,
                     );
                     if ( !IsHashRefWithData($ValidationResult) || !$ValidationResult->{Success} ) {
                         $Result = $ValidationResult;
@@ -167,7 +170,8 @@ sub Validate {
             }
             elsif ( IsHashRefWithData($Param{Data}->{$Attribute}) ) {
                 my $ValidationResult = $Self->Validate(
-                    Data => $Param{Data}->{$Attribute},
+                    ParentAttribute  => $Attribute,
+                    Data             => $Param{Data}->{$Attribute},
                 );
                 if ( !IsHashRefWithData($ValidationResult) || !$ValidationResult->{Success} ) {
                     $Result = $ValidationResult;
@@ -189,8 +193,7 @@ sub _ValidateAttribute {
     VALIDATOR:
     foreach my $Validator ( @{$Self->{Validators}->{$Param{Attribute}}} ) {
         my $ValidatorResult = $Validator->Validate(
-            Attribute => $Param{Attribute},
-            Data      => $Param{Data},
+            %Param,
         );
 
         if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {

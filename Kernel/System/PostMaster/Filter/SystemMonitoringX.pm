@@ -12,7 +12,6 @@ use strict;
 use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
-use Kernel::System::EmailParser;
 
 our @ObjectDependencies = (
     'Config',
@@ -40,24 +39,20 @@ sub new {
     $Self->{MainObject} = $Kernel::OM->Get('Main');
 
     # parser-object needs to bei instantiated in OTRS V4-style - no workaround found yet
-    $Self->{ParserObject} = Kernel::System::EmailParser->new(
+    $Self->{ParserObject} = $Kernel::OM->GetModuleFor('EmailParser')->new(
         Mode => 'Standalone',
     );
 
     # check if it is nesessary to update CIs - load related objects
     if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState') ) {
-        if ( $Self->{MainObject}->Require('GeneralCatalog') ) {
-            $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
-        }
-        if ( $Self->{MainObject}->Require('ITSMConfigItem') ) {
-            $Self->{ConfigItemObject} = $Kernel::OM->Get('ITSMConfigItem');
-        }
+        $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+        $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
     }
 
 # Default (FALLBACK) Settings
 # if new keys are updated or to be added in Kernel/Config/Files/SystemMonitoringX.xml, do the same right here
     $Self->{Config} = {
-        Module                         => 'PostMaster::Filter::SystemMonitoringX',
+        Module                         => 'Kernel::System::PostMaster::Filter::SystemMonitoringX',
         'DynamicFieldContent::Ticket'  => 'Host,Service,Address,Alias',
         'DynamicFieldContent::Article' => 'State',
 

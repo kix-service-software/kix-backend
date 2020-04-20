@@ -48,7 +48,7 @@ sub PreRun {
     #deleteme
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => '$Self' . Data::Dumper::Dumper \$Self,
+        Message  => '$Self' . Data::Dumper::Dumper(\$Self),
     );
 
     if (!$Self->{ListAll} && !$Self->{RoleName}) {

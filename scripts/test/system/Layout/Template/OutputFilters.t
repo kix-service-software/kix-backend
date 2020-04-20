@@ -32,7 +32,7 @@ my @Tests = (
         Config => {
             "Frontend::Output::FilterElementPost" => {
                 "100-TestFilter" => {
-                    Module    => 'scripts::test::Layout::Template::OutputFilter',
+                    Module    => 'scripts::test::system::Layout::Template::OutputFilter',
                     Templates => {
                         ALL => 1,
                     },
@@ -52,7 +52,7 @@ my @Tests = (
         Config => {
             "Frontend::Output::FilterElementPost" => {
                 "100-TestFilter" => {
-                    Module    => 'scripts::test::Layout::Template::OutputFilter',
+                    Module    => 'scripts::test::system::Layout::Template::OutputFilter',
                     Templates => {
                         ALL => 1,
                     },
@@ -72,7 +72,7 @@ my @Tests = (
         Config => {
             "Frontend::Output::FilterElementPost" => {
                 "100-TestFilter" => {
-                    Module    => 'scripts::test::Layout::Template::OutputFilter',
+                    Module    => 'scripts::test::system::Layout::Template::OutputFilter',
                     Templates => {
                         OutputFilters => 1,
                     },
@@ -93,7 +93,7 @@ Test: B&B 3
         Config => {
             "Frontend::Output::FilterElementPost" => {
                 "100-TestFilter" => {
-                    Module    => 'scripts::test::Layout::Template::OutputFilter',
+                    Module    => 'scripts::test::system::Layout::Template::OutputFilter',
                     Templates => {
                         OutputFilters => 1,
                     },
