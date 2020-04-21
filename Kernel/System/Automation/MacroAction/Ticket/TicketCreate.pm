@@ -185,7 +185,7 @@ sub Run {
                 my $ContactID;
                 
                 if ($Param{Config}->{Contact} =~ /\d+/) {
-                    $Mail = $Kernel::OM->Get('Contact')->ContactLookup(
+                    my $Mail = $Kernel::OM->Get('Contact')->ContactLookup(
                         ID  => $Param{Config}->{Contact},
                         Silent => 1
                     );
