@@ -706,7 +706,7 @@ sub ConvertDataToExternal {
                     $Content = delete $ArrayItem->{Content} || '';
 
                     # get display values if ForDisplay=! is given or attribute type is Attachment
-                    if ( $Param{ForDisplay} || $AttrDef->{Input}->{Type} eq 'Attachment' ) {
+                    if ( $Param{ForDisplay} || ($AttrDef->{Input} && $AttrDef->{Input}->{Type} && $AttrDef->{Input}->{Type} eq 'Attachment') ) {
                         # check if we have already created an instance of this type
                         if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
                             # create module instance
