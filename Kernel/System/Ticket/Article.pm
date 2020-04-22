@@ -2000,7 +2000,7 @@ sub _ArticleGetId {
 
 update an article
 
-Note: Keys "Body", "Subject", "From", "To", "Cc", "ReplyTo", "CustomerVisible" and "SenderType" are implemented.
+Note: Keys "Body", "Subject", "From", "To", "Cc", "Bcc", "ReplyTo", "CustomerVisible" and "SenderType" are implemented.
 
     my $Success = $TicketObject->ArticleUpdate(
         ArticleID => 123,
@@ -2062,6 +2062,7 @@ sub ArticleUpdate {
         ReplyTo       => 'a_reply_to',
         To            => 'a_to',
         Cc            => 'a_cc',
+        Bcc           => 'a_bcc',
         CustomerVisible => 'customer_visible',
         SenderTypeID  => 'article_sender_type_id',
     );

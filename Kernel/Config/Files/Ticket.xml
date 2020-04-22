@@ -1751,9 +1751,6 @@
                 <Item Key="EscalationSolutionTimeNotifyBefore" Translatable="1">Escalation solution time forewarned</Item>
                 <Item Key="EscalationSolutionTimeStart" Translatable="1">Escalation solution time in effect</Item>
                 <Item Key="EscalationSolutionTimeStop" Translatable="1">Escalation solution time finished</Item>
-                <Item Key="EscalationUpdateTimeNotifyBefore" Translatable="1">Escalation update time forewarned</Item>
-                <Item Key="EscalationUpdateTimeStart" Translatable="1">Escalation update time in effect</Item>
-                <Item Key="EscalationUpdateTimeStop" Translatable="1">Escalation update time finished</Item>
                 <Item Key="FollowUp" Translatable="1">FollowUp for [%s]. %s</Item>
                 <Item Key="Forward" Translatable="1">Forwarded to "%s".</Item>
                 <Item Key="Lock" Translatable="1">Locked ticket.</Item>
@@ -1762,16 +1759,11 @@
                 <Item Key="Move" Translatable="1">Ticket moved into Queue "%s" (%s) from Queue "%s" (%s).</Item>
                 <Item Key="NewTicket" Translatable="1">New Ticket [%s] created (Q=%s;P=%s;S=%s).</Item>
                 <Item Key="OwnerUpdate" Translatable="1">New owner is "%s" (ID=%s).</Item>
-                <Item Key="PhoneCallAgent" Translatable="1">Agent called customer.</Item>
-                <Item Key="PhoneCallCustomer" Translatable="1">Customer called us.</Item>
                 <Item Key="PriorityUpdate" Translatable="1">Changed priority from "%s" (%s) to "%s" (%s).</Item>
                 <Item Key="Remove" Translatable="1">%s</Item>
                 <Item Key="ResponsibleUpdate" Translatable="1">New responsible is "%s" (ID=%s).</Item>
                 <Item Key="SendAgentNotification" Translatable="1">"%s" notification was sent to "%s" by "%s".</Item>
                 <Item Key="SendAnswer" Translatable="1">Email sent to "%s".</Item>
-                <Item Key="SendAutoFollowUp" Translatable="1">AutoFollowUp sent to "%s".</Item>
-                <Item Key="SendAutoReject" Translatable="1">AutoReject sent to "%s".</Item>
-                <Item Key="SendAutoReply" Translatable="1">AutoReply sent to "%s".</Item>
                 <Item Key="SendCustomerNotification" Translatable="1">Notification sent to "%s".</Item>
                 <Item Key="ServiceUpdate" Translatable="1">Updated Service to %s (ID=%s).</Item>
                 <Item Key="SetPendingTime" Translatable="1">Updated: %s</Item>
@@ -1787,7 +1779,6 @@
                 <Item Key="TypeUpdate" Translatable="1">Updated Type to %s (ID=%s).</Item>
                 <Item Key="Unlock" Translatable="1">Unlocked ticket.</Item>
                 <Item Key="Unsubscribe" Translatable="1">Removed subscription for user "%s".</Item>
-                <Item Key="WebRequestCustomer" Translatable="1">Customer request via web.</Item>
             </Hash>
         </Setting>
     </ConfigItem>
