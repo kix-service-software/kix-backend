@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-26 15:02+0000\n"
+"POT-Creation-Date: 2020-04-20 10:54+0000\n"
 "PO-Revision-Date: 2020-04-08 09:49+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
@@ -353,6 +353,12 @@ msgid ""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"Permission type that restricts access on object properties (QueueID in "
+"tickets)."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Phone"
 msgstr ""
 
@@ -373,6 +379,10 @@ msgid "Production"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Property"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "PropertyValue"
 msgstr ""
 
@@ -382,6 +392,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Repair"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Resource"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -470,6 +484,26 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "TextArea"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The import is running."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The import run has been finished."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The job is running."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The last job run has been finished but some errors occured."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "The last job run has been finished."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -592,6 +626,10 @@ msgid "external"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "finished"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "full permissions on everything (CRUD on resource /*)"
 msgstr ""
 
@@ -629,6 +667,10 @@ msgid "reject"
 msgstr "ablehnen"
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "running"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "same as Asset-Reader, but additionally  allows to create new or update any "
 "existing asset entry and allows to CREATE, UPDATE, DELETE links"
@@ -662,70 +704,8 @@ msgstr ""
 msgid "valid"
 msgstr "gültig"
 
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
-msgid "The job is running."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
-msgid "The last job run has been finished but some errors occured."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
-msgid "The last job run has been finished."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1078_pre.xml
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "The import is running."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "The import run has been finished."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "finished"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1090_pre.xml
-msgid "running"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1132_pre.xml
-msgid ""
-"Permission type that restricts access on object properties (QueueID in "
-"tickets)."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-1132_pre.xml
-msgid "Property"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Object"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Permission type for the relationship of queues and tickets."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Permission type that corresponds with a collection resource."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Permission type that corresponds with a item resource."
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Queue->Ticket"
-msgstr ""
-
-#. Database: scripts/database/update/db-update-build-807_pre.xml
-msgid "Resource"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
@@ -5979,6 +5959,10 @@ msgid ""
 "Defines state names for which the SLA time is disabled. Is a ticket set to "
 "on of these states, the SLA-destination times are set to hold. The time a "
 "ticket stays in this state is not SLA-relevant."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the backend module for the watcher feature."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
