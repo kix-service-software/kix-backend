@@ -418,7 +418,7 @@ sub DisplayValueRender {
 
     VALUEITEM:
     for my $Item (@Values) {
-        next VALUEITEM if !$Item;
+        next VALUEITEM if !$Item && $Item != 0;
 
         my $ReadableValue = $Item;
 
