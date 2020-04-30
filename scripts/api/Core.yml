@@ -2107,41 +2107,6 @@ Provider:
         MappingOutbound:
             Type: Simple
         Type: V1::Ticket::ArticleFlagUpdate
-    V1::Ticket::ChecklistSearch:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ChecklistSearch
-    V1::Ticket::ChecklistCreate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ChecklistCreate
-    V1::Ticket::ChecklistDelete:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ChecklistDelete
-    V1::Ticket::ChecklistGet:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ChecklistGet
-    V1::Ticket::ChecklistUpdate:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: V1::Ticket::ChecklistUpdate
     V1::Ticket::HistorySearch:
         Description: ''
         MappingInbound:
@@ -3390,26 +3355,6 @@ Provider:
           RequestMethod:
           - PATCH
           Route: /tickets/:TicketID/articles/:ArticleID/flags/:FlagName
-        V1::Ticket::ChecklistSearch:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/checklist
-        V1::Ticket::ChecklistCreate:
-          RequestMethod:
-          - POST
-          Route: /tickets/:TicketID/checklist
-        V1::Ticket::ChecklistDelete:
-          RequestMethod:
-          - DELETE
-          Route: /tickets/:TicketID/checklist/:ChecklistItemID
-        V1::Ticket::ChecklistGet:
-          RequestMethod:
-          - GET
-          Route: /tickets/:TicketID/checklist/:ChecklistItemID
-        V1::Ticket::ChecklistUpdate:
-          RequestMethod:
-          - PATCH
-          Route: /tickets/:TicketID/checklist/:ChecklistItemID
         V1::Ticket::HistorySearch:
           RequestMethod:
           - GET

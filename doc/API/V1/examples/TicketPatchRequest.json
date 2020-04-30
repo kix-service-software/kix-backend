@@ -1,0 +1,13 @@
+{
+    "Ticket": {
+        "ContactID" : 5,
+        "DynamicFields": [
+            {
+                "Name": "Keywords",
+                "Value": ["Problem","Server"]
+            }
+        ],
+        "LockID": 2,
+        "TypeID": 4
+    }
+}

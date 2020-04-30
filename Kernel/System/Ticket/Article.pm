@@ -103,7 +103,7 @@ example with "Charset & MimeType" and no "ContentType"
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => 123,
-        Channel          => 'note',                                 # Channel or 
+        Channel          => 'note',                                 # Channel or
         ChannelID        => 1,                                      # ChannelID
         CustomerVisible  => 0|1,                                    # optional - will be set to 1 on special conditions (only if not given)
         SenderType       => 'agent',                                # agent|system|customer
@@ -513,7 +513,7 @@ sub ArticleCreate {
             UserID    => $Param{UserID},
         );
     }
-    
+
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # add history row
@@ -730,7 +730,7 @@ sub ArticleCreate {
         # prepare body and charset
         my $Body = $Kernel::OM->Get('Output::HTML::Layout')->RichTextDocumentComplete(
             String => $Param{HTMLBody} || $Param{Body},
-        );        
+        );
 
         my $Charset = $Param{Charset};
         $Charset =~ s/plain/html/i;
@@ -759,7 +759,7 @@ sub ArticleCreate {
                 ArticleID => $ArticleID,
                 Key       => 'NotSentError',
                 Value     => $Error,
-                UserID    => $Param{UserID},                
+                UserID    => $Param{UserID},
             );
 
             # return the ArticleID since we have created the article already but just not sent
@@ -1619,7 +1619,7 @@ sub ArticleGet {
     # add customer visibility
     if ($CustomerVisibleSQL) {
         $SQL .= $CustomerVisibleSQL;
-    }    
+    }
 
     # add sender types
     if ($SenderTypeSQL) {
@@ -1780,7 +1780,7 @@ sub ArticleGet {
         RECIPIENT:
         for my $Key (qw( From To Cc Bcc)) {
             if (!$Part->{$Key}) {
-                $Part->{ $Key . 'Realname' } = undef;                
+                $Part->{ $Key . 'Realname' } = undef;
                 next RECIPIENT;
             }
 
@@ -2504,6 +2504,8 @@ sub ArticleFlagSet {
             VALUES (?, ?, ?, current_timestamp, ?)',
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
     );
+
+    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # event
     my %Article = $Self->ArticleGet(

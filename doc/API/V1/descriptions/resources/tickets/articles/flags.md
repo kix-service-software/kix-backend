@@ -1,0 +1,1 @@
+This resource returns a list of all flags of an ticket article.

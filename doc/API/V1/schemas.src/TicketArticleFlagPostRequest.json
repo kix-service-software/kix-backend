@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#TicketArticleFlagPostRequest",
+  "type": "object",
+  "description": "The ticket article flag request object for creation.",
+  "properties": {
+    "ArticleFlag": {
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Value": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "integer"}
+          ]
+        }
+      },
+      "required": [
+        "Name",
+        "Value"
+      ]
+    }
+  },
+  "required": [
+    "ArticleFlag"
+  ]
+}

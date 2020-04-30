@@ -130,6 +130,7 @@ perform TicketCreate Operation. This will return the created TicketID.
                 SLA             => 'some SLA name',                               # optional
                 OwnerID         => 123,                                           # optional
                 Owner           => 'some user login',                             # optional
+                OrganisationID  => 123,                                           # optional
                 ResponsibleID   => 123,                                           # optional
                 Responsible     => 'some user login',                             # optional
                 PendingTime     => '2011-12-03 23:05:00',                         # optional
@@ -494,26 +495,6 @@ sub _TicketCreate {
                 Data          => {
                     TicketID => $TicketID,
                     Article  => $Article,
-                    }
-            );
-
-            if ( !$Result->{Success} ) {
-                return $Self->_Error(
-                    %{$Result},
-                    )
-            }
-        }
-    }
-
-    # create checklist
-    if ( IsHashRefWithData( $Ticket->{Checklist} ) ) {
-
-        foreach my $ChecklistItem ( @{ $Ticket->{Checklist} } ) {
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::TicketChecklistCreate',
-                Data          => {
-                    TicketID      => $TicketID,
-                    ChecklistItem => $ChecklistItem,
                     }
             );
 

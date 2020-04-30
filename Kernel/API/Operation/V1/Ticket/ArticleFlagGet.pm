@@ -162,7 +162,7 @@ sub Run {
     # start loop
     foreach my $ArticleFlag ( sort @{$Param{Data}->{FlagName}} ) {
         my %Flag = (
-            ArticleID => $Param{Data}->{ArticleID},
+            ArticleID => 0 + $Param{Data}->{ArticleID},
             Name      => $ArticleFlag,
             Value     => $ArticleFlags{$ArticleFlag},
         );

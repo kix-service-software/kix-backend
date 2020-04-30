@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#TicketArticlePatchRequest",
+  "type": "object",
+  "description": "The ticket article request object for update.",
+  "properties": {
+    "Article": {
+      "Bcc" : {
+        "type" : "string"
+      },
+      "Body" : {
+        "type" : "string"
+      },
+      "Cc" : {
+        "type" : "string"
+      },
+      "CustomerVisible" : {
+        "type" : "integer"
+      },
+      "DynamicFields": {
+        "description": "list of dynamic field values to be set",
+        "type": "array",
+        "items": {
+          "$ref": "DynamicFieldValueSetItem.json"
+        }
+      },
+      "From" : {
+        "type" : "string"
+      },
+      "IncomingTime" : {
+        "description": "date time sting as \"YYYY-MM-DD HH24:MM:SS\"",
+        "type" : "string"
+      },
+      "ReplyTo" : {
+        "type" : "string"
+      },
+      "SenderTypeID" : {
+        "type" : "integer"
+      },
+      "Subject" : {
+        "type" : "string"
+      },
+      "TimeUnit" : {
+        "type" : "integer"
+      },
+      "TicketID" : {
+        "description": "to move the article to another ticket",
+        "type" : "integer"
+      },
+      "To" : {
+        "type" : "string"
+      }
+    }
+  },
+  "required": [
+    "Article"
+  ]
+}
