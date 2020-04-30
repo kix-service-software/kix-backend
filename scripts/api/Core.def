@@ -301,11 +301,6 @@
 /tickets/:TicketID/articles/:ArticleID/flags                                   |   POST            | V1::Ticket::ArticleFlagCreate
 /tickets/:TicketID/articles/:ArticleID/flags/:FlagName                         |   GET             | V1::Ticket::ArticleFlagGet
 /tickets/:TicketID/articles/:ArticleID/flags/:FlagName                         |   PATCH           | V1::Ticket::ArticleFlagUpdate
-/tickets/:TicketID/checklist                                                   |   GET             | V1::Ticket::ChecklistSearch
-/tickets/:TicketID/checklist                                                   |   POST            | V1::Ticket::ChecklistCreate
-/tickets/:TicketID/checklist/:ChecklistItemID                                  |   DELETE          | V1::Ticket::ChecklistDelete
-/tickets/:TicketID/checklist/:ChecklistItemID                                  |   GET             | V1::Ticket::ChecklistGet
-/tickets/:TicketID/checklist/:ChecklistItemID                                  |   PATCH           | V1::Ticket::ChecklistUpdate
 /tickets/:TicketID/history                                                     |   GET             | V1::Ticket::HistorySearch
 /tickets/:TicketID/history/:HistoryID                                          |   GET             | V1::Ticket::HistoryGet
 /watchers                                                                      |   GET             | V1::Watcher::WatcherSearch

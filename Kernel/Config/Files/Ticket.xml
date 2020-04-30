@@ -3669,72 +3669,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateDefault" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default item state for new items. It should be one of the item states out of the list below.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <String Regex="">open</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemState" Required="1" Valid="1">
-        <Description Translatable="1">Defines all possible item states for the checklist sidebar. Key has to be unique and used for StateIcon list and StateStyle list below.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="open">open</Item>
-                <Item Key="pending">pending</Item>
-                <Item Key="closed">closed</Item>
-                <Item Key="notok">notok</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateIcon" Required="1" Valid="1">
-        <Description Translatable="1">Defines the item state icons for the item states defined above.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="open">fa-square-o</Item>
-                <Item Key="pending">fa-clock-o</Item>
-                <Item Key="closed">fa-check-square-o</Item>
-                <Item Key="notok">fa-times</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###ItemStateStyle" Required="1" Valid="1">
-        <Description Translatable="1">Defines the item state styles for the item states defined above. Use CSS-styles.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="open">color: gray</Item>
-                <Item Key="pending">color: orange</Item>
-                <Item Key="closed">color: green</Item>
-                <Item Key="notok">color: red</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###NonEditableTicketStates" Required="1" Valid="1">
-        <Description Translatable="1">Defines all the ticket states in which the checklist cannot be changed.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::KIXSidebarChecklist###NonEditableTicketStateTypes" Required="1" Valid="1">
-        <Description Translatable="1">Defines all the ticket state types in which the checklist cannot be changed.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::KIXSidebarBackend</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="closed">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###500-RestrictTicketActionsOnMerged" Required="0" Valid="1">
         <Description Translatable="1">Ticket-ACL to restrict ticket actions for merged tickets.</Description>
         <Group>Ticket</Group>
@@ -3822,17 +3756,6 @@ Thanks for your help!
                 <Item Key="Module">Kernel::System::Ticket::Event::CreateFAQEntry</Item>
                 <Item Key="Event">(ArticleCreate)</Item>
                 <Item Key="Transaction">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###230-TicketCreateChecklistFromTicketTemplate" Required="0" Valid="1">
-        <Description Translatable="1">Ticket event module to create a checklist from ticket template on ticket create.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::TicketCreateChecklistFromTicketTemplate</Item>
-                <Item Key="Event">TicketCreate</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -1,0 +1,17 @@
+{
+    "History": {
+        "ArticleID": 0,
+        "CreateBy": 1,
+        "CreateTime": "2020-04-27 16:31:26",
+        "HistoryID": 883,
+        "HistoryType": "NewTicket",
+        "HistoryTypeID": 1,
+        "Name": "New Ticket [2020042717000016] created (Q=Service Desk::Monitoring;P=3 normal;S=new).",
+        "OwnerID": 1,
+        "PriorityID": 3,
+        "QueueID": 2,
+        "StateID": 1,
+        "TicketID": "53",
+        "TypeID": 1
+    }
+}

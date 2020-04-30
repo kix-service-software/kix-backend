@@ -1,0 +1,27 @@
+{
+   "$id" : "#DynamicFieldValueSetItem",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The dynamic field value object to set it for an object.",
+   "type" : "object",
+   "properties" : {
+      "Name" : {
+         "description" : "the name of the relevant dynami field",
+         "type" : "string"
+      },
+      "Value" : {
+         "description" : "value type depends on the dynamic field (can also be an array of value type)",
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "integer"
+            }
+         ]
+      }
+   },
+   "required" : [
+      "Name",
+      "Value"
+   ]
+}
