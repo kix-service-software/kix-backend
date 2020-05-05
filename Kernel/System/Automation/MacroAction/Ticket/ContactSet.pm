@@ -51,7 +51,7 @@ sub Describe {
     $Self->AddOption(
         Name        => 'Contact',
         Label       => Kernel::Language::Translatable('Contact'),
-        Description => Kernel::Language::Translatable('The login of the contact to be set.'),
+        Description => Kernel::Language::Translatable('The email of the contact to be set.'),
         Required    => 1,
     );
 
@@ -98,7 +98,7 @@ sub Run {
     );
 
     my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-        Login  => $Contact,
+        Email  => $Contact,
         Silent => 1
     );
 

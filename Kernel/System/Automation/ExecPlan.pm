@@ -123,9 +123,9 @@ This returns something like:
         'Type'       => '...'
         'Name'       => 'Test'
         'Parameters' => {
-            Weekdays => [0,2],                  # 0 = Sunday, 1 = Monday, ...
-            Time => '10:00:00',
-            Events => [ 'TicketCreate', ...]
+            Weekday => [0,2],                  # 0 = Sunday, 1 = Monday, ...
+            Time    => '10:00:00',
+            Event   => [ 'TicketCreate', ...]
         },
         'Comment'    => '...',
         'ValidID'    => '1',
@@ -215,9 +215,9 @@ adds a new ExecPlan
         Name       => 'test',
         Type       => 'test',
         Parameters => {                             # optional
-            Weekdays => [0,2],                          # optional 0 = Sunday, 1 = Monday, ...
-            Time => '10:00:00',                         # optional
-            Events => [ 'TicketCreate', ...]            # optional
+            Weekday => [0,2],                       # optional 0 = Sunday, 1 = Monday, ...
+            Time    => '10:00:00',                  # optional
+            Event   => [ 'TicketCreate', ...]       # optional
         },
         Comment    => '...',                        # optional
         ValidID    => 1,                            # optional
@@ -329,9 +329,9 @@ updates an ExecPlan
         Name       => 'test'
         Type       => 'test',
         Parameters => {                             # optional
-            Weekdays => [0,2],                          # optional 0 = Sunday, 1 = Monday, ...
-            Time => '10:00:00',                         # optional
-            Events => [ 'TicketCreate', ...]            # optional
+            Weekday => [0,2],                       # optional 0 = Sunday, 1 = Monday, ...
+            Time    => '10:00:00',                  # optional
+            Event   => [ 'TicketCreate', ...]       # optional
         },
         Comment    => '...',                        # optional
         ValidID    => 1,                            # optional

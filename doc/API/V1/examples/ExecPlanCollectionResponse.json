@@ -9,9 +9,9 @@
             "ID": 1,
             "Name": "Some Job",
             "Parameters": {
-                "Weekdays": [ 0,3 ],
+                "Weekday": [ 0,3 ],
                 "Time": "10:00:00",
-                "Events": [ "TicketCreate" ]
+                "Event": [ "TicketCreate" ]
             },
             "Type": "Ticket",
             "ValidID": 1
@@ -25,9 +25,9 @@
             "ID": 2,
             "Name": "Another Job",
             "Parameters": {
-                "Weekdays": [],
+                "Weekday": [],
                 "Time": "",
-                "Events": [ "TicketStateUpdate" ]
+                "Event": [ "TicketStateUpdate" ]
             },
             "Type": "Ticket",
             "ValidID": 1
