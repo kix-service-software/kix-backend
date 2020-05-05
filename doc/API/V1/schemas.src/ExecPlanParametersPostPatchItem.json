@@ -4,7 +4,7 @@
   "type": "object",
   "description": "The parameters object for creation and update, for when and/or by what the corresponding job of the execution plan will be triggert.",
   "properties": {
-    "Weekdays": {
+    "Weekday": {
       "type": "array",
       "item": {
         "type": "integer"
@@ -15,7 +15,7 @@
        "type": "string",
        "description": "time for the weekdays as \"hh:mm:ss\""
     },
-    "Events": {
+    "Event": {
        "type": "array",
        "item": {
           "type": "string"

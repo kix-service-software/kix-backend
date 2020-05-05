@@ -56,6 +56,10 @@ sub new {
 
     # init the basic configuration to "find" ourself
     $Self->{Config}->{Home} = $ENV{KIX_HOME} || dirname($Bin);
+    if ($ENV{KIX_HOME}) {
+        use lib $ENV{KIX_HOME};
+        use lib $ENV{KIX_HOME} . '/plugins';
+    }
 
     # load settings from Config.pm
     $Self->{Config} = $Self->LoadLocalConfig($Self->{Config}->{Home}.'/config');
