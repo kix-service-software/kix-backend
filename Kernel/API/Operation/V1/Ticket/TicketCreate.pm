@@ -207,7 +207,7 @@ sub Run {
         return $Self->_Error(
             Code    => 'Conflict',
             Message => "Ticket can't be locked if OwnerID is 1!",
-        );            
+        );
     }
 
     # check Ticket attribute values
@@ -495,7 +495,7 @@ sub _TicketCreate {
                 Data          => {
                     TicketID => $TicketID,
                     Article  => $Article,
-                    }
+                }
             );
 
             if ( !$Result->{Success} ) {

@@ -136,13 +136,6 @@ sub Run {
         );
     }
 
-    # restrict article sender types
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' && $Article{ArticleSenderType} ne 'external') {
-        return $Self->_Error(
-            Code => 'Object.NoPermission',
-        );
-    }    
-
     # By default does not include HTML body as attachment (3) unless is explicitly requested (2).
     my $StripPlainBodyAsAttachment = $Param{Data}->{HTMLBodyAsAttachment} ? 2 : 3;
 
