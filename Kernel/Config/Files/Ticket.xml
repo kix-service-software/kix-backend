@@ -8,18 +8,6 @@
             <String Regex="">Kernel::System::Ticket::TicketTemplateHandler</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###850-LimitTemplateSelections" Required="0" Valid="1">
-        <Description Translatable="1">Ticket-ACL to restrict selection values if ticket templates are used.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::LimitTemplateSelections</Item>
-                <Item Key="FrontendActions">CustomerTicketMessage|AgentTicketPhone|AgentTicketEmail</Item>
-                <Item Key="ReturnType">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::Hook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a ticket, e.g. Ticket#, Call#, MyTicket#. The default is Ticket#.</Description>
         <Group>Ticket</Group>
@@ -321,14 +309,6 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/article</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="EscalationEvents::DecayTime" Required="0" Valid="1">
-        <Description Translatable="1">The duration in minutes after emitting an event, in which the new escalation notify and start events are suppressed.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="^[0-9]+$">1440</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###100-ArchiveRestore" Required="0" Valid="1">
         <Description Translatable="1">Restores a ticket from the archive (only if the event is a state change, from closed to any open available state).</Description>
         <Group>Ticket</Group>
@@ -405,28 +385,6 @@
                 <Item Key="Module">Kernel::System::Ticket::Event::NotificationEvent</Item>
                 <Item Key="Transaction">1</Item>
                 <Item Key="Event"></Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###910-EscalationIndex" Required="0" Valid="1">
-        <Description Translatable="1">Updates the ticket escalation index after a ticket attribute got updated.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::TicketEscalationIndex</Item>
-                <Item Key="Event">TicketSLAUpdate|TicketQueueUpdate|TicketStateUpdate|TicketCreate|ArticleCreate</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###920-EscalationStopEvents" Required="0" Valid="1">
-        <Description Translatable="1">Ticket event module that triggers the escalation stop events.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::TriggerEscalationStopEvents</Item>
-                <Item Key="Event">TicketSLAUpdate|TicketQueueUpdate|TicketStateUpdate|ArticleCreate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -618,16 +576,6 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Service</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###SLA" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::SLA</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1745,12 +1693,6 @@
                 <Item Key="CustomerUpdate" Translatable="1">Updated: %s</Item>
                 <Item Key="EmailAgent" Translatable="1">Email sent to customer.</Item>
                 <Item Key="EmailCustomer" Translatable="1">Added email. %s</Item>
-                <Item Key="EscalationResponseTimeNotifyBefore" Translatable="1">Escalation response time forewarned</Item>
-                <Item Key="EscalationResponseTimeStart" Translatable="1">Escalation response time in effect</Item>
-                <Item Key="EscalationResponseTimeStop" Translatable="1">Escalation response time finished</Item>
-                <Item Key="EscalationSolutionTimeNotifyBefore" Translatable="1">Escalation solution time forewarned</Item>
-                <Item Key="EscalationSolutionTimeStart" Translatable="1">Escalation solution time in effect</Item>
-                <Item Key="EscalationSolutionTimeStop" Translatable="1">Escalation solution time finished</Item>
                 <Item Key="FollowUp" Translatable="1">FollowUp for [%s]. %s</Item>
                 <Item Key="Forward" Translatable="1">Forwarded to "%s".</Item>
                 <Item Key="Lock" Translatable="1">Locked ticket.</Item>
@@ -1767,7 +1709,6 @@
                 <Item Key="SendCustomerNotification" Translatable="1">Notification sent to "%s".</Item>
                 <Item Key="ServiceUpdate" Translatable="1">Updated Service to %s (ID=%s).</Item>
                 <Item Key="SetPendingTime" Translatable="1">Updated: %s</Item>
-                <Item Key="SLAUpdate" Translatable="1">Updated SLA to %s (ID=%s).</Item>
                 <Item Key="StateUpdate" Translatable="1">Old: "%s" New: "%s"</Item>
                 <Item Key="Subscribe" Translatable="1">Added subscription for user "%s".</Item>
                 <Item Key="SystemRequest" Translatable="1">System Request (%s).</Item>
@@ -2220,22 +2161,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SLAPreferences###Comment2" Required="0" Valid="0">
-        <Description Translatable="1">Parameters of the example SLA attribute Comment2.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::SLA::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::SLAPreferences::Generic</Item>
-                <Item Key="Label" Translatable="1">Comment2</Item>
-                <Item Key="Desc" Translatable="1">Define the sla comment 2.</Item>
-                <Item Key="Block">TextArea</Item>
-                <Item Key="Cols">50</Item>
-                <Item Key="Rows">5</Item>
-                <Item Key="PrefKey">Comment2</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="CustomerNotifyJustToRealCustomer" Required="1" Valid="1">
         <Description Translatable="1">Sends customer notifications just to the mapped customer.</Description>
         <Group>Ticket</Group>
@@ -2363,7 +2288,6 @@
                 <Item>TicketQueueUpdate</Item>
                 <Item>TicketTypeUpdate</Item>
                 <Item>TicketServiceUpdate</Item>
-                <Item>TicketSLAUpdate</Item>
                 <Item>TicketCustomerUpdate</Item>
                 <Item>TicketOrganisationUpdate</Item>
                 <Item>TicketContactUpdate</Item>
@@ -2385,15 +2309,6 @@
                 <Item>TicketSlaveLinkAdd</Item>
                 <Item>TicketSlaveLinkDelete</Item>
                 <Item>TicketMasterLinkDelete</Item>
-                <Item>EscalationResponseTimeNotifyBefore</Item>
-                <Item>EscalationUpdateTimeNotifyBefore</Item>
-                <Item>EscalationSolutionTimeNotifyBefore</Item>
-                <Item>EscalationResponseTimeStart</Item>
-                <Item>EscalationUpdateTimeStart</Item>
-                <Item>EscalationSolutionTimeStart</Item>
-                <Item>EscalationResponseTimeStop</Item>
-                <Item>EscalationUpdateTimeStop</Item>
-                <Item>EscalationSolutionTimeStop</Item>
                 <Item>NotificationNewTicket</Item>
                 <Item>NotificationFollowUp</Item>
                 <Item>NotificationLockTimeout</Item>
@@ -2402,10 +2317,7 @@
                 <Item>NotificationAddNote</Item>
                 <Item>NotificationMove</Item>
                 <Item>NotificationPendingReminder</Item>
-                <Item>NotificationEscalation</Item>
-                <Item>NotificationEscalationNotifyBefore</Item>
                 <Item>NotificationServiceUpdate</Item>
-
             </Array>
         </Setting>
     </ConfigItem>
@@ -2477,182 +2389,6 @@
                 <Item Key="PrefKey">AdminNotifcationEventTransport</Item>
                 <Item Key="Prio">8000</Item>
                 <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###1-Ticket::Acl::Module" Required="0" Valid="0">
-        <Description Translatable="1">ACL module that allows closing parent tickets only if all its children are already closed ("State" shows which states are not available for the parent ticket until all child tickets are closed).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::CloseParentAfterClosedChilds</Item>
-                <Item Key="State">
-                    <Array>
-                        <Item Translatable="1">closed</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketACL::Default::Action" Required="1" Valid="1">
-        <Description Translatable="1">Default ACL values for ticket actions.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel1Match" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available in first level of the ACL structure.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Properties">Properties</Item>
-                <Item Key="PropertiesDatabase">PropertiesDatabase</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel1Change" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available in first level of the ACL structure.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Possible">Possible</Item>
-                <Item Key="PossibleAdd">PossibleAdd</Item>
-                <Item Key="PossibleNot">PossibleNot</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::Possible" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Ticket">Ticket</Item>
-                <Item Key="Action">Action</Item>
-                <Item Key="ActivityDialog">ActivityDialog</Item>
-                <Item Key="Form">Form</Item>
-                <Item Key="Process">Process</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::PossibleAdd" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Ticket">Ticket</Item>
-                <Item Key="Action">Action</Item>
-                <Item Key="ActivityDialog">ActivityDialog</Item>
-                <Item Key="Process">Process</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::PossibleNot" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Ticket">Ticket</Item>
-                <Item Key="Action">Action</Item>
-                <Item Key="ActivityDialog">ActivityDialog</Item>
-                <Item Key="Form">Form</Item>
-                <Item Key="Process">Process</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::Properties" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="User" Translatable="1">User</Item>
-                <Item Key="Contact" Translatable="1">Contact</Item>
-                <Item Key="Queue" Translatable="1">Queue</Item>
-                <Item Key="Service" Translatable="1">Service</Item>
-                <Item Key="Type" Translatable="1">Type</Item>
-                <Item Key="Priority" Translatable="1">Priority</Item>
-                <Item Key="SLA" Translatable="1">SLA</Item>
-                <Item Key="State" Translatable="1">State</Item>
-                <Item Key="Owner" Translatable="1">Owner</Item>
-                <Item Key="Process" Translatable="1">Process</Item>
-                <Item Key="Responsible" Translatable="1">Responsible</Item>
-                <Item Key="DynamicField" Translatable="1">DynamicField</Item>
-                <Item Key="Frontend" Translatable="1">Frontend</Item>
-                <Item Key="Ticket" Translatable="1">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACLKeysLevel2::PropertiesDatabase" Required="0" Valid="1">
-        <Description Translatable="1">Defines which items are available in second level of the ACL structure.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="User" Translatable="1">User</Item>
-                <Item Key="Contact" Translatable="1">Contact</Item>
-                <Item Key="Queue" Translatable="1">Queue</Item>
-                <Item Key="Service" Translatable="1">Service</Item>
-                <Item Key="Type" Translatable="1">Type</Item>
-                <Item Key="Priority" Translatable="1">Priority</Item>
-                <Item Key="SLA" Translatable="1">SLA</Item>
-                <Item Key="State" Translatable="1">State</Item>
-                <Item Key="Owner" Translatable="1">Owner</Item>
-                <Item Key="Process" Translatable="1">Process</Item>
-                <Item Key="Responsible" Translatable="1">Responsible</Item>
-                <Item Key="DynamicField" Translatable="1">DynamicField</Item>
-                <Item Key="Ticket" Translatable="1">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ACL::CacheTTL" Required="1" Valid="1">
-        <Description Translatable="1">Cache time in seconds for the DB ACL backend.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <String Regex="">3600</String><!-- default 1 hour -->
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketACL::Debug::Enabled" Required="1" Valid="1">
-        <Description Translatable="1">If enabled debugging information for ACLs is logged.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketACL::Debug::LogPriority" Required="0" Valid="0">
-        <Description Translatable="1">Defines the priority in which the information is logged and presented.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Option SelectedID="debug">
-                <Item Key="debug" Translatable="1">Debug</Item>
-                <Item Key="info" Translatable="1">Info</Item>
-                <Item Key="notice" Translatable="1">Notice</Item>
-                <Item Key="error" Translatable="1">Error</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketACL::Debug::Filter###00-Default" Required="0" Valid="0">
-        <Description Translatable="1">Filter for debugging ACLs. Note: More ticket attributes can be added in the format &lt;KIX_TICKET_Attribute&gt; e.g. &lt;KIX_TICKET_Priority&gt;.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="ACLName"></Item>
-                <Item Key="&lt;KIX_TICKET_TicketNumber&gt;"></Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2813,7 +2549,6 @@
                 <Item>X-KIX-State-PendingTime</Item>
                 <Item>X-KIX-Type</Item>
                 <Item>X-KIX-Service</Item>
-                <Item>X-KIX-SLA</Item>
                 <Item>X-KIX-CustomerNo</Item>
                 <Item>X-KIX-Contact</Item>
                 <Item>X-KIX-SenderType</Item>
@@ -2825,7 +2560,6 @@
                 <Item>X-KIX-FollowUp-State-PendingTime</Item>
                 <Item>X-KIX-FollowUp-Type</Item>
                 <Item>X-KIX-FollowUp-Service</Item>
-                <Item>X-KIX-FollowUp-SLA</Item>
                 <Item>X-KIX-FollowUp-SenderType</Item>
                 <Item>X-KIX-FollowUp-ArticleType</Item>
                 <Item>X-KIX-BodyDecrypted</Item>
@@ -3566,109 +3300,6 @@ Thanks for your help!
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###ProcessProgressAfterClosedChilds" Required="0" Valid="1">
-        <Description Translatable="1">ACL module that allows progress of parent tickets only if all its children are already closed ("ActivityDialog" shows which ActivityDialogs are not available for the parent ticket until all child tickets are closed).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketACL</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::ProcessProgressAfterClosedChilds</Item>
-                <Item Key="ActivityDialog">
-                    <Array>
-                        <Item></Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-EscalationIndex" Required="0" Valid="1">
-        <Description Translatable="1">Updates the ticket escalation index after a ticket attribute got updated.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::TicketEscalationIndex</Item>
-                <Item Key="Event">(TicketSLAUpdate|TicketQueueUpdate|TicketStateUpdate|TicketCreate|ArticleCreate|TicketTypeUpdate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByPhoneTicket" Required="1" Valid="1">
-        <Description Translatable="1">Disables response time SLA, if the newly created ticket is a phone ticket.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByPhoneTicket::OnlyForTheseTicketTypes" Required="0" Valid="1">
-        <Description Translatable="1">Restricts the ResponsetimeSetByPhoneTicket to these ticket types.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByAutoReply" Required="1" Valid="1">
-        <Description Translatable="1">Disables response time SLA, if an auto reply was sent for this ticket.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::ResponsetimeSetByAutoReply::OnlyForTheseTicketTypes" Required="0" Valid="1">
-        <Description Translatable="1">Restricts the ResponsetimeSetByAutoReply to these ticket types.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDisabled::RelevantStates" Required="0" Valid="1">
-        <Description Translatable="1">Defines state names for which the SLA time is disabled. Is a ticket set to on of these states, the SLA-destination times are set to hold. The time a ticket stays in this state is not SLA-relevant.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDisabled::RelevantTypes" Required="0" Valid="1">
-        <Description Translatable="1">Defines ticket type names for which the SLA calulation time is disabled.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDisabled::RelevantQueues" Required="0" Valid="1">
-        <Description Translatable="1">Defines queue names for which the SLA calulation time is disabled.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EscalationDelayed::FreeTimeField" Required="0" Valid="0">
-        <Description Translatable="1">Defines a dynamic field of type date/time which is used as start time for solution SLA-computation rather than ticket creation time, thus allowing to start SLA-countdown with begin of customer desired times.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DynamicField"></Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###500-RestrictTicketActionsOnMerged" Required="0" Valid="1">
         <Description Translatable="1">Ticket-ACL to restrict ticket actions for merged tickets.</Description>
         <Group>Ticket</Group>
@@ -3759,17 +3390,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###995_HideProcessTicketTabs" Required="0" Valid="1">
-        <Description Translatable="1">Ticket-ACLs to define shown tabs if ticket is process ticket.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::AgentTicketZoom</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::HideProcessTicketTabs</Item>
-                <Item Key="ReturnType">Action</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###500-TicketAutoLinkConfigItem" Required="0" Valid="0">
         <Description Translatable="1">Workflowmodule which links the ticket to related CIs - event handler supports only following events: ArticleCreate, TicketFreeTextUpdate.</Description>
         <Group>Ticket</Group>
@@ -3778,18 +3398,6 @@ Thanks for your help!
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::TicketAutoLinkConfigItem</Item>
                 <Item Key="Event">(ArticleCreate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###950_TicketStateWorkflow" Required="0" Valid="0">
-        <Description Translatable="1">Ticket-ACLs to define the following possible state.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketStateWorkflow</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::TicketStateWorkflow</Item>
-                <Item Key="ReturnType">Ticket</Item>
-                <Item Key="ReturnSubType">State</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3981,27 +3589,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###802-MatchTicketDataRestrictions" Required="0" Valid="0">
-        <Description Translatable="1">Ticket-ACL to restrict some ticket data selections based on current ticket data.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::MatchTicketDataRestrictions</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###803-MatchActionRestrictions" Required="0" Valid="0">
-        <Description Translatable="1">Ticket-ACL to restrict some ticket actions based on current ticket data.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::MatchActionRestrictions</Item>
-                <Item Key="ReturnType">Action</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###800-ResponsibleAutoSetPerTickettype" Required="0" Valid="0">
         <Description Translatable="1">Workflowmodule which sets the ticket responsible based on ticket type if not given.</Description>
         <Group>Ticket</Group>
@@ -4035,17 +3622,6 @@ Thanks for your help!
             <String Regex="">Kernel::System::Ticket::TicketExtensionsKIX4OTRS</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::ACL-PossiblePropertiesSubsumption" Required="1" Valid="1">
-        <Description Translatable="1">Defines whether results of PossibleNot for tickets of multiple ACLs are subsumed, thus allowing a more modular approach to ACLS (default behavior is disabled).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::DynamicField###DisabledDynamicFields" Required="0" Valid="1">
         <Description Translatable="1">Configures which dynamic fields were disabled depending on used frontend module, attributes like service, type, state or priority and its value. The key is composed like FrontendModule:::Attribute::Value. The key should contain the names of the disabled fields using regular expressions. If dynamic fields should be hidden on empty values, use EMPTY like FrontendModule:::Attribute::EMPTY.</Description>
         <Group>Ticket</Group>
@@ -4054,28 +3630,6 @@ Thanks for your help!
                 <Hash>
                 </Hash>
             </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###990_DependingDynamicFieldSelection" Required="0" Valid="1">
-        <Description Translatable="1">Ticket-ACLs to define dynamic fields dependencies.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::DynamicField</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::DependingDynamicFieldSelection</Item>
-                <Item Key="ReturnType">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###991_DisabledDynamicFields" Required="0" Valid="0">
-        <Description Translatable="1">Ticket-ACLs to define shown or hidden dynamic fields in forms.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::DynamicField</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::DisabledDynamicFields</Item>
-                <Item Key="ReturnType">Ticket</Item>
-            </Hash>
-        </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###330-DFTypeObjectReferenceAddLink" Required="0" Valid="1">
         <Description Translatable="1"></Description>

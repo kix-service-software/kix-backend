@@ -172,7 +172,7 @@ $Self->IsNot(
 my $Success = $BackendObject->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfigs{Text},
     ObjectID           => $TicketID,
-    Value              => 'otrs',
+    Value              => 'kix',
     UserID             => 1,
 );
 $Self->True(
@@ -243,17 +243,17 @@ my @Tests = (
         Name => 'KIX customer subject',    # <KIX_CUSTOMER_SUBJECT>
         Data => {
             From    => 'test@home.com',
-            Subject => 'otrs',
+            Subject => 'kix',
         },
         RichText => 0,
         Template => 'Test <KIX_CUSTOMER_SUBJECT>',
-        Result   => 'Test otrs',
+        Result   => 'Test kix',
     },
     {
         Name => 'KIX customer subject 3 letters',    # <KIX_CUSTOMER_SUBJECT[20]>
         Data => {
             From    => 'test@home.com',
-            Subject => 'otrs',
+            Subject => 'kix',
         },
         RichText => 0,
         Template => 'Test <KIX_CUSTOMER_SUBJECT[3]>',
@@ -263,11 +263,11 @@ my @Tests = (
         Name => 'KIX customer subject 20 letters + garbarge',    # <KIX_CUSTOMER_SUBJECT[20]>
         Data => {
             From    => 'test@home.com',
-            Subject => 'RE: otrs',
+            Subject => 'RE: kix',
         },
         RichText => 0,
         Template => 'Test <KIX_CUSTOMER_SUBJECT[20]>',
-        Result   => 'Test otrs',
+        Result   => 'Test kix',
     },
     {
         Name => 'KIX responsible firstname',                     # <KIX_RESPONSIBLE_Firstname>
@@ -330,7 +330,7 @@ my @Tests = (
         },
         RichText => 0,
         Template => 'Test <KIX_TICKET_DynamicField_Replace1' . $RandomID . '>',
-        Result   => 'Test otrs',
+        Result   => 'Test kix',
     },
     {
         Name => 'KIX dynamic field value (text)',                # <KIX_TICKET_DynamicField_*_Value>
@@ -339,7 +339,7 @@ my @Tests = (
         },
         RichText => 0,
         Template => 'Test <KIX_TICKET_DynamicField_Replace1' . $RandomID . '_Value>',
-        Result   => 'Test otrs',
+        Result   => 'Test kix',
     },
     {
         Name => 'KIX dynamic field (Dropdown)',                  # <KIX_TICKET_DynamicField_*>

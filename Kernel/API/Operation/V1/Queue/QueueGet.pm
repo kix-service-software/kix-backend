@@ -300,32 +300,6 @@ sub Run {
                 Result => 'COUNT',
             );
             
-            # escalated tickets
-            @Filter = (
-                {
-                    Field    => 'QueueID',
-                    Operator => 'EQ',
-                    Value    => $QueueID,
-                },
-                {
-                    Field    => 'EscalationTime',
-                    Operator => 'LT',
-                    DataType => 'NUMERIC',
-                    Value    => $Kernel::OM->Get('Time')->CurrentTimestamp(),
-                },
-            );
-            if ( IsHashRefWithData($TicketStatsFilter) ) {
-                push(@Filter, $TicketStatsFilter);
-            }
-            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
-                    AND => \@Filter
-                },
-                
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
-            );
-            
             # force numeric values
             foreach my $Key (keys %TicketStats) {
                 $TicketStats{$Key} = 0 + $TicketStats{$Key};

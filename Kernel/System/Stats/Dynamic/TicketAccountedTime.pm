@@ -363,19 +363,6 @@ sub GetObjectAttributes {
             },
         },
         {
-            Name             => Translatable('Escalation - Update Time'),
-            UseAsXvalue      => 1,
-            UseAsValueSeries => 1,
-            UseAsRestriction => 1,
-            Element          => 'EscalationUpdateTime',
-            TimePeriodFormat => 'DateInputFormatLong',                      # 'DateInputFormat',
-            Block            => 'Time',
-            Values           => {
-                TimeStart => 'TicketEscalationUpdateTimeNewerDate',
-                TimeStop  => 'TicketEscalationUpdateTimeOlderDate',
-            },
-        },
-        {
             Name             => Translatable('Escalation - Solution Time'),
             UseAsXvalue      => 1,
             UseAsValueSeries => 1,
@@ -590,39 +577,6 @@ sub GetObjectAttributes {
         next DYNAMICFIELD if !$IsStatsCondition;
 
         my $PossibleValuesFilter;
-
-        my $IsACLReducible = $DynamicFieldBackendObject->HasBehavior(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            Behavior           => 'IsACLReducible',
-        );
-
-        if ($IsACLReducible) {
-
-            # get PossibleValues
-            my $PossibleValues = $DynamicFieldBackendObject->PossibleValuesGet(
-                DynamicFieldConfig => $DynamicFieldConfig,
-            );
-
-            # convert possible values key => value to key => key for ACLs using a Hash slice
-            my %AclData = %{ $PossibleValues || {} };
-            @AclData{ keys %AclData } = keys %AclData;
-
-            # set possible values filter from ACLs
-            my $ACL = $TicketObject->TicketAcl(
-                Action        => 'AgentStats',
-                Type          => 'DynamicField_' . $DynamicFieldConfig->{Name},
-                ReturnType    => 'Ticket',
-                ReturnSubType => 'DynamicField_' . $DynamicFieldConfig->{Name},
-                Data          => \%AclData || {},
-                UserID        => 1,
-            );
-            if ($ACL) {
-                my %Filter = $TicketObject->TicketAclData();
-
-                # convert Filer key => key back to key => value using map
-                %{$PossibleValuesFilter} = map { $_ => $PossibleValues->{$_} } keys %Filter;
-            }
-        }
 
         # get field html
         my $DynamicFieldStatsParameter = $DynamicFieldBackendObject->StatsFieldParameterBuild(
@@ -1411,8 +1365,6 @@ sub _AllowedTicketSearchAttributes {
         TicketPendingTimeOlderDate
         TicketEscalationTimeNewerDate
         TicketEscalationTimeOlderDate
-        TicketEscalationUpdateTimeNewerDate
-        TicketEscalationUpdateTimeOlderDate
         TicketEscalationResponseTimeNewerDate
         TicketEscalationResponseTimeOlderDate
         TicketEscalationSolutionTimeNewerDate

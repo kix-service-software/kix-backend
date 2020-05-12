@@ -56,7 +56,7 @@ sub new {
 
     # for usage help
     $Self->{Name} = $Type;
-    $Self->{Name} =~ s{Kernel::System::Console::Command::}{}smx;
+    $Self->{Name} =~ s{.+?::Console::Command::(.+?)$}{$1}smx;
 
     $Self->{ANSI} = 1;
 

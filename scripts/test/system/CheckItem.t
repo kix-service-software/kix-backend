@@ -146,10 +146,10 @@ my @Tests = (
     },
 
     # Local part of email address is too long according to RFC.
-    # See http://isemail.info/modperl-uc.1384763750.ffhelkebjhfdihihkbce-michiel.beijen%3Dotrs.com%40perl.apache.org
+    # See http://isemail.info/modperl-uc.1384763750.ffhelkebjhfdihihkbce-michiel.beijen%3Dkixdesk.com%40perl.apache.org
     {
         Email =>
-            'modperl-uc.1384763750.ffhelkebjhfdihihkbce-michiel.beijen=otrs.com@perl.apache.org',
+            'modperl-uc.1384763750.ffhelkebjhfdihihkbce-michiel.beijen=kixdesk.com@perl.apache.org',
         Valid => 0,
     },
 

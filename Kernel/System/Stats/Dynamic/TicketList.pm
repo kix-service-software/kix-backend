@@ -458,19 +458,6 @@ sub GetObjectAttributes {
             },
         },
         {
-            Name             => Translatable('Escalation - Update Time'),
-            UseAsXvalue      => 0,
-            UseAsValueSeries => 0,
-            UseAsRestriction => 1,
-            Element          => 'EscalationUpdateTime',
-            TimePeriodFormat => 'DateInputFormatLong',                      # 'DateInputFormat',
-            Block            => 'Time',
-            Values           => {
-                TimeStart => 'TicketEscalationUpdateTimeNewerDate',
-                TimeStop  => 'TicketEscalationUpdateTimeOlderDate',
-            },
-        },
-        {
             Name             => Translatable('Escalation - Solution Time'),
             UseAsXvalue      => 0,
             UseAsValueSeries => 0,
@@ -672,39 +659,6 @@ sub GetObjectAttributes {
         next DYNAMICFIELD if !$IsStatsCondition;
 
         my $PossibleValuesFilter;
-
-        my $IsACLReducible = $DynamicFieldBackendObject->HasBehavior(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            Behavior           => 'IsACLReducible',
-        );
-
-        if ($IsACLReducible) {
-
-            # get PossibleValues
-            my $PossibleValues = $DynamicFieldBackendObject->PossibleValuesGet(
-                DynamicFieldConfig => $DynamicFieldConfig,
-            );
-
-            # convert possible values key => value to key => key for ACLs using a Hash slice
-            my %AclData = %{ $PossibleValues || {} };
-            @AclData{ keys %AclData } = keys %AclData;
-
-            # set possible values filter from ACLs
-            my $ACL = $TicketObject->TicketAcl(
-                Action        => 'AgentStats',
-                Type          => 'DynamicField_' . $DynamicFieldConfig->{Name},
-                ReturnType    => 'Ticket',
-                ReturnSubType => 'DynamicField_' . $DynamicFieldConfig->{Name},
-                Data          => \%AclData || {},
-                UserID        => 1,
-            );
-            if ($ACL) {
-                my %Filter = $TicketObject->TicketAclData();
-
-                # convert Filer key => key back to key => value using map
-                %{$PossibleValuesFilter} = map { $_ => $PossibleValues->{$_} } keys %Filter;
-            }
-        }
 
         # get dynamic field stats parameters
         my $DynamicFieldStatsParameter = $DynamicFieldBackendObject->StatsFieldParameterBuild(
@@ -1246,10 +1200,6 @@ sub GetStatTable {
         $Ticket{FirstResponseInMin}          ||= 0;
         $Ticket{FirstResponseTimeEscalation} ||= 0;
         $Ticket{FirstLock}                   ||= '';
-        $Ticket{UpdateTimeDestinationDate}   ||= '';
-        $Ticket{UpdateTimeDestinationTime}   ||= 0;
-        $Ticket{UpdateTimeWorkingTime}       ||= 0;
-        $Ticket{UpdateTimeEscalation}        ||= 0;
         $Ticket{SolutionTimeDestinationDate} ||= '';
         $Ticket{EscalationDestinationIn}     ||= '';
         $Ticket{EscalationDestinationDate}   ||= '';
@@ -1570,7 +1520,6 @@ sub _TicketAttributes {
         FirstLock => 'First Lock',
 
         EscalationResponseTime => 'EscalationResponseTime',
-        EscalationUpdateTime   => 'EscalationUpdateTime',
         EscalationSolutionTime => 'EscalationSolutionTime',
 
         EscalationDestinationIn => 'EscalationDestinationIn',
@@ -1589,13 +1538,6 @@ sub _TicketAttributes {
         FirstResponseTimeDestinationTime => 'FirstResponseTimeDestinationTime',
         FirstResponseTimeDestinationDate => 'FirstResponseTimeDestinationDate',
         FirstResponseTime                => 'FirstResponseTime',
-
-        UpdateTimeEscalation      => 'UpdateTimeEscalation',
-        UpdateTimeNotification    => 'UpdateTimeNotification',
-        UpdateTimeDestinationTime => 'UpdateTimeDestinationTime',
-        UpdateTimeDestinationDate => 'UpdateTimeDestinationDate',
-        UpdateTimeWorkingTime     => 'UpdateTimeWorkingTime',
-        UpdateTime                => 'UpdateTime',
 
         SolutionTime                => 'SolutionTime',
         SolutionInMin               => 'SolutionInMin',
@@ -1681,13 +1623,6 @@ sub _SortedAttributes {
         FirstResponseTimeDestinationDate
         FirstResponseTime
 
-        UpdateTimeEscalation
-        UpdateTimeNotification
-        UpdateTimeDestinationTime
-        UpdateTimeDestinationDate
-        UpdateTimeWorkingTime
-        UpdateTime
-
         SolutionTime
         SolutionInMin
         SolutionDiffInMin
@@ -1705,7 +1640,6 @@ sub _SortedAttributes {
         UnlockTimeout
         EscalationResponseTime
         EscalationSolutionTime
-        EscalationUpdateTime
         RealTillTimeNotUsed
         NumberOfArticles
     );
@@ -1757,7 +1691,6 @@ sub _OrderByIsValueOfTicketSearchSort {
         EscalationResponseTime => 'EscalationResponseTime',
         EscalationSolutionTime => 'EscalationSolutionTime',
         EscalationTime         => 'EscalationTime',
-        EscalationUpdateTime   => 'EscalationUpdateTime',
         Lock                   => 'Lock',
         Owner                  => 'Owner',
         Priority               => 'Priority',
@@ -1856,9 +1789,6 @@ sub _IndividualResultOrder {
         @Sorted = sort { $a->[$Counter] <=> $b->[$Counter] } @Unsorted;
     }
     elsif ( $Param{OrderBy} eq 'EscalationResponseTime' ) {
-        @Sorted = sort { $a->[$Counter] <=> $b->[$Counter] } @Unsorted;
-    }
-    elsif ( $Param{OrderBy} eq 'EscalationUpdateTime' ) {
         @Sorted = sort { $a->[$Counter] <=> $b->[$Counter] } @Unsorted;
     }
     elsif ( $Param{OrderBy} eq 'EscalationSolutionTime' ) {

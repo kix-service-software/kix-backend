@@ -12,7 +12,7 @@
       "Article"
    ],
    "definitions" : {
-      "DynamicFieldValueSetItem_json-89f4203892" : {
+      "DynamicFieldValueSetItem_json-142e42dd10" : {
          "$id" : "#DynamicFieldValueSetItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
@@ -39,7 +39,7 @@
             "Value"
          ]
       },
-      "TicketArticleAttachmentPostItem_json-436743dd0d" : {
+      "TicketArticleAttachmentPostItem_json-15cfff7bfc" : {
          "$id" : "#TicketArticleAttachmentPostItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object for creation.",
@@ -71,7 +71,7 @@
             "Attachments" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-436743dd0d"
+                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-15cfff7bfc"
                }
             },
             "AutoResponseType" : {
@@ -104,7 +104,7 @@
                "description" : "list of dynamic field values to be set",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-89f4203892"
+                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-142e42dd10"
                }
             },
             "ExcludeMuteNotificationToUserID" : {

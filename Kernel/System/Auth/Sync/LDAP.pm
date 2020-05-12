@@ -319,7 +319,7 @@ sub Sync {
     # variable to store role permissions from ldap
     my %RolePermissionsFromLDAP;
 
-    # sync ldap group 2 otrs role permissions
+    # sync ldap group 2 kix role permissions
     my $UserSyncRolesDefinition = $ConfigObject->Get(
         'AuthSyncModule::LDAP::UserSyncRolesDefinition' . $Self->{Count}
     );
@@ -391,7 +391,7 @@ sub Sync {
         }
     }
 
-    # sync ldap attribute 2 otrs role permissions
+    # sync ldap attribute 2 kix role permissions
     my $UserSyncAttributeRolesDefinition = $ConfigObject->Get(
         'AuthSyncModule::LDAP::UserSyncAttributeRolesDefinition' . $Self->{Count}
     );

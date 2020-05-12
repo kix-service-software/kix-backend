@@ -323,7 +323,7 @@ for my $Test (@Tests) {
             Priority     => '3 normal',
             State        => 'closed',
             OrganisationID   => '123465',
-            ContactID    => 'unittest@otrs.com',
+            ContactID    => 'unittest@kix.com',
             OwnerID      => 1,
             UserID       => 1,
         );
@@ -451,7 +451,7 @@ my $TicketObject = $Kernel::OM->Get('Ticket');
 # cleanup ticket database
 my @DeleteTicketList = $TicketObject->TicketSearch(
     Result            => 'ARRAY',
-    ContactLogin => 'unittest@otrs.com',
+    ContactLogin => 'unittest@kix.com',
     UserID            => 1,
 );
 for my $TicketID (@DeleteTicketList) {

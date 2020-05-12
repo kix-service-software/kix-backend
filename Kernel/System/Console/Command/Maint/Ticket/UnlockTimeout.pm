@@ -46,7 +46,7 @@ sub Run {
 
     $Kernel::OM->Get('DB')->Prepare(
         SQL => "
-            SELECT st.tn, st.id, st.timeout, sq.unlock_timeout, st.sla_id, st.queue_id
+            SELECT st.tn, st.id, st.timeout, sq.unlock_timeout
             FROM ticket st, queue sq
             WHERE st.queue_id = sq.id
                 AND sq.unlock_timeout != 0
@@ -64,8 +64,7 @@ sub Run {
 
         # get used calendar
         my $Calendar = $Kernel::OM->Get('Ticket')->TicketCalendarGet(
-            QueueID => $Row[5],
-            SLAID   => $Row[4],
+            TicketID => $Row[1],
         );
 
         my $CountedTime = $Kernel::OM->Get('Time')->WorkingTime(

@@ -174,7 +174,6 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
         },
         ExpectedResults => {
-            'IsACLReducible'               => 0,
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
             'IsFiltrable'                  => 0,
@@ -188,7 +187,6 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
         },
         ExpectedResults => {
-            'IsACLReducible'               => 0,
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 0,
             'IsFiltrable'                  => 0,
@@ -202,7 +200,6 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
         },
         ExpectedResults => {
-            'IsACLReducible'               => 0,
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
             'IsFiltrable'                  => 1,
@@ -216,7 +213,6 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
         },
         ExpectedResults => {
-            'IsACLReducible'               => 1,
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
             'IsFiltrable'                  => 1,
@@ -230,7 +226,6 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
         },
         ExpectedResults => {
-            'IsACLReducible'               => 1,
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 0,
             'IsFiltrable'                  => 0,
@@ -244,7 +239,6 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
         },
         ExpectedResults => {
-            'IsACLReducible'               => 0,
             'IsNotificationEventCondition' => 0,
             'IsSortable'                   => 1,
             'IsFiltrable'                  => 0,
@@ -258,7 +252,6 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
         },
         ExpectedResults => {
-            'IsACLReducible'               => 0,
             'IsNotificationEventCondition' => 0,
             'IsSortable'                   => 1,
             'IsFiltrable'                  => 0,
@@ -275,7 +268,7 @@ for my $Test (@Tests) {
     BEHAVIOR:
     for my $Behavior (
         qw(
-        IsACLReducible IsNotificationEventCondition IsSortable IsFiltrable IsStatsCondition
+        IsNotificationEventCondition IsSortable IsFiltrable IsStatsCondition
         IsCustomerInterfaceCapable NotExisting
         )
         )

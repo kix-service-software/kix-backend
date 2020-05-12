@@ -1099,8 +1099,8 @@ for my $Query (@Queries) {
 
 # extended test
 %Fill = (
-    Some0 => '0 otrs',
-    Some1 => '1 otrs',
+    Some0 => '0 kix',
+    Some1 => '1 kix',
 );
 for my $Key ( sort keys %Fill ) {
     my $SQL = "INSERT INTO test_condition (name_a, name_b) VALUES ('$Key', '$Fill{$Key}')";
@@ -1114,14 +1114,14 @@ for my $Key ( sort keys %Fill ) {
 }
 @Queries = (
     {
-        Query  => '0 otrs',
+        Query  => '0 kix',
         Result => {
             Some0 => 1,
             Some1 => 0,
         },
     },
     {
-        Query  => '1 otrs',
+        Query  => '1 kix',
         Result => {
             Some0 => 0,
             Some1 => 1,

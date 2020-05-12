@@ -216,26 +216,7 @@ sub Run {
                 UserID => $Self->{Authorization}->{UserID},
                 Result => 'COUNT',
             );
-            # escalated tickets
-            $TicketStats{EscalatedCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
-                    AND => [
-                        {
-                            Field    => 'OrganisationID',
-                            Operator => 'EQ',
-                            Value    => $ID,
-                        },
-                        {
-                            Field    => 'EscalationTime',
-                            Operator => 'LT',
-                            DataType => 'NUMERIC',
-                            Value    => $Kernel::OM->Get('Time')->CurrentTimestamp(),
-                        },
-                    ]
-                },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
-            );
+ 
             $OrganisationData{TicketStats} = \%TicketStats;
 
             # inform API caching about a new dependency

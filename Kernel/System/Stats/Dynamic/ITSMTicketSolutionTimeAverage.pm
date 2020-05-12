@@ -359,20 +359,6 @@ sub GetObjectAttributes {
 
         my $PossibleValuesFilter;
 
-        # set possible values filter from ACLs
-        my $ACL = $Kernel::OM->Get('Ticket')->TicketAcl(
-            Action        => 'AgentStats',
-            Type          => 'DynamicField_' . $DynamicFieldConfig->{Name},
-            ReturnType    => 'Ticket',
-            ReturnSubType => 'DynamicField_' . $DynamicFieldConfig->{Name},
-            Data          => $DynamicFieldConfig->{Config}->{PossibleValues} || {},
-            UserID        => 1,
-        );
-        if ($ACL) {
-            my %Filter = $Kernel::OM->Get('Ticket')->TicketAclData();
-            $PossibleValuesFilter = \%Filter;
-        }
-
         # get field html
         my $DynamicFieldStatsParameter
             = $Kernel::OM->Get('DynamicField::Backend')->StatsFieldParameterBuild(

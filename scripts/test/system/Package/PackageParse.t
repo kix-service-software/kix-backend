@@ -74,7 +74,7 @@ for a package file.',
       <Filelist>
         <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
         <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
-        <File Location="bin/otrs.CheckDB.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
+        <File Location="bin/kix.CheckDB.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
       </Filelist>
     </kix_package>
 ',

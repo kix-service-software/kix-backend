@@ -14,7 +14,6 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::PerfLog
     Kernel::API::Operation::V1::Ticket::Common
 );
 
@@ -109,8 +108,6 @@ perform TicketUpdate Operation. This will return the updated TicketID
                 Type          => 'some type name',                              # optional
                 ServiceID     => 123,                                           # optional
                 Service       => 'some service name',                           # optional
-                SLAID         => 123,                                           # optional
-                SLA           => 'some SLA name',                               # optional
                 StateID       => 123,                                           # optional
                 State         => 'some state name',                             # optional
                 PriorityID    => 123,                                           # optional
@@ -691,7 +688,7 @@ sub _TicketUpdate {
     }
 
     return $Self->_Success(
-        TicketID => $Param{TicketID},
+        TicketID => 0 + $Param{TicketID},
     );
 }
 

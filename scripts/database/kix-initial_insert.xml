@@ -2322,15 +2322,6 @@
     </Insert>
     <Insert Table="ticket_history_type">
         <Data Key="id" Type="AutoIncrement">33</Data>
-        <Data Key="name" Type="Quote">SLAUpdate</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">34</Data>
         <Data Key="name" Type="Quote">ArchiveFlagUpdate</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -2339,61 +2330,7 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">35</Data>
-        <Data Key="name" Type="Quote">EscalationSolutionTimeStop</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">36</Data>
-        <Data Key="name" Type="Quote">EscalationResponseTimeStart</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">37</Data>
-        <Data Key="name" Type="Quote">EscalationSolutionTimeStart</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">38</Data>
-        <Data Key="name" Type="Quote">EscalationResponseTimeNotifyBefore</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">39</Data>
-        <Data Key="name" Type="Quote">EscalationSolutionTimeNotifyBefore</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">40</Data>
-        <Data Key="name" Type="Quote">EscalationResponseTimeStop</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">41</Data>
+        <Data Key="id" Type="AutoIncrement">34</Data>
         <Data Key="name" Type="Quote">TitleUpdate</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -2402,7 +2339,7 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">42</Data>
+        <Data Key="id" Type="AutoIncrement">35</Data>
         <Data Key="name" Type="Quote">ArticleEdit</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>

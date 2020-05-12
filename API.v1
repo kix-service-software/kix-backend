@@ -119,8 +119,6 @@
 /system/importexport/templates/:TemplateID/runs                                |   POST            | V1::ImportExport::TemplateRunCreate
 /system/logs                                                                   |   GET             | V1::Log::LogFileSearch
 /system/logs/:LogFileID                                                        |   GET             | V1::Log::LogFileGet
-/system/objectdefinitions                                                      |   GET             | V1::ObjectDefinition::ObjectDefinitionSearch
-/system/objectdefinitions/:ObjectType                                          |   GET             | V1::ObjectDefinition::ObjectDefinitionGet
 /system/objecticons                                                            |   GET             | V1::ObjectIcon::ObjectIconSearch
 /system/objecticons                                                            |   POST            | V1::ObjectIcon::ObjectIconCreate
 /system/objecticons/:ObjectIconID                                              |   DELETE          | V1::ObjectIcon::ObjectIconDelete
@@ -148,11 +146,6 @@
 /system/sessions                                                               |   GET             | V1::Sessions::SessionSearch
 /system/sessions/:Token                                                        |   DELETE          | V1::Sessions::SessionDelete
 /system/sessions/:Token                                                        |   GET             | V1::Sessions::SessionGet
-/system/slas                                                                   |   GET             | V1::SLA::SLASearch
-/system/slas                                                                   |   POST            | V1::SLA::SLACreate
-/system/slas/:SLAID                                                            |   DELETE          | V1::SLA::SLADelete
-/system/slas/:SLAID                                                            |   GET             | V1::SLA::SLAGet
-/system/slas/:SLAID                                                            |   PATCH           | V1::SLA::SLAUpdate
 /system/templates                                                              |   GET             | V1::Template::TemplateSearch
 /system/templates                                                              |   POST            | V1::Template::TemplateCreate
 /system/templates/:TemplateID                                                  |   DELETE          | V1::Template::TemplateDelete

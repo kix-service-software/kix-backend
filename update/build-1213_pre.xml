@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="ticket">
+        <ColumnDrop Name="sla_id"/>
+        <ColumnDrop Name="escalation_time"/>
+        <ColumnDrop Name="escalation_update_time"/>
+        <ColumnDrop Name="escalation_response_time"/>
+        <ColumnDrop Name="escalation_solution_time"/>
+    </TableAlter>
+
+    <TableDrop Name="sla_preferences"/>
+    <TableDrop Name="service_sla"/>
+    <TableDrop Name="sla"/>
+
+</database>

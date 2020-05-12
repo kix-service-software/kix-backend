@@ -70,6 +70,28 @@ sub ValidateSetting {
     return (undef, \%DefaultValue);
 }
 
+=item Extend()
+
+Extends the given value with the extension
+
+    my $Result = $OptionTypeObject->Extend(
+        Value  => ...,
+        Extend => ...,
+    );
+
+=cut
+
+sub Extend {
+    my ( $Self, %Param ) = @_;
+
+    my %Value = (
+        %{$Param{Value}},
+        %{$Param{Extend}}
+    );
+
+    return \%Value;
+}
+
 =item Encode()
 
 Encode the data to JSON

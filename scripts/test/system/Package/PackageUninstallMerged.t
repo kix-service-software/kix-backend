@@ -101,7 +101,7 @@ if ( !$DeveloperSystem ) {
       <Filelist>
         <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
         <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
-        <File Location="bin/otrs.CheckSum.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
+        <File Location="bin/kix.CheckSum.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
       </Filelist>
     </kix_package>
     ';
@@ -121,14 +121,14 @@ if ( !$DeveloperSystem ) {
 
     # now create an .save file for the framework file, content doesn't matter as it will be deleted
     my $Write = $Kernel::OM->Get('Main')->FileWrite(
-        Location   => $Home . '/bin/otrs.CheckSum.pl.save',
+        Location   => $Home . '/bin/kix.CheckSum.pl.save',
         Content    => \$Content,
         Mode       => 'binmode',
         Permission => '644',
     );
     $Self->True(
         $Write,
-        '#FileWrite() - bin/otrs.CheckSum.pl.save',
+        '#FileWrite() - bin/kix.CheckSum.pl.save',
     );
 
     # create PackageObject again to make sure cache is cleared
@@ -143,7 +143,7 @@ if ( !$DeveloperSystem ) {
 
     # check that the original files from the package does not exist anymore
     # these files are suppose to be old files that are not required anymore by the merged package
-    for my $File (qw( Test var/Test bin/otrs.CheckSum.pl.save )) {
+    for my $File (qw( Test var/Test bin/kix.CheckSum.pl.save )) {
         my $RealFile = $Home . '/' . $File;
         $RealFile =~ s/\/\//\//g;
         $Self->False(
@@ -153,7 +153,7 @@ if ( !$DeveloperSystem ) {
     }
 
     # check that the framework file still exists
-    for my $File (qw( bin/otrs.CheckSum.pl )) {
+    for my $File (qw( bin/kix.CheckSum.pl )) {
         my $RealFile = $Home . '/' . $File;
         $RealFile =~ s/\/\//\//g;
         $Self->True(

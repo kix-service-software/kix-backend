@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::TicketCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 use  Kernel::System::EmailParser;
 
 use base qw(
@@ -126,8 +126,6 @@ perform TicketCreate Operation. This will return the created TicketID.
                 Type            => 'some type name',                              # optional
                 ServiceID       => 123,                                           # optional
                 Service         => 'some service name',                           # optional
-                SLAID           => 123,                                           # optional
-                SLA             => 'some SLA name',                               # optional
                 OwnerID         => 123,                                           # optional
                 Owner           => 'some user login',                             # optional
                 OrganisationID  => 123,                                           # optional
@@ -355,8 +353,6 @@ sub _TicketCreate {
         Type           => $Ticket->{Type} || '',
         ServiceID      => $Ticket->{ServiceID} || '',
         Service        => $Ticket->{Service} || '',
-        SLAID          => $Ticket->{SLAID} || '',
-        SLA            => $Ticket->{SLA} || '',
         StateID        => $Ticket->{StateID} || '',
         State          => $Ticket->{State} || '',
         PriorityID     => $Ticket->{PriorityID} || '',

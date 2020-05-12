@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-04-20 10:54+0000\n"
+"POT-Creation-Date: 2020-04-24 10:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -931,6 +931,10 @@ msgid "Organisation"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
+msgid "Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Pending Time Difference"
 msgstr ""
 
@@ -1327,10 +1331,6 @@ msgid "Escalation - Solution Time"
 msgstr ""
 
 #. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
-msgid "Escalation - Update Time"
-msgstr ""
-
-#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
 msgid "Evaluation by"
 msgstr ""
 
@@ -1375,6 +1375,18 @@ msgid "Response Working Time Average (affected by escalation configuration)"
 msgstr ""
 
 #. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Responsible"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "SLA"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "Service"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
 msgid "Solution Average"
 msgstr ""
 
@@ -1408,6 +1420,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
 msgid "Solution Working Time Average (affected by escalation configuration)"
+msgstr ""
+
+#. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
+msgid "State"
 msgstr ""
 
 #. Perl Module: Kernel/System/Stats/Dynamic/TicketSolutionResponseTime.pm
@@ -2087,6 +2103,14 @@ msgid "Maximum number of tickets to be displayed in the result of this operation
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
+msgid "Priority"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Ticket.xml
+msgid "Queue"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Up"
 msgstr ""
 
@@ -2763,7 +2787,7 @@ msgid "Defines the link type which is used for the link creation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the list of online repositories. Another installations can be used as repository, for example: Key=\"http://example.com/otrs/public.pl?Action=PublicRepository;File=\" and Content=\"Some Name\"."
+msgid "Defines the list of online repositories. Another installations can be used as repository, for example: Key=\"http://example.com/kix/public.pl?Action=PublicRepository;File=\" and Content=\"Some Name\"."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4275,10 +4299,6 @@ msgid "Thursday"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Ticket-ACL to show/hide ticket action AgentTicketPrintForwardFax."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Time Based"
 msgstr ""
 
@@ -4475,7 +4495,7 @@ msgid "Defines which type of ticket can affect the status of a linked CI."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Enables/disables the functionality to check ConfigItems for unique names. Before enabling this option you should check your system for already existing config items with duplicate names. You can do this with the script bin/otrs.ITSMConfigItemListDuplicates.pl."
+msgid "Enables/disables the functionality to check ConfigItems for unique names. Before enabling this option you should check your system for already existing config items with duplicate names. You can do this with the console command Admin::ITSM::Configitem::ListDuplicates."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4535,7 +4555,7 @@ msgid "Set the incident state of a CI automatically when a Ticket is Linked to a
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Set the type and direction of links to be used to calculate the incident state. The key is the name of the link type (as defined in LinkObject::Type), and the value is the direction of the IncidentLinkType that should be followed to calculate the incident state. For example if the IncidentLinkType is set to 'DependsOn', and the Direction is 'Source', only 'Depends on' links will be followed (and not the opposite link 'Required for') to calculate the incident state. You can add more link types ad directions as you like, e.g. 'Includes' with the direction 'Target'. All link types defined in the sysconfig options LinkObject::Type are possible and the direction can be 'Source', 'Target', or 'Both'. IMPORTANT: AFTER YOU MAKE CHANGES TO THIS SYSCONFIG OPTION YOU NEED TO RUN THE SCRIPT bin/otrs.ITSMConfigItemIncidentStateRecalculate.pl SO THAT ALL INCIDENT STATES WILL BE RECALCULATED BASED ON THE NEW SETTINGS!"
+msgid "Set the type and direction of links to be used to calculate the incident state. The key is the name of the link type (as defined in LinkObject::Type), and the value is the direction of the IncidentLinkType that should be followed to calculate the incident state. For example if the IncidentLinkType is set to 'DependsOn', and the Direction is 'Source', only 'Depends on' links will be followed (and not the opposite link 'Required for') to calculate the incident state. You can add more link types ad directions as you like, e.g. 'Includes' with the direction 'Target'. All link types defined in the sysconfig options LinkObject::Type are possible and the direction can be 'Source', 'Target', or 'Both'. IMPORTANT: AFTER YOU MAKE CHANGES TO THIS SYSCONFIG OPTION YOU NEED TO RUN THE CONSOLE COMMAND Admin::ITSM::IncidentState::Recalculate SO THAT ALL INCIDENT STATES WILL BE RECALCULATED BASED ON THE NEW SETTINGS!"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4619,11 +4639,23 @@ msgid "Cache time in seconds for the DB process backend."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ProcessManagement.xml
+msgid "Debug"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ProcessManagement.xml
 msgid "Default ProcessManagement entity prefixes for entity IDs that are automatically generated."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ProcessManagement.xml
+msgid "Defines the priority in which the information is logged and presented."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ProcessManagement.xml
 msgid "DynamicField backend registration."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ProcessManagement.xml
+msgid "Error"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ProcessManagement.xml
@@ -4636,6 +4668,14 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ProcessManagement.xml
 msgid "If enabled debugging information for transitions is logged."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ProcessManagement.xml
+msgid "Info"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ProcessManagement.xml
+msgid "Notice"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ProcessManagement.xml
@@ -4703,14 +4743,6 @@ msgid "A list of dynamic fields that are merged into the main ticket during a me
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "ACL module that allows closing parent tickets only if all its children are already closed (\"State\" shows which states are not available for the parent ticket until all child tickets are closed)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "ACL module that allows progress of parent tickets only if all its children are already closed (\"ActivityDialog\" shows which ActivityDialogs are not available for the parent ticket until all child tickets are closed)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Activates the ticket archive system search in the customer interface."
 msgstr ""
 
@@ -4747,10 +4779,6 @@ msgid "Agent Name + FromSeparator + System Address Display Name"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Agent called customer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Allows default services to be selected also for non existing customers."
 msgstr ""
 
@@ -4768,18 +4796,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Archive state changed: \"%s\""
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "AutoFollowUp sent to \"%s\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "AutoReject sent to \"%s\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "AutoReply sent to \"%s\"."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4808,10 +4824,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "CMD example setup. Ignores emails where external CMD returns some output on STDOUT (email will be piped into STDIN of some.bin)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Cache time in seconds for the DB ACL backend."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4891,23 +4903,7 @@ msgid "Creates a new address book entry if necessary."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Customer called us."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Customer request via web."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Customizable stop words for fulltext index. These words will be removed from the search index."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Debug"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Default ACL values for ticket actions."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4931,19 +4927,11 @@ msgid "Define the service comment 2."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Define the sla comment 2."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines Queue, TicketType and new State for TicketQueueMoveWorkflowState."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines Queue, TicketType and new TicketType for TicketQueueMoveWorkflowTickettype."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines a dynamic field of type date/time which is used as start time for solution SLA-computation rather than ticket creation time, thus allowing to start SLA-countdown with begin of customer desired times."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4979,23 +4967,11 @@ msgid "Defines all the ticket states in which the checklist cannot be changed."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines allowed and not allowed actions for merged and removed tickets."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines how the From field from the emails (sent from answers and email tickets) should look like."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines if time accounting is mandatory in the agent interface. If activated, a note must be entered for all ticket actions (no matter if the note itself is configured as active or is originally mandatory for the individual ticket action screen)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines queue names for which the SLA calulation time is disabled."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines state names for which the SLA time is disabled. Is a ticket set to on of these states, the SLA-destination times are set to hold. The time a ticket stays in this state is not SLA-relevant."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5059,10 +5035,6 @@ msgid "Defines the postmaster default queue."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines the priority in which the information is logged and presented."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the sender for rejected emails."
 msgstr ""
 
@@ -5103,22 +5075,6 @@ msgid "Defines the viewable locks of a ticket. NOTE: When you change this settin
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines ticket type names for which the SLA calulation time is disabled."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines whether results of PossibleNot for tickets of multiple ACLs are subsumed, thus allowing a more modular approach to ACLS (default behavior is disabled)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines which items are available in first level of the ACL structure."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines which items are available in second level of the ACL structure."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines which states should be set automatically (Content), after the pending time of state (Key) has been reached."
 msgstr ""
 
@@ -5143,23 +5099,11 @@ msgid "Determines the possible states for pending tickets that changed state aft
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Disables response time SLA, if an auto reply was sent for this ticket."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Disables response time SLA, if the newly created ticket is a phone ticket."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Display a warning and prevent search when using stop words within fulltext search."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Dutch stop words for fulltext index. These words will be removed from the search index."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "DynamicField"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5191,10 +5135,6 @@ msgid "English stop words for fulltext index. These words will be removed from t
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Error"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Escalation response time finished"
 msgstr ""
 
@@ -5216,18 +5156,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Escalation solution time in effect"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation update time finished"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation update time forewarned"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation update time in effect"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5259,10 +5187,6 @@ msgid "Executes follow-up checks on the raw source email for mails that don't ha
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Filter for debugging ACLs. Note: More ticket attributes can be added in the format &lt;KIX_TICKET_Attribute&gt; e.g. &lt;KIX_TICKET_Priority&gt;."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "FollowUp for [%s]. %s"
 msgstr ""
 
@@ -5291,10 +5215,6 @@ msgid "From"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Frontend"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Fulltext index regex filters to remove parts of the text."
 msgstr ""
 
@@ -5308,10 +5228,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Hide AgentTicketMove if service of current ticket has a configured AssignedQueue and ticket is not excluded from automatic queue assigment."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "If enabled debugging information for ACLs is logged."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5332,10 +5248,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "IndexAccelerator: to choose your backend TicketViewAccelerator module. \"RuntimeDB\" generates each queue view on the fly from ticket table (no performance problems up to approx. 60.000 tickets in total and 6.000 open tickets in the system). \"StaticDB\" is the most powerful module, it uses an extra ticket-index table that works like a view (recommended if more than 80.000 and 6.000 open tickets are stored in the system). Use the command \"bin/kix.Console.pl Maint::Ticket::QueueIndexRebuild\" for initial index creation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Info"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5515,10 +5427,6 @@ msgid "None"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Notice"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Notification Settings"
 msgstr ""
 
@@ -5559,10 +5467,6 @@ msgid "Overloads (redefines) existing functions in Kernel::System::Ticket. Used 
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Owner"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Parameters for the CreateNextMask object in the preference view of the agent interface."
 msgstr ""
 
@@ -5572,10 +5476,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Parameters for the CustomService object in the preference view of the agent interface."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Parameters of the example SLA attribute Comment2."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5611,18 +5511,6 @@ msgid "Postmaster handles followups and new tickets based on the system address 
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Priority"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Process"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Queue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Recognize if a ticket is a follow-up to an existing ticket using an external ticket number."
 msgstr ""
 
@@ -5655,19 +5543,7 @@ msgid "Resets and unlocks the owner of a ticket if it was moved to another queue
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Responsible"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Restores a ticket from the archive (only if the event is a state change, from closed to any open available state)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Restricts the ResponsetimeSetByAutoReply to these ticket types."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Restricts the ResponsetimeSetByPhoneTicket to these ticket types."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5676,10 +5552,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Right"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "SLA"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5708,10 +5580,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Sends the notifications which are configured in the admin interface under \"Notfication (Event)\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Service"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5819,10 +5687,6 @@ msgid "Standard available permissions for agents within the application. If more
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "State"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "State update for closed tickets if a new article of type webrequest is created in customer interface."
 msgstr ""
 
@@ -5879,10 +5743,6 @@ msgid "Ticket"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket event module that triggers the escalation stop events."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Ticket event module to create a checklist from ticket template on ticket create."
 msgstr ""
 
@@ -5900,38 +5760,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Ticket overview"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACL to restrict selection values if ticket templates are used."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACL to restrict some ticket actions based on current ticket data."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACL to restrict some ticket data selections based on current ticket data."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACL to restrict ticket actions for merged tickets."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACLs to define dynamic fields dependencies."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACLs to define shown or hidden dynamic fields in forms."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACLs to define shown tabs if ticket is process ticket."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket-ACLs to define the following possible state."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5971,10 +5799,6 @@ msgid "Update Ticket \"Seen\" flag if every article got seen or a new Article go
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Updated SLA to %s (ID=%s)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Updated Service to %s (ID=%s)."
 msgstr ""
 
@@ -5988,10 +5812,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Updated: %s=%s;%s=%s;%s=%s;"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Updates the ticket escalation index after a ticket attribute got updated."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6012,10 +5832,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Updates ticket type if configured or required after queue move."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "User"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

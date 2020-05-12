@@ -205,10 +205,10 @@ my @Tests = (
     {
         Name   => 'Complex correct HTML link',
         Config => {
-            String => '<p><i>We</i> have to test <strong><a href="www.otrs.com">something</a></strong>.</p>',
+            String => '<p><i>We</i> have to test <strong><a href="www.kixdesk.com">something</a></strong>.</p>',
             Chars  => 20,
         },
-        ExpectedResults => '<p><i>We</i> have to test <strong><a href="www.otrs.com">some&#8230;</a></strong></p>',
+        ExpectedResults => '<p><i>We</i> have to test <strong><a href="www.kixdesk.com">some&#8230;</a></strong></p>',
         Success         => 1,
     },
     {
