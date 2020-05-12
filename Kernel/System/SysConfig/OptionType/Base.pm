@@ -107,6 +107,66 @@ sub ValidateSetting {
     );
 }
 
+=item Extend()
+
+Base method to be overridden in type modules.
+
+    my $Success = $OptionTypeObject->Extend(
+        Value  => ...,
+        Extend => ...,
+    );
+
+=cut
+
+sub Extend {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Type Setting)) {
+        if ( !defined( $Param{$_} ) ) {
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            return;
+        }
+    }
+    if ( !$Self->{OptionTypeModules}->{$Param{Type}} ) {
+        my $Backend = 'Kernel::System::SysConfig::OptionType::' . $Param{Type};
+
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require $Backend!"
+            );        
+        }
+
+        my $BackendObject = $Backend->new( %{$Self} );
+        if ( !$BackendObject ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Backend!"
+            );        
+        }
+
+        $Self->{OptionTypeModules}->{$Param{Type}} = $BackendObject;
+    }
+
+    # check type
+    if ( !$Self->{OptionTypeModules}->{$Param{Type}} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Item has unknown type \"$Param{Type}\".",
+        );            
+        return;
+    }
+
+    if ( $Self->{OptionTypeModules}->{$Param{Type}}->can('Extend') ) {
+        return $Self->{OptionTypeModules}->{$Param{Type}}->Extend(
+            %Param
+        );
+    }
+
+    return;
+}
+
 =item Encode()
 
 Base method to be overridden in type modules if needed.

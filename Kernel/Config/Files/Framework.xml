@@ -207,17 +207,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ImportExport::ObjectBackendRegistration###SLA" Required="0" Valid="1">
-        <Description Translatable="1">Object backend module registration for the import/export module.</Description>
-        <Group>Framework</Group>
-        <SubGroup>ObjectBackend::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::SLA</Item>
-                <Item Key="Name">SLA</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ImportExport::ServiceImportExport::ForceCSVMappingRecreation" Required="1" Valid="1">
         <Description Translatable="1">Defines if CSV-mappings are re-created on next package reinstallation or upgrade if already existent.</Description>
         <Group>Framework</Group>
@@ -293,16 +282,6 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <String Regex="">Your Org. Director/s according to Registration</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###500-ExternalSupplierForwarding" Required="0" Valid="0">
-        <Description Translatable="1">Ticket-ACL to show/hide ticket action AgentTicketPrintForwardFax.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::ExternalSupplierForwarding</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###999-ExternalSupplierForwarding" Required="0" Valid="1">
@@ -844,24 +823,6 @@
                 <Item Key="Schedule">5 * * * *</Item> <!-- default: every hour on the 5th minute -->
                 <!-- Use a console command here as it does some PID handling -->
                 <Item Key="Module">Kernel::System::Console::Command::Maint::Stats::Dashboard::Generate</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###EscalationCheck" Required="0" Valid="1" ConfigLevel="100">
-        <Description Translatable="1">Triggers ticket escalation events and notification events for escalation.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">EscalationCheck</Item>
-                <Item Key="Schedule">*/5 * * * *</Item> <!-- Default every 5 mins -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Ticket::EscalationCheck</Item>
                 <Item Key="Function">Execute</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
@@ -1945,7 +1906,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -1989,7 +1950,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2033,7 +1994,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2077,7 +2038,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2121,7 +2082,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2165,7 +2126,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2209,7 +2170,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2253,7 +2214,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2297,7 +2258,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2341,7 +2302,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2385,7 +2346,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2429,7 +2390,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2473,7 +2434,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2517,7 +2478,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -2561,7 +2522,7 @@
                 <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
                 <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
                 <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">otrs@example.com</Item>
+                <Item Key="ToAddressRegExp">kix@example.com</Item>
                 <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
                 <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
                 <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
@@ -4041,7 +4002,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar1" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar1" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -4475,7 +4436,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar2" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar2" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -4909,7 +4870,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar3" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar3" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -5343,7 +5304,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar4" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar4" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -5777,7 +5738,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar5" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar5" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -6211,7 +6172,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar6" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar6" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -6645,7 +6606,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar7" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar7" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -7079,7 +7040,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar8" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar8" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -7513,7 +7474,7 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TimeWorkingConfig::Calendar9" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar9" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
@@ -7641,7 +7602,7 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Package::RepositoryList" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines the list of online repositories. Another installations can be used as repository, for example: Key="http://example.com/otrs/public.pl?Action=PublicRepository;File=" and Content="Some Name".</Description>
+        <Description Translatable="1">Defines the list of online repositories. Another installations can be used as repository, for example: Key="http://example.com/kix/public.pl?Action=PublicRepository;File=" and Content="Some Name".</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Package</SubGroup>
         <Setting>
@@ -7884,7 +7845,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Crypt::PGP</SubGroup>
         <Setting>
-            <String Regex="">--homedir /opt/otrs/.gnupg/ --batch --no-tty --yes</String>
+            <String Regex="">--homedir /opt/kix/.gnupg/ --batch --no-tty --yes</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="confidential" Name="PGP::Key::Password" Required="1" Valid="1">
@@ -8660,7 +8621,7 @@ via the Preferences button after logging in.
         <Group>Framework</Group>
         <SubGroup>Frontend::Contact::Auth</SubGroup>
         <Setting>
-            <String Regex="">cn=otrsallow,ou=posixGroups,dc=example,dc=com</String>
+            <String Regex="">cn=kixallow,ou=posixGroups,dc=example,dc=com</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
@@ -8868,7 +8829,7 @@ via the Preferences button after logging in.
         <Group>Framework</Group>
         <SubGroup>Frontend::Auth</SubGroup>
         <Setting>
-            <String Regex="">cn=otrsallow,ou=posixGroups,dc=example,dc=com</String>
+            <String Regex="">cn=kixallow,ou=posixGroups,dc=example,dc=com</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
@@ -9003,7 +8964,7 @@ via the Preferences button after logging in.
         <Group>Framework</Group>
         <SubGroup>Frontend::Auth</SubGroup>
         <Setting>
-            <String Regex="">cn=otrsallow,ou=posixGroups,dc=example,dc=com</String>
+            <String Regex="">cn=kixallow,ou=posixGroups,dc=example,dc=com</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">

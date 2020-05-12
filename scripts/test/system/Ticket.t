@@ -17,7 +17,6 @@ use vars (qw($Self));
 # get needed objects
 my $QueueObject   = $Kernel::OM->Get('Queue');
 my $ServiceObject = $Kernel::OM->Get('Service');
-my $SLAObject     = $Kernel::OM->Get('SLA');
 my $StateObject   = $Kernel::OM->Get('State');
 my $TicketObject  = $Kernel::OM->Get('Ticket');
 my $TimeObject    = $Kernel::OM->Get('Time');
@@ -42,7 +41,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'closed',
     OrganisationID => '123465',
-    ContactID    => 'unittest@otrs.com',
+    ContactID    => 'unittest@kixdesk.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -110,11 +109,6 @@ $Self->Is(
     '',
     'TicketGet() (ServiceID)',
 );
-$Self->Is(
-    $Ticket{SLAID},
-    '',
-    'TicketGet() (SLAID)',
-);
 
 my $DefaultTicketType = $Kernel::OM->Get('Config')->Get('Ticket::Type::Default');
 $Self->Is(
@@ -143,7 +137,7 @@ my $TicketIDCreatedBy = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'closed',
     OrganisationID   => '123465',
-    ContactID    => 'unittest@otrs.com',
+    ContactID    => 'unittest@kixdesk.com',
     OwnerID      => 1,
     UserID       => $TestUserID,
 );
@@ -1133,85 +1127,16 @@ $ChangeTime = $TicketData{Changed};
 # wait 5 seconds
 $Helper->FixedTimeAddSeconds(5);
 
-my $TicketEscalationIndexBuild = $TicketObject->TicketEscalationIndexBuild(
-    TicketID => $TicketID,
-    UserID   => 1,
-);
-
-$Self->True(
-    $TicketEscalationIndexBuild,
-    'TicketEscalationIndexBuild()',
-);
-
-# get updated ticket data
-%TicketData = $TicketObject->TicketGet(
-    TicketID => $TicketID,
-    UserID   => 1,
-);
-
-# compare current change_time with old one
-$Self->IsNot(
-    $ChangeTime,
-    $TicketData{Changed},
-    'Change_time updated in TicketEscalationIndexBuild()',
-);
-
 # save current change_time
 $ChangeTime = $TicketData{Changed};
-
-# create a test SLA
-my $SLAID = $SLAObject->SLAAdd(
-    Name    => 'SLA' . $Helper->GetRandomID(),
-    ValidID => 1,
-    Comment => 'Unit Test Comment',
-# ---
-# ITSMCore
-# ---
-    TypeID => 1,
-# ---
-    UserID  => 1,
-);
 
 # wait 5 seconds
 $Helper->FixedTimeAddSeconds(5);
 
-# set SLA
-my $TicketSLASet = $TicketObject->TicketSLASet(
-    SLAID    => $SLAID,
-    TicketID => $TicketID,
-    UserID   => 1,
-);
-
-$Self->True(
-    $TicketSLASet,
-    'TicketSLASet()',
-);
-
 # get updated ticket data
 %TicketData = $TicketObject->TicketGet(
     TicketID => $TicketID,
     UserID   => 1,
-);
-
-# compare current change_time with old one
-$Self->IsNot(
-    $ChangeTime,
-    $TicketData{Changed},
-    'Change_time updated in TicketSLASet()',
-);
-
-# set as invalid the test SLA
-my %SLA = $SLAObject->SLAGet(
-    SLAID  => $SLAID,
-    UserID => 1, 
-);
-$SLAObject->SLAUpdate(
-    SLAID   => $SLAID,
-    Name    => 'SLA' . $Helper->GetRandomID(),
-    TypeID  => $SLA{TypeID},
-    ValidID => 1,
-    Comment => 'Unit Test Comment',
-    UserID  => 1,
 );
 
 my $TicketLock = $TicketObject->LockSet(
@@ -1709,7 +1634,7 @@ my $TicketIDSortOrder1 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     OrganisationID => $OrganisationID,
-    ContactID    => 'unittest@otrs.com',
+    ContactID    => 'unittest@kixdesk.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1729,7 +1654,7 @@ my $TicketIDSortOrder2 = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     OrganisationID => $OrganisationID,
-    ContactID    => 'unittest@otrs.com',
+    ContactID    => 'unittest@kixdesk.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1778,7 +1703,7 @@ my @TicketIDsSortOrder = $TicketObject->TicketSearch(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -1825,7 +1750,7 @@ $Self->Is(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -1871,7 +1796,7 @@ $Self->Is(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -1914,7 +1839,7 @@ $Self->Is(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -1942,7 +1867,7 @@ my $TicketIDSortOrder3 = $TicketObject->TicketCreate(
     Priority     => '4 high',
     State        => 'new',
     OrganisationID   => $OrganisationID,
-    ContactID=> 'unittest@otrs.com',
+    ContactID=> 'unittest@kixdesk.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1957,7 +1882,7 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
     Priority     => '4 high',
     State        => 'new',
     OrganisationID   => $OrganisationID,
-    ContactID=> 'unittest@otrs.com',
+    ContactID=> 'unittest@kixdesk.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1984,7 +1909,7 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -2030,7 +1955,7 @@ $Self->Is(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -2076,7 +2001,7 @@ $Self->Is(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -2118,7 +2043,7 @@ $Self->Is(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -2159,7 +2084,7 @@ $Count = $TicketObject->TicketSearch(
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             }            
         ]
@@ -2215,7 +2140,7 @@ $TicketID = $TicketObject->TicketCreate(
     Priority     => '3 normal',
     State        => 'new',
     OrganisationID   => '123465',
-    ContactID=> 'unittest@otrs.com',
+    ContactID=> 'unittest@kixdesk.com',
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -2663,7 +2588,7 @@ my @DeleteTicketList = $TicketObject->TicketSearch(
         AND => [ 
             {
                 Field => 'ContactID',
-                Value => 'unittest@otrs.com',
+                Value => 'unittest@kixdesk.com',
                 Operator => 'EQ',
             },                
         ]

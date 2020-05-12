@@ -131,27 +131,7 @@ sub Run {
                 Message => 'Cannot delete GeneralCatalogItem. A Service with this GeneralCatalogItem already exists.',
             );
         }
-         	    
-        my %SLAList = $Kernel::OM->Get('SLA')->SLAList(
-            Valid     => 1,  
-            UserID  => $Self->{Authorization}->{UserID},
-        );
-                  
-        foreach my $ID (keys %SLAList) {
-	        my %SLAData = $Kernel::OM->Get('SLA')->SLAGet(
-	            SLAID => $ID,
-	            UserID  => $Self->{Authorization}->{UserID},
-	        );
-	                	    	
-            if ( $SLAData{TypeID} == $GeneralCatalogItemID) {
-
-                return $Self->_Error(
-                    Code    => 'Object.DependingObjectExists',
-                    Message => 'Cannot delete GeneralCatalogItem. A SLA with this GeneralCatalogItem already exists.',
-                );
-            }    	
-        }
-   
+         	       
         # delete GeneralCatalog	    
         my $Success = $Kernel::OM->Get('GeneralCatalog')->GeneralCatalogItemDelete(
             GeneralCatalogItemID  => $GeneralCatalogItemID,

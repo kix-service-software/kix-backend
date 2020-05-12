@@ -40,14 +40,21 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'locale-directory',
-        Description => "The directory where the PO files are located. If omitted <KIX home>/locale will be used.",
+        Description => "The directory where the PO files are located. If omitted <KIX home>/locale will be used. ",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'file',
-        Description => "Only import the given file. The option locale-directory will be ignored in this case.",
+        Description => "Only import the given file. The option \"locale-directory\" will be ignored in this case.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
+        Name        => 'plugin',
+        Description => "The name (ID) of the plugin to be updated. If this is not given the framework will be updated. (use ALL to update all plugins). The options \"locale-directory\" and \"file\" will be ignored in this case.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -61,13 +68,51 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Home      = $Kernel::OM->Get('Config')->Get('Home');
+    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
 
+    my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
+        InitOrder => 1
+    );
+    my %PluginList = map { $_->{Product} => $_ } @Plugins;
+    
     my $Language  = $Self->GetOption('language') || '';
     my $LocaleDir = $Self->GetOption('locale-directory') || $Home.'/locale';
     my $File      = $Self->GetOption('file') || '';
+    my $Plugin    = $Self->GetOption('plugin') || '';
 
     $Self->Print("<yellow>Updating translations...</yellow>\n\n");
+
+    my @ImportItems;
+    if ( !$Plugin ) {
+        # add framework
+        push @ImportItems, { Name => 'framework', Directory => $LocaleDir };
+    }
+    elsif ( $Plugin && $Plugin ne 'ALL' ) {
+        my $Directory = $PluginList{$Plugin}->{Directory};
+    
+        if ( ! -d $Directory ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Plugin $Plugin doesn't exist!"
+            );
+            return;
+        }
+        # add plugin
+        push @ImportItems, { Name => $Plugin, Directory => $Directory };
+    }
+    elsif ( $Plugin && $Plugin eq 'ALL' ) {
+        foreach my $Plugin ( @Plugins ) {
+            if ( ! -d $Plugin->{Directory} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Plugin $Plugin->{Product} doesn't exist!"
+                );
+                return;        
+            }
+            # add plugin
+            push @ImportItems, { Name => $Plugin->{Product}, Directory => $Plugin->{Directory} };
+        }
+    }
 
     my @POFiles;
     if ( $File ) {
@@ -75,18 +120,23 @@ sub Run {
         push @POFiles, $File;
     }
     else {
-        # get all relevant PO files in given directory
-        @POFiles = $Kernel::OM->Get('Main')->DirectoryRead(
-            Directory => $LocaleDir,
-            Filter    => $Language ? "$Language.po" : '*.po'
-        );
+        foreach my $ImportItem ( @ImportItems ) {
+            # get all relevant PO files in given directory
+            @POFiles = $Kernel::OM->Get('Main')->DirectoryRead(
+                Directory => $ImportItem->{Directory},
+                Filter    => $Language ? "$Language.po" : '*.po'
+            );
+        }
     }
 
     foreach my $File ( sort @POFiles ) {
+        # ignore plugins
+        next if $File =~ /\/plugins\// && !$Plugin;
+
         my $Filename = basename $File;
         my ($Language) = split(/\./, $Filename);
 
-        $Self->Print("    importing $LocaleDir/$Filename...");
+        $Self->Print("    importing $Filename...");
 
         my ($CountTotal, $CountOK) = $Kernel::OM->Get('Translation')->ImportPO(
             Language => $Language,

@@ -13,7 +13,6 @@ use warnings;
 
 our @ObjectDependencies = (
     'GeneralCatalog',
-    'ITSMCIAttributCollectionUtils',
     'ITSMConfigItem',
     'Log'
 );
@@ -48,7 +47,6 @@ sub new {
     bless( $Self, $Type );
 
     $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
-    $Self->{CIACUtilsObject}      = $Kernel::OM->Get('ITSMCIAttributCollectionUtils');
     $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
     $Self->{LogObject}            = $Kernel::OM->Get('Log');
 
@@ -213,7 +211,7 @@ sub ExportValuePrepare {
                 my $XMLDefinition =
                     $Self->{ConfigItemObject}->DefinitionGet( ClassID => $ReferencedCIClassID, );
 
-                my $ArrRef = $Self->{CIACUtilsObject}->GetAttributeValuesByKey(
+                my $ArrRef = $Self->{ConfigItemObject}->GetAttributeValuesByKey(
                     KeyName       => $SearchAttr,
                     XMLData       => $VersionData->{XMLData}->[1]->{Version}->[1],
                     XMLDefinition => $XMLDefinition->{DefinitionRef},

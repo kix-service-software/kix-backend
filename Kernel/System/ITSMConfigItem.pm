@@ -2046,7 +2046,7 @@ sub GetAttributeValuesByKey {
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
             # no content then stop loop...
-            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
+            last COUNTER if $Item->{Input}->{Type} ne 'Dummy' && !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
 
             # check if we are looking for this key
             if ( $Item->{Key} eq $Param{KeyName} ) {
@@ -2117,11 +2117,12 @@ sub GetAttributeContentsByKey {
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
             # no content then stop loop...
-            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
+            last COUNTER if $Item->{Input}->{Type} ne 'Dummy' && !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
 
             # get the value...
             my $Content
-                = length( $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} )
+                = defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}
+                && length( $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} )
                 ? $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}
                 : '';
 
@@ -2448,13 +2449,13 @@ sub SetAttributeContentsByKey {
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
+            # no content then stop loop...
+            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
+
             # get the value...
             if ( $Item->{Key} eq $Param{KeyName} ) {
                 $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} = $Param{NewContent};
             }
-
-            # no content then stop loop...
-            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
 
             next COUNTER if !$Item->{Sub};
 

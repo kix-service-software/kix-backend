@@ -51,10 +51,9 @@ sub Run {
     COMMAND:
     for my $Command ( $Kernel::OM->Get('Console')->CommandList() ) {
 
-        # KIXCore-capeIT
-        if ( $Kernel::OM->Get('Main')->Require( $Command, Silent => 1 ) ) {
+        my $Module = $Kernel::OM->GetModuleFor($Command);
 
-            # EO KIXCore-capeIT
+        if ( $Kernel::OM->Get('Main')->Require( $Module, Silent => 1 ) ) {
 
             my $CommandObject = $Kernel::OM->Get($Command);
             my $CommandName   = $CommandObject->Name();

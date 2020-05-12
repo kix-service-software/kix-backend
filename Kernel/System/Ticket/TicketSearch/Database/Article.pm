@@ -114,7 +114,7 @@ sub Search {
     }
 
     # check if we have to add a join
-    if ( !$Self->{ModuleData}->{AlreadyJoined} ) {
+    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} ) {
         # use appropriate table for selected search index module
         my $ArticleSearchTable = 'article';
         if ( $IsStaticSearch ) {
@@ -126,7 +126,7 @@ sub Search {
         } else {
             push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
         }
-        $Self->{ModuleData}->{AlreadyJoined} = 1;
+        $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
     }
 
     if ( $Param{Search}->{Field} =~ /ArticleCreateTime/ ) {
@@ -259,7 +259,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
-    };       
+    };
 }
 
 sub _prepareField {

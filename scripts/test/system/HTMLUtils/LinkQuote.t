@@ -88,9 +88,9 @@ my @Tests = (
     },
     {
         Input =>
-            'Some text with a complicated url http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631',
+            'Some text with a complicated url http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631',
         Result =>
-            'Some text with a complicated url <a href="http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631" title="http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631">http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631</a>',
+            'Some text with a complicated url <a href="http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631" title="http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631">http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631</a>',
         Name   => 'LinkQuote - complicated',
         Target => '',
     },
@@ -152,9 +152,9 @@ my @Tests = (
     },
     {
         Input =>
-            'Some text with a full url http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631',
+            'Some text with a full url http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631',
         Result =>
-            'Some text with a full url <a href="http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631" title="http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631">http://example.com/otrs/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631</a>',
+            'Some text with a full url <a href="http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631" title="http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631">http://example.com/kix/index.pl?Action=AgentTicketZoom&TicketID=256868&ArticleID=696631&ZoomExpand=0#696631</a>',
         Name   => 'LinkQuote – full url',
         Target => '',
     },
@@ -311,9 +311,9 @@ my @Tests = (
     },
     {
         Input =>
-            '<br />http://cuba/otrs/index.pl?Action=AgentTicketZoom&amp;TicketID=4348<br /><br />Your KIX Notification Master',
+            '<br />http://cuba/kix/index.pl?Action=AgentTicketZoom&amp;TicketID=4348<br /><br />Your KIX Notification Master',
         Result =>
-            '<br /><a href="http://cuba/otrs/index.pl?Action=AgentTicketZoom&amp;TicketID=4348" title="http://cuba/otrs/index.pl?Action=AgentTicketZoom&amp;TicketID=4348">http://cuba/otrs/index.pl?Action=AgentTicketZoom&amp;TicketID=4348</a><br /><br />Your KIX Notification Master',
+            '<br /><a href="http://cuba/kix/index.pl?Action=AgentTicketZoom&amp;TicketID=4348" title="http://cuba/kix/index.pl?Action=AgentTicketZoom&amp;TicketID=4348">http://cuba/kix/index.pl?Action=AgentTicketZoom&amp;TicketID=4348</a><br /><br />Your KIX Notification Master',
         Name   => 'LinkQuote - just TLD given;',
         Target => '',
     },

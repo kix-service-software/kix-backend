@@ -1352,7 +1352,7 @@ sub PackageOnlineList {
     }
     if ( !defined $Param{Cache} ) {
 
-        if ( $Param{URL} =~ m{ \.otrs\.org\/ }xms ) {
+        if ( $Param{URL} =~ m{ \.kix\.org\/ }xms ) {
             $Param{Cache} = 1;
         }
         else {
@@ -1378,7 +1378,7 @@ sub PackageOnlineList {
     my $Filelist;
     if ( !$Param{FromCloud} ) {
 
-        my $XML = $Self->_Download( URL => $Param{URL} . '/otrs.xml' );
+        my $XML = $Self->_Download( URL => $Param{URL} . '/kix.xml' );
         return if !$XML;
 
         my @XMLARRAY = $Kernel::OM->Get('XML')->XMLParse( String => $XML );
@@ -3417,7 +3417,7 @@ sub _FileSystemCheck {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "ERROR: Need write permissions for directory $Home$Filepath\n"
-                    . " Try: $Home/bin/otrs.SetPermissions.pl!",
+                    . " Try: $Home/bin/kix.SetPermissions.pl!",
             );
             return;
         }

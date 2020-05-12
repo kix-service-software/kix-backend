@@ -56,7 +56,7 @@ for my $SQL (@SQL) {
 }
 
 my @SpecialCharacters = qw( - _ . : ; ' " \ [ ] { } ( ) < > ? ! $ % & / + * = ' ^ | ö ス);
-push @SpecialCharacters, ( ',', '#', 'otrs test', 'otrs_test' );
+push @SpecialCharacters, ( ',', '#', 'kix test', 'kix_test' );
 my $Counter = 0;
 
 for my $Character (@SpecialCharacters) {
@@ -165,7 +165,7 @@ for my $Character (@SpecialCharacters) {
 {
 
     # select like value (with space)
-    my $Character     = 'otrs test';
+    my $Character     = 'kix test';
     my $CharacterLike = $DBObject->Quote( $Character, 'Like' );
     my $SQL           = "SELECT COUNT(name_b) FROM test_d WHERE name_b LIKE ?";
 
@@ -189,7 +189,7 @@ for my $Character (@SpecialCharacters) {
     );
 
     # select like value (with underscore)
-    $Character = 'otrs_test';
+    $Character = 'kix_test';
     $CharacterLike = $DBObject->Quote( $Character, 'Like' );
 
     # proof of concept that oracle needs special treatment

@@ -259,7 +259,7 @@
             "Value"
          ]
       },
-      "DynamicFieldValue_json-95816834ee" : {
+      "DynamicFieldValue_json-c39a01a9a4" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -320,7 +320,7 @@
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-3fc26e02ab" : {
+      "TicketArticleAttachment_json-105363e477" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -375,7 +375,7 @@
             "ID"
          ]
       },
-      "TicketArticleFlag_json-73c45dc8a4" : {
+      "TicketArticleFlag_json-91a9ab63f3" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -414,7 +414,7 @@
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
                },
                "readOnly" : true
             },
@@ -480,7 +480,7 @@
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
                },
                "readOnly" : true
             },
@@ -488,7 +488,7 @@
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
                },
                "readOnly" : true
             },

@@ -69,13 +69,12 @@ sub ReplaceExtended {
     # Extension Placeholder
     # additionel Placeholder KIX_LAST_...
     # PriorityID, To, Channel, AgeTimeUnix, Body, MimeType, InReplyTo, TicketNumber,
-    # SenderTypeID, ContentCharset, ResponsibleID, ReplyTo, EscalationSolutionTime,
-    # SLA, EscalationUpdateTime, CreateTimeUnix, EscalationResponseTime, UntilTime,
+    # SenderTypeID, ContentCharset, ResponsibleID, ReplyTo, SLA, CreateTimeUnix, UntilTime,
     # ChannelID, ServiceID, FromRealname, From, Changed, MessageID, State,
     # References, TypeID, Subject, ContentType, SenderType, QueueID, Title,
     # Responsible, LockID, Age, Owner, TicketID, Priority, Created, Lock, Queue,
     # ContactID, CreatedBy, StateType, OwnerID, Service, ArticleID, Cc,
-    # CustomerID, StateID, IncomingTime, Type, RealTillTimeNotUsed, EscalationTime, SLAID, Charset,
+    # CustomerID, StateID, IncomingTime, Type, RealTillTimeNotUsed, Charset,
     # Idea: Code from sub _Replace
 
     my ( $Self, %Param ) = @_;

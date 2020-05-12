@@ -19,6 +19,8 @@ use 5.010_000;
 use File::Basename;
 use FindBin qw($Bin);
 use lib dirname($Bin);
+use lib dirname($Bin) . '/Kernel/cpan-lib';
+use lib dirname($Bin) . '/plugins';
 use lib dirname($Bin) . '/../Kernel/cpan-lib';
 use lib dirname($Bin) . '/../plugins';
 
@@ -179,7 +181,7 @@ sub Exists {
 sub Get {
     my ( $Self, $What ) = @_;
 
-    if ( !defined $Self->{Config}->{$What} && !$Self->{SysConfigLoaded} ) {        
+    if ( !defined $Self->{Config}->{$What} && !$Self->{SysConfigLoaded} ) {
         # Config hash has not been loaded yet, just do it
         $Self->LoadSysConfig();
     }

@@ -54,20 +54,12 @@ sub GetSupportedAttributes {
             'CreateTime',
             'PendingTime',
             'LastChangeTime',
-            'EscalationTime',
-            'EscalationUpdateTime',
-            'EscalationResponseTime',
-            'EscalationSolutionTime',
         ],
         Sort => [
             'Age',
             'CreateTime',
             'PendingTime',
             'LastChangeTime',
-            'EscalationTime',
-            'EscalationUpdateTime',
-            'EscalationResponseTime',
-            'EscalationSolutionTime',            
         ]
     }
 }
@@ -106,10 +98,6 @@ sub Search {
         CreateTime             => 'st.create_time_unix',
         PendingTime            => 'st.until_time',
         LastChangeTime         => 'st.change_time',
-        EscalationTime         => 'st.escalation_time',
-        EscalationUpdateTime   => 'st.escalation_update_time',
-        EscalationResponseTime => 'st.escalation_response_time',
-        EscalationSolutionTime => 'st.escalation_solution_time',
     );
 
     # convert to unix time and check
@@ -117,7 +105,7 @@ sub Search {
         String => $Param{Search}->{Value},
     );
 
-    if ( $Param{Search}->{Field} !~ /^(Create|Pending|Escalation)/ ) {
+    if ( $Param{Search}->{Field} !~ /^(Create|Pending)/ ) {
         # use original string value
         $Value = "'".$Param{Search}->{Value}."'";
     }
@@ -140,12 +128,7 @@ sub Search {
 
     push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
 
-    # some special handling
-    if ( $Param{Search}->{Field} =~ /^Escalation/ ) {
-        # in case of escalation time search, exclude tickets without escalations
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' != 0' );
-    }
-    elsif ( $Param{Search}->{Field} =~ /^Pending/ ) {
+    if ( $Param{Search}->{Field} =~ /^Pending/ ) {
         # in case of pending time search, restrict states to pending states
         my @List = $Kernel::OM->Get('State')->StateGetStatesByType(
             StateType => [ 'pending reminder', 'pending auto' ],
@@ -185,10 +168,6 @@ sub Sort {
         CreateTime             => 'st.create_time_unix',
         PendingTime            => 'st.until_time',
         LastChangeTime         => 'st.change_time',
-        EscalationTime         => 'st.escalation_time',
-        EscalationUpdateTime   => 'st.escalation_update_time',
-        EscalationResponseTime => 'st.escalation_response_time',
-        EscalationSolutionTime => 'st.escalation_solution_time',
     );
 
     return {

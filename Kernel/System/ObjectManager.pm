@@ -306,7 +306,7 @@ sub _ObjectBuild {
     $Self->{ObjectDependencies}->{$Package} = $Dependencies;
 
     my $NewObject = $Package->new(
-        %{ $Self->{Param}->{$Package} // {} }
+        %{ $Self->{Param}->{$Param{Package}} // {} }
     );
 
     if ( !defined $NewObject ) {

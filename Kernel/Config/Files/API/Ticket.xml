@@ -79,7 +79,6 @@
                 <Item Key="Subject" Translatable="1">Subject</Item>
                 <Item Key="Queue" Translatable="1">Queue</Item>
                 <Item Key="Priority" Translatable="1">Priority</Item>
-                <Item Key="EscalationTime" Translatable="1">EscalationTime</Item>
             </Option>
         </Setting>
     </ConfigItem>

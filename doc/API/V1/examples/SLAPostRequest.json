@@ -1,8 +1,0 @@
-{
-    "SLA": {
-        "Name": "test SLA",
-        "FirstResponseTime": 120,
-        "FirstResponseNotify": 90,
-        "TypeID": 2
-    }
-}
