@@ -1136,6 +1136,7 @@ get first article
 
     my %Article = $TicketObject->ArticleFirstArticle(
         TicketID      => 123,
+        Extended      => 1,     # 0 or 1, see ArticleGet()
         DynamicFields => 1,     # 0 or 1, see ArticleGet()
     );
 
@@ -1161,6 +1162,43 @@ sub ArticleFirstArticle {
 
     return $Self->ArticleGet(
         ArticleID     => $Index[0],
+        Extended      => $Param{Extended},
+        DynamicFields => $Param{DynamicFields},
+    );
+}
+
+=item ArticleLastArticle()
+
+get last article
+
+    my %Article = $TicketObject->ArticleLastArticle(
+        TicketID      => 123,
+        Extended      => 1,     # 0 or 1, see ArticleGet()
+        DynamicFields => 1,     # 0 or 1, see ArticleGet()
+    );
+
+=cut
+
+sub ArticleLastArticle {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{TicketID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need TicketID!"
+        );
+        return;
+    }
+
+    # get article index
+    my @Index = $Self->ArticleIndex( TicketID => $Param{TicketID} );
+
+    # get article data
+    return if !@Index;
+
+    return $Self->ArticleGet(
+        ArticleID     => $Index[-1],
         Extended      => $Param{Extended},
         DynamicFields => $Param{DynamicFields},
     );

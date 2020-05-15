@@ -458,7 +458,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::ArchiveFlag</Item>
             </Hash>
         </Setting>
-    </ConfigItem>  
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Article" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -498,7 +498,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Contact</Item>
             </Hash>
         </Setting>
-    </ConfigItem>      
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###DynamicField" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -508,7 +508,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::DynamicField</Item>
             </Hash>
         </Setting>
-    </ConfigItem>      
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###History" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -518,7 +518,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::History</Item>
             </Hash>
         </Setting>
-    </ConfigItem>      
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Lock" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -528,7 +528,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Lock</Item>
             </Hash>
         </Setting>
-    </ConfigItem>      
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Organisation" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -538,7 +538,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Organisation</Item>
             </Hash>
         </Setting>
-    </ConfigItem>    
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###OwnerResponsible" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -548,7 +548,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::OwnerResponsible</Item>
             </Hash>
         </Setting>
-    </ConfigItem>   
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Priority" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -558,7 +558,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Priority</Item>
             </Hash>
         </Setting>
-    </ConfigItem>    
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Queue" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -568,7 +568,7 @@
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Queue</Item>
             </Hash>
         </Setting>
-    </ConfigItem>         
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Service" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -4109,4 +4109,63 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
+
+    <!-- ticket placeholder module registrations -->
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###010-Config" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for configuration placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Config</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###100-User" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for user attribute placeholders such as owner, responsible or current user.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::User</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###150-DynamicField" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for dynamic field attribute placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###200-Contact" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for contact attribute placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Contact</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###250-Article" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for article attribute placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Article</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###500-Ticket" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for ticket attribute placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###600-Recipient" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for notification recipient placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Recipient</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO ticket placeholder module registrations -->
 </kix_config>

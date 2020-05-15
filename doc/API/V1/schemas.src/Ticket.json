@@ -29,7 +29,7 @@
       "readOnly": true
     },
     "ContactID": {
-      "type": "integer",
+      "type": "string",
       "readOnly": true
     },
     "CreateBy": {
@@ -69,7 +69,7 @@
       "readOnly": true
     },
     "OrganisationID": {
-      "type": "integer",
+      "type": "string",
       "readOnly": true
     },
     "Owner": {
@@ -113,7 +113,14 @@
       "readOnly": true
     },
     "ServiceID": {
-      "type": "integer",
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
       "readOnly": true
     },
     "State": {

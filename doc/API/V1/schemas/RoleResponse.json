@@ -12,7 +12,7 @@
       "Role"
    ],
    "definitions" : {
-      "Permission_json-0f9ebcd307" : {
+      "Permission_json-a9c743d381" : {
          "$id" : "#Permission",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
@@ -115,7 +115,7 @@
                "description" : "added via include \"Permissions\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Permission_json-0f9ebcd307"
+                  "$ref" : "#/definitions/Permission_json-a9c743d381"
                },
                "readOnly" : true
             },

@@ -195,7 +195,7 @@ one or more ticket entries in one call.
                             Attachments => [
                                 <AttachmentID>
                                 # . . .
-                            ]                            
+                            ]
                             # If include=Attachments => 1 AND expand=Attachments => 1 was passed, you'll get an entry like this for each attachment:
                             Attachments => [
                                 {
@@ -226,7 +226,7 @@ one or more ticket entries in one call.
                     # If Include=History AND Expand=History was passed, the history data will be expanded (see HistoryGet for details):
                     History => [
                         {
-                            OwnerID 
+                            OwnerID
                             ArticleID
                             CreateBy
                             HistoryType
@@ -234,11 +234,11 @@ one or more ticket entries in one call.
                             StateID
                             TypeID
                             HistoryTypeID
-                            Name 
+                            Name
                             HistoryID
                             QueueID
                             TicketID
-                            PriorityID                        
+                            PriorityID
                         },
                         {
                             #. . .
@@ -283,7 +283,7 @@ sub Run {
         # add unseen information
         my %Flags = $TicketObject->TicketFlagGet(
             TicketID => $TicketID,
-            UserID   => $Self->{Authorization}->{UserID},  
+            UserID   => $Self->{Authorization}->{UserID},
         );
         $TicketRaw{Unseen} = (!exists($Flags{Seen}) || !$Flags{Seen}) ? 1 : 0;
 
@@ -353,7 +353,7 @@ sub Run {
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Value              => $TicketRaw{$Attribute}
                         );
-                        
+
                         push @DynamicFields, {
                             ID                => $DynamicFieldConfig->{ID},
                             Name              => $DynamicFieldConfig->{Name},
@@ -391,6 +391,8 @@ sub Run {
         $TicketData{ContactID} = "" . $TicketData{ContactID};
         $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
 
+        $TicketData{ServiceID} = $TicketData{ServiceID} ? (0 + $TicketData{ServiceID}) : undef;
+
         # add
         push(@TicketList, \%TicketData);
     }
@@ -398,7 +400,7 @@ sub Run {
     if ( scalar(@TicketList) == 1 ) {
         return $Self->_Success(
             Ticket => $TicketList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

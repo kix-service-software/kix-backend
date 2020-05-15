@@ -1,4 +1,4 @@
-<!DOCTYPE HTML><html><head><title>KIX REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.2.1"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
+<!DOCTYPE HTML><html><head><title>KIX REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.5.0"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
       // --
 // Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
 // --
@@ -592,33 +592,30 @@ pre code {
     text-decoration: underline;
   }
   
-    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api/v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#auth"><code>/auth</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="responses"><a href="#responses">Responses</a></h2><p>In case of a successful execution of the request the API responds with an appropriate HTTP code and the corresponding JSON response as the content. If an error occurs the API returns a simple error object. You can find the structure of these objects in the response description for each API resource.</p></div><div class="chapter"><h2 id="permissions"><a href="#permissions">Permissions</a></h2></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In contrast to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function depends on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?search={...}
-</code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be executed at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?filter={...}
-</code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="lang-bash">{
+    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api/v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#auth"><code>/auth</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="responses"><a href="#responses">Responses</a></h2><p>In case of a successful execution of the request the API responds with an appropriate HTTP code and the corresponding JSON response as the content. If an error occurs the API returns a simple error object. You can find the structure of these objects in the response description for each API resource.</p></div><div class="chapter"><h2 id="permissions"><a href="#permissions">Permissions</a></h2></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In contrast to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function depends on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?search={...}</code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be executed at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?filter={...}</code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="language-bash">{
 "&lt;Object&gt;": {
 "AND": [
 {
-    "Field":     "&lt;Fieldname&gt;",
-    "Operator":  "&lt;Operator&gt;",
-    "Value":     "&lt;Value&gt;"[,]
-    ["Type":     "&lt;Type&gt;",]
-    ["Not":      &lt;Not&gt;,]
+  "Field":     "&lt;Fieldname&gt;",
+  "Operator":  "&lt;Operator&gt;",
+  "Value":     "&lt;Value&gt;"[,]
+  ["Type":     "&lt;Type&gt;",]
+  ["Not":      &lt;Not&gt;,]
 },
 ...next field...
 ],
 "OR": [
 {
-    "Field":     "&lt;Fieldname&gt;",
-    "Operator":  "&lt;Operator&gt;",
-    "Value":     "&lt;Value&gt;"[,]
-    ["Type":     "&lt;Type&gt;",]
-    ["Not":      &lt;Not&gt;,]
+  "Field":     "&lt;Fieldname&gt;",
+  "Operator":  "&lt;Operator&gt;",
+  "Value":     "&lt;Value&gt;"[,]
+  ["Type":     "&lt;Type&gt;",]
+  ["Not":      &lt;Not&gt;,]
 },
 ...next field...
 ]
 }
-}
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td style="text-align:center">yes</td><td>The object in the JSON response to be filtered.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td style="text-align:center">yes</td><td>The attribute in each item of the response to be filtered.</td></tr><tr><td><code>&lt;Operator&gt;</code></td><td style="text-align:center">yes</td><td>The compare operator to be used.</td></tr><tr><td><code>&lt;Value&gt;</code></td><td style="text-align:center">yes</td><td>The value to compare to. Filters are working case-insensitive. If the value starts with a <code>$</code> character it will be interpreted as a reference to another attribute and the actual value will be taken from the referenced attribute.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td style="text-align:center"></td><td>The type of data that should be used to compare the value. If not given, the value will be interpreted as a string.</td></tr><tr><td><code>&lt;Not&gt;</code></td><td style="text-align:center"></td><td>To negate the comparison set this to <code>true</code>.</td></tr></tbody></table><p>If both lists are given (AND and OR) they will be combines using a logical AND operation.</p><p><strong>Supported types</strong></p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>STRING</code></td><td>The value will be treated as a text of ASCII characters.</td></tr><tr><td><code>NUMERIC</code></td><td>The value will be treated as a number (integer or float).</td></tr><tr><td><code>DATE</code></td><td>The value will be treated as a date of the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>DATETIME</code></td><td>The value will be treated as a date + time combination of the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p><strong>Supported operators</strong></p><table class="table"><thead><tr><th>Operator</th><th>Meaning</th><th>Valid for datatypes</th><th>Description</th></tr></thead><tbody><tr><td><code>EQ</code></td><td>equal to</td><td>all</td><td>The data value must be exactly identical to the filter value.</td></tr><tr><td><code>NE</code></td><td>not equal to</td><td>all</td><td>The data value must not be identical to the filter value.</td></tr><tr><td><code>LT</code></td><td>less than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than the filter value.</td></tr><tr><td><code>LTE</code></td><td>less than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than or equal to the filter value.</td></tr><tr><td><code>GT</code></td><td>greater than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than the filter value.</td></tr><tr><td><code>GTE</code></td><td>greater than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than or equal to the filter value.</td></tr><tr><td><code>IN</code></td><td>exists in list</td><td>all</td><td>The data value must be one of the given list of filter values. This is identical to separate OR filters with EQ operators for each filter value</td></tr><tr><td><code>CONTAINS</code></td><td>contains a pattern</td><td>STRING</td><td>The filter value is contained in the data value at any position.</td></tr><tr><td><code>STARTSWITH</code></td><td>starts with a pattern</td><td>STRING</td><td>The data value starts with the filter value.</td></tr><tr><td><code>ENDSWITH</code></td><td>ends with a pattern</td><td>STRING</td><td>The data value end with the filter value.</td></tr><tr><td><code>LIKE</code></td><td>matches pattern</td><td>STRING</td><td>The data value matches the filter value which represents a pattern. The wildcard <code>*</code> can be used multiple times. Without a wildcard the LIKE operator works like the EQ operator.</td></tr></tbody></table><p><strong>Example</strong></p><p>Return all users whose UserID isn&#39;t 1, 2 oder 3 and whose first name doesn&#39;t begin with their last name and whose email address doesn&#39;t end with "cape-it.de".</p><pre><code class="lang-js">{
+}</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response to be filtered.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td align="center">yes</td><td>The attribute in each item of the response to be filtered.</td></tr><tr><td><code>&lt;Operator&gt;</code></td><td align="center">yes</td><td>The compare operator to be used.</td></tr><tr><td><code>&lt;Value&gt;</code></td><td align="center">yes</td><td>The value to compare to. Filters are working case-insensitive. If the value starts with a <code>$</code> character it will be interpreted as a reference to another attribute and the actual value will be taken from the referenced attribute.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td align="center"></td><td>The type of data that should be used to compare the value. If not given, the value will be interpreted as a string.</td></tr><tr><td><code>&lt;Not&gt;</code></td><td align="center"></td><td>To negate the comparison set this to <code>true</code>.</td></tr></tbody></table><p>If both lists are given (AND and OR) they will be combines using a logical AND operation.</p><p><strong>Supported types</strong></p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>STRING</code></td><td>The value will be treated as a text of ASCII characters.</td></tr><tr><td><code>NUMERIC</code></td><td>The value will be treated as a number (integer or float).</td></tr><tr><td><code>DATE</code></td><td>The value will be treated as a date of the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>DATETIME</code></td><td>The value will be treated as a date + time combination of the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p><strong>Supported operators</strong></p><table class="table"><thead><tr><th>Operator</th><th>Meaning</th><th>Valid for datatypes</th><th>Description</th></tr></thead><tbody><tr><td><code>EQ</code></td><td>equal to</td><td>all</td><td>The data value must be exactly identical to the filter value.</td></tr><tr><td><code>NE</code></td><td>not equal to</td><td>all</td><td>The data value must not be identical to the filter value.</td></tr><tr><td><code>LT</code></td><td>less than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than the filter value.</td></tr><tr><td><code>LTE</code></td><td>less than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be less than or equal to the filter value.</td></tr><tr><td><code>GT</code></td><td>greater than</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than the filter value.</td></tr><tr><td><code>GTE</code></td><td>greater than or equal</td><td>NUMERIC, DATE, DATETIME</td><td>The data value must be greater than or equal to the filter value.</td></tr><tr><td><code>IN</code></td><td>exists in list</td><td>all</td><td>The data value must be one of the given list of filter values. This is identical to separate OR filters with EQ operators for each filter value</td></tr><tr><td><code>CONTAINS</code></td><td>contains a pattern</td><td>STRING</td><td>The filter value is contained in the data value at any position.</td></tr><tr><td><code>STARTSWITH</code></td><td>starts with a pattern</td><td>STRING</td><td>The data value starts with the filter value.</td></tr><tr><td><code>ENDSWITH</code></td><td>ends with a pattern</td><td>STRING</td><td>The data value end with the filter value.</td></tr><tr><td><code>LIKE</code></td><td>matches pattern</td><td>STRING</td><td>The data value matches the filter value which represents a pattern. The wildcard <code>*</code> can be used multiple times. Without a wildcard the LIKE operator works like the EQ operator.</td></tr></tbody></table><p><strong>Example</strong></p><p>Return all users whose UserID isn&#39;t 1, 2 oder 3 and whose first name doesn&#39;t begin with their last name and whose email address doesn&#39;t end with "cape-it.de".</p><pre><code class="language-js">{
 "User": {
 "AND": [
 {
@@ -640,24 +637,7 @@ pre code {
 }
 ]
 ]
-}
-</code></pre></div><div class="chapter"><h2 id="sort_results"><a href="#sort_results">Sort results</a></h2><p>Every collection resource supports the sorting of items in the response. This can be done with the optional query parameter <code>sort</code>.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?sort=&lt;Object&gt;.[-]&lt;Fieldname&gt;[:&lt;Type&gt;]
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td style="text-align:center">yes</td><td>The object in the JSON response to be sorted.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td style="text-align:center">yes</td><td>The attribute in each item of the response to be sorted by. If the fieldname starts with <code>-</code> the attribute will be sorted in descending order.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td style="text-align:center"></td><td>The type of data that should be used to compare the value. If not given, the the value will be sorted as ASCII text and case-insensitive.</td></tr></tbody></table><p><strong>Supported types</strong></p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>numeric</code></td><td>The attribute value will be sorted as a number (integer or float).</td></tr><tr><td><code>textual</code></td><td>The attribute value will be sorted as ASCII text. Case and spaces will be ignored.</td></tr><tr><td><code>natural</code></td><td>Multi-type-sort. Sorting of different parts of value, starting with spaces, followed by numbers, non-text characters and text characters. Additionally subsidiary words will be moved to the end of the value. Example: "The Book of Verse" will be sorted as "Book of Verse, The"</td></tr><tr><td><code>date</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>datetime</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p>Multiple attributes can be sorted by separating the sort definition with comma.</p><p><strong>Example</strong></p><p>Query all users and sort the result for the creation time ascending + UserID descending + first name ascending.</p><pre><code class="lang-bash">.../users?sort=User.CreateTime:date,User.-UserID:numeric,User.UserFirstname
-</code></pre></div><div class="chapter"><h2 id="limit_results"><a href="#limit_results">Limit results</a></h2><p>There are two optional functions <code>offset</code> and <code>limit</code> to limit the number of items in a response of a collection resource. The combination of both functions is a powerful instrument to create paged responses.</p><h3 id="using-offsets">Using offsets</h3><p>By using the optional query parameter <code>offset</code> a collection resource can be forced to return its response starting at a specific array index. This function will be executed before the <a href="#limit_results">limit</a> function.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?offset=[&lt;Object&gt;:]&lt;Offset&gt;
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td style="text-align:center"></td><td>The object in the JSON response to apply an offset to. If omitted the offset will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Offset&gt;</code></td><td style="text-align:center">yes</td><td>The numeric offset to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="lang-bash">.../users?offset=100,User:10
-</code></pre><h3 id="limit-results">Limit results</h3><p>The optional query parameter <code>limit</code> allows to limit the number objects contained in the response of a collection.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?limit=[&lt;Object&gt;:]&lt;Limit&gt;
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td style="text-align:center"></td><td>The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Limit&gt;</code></td><td style="text-align:center">yes</td><td>The numeric limit to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate limits can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="lang-bash">.../users?limit=100,User:10
-</code></pre></div><div class="chapter"><h2 id="select_properties"><a href="#select_properties">Select properties</a></h2><p>With the use of the optional query parameter <code>fields</code> it is possible to select which properties of an object should be included in the response. There are three ways to do this: a general style, a compact style and the use of pre-defined fieldsets.</p><p><strong>Usage in URL</strong></p><p>General:</p><pre><code class="lang-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.&lt;Property&gt;
-</code></pre><p>Compact:</p><pre><code class="lang-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.[&lt;Property&gt;;&lt;Property&gt;;&lt;Property&gt;]
-</code></pre><p>Please note that the "[]" characters do not declare optional content but define an actual array list in this case.</p><p>Fieldset:</p><pre><code class="lang-bash">.../&lt;resource&gt;?fields=:&lt;Fieldset&gt;
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td style="text-align:center">yes</td><td>The object in the JSON response for which the properties should be selected.</td></tr><tr><td><code>&lt;Property&gt;</code></td><td style="text-align:center">yes</td><td>The name of the property that should be included in the response.</td></tr></tbody></table><p>When using the general style, multiple properties can be selected by multiplying the whole<object>.<property>part and separating it with comma. In the compact style the object has to be specified only once and the relevant properties are separated by semicolon in the array part.</property></object></p><p>A fieldset is a pre-defined property selection with a name. Please see the documentation of a specific resource whether fieldsets are available.</p><p><strong>Example</strong></p><p>Only select the attributes "UserLogin" and "UserID" from the users collection. In our example a fieldset named "Short" exists which selects those two properties.</p><p>General:</p><pre><code class="lang-bash">.../users?fields=User.UserLogin,User.UserID
-</code></pre><p>Compact:</p><pre><code class="lang-bash">.../users?fields=User.[UserLogin;UserID]
-</code></pre><p>Fieldset:</p><pre><code class="lang-bash">.../users?fields=:Short
-</code></pre></div><div class="chapter"><h2 id="include_more_information"><a href="#include_more_information">Include more information</a></h2><p>When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter <code>include</code>. Every resource can always include its own direct sub-resources. What exactly can be included additionally, depends on the actual resource you are querying. Therefore it will be documented in the description of the resource.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?include=&lt;What&gt;
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td style="text-align:center">yes</td><td>The additional data to include into the response. You can separate multiple ones by comma.</td></tr></tbody></table><p>There are some generic includes that can be used in every query regardless of a specific resource. At the moment those generic includes are:</p><table class="table"><thead><tr><th>Generic Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Links</code></td><td>Include all the the linked objects of this item.</td></tr><tr><td><code>ObjectIcon</code></td><td>Include the icon for this item.</td></tr><tr><td><code>ConfiguredPermissions</code></td><td>Include the configured permissions for this item and its dependent items.</td></tr><tr><td><code>Watchers</code></td><td>Include the watchers for this object if possible.</td></tr><tr><td><code>DynamicFields</code></td><td>Include the dynamic field values for this object if possible.</td></tr></tbody></table><p>Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function <a href="#expand_objects"><code>expand</code></a> for information on how to transform these IDs to actual objects.</p><p>The <code>ConfiguredPermissions</code> include will include an object with two arrays that each contain the relevant configured permissions <code>Assigned</code> and <code>DependingObjects</code>. The <code>Assigned</code> list contains the permissions that are configured exactly for this specific object. The second list <code>DependingObjects</code> contains the list of permissions configured for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz).</p><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation.</p><pre><code class="lang-bash">.../organisations?include=Tickets,Contacts
-</code></pre></div><div class="chapter"><h2 id="expand_objects"><a href="#expand_objects">Expand objects</a></h2><p>When requesting items and using the optional function <a href="#include_more_information"><code>include</code></a> to include another depending resource, a list of IDs will be the result. This can be used to count the relevant objects without the need to include unnecessary and huge additional data. To replace this list of IDs with the actual objects you can use the optional query parameter <code>expand</code>. Whether a resource supports expanding of includes and which includes can be expanded can be found in the documentation of the specific resource.</p><p><strong>Usage in URL</strong></p><pre><code class="lang-bash">.../&lt;resource&gt;?expand=&lt;What&gt;
-</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th style="text-align:center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td style="text-align:center">yes</td><td>The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.</td></tr></tbody></table><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation. Expand the list of tickets with the actual ticket objects.</p><pre><code class="lang-bash">.../organisations?include=Tickets,Contacts&amp;expand=Tickets
-</code></pre></div></div><div class="chapter"><h2 id="resources"><a href="#resources">Resources</a></h2><div class="panel panel-default resource"><div class="panel-heading"><h3 id="auth" class="panel-title">Authentication</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_auth" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/auth</span> <span class="methods"><a href="#auth_post"><span class="badge badge_post">post</span></a></span></h4></div><div class="modal fade" tabindex="0" id="auth_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent uri"></span><span class="uri">/auth</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Manage existing sessions.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#auth_post_request" data-toggle="tab">Request</a></li><li><a href="#auth_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="auth_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: AuthRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div><div class="chapter"><h2 id="sort_results"><a href="#sort_results">Sort results</a></h2><p>Every collection resource supports the sorting of items in the response. This can be done with the optional query parameter <code>sort</code>.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?sort=&lt;Object&gt;.[-]&lt;Fieldname&gt;[:&lt;Type&gt;]</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response to be sorted.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td align="center">yes</td><td>The attribute in each item of the response to be sorted by. If the fieldname starts with <code>-</code> the attribute will be sorted in descending order.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td align="center"></td><td>The type of data that should be used to compare the value. If not given, the the value will be sorted as ASCII text and case-insensitive.</td></tr></tbody></table><p><strong>Supported types</strong></p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>numeric</code></td><td>The attribute value will be sorted as a number (integer or float).</td></tr><tr><td><code>textual</code></td><td>The attribute value will be sorted as ASCII text. Case and spaces will be ignored.</td></tr><tr><td><code>natural</code></td><td>Multi-type-sort. Sorting of different parts of value, starting with spaces, followed by numbers, non-text characters and text characters. Additionally subsidiary words will be moved to the end of the value. Example: "The Book of Verse" will be sorted as "Book of Verse, The"</td></tr><tr><td><code>date</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>datetime</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p>Multiple attributes can be sorted by separating the sort definition with comma.</p><p><strong>Example</strong></p><p>Query all users and sort the result for the creation time ascending + UserID descending + first name ascending.</p><pre><code class="language-bash">.../users?sort=User.CreateTime:date,User.-UserID:numeric,User.UserFirstname</code></pre></div><div class="chapter"><h2 id="limit_results"><a href="#limit_results">Limit results</a></h2><p>There are two optional functions <code>offset</code> and <code>limit</code> to limit the number of items in a response of a collection resource. The combination of both functions is a powerful instrument to create paged responses.</p><h3 id="using-offsets">Using offsets</h3><p>By using the optional query parameter <code>offset</code> a collection resource can be forced to return its response starting at a specific array index. This function will be executed before the <a href="#limit_results">limit</a> function.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?offset=[&lt;Object&gt;:]&lt;Offset&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply an offset to. If omitted the offset will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Offset&gt;</code></td><td align="center">yes</td><td>The numeric offset to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="language-bash">.../users?offset=100,User:10</code></pre><h3 id="limit-results">Limit results</h3><p>The optional query parameter <code>limit</code> allows to limit the number objects contained in the response of a collection.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?limit=[&lt;Object&gt;:]&lt;Limit&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Limit&gt;</code></td><td align="center">yes</td><td>The numeric limit to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate limits can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="language-bash">.../users?limit=100,User:10</code></pre></div><div class="chapter"><h2 id="select_properties"><a href="#select_properties">Select properties</a></h2><p>With the use of the optional query parameter <code>fields</code> it is possible to select which properties of an object should be included in the response. There are three ways to do this: a general style, a compact style and the use of pre-defined fieldsets.</p><p><strong>Usage in URL</strong></p><p>General:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.&lt;Property&gt;</code></pre><p>Compact:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.[&lt;Property&gt;;&lt;Property&gt;;&lt;Property&gt;]</code></pre><p>Please note that the "[]" characters do not declare optional content but define an actual array list in this case.</p><p>Fieldset:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=:&lt;Fieldset&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response for which the properties should be selected.</td></tr><tr><td><code>&lt;Property&gt;</code></td><td align="center">yes</td><td>The name of the property that should be included in the response.</td></tr></tbody></table><p>When using the general style, multiple properties can be selected by multiplying the whole<object>.<property>part and separating it with comma. In the compact style the object has to be specified only once and the relevant properties are separated by semicolon in the array part.</property></object></p><p>A fieldset is a pre-defined property selection with a name. Please see the documentation of a specific resource whether fieldsets are available.</p><p><strong>Example</strong></p><p>Only select the attributes "UserLogin" and "UserID" from the users collection. In our example a fieldset named "Short" exists which selects those two properties.</p><p>General:</p><pre><code class="language-bash">.../users?fields=User.UserLogin,User.UserID</code></pre><p>Compact:</p><pre><code class="language-bash">.../users?fields=User.[UserLogin;UserID]</code></pre><p>Fieldset:</p><pre><code class="language-bash">.../users?fields=:Short</code></pre></div><div class="chapter"><h2 id="include_more_information"><a href="#include_more_information">Include more information</a></h2><p>When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter <code>include</code>. Every resource can always include its own direct sub-resources. What exactly can be included additionally, depends on the actual resource you are querying. Therefore it will be documented in the description of the resource.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?include=&lt;What&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td align="center">yes</td><td>The additional data to include into the response. You can separate multiple ones by comma.</td></tr></tbody></table><p>There are some generic includes that can be used in every query regardless of a specific resource. At the moment those generic includes are:</p><table class="table"><thead><tr><th>Generic Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Links</code></td><td>Include all the the linked objects of this item.</td></tr><tr><td><code>ObjectIcon</code></td><td>Include the icon for this item.</td></tr><tr><td><code>ConfiguredPermissions</code></td><td>Include the configured permissions for this item and its dependent items.</td></tr><tr><td><code>Watchers</code></td><td>Include the watchers for this object if possible.</td></tr><tr><td><code>DynamicFields</code></td><td>Include the dynamic field values for this object if possible.</td></tr></tbody></table><p>Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function <a href="#expand_objects"><code>expand</code></a> for information on how to transform these IDs to actual objects.</p><p>The <code>ConfiguredPermissions</code> include will include an object with two arrays that each contain the relevant configured permissions <code>Assigned</code> and <code>DependingObjects</code>. The <code>Assigned</code> list contains the permissions that are configured exactly for this specific object. The second list <code>DependingObjects</code> contains the list of permissions configured for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz).</p><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation.</p><pre><code class="language-bash">.../organisations?include=Tickets,Contacts</code></pre></div><div class="chapter"><h2 id="expand_objects"><a href="#expand_objects">Expand objects</a></h2><p>When requesting items and using the optional function <a href="#include_more_information"><code>include</code></a> to include another depending resource, a list of IDs will be the result. This can be used to count the relevant objects without the need to include unnecessary and huge additional data. To replace this list of IDs with the actual objects you can use the optional query parameter <code>expand</code>. Whether a resource supports expanding of includes and which includes can be expanded can be found in the documentation of the specific resource.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?expand=&lt;What&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td align="center">yes</td><td>The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.</td></tr></tbody></table><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation. Expand the list of tickets with the actual ticket objects.</p><pre><code class="language-bash">.../organisations?include=Tickets,Contacts&amp;expand=Tickets</code></pre></div></div><div class="chapter"><h2 id="resources"><a href="#resources">Resources</a></h2><div class="panel panel-default resource"><div class="panel-heading"><h3 id="auth" class="panel-title">Authentication</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_auth" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/auth</span> <span class="methods"><a href="#auth_post"><span class="badge badge_post">post</span></a></span></h4></div><div class="modal fade" tabindex="0" id="auth_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent uri"></span><span class="uri">/auth</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Manage existing sessions.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#auth_post_request" data-toggle="tab">Request</a></li><li><a href="#auth_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="auth_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: AuthRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#AuthRequest",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "An authorization object.",
@@ -1241,7 +1221,7 @@ pre code {
       "ConfigItem"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
+      "ConfigItemClassDefinition_json-01f549b109" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -1294,7 +1274,7 @@ pre code {
             "Version"
          ]
       },
-      "ConfigItemHistory_json-03e59dd02e" : {
+      "ConfigItemHistory_json-f42dbc1044" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item history object.",
@@ -1364,7 +1344,7 @@ pre code {
             "UserLogin"
          ]
       },
-      "ConfigItemImage_json-022635ed5d" : {
+      "ConfigItemImage_json-160fd282cb" : {
          "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
@@ -1410,7 +1390,7 @@ pre code {
             "ID"
          ]
       },
-      "ConfigItemVersion_json-d27530ecc6" : {
+      "ConfigItemVersion_json-9b23def65c" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
@@ -1465,7 +1445,7 @@ pre code {
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
             },
             "DeplState" : {
                "type" : "string",
@@ -1583,20 +1563,20 @@ pre code {
                "readOnly" : true
             },
             "CurrentVersion" : {
-               "$ref" : "#/definitions/ConfigItemVersion_json-d27530ecc6"
+               "$ref" : "#/definitions/ConfigItemVersion_json-9b23def65c"
             },
             "History" : {
                "description" : "added via include \"History\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemHistory_json-03e59dd02e"
+                  "$ref" : "#/definitions/ConfigItemHistory_json-f42dbc1044"
                }
             },
             "Images" : {
                "description" : "added via include \"Images\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemImage_json-022635ed5d"
+                  "$ref" : "#/definitions/ConfigItemImage_json-160fd282cb"
                }
             },
             "LastVersionID" : {
@@ -1618,7 +1598,7 @@ pre code {
                "description" : "added via include \"Versions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemVersion_json-d27530ecc6"
+                  "$ref" : "#/definitions/ConfigItemVersion_json-9b23def65c"
                }
             }
          },
@@ -1875,7 +1855,7 @@ pre code {
       "ConfigItem"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
+      "ConfigItemClassDefinition_json-01f549b109" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -1928,7 +1908,7 @@ pre code {
             "Version"
          ]
       },
-      "ConfigItemHistory_json-03e59dd02e" : {
+      "ConfigItemHistory_json-f42dbc1044" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item history object.",
@@ -1998,7 +1978,7 @@ pre code {
             "UserLogin"
          ]
       },
-      "ConfigItemImage_json-022635ed5d" : {
+      "ConfigItemImage_json-160fd282cb" : {
          "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
@@ -2044,7 +2024,7 @@ pre code {
             "ID"
          ]
       },
-      "ConfigItemVersion_json-d27530ecc6" : {
+      "ConfigItemVersion_json-9b23def65c" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
@@ -2099,7 +2079,7 @@ pre code {
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
             },
             "DeplState" : {
                "type" : "string",
@@ -2217,20 +2197,20 @@ pre code {
                "readOnly" : true
             },
             "CurrentVersion" : {
-               "$ref" : "#/definitions/ConfigItemVersion_json-d27530ecc6"
+               "$ref" : "#/definitions/ConfigItemVersion_json-9b23def65c"
             },
             "History" : {
                "description" : "added via include \"History\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemHistory_json-03e59dd02e"
+                  "$ref" : "#/definitions/ConfigItemHistory_json-f42dbc1044"
                }
             },
             "Images" : {
                "description" : "added via include \"Images\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemImage_json-022635ed5d"
+                  "$ref" : "#/definitions/ConfigItemImage_json-160fd282cb"
                }
             },
             "LastVersionID" : {
@@ -2252,7 +2232,7 @@ pre code {
                "description" : "added via include \"Versions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemVersion_json-d27530ecc6"
+                  "$ref" : "#/definitions/ConfigItemVersion_json-9b23def65c"
                }
             }
          },
@@ -3077,37 +3057,32 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems__configitemid__images__imageid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__images__imageid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_cmdb_configitems__configitemid__versions" class="panel"><div class="resource-description"><h4 id="versions-of-a-config-item">Versions of a Config Item</h4><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Definition</code></td><td>Adds the corresponding definition of the Config Item class to the response. See sub-resource <a href="#cmdb_classes__classid__classes_get">"definitions"</a>.</td></tr><tr><td><code>Data</code></td><td>Adds the version data to the response.</td></tr><tr><td><code>PreparedData</code></td><td>Adds the prepared data to the response. The structure of this object is based on the structure of the definition. For every value in the <code>Data</code> object an array item will be created. Please see the description below.</td></tr></tbody></table><p><strong>Structure of the Data attribute</strong></p><p>The structure of the <code>Data</code> attribute is based on the structure and configuration of the corresponding Config Item class definition. The following rules apply:</p><p>1. The <code>Key</code>in the attribute definition is the attribute name</p><pre><code class="lang-bash">{
+}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems__configitemid__images__imageid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__images__imageid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_cmdb_configitems__configitemid__versions" class="panel"><div class="resource-description"><h4 id="versions-of-a-config-item">Versions of a Config Item</h4><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Definition</code></td><td>Adds the corresponding definition of the Config Item class to the response. See sub-resource <a href="#cmdb_classes__classid__classes_get">"definitions"</a>.</td></tr><tr><td><code>Data</code></td><td>Adds the version data to the response.</td></tr><tr><td><code>PreparedData</code></td><td>Adds the prepared data to the response. The structure of this object is based on the structure of the definition. For every value in the <code>Data</code> object an array item will be created. Please see the description below.</td></tr></tbody></table><p><strong>Structure of the Data attribute</strong></p><p>The structure of the <code>Data</code> attribute is based on the structure and configuration of the corresponding Config Item class definition. The following rules apply:</p><p>1. The <code>Key</code>in the attribute definition is the attribute name</p><pre><code class="language-bash">{
 "AttributeKey": ...
-}
-</code></pre><p>2. If CountMax in the attribute definition is 1 (or omitted) the value is assigned directly</p><pre><code class="lang-bash">{
+}</code></pre><p>2. If CountMax in the attribute definition is 1 (or omitted) the value is assigned directly</p><pre><code class="language-bash">{
 "AttributeKey": "Value"
-}
-</code></pre><p>3. If CountMax in the attribute definition is &gt; 1 the value is assigned as an array</p><pre><code class="lang-bash">{
+}</code></pre><p>3. If CountMax in the attribute definition is &gt; 1 the value is assigned as an array</p><pre><code class="language-bash">{
 "AttributeKey": [
 "Value1",
 "Value2",
 "Value3"
 ]
-}
-</code></pre><p>4. If the attribute has a value AND also contains values in a sub-structure, the attribute is an object and its value will be assigned to an attribute with the same name with this object</p><pre><code class="lang-bash">{
+}</code></pre><p>4. If the attribute has a value AND also contains values in a sub-structure, the attribute is an object and its value will be assigned to an attribute with the same name with this object</p><pre><code class="language-bash">{
 "AttributeKey": {
 "AttributeKey": "Value",
 "SubAttributKey1": "...",
 "SubAttributKey2": {
-    "SubSubAttributKey1": "..."
+  "SubSubAttributKey1": "..."
 }
 }
-}
-</code></pre><p><strong>Format of the PreparedData array items</strong></p><pre><code class="lang-bash">{ 
+}</code></pre><p><strong>Format of the PreparedData array items</strong></p><pre><code class="language-bash">{ 
 "Key": "&lt;the key from the attribute definition&gt;",
 "Label": "&lt;the name from the attribute definition&gt;",
 "Type": "&lt;the type from the attribute definition&gt;",
 "Value": "&lt;the internal value of the attribute&gt;",
 "DisplayValue": "&lt;the display value of the attribute&gt;",
 "Sub": [...]
-}
-</code></pre><p>The <code>Sub</code> attribute only exists if the attribute definition contains a sub-structure and ony if the sub-structure contains data.</p><p>The <code>DisplayValue</code> attribute is not available for attribute of the type <code>Attachment</code></p><h5 id="supported-attribute-types">Supported attribute types</h5><p>When creating a version of a Config Item only the following attribute types are supported:</p><table class="table"><thead><tr><th>Attribute type</th><th>Description</th><th>Value in request</th><th>Example in POST</th></tr></thead><tbody><tr><td><code>Attachment</code></td><td>An attachment object containing the attributes <code>Filename</code>, <code>ContentType</code>, <code>Content</code>. The content has to be base64 encoded.</td><td>attachment object</td><td><code>"MyAttachment": [ {     "Filename": "test.pdf", "ContentType": "application/pdf", "Content": "..." } ]</code></td></tr><tr><td><code>CIClassReference</code></td><td>A reference to another Config Item</td><td>numeric ID of the referenced Config Item</td><td><code>"ReferencedCI": 612</code></td></tr><tr><td><code>Contact</code></td><td>A reference to a contact</td><td>ContactID</td><td><code>"MyContact": 123</code></td></tr><tr><td><code>Organisation</code></td><td>A reference to an organisation</td><td>OrganisationID</td><td><code>"MyOrganisation": 456</code></td></tr><tr><td><code>Date</code></td><td>A date value in the form "<code>YYYY-MM-DD</code>"</td><td>string</td><td><code>"MyDate": "2018-08-28"</code></td></tr><tr><td><code>DateTime</code></td><td>A date+time value in the form "<code>YYYY-MM-DD HH24:MI:SS</code>"</td><td>string</td><td><code>"MyDateTime": "2018-08-28 09:23:58"</code></td></tr><tr><td><code>Dummy</code></td><td>An empty object to create sub-structures</td><td>sub-structure</td><td><code>"MyDummy": {}</code></td></tr><tr><td><code>GeneralCatalog</code></td><td>A reference to a GeneralCatalog item</td><td>numeric ID of the GeneralCatalog item</td><td><code>"MyGeneralCatalogItem": 123</code></td></tr><tr><td><code>TextArea</code></td><td>A multi-line text</td><td>string</td><td><code>"MyTextArea": "This\nis\njust\na\ntest."</code></td></tr><tr><td><code>Text</code></td><td>A single-line text</td><td>string</td><td><code>"MyText": "This is just a test."</code></td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/cmdb/configitems/{configItemId}</span><span class="uri">/versions</span> <span class="methods"><a href="#cmdb_configitems__configitemid__versions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#cmdb_configitems__configitemid__versions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="cmdb_configitems__configitemid__versions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/cmdb/configitems/{configItemId}</span><span class="uri">/versions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#cmdb_configitems__configitemid__versions_get_request" data-toggle="tab">Request</a></li><li><a href="#cmdb_configitems__configitemid__versions_get_response" data-toggle="tab">Response</a></li><li><a href="#cmdb_configitems__configitemid__versions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="cmdb_configitems__configitemid__versions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">configItemId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="cmdb_configitems__configitemid__versions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ConfigItemVersionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre><p>The <code>Sub</code> attribute only exists if the attribute definition contains a sub-structure and ony if the sub-structure contains data.</p><p>The <code>DisplayValue</code> attribute is not available for attribute of the type <code>Attachment</code></p><h5 id="supported-attribute-types">Supported attribute types</h5><p>When creating a version of a Config Item only the following attribute types are supported:</p><table class="table"><thead><tr><th>Attribute type</th><th>Description</th><th>Value in request</th><th>Example in POST</th></tr></thead><tbody><tr><td><code>Attachment</code></td><td>An attachment object containing the attributes <code>Filename</code>, <code>ContentType</code>, <code>Content</code>. The content has to be base64 encoded.</td><td>attachment object</td><td><code>"MyAttachment": [ {     "Filename": "test.pdf", "ContentType": "application/pdf", "Content": "..." } ]</code></td></tr><tr><td><code>CIClassReference</code></td><td>A reference to another Config Item</td><td>numeric ID of the referenced Config Item</td><td><code>"ReferencedCI": 612</code></td></tr><tr><td><code>Contact</code></td><td>A reference to a contact</td><td>ContactID</td><td><code>"MyContact": 123</code></td></tr><tr><td><code>Organisation</code></td><td>A reference to an organisation</td><td>OrganisationID</td><td><code>"MyOrganisation": 456</code></td></tr><tr><td><code>Date</code></td><td>A date value in the form "<code>YYYY-MM-DD</code>"</td><td>string</td><td><code>"MyDate": "2018-08-28"</code></td></tr><tr><td><code>DateTime</code></td><td>A date+time value in the form "<code>YYYY-MM-DD HH24:MI:SS</code>"</td><td>string</td><td><code>"MyDateTime": "2018-08-28 09:23:58"</code></td></tr><tr><td><code>Dummy</code></td><td>An empty object to create sub-structures</td><td>sub-structure</td><td><code>"MyDummy": {}</code></td></tr><tr><td><code>GeneralCatalog</code></td><td>A reference to a GeneralCatalog item</td><td>numeric ID of the GeneralCatalog item</td><td><code>"MyGeneralCatalogItem": 123</code></td></tr><tr><td><code>TextArea</code></td><td>A multi-line text</td><td>string</td><td><code>"MyTextArea": "This\nis\njust\na\ntest."</code></td></tr><tr><td><code>Text</code></td><td>A single-line text</td><td>string</td><td><code>"MyText": "This is just a test."</code></td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/cmdb/configitems/{configItemId}</span><span class="uri">/versions</span> <span class="methods"><a href="#cmdb_configitems__configitemid__versions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#cmdb_configitems__configitemid__versions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="cmdb_configitems__configitemid__versions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/cmdb/configitems/{configItemId}</span><span class="uri">/versions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#cmdb_configitems__configitemid__versions_get_request" data-toggle="tab">Request</a></li><li><a href="#cmdb_configitems__configitemid__versions_get_response" data-toggle="tab">Response</a></li><li><a href="#cmdb_configitems__configitemid__versions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="cmdb_configitems__configitemid__versions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">configItemId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="cmdb_configitems__configitemid__versions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ConfigItemVersionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ConfigItemVersionCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of config item versions.",
@@ -3124,7 +3099,7 @@ pre code {
       "ConfigItemVersion"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
+      "ConfigItemClassDefinition_json-01f549b109" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -3232,7 +3207,7 @@ pre code {
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
             },
             "DeplState" : {
                "type" : "string",
@@ -3505,7 +3480,7 @@ pre code {
       "ConfigItemVersion"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
+      "ConfigItemClassDefinition_json-01f549b109" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -3613,7 +3588,7 @@ pre code {
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
             },
             "DeplState" : {
                "type" : "string",
@@ -3809,7 +3784,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems__configitemid__versions__versionid__attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions__versionid__attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr><tr><td><code>AssignedConfigItems</code></td><td>Adds assigend configitems (as IDs) to the response. It can be expanded to get the relevant configitems. The Assignment is configured in sysconfig option <code>AssignedConfigItemsMapping</code></td></tr><tr><td><code>User</code></td><td>Adds the corresponding user to the response. If no user is assigned to this contact, the attribute is empty.</td></tr></tbody></table><p>This resource supports a special <code>search</code> property</p><table class="table"><thead><tr><th>Search</th><th>Description</th></tr></thead><tbody><tr><td><code>Fulltext</code></td><td>Searches with the given value in the following contact attributes: login, firstname, lastname, email, title, phone, fax, mobile, street, zip, city, country. Some logical operators are possible: "+" or "&amp;" as AND, "\</td><td>" as OR and "*" as any string, e.g. "john&amp;doe" or "j*+doe\</td><td>james"</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="cmdb_configitems__configitemid__versions__versionid__attachments__attachmentid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions__versionid__attachments__attachmentid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="contacts" class="panel-title">Contacts</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets of this contact. It will contain the number of tickets that are in a state of types "new" and "open", the number of pending tickets and the number of escalated tickets.</td></tr><tr><td><code>AssignedConfigItems</code></td><td>Adds assigend configitems (as IDs) to the response. It can be expanded to get the relevant configitems. The Assignment is configured in sysconfig option <code>AssignedConfigItemsMapping</code></td></tr><tr><td><code>User</code></td><td>Adds the corresponding user to the response. If no user is assigned to this contact, the attribute is empty.</td></tr></tbody></table><p>This resource supports a special <code>search</code> property</p><table class="table"><thead><tr><th>Search</th><th>Description</th></tr></thead><tbody><tr><td><code>Fulltext</code></td><td>Searches with the given value in the following contact attributes: login, firstname, lastname, email, title, phone, fax, mobile, street, zip, city, country. Some logical operators are possible: "+" or "&amp;" as AND, "|" as OR and "*" as any string, e.g. "john&amp;doe" or "j*+doe|james"</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_contacts" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/contacts</span> <span class="methods"><a href="#contacts_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#contacts_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="contacts_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/contacts</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#contacts_get_request" data-toggle="tab">Request</a></li><li><a href="#contacts_get_response" data-toggle="tab">Response</a></li><li><a href="#contacts_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="contacts_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="contacts_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="contacts_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ContactCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "#ContactCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of contacts.",
@@ -3879,6 +3854,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Fullname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -3918,7 +3897,7 @@ pre code {
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-c52d206408"
+                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
                },
                "readOnly" : true
             },
@@ -3943,6 +3922,7 @@ pre code {
             "CreateBy",
             "CreateTime",
             "Firstname",
+            "Fullname",
             "Email",
             "ID",
             "Lastname",
@@ -3950,7 +3930,7 @@ pre code {
             "ValidID"
          ]
       },
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -4011,7 +3991,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -4066,7 +4046,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -4091,7 +4071,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -4105,7 +4085,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -4156,7 +4136,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -4171,7 +4151,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -4179,7 +4159,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -4280,7 +4260,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -4355,7 +4335,7 @@ pre code {
             "TypeID"
          ]
       },
-      "Ticket_json-c52d206408" : {
+      "Ticket_json-9720ce4c98" : {
          "$id" : "#Ticket",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
@@ -4373,7 +4353,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -4386,7 +4366,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -4405,7 +4385,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -4413,7 +4393,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -4426,7 +4406,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -4470,7 +4450,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -4526,7 +4513,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -4555,7 +4542,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -4622,6 +4609,7 @@ pre code {
       "Email":"contact047@nomail.org",
       "Fax":"",
       "Firstname":"George",
+      "Fullname": "George Back",
       "ID":102,
       "Lastname":"Back",
       "Login":"contact047",
@@ -4880,6 +4868,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Fullname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -4919,7 +4911,7 @@ pre code {
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-c52d206408"
+                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
                },
                "readOnly" : true
             },
@@ -4944,6 +4936,7 @@ pre code {
             "CreateBy",
             "CreateTime",
             "Firstname",
+            "Fullname",
             "Email",
             "ID",
             "Lastname",
@@ -4951,7 +4944,7 @@ pre code {
             "ValidID"
          ]
       },
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -5012,7 +5005,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -5067,7 +5060,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -5092,7 +5085,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -5106,7 +5099,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -5157,7 +5150,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -5172,7 +5165,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -5180,7 +5173,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -5281,7 +5274,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -5356,7 +5349,7 @@ pre code {
             "TypeID"
          ]
       },
-      "Ticket_json-c52d206408" : {
+      "Ticket_json-9720ce4c98" : {
          "$id" : "#Ticket",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
@@ -5374,7 +5367,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -5387,7 +5380,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -5406,7 +5399,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -5414,7 +5407,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -5427,7 +5420,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -5471,7 +5464,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -5527,7 +5527,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -5556,7 +5556,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -5625,6 +5625,8 @@ pre code {
     "Firstname": "John",
     "Fullname": "John Doe",
     "ID":102,
+    "Lastname": "Doe",
+    "Login": "jdoe",
     "Mobile":"+49 170 111 222 333",
     "OrganisationIDs":[
       1,
@@ -5895,7 +5897,7 @@ pre code {
       "Ticket"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -5956,7 +5958,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -6011,7 +6013,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -6036,7 +6038,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -6050,7 +6052,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -6101,7 +6103,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -6116,7 +6118,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -6124,7 +6126,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -6225,7 +6227,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -6318,7 +6320,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -6331,7 +6333,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -6350,7 +6352,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -6358,7 +6360,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -6371,7 +6373,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -6415,7 +6417,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -6471,7 +6480,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -6500,7 +6509,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -6601,7 +6610,7 @@ pre code {
             "PriorityID": 5,
             "QueueID": 3,
             "ResponsibleID": 1,
-            "ServiceID": "",
+            "ServiceID": null,
             "StateID": 1,
             "TicketID": 49,
             "TicketNumber": "2020040917000014",
@@ -6626,7 +6635,7 @@ pre code {
             "PriorityID": 3,
             "QueueID": 2,
             "ResponsibleID": 1,
-            "ServiceID": "",
+            "ServiceID": null,
             "StateID": 1,
             "TicketID": 50,
             "TicketNumber": "2020040917000015",
@@ -6690,7 +6699,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+                  "$ref" : "#/definitions/FAQAttachment_json-4335a8d47f"
                },
                "readOnly" : true
             },
@@ -6754,7 +6763,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+                  "$ref" : "#/definitions/FAQHistory_json-bc1e2bbc07"
                },
                "readOnly" : true
             },
@@ -6793,7 +6802,7 @@ pre code {
                "description" : "added via include \"Votes\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+                  "$ref" : "#/definitions/FAQVote_json-0d88ed7e95"
                },
                "readOnly" : true
             }
@@ -6822,7 +6831,7 @@ pre code {
             "ValidID"
          ]
       },
-      "FAQAttachment_json-ec8b67bcc9" : {
+      "FAQAttachment_json-4335a8d47f" : {
          "$id" : "#FAQAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
@@ -6895,7 +6904,7 @@ pre code {
             "ID"
          ]
       },
-      "FAQHistory_json-b505629552" : {
+      "FAQHistory_json-bc1e2bbc07" : {
          "$id" : "#FAQHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
@@ -6930,7 +6939,7 @@ pre code {
             "Name"
          ]
       },
-      "FAQVote_json-a6c5d69008" : {
+      "FAQVote_json-0d88ed7e95" : {
          "$id" : "#FAQVote",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
@@ -7282,7 +7291,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+                  "$ref" : "#/definitions/FAQAttachment_json-4335a8d47f"
                },
                "readOnly" : true
             },
@@ -7346,7 +7355,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+                  "$ref" : "#/definitions/FAQHistory_json-bc1e2bbc07"
                },
                "readOnly" : true
             },
@@ -7385,7 +7394,7 @@ pre code {
                "description" : "added via include \"Votes\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+                  "$ref" : "#/definitions/FAQVote_json-0d88ed7e95"
                },
                "readOnly" : true
             }
@@ -7414,7 +7423,7 @@ pre code {
             "ValidID"
          ]
       },
-      "FAQAttachment_json-ec8b67bcc9" : {
+      "FAQAttachment_json-4335a8d47f" : {
          "$id" : "#FAQAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
@@ -7487,7 +7496,7 @@ pre code {
             "ID"
          ]
       },
-      "FAQHistory_json-b505629552" : {
+      "FAQHistory_json-bc1e2bbc07" : {
          "$id" : "#FAQHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
@@ -7522,7 +7531,7 @@ pre code {
             "Name"
          ]
       },
-      "FAQVote_json-a6c5d69008" : {
+      "FAQVote_json-0d88ed7e95" : {
          "$id" : "#FAQVote",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
@@ -9312,7 +9321,7 @@ pre code {
       "Organisation"
    ],
    "definitions" : {
-      "Contact_json-4841673548" : {
+      "Contact_json-01c2f5ac9c" : {
          "$id" : "#Contact",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The contact object.",
@@ -9365,6 +9374,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Fullname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -9404,7 +9417,7 @@ pre code {
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-c52d206408"
+                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
                },
                "readOnly" : true
             },
@@ -9429,6 +9442,7 @@ pre code {
             "CreateBy",
             "CreateTime",
             "Firstname",
+            "Fullname",
             "Email",
             "ID",
             "Lastname",
@@ -9436,7 +9450,7 @@ pre code {
             "ValidID"
          ]
       },
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -9530,7 +9544,7 @@ pre code {
                "description" : "added via include \"Contacts\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Contact_json-4841673548"
+                  "$ref" : "#/definitions/Contact_json-01c2f5ac9c"
                },
                "readOnly" : true
             },
@@ -9566,7 +9580,7 @@ pre code {
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-c52d206408"
+                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
                },
                "readOnly" : true
             },
@@ -9594,7 +9608,7 @@ pre code {
             "ValidID"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -9649,7 +9663,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -9674,7 +9688,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -9688,7 +9702,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -9739,7 +9753,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -9754,7 +9768,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -9762,7 +9776,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -9863,7 +9877,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -9938,7 +9952,7 @@ pre code {
             "TypeID"
          ]
       },
-      "Ticket_json-c52d206408" : {
+      "Ticket_json-9720ce4c98" : {
          "$id" : "#Ticket",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
@@ -9956,7 +9970,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -9969,7 +9983,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -9988,7 +10002,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -9996,7 +10010,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -10009,7 +10023,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -10053,7 +10067,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -10109,7 +10130,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -10138,7 +10159,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -10378,7 +10399,7 @@ pre code {
       "Organisation"
    ],
    "definitions" : {
-      "Contact_json-4841673548" : {
+      "Contact_json-01c2f5ac9c" : {
          "$id" : "#Contact",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The contact object.",
@@ -10431,6 +10452,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Fullname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -10470,7 +10495,7 @@ pre code {
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-c52d206408"
+                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
                },
                "readOnly" : true
             },
@@ -10495,6 +10520,7 @@ pre code {
             "CreateBy",
             "CreateTime",
             "Firstname",
+            "Fullname",
             "Email",
             "ID",
             "Lastname",
@@ -10502,7 +10528,7 @@ pre code {
             "ValidID"
          ]
       },
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -10596,7 +10622,7 @@ pre code {
                "description" : "added via include \"Contacts\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Contact_json-4841673548"
+                  "$ref" : "#/definitions/Contact_json-01c2f5ac9c"
                },
                "readOnly" : true
             },
@@ -10632,7 +10658,7 @@ pre code {
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-c52d206408"
+                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
                },
                "readOnly" : true
             },
@@ -10660,7 +10686,7 @@ pre code {
             "ValidID"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -10715,7 +10741,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -10740,7 +10766,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -10754,7 +10780,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -10805,7 +10831,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -10820,7 +10846,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -10828,7 +10854,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -10929,7 +10955,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -11004,7 +11030,7 @@ pre code {
             "TypeID"
          ]
       },
-      "Ticket_json-c52d206408" : {
+      "Ticket_json-9720ce4c98" : {
          "$id" : "#Ticket",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
@@ -11022,7 +11048,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -11035,7 +11061,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -11054,7 +11080,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -11062,7 +11088,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -11075,7 +11101,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -11119,7 +11145,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -11175,7 +11208,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -11204,7 +11237,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -11546,6 +11579,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Fullname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -11585,7 +11622,7 @@ pre code {
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-c52d206408"
+                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
                },
                "readOnly" : true
             },
@@ -11610,6 +11647,7 @@ pre code {
             "CreateBy",
             "CreateTime",
             "Firstname",
+            "Fullname",
             "Email",
             "ID",
             "Lastname",
@@ -11617,7 +11655,7 @@ pre code {
             "ValidID"
          ]
       },
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -11678,7 +11716,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -11733,7 +11771,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -11758,7 +11796,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -11772,7 +11810,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -11823,7 +11861,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -11838,7 +11876,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -11846,7 +11884,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -11947,7 +11985,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -12022,7 +12060,7 @@ pre code {
             "TypeID"
          ]
       },
-      "Ticket_json-c52d206408" : {
+      "Ticket_json-9720ce4c98" : {
          "$id" : "#Ticket",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
@@ -12040,7 +12078,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -12053,7 +12091,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -12072,7 +12110,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -12080,7 +12118,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -12093,7 +12131,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -12137,7 +12175,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -12193,7 +12238,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -12222,7 +12267,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -12289,6 +12334,7 @@ pre code {
       "Email":"contact047@nomail.org",
       "Fax":"",
       "Firstname":"George",
+      "Fullname": "George Back",
       "ID":102,
       "Lastname":"Back",
       "Login":"contact047",
@@ -12345,7 +12391,7 @@ pre code {
       "Ticket"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -12406,7 +12452,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -12461,7 +12507,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -12486,7 +12532,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -12500,7 +12546,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -12551,7 +12597,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -12566,7 +12612,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -12574,7 +12620,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -12675,7 +12721,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -12768,7 +12814,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -12781,7 +12827,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -12800,7 +12846,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -12808,7 +12854,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -12821,7 +12867,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -12865,7 +12911,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -12921,7 +12974,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -12950,7 +13003,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -13051,7 +13104,7 @@ pre code {
             "PriorityID": 5,
             "QueueID": 3,
             "ResponsibleID": 1,
-            "ServiceID": "",
+            "ServiceID": null,
             "StateID": 1,
             "TicketID": 49,
             "TicketNumber": "2020040917000014",
@@ -13076,7 +13129,7 @@ pre code {
             "PriorityID": 3,
             "QueueID": 2,
             "ResponsibleID": 1,
-            "ServiceID": "",
+            "ServiceID": null,
             "StateID": 1,
             "TicketID": 50,
             "TicketNumber": "2020040917000015",
@@ -13310,7 +13363,7 @@ pre code {
       "User"
    ],
    "definitions" : {
-      "UserPreference_json-7fdc063bfe" : {
+      "UserPreference_json-80ace01208" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",
@@ -13361,7 +13414,7 @@ pre code {
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreference_json-7fdc063bfe"
+                  "$ref" : "#/definitions/UserPreference_json-80ace01208"
                }
             },
             "RoleIDs" : {
@@ -13986,7 +14039,7 @@ pre code {
       "Ticket"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -14047,7 +14100,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -14102,7 +14155,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -14127,7 +14180,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -14141,7 +14194,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -14192,7 +14245,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -14207,7 +14260,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -14215,7 +14268,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -14316,7 +14369,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -14409,7 +14462,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -14422,7 +14475,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -14441,7 +14494,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -14449,7 +14502,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -14462,7 +14515,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -14506,7 +14559,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -14562,7 +14622,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -14591,7 +14651,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -14692,7 +14752,7 @@ pre code {
             "PriorityID": 5,
             "QueueID": 3,
             "ResponsibleID": 1,
-            "ServiceID": "",
+            "ServiceID": null,
             "StateID": 1,
             "TicketID": 49,
             "TicketNumber": "2020040917000014",
@@ -14717,7 +14777,7 @@ pre code {
             "PriorityID": 3,
             "QueueID": 2,
             "ResponsibleID": 1,
-            "ServiceID": "",
+            "ServiceID": null,
             "StateID": 1,
             "TicketID": 50,
             "TicketNumber": "2020040917000015",
@@ -14819,33 +14879,6 @@ pre code {
       "Ticket"
    ],
    "definitions" : {
-      "DynamicFieldValueSetItem_json-142e42dd10" : {
-         "$id" : "#DynamicFieldValueSetItem",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The dynamic field value object to set it for an object.",
-         "type" : "object",
-         "properties" : {
-            "Name" : {
-               "description" : "the name of the relevant dynami field",
-               "type" : "string"
-            },
-            "Value" : {
-               "description" : "value type depends on the dynamic field (can also be an array of value type)",
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "integer"
-                  }
-               ]
-            }
-         },
-         "required" : [
-            "Name",
-            "Value"
-         ]
-      },
       "DynamicFieldValueSetItem_json-16dfcaf043" : {
          "$id" : "#DynamicFieldValueSetItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -14864,6 +14897,19 @@ pre code {
                   },
                   {
                      "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
                   }
                ]
             }
@@ -14873,7 +14919,47 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachmentPostItem_json-15cfff7bfc" : {
+      "DynamicFieldValueSetItem_json-89f4203892" : {
+         "$id" : "#DynamicFieldValueSetItem",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynami field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      },
+      "TicketArticleAttachmentPostItem_json-436743dd0d" : {
          "$id" : "#TicketArticleAttachmentPostItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object for creation.",
@@ -14905,7 +14991,7 @@ pre code {
             "Attachments" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-15cfff7bfc"
+                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-436743dd0d"
                }
             },
             "AutoResponseType" : {
@@ -14938,7 +15024,7 @@ pre code {
                "description" : "list of dynamic field values to be set",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-142e42dd10"
+                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-89f4203892"
                }
             },
             "ExcludeMuteNotificationToUserID" : {
@@ -15125,7 +15211,7 @@ pre code {
       "Ticket"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -15186,7 +15272,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -15241,7 +15327,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -15266,7 +15352,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticle_json-59cb681d06" : {
+      "TicketArticle_json-358c16fe85" : {
          "$id" : "#TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
@@ -15280,7 +15366,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -15331,7 +15417,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -15346,7 +15432,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -15354,7 +15440,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -15455,7 +15541,7 @@ pre code {
             "ToRealname"
          ]
       },
-      "TicketHistory_json-f970feaedb" : {
+      "TicketHistory_json-b84d38baa5" : {
          "$id" : "#TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
@@ -15548,7 +15634,7 @@ pre code {
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-59cb681d06"
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
                },
                "readOnly" : true
             },
@@ -15561,7 +15647,7 @@ pre code {
                "readOnly" : true
             },
             "ContactID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreateBy" : {
@@ -15580,7 +15666,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -15588,7 +15674,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-f970feaedb"
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
                },
                "readOnly" : true
             },
@@ -15601,7 +15687,7 @@ pre code {
                "readOnly" : true
             },
             "OrganisationID" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "Owner" : {
@@ -15645,7 +15731,14 @@ pre code {
                "readOnly" : true
             },
             "ServiceID" : {
-               "type" : "integer",
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "State" : {
@@ -15701,7 +15794,7 @@ pre code {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-cf85a346e4"
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
                },
                "readOnly" : true
             }
@@ -15730,7 +15823,7 @@ pre code {
             "UntilTime"
          ]
       },
-      "Watcher_json-cf85a346e4" : {
+      "Watcher_json-8eca247d7a" : {
          "$id" : "#Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
@@ -15865,7 +15958,7 @@ pre code {
         "PriorityID": 5,
         "QueueID": 3,
         "ResponsibleID": 1,
-        "ServiceID": "",
+        "ServiceID": null,
         "StateID": 1,
         "TicketID": 49,
         "TicketNumber": "2020040917000014",
@@ -15974,6 +16067,19 @@ pre code {
                   },
                   {
                      "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
                   }
                ]
             }
@@ -16145,7 +16251,7 @@ pre code {
       "Article"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -16206,7 +16312,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -16261,7 +16367,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -16300,7 +16406,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -16351,7 +16457,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -16366,7 +16472,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -16374,7 +16480,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -16583,7 +16689,7 @@ pre code {
       "Article"
    ],
    "definitions" : {
-      "DynamicFieldValueSetItem_json-142e42dd10" : {
+      "DynamicFieldValueSetItem_json-89f4203892" : {
          "$id" : "#DynamicFieldValueSetItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
@@ -16601,6 +16707,19 @@ pre code {
                   },
                   {
                      "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
                   }
                ]
             }
@@ -16610,7 +16729,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachmentPostItem_json-15cfff7bfc" : {
+      "TicketArticleAttachmentPostItem_json-436743dd0d" : {
          "$id" : "#TicketArticleAttachmentPostItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object for creation.",
@@ -16642,7 +16761,7 @@ pre code {
             "Attachments" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-15cfff7bfc"
+                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-436743dd0d"
                }
             },
             "AutoResponseType" : {
@@ -16675,7 +16794,7 @@ pre code {
                "description" : "list of dynamic field values to be set",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-142e42dd10"
+                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-89f4203892"
                }
             },
             "ExcludeMuteNotificationToUserID" : {
@@ -16837,7 +16956,7 @@ pre code {
       "Article"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -16898,7 +17017,7 @@ pre code {
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -16953,7 +17072,7 @@ pre code {
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -16992,7 +17111,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -17043,7 +17162,7 @@ pre code {
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -17058,7 +17177,7 @@ pre code {
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -17066,7 +17185,7 @@ pre code {
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },
@@ -17302,6 +17421,19 @@ pre code {
                   },
                   {
                      "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
                   }
                ]
             }
@@ -17784,7 +17916,7 @@ pre code {
                "readOnly" : true
             },
             "FilesizeRaw" : {
-               "type" : "string",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -18300,7 +18432,7 @@ pre code {
             "PriorityID": 3,
             "QueueID": 2,
             "StateID": 1,
-            "TicketID": "53",
+            "TicketID": 53,
             "TypeID": 1
         },
         {
@@ -18315,7 +18447,7 @@ pre code {
             "PriorityID": 3,
             "QueueID": 2,
             "StateID": 1,
-            "TicketID": "53",
+            "TicketID": 53,
             "TypeID": 1
         },
         {
@@ -18330,7 +18462,7 @@ pre code {
             "PriorityID": 3,
             "QueueID": 2,
             "StateID": 1,
-            "TicketID": "53",
+            "TicketID": 53,
             "TypeID": 1
         },
         {
@@ -18345,7 +18477,7 @@ pre code {
             "PriorityID": 3,
             "QueueID": 2,
             "StateID": 1,
-            "TicketID": "53",
+            "TicketID": 53,
             "TypeID": 1
         }
     ]
@@ -18476,7 +18608,7 @@ pre code {
         "PriorityID": 3,
         "QueueID": 2,
         "StateID": 1,
-        "TicketID": "53",
+        "TicketID": 53,
         "TypeID": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__history__historyid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -18576,6 +18708,8 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Watcher": [
         {
+            "ChangeBy": 1,
+            "ChangeTime": "2009-01-20 09:27:53",
             "CreateBy": 1,
             "CreateTime": "2009-01-20 09:27:53",
             "ID": 1,
@@ -18584,6 +18718,8 @@ pre code {
             "UserID": 99
         },
         {
+            "ChangeBy": 1,
+            "ChangeTime": "2009-01-20 10:43:17",
             "CreateBy": 1,
             "CreateTime": "2009-01-20 10:43:17",
             "ID": 2,
@@ -18592,6 +18728,8 @@ pre code {
             "UserID": 7
         },
         {
+            "ChangeBy": 1,
+            "ChangeTime": "2011-01-20 09:28:32",
             "CreateBy": 1,
             "CreateTime": "2011-01-20 09:28:32",
             "ID": 3,
@@ -18787,7 +18925,7 @@ pre code {
       "Job"
    ],
    "definitions" : {
-      "ExecPlan_json-57e717fede" : {
+      "ExecPlan_json-cdf3609f11" : {
          "$id" : "#ExecPlan",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The execution plan object.",
@@ -18907,7 +19045,7 @@ pre code {
                "description" : "assigned execution plans - added via include \"ExecPlans\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ExecPlan_json-57e717fede"
+                  "$ref" : "#/definitions/ExecPlan_json-cdf3609f11"
                },
                "readOnly" : true
             },
@@ -18931,7 +19069,7 @@ pre code {
                "description" : "assigned macros - added via include \"Macros\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/Macro_json-22c43183c2"
+                  "$ref" : "#/definitions/Macro_json-8a95f87e34"
                },
                "readOnly" : true
             },
@@ -18959,7 +19097,7 @@ pre code {
             "ValidID"
          ]
       },
-      "MacroAction_json-1c13e7e1ed" : {
+      "MacroAction_json-c2a5846916" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
@@ -19017,7 +19155,7 @@ pre code {
             "ValidID"
          ]
       },
-      "Macro_json-22c43183c2" : {
+      "Macro_json-8a95f87e34" : {
          "$id" : "#Macro",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
@@ -19027,7 +19165,7 @@ pre code {
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-1c13e7e1ed"
+                  "$ref" : "#/definitions/MacroAction_json-c2a5846916"
                },
                "readOnly" : true
             },
@@ -19297,7 +19435,7 @@ pre code {
       "Job"
    ],
    "definitions" : {
-      "ExecPlan_json-57e717fede" : {
+      "ExecPlan_json-cdf3609f11" : {
          "$id" : "#ExecPlan",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The execution plan object.",
@@ -19417,7 +19555,7 @@ pre code {
                "description" : "assigned execution plans - added via include \"ExecPlans\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ExecPlan_json-57e717fede"
+                  "$ref" : "#/definitions/ExecPlan_json-cdf3609f11"
                },
                "readOnly" : true
             },
@@ -19441,7 +19579,7 @@ pre code {
                "description" : "assigned macros - added via include \"Macros\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/Macro_json-22c43183c2"
+                  "$ref" : "#/definitions/Macro_json-8a95f87e34"
                },
                "readOnly" : true
             },
@@ -19469,7 +19607,7 @@ pre code {
             "ValidID"
          ]
       },
-      "MacroAction_json-1c13e7e1ed" : {
+      "MacroAction_json-c2a5846916" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
@@ -19527,7 +19665,7 @@ pre code {
             "ValidID"
          ]
       },
-      "Macro_json-22c43183c2" : {
+      "Macro_json-8a95f87e34" : {
          "$id" : "#Macro",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
@@ -19537,7 +19675,7 @@ pre code {
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-1c13e7e1ed"
+                  "$ref" : "#/definitions/MacroAction_json-c2a5846916"
                },
                "readOnly" : true
             },
@@ -20192,7 +20330,7 @@ pre code {
       "JobRun"
    ],
    "definitions" : {
-      "JobRunLog_json-7ddb9237e5" : {
+      "JobRunLog_json-4634c233b6" : {
          "$id" : "#JobRun",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The job run object.",
@@ -20299,7 +20437,7 @@ pre code {
                "description" : "execution logs of this run - added via include \"Logs\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/JobRunLog_json-7ddb9237e5"
+                  "$ref" : "#/definitions/JobRunLog_json-4634c233b6"
                },
                "readOnly" : true
             },
@@ -21328,7 +21466,7 @@ pre code {
       "Macro"
    ],
    "definitions" : {
-      "MacroAction_json-1c13e7e1ed" : {
+      "MacroAction_json-c2a5846916" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
@@ -21396,7 +21534,7 @@ pre code {
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-1c13e7e1ed"
+                  "$ref" : "#/definitions/MacroAction_json-c2a5846916"
                },
                "readOnly" : true
             },
@@ -22040,7 +22178,7 @@ pre code {
       "Macro"
    ],
    "definitions" : {
-      "MacroAction_json-1c13e7e1ed" : {
+      "MacroAction_json-c2a5846916" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
@@ -22108,7 +22246,7 @@ pre code {
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-1c13e7e1ed"
+                  "$ref" : "#/definitions/MacroAction_json-c2a5846916"
                },
                "readOnly" : true
             },
@@ -22941,7 +23079,7 @@ pre code {
       "ConfigItemClass"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
+      "ConfigItemClassDefinition_json-01f549b109" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -23046,13 +23184,13 @@ pre code {
                "readOnly" : true
             },
             "CurrentDefinition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
             },
             "Definitions" : {
                "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
                }
             },
             "ID" : {
@@ -23222,7 +23360,7 @@ pre code {
       "ConfigItemClass"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
+      "ConfigItemClassDefinition_json-01f549b109" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -23327,13 +23465,13 @@ pre code {
                "readOnly" : true
             },
             "CurrentDefinition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
             },
             "Definitions" : {
                "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
                }
             },
             "ID" : {
@@ -29004,7 +29142,7 @@ pre code {
       "FAQCategory"
    ],
    "definitions" : {
-      "FAQArticle_json-61e393a649" : {
+      "FAQArticle_json-bb9508286a" : {
          "$id" : "#FAQArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ article object.",
@@ -29018,7 +29156,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+                  "$ref" : "#/definitions/FAQAttachment_json-4335a8d47f"
                },
                "readOnly" : true
             },
@@ -29082,7 +29220,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+                  "$ref" : "#/definitions/FAQHistory_json-bc1e2bbc07"
                },
                "readOnly" : true
             },
@@ -29121,7 +29259,7 @@ pre code {
                "description" : "added via include \"Votes\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+                  "$ref" : "#/definitions/FAQVote_json-0d88ed7e95"
                },
                "readOnly" : true
             }
@@ -29150,7 +29288,7 @@ pre code {
             "ValidID"
          ]
       },
-      "FAQAttachment_json-ec8b67bcc9" : {
+      "FAQAttachment_json-4335a8d47f" : {
          "$id" : "#FAQAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
@@ -29223,7 +29361,7 @@ pre code {
             "ID"
          ]
       },
-      "FAQCategory_json-02f8c50b4e" : {
+      "FAQCategory_json-b309fd82cd" : {
          "$id" : "#FAQCategory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
@@ -29235,7 +29373,7 @@ pre code {
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-bb9508286a"
                      },
                      {
                         "type" : "integer"
@@ -29293,7 +29431,7 @@ pre code {
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-b309fd82cd"
                   },
                   {
                      "type" : "integer"
@@ -29330,7 +29468,7 @@ pre code {
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-bb9508286a"
                      },
                      {
                         "type" : "integer"
@@ -29388,7 +29526,7 @@ pre code {
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-b309fd82cd"
                   },
                   {
                      "type" : "integer"
@@ -29413,7 +29551,7 @@ pre code {
             "ValidID"
          ]
       },
-      "FAQHistory_json-b505629552" : {
+      "FAQHistory_json-bc1e2bbc07" : {
          "$id" : "#FAQHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
@@ -29448,7 +29586,7 @@ pre code {
             "Name"
          ]
       },
-      "FAQVote_json-a6c5d69008" : {
+      "FAQVote_json-0d88ed7e95" : {
          "$id" : "#FAQVote",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
@@ -29661,7 +29799,7 @@ pre code {
       "FAQCategory"
    ],
    "definitions" : {
-      "FAQArticle_json-61e393a649" : {
+      "FAQArticle_json-bb9508286a" : {
          "$id" : "#FAQArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ article object.",
@@ -29675,7 +29813,7 @@ pre code {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+                  "$ref" : "#/definitions/FAQAttachment_json-4335a8d47f"
                },
                "readOnly" : true
             },
@@ -29739,7 +29877,7 @@ pre code {
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+                  "$ref" : "#/definitions/FAQHistory_json-bc1e2bbc07"
                },
                "readOnly" : true
             },
@@ -29778,7 +29916,7 @@ pre code {
                "description" : "added via include \"Votes\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+                  "$ref" : "#/definitions/FAQVote_json-0d88ed7e95"
                },
                "readOnly" : true
             }
@@ -29807,7 +29945,7 @@ pre code {
             "ValidID"
          ]
       },
-      "FAQAttachment_json-ec8b67bcc9" : {
+      "FAQAttachment_json-4335a8d47f" : {
          "$id" : "#FAQAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
@@ -29880,7 +30018,7 @@ pre code {
             "ID"
          ]
       },
-      "FAQCategory_json-02f8c50b4e" : {
+      "FAQCategory_json-b309fd82cd" : {
          "$id" : "#FAQCategory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
@@ -29892,7 +30030,7 @@ pre code {
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-bb9508286a"
                      },
                      {
                         "type" : "integer"
@@ -29950,7 +30088,7 @@ pre code {
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-b309fd82cd"
                   },
                   {
                      "type" : "integer"
@@ -29987,7 +30125,7 @@ pre code {
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-bb9508286a"
                      },
                      {
                         "type" : "integer"
@@ -30045,7 +30183,7 @@ pre code {
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-b309fd82cd"
                   },
                   {
                      "type" : "integer"
@@ -30070,7 +30208,7 @@ pre code {
             "ValidID"
          ]
       },
-      "FAQHistory_json-b505629552" : {
+      "FAQHistory_json-bc1e2bbc07" : {
          "$id" : "#FAQHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
@@ -30105,7 +30243,7 @@ pre code {
             "Name"
          ]
       },
-      "FAQVote_json-a6c5d69008" : {
+      "FAQVote_json-0d88ed7e95" : {
          "$id" : "#FAQVote",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
@@ -32918,7 +33056,7 @@ pre code {
       "Role"
    ],
    "definitions" : {
-      "Permission_json-0f9ebcd307" : {
+      "Permission_json-a9c743d381" : {
          "$id" : "#Permission",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
@@ -33021,7 +33159,7 @@ pre code {
                "description" : "added via include \"Permissions\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Permission_json-0f9ebcd307"
+                  "$ref" : "#/definitions/Permission_json-a9c743d381"
                },
                "readOnly" : true
             },
@@ -33363,7 +33501,7 @@ pre code {
       "Role"
    ],
    "definitions" : {
-      "Permission_json-0f9ebcd307" : {
+      "Permission_json-a9c743d381" : {
          "$id" : "#Permission",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
@@ -33466,7 +33604,7 @@ pre code {
                "description" : "added via include \"Permissions\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Permission_json-0f9ebcd307"
+                  "$ref" : "#/definitions/Permission_json-a9c743d381"
                },
                "readOnly" : true
             },
@@ -37982,7 +38120,7 @@ pre code {
       "User"
    ],
    "definitions" : {
-      "UserPreference_json-7fdc063bfe" : {
+      "UserPreference_json-80ace01208" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",
@@ -38033,7 +38171,7 @@ pre code {
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreference_json-7fdc063bfe"
+                  "$ref" : "#/definitions/UserPreference_json-80ace01208"
                }
             },
             "RoleIDs" : {
@@ -38283,7 +38421,7 @@ pre code {
       "User"
    ],
    "definitions" : {
-      "UserPreference_json-7fdc063bfe" : {
+      "UserPreference_json-80ace01208" : {
          "$id" : "#UserPreference",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",
@@ -38334,7 +38472,7 @@ pre code {
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreference_json-7fdc063bfe"
+                  "$ref" : "#/definitions/UserPreference_json-80ace01208"
                }
             },
             "RoleIDs" : {

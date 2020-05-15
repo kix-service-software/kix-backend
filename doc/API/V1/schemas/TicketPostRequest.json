@@ -67,33 +67,6 @@
       "Ticket"
    ],
    "definitions" : {
-      "DynamicFieldValueSetItem_json-142e42dd10" : {
-         "$id" : "#DynamicFieldValueSetItem",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The dynamic field value object to set it for an object.",
-         "type" : "object",
-         "properties" : {
-            "Name" : {
-               "description" : "the name of the relevant dynami field",
-               "type" : "string"
-            },
-            "Value" : {
-               "description" : "value type depends on the dynamic field (can also be an array of value type)",
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "integer"
-                  }
-               ]
-            }
-         },
-         "required" : [
-            "Name",
-            "Value"
-         ]
-      },
       "DynamicFieldValueSetItem_json-16dfcaf043" : {
          "$id" : "#DynamicFieldValueSetItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -112,6 +85,19 @@
                   },
                   {
                      "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
                   }
                ]
             }
@@ -121,7 +107,47 @@
             "Value"
          ]
       },
-      "TicketArticleAttachmentPostItem_json-15cfff7bfc" : {
+      "DynamicFieldValueSetItem_json-89f4203892" : {
+         "$id" : "#DynamicFieldValueSetItem",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynami field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      },
+      "TicketArticleAttachmentPostItem_json-436743dd0d" : {
          "$id" : "#TicketArticleAttachmentPostItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object for creation.",
@@ -153,7 +179,7 @@
             "Attachments" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-15cfff7bfc"
+                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-436743dd0d"
                }
             },
             "AutoResponseType" : {
@@ -186,7 +212,7 @@
                "description" : "list of dynamic field values to be set",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-142e42dd10"
+                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-89f4203892"
                }
             },
             "ExcludeMuteNotificationToUserID" : {

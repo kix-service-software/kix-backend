@@ -110,7 +110,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID             => '1',                                           # required 
+            TicketID             => '1',                                           # required
             HistoryID            => '32,33',                                       # required, could be coma separated IDs or an Array
         },
     );
@@ -177,6 +177,8 @@ sub Run {
             $HistoryItem->{Name} =~ s/\%s//xg;
         }
 
+        $HistoryItem->{TicketID} += 0;
+
         # add
         push(@HistoryItemList, $HistoryItem);
     }
@@ -184,7 +186,7 @@ sub Run {
     if ( scalar(@HistoryItemList) == 1 ) {
         return $Self->_Success(
             History => $HistoryItemList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

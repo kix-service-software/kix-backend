@@ -24,7 +24,7 @@
             "readOnly": true
         },
         "FilesizeRaw": {
-            "type": "string",
+            "type": "integer",
             "readOnly": true
         }
       },
