@@ -75,6 +75,10 @@ sub Run {
         Directory => "$Self->{Home}/Kernel/Config/Files",
         Source    => "SysConfig",
     ));
+    %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
+        Directory => "$Self->{Home}/update",
+        Source    => "Update",
+    ));
 
     $Self->Print(sprintf "\nextracted %i Translatables\n", (scalar keys %Translatables));
 
@@ -238,6 +242,16 @@ sub _ExtractFromPerlFiles {
         Silent    => 1,
     );
 
+    @PerlModuleList = (
+        @PerlModuleList,
+        $Kernel::OM->Get('Main')->DirectoryRead(
+            Directory => "$Self->{Home}/update",
+            Filter    => '*.pl',
+            Recursive => 1,
+            Silent    => 1,
+        )
+    );
+
     FILE:
     for my $File (@PerlModuleList) {
         # ignore plugins if not given
@@ -256,7 +270,7 @@ sub _ExtractFromPerlFiles {
             die "Can't open $File: $!";
         }
 
-        $File =~ s{^.*/(Kernel/)}{$1}smx;
+        $File =~ s{^.*/(Kernel/|update/)}{$1}smx;
 
         my $Content = ${$ContentRef};
 
@@ -333,7 +347,7 @@ sub _ExtractFromXMLFiles {
             die "Can't open $File: $!";
         }
 
-        $File =~ s{^.*/(scripts/|Kernel/)}{$1}smx;
+        $File =~ s{^.*/(scripts/|Kernel/|update/)}{$1}smx;
 
         my $Content = ${$ContentRef};
 
