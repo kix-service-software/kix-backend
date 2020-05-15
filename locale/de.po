@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-24 10:55+0000\n"
+"POT-Creation-Date: 2020-05-14 17:40+0000\n"
 "PO-Revision-Date: 2020-05-07 07:50+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
@@ -353,12 +353,6 @@ msgid ""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid ""
-"Permission type that restricts access on object properties (QueueID in "
-"tickets)."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Phone"
 msgstr ""
 
@@ -379,10 +373,6 @@ msgid "Production"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Property"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "PropertyValue"
 msgstr ""
 
@@ -392,10 +382,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Repair"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "Resource"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -484,26 +470,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "TextArea"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "The import is running."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "The import run has been finished."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "The job is running."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "The last job run has been finished but some errors occured."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "The last job run has been finished."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -626,10 +592,6 @@ msgid "external"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "finished"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "full permissions on everything (CRUD on resource /*)"
 msgstr ""
 
@@ -667,10 +629,6 @@ msgid "reject"
 msgstr "ablehnen"
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "running"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "same as Asset-Reader, but additionally  allows to create new or update any "
 "existing asset entry and allows to CREATE, UPDATE, DELETE links"
@@ -703,10 +661,6 @@ msgstr ""
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "valid"
 msgstr "gültig"
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "warning"
-msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "Check to activate this date"
@@ -897,7 +851,7 @@ msgid ""
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
-msgid "The login of the contact to be set."
+msgid "The email of the contact to be set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
@@ -2210,10 +2164,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Down"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Ticket.xml
-msgid "EscalationTime"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -5085,11 +5035,6 @@ msgid "Toolbar Position"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Triggers ticket escalation events and notification events for escalation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Tuesday"
 msgstr ""
 
@@ -5877,12 +5822,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Defines all possible item states for the checklist sidebar. Key has to be "
-"unique and used for StateIcon list and StateStyle list below."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines all the X-headers that should be scanned."
 msgstr ""
 
@@ -5903,12 +5842,7 @@ msgid "Defines all the parameters for this notification transport."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Defines all the ticket state types in which the checklist cannot be changed."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines all the ticket states in which the checklist cannot be changed."
+msgid "Defines allowed and not allowed actions for merged and removed tickets."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5935,12 +5869,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the body text for rejected emails."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Defines the default item state for new items. It should be one of the item "
-"states out of the list below."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5971,16 +5899,6 @@ msgid ""
 "Defines the format of responses in the ticket compose screen of the agent "
 "interface ([% Data.OrigFrom | html %] is From 1:1, [% Data.OrigFromName | "
 "html %] is only realname of From)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines the item state icons for the item states defined above."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Defines the item state styles for the item states defined above. Use CSS-"
-"styles."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6121,30 +6039,6 @@ msgid ""
 msgstr ""
 "Englische Stopp-Wörter für Volltextindex. Diese Wörter werden aus dem "
 "Suchindex entfernt."
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation response time finished"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation response time forewarned"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation response time in effect"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation solution time finished"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation solution time forewarned"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Escalation solution time in effect"
-msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Event module registration."
@@ -6846,12 +6740,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
-"The duration in minutes after emitting an event, in which the new escalation "
-"notify and start events are suppressed."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
 "The format of the subject. 'Left' means '[TicketHook#:12345] Some Subject', "
 "'Right' means 'Some Subject [TicketHook#:12345]', 'None' means 'Some "
 "Subject' and no ticket number. In the latter case you should verify that the "
@@ -6901,12 +6789,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
-"Ticket event module to create a checklist from ticket template on ticket "
-"create."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
 "Ticket event module to send an acknowledge to registered system monitoring "
 "tools."
 msgstr ""
@@ -6921,6 +6803,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Ticket overview"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Ticket-ACL to restrict ticket actions for merged tickets."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -7090,6 +6976,72 @@ msgstr "entfernt"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "system"
+msgstr ""
+
+#. Update: update/build-1078_pre.xml
+msgid "The job is running."
+msgstr ""
+
+#. Update: update/build-1078_pre.xml
+msgid "The last job run has been finished but some errors occured."
+msgstr ""
+
+#. Update: update/build-1078_pre.xml
+msgid "The last job run has been finished."
+msgstr ""
+
+#. Update: update/build-1078_pre.xml
+msgid "warning"
+msgstr ""
+
+#. Update: update/build-1090_pre.xml
+msgid "The import is running."
+msgstr ""
+
+#. Update: update/build-1090_pre.xml
+msgid "The import run has been finished."
+msgstr ""
+
+#. Update: update/build-1090_pre.xml
+msgid "finished"
+msgstr ""
+
+#. Update: update/build-1090_pre.xml
+msgid "running"
+msgstr ""
+
+#. Update: update/build-1132_pre.xml
+msgid ""
+"Permission type that restricts access on object properties (QueueID in "
+"tickets)."
+msgstr ""
+
+#. Update: update/build-1132_pre.xml
+msgid "Property"
+msgstr ""
+
+#. Update: update/build-807_pre.xml
+msgid "Object"
+msgstr ""
+
+#. Update: update/build-807_pre.xml
+msgid "Permission type for the relationship of queues and tickets."
+msgstr ""
+
+#. Update: update/build-807_pre.xml
+msgid "Permission type that corresponds with a collection resource."
+msgstr ""
+
+#. Update: update/build-807_pre.xml
+msgid "Permission type that corresponds with a item resource."
+msgstr ""
+
+#. Update: update/build-807_pre.xml
+msgid "Queue->Ticket"
+msgstr ""
+
+#. Update: update/build-807_pre.xml
+msgid "Resource"
 msgstr ""
 
 #. manual entry from templates.pot.manual
