@@ -16,6 +16,19 @@
             },
             {
                "type" : "integer"
+            },
+            {
+               "type" : "array",
+               "items" : {
+                  "anyOf" : [
+                     {
+                        "type" : "string"
+                     },
+                     {
+                        "type" : "integer"
+                     }
+                  ]
+               }
             }
          ]
       }

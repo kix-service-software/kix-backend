@@ -12,7 +12,7 @@
       "Article"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
+      "DynamicFieldValue_json-95816834ee" : {
          "$id" : "#DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
@@ -73,7 +73,7 @@
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
+      "TicketArticleAttachment_json-3fc26e02ab" : {
          "$id" : "#TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
@@ -128,7 +128,7 @@
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
+      "TicketArticleFlag_json-73c45dc8a4" : {
          "$id" : "#TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
@@ -167,7 +167,7 @@
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
                },
                "readOnly" : true
             },
@@ -218,7 +218,7 @@
                "readOnly" : true
             },
             "CreateTime" : {
-               "type" : "integer",
+               "type" : "string",
                "readOnly" : true
             },
             "CreatedBy" : {
@@ -233,7 +233,7 @@
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
                },
                "readOnly" : true
             },
@@ -241,7 +241,7 @@
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
                },
                "readOnly" : true
             },

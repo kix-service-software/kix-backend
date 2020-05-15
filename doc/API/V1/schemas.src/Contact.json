@@ -58,6 +58,10 @@
       "type": "string",
       "readOnly": true
     },
+    "Fullname": {
+      "type": "string",
+      "readOnly": true
+    },
     "ID": {
       "type": "integer",
       "readOnly": true
@@ -111,6 +115,7 @@
     "CreateBy",
     "CreateTime",
     "Firstname",
+    "Fullname",
     "Email",
     "ID",
     "Lastname",

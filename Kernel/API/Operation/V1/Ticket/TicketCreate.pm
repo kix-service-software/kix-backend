@@ -155,7 +155,7 @@ perform TicketCreate Operation. This will return the created TicketID.
                         ExcludeMuteNotificationToUserID => [1, 2, 3]                   # optional
                         DynamicFields => [                                             # optional
                             {
-                                Name   => 'some name',                                          
+                                Name   => 'some name',
                                 Value  => $Value,                                      # value type depends on the dynamic field
                             },
                             # ...
@@ -167,13 +167,13 @@ perform TicketCreate Operation. This will return the created TicketID.
                                 Filename    => 'some fine name'
                             },
                             # ...
-                        ],                    
+                        ],
                     },
                     # ...
                 ]
                 DynamicFields => [                                                     # optional
                     {
-                        Name   => 'some name',                                          
+                        Name   => 'some name',
                         Value  => $Value,                                              # value type depends on the dynamic field
                     },
                     # ...
@@ -345,6 +345,7 @@ sub _TicketCreate {
 
     # create new ticket
     my $TicketID = $TicketObject->TicketCreate(
+        %{ $Ticket },
         Title          => $Ticket->{Title},
         QueueID        => $Ticket->{QueueID} || '',
         Queue          => $Ticket->{Queue} || '',

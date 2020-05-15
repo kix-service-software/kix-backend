@@ -63,7 +63,7 @@
          "readOnly" : true
       },
       "CreateTime" : {
-         "type" : "integer",
+         "type" : "string",
          "readOnly" : true
       },
       "CreatedBy" : {

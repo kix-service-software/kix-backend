@@ -15,6 +15,19 @@
         },
         {
           "type": "integer"
+        },
+        {
+          "type":"array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          }
         }
       ],
       "description": "value type depends on the dynamic field (can also be an array of value type)"
