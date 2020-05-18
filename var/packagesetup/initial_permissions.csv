@@ -95,7 +95,7 @@
 "Customer";"Resource";"/faq";;"x";;;
 "Customer";"Resource";"/faq/*";;;;;
 "Customer";"Resource";"/faq/articles";;"x";;;   
-"Customer";"PropertyValue";"/faq/articles/*{FAQArticle.CustomerVisible EQ 1}";;"x";;;
+"Customer";"PropertyValue";"/faq/articles/*{FAQArticle.CustomerVisible NE 1}";;;;;
 "Customer";"Resource";"/faq/articles/*/votes";"x";"x";;;
 "Customer";"Resource";"/i18n";;"x";;;
 "Customer";"Resource";"/links";;"x";;;
@@ -115,7 +115,7 @@
 "Customer";"Resource";"/system/faq/*";;;;;
 "Customer";"Resource";"/system/faq/categories";;"x";;;
 "Customer";"Resource";"/system/ticket";;"x";;;
-"Customer";"PropertyValue";"/system/ticket/templates/*{TicketTemplate.CustomerVisible EQ 1}";;"x";;;
+"Customer";"PropertyValue";"/system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}";;;;;
 "Customer";"Resource";"/system/users";;"x";;;
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
@@ -124,6 +124,10 @@
 "Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;
-"Customer";"PropertyValue";"/tickets/*/articles/*{Article.CustomerVisible EQ 1}";;"x";;;
+"Customer";"PropertyValue";"/tickets/*/articles/*{Article.CustomerVisible NE 1}";;;;;
 "Customer";"Property";"/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles/*/flags";"x";"x";;;
+"Customer";"Resource";"/system/config";;"x";;;
+"Customer";"Resource";"/system/config/*";;"x";;;
+"Customer";"PropertyValue";"/system/config{SysConfigOption.AccessLevel NE external}";;;;;
+"Customer";"PropertyValue";"/system/config/*{SysConfigOption.AccessLevel NE external}";;;;;

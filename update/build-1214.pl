@@ -42,114 +42,165 @@ sub _UpdatePermissionsForRoleCustomer {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
     my $RoleObject = $Kernel::OM->Get('Role');
-    my $RoleID = $RoleObject->RoleLookup(
-        Role => 'Customer'
+
+    my %RoleList           = reverse $RoleObject->RoleList();
+    my %PermissionTypeList = reverse $RoleObject->PermissionTypeList();
+
+    my @PermissionUpdates = (
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'PropertyValue',
+                Target => '/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}'
+            },
+            Change => {
+                Value => 0,
+            }
+        },
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'PropertyValue',
+                Target => '/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}'
+            },
+            Change => {
+                Value => 0,
+            }
+        },
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'PropertyValue',
+                Target => '/system/ticket/templates/*{TicketTemplate.CustomerVisible EQ 1}',
+            },
+            Change => {
+                Target => '/system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}',
+                Value  => 0,
+            }
+        },
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'PropertyValue',
+                Target => '/tickets/*/articles/*{Article.CustomerVisible EQ 1}',
+            },
+            Change => {
+                Target => '/tickets/*/articles/*{Article.CustomerVisible NE 1}',
+                Value  => 0,
+            }
+        },
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'PropertyValue',
+                Target => '/faq/articles/*{FAQArticle.CustomerVisible EQ 1}',
+            },
+            Change => {
+                Target => '/faq/articles/*{FAQArticle.CustomerVisible NE 1}',
+                Value  => 0,
+            }
+        },
     );
 
-    if (!$RoleID) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Unable to find role "Customer"! Aborting.'
+    foreach my $Update ( @PermissionUpdates ) {
+        my $RoleID = $RoleList{$Update->{Permission}->{Role}};
+        if (!$RoleID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find role "'.$Update->{Permission}->{Role}.'"!'
+            );
+            next;
+        }
+        my $PermissionTypeID = $PermissionTypeList{$Update->{Permission}->{Type}};
+        if (!$PermissionTypeID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find permission type "'.$Update->{Permission}->{Type}.'"!'
+            );
+            next;
+        }
+
+        my $PermissionID = $RoleObject->PermissionLookup(
+            RoleID => $RoleID,
+            TypeID => $PermissionTypeID,
+            Target => $Update->{Permission}->{Target}
         );
-        return;
-    }
+        # nothing to do
+        next if !$PermissionID;
 
-    # update existing permissions
-    my $PermissionID = 0;
-
-    $PermissionID = $RoleObject->PermissionLookup(
-        RoleID => $RoleID,
-        TypeID => 2,
-        Target => '/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}'
-    );
-
-    if (!$PermissionID) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Unable to find permission for target "/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}"! Aborting.'
+        my $Success = $RoleObject->PermissionUpdate(
+            ID     => $PermissionID,
+            UserID => 1,
+            %{$Update->{Change}}
         );
-        return;
-    }
 
-    my $IsPermissionUpdated = 0;
-    $IsPermissionUpdated = $RoleObject->PermissionUpdate(
-        ID     => $PermissionID,
-        Target => '/tickets{Ticket.ContactID EQ $CurrentUser.Contact.ID && Ticket.OrganisationID EQ $CurrentUser.Contact.PrimaryOrganisationID}',
-        Value  => 3
-    );
-
-    if (!$IsPermissionUpdated) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Unable to update permission with target "/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}"!'
-        );
-        return;
-    }
-
-    $PermissionID = 0;
-
-    $PermissionID = $RoleObject->PermissionLookup(
-        RoleID => $RoleID,
-        TypeID => 2,
-        Target => '/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}'
-    );
-
-    if (!$PermissionID) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Unable to find permission for target "/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}"! Aborting.'
-        );
-        return;
-    }
-
-    $IsPermissionUpdated = 0;
-
-    $IsPermissionUpdated = $RoleObject->PermissionUpdate(
-        ID     => $PermissionID,
-        Target => '/tickets/*{Ticket.ContactID EQ $CurrentUser.Contact.ID && Ticket.OrganisationID EQ $CurrentUser.Contact.PrimaryOrganisationID}',
-        Value  => 3
-    );
-
-    if (!$IsPermissionUpdated) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Unable to update permission with target "/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}"!'
-        );
-        return;
+        if (!$Success) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
+            );
+        }
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "Updated permission ID $PermissionID!"
+            );
+        }
     }
 
     #add new permissions
     my @NewPermissions = (
         {
-            TypeID => 1,
+            Role   => 'Customer',
+            Type   => 'Resource',
             Target => '/system/config',
             Value  => 2
         },
         {
-            TypeID => 1,
+            Role   => 'Customer',
+            Type   => 'Resource',
             Target => '/system/config/*',
             Value  => 2
         },
         {
-            TypeID => 2,
-            Target => '/system/config{SysConfigOption.AccessLevel EQ external}',
-            Value  => 2
+            Role   => 'Customer',
+            Type   => 'PropertyValue',
+            Target => '/system/config{SysConfigOption.AccessLevel NE external}',
+            Value  => 0
         },
         {
-            TypeID => 2,
-            Target => '/system/config/*{SysConfigOption.AccessLevel EQ external}',
-            Value  => 2
+            Role   => 'Customer',
+            Type   => 'PropertyValue',
+            Target => '/system/config/*{SysConfigOption.AccessLevel NE external}',
+            Value  => 0
         },
     );
 
     my $PermissionID;
     my $AllPermsOK = 1;
-    for my $p (@NewPermissions) {
+    foreach my $Permission (@NewPermissions) {
+        my $RoleID = $RoleList{$Permission->{Role}};
+        if (!$RoleID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find role "'.$Permission->{Role}.'"!'
+            );
+            next;
+        }
+        my $PermissionTypeID = $PermissionTypeList{$Permission->{Type}};
+        if (!$PermissionTypeID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find permission type "'.$Permission->{Type}.'"!'
+            );
+            next;
+        }
+
         $PermissionID = $RoleObject->PermissionAdd(
             RoleID     => $RoleID,
-            TypeID     => $p->{TypeID},
-            Target     => $p->{Target},
-            Value      => $p->{Value},
+            TypeID     => $PermissionTypeID,
+            Target     => $Permission->{Target},
+            Value      => $Permission->{Value},
             IsRequired => 0,
             Comment    => '',
             UserID     => 1,
@@ -158,18 +209,10 @@ sub _UpdatePermissionsForRoleCustomer {
         if (!$PermissionID) {
             $LogObject->Log(
                 Priority => 'error',
-                Message  => 'Could not add permission for ' . $p->{Target} . '!'
+                Message  => "Unable to add permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target}!"
             );
             $AllPermsOK = 0;
         }
-    }
-
-    if (!$AllPermsOK) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => 'Error during adding permissions to role. Aborting.',
-        );
-        return;
     }
 
 

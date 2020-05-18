@@ -128,7 +128,7 @@ sub Run {
         my %PossiblePermissions = %{Kernel::System::Role::Permission->PERMISSION};
         $PossiblePermissions{CRUD} = Kernel::System::Role::Permission->PERMISSION_CRUD;
 
-        foreach my $Permission ( split(/\s*\,\s*/, $Self->GetOption('value') ) ) {            
+        foreach my $Permission ( split(/\s*\,\s*/, $Self->GetOption('value') ) ) {
             my $Mode = 'add';
             if ( $Permission =~ /^([+-])(.*?)$/g ) {
                 $Mode = $1;
@@ -151,7 +151,7 @@ sub Run {
         TypeID     => $Self->{PermissionTypeID} || $Self->{Permission}->{TypeID},
         Target     => $Self->GetOption('target') || $Self->{Permission}->{Target},
         Value      => defined $Self->GetOption('value') ? $Value : $Self->{Permission}->{Value},
-        IsRequired => (defined $Self->GetOption('required') ? ($Self->GetOption('required') eq 'yes') : $Self->{Permission}->{IsRequired}) || 0,
+        IsRequired => 0,
         Comment    => defined $Self->GetOption('comment') ? $Self->GetOption('comment') : $Self->{Permission}->{Comment},
         UserID     => 1,
     );
