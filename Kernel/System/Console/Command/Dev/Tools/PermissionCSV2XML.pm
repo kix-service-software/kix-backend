@@ -14,6 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 use Kernel::Language;
+use Kernel::System::Role::Permission;
 
 our @ObjectDependencies = (
     'Config',

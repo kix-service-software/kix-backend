@@ -566,18 +566,18 @@ sub PermissionUpdate {
     my $ChangeRequired;
     KEY:
     for my $Key ( qw(TypeID Target Value IsRequired Comment) ) {
-
-        next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
+        next KEY if defined $Data{$Key} && defined $Param{Key} && $Data{$Key} eq $Param{$Key};
 
         $ChangeRequired = 1;
-
-        last KEY;
     }
 
     return 1 if !$ChangeRequired;
 
-    $Param{TypeID} ||= $Data{TypeID};
-
+    $Param{TypeID}     ||= $Data{TypeID};
+    $Param{Target}     ||= $Data{Target};
+    $Param{Value}      ||= $Data{Value} if !defined $Param{Value};
+    $Param{IsRequired} ||= $Data{IsRequired} if !defined $Param{IsRequired};
+    
     # update role in database
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE role_permission SET type_id = ?, target = ?, value = ?, is_required = ?, comments = ?, '

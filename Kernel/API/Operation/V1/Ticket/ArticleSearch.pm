@@ -110,6 +110,20 @@ perform ArticleSearch Operation. This will return a article list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # check if ticket can be accessed (temporary solution)
+    my $Access = $Self->ExecOperation(
+        OperationType            => 'V1::Ticket::TicketGet',
+        SuppressPermissionErrors => 1,
+        Data      => {
+            TicketID => $Param{Data}->{TicketID},
+        }
+    );
+    if ( !$Access->{Success} || !IsHashRefWithData($Access->{Data}->{Ticket}) ) {
+        return $Self->_Error(
+            Code => 'Forbidden',
+        );
+    }
+    
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @ArticleIndex = $TicketObject->ArticleIndex(

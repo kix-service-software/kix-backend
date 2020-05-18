@@ -147,6 +147,21 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # check if ticket can be accessed (temporary solution)
+    my $Access = $Self->ExecOperation(
+        RequestMethod            => 'GET',
+        OperationType            => 'V1::Ticket::TicketGet',
+        SuppressPermissionErrors => 1,
+        Data      => {
+            TicketID => $Param{Data}->{TicketID},
+        }
+    );
+    if ( !$Access->{Success} || !IsHashRefWithData($Access->{Data}->{Ticket}) ) {
+        return $Self->_Error(
+            Code => 'Forbidden',
+        );
+    }
+    
     # isolate and trim Article parameter
     my $Article = $Self->_Trim(
         Data => $Param{Data}->{Article}
