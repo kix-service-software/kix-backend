@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#TicketArticleFlagCollectionResponse",
+  "type": "object",
+  "description": "A list of ticket article flags.",
+  "properties": {
+    "ArticleFlag": {
+      "type": "array",
+      "items": {
+        "$ref": "TicketArticleFlag.json"
+      }
+    }
+  },
+  "required": [
+    "ArticleFlag"
+  ]
+}

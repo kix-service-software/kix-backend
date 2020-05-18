@@ -1,0 +1,101 @@
+{
+   "$id" : "#TicketPatchRequest",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ticket request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Ticket" : {
+         "type" : "object",
+         "properties" : {
+            "ContactID" : {
+               "type" : "integer"
+            },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-16dfcaf043"
+               }
+            },
+            "LockID" : {
+               "type" : "integer"
+            },
+            "OrganisationID" : {
+               "type" : "integer"
+            },
+            "OwnerID" : {
+               "type" : "integer"
+            },
+            "PendingTime" : {
+               "type" : "string"
+            },
+            "PriorityID" : {
+               "type" : "integer"
+            },
+            "QueueID" : {
+               "type" : "integer"
+            },
+            "ResponsibleID" : {
+               "type" : "integer"
+            },
+            "ServiceID" : {
+               "type" : "integer"
+            },
+            "StateID" : {
+               "type" : "integer"
+            },
+            "Title" : {
+               "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "Ticket"
+   ],
+   "definitions" : {
+      "DynamicFieldValueSetItem_json-16dfcaf043" : {
+         "$id" : "#DynamicFieldValueSetItem",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynami field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
+}

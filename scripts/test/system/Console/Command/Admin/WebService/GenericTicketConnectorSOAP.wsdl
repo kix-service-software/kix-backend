@@ -150,22 +150,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
             </xsd:choice>
             <xsd:choice
                 maxOccurs="1"
-                minOccurs="0">
-                <xsd:element
-                    name="SLAID"
-                    type="xsd:positiveInteger"
-                    maxOccurs="1"
-                    minOccurs="0">
-                </xsd:element>
-                <xsd:element
-                    name="SLA"
-                    type="xsd:string"
-                    maxOccurs="1"
-                    minOccurs="0">
-                </xsd:element>
-            </xsd:choice>
-            <xsd:choice
-                maxOccurs="1"
                 minOccurs="1">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -618,22 +602,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 maxOccurs="1"
                 minOccurs="0">
                 <xsd:element
-                    name="SLAID"
-                    type="xsd:positiveInteger"
-                    maxOccurs="1"
-                    minOccurs="0">
-                </xsd:element>
-                <xsd:element
-                    name="SLA"
-                    type="xsd:string"
-                    maxOccurs="1"
-                    minOccurs="0">
-                </xsd:element>
-            </xsd:choice>
-            <xsd:choice
-                maxOccurs="1"
-                minOccurs="0">
-                <xsd:element
                     name="StateID"
                     type="xsd:positiveInteger"
                     maxOccurs="1"
@@ -895,11 +863,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 minOccurs="0">
             </xsd:element>
             <xsd:element
-                name="EscalationUpdateTime"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
                 name="FirstResponseTimeEscalation"
                 type="xsd:string"
                 minOccurs="0">
@@ -926,36 +889,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
             </xsd:element>
             <xsd:element
                 name="FirstResponseTime"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
-                name="UpdateTimeEscalation"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
-                name="UpdateTimeNotification"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
-                name="UpdateTimeDestinationTime"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
-                name="UpdateTimeDestinationDate"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
-                name="UpdateTimeWorkingTime"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
-                name="UpdateTime"
                 type="xsd:string"
                 minOccurs="0">
             </xsd:element>
@@ -1051,17 +984,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
             </xsd:element>
             <xsd:element
                 name="ResponsibleID"
-                type="xsd:positiveInteger"
-                minOccurs="1"
-                maxOccurs="1">
-            </xsd:element>
-            <xsd:element
-                name="SLA"
-                type="xsd:string"
-                minOccurs="1">
-            </xsd:element>
-            <xsd:element
-                name="SLAID"
                 type="xsd:positiveInteger"
                 minOccurs="1"
                 maxOccurs="1">
@@ -1327,11 +1249,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 minOccurs="0">
             </xsd:element>
             <xsd:element
-                name="EscalationUpdateTime"
-                type="xsd:string"
-                minOccurs="0">
-            </xsd:element>
-            <xsd:element
                 name="FirstLock"
                 type="xsd:string"
                 minOccurs="0">
@@ -1433,17 +1350,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
             </xsd:element>
             <xsd:element
                 name="ResponsibleID"
-                type="xsd:positiveInteger"
-                minOccurs="1"
-                maxOccurs="1">
-            </xsd:element>
-            <xsd:element
-                name="SLA"
-                type="xsd:string"
-                minOccurs="1">
-            </xsd:element>
-            <xsd:element
-                name="SLAID"
                 type="xsd:positiveInteger"
                 minOccurs="1"
                 maxOccurs="1">
@@ -1736,18 +1642,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
                 </xsd:element>
                 <xsd:element
                     name="ServiceIDs"
-                    type="xsd:positiveInteger"
-                    minOccurs="0"
-                    maxOccurs="unbounded">
-                </xsd:element>
-                <xsd:element
-                    name="SLAs"
-                    type="xsd:string"
-                    minOccurs="0"
-                    maxOccurs="unbounded">
-                </xsd:element>
-                <xsd:element
-                    name="SLAIDs"
                     type="xsd:positiveInteger"
                     minOccurs="0"
                     maxOccurs="unbounded">
@@ -2347,6 +2241,6 @@ WARNING: This WSDL file is for Development and Test purposes ONLY!
     </wsdl:binding>
     <wsdl:service name="GenericTicketConnector">
         <wsdl:port name="GenericTicketConnector_Port" binding="tns:GenericTicketConnector_Binding">
-            <soap:address location="http://localhost/otrs/nph-genericinterface.pl/Webservice/GenericTicketConnectorSOAP" />
+            <soap:address location="http://localhost/kix/nph-genericinterface.pl/Webservice/GenericTicketConnectorSOAP" />
         </wsdl:port>
     </wsdl:service></wsdl:definitions>

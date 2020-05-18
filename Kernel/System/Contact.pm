@@ -474,7 +474,7 @@ sub ContactLookup {
     if (!$Param{Email} && !$Param{ID} && !$Param{UserID}) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Email, contact ID or user ID!'
+            Message  => 'Need Email, ID of contact or UserID!'
         );
         return;
     }

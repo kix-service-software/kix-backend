@@ -1043,7 +1043,7 @@ sub JobExecute {
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Job.JobRun',
-        ObjectID  => $Param{JobID}.'::'.$Param{RunID},
+        ObjectID  => $Param{ID}.'::'.$RunID,
     );
 
     return 1;

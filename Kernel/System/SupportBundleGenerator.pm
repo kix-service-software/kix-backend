@@ -433,7 +433,7 @@ sub GeneratePackageList {
 
 =item GenerateRegistrationInfo()
 
-Generates a .json file with the otrs system registration information
+Generates a .json file with the kix system registration information
 
     my ( $Content, $Filename ) = $SupportBundleGeneratorObject->GenerateRegistrationInfo();
 

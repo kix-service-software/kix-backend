@@ -197,9 +197,9 @@ sub MacroAdd {
         }
     }
 
-    if ( !defined $Param{ValidID} ) {
-        $Param{ValidID} = 1;
-    }
+    # set default value
+    $Param{ValidID} //= 1;
+    $Param{Comment} ||= '';
 
     # check if this is a duplicate after the change
     my $ID = $Self->MacroLookup( 
@@ -257,7 +257,7 @@ updates a macro
 
     my $Success = $AutomationObject->MacroUpdate(
         ID         => 123,
-        Name       => 'test'
+        Name       => 'test'                                    # optional
         Type       => 'Ticket',                                 # optional
         ExecOrder  => [],                                       # optional
         Comment    => '...',                                    # optional
@@ -286,27 +286,35 @@ sub MacroUpdate {
         ID => $Param{ID},
     );
 
+    return if (!IsHashRefWithData(\%Data));
+
     # check if this is a duplicate after the change
-    my $ID = $Self->MacroLookup( 
-        Name => $Param{Name} || $Data{Name},
-    );
-    if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A macro with the same name already exists.",
+    if ($Param{Name}) {
+        my $ID = $Self->MacroLookup( 
+            Name => $Param{Name},
         );
-        return;
+        if ( $ID && $ID != $Param{ID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A macro with the same name already exists.",
+            );
+            return;
+        }
+    } else {
+        $Param{Name} = $Data{Name};
     }
 
     # set default value
-    $Param{Comment} ||= '';
+    $Param{Comment} //= $Data{Comment};
+    $Param{Type}    ||= $Data{Type};
+    $Param{ValidID} //= $Data{ValidID};
 
     # check if update is required
     my $ChangeRequired;
     KEY:
     for my $Key ( qw(Type Name Comment ValidID) ) {
 
-        next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
+        next KEY if defined $Param{$Key} && $Data{$Key} eq $Param{$Key};
 
         $ChangeRequired = 1;
 
@@ -324,8 +332,6 @@ sub MacroUpdate {
     }
 
     return 1 if !$ChangeRequired;
-
-    $Param{Type} ||= $Data{Type};
 
     # update Macro in database
     return if !$Kernel::OM->Get('DB')->Do(

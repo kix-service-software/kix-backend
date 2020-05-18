@@ -3,11 +3,11 @@ Certificate:
         Version: 3 (0x2)
         Serial Number: 1 (0x1)
         Signature Algorithm: sha1WithRSAEncryption
-        Issuer: C=DE, ST=Bayern, L=Straubing, O=OTRS AG, OU=Development, CN=OTRS Root CA/emailAddress=otrsroot@example.com
+        Issuer: C=DE, ST=Bayern, L=Straubing, O=OTRS AG, OU=Development, CN=OTRS Root CA/emailAddress=kixdeskroot@example.com
         Validity
             Not Before: May 14 23:58:14 2012 GMT
             Not After : May 12 23:58:14 2022 GMT
-        Subject: C=DE, ST=Bayern, O=OTRS AG, OU=R&D, CN=OTRS R&D/emailAddress=otrsrd@example.com
+        Subject: C=DE, ST=Bayern, O=OTRS AG, OU=R&D, CN=OTRS R&D/emailAddress=kixdeskrd@example.com
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
             RSA Public Key: (4096 bit)
@@ -53,7 +53,7 @@ Certificate:
                 1E:84:61:EF:D9:41:46:38:7A:40:31:85:50:3D:A3:A0:CD:79:0F:9A
             X509v3 Authority Key Identifier: 
                 keyid:E6:93:90:A2:90:CB:D4:6A:84:1E:38:C1:6D:92:3D:4A:A4:68:CE:7F
-                DirName:/C=DE/ST=Bayern/L=Straubing/O=OTRS AG/OU=Development/CN=OTRS Root CA/emailAddress=otrsroot@example.com
+                DirName:/C=DE/ST=Bayern/L=Straubing/O=OTRS AG/OU=Development/CN=OTRS Root CA/emailAddress=kixdeskroot@example.com
                 serial:D6:FD:7C:65:60:CF:B7:BF
 
             X509v3 Basic Constraints: 

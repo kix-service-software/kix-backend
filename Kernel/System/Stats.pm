@@ -160,7 +160,7 @@ sub StatsAdd {
 
     # start new stats record
     my @XMLHash = (
-        { otrs_stats => [ \%MetaData ] },
+        { kix_stats => [ \%MetaData ] },
     );
     my $Success = $XMLObject->XMLHashAdd(
         Type    => 'Stats',
@@ -235,7 +235,7 @@ sub StatsGet {
     }
 
     my %Stat;
-    my $StatsXML = $XMLHash[0]->{otrs_stats}->[1];
+    my $StatsXML = $XMLHash[0]->{kix_stats}->[1];
 
     # process all strings
     $Stat{StatID} = $Param{StatID};
@@ -556,7 +556,7 @@ sub StatsUpdate {
 
     my @Array = (
         {
-            otrs_stats => [ \%StatXML ],
+            kix_stats => [ \%StatXML ],
         },
     );
 
@@ -1192,7 +1192,7 @@ sub Export {
         #Cache => 0,
         Key => $Param{StatID}
     );
-    my $StatsXML = $XMLHash[0]->{otrs_stats}->[1];
+    my $StatsXML = $XMLHash[0]->{kix_stats}->[1];
 
     my %File;
     $File{Filename} = $Self->StringAndTimestamp2Filename(
@@ -1279,7 +1279,7 @@ sub Export {
     # convert hash to string
     $File{Content} = $XMLObject->XMLHash2XML(
         {
-            otrs_stats => [
+            kix_stats => [
                 undef,
                 $StatsXML,
             ],
@@ -1321,7 +1321,7 @@ sub Import {
     if ( !$XMLHash[0] ) {
         shift @XMLHash;
     }
-    my $StatsXML = $XMLHash[0]->{otrs_stats}->[1];
+    my $StatsXML = $XMLHash[0]->{kix_stats}->[1];
 
     # Get new StatID
     my @Keys = $XMLObject->XMLHashSearch(
@@ -1483,7 +1483,7 @@ sub Import {
         Key     => $StatID,
         XMLHash => [
             {
-                otrs_stats => [
+                kix_stats => [
                     undef,
                     $StatsXML,
                 ],
@@ -1520,7 +1520,7 @@ sub GetParams {
     my $Stat = $Self->StatsGet( StatID => $Param{StatID} );
 
     # static
-    # don't remove this if clause, because is required for otrs.GenerateStats.pl
+    # don't remove this if clause, because is required for kix.GenerateStats.pl
     my @Params;
     if ( $Stat->{StatType} eq 'static' ) {
 
@@ -1859,7 +1859,7 @@ sub StatNumber2StatID {
 
     my @Key = $Kernel::OM->Get('XML')->XMLHashSearch(
         Type => 'Stats',
-        What => [ { "[%]{'otrs_stats'}[%]{'StatNumber'}[%]{'Content'}" => $Param{StatNumber} } ],
+        What => [ { "[%]{'kix_stats'}[%]{'StatNumber'}[%]{'Content'}" => $Param{StatNumber} } ],
     );
     if ( @Key && $#Key < 1 ) {
         return $Key[0];
@@ -2373,7 +2373,7 @@ sub _GenerateDynamicStats {
                 $TitleTimeStop  = $Element->{TimeStop};
             }
 
-            # Select All function needed from otrs.GenerateStats.pl and fixed values of the frontend
+            # Select All function needed from kix.GenerateStats.pl and fixed values of the frontend
             elsif ( !$Element->{SelectedValues}[0] ) {
                 my @Values = keys( %{ $Element->{Values} } );
                 $Element->{SelectedValues} = \@Values;

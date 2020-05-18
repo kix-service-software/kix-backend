@@ -15,7 +15,7 @@
       "ConfigItemVersion"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
+      "ConfigItemClassDefinition_json-01f549b109" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -123,7 +123,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
             },
             "DeplState" : {
                "type" : "string",

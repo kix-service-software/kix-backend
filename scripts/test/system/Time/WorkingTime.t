@@ -146,14 +146,17 @@ my $ConfigObject = $Kernel::OM->Get('Config');
 
 # use a calendar with the same business hours for every day so that the UT runs correctly
 # on every day of the week and outside usual business hours.
-my %Week;
-my @Days = qw(Sun Mon Tue Wed Thu Fri Sat);
-for my $Day (@Days) {
-    $Week{$Day} = [ 0 .. 23 ];
-}
 $ConfigObject->Set(
     Key   => 'TimeWorkingHours',
-    Value => \%Week,
+    Value => {
+        Mon => '00:00-24:00',
+        Tue => '00:00-24:00',
+        Wed => '00:00-24:00',
+        Thu => '00:00-24:00',
+        Fri => '00:00-24:00',
+        Sat => '00:00-24:00',
+        Sun => '00:00-24:00',
+    },
 );
 
 # disable default Vacation days
@@ -191,21 +194,17 @@ for my $Test (@Tests) {
         Value => '',
     );
 
-    $Kernel::OM->ObjectsDiscard(
-        Objects => ['Time'],
-    );
-
     my $TimeObject = $Kernel::OM->Get('Time');
 
     my $StopTime = $TimeObject->SystemTime();
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WDay ) = localtime $FixedTimeStop;
     $Year  += 1900;
     $Month += 1;
-    my $Stop = "$Day-$Month-$Year $Hour:$Min:$Sec";
+    my $Stop = sprintf("%04i-%02i-%02i %02i:%02i:%02i", $Year, $Month, $Day, $Hour, $Min, $Sec);
     ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WDay ) = localtime $FixedTimeStart;
     $Year  += 1900;
     $Month += 1;
-    my $Start = "$Day-$Month-$Year $Hour:$Min:$Sec";
+    my $Start = sprintf("%04i-%02i-%02i %02i:%02i:%02i", $Year, $Month, $Day, $Hour, $Min, $Sec);
 
     my $WorkingTime = $TimeObject->WorkingTime(
         StartTime => $FixedTimeStart,

@@ -58,7 +58,6 @@ sub new {
 
     # set field behaviors
     $Self->{Behaviors} = {
-        'IsACLReducible'               => 0,
         'IsNotificationEventCondition' => 1,
         'IsSortable'                   => 0,
         'IsFiltrable'                  => 0,

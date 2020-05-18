@@ -12,7 +12,6 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'ITSMCIAttributCollectionUtils',
     'ITSMConfigItem',
     'LinkObject',
     'Log'
@@ -25,7 +24,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{CIACUtilsObject}  = $Kernel::OM->Get('ITSMCIAttributCollectionUtils');
     $Self->{ConfigItemObject} = $Kernel::OM->Get('ITSMConfigItem');
     $Self->{LinkObject}       = $Kernel::OM->Get('LinkObject');
     $Self->{LogObject}        = $Kernel::OM->Get('Log');
@@ -235,7 +233,7 @@ sub _CreateCIReferencesHash {
         return;
     }
 
-    my $CIRelAttr = $Self->{CIACUtilsObject}->GetAttributeDataByType(
+    my $CIRelAttr = $Self->{ConfigItemObject}->GetAttributeDataByType(
         XMLData       => $Param{XMLData},
         XMLDefinition => $Param{XMLDefinition},
         AttributeType => 'CIClassReference',
@@ -297,7 +295,7 @@ sub _GetAttributeDataByKey {
     my %Result;
 
     if ( $Param{Content} ) {
-        my $CurrContent = $Self->{CIACUtilsObject}->GetAttributeContentsByKey(
+        my $CurrContent = $Self->{ConfigItemObject}->GetAttributeContentsByKey(
             KeyName       => $Param{KeyName},
             XMLData       => $Param{XMLData},
             XMLDefinition => $Param{XMLDefinition},
@@ -305,7 +303,7 @@ sub _GetAttributeDataByKey {
         $Result{ $Param{KeyName} } = $CurrContent;
     }
     else {
-        my $CurrVal = $Self->{CIACUtilsObject}->GetAttributeValuesByKey(
+        my $CurrVal = $Self->{ConfigItemObject}->GetAttributeValuesByKey(
             KeyName       => $Param{KeyName},
             XMLData       => $Param{XMLData},
             XMLDefinition => $Param{XMLDefinition},

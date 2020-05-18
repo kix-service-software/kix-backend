@@ -20,8 +20,6 @@ use Encode ();
 use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
-use Kernel::System::Ticket::TicketACL;
-use Kernel::System::Ticket::TicketChecklist;
 use Kernel::System::Ticket::TicketSearch;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
@@ -45,7 +43,6 @@ our @ObjectDependencies = (
     'Priority',
     'Queue',
     'Service',
-    'SLA',
     'State',
     'TemplateGenerator',
     'Time',
@@ -93,8 +90,6 @@ sub new {
 
     @ISA = qw(
         Kernel::System::Ticket::Article
-        Kernel::System::Ticket::TicketACL
-        Kernel::System::Ticket::TicketChecklist
         Kernel::System::Ticket::TicketSearch
         Kernel::System::EventHandler
         Kernel::System::PerfLog
@@ -285,7 +280,6 @@ or
         State         => 'new',              # or StateID => 5,
         Type          => 'Incident',         # or TypeID = 1 or Ticket type default (Ticket::Type::Default), not required
         Service       => 'Service A',        # or ServiceID => 1, not required
-        SLA           => 'SLA A',            # or SLAID => 1, not required
         OrganisationID => '123465',
         ContactID     => '123' || 'customer@example.com',
         OwnerID       => 123,
@@ -448,17 +442,6 @@ sub TicketCreate {
         );
     }
 
-    # get sla object
-    my $SLAObject = $Kernel::OM->Get('SLA');
-
-    # SLAID/SLA lookup!
-    if ( !$Param{SLAID} && $Param{SLA} ) {
-        $Param{SLAID} = $SLAObject->SLALookup( Name => $Param{SLA} );
-    }
-    elsif ( $Param{SLAID} && !$Param{SLA} ) {
-        $Param{SLA} = $SLAObject->SLALookup( SLAID => $Param{SLAID} );
-    }
-
     # create ticket number if none is given
     if ( !$Param{TN} ) {
         $Param{TN} = $Self->TicketCreateNumber();
@@ -483,7 +466,6 @@ sub TicketCreate {
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
     $Param{ServiceID} ||= undef;
-    $Param{SLAID}     ||= undef;
 
     if (!$Param{ContactID} || $Param{ContactID} !~ /^\d+$/) {
         $Self->{ParserObject} = Kernel::System::EmailParser->new(
@@ -532,20 +514,17 @@ sub TicketCreate {
         SQL => '
             INSERT INTO ticket (
                 tn, title, create_time_unix, type_id, queue_id, ticket_lock_id, user_id,
-                responsible_user_id, ticket_priority_id, ticket_state_id,
-                escalation_time, escalation_update_time, escalation_response_time, escalation_solution_time, timeout,
-                service_id, sla_id, until_time, archive_flag, create_time, create_by, change_time, change_by,
+                responsible_user_id, ticket_priority_id, ticket_state_id, timeout,
+                service_id, until_time, archive_flag, create_time, create_by, change_time, change_by,
                 contact_id, organisation_id)
             VALUES (?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?,
-                    0, 0, 0, 0, 0,
-                    ?, ?, 0, ?, current_timestamp, ?, current_timestamp, ?,
+                    ?, ?, ?, 0,
+                    ?, 0, ?, current_timestamp, ?, current_timestamp, ?,
                     ?, ?)',
         Bind => [
             \$Param{TN}, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
             \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
-
-            \$Param{ServiceID}, \$Param{SLAID}, \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
+            \$Param{ServiceID}, \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
             \$Param{ContactID}, \$Param{OrganisationID},
         ],
     );
@@ -574,16 +553,6 @@ sub TicketCreate {
             TicketID     => $TicketID,
             HistoryType  => 'ServiceUpdate',
             Name         => "\%\%$HistoryService\%\%$HistoryServiceID\%\%NULL\%\%",
-            CreateUserID => $Param{UserID},
-        );
-
-        # history insert for SLA
-        my $HistorySLA   = $Param{SLA}   || 'NULL';
-        my $HistorySLAID = $Param{SLAID} || '';
-        $Self->HistoryAdd(
-            TicketID     => $TicketID,
-            HistoryType  => 'SLAUpdate',
-            Name         => "\%\%$HistorySLA\%\%$HistorySLAID\%\%NULL\%\%",
             CreateUserID => $Param{UserID},
         );
     }
@@ -1058,8 +1027,6 @@ Returns:
         OwnerID            => 123,
         Type               => 'some ticket type',
         TypeID             => 123,
-        SLA                => 'some sla',
-        SLAID              => 123,
         Service            => 'some service',
         ServiceID          => 123,
         Responsible        => 'some_responsible_login',
@@ -1076,40 +1043,6 @@ Returns:
 
         # If DynamicFields => 1 was passed, you'll get an entry like this for each dynamic field:
         DynamicField_X     => 'value_x',
-
-        # (time stamps of expected escalations)
-        EscalationResponseTime           (unix time stamp of response time escalation)
-        EscalationUpdateTime             (unix time stamp of update time escalation)
-        EscalationSolutionTime           (unix time stamp of solution time escalation)
-
-        # (general escalation info of nearest escalation type)
-        EscalationDestinationIn          (escalation in e. g. 1h 4m)
-        EscalationDestinationTime        (date of escalation in unix time, e. g. 72193292)
-        EscalationDestinationDate        (date of escalation, e. g. "2009-02-14 18:00:00")
-        EscalationTimeWorkingTime        (seconds of working/service time till escalation, e. g. "1800")
-        EscalationTime                   (seconds total till escalation of nearest escalation time type - response, update or solution time, e. g. "3600")
-
-        # (detailed escalation info about first response, update and solution time)
-        FirstResponseTimeEscalation      (if true, ticket is escalated)
-        FirstResponseTimeNotification    (if true, notify - x% of escalation has reached)
-        FirstResponseTimeDestinationTime (date of escalation in unix time, e. g. 72193292)
-        FirstResponseTimeDestinationDate (date of escalation, e. g. "2009-02-14 18:00:00")
-        FirstResponseTimeWorkingTime     (seconds of working/service time till escalation, e. g. "1800")
-        FirstResponseTime                (seconds total till escalation, e. g. "3600")
-
-        UpdateTimeEscalation             (if true, ticket is escalated)
-        UpdateTimeNotification           (if true, notify - x% of escalation has reached)
-        UpdateTimeDestinationTime        (date of escalation in unix time, e. g. 72193292)
-        UpdateTimeDestinationDate        (date of escalation, e. g. "2009-02-14 18:00:00")
-        UpdateTimeWorkingTime            (seconds of working/service time till escalation, e. g. "1800")
-        UpdateTime                       (seconds total till escalation, e. g. "3600")
-
-        SolutionTimeEscalation           (if true, ticket is escalated)
-        SolutionTimeNotification         (if true, notify - x% of escalation has reached)
-        SolutionTimeDestinationTime      (date of escalation in unix time, e. g. 72193292)
-        SolutionTimeDestinationDate      (date of escalation, e. g. "2009-02-14 18:00:00")
-        SolutionTimeWorkingTime          (seconds of working/service time till escalation, e. g. "1800")
-        SolutionTime                     (seconds total till escalation, e. g. "3600")
     );
 
 To get extended ticket attributes, use param Extended:
@@ -1123,14 +1056,6 @@ To get extended ticket attributes, use param Extended:
 Additional params are:
 
     %Ticket = (
-        FirstResponse                   (timestamp of first response, first contact with customer)
-        FirstResponseInMin              (minutes till first response)
-        FirstResponseDiffInMin          (minutes till or over first response)
-
-        SolutionTime                    (timestamp of solution time, also close time)
-        SolutionInMin                   (minutes till solution time)
-        SolutionDiffInMin               (minutes till or over solution time)
-
         FirstLock                       (timestamp of first lock)
     );
 
@@ -1196,8 +1121,7 @@ sub TicketGet {
                 SELECT st.id, st.queue_id, st.ticket_state_id, st.ticket_lock_id, st.ticket_priority_id,
                     st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
                     st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
-                    st.escalation_update_time, st.timeout, st.type_id, st.service_id, st.sla_id,
-                    st.escalation_response_time, st.escalation_solution_time, st.escalation_time, st.archive_flag,
+                    st.timeout, st.type_id, st.service_id, st.archive_flag,
                     st.create_by, st.change_by
                 FROM ticket st
                 WHERE st.id = ?',
@@ -1206,50 +1130,26 @@ sub TicketGet {
         );
 
         while ( my @Row = $DBObject->FetchrowArray() ) {
-            $Ticket{TicketID}   = $Row[0];
-            $Ticket{QueueID}    = $Row[1];
-            $Ticket{StateID}    = $Row[2];
-            $Ticket{LockID}     = $Row[3];
-            $Ticket{PriorityID} = $Row[4];
-
+            $Ticket{TicketID}       = $Row[0];
+            $Ticket{QueueID}        = $Row[1];
+            $Ticket{StateID}        = $Row[2];
+            $Ticket{LockID}         = $Row[3];
+            $Ticket{PriorityID}     = $Row[4];
             $Ticket{CreateTimeUnix} = $Row[5];
             $Ticket{TicketNumber}   = $Row[7];
             $Ticket{OrganisationID} = $Row[8];
             $Ticket{ContactID}      = $Row[9];
-
-            $Ticket{OwnerID}             = $Row[10];
-            $Ticket{ResponsibleID}       = $Row[11] || 1;
-            $Ticket{PendingTimeUnix}     = $Row[12];
-            $Ticket{Changed}             = $Row[13];
-            $Ticket{Title}               = $Row[14];
-
-            $Ticket{EscalationUpdateTime} = $Row[15];
-            $Ticket{UnlockTimeout}        = $Row[16];
-            $Ticket{TypeID}               = $Row[17] || 1;
-            $Ticket{ServiceID}            = $Row[18] || '';
-            $Ticket{SLAID}                = $Row[19] || '';
-
-            $Ticket{EscalationResponseTime} = $Row[20];
-            $Ticket{EscalationSolutionTime} = $Row[21];
-            $Ticket{EscalationTime}         = $Row[22];
-            $Ticket{ArchiveFlag}            = $Row[23] ? 'y' : 'n';
-
-            $Ticket{CreateBy} = $Row[24];
-            $Ticket{ChangeBy} = $Row[25];
-        }
-
-        # use cache only when a ticket number is found otherwise a non-existant ticket
-        # is cached. That can cause errors when the cache isn't expired and postmaster
-        # creates that ticket
-        if ( $Ticket{TicketID} ) {
-            $Kernel::OM->Get('Cache')->Set(
-                Type => $Self->{CacheType},
-                TTL  => $Self->{CacheTTL},
-                Key  => $CacheKey,
-
-                # make a local copy of the ticket data to avoid it being altered in-memory later
-                Value => {%Ticket},
-            );
+            $Ticket{OwnerID}        = $Row[10];
+            $Ticket{ResponsibleID}  = $Row[11] || 1;
+            $Ticket{PendingTimeUnix}= $Row[12];
+            $Ticket{Changed}        = $Row[13];
+            $Ticket{Title}          = $Row[14];
+            $Ticket{UnlockTimeout}  = $Row[15];
+            $Ticket{TypeID}         = $Row[16] || 1;
+            $Ticket{ServiceID}      = $Row[17] || '';
+            $Ticket{ArchiveFlag}    = $Row[18] ? 'y' : 'n';
+            $Ticket{CreateBy}       = $Row[19];
+            $Ticket{ChangeBy}       = $Row[20];
         }
     }
 
@@ -1352,13 +1252,6 @@ sub TicketGet {
         );
     }
 
-    # get sla
-    if ( $Ticket{SLAID} ) {
-        $Ticket{SLA} = $Kernel::OM->Get('SLA')->SLALookup(
-            SLAID => $Ticket{SLAID},
-        );
-    }
-
     # get state info
     my %StateData = $Kernel::OM->Get('State')->StateGet(
         ID => $Ticket{StateID}
@@ -1374,16 +1267,6 @@ sub TicketGet {
         $Ticket{UntilTime} = $Ticket{PendingTimeUnix} - $TimeObject->SystemTime();
     }
 
-    # get escalation attributes
-    my %Escalation = $Self->TicketEscalationDateCalculation(
-        Ticket => \%Ticket,
-        UserID => $Param{UserID} || 1,
-    );
-
-    for my $Key ( sort keys %Escalation ) {
-        $Ticket{$Key} = $Escalation{$Key};
-    }
-
     # do extended lookups
     if ( $Param{Extended} ) {
         my %TicketExtended = $Self->_TicketGetExtended(
@@ -1397,14 +1280,10 @@ sub TicketGet {
 
     # cache user result
     $Kernel::OM->Get('Cache')->Set(
-        Type => $Self->{CacheType},
-        TTL  => $Self->{CacheTTL},
-        Key  => $CacheKeyDynamicFields,
-
-        # make a local copy of the ticket data to avoid it being altered in-memory later
-        Value          => {%Ticket},
-        CacheInMemory  => 1,
-        CacheInBackend => 0,
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKeyDynamicFields,
+        Value => \%Ticket,
     );
 
     return %Ticket;
@@ -1532,17 +1411,7 @@ sub _TicketGetFirstResponse {
 
     # check if first response is already done
     return if !$DBObject->Prepare(
-
-# KIX4OTRS-capeIT
-# SQL => 'SELECT a.create_time,a.id FROM article a, article_sender_type ast, article_type art'
-#     . ' WHERE a.article_sender_type_id = ast.id AND a.article_type_id = art.id AND'
-#     . ' a.ticket_id = ? AND ast.name = \'agent\' AND'
-#     . ' (art.name LIKE \'email-ext%\' OR art.name LIKE \'note-ext%\' OR art.name = \'phone\' OR art.name = \'fax\' OR art.name = \'sms\')'
-#     . ' ORDER BY a.create_time',
         SQL => $SQL,
-
-        # EO KIX4OTRS-capeIT
-
         Bind  => [ \$Param{TicketID} ],
         Limit => 1,
     );
@@ -1557,37 +1426,6 @@ sub _TicketGetFirstResponse {
     }
 
     return if !$Data{FirstResponse};
-
-    # get escalation properties
-    my %Escalation = $Self->TicketEscalationPreferences(
-        Ticket => $Param{Ticket},
-        UserID => $Param{UserID} || 1,
-    );
-
-    if ( $Escalation{FirstResponseTime} ) {
-
-        # get time object
-        my $TimeObject = $Kernel::OM->Get('Time');
-
-        # get unix time stamps
-        my $CreateTime = $TimeObject->TimeStamp2SystemTime(
-            String => $Param{Ticket}->{Created},
-        );
-        my $FirstResponseTime = $TimeObject->TimeStamp2SystemTime(
-            String => $Data{FirstResponse},
-        );
-
-        # get time between creation and first response
-        my $WorkingTime = $TimeObject->WorkingTime(
-            StartTime => $CreateTime,
-            StopTime  => $FirstResponseTime,
-            Calendar  => $Escalation{Calendar},
-        );
-
-        $Data{FirstResponseInMin} = int( $WorkingTime / 60 );
-        my $EscalationFirstResponseTime = $Escalation{FirstResponseTime} * 60;
-        $Data{FirstResponseDiffInMin} = int( ( $EscalationFirstResponseTime - $WorkingTime ) / 60 );
-    }
 
     return %Data;
 }
@@ -1622,18 +1460,6 @@ sub _TicketGetClosed {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    # KIX4OTRS-capeIT
-    # see for OTRS-Bug 5531
-    # return if !$DBObject->Prepare(
-    #     SQL => "
-    #         SELECT MAX(create_time)
-    #         FROM ticket_history
-    #         WHERE ticket_id = ?
-    #            AND state_id IN (${\(join ', ', sort @List)})
-    #            AND history_type_id IN  (${\(join ', ', sort @HistoryTypeIDs)})
-    #         ",
-    #     Bind => [ \$Param{TicketID} ],
-    # );
     return if !$DBObject->Prepare(
         SQL => "
             SELECT MIN(create_time)
@@ -1656,50 +1482,6 @@ sub _TicketGetClosed {
         # cleanup time stamps (some databases are using e. g. 2008-02-25 22:03:00.000000
         # and 0000-00-00 00:00:00 time stamps)
         $Data{Closed} =~ s/^(\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d)\..+?$/$1/;
-    }
-
-    return if !$Data{Closed};
-
-    # for compat. wording reasons
-    $Data{SolutionTime} = $Data{Closed};
-
-    # get escalation properties
-    my %Escalation = $Self->TicketEscalationPreferences(
-        Ticket => $Param{Ticket},
-        UserID => $Param{UserID} || 1,
-    );
-
-    # KIX4OTRS-capeIT
-    # content moved from upwards
-    # get time object
-    my $TimeObject = $Kernel::OM->Get('Time');
-
-    # get unix time stamps
-    my $CreateTime = $TimeObject->TimeStamp2SystemTime(
-        String => $Param{Ticket}->{Created},
-    );
-    my $SolutionTime = $TimeObject->TimeStamp2SystemTime(
-        String => $Data{Closed},
-    );
-
-    # get time between creation and solution
-    my $WorkingTime = $TimeObject->WorkingTime(
-        StartTime => $CreateTime,
-        StopTime  => $SolutionTime,
-        Calendar  => $Escalation{Calendar},
-    );
-
-    $Data{SolutionInMin} = int( $WorkingTime / 60 );
-    # EO KIX4OTRS-capeIT
-
-    if ( $Escalation{SolutionTime} ) {
-
-        # KIX4OTRS-capeIT
-        # moved content upwards
-        # EO KIX4OTRS-capeIT
-
-        my $EscalationSolutionTime = $Escalation{SolutionTime} * 60;
-        $Data{SolutionDiffInMin} = int( ( $EscalationSolutionTime - $WorkingTime ) / 60 );
     }
 
     return %Data;
@@ -1924,76 +1706,6 @@ sub TicketQueueID {
     return if !%Ticket;
 
     return $Ticket{QueueID};
-}
-
-=item TicketMoveList()
-
-to get the move queue list for a ticket (depends on workflow, if configured)
-
-    my %Queues = $TicketObject->TicketMoveList(
-        Type   => 'create',
-        UserID => 123,
-    );
-
-    my %Queues = $TicketObject->TicketMoveList(
-        Type           => 'create',
-        ContactID => 'customer_user_id_123',
-    );
-
-
-    my %Queues = $TicketObject->TicketMoveList(
-        QueueID => 123,
-        UserID  => 123,
-    );
-
-    my %Queues = $TicketObject->TicketMoveList(
-        TicketID => 123,
-        UserID   => 123,
-    );
-
-=cut
-
-sub TicketMoveList {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} && !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID or ContactID!',
-        );
-        return;
-    }
-
-    # check needed stuff
-    if ( !$Param{QueueID} && !$Param{TicketID} && !$Param{Type} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID, TicketID or Type!',
-        );
-        return;
-    }
-
-    # get queue object
-    my $QueueObject = $Kernel::OM->Get('Queue');
-
-    my %Queues;
-    if ( $Param{UserID} && $Param{UserID} eq 1 ) {
-        %Queues = $QueueObject->GetAllQueues();
-    }
-    else {
-        %Queues = $QueueObject->GetAllQueues(%Param);
-    }
-
-    # workflow
-    my $ACL = $Self->TicketAcl(
-        %Param,
-        ReturnType    => 'Ticket',
-        ReturnSubType => 'Queue',
-        Data          => \%Queues,
-    );
-    return $Self->TicketAclData() if $ACL;
-    return %Queues;
 }
 
 =item TicketQueueSet()
@@ -2275,15 +1987,6 @@ sub TicketTypeList {
 
     my %Types = $Kernel::OM->Get('Type')->TypeList( Valid => 1 );
 
-    # workflow
-    my $ACL = $Self->TicketAcl(
-        %Param,
-        ReturnType    => 'Ticket',
-        ReturnSubType => 'Type',
-        Data          => \%Types,
-    );
-
-    return $Self->TicketAclData() if $ACL;
     return %Types;
 }
 
@@ -2462,15 +2165,6 @@ sub TicketServiceList {
         );
     }
 
-    # workflow
-    my $ACL = $Self->TicketAcl(
-        %Param,
-        ReturnType    => 'Ticket',
-        ReturnSubType => 'Service',
-        Data          => \%Services,
-    );
-
-    return $Self->TicketAclData() if $ACL;
     return %Services;
 }
 
@@ -2536,7 +2230,7 @@ sub TicketServiceSet {
     }
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
-    for my $Parameter (qw(ServiceID SLAID)) {
+    for my $Parameter (qw(ServiceID)) {
         if ( !$Param{$Parameter} ) {
             $Param{$Parameter} = undef;
         }
@@ -2596,925 +2290,6 @@ sub TicketServiceSet {
         ObjectID  => $Param{TicketID},
     );
     
-    return 1;
-}
-
-=item TicketEscalationPreferences()
-
-get escalation preferences of a ticket (e. g. from SLA or from Queue based settings)
-
-    my %Escalation = $TicketObject->TicketEscalationPreferences(
-        Ticket => $Param{Ticket},
-        UserID => $Param{UserID},
-    );
-
-=cut
-
-sub TicketEscalationPreferences {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Ticket UserID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # get ticket attributes
-    my %Ticket = %{ $Param{Ticket} };
-
-    # get escalation properties
-    my %Escalation;
-    if ( $Kernel::OM->Get('Config')->Get('Ticket::Service') && $Ticket{SLAID} ) {
-
-        %Escalation = $Kernel::OM->Get('SLA')->SLAGet(
-            SLAID  => $Ticket{SLAID},
-            UserID => $Param{UserID},
-            Cache  => 1,
-        );
-    }
-
-    return %Escalation;
-}
-
-=item TicketEscalationDateCalculation()
-
-get escalation properties of a ticket
-
-    my %Escalation = $TicketObject->TicketEscalationDateCalculation(
-        Ticket => $Param{Ticket},
-        UserID => $Param{UserID},
-    );
-
-it returnes
-
-    (general escalation info)
-    EscalationDestinationIn          (escalation in e. g. 1h 4m)
-    EscalationDestinationTime        (date of escalation in unix time, e. g. 72193292)
-    EscalationDestinationDate        (date of escalation, e. g. "2009-02-14 18:00:00")
-    EscalationTimeWorkingTime        (seconds of working/service time till escalation, e. g. "1800")
-    EscalationTime                   (seconds total till escalation, e. g. "3600")
-
-    (detail escalation info about first response, update and solution time)
-    FirstResponseTimeEscalation      (if true, ticket is escalated)
-    FirstResponseTimeNotification    (if true, notify - x% of escalation has reached)
-    FirstResponseTimeDestinationTime (date of escalation in unix time, e. g. 72193292)
-    FirstResponseTimeDestinationDate (date of escalation, e. g. "2009-02-14 18:00:00")
-    FirstResponseTimeWorkingTime     (seconds of working/service time till escalation, e. g. "1800")
-    FirstResponseTime                (seconds total till escalation, e. g. "3600")
-
-    UpdateTimeEscalation             (if true, ticket is escalated)
-    UpdateTimeNotification           (if true, notify - x% of escalation has reached)
-    UpdateTimeDestinationTime        (date of escalation in unix time, e. g. 72193292)
-    UpdateTimeDestinationDate        (date of escalation, e. g. "2009-02-14 18:00:00")
-    UpdateTimeWorkingTime            (seconds of working/service time till escalation, e. g. "1800")
-    UpdateTime                       (seconds total till escalation, e. g. "3600")
-
-    SolutionTimeEscalation           (if true, ticket is escalated)
-    SolutionTimeNotification         (if true, notify - x% of escalation has reached)
-    SolutionTimeDestinationTime      (date of escalation in unix time, e. g. 72193292)
-    SolutionTimeDestinationDate      (date of escalation, e. g. "2009-02-14 18:00:00")
-    SolutionTimeWorkingTime          (seconds of working/service time till escalation, e. g. "1800")
-    SolutionTime                     (seconds total till escalation, e. g. "3600")
-
-=cut
-
-sub TicketEscalationDateCalculation {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(Ticket UserID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # get ticket attributes
-    my %Ticket = %{ $Param{Ticket} };
-
-    # do no escalations on (merge|close|remove) tickets
-    return if $Ticket{StateType} eq 'merged';
-    return if $Ticket{StateType} eq 'closed';
-    return if $Ticket{StateType} eq 'removed';
-
-    # get escalation properties
-    my %Escalation = $Self->TicketEscalationPreferences(
-        Ticket => $Param{Ticket},
-        UserID => $Param{UserID} || 1,
-    );
-
-    # return if we do not have any escalation attributes
-    my %Map = (
-        EscalationResponseTime => 'FirstResponse',
-        EscalationUpdateTime   => 'Update',
-        EscalationSolutionTime => 'Solution',
-    );
-    my $EscalationAttribute;
-    KEY:
-    for my $Key ( sort keys %Map ) {
-        if ( $Escalation{ $Map{$Key} . 'Time' } ) {
-            $EscalationAttribute = 1;
-            last KEY;
-        }
-    }
-
-    return if !$EscalationAttribute;
-
-    # get time object
-    my $TimeObject = $Kernel::OM->Get('Time');
-
-    # calculate escalation times based on escalation properties
-    my $Time = $TimeObject->SystemTime();
-    my %Data;
-
-    TIME:
-    for my $Key ( sort keys %Map ) {
-
-        next TIME if !$Ticket{$Key};
-
-        # get time before or over escalation (escalation_destination_unixtime - now)
-        my $TimeTillEscalation = $Ticket{$Key} - $Time;
-
-        # ticket is not escalated till now ($TimeTillEscalation > 0)
-        my $WorkingTime = 0;
-        if ( $TimeTillEscalation > 0 ) {
-
-            $WorkingTime = $TimeObject->WorkingTime(
-                StartTime => $Time,
-                StopTime  => $Ticket{$Key},
-                Calendar  => $Escalation{Calendar},
-            );
-
-            # extract needed data
-            my $Notify = $Escalation{ $Map{$Key} . 'Notify' };
-            my $Time   = $Escalation{ $Map{$Key} . 'Time' };
-
-            # set notification if notify % is reached
-            if ( $Notify && $Time ) {
-
-                my $Reached = 100 - ( $WorkingTime / ( $Time * 60 / 100 ) );
-
-                if ( $Reached >= $Notify ) {
-                    $Data{ $Map{$Key} . 'TimeNotification' } = 1;
-                }
-            }
-        }
-
-        # ticket is overtime ($TimeTillEscalation < 0)
-        else {
-            $WorkingTime = $TimeObject->WorkingTime(
-                StartTime => $Ticket{$Key},
-                StopTime  => $Time,
-                Calendar  => $Escalation{Calendar},
-            );
-            $WorkingTime = "-$WorkingTime";
-
-            # set escalation
-            $Data{ $Map{$Key} . 'TimeEscalation' } = 1;
-        }
-        my $DestinationDate = $TimeObject->SystemTime2TimeStamp(
-            SystemTime => $Ticket{$Key},
-        );
-        $Data{ $Map{$Key} . 'TimeDestinationTime' } = $Ticket{$Key};
-        $Data{ $Map{$Key} . 'TimeDestinationDate' } = $DestinationDate;
-        $Data{ $Map{$Key} . 'TimeWorkingTime' }     = $WorkingTime;
-        $Data{ $Map{$Key} . 'Time' }                = $TimeTillEscalation;
-
-        # set global escalation attributes (set the escalation which is the first in time)
-        if (
-            !$Data{EscalationDestinationTime}
-            || $Data{EscalationDestinationTime} > $Ticket{$Key}
-            )
-        {
-            $Data{EscalationDestinationTime} = $Ticket{$Key};
-            $Data{EscalationDestinationDate} = $DestinationDate;
-            $Data{EscalationTimeWorkingTime} = $WorkingTime;
-            $Data{EscalationTime}            = $TimeTillEscalation;
-
-            # escalation time in readable way
-            $Data{EscalationDestinationIn} = '';
-            $WorkingTime = abs($WorkingTime);
-            if ( $WorkingTime >= 3600 ) {
-                $Data{EscalationDestinationIn} .= int( $WorkingTime / 3600 ) . 'h ';
-                $WorkingTime = $WorkingTime
-                    - ( int( $WorkingTime / 3600 ) * 3600 );    # remove already shown hours
-            }
-            if ( $WorkingTime <= 3600 || int( $WorkingTime / 60 ) ) {
-                $Data{EscalationDestinationIn} .= int( $WorkingTime / 60 ) . 'm';
-            }
-        }
-    }
-
-    return %Data;
-}
-
-=item TicketEscalationIndexBuild()
-
-build escalation index of one ticket with current settings (SLA, Queue, Calendar...)
-
-    my $Success = $TicketObject->TicketEscalationIndexBuild(
-        TicketID => $Param{TicketID},
-        UserID   => $Param{UserID},
-    );
-
-=cut
-
-sub TicketEscalationIndexBuild {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID UserID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    my %Ticket = $Self->TicketGet(
-        TicketID => $Param{TicketID},
-        UserID   => $Param{UserID},
-
-        # KIX4OTRS-capeIT
-        # DynamicFields => 0,
-        DynamicFields => 1,
-
-        # EO KIX4OTRS-capeIT
-    );
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # KIX4OTRS-capeIT
-    # no escalation for certain ticket types
-    my $RelevantTypeNamesArrRef = $Kernel::OM->Get('Config')->Get(
-        'Ticket::EscalationDisabled::RelevantTypes'
-    );
-    if ( $Ticket{Type} && $RelevantTypeNamesArrRef && ref($RelevantTypeNamesArrRef) eq 'ARRAY' )
-    {
-        if (grep { $_ eq $Ticket{Type} } @{$RelevantTypeNamesArrRef}) {
-            $Ticket{DoNotSetEscalation} = 1;
-        }
-    }
-
-    # no escalation for certain queues
-    my $RelevantQueueNamesArrRef = $Kernel::OM->Get('Config')->Get(
-        'Ticket::EscalationDisabled::RelevantQueues'
-    );
-    if (
-        $Ticket{Queue}
-        && $RelevantQueueNamesArrRef
-        && ref($RelevantQueueNamesArrRef) eq 'ARRAY'
-        )
-    {
-        if (grep { $_ eq $Ticket{Queue} } @{$RelevantQueueNamesArrRef}) {
-            $Ticket{DoNotSetEscalation} = 1;
-        }
-    }
-
-    # check for Non-SLA-relevant pending time...
-    my $RelevantStateNamesArrRef = $Kernel::OM->Get('Config')->Get(
-        'Ticket::EscalationDisabled::RelevantStates'
-    );
-
-    my %RelevantStateHash         = ();
-    my $RelevantStateNamesArrStrg = '';
-
-    if ( $RelevantStateNamesArrRef && ref($RelevantStateNamesArrRef) eq 'ARRAY' ) {
-        my %StateListHash
-            = $Kernel::OM->Get('State')->StateList( UserID => 1, );
-        for my $CurrStateID ( keys(%StateListHash) ) {
-            if ( grep { $_ eq $StateListHash{$CurrStateID} } @{$RelevantStateNamesArrRef} ) {
-                $RelevantStateHash{$CurrStateID} = $StateListHash{$CurrStateID};
-            }
-        }
-    }
-
-    my $PendSumTime = 0;
-    my $StatePend   = 0;
-
-    if ( grep { $_ eq $Ticket{State} } @{$RelevantStateNamesArrRef} ) {
-        $Ticket{DoNotSetEscalation} = 1;
-    }
-    else {
-        $PendSumTime = $Self->GetTotalNonEscalationRelevantBusinessTime(
-            TicketID       => $Param{TicketID},
-            RelevantStates => \%RelevantStateHash,
-        ) || 0;
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # do no escalations on (merge|close|remove) tickets
-    # KIX4OTRS-capeIT
-    # if ( $Ticket{StateType} && $Ticket{StateType} =~ /^(merge|close|remove)/i ) {
-    if ( $Ticket{DoNotSetEscalation} || $Ticket{StateType} =~ /^(merge|close|remove)/i ) {
-
-        # EO KIX4OTRS-capeIT
-
-        # update escalation times with 0
-        my %EscalationTimes = (
-            EscalationTime         => 'escalation_time',
-            EscalationResponseTime => 'escalation_response_time',
-            EscalationUpdateTime   => 'escalation_update_time',
-            EscalationSolutionTime => 'escalation_solution_time',
-        );
-
-        TIME:
-        for my $Key ( sort keys %EscalationTimes ) {
-
-            # check if table update is needed
-            next TIME if !$Ticket{$Key};
-
-            # update ticket table
-            $DBObject->Do(
-                SQL =>
-                    "UPDATE ticket SET $EscalationTimes{$Key} = 0, change_time = current_timestamp, "
-                    . " change_by = ? WHERE id = ?",
-                Bind => [ \$Param{UserID}, \$Ticket{TicketID}, ],
-            );
-        }
-
-        # clear ticket cache
-        $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
-        # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-            Event     => 'UPDATE',
-            Namespace => 'Ticket',
-            ObjectID  => $Param{TicketID},
-        );
-
-        return 1;
-    }
-
-    # get escalation properties
-    my %Escalation;
-    if (%Ticket) {
-        %Escalation = $Self->TicketEscalationPreferences(
-            Ticket => \%Ticket,
-            UserID => $Param{UserID},
-        );
-    }
-
-    # find escalation times
-    my $EscalationTime = 0;
-
-    # update first response (if not responded till now)
-    if ( !$Escalation{FirstResponseTime} ) {
-        $DBObject->Do(
-            SQL =>
-                'UPDATE ticket SET escalation_response_time = 0, change_time = current_timestamp, '
-                . ' change_by = ? WHERE id = ?',
-            Bind => [ \$Param{UserID}, \$Ticket{TicketID}, ]
-        );
-    }
-    else {
-
-        # check if first response is already done
-        my %FirstResponseDone = $Self->_TicketGetFirstResponse(
-            TicketID => $Ticket{TicketID},
-            Ticket   => \%Ticket,
-        );
-
-        # KIX4OTRS-capeIT
-        # find solution time / first close time
-        my %SolutionDone = $Self->_TicketGetClosed(
-            TicketID => $Ticket{TicketID},
-            Ticket   => \%Ticket,
-        );
-
-        # update first response time to 0
-        # if (%FirstResponseDone) {
-        if ( %FirstResponseDone || %SolutionDone ) {
-
-            # EO KIX4OTRS-capeIT
-            $DBObject->Do(
-                SQL =>
-                    'UPDATE ticket SET escalation_response_time = 0, change_time = current_timestamp, '
-                    . ' change_by = ? WHERE id = ?',
-                Bind => [ \$Param{UserID}, \$Ticket{TicketID}, ]
-            );
-        }
-
-        # update first response time to expected escalation destination time
-        else {
-
-            # get time object
-            my $TimeObject = $Kernel::OM->Get('Time');
-
-            my $DestinationTime = $TimeObject->DestinationTime(
-                StartTime => $TimeObject->TimeStamp2SystemTime(
-                    String => $Ticket{Created}
-                ),
-                Time     => $Escalation{FirstResponseTime} * 60,
-                Calendar => $Escalation{Calendar},
-            );
-
-            # update first response time to $DestinationTime
-            $DBObject->Do(
-                SQL =>
-                    'UPDATE ticket SET escalation_response_time = ?, change_time = current_timestamp, '
-                    . ' change_by = ? WHERE id = ?',
-                Bind => [ \$DestinationTime, \$Param{UserID}, \$Ticket{TicketID}, ]
-            );
-
-            # remember escalation time
-            $EscalationTime = $DestinationTime;
-        }
-    }
-
-    # update update && do not escalate in "pending auto" for escalation update time
-    if ( !$Escalation{UpdateTime} || $Ticket{StateType} =~ /^(pending)/i ) {
-        $DBObject->Do(
-            SQL => 'UPDATE ticket SET escalation_update_time = 0, change_time = current_timestamp, '
-                . ' change_by = ? WHERE id = ?',
-            Bind => [ \$Param{UserID}, \$Ticket{TicketID}, ]
-        );
-    }
-    else {
-
-        # check if update escalation should be set
-        my @SenderHistory;
-        return if !$DBObject->Prepare(
-            SQL => 'SELECT article_sender_type_id, channel_id, create_time FROM '
-                . 'article WHERE ticket_id = ? ORDER BY create_time ASC',
-            Bind => [ \$Param{TicketID} ],
-        );
-        while ( my @Row = $DBObject->FetchrowArray() ) {
-            push @SenderHistory, {
-                SenderTypeID  => $Row[0],
-                ChannelID     => $Row[1],
-                Created       => $Row[2],
-            };
-        }
-
-        # fill up lookups
-        for my $Row (@SenderHistory) {
-
-            # get sender type
-            $Row->{SenderType} = $Self->ArticleSenderTypeLookup(
-                SenderTypeID => $Row->{SenderTypeID},
-            );
-
-            # get channel
-            $Row->{Channel} = $Kernel::OM->Get('Channel')->ChannelLookup(
-                ChannelID => $Row->{ChannelID},
-            );
-        }
-
-        # get latest customer contact time
-        my $LastSenderTime;
-        my $LastSenderType = '';
-        ROW:
-        for my $Row ( reverse @SenderHistory ) {
-
-            # fill up latest sender time (as initial value)
-            if ( !$LastSenderTime ) {
-                $LastSenderTime = $Row->{Created};
-            }
-
-            # do not use locked tickets for calculation
-            #last ROW if $Ticket{Lock} eq 'lock';
-
-            # do not use internal articles for calculation
-            next ROW if !$Row->{CustomerVisible};
-
-            # only use 'agent' and 'external' sender types for calculation
-            next ROW if $Row->{SenderType} !~ /^(agent|external)$/;
-
-            # last ROW if latest was customer and the next was not customer
-            # otherwise use also next, older customer article as latest
-            # customer followup for starting escalation
-            if ( $Row->{SenderType} eq 'agent' && $LastSenderType eq 'external' ) {
-                last ROW;
-            }
-
-            # start escalation on latest external article
-            if ( $Row->{SenderType} eq 'external' ) {
-                $LastSenderType = 'external';
-                $LastSenderTime = $Row->{Created};
-            }
-
-            # start escalation on latest agent article
-            if ( $Row->{SenderType} eq 'agent' ) {
-                $LastSenderTime = $Row->{Created};
-                last ROW;
-            }
-        }
-        if ($LastSenderTime) {
-
-            # get time object
-            my $TimeObject = $Kernel::OM->Get('Time');
-
-            my $DestinationTime = $TimeObject->DestinationTime(
-                StartTime => $TimeObject->TimeStamp2SystemTime(
-                    String => $LastSenderTime,
-                ),
-                Time     => $Escalation{UpdateTime} * 60,
-                Calendar => $Escalation{Calendar},
-            );
-
-            # update update time to $DestinationTime
-            $DBObject->Do(
-                SQL =>
-                    'UPDATE ticket SET escalation_update_time = ?, change_time = current_timestamp, '
-                    . ' change_by = ? WHERE id = ?',
-                Bind => [ \$DestinationTime, \$Param{UserID}, \$Ticket{TicketID}, ]
-            );
-
-            # remember escalation time
-            if ( $EscalationTime == 0 || $DestinationTime < $EscalationTime ) {
-                $EscalationTime = $DestinationTime;
-            }
-        }
-
-        # else, no not escalate, because latest sender was agent
-        else {
-            $DBObject->Do(
-                SQL =>
-                    'UPDATE ticket SET escalation_update_time = 0, change_time = current_timestamp, '
-                    . ' change_by = ? WHERE id = ?',
-                Bind => [ \$Param{UserID}, \$Ticket{TicketID}, ]
-            );
-        }
-    }
-
-    # update solution
-    if ( !$Escalation{SolutionTime} ) {
-        $DBObject->Do(
-            SQL =>
-                'UPDATE ticket SET escalation_solution_time = 0, change_time = current_timestamp, '
-                . ' change_by = ? WHERE id = ?',
-            Bind => [ \$Param{UserID}, \$Ticket{TicketID}, ],
-        );
-    }
-    else {
-
-        # find solution time / first close time
-        my %SolutionDone = $Self->_TicketGetClosed(
-            TicketID => $Ticket{TicketID},
-            Ticket   => \%Ticket,
-        );
-
-        # KIX4OTRS-capeIT
-        my $EscalationDelayByFreeTimeRef =
-            $Kernel::OM->Get('Config')->Get('Ticket::EscalationDelayed::FreeTimeField');
-
-        if (
-            $EscalationDelayByFreeTimeRef
-            && ref($EscalationDelayByFreeTimeRef) eq 'HASH'
-            )
-        {
-            my $CreateTimeStamp
-                = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                String => $Ticket{Created},
-                );
-
-            if ( $EscalationDelayByFreeTimeRef->{DynamicField} ) {
-
-                my $TicketFreeTimeStamp
-                    = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                    String => $Ticket{
-                        'DynamicField_'
-                            . $EscalationDelayByFreeTimeRef->{DynamicField}
-                        }
-                        || '2000-01-01 00:00:00',
-                    );
-
-                if (
-                    $Ticket{ 'DynamicField_' . $EscalationDelayByFreeTimeRef->{DynamicField} }
-                    && $CreateTimeStamp < $TicketFreeTimeStamp
-                    )
-                {
-                    $Ticket{SLAStartTime} =
-                        $Ticket{ 'DynamicField_' . $EscalationDelayByFreeTimeRef->{DynamicField} };
-                }
-            }
-            elsif ( $EscalationDelayByFreeTimeRef->{Index} ) {
-                my $TicketFreeTimeStamp
-                    = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                    String => $Ticket{
-                        'DynamicField_FreeTimeField'
-                            . $EscalationDelayByFreeTimeRef->{Index}
-                        }
-                        || '2000-01-01 00:00:00',
-                    );
-
-                if (
-                    $Ticket{ 'DynamicField_FreeTimeField' . $EscalationDelayByFreeTimeRef->{Index} }
-                    && $CreateTimeStamp < $TicketFreeTimeStamp
-                    )
-                {
-                    $Ticket{SLAStartTime} =
-                        $Ticket{ 'DynamicField_FreeTimeField'
-                            . $EscalationDelayByFreeTimeRef->{Index} };
-                }
-            }
-
-        }
-
-        # EO KIX4OTRS-capeIT
-
-        # update solution time to 0
-        if (%SolutionDone) {
-            $DBObject->Do(
-                SQL =>
-                    'UPDATE ticket SET escalation_solution_time = 0, change_time = current_timestamp, '
-                    . ' change_by = ? WHERE id = ?',
-                Bind => [ \$Param{UserID}, \$Ticket{TicketID}, ],
-            );
-        }
-        else {
-
-            # KIX4OTRS-capeIT
-            my $DestinationTime;
-            if ( $StatePend && $PendSumTime ) {
-                $DestinationTime = $PendSumTime;
-            }
-            else {
-
-                # EO KIX4OTRS-capeIT
-
-                # get time object
-                my $TimeObject = $Kernel::OM->Get('Time');
-
-                # KIX4OTRS-capeIT
-                # my $DestinationTime = $TimeObject->DestinationTime(
-                $DestinationTime = $TimeObject->DestinationTime(
-
-                    # EO KIX4OTRS-capeIT
-                    StartTime => $TimeObject->TimeStamp2SystemTime(
-
-                        # KIX4OTRS-capeIT
-                        # String => $Ticket{Created}
-                        String => $Ticket{SLAStartTime} || $Ticket{Created},
-
-                        # EO KIX4OTRS-capeIT
-
-                    ),
-
-                    # KIX4OTRS-capeIT
-                    # Time     => $Escalation{SolutionTime} * 60,
-                    Time => $Escalation{SolutionTime} * 60 + $PendSumTime,
-
-                    # EO KIX4OTRS-capeIT
-                    Calendar => $Escalation{Calendar},
-                );
-            }
-
-            # KIX4OTRS-capeIT
-            # moved s.o. for use of PendingSumTime with Calendar/WorkingTime
-            # if ( $StatePend && $PendSumTime ) {
-            #    $DestinationTime = $PendSumTime;
-            #}
-            # elsif ( !$StatePend && $PendSumTime ) {
-            #    $DestinationTime = $DestinationTime + $PendSumTime;
-            # }
-            # EO KIX4OTRS-capeIT
-
-            # update solution time to $DestinationTime
-            $DBObject->Do(
-                SQL =>
-                    'UPDATE ticket SET escalation_solution_time = ?, change_time = current_timestamp, '
-                    . ' change_by = ? WHERE id = ?',
-                Bind => [ \$DestinationTime, \$Param{UserID}, \$Ticket{TicketID}, ],
-            );
-
-            # remember escalation time
-            if ( $EscalationTime == 0 || $DestinationTime < $EscalationTime ) {
-                $EscalationTime = $DestinationTime;
-            }
-        }
-    }
-
-    # update escalation time (< escalation time)
-    if ( defined $EscalationTime ) {
-        $DBObject->Do(
-            SQL => 'UPDATE ticket SET escalation_time = ?, change_time = current_timestamp, '
-                . ' change_by = ? WHERE id = ?',
-            Bind => [ \$EscalationTime, \$Param{UserID}, \$Ticket{TicketID}, ],
-        );
-    }
-
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
-    );
-
-    return 1;
-}
-
-=item TicketSLAList()
-
-to get all possible SLAs for a ticket (depends on workflow, if configured)
-
-    my %SLAs = $TicketObject->TicketSLAList(
-        ServiceID => 1,
-        UserID    => 123,
-    );
-
-    my %SLAs = $TicketObject->TicketSLAList(
-        ServiceID      => 1,
-        ContactID => 'customer_user_id_123',
-    );
-
-
-    my %SLAs = $TicketObject->TicketSLAList(
-        QueueID   => 123,
-        ServiceID => 1,
-        UserID    => 123,
-    );
-
-    my %SLAs = $TicketObject->TicketSLAList(
-        TicketID  => 123,
-        ServiceID => 1,
-        UserID    => 123,
-    );
-
-Returns:
-
-    %SLAs = (
-        1 => 'SLA A',
-        2 => 'SLA B',
-        3 => 'SLA C',
-    );
-
-=cut
-
-sub TicketSLAList {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} && !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID or ContactID!'
-        );
-        return;
-    }
-
-    # check needed stuff
-    if ( !$Param{QueueID} && !$Param{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID or TicketID!'
-        );
-        return;
-    }
-
-    # return emty hash, if no service id is given
-    if ( !$Param{ServiceID} ) {
-        return ();
-    }
-
-    # get sla list
-    my %SLAs = $Kernel::OM->Get('SLA')->SLAList(
-        ServiceID => $Param{ServiceID},
-        UserID    => 1,
-    );
-
-    # workflow
-    my $ACL = $Self->TicketAcl(
-        %Param,
-        ReturnType    => 'Ticket',
-        ReturnSubType => 'SLA',
-        Data          => \%SLAs,
-    );
-
-    return $Self->TicketAclData() if $ACL;
-    return %SLAs;
-}
-
-=item TicketSLASet()
-
-to set a ticket service level agreement
-
-    my $Success = $TicketObject->TicketSLASet(
-        SLAID    => 123,
-        TicketID => 123,
-        UserID   => 123,
-    );
-
-    my $Success = $TicketObject->TicketSLASet(
-        SLA      => 'SLA A',
-        TicketID => 123,
-        UserID   => 123,
-    );
-
-Events:
-    TicketSLAUpdate
-
-=cut
-
-sub TicketSLASet {
-    my ( $Self, %Param ) = @_;
-
-    # sla lookup
-    if ( $Param{SLA} && !$Param{SLAID} ) {
-        $Param{SLAID} = $Kernel::OM->Get('SLA')->SLALookup( Name => $Param{SLA} );
-    }
-
-    # check needed stuff
-    for my $Needed (qw(TicketID SLAID UserID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # get current ticket
-    my %Ticket = $Self->TicketGet(
-        %Param,
-        DynamicFields => 0,
-    );
-
-    # update needed?
-    return 1 if ( $Param{SLAID} eq $Ticket{SLAID} );
-
-    # permission check
-    my %SLAList = $Self->TicketSLAList(
-        %Param,
-        ServiceID => $Ticket{ServiceID},
-    );
-
-    if ( $Param{UserID} != 1 && $Param{SLAID} ne '' && !$SLAList{ $Param{SLAID} } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Permission denied on TicketID: $Param{TicketID}!",
-        );
-        return;
-    }
-
-    # check database undef/NULL (set value to undef/NULL to prevent database errors)
-    for my $Parameter (qw(ServiceID SLAID)) {
-        if ( !$Param{$Parameter} ) {
-            $Param{$Parameter} = undef;
-        }
-    }
-
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE ticket SET sla_id = ?, change_time = current_timestamp, '
-            . ' change_by = ? WHERE id = ?',
-        Bind => [ \$Param{SLAID}, \$Param{UserID}, \$Param{TicketID} ],
-    );
-
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
-    # get new ticket data
-    my %TicketNew = $Self->TicketGet(
-        %Param,
-        DynamicFields => 0,
-    );
-    $TicketNew{SLA} = $TicketNew{SLA} || 'NULL';
-    $Param{SLAID}   = $Param{SLAID}   || '';
-    $Ticket{SLA}    = $Ticket{SLA}    || 'NULL';
-    $Ticket{SLAID}  = $Ticket{SLAID}  || '';
-
-    # history insert
-    $Self->HistoryAdd(
-        TicketID     => $Param{TicketID},
-        HistoryType  => 'SLAUpdate',
-        Name         => "\%\%$TicketNew{SLA}\%\%$Param{SLAID}\%\%$Ticket{SLA}\%\%$Ticket{SLAID}",
-        CreateUserID => $Param{UserID},
-    );
-
-    # trigger event, OldTicketData is needed for escalation events
-    $Self->EventHandler(
-        Event => 'TicketSLAUpdate',
-        Data  => {
-            TicketID      => $Param{TicketID},
-            OldTicketData => \%Ticket,
-        },
-        UserID => $Param{UserID},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
-    );
-
     return 1;
 }
 
@@ -4572,15 +3347,6 @@ sub TicketStateList {
         );
     }
 
-    # workflow
-    my $ACL = $Self->TicketAcl(
-        %Param,
-        ReturnType    => 'Ticket',
-        ReturnSubType => 'State',
-        Data          => \%States,
-    );
-
-    return $Self->TicketAclData() if $ACL;
     return %States;
 }
 
@@ -5386,15 +4152,6 @@ sub TicketPriorityList {
 
     my %Data = $Kernel::OM->Get('Priority')->PriorityList(%Param);
 
-    # workflow
-    my $ACL = $Self->TicketAcl(
-        %Param,
-        ReturnType    => 'Ticket',
-        ReturnSubType => 'Priority',
-        Data          => \%Data,
-    );
-
-    return $Self->TicketAclData() if $ACL;
     return %Data;
 }
 
@@ -7245,11 +6002,10 @@ sub TicketCheckForProcessType {
 
 =item TicketCalendarGet()
 
-checks calendar to be used for ticket based on sla and queue
+get the relevant calendar for the ticket
 
     my $Calendar = $TicketObject->TicketCalendarGet(
-        QueueID => 1,
-        SLAID   => 1,   # optional
+        TicketID => 123
     );
 
 returns calendar number or empty string for default calendar
@@ -7260,29 +6016,29 @@ sub TicketCalendarGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{QueueID} ) {
+    if ( !$Param{TicketID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need QueueID!'
+            Message  => 'Need TicketID!'
         );
         return;
     }
 
-    # check if SLAID was passed and if sla has a specific calendar
-    if ( $Param{SLAID} ) {
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID}
+    );
 
-        my %SLAData = $Kernel::OM->Get('SLA')->SLAGet(
-            SLAID  => $Param{SLAID},
-            UserID => 1,
+    if (!%Ticket) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No such TicketID ($Param{TicketID})!",
         );
-
-        # if SLA has a defined calendar, return it
-        return $SLAData{Calendar} if $SLAData{Calendar};
+        return;
     }
 
-    # if no calendar was determined by SLA, check if queue has a specific calendar
+    # get queue specific calendar
     my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
-        ID => $Param{QueueID},
+        ID => $Ticket{QueueID},
     );
 
     # if queue has a defined calendar, return it
@@ -7319,12 +6075,6 @@ sub LockSet {
     my $Self = shift;
 
     return $Self->TicketLockSet(@_);
-}
-
-sub MoveList {
-    my $Self = shift;
-
-    return $Self->TicketMoveList(@_);
 }
 
 sub MoveTicket {

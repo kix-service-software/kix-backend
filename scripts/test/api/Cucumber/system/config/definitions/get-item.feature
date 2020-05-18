@@ -6,7 +6,6 @@
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
   Scenario: get an existing config definition
-    When I get the config definitions with Option "ACLKeysLevel2::Possible"
+    When I get the config definitions with Option "ProductName"
     Then the response code is 200
-#    And the attribute "SysConfigItemDefinition.SubGroup" is "Core::TicketACL"
 

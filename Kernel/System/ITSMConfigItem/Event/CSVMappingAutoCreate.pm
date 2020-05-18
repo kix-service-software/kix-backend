@@ -13,7 +13,6 @@ use warnings;
 
 our @ObjectDependencies = (
     'Config',
-    'ITSMCIAttributCollectionUtils',
     'ITSMConfigItem',
     'ImportExport',
     'GeneralCatalog',
@@ -27,7 +26,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{CIACUtilsObject}      = $Kernel::OM->Get('ITSMCIAttributCollectionUtils');
     $Self->{ITSMConfigItemObject} = $Kernel::OM->Get('ITSMConfigItem');
     $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
     $Self->{LogObject}            = $Kernel::OM->Get('Log');

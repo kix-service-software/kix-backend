@@ -2026,9 +2026,7 @@ checks if the dynamic field as an specified behavior
 
     my $Success = $BackendObject->HasBehavior(
         DynamicFieldConfig => $DynamicFieldConfig,       # complete config of the DynamicField
-        Behavior           => 'Some Behavior',           # 'IsACLReducible' to be reduded by ACLs
-                                                         #    and updatable via AJAX
-                                                         # 'IsNotificationEventCondition' to be used
+        Behavior           => 'Some Behavior',           # 'IsNotificationEventCondition' to be used
                                                          #     in the notification events as a
                                                          #     ticket condition
                                                          # 'IsSortable' to sort by this field in

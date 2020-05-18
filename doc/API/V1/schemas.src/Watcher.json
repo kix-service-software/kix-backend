@@ -4,6 +4,14 @@
   "type": "object",
   "description": "The watcher object.",
   "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
     "CreateBy": {
       "type": "integer",
       "readOnly": true
@@ -32,6 +40,8 @@
     }
   },
   "required": [
+    "ChangeBy",
+    "ChangeTime",
     "CreateBy",
     "CreateTime",
     "ID",

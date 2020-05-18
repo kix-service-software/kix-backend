@@ -18,7 +18,6 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
-#rbo - T2016121190001552 - renamed otrs.Daemon.pl to kix.Daemon.pl
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
 
 # get daemon status (stop if necessary)

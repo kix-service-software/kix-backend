@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "#TicketArticleAttachmentPostRequest",
+  "type": "object",
+  "description": "The ticket article attachment request object for creation.",
+  "properties": {
+    "Attachment": {
+      "$ref": "TicketArticleAttachmentPostItem.json"
+    }
+  },
+  "required": [
+    "Attachment"
+  ]
+}

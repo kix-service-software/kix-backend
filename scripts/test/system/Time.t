@@ -11,6 +11,8 @@
 use strict;
 use warnings;
 use utf8;
+use DateTime;
+use DateTime::TimeZone;
 
 use vars (qw($Self));
 
@@ -25,10 +27,21 @@ $ConfigObject->Set(
     Value => 'Atlantic/Azores',
 );
 
+# get DaylightSaving 
+my $TimeZoneObject = DateTime::TimeZone->new(
+    name => $ConfigObject->Get( 'TimeZone::Calendar9' )
+);
+my $Calendar9_DST = $TimeZoneObject->is_dst_for_datetime(DateTime->now);
+
 $ConfigObject->Set(
     Key   => 'TimeZone::Calendar8',
     Value => 'Europe/Berlin',
 );
+
+$TimeZoneObject = DateTime::TimeZone->new(
+    name => $ConfigObject->Get( 'TimeZone::Calendar8' )
+);
+my $Calendar8_DST = $TimeZoneObject->is_dst_for_datetime(DateTime->now);
 
 my $TimeObject = $Kernel::OM->Get('Time');
 
@@ -429,7 +442,7 @@ my @DestinationTime = (
         Calendar        => 9,
         StartTimeSystem => '',
         Diff            => 60 * 1,
-        EndTime         => '2013-03-18 09:01:00',    # Monday
+        EndTime         => $Calendar9_DST ? '2013-03-18 08:01:00' : '2013-03-18 09:01:00',    # Monday
         EndTimeSystem   => '',
     },
     {
@@ -438,7 +451,7 @@ my @DestinationTime = (
         Calendar        => 8,
         StartTimeSystem => '',
         Diff            => 60 * 1,
-        EndTime         => '2013-03-18 07:01:00',    # Monday
+        EndTime         => $Calendar8_DST ? '2013-03-18 06:01:00' : '2013-03-18 07:01:00',    # Monday
         EndTimeSystem   => '',
     },
     {
@@ -472,6 +485,7 @@ for my $Test (@DestinationTime) {
 
     # get system time
     my $SystemTimeDestination = $TimeObject->TimeStamp2SystemTime( String => $Test->{StartTime} );
+    print STDERR "SystemTimeDestination: $SystemTimeDestination\n";
 
     # check system time
     if ( $Test->{StartTimeSystem} ) {
@@ -658,7 +672,7 @@ $Self->Is(
 );
 
 # modify calendar 1
-my $TimeVacationDays1        = $TimeObject->GetVacationDaysOneTime(Calendar => 'TimeVacationDays::Calendar1');
+my $TimeVacationDays1        = $TimeObject->GetVacationDays(Calendar => 'TimeVacationDays::Calendar1');
 my $TimeVacationDaysOneTime1 = $TimeObject->GetVacationDaysOneTime(Calendar => 'TimeVacationDaysOneTime::Calendar1');
 
 # 2005-01-01
@@ -692,6 +706,19 @@ $Self->Is(
 # remove vacation days
 $TimeVacationDays1->{1}->{1} = undef;
 $TimeVacationDaysOneTime1->{2004}->{1}->{1} = undef;
+
+$ConfigObject->Set(
+    Key   => 'TimeVacationDays::Calendar1',
+    Value => $TimeVacationDays1
+);
+$ConfigObject->Set(
+    Key   => 'TimeVacationDaysOneTime::Calendar1',
+    Value => $TimeVacationDaysOneTime1
+);
+
+$TimeVacationDays1        = $TimeObject->GetVacationDays(Calendar => 'TimeVacationDays::Calendar1');
+$TimeVacationDaysOneTime1 = $TimeObject->GetVacationDaysOneTime(Calendar => 'TimeVacationDaysOneTime::Calendar1');
+
 
 # 2005-01-01
 $Vacation = $TimeObject->VacationCheck(
