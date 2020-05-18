@@ -3773,7 +3773,7 @@ Thanks for your help!
         "required": true,
         "readonly": true,
         "defaultValue": {
-          "value": 1,
+          "value": 2,
           "valid": true
         },
         "property": "TypeID",
@@ -3894,7 +3894,7 @@ Thanks for your help!
         "required": true,
         "readonly": true,
         "defaultValue": {
-          "value": 1,
+          "value": 3,
           "valid": true
         },
         "property": "TypeID",
