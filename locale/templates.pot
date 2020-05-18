@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-05-14 17:40+0000\n"
+"POT-Creation-Date: 2020-05-18 10:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -6195,10 +6195,45 @@ msgid "ZIP"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "accepted"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "assigned"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "cancelled"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "completed"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "downloaded"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "no"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "partially executed"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "processing"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "rejected"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "suspended"
 msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr ""
-
