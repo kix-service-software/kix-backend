@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-14 17:40+0000\n"
+"POT-Creation-Date: 2020-05-18 10:13+0000\n"
 "PO-Revision-Date: 2020-05-07 07:50+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
@@ -7383,8 +7383,44 @@ msgid "ZIP"
 msgstr "PLZ"
 
 #. manual entry from templates.pot.manual
+msgid "accepted"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "assigned"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "cancelled"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "completed"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "downloaded"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "no"
 msgstr "nein"
+
+#. manual entry from templates.pot.manual
+msgid "partially executed"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "processing"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "rejected"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "suspended"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "yes"
