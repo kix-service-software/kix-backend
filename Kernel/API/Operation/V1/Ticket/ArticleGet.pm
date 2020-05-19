@@ -174,20 +174,6 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check if ticket can be accessed (temporary solution)
-    my $Access = $Self->ExecOperation(
-        OperationType            => 'V1::Ticket::TicketGet',
-        SuppressPermissionErrors => 1,
-        Data      => {
-            TicketID => $Param{Data}->{TicketID},
-        }
-    );
-    if ( !$Access->{Success} || !IsHashRefWithData($Access->{Data}->{Ticket}) ) {
-        return $Self->_Error(
-            Code => 'Forbidden',
-        );
-    }
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 

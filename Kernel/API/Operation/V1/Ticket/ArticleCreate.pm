@@ -176,21 +176,6 @@ perform ArticleCreate Operation. This will return the created ArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check if ticket can be accessed (temporary solution)
-    my $Access = $Self->ExecOperation(
-        RequestMethod            => 'GET',
-        OperationType            => 'V1::Ticket::TicketGet',
-        SuppressPermissionErrors => 1,
-        Data      => {
-            TicketID => $Param{Data}->{TicketID},
-        }
-    );
-    if ( !$Access->{Success} || !IsHashRefWithData($Access->{Data}->{Ticket}) ) {
-        return $Self->_Error(
-            Code => 'Forbidden',
-        );
-    }
-
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket data
