@@ -62,7 +62,7 @@ sub new {
 =cut
 
 sub Run {
-    my ( $Self, %Param ) = @_;    
+    my ( $Self, %Param ) = @_;
 
     # check required parameters
     foreach my $Key ( qw(Object ObjectID) ) {
@@ -90,7 +90,7 @@ sub _LoadObjectActionBackend {
     $Self->{ObjectActionModules} //= {};
 
     if ( !$Self->{ObjectActionModules}->{$Param{Object}} ) {
-        my $Backend = 'API::Operation::V1::ObjectAction::' . $Param{Object};
+        my $Backend = 'Kernel::API::Operation::V1::ObjectAction::' . $Param{Object};
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
