@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-18 10:13+0000\n"
-"PO-Revision-Date: 2020-05-07 07:50+0000\n"
+"PO-Revision-Date: 2020-05-26 14:50+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
@@ -7420,7 +7420,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "suspended"
-msgstr ""
+msgstr "ausgesetzt"
 
 #. manual entry from templates.pot.manual
 msgid "yes"
