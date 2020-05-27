@@ -1308,7 +1308,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Customer": permission _R__X on /faq/articles -->
+    <!-- role "Customer": permission _R___ on /faq/articles -->
     <Insert Table="role_permission">
         <Data Key="role_id">13</Data>
         <Data Key="type_id">1</Data>
