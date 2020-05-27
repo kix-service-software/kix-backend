@@ -1313,7 +1313,7 @@
         <Data Key="role_id">13</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/faq/articles]]></Data>
-        <Data Key="value">61442</Data>
+        <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -1710,6 +1710,17 @@
         <Data Key="type_id">2</Data>
         <Data Key="target" Type="Quote"><![CDATA[/system/config/*{SysConfigOption.AccessLevel NE external}]]></Data>
         <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Customer": permission _R___ on  /system/objecticons-->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
+        <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
