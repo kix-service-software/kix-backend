@@ -782,7 +782,7 @@
         <Setting>
             <Hash>
                 <Item Key="TaskName">FetchMail</Item>
-                <Item Key="Schedule">*/5 * * * *</Item> <!-- default each five minutes -->
+                <Item Key="Schedule">*/5 * * * *</Item> <!-- default: every 5 minutes -->
                 <Item Key="Module">Kernel::System::FetchMail</Item>
                 <Item Key="Function">Fetch</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
@@ -800,7 +800,7 @@
         <Setting>
             <Hash>
                 <Item Key="TaskName">FetchMailSSL</Item>
-                <Item Key="Schedule">*/5 * * * *</Item> <!-- default each five minutes -->
+                <Item Key="Schedule">*/5 * * * *</Item> <!-- default: every 5 minutes -->
                 <Item Key="Module">Kernel::System::FetchMail</Item>
                 <Item Key="Function">Fetch</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
@@ -839,7 +839,7 @@
         <Setting>
             <Hash>
                 <Item Key="TaskName">TicketPendingCheck</Item>
-                <Item Key="Schedule">45 */2 * * *</Item> <!-- default every 2 hours in the minute 45 -->
+                <Item Key="Schedule">*/5 * * * *</Item> <!-- default: every 5 minutes -->
                 <Item Key="Module">Kernel::System::Console::Command::Maint::Ticket::PendingCheck</Item>
                 <Item Key="Function">Execute</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
@@ -929,7 +929,7 @@
         <Setting>
             <Hash>
                 <Item Key="TaskName">TicketUnlockTimeout</Item>
-                <Item Key="Schedule">35 * * * *</Item> <!-- default: every hour in minute 35 -->
+                <Item Key="Schedule">*/5 * * * *</Item> <!-- default: every 5 minutes -->
                 <Item Key="Module">Kernel::System::Console::Command::Maint::Ticket::UnlockTimeout</Item>
                 <Item Key="Function">Execute</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
