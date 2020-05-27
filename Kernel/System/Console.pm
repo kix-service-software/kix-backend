@@ -73,8 +73,12 @@ sub Run {
         return $Kernel::OM->Get($CommandName)->Execute(@CommandlineArguments);
     }
 
+    if ($CommandlineArguments[0] !~ m/^Console::Command::.+/) {
+        $CommandlineArguments[0] = 'Console::Command::' . $CommandlineArguments[0];
+    }
+
     # Ok, let's try to find the command.
-    $CommandName = $Kernel::OM->GetModuleFor('Console::Command::' . $CommandlineArguments[0]);
+    $CommandName = $Kernel::OM->GetModuleFor($CommandlineArguments[0]);
 
     if ( $Kernel::OM->Get('Main')->Require( $CommandName, Silent => 1 ) ) {
 
@@ -127,8 +131,12 @@ sub CommandGet {
         }
     }
 
+    if ($Param{Command} !~ m/^Console::Command::.+/) {
+        $Param{Command} = 'Console::Command::' . $Param{Command};
+    }
+
     # Ok, let's try to find the command.
-    my $CommandName = $Kernel::OM->GetModuleFor('Console::Command::' . $Param{Command});
+    my $CommandName = $Kernel::OM->GetModuleFor($Param{Command});
 
     # get command object
     my $CommandObject = $Kernel::OM->Get($CommandName);
@@ -157,20 +165,20 @@ sub CommandGet {
         my %OptionClone = %{$Option};
         delete $OptionClone{ValueRegex};
         push @ValidOptions, \%OptionClone;
-    }   
-    
+    }
+
     my @Arguments;
     if ( IsArrayRefWithData($CommandObject->{_Arguments}) ) {
         @Arguments = @{$CommandObject->{_Arguments}};
     }
-    
+
     # special handling for regexp arguments
     my @ValidArguments;
     foreach my $Arg ( @Arguments ) {
         my %ArgClone = %{$Arg};
-        delete $ArgClone{ValueRegex};     
+        delete $ArgClone{ValueRegex};
         push @ValidArguments, \%ArgClone;
-    }   
+    }
 
     $Param{Command} =~ s/.+?::Console::Command::(.+?)$/$1/;
 
@@ -211,7 +219,7 @@ sub CommandList {
     # add commands from plugins
     my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
         InitOrder => 1
-    ); 
+    );
 
     foreach my $Plugin ( @Plugins ) {
         next if ( ! -d $Plugin->{Directory} );
@@ -240,7 +248,7 @@ sub CommandList {
         next COMMAND_FILE if ( $CommandFile =~ m{/Internal/}xms );
         $CommandFile =~ s{^.*(Console/Command.*)[.]pm$}{$1}xmsg;
         $CommandFile =~ s{/+}{::}xmsg;
- 
+
         push @Commands, $CommandFile;
     }
 
@@ -279,7 +287,7 @@ sub FileList {
     );
 
     foreach my $File ( sort @Files ) {
-        next if $File =~ /\.gitkeep/;        
+        next if $File =~ /\.gitkeep/;
         next if ! -f $File;
 
         my $Filename = $File;
