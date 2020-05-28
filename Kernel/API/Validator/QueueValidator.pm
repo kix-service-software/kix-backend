@@ -104,12 +104,12 @@ sub Validate {
     if ( $Param{Attribute} eq 'QueueID' ) {
         $Found = $Kernel::OM->Get('Queue')->QueueLookup(
             QueueID => $Param{Data}->{$Param{Attribute}},
-        );        
+        );
     }
     elsif ( $Param{Attribute} eq 'Queue' ) {
         $Found = $Kernel::OM->Get('Queue')->QueueLookup(
             Queue => $Param{Data}->{$Param{Attribute}},
-        );        
+        );
     }
     else {
         return $Self->_Error(
@@ -122,10 +122,10 @@ sub Validate {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => "Validation of attribute $Param{Attribute} failed!",
-        );        
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;
