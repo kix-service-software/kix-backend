@@ -183,16 +183,16 @@ sub SendNotification {
     # EO NotificationEventX-capeIT
 
     # get the contact for the recipient user
-    if ( !$Recipient{Email} && $Recipient{ID} ) {
+    if ( !$Recipient{Email} && $Recipient{UserID} ) {
         my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-            ID => $Recipient{ID},
+            UserID => $Recipient{UserID},
         );
 
         if ( !$Contact{Email} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'info',
                 Message  => "Can't send notification because of missing "
-                    . "recipient email (ContactID=$Contact{ContactID})!",
+                    . "recipient email (UserID=$Recipient{UserID}, ContactID=$Contact{ContactID})!",
             );
             return;
         }
