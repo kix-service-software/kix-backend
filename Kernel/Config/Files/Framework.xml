@@ -2981,15 +2981,34 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/log/kix.log</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LogModule::LogFile::Date" Required="1" Valid="1">
-        <Description Translatable="1">Adds a suffix with the actual year and month to the KIX log file. A logfile for every month will be created.</Description>
+    <ConfigItem AccessLevel="internal" Name="LogModule::LogFile::Rotate" Required="1" Valid="1">
+        <Description Translatable="1">If "file" was selected for LogModule, rotate the log files never, hourly, daily, weekly or monthly. The default is monthly.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Log</SubGroup>
         <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
+            <Option SelectedID="monthly">
+                <Item Key="never" Translatable="1">Never</Item>
+                <Item Key="hourly" Translatable="1">Hourly</Item>
+                <Item Key="daily" Translatable="1">Daily</Item>
+                <Item Key="weekly" Translatable="1">Weekly</Item>
+                <Item Key="monthly" Translatable="1">Monthly</Item>
             </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="LogModule::LogFile::MaxSize" Required="1" Valid="1">
+        <Description Translatable="1">If "file" was selected for LogModule, create a new log file if the maximum size has been reached. You can enter bytes or add "K" (kilobytes) or "M" (megabytes) or "G" (gigabytes) to make it easier. Set it to 0 (default) if no maximum size exists. PLEASE NOTE: the maximum size of the file will not exactly match, due to the different length of the log messages.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Log</SubGroup>
+        <Setting>
+            <String Regex="">0</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="LogModule::LogFile::Keep" Required="1" Valid="1">
+        <Description Translatable="1">If "file" was selected for LogModule, keep this number of old files. Set it to 0 if no files should be deleted.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Log</SubGroup>
+        <Setting>
+            <String Regex="">12</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="MinimumLogLevel" Required="1" Valid="1">

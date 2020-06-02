@@ -26,7 +26,7 @@ sub Configure {
     $Self->Description('Dump configuration settings.');
     $Self->AddArgument(
         Name        => 'name',
-        Description => "Specify which config setting should be dumped.",
+        Description => "Specify which config setting should be dumped. The wildcard '*' can be used.",
         Required    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -39,31 +39,39 @@ sub Run {
 
     my $Key = $Self->GetArgument('name');
     chomp $Key;
-    my $Value = $Kernel::OM->Get('Config')->Get($Key);
+    $Key =~ s/\*/.*?/g;
+    
+    my @Options = sort keys %{$Kernel::OM->Get('Config')->{Config} || {}};
 
-    if ( !defined $Value ) {
-        $Self->PrintError("The config setting $Key could not be found.");
-        return $Self->ExitCodeError();
-    }
+    foreach my $Option ( @Options ) {
+        next if $Option !~ /^$Key$/;
+            
+        my $Value = $Kernel::OM->Get('Config')->Get($Option);
 
-    my $Output;
-
-    if ( ref($Value) eq 'ARRAY' ) {
-        for ( @{$Value} ) {
-            $Output .= "$_;";
+        if ( !defined $Value ) {
+            $Self->PrintError("The config setting $Key could not be found.");
+            return $Self->ExitCodeError();
         }
-        $Output .= "\n";
-    }
-    elsif ( ref($Value) eq 'HASH' ) {
-        for my $SubKey ( sort keys %{$Value} ) {
-            $Output .= "$SubKey=$Value->{$SubKey};";
+
+        my $Output = "$Option = ";
+
+        if ( ref($Value) eq 'ARRAY' ) {
+            for ( @{$Value} ) {
+                $Output .= "$_;";
+            }
+            $Output .= "\n";
         }
-        $Output .= "\n";
+        elsif ( ref($Value) eq 'HASH' ) {
+            for my $SubKey ( sort keys %{$Value} ) {
+                $Output .= "$SubKey=$Value->{$SubKey};";
+            }
+            $Output .= "\n";
+        }
+        else {
+            $Output .= $Value . "\n";
+        }
+        print $Output;
     }
-    else {
-        $Output .= $Value . "\n";
-    }
-    print $Output;
 
     return $Self->ExitCodeOk();
 }

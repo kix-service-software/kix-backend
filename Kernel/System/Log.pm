@@ -305,7 +305,7 @@ sub GetLog {
 
 =item CleanUp()
 
-to clean up tmp log data from shared memory (ipc)
+to clean up the logs and tmp log data from shared memory (ipc)
 
     $LogObject->CleanUp();
 
@@ -313,6 +313,11 @@ to clean up tmp log data from shared memory (ipc)
 
 sub CleanUp {
     my ( $Self, %Param ) = @_;
+
+    # cleanup backend
+    if ( $Self->{Backend}->can('CleanUp') ) {
+        $Self->{Backend}->CleanUp();
+    }
 
     return 1 if !$Self->{IPC};
 
