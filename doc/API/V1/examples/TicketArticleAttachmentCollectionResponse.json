@@ -1,0 +1,15 @@
+{
+    "Attachment": [
+        {
+            "Content": "somebase64encodedContentString",
+            "ContentAlternative": "",
+            "ContentID": "",
+            "ContentType": "text/html; charset=\"utf8\"",
+            "Disposition": "inline",
+            "Filename": "file-2",
+            "Filesize": "15 Bytes",
+            "FilesizeRaw": "15",
+            "ID": 1
+        }
+    ]
+}

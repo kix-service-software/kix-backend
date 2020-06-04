@@ -1,0 +1,683 @@
+{
+   "$id" : "#TicketCollectionResponse",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of tickets.",
+   "type" : "object",
+   "properties" : {
+      "Ticket" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/Ticket_json-159f7ac3d7"
+         }
+      }
+   },
+   "required" : [
+      "Ticket"
+   ],
+   "definitions" : {
+      "DynamicFieldValue_json-95816834ee" : {
+         "$id" : "#DynamicFieldValue",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object.",
+         "type" : "object",
+         "properties" : {
+            "DisplayValue" : {
+               "description" : "prepared values ",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueHTML" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueShort" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "description" : "ID of the dynamic field",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "description" : "label of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "description" : "name of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedValue" : {
+               "description" : "prepared values - e.g. display values of a selection field instead of the keys",
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "DisplayValue",
+            "DisplayValueHTML",
+            "DisplayValueShort",
+            "ID",
+            "Label",
+            "Name",
+            "PreparedValue",
+            "Value"
+         ]
+      },
+      "TicketArticleAttachment_json-3fc26e02ab" : {
+         "$id" : "#TicketArticleAttachment",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article attachment object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "added via include \"Content\" (base64 encoded)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentAlternative" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Disposition" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ContentAlternative",
+            "ContentID",
+            "ContentType",
+            "Disposition",
+            "Filename",
+            "Filesize",
+            "FilesizeRaw",
+            "ID"
+         ]
+      },
+      "TicketArticleFlag_json-73c45dc8a4" : {
+         "$id" : "#TicketArticleFlag",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article flag object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Name",
+            "Value"
+         ]
+      },
+      "TicketArticle_json-358c16fe85" : {
+         "$id" : "#TicketArticle",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Attachmnets" : {
+               "description" : "added via include \"Attachments\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
+               },
+               "readOnly" : true
+            },
+            "Bcc" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "BccRealname" : {
+               "description" : "realnames from \"Bcc\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Body" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Cc" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CcRealname" : {
+               "description" : "realnames from \"Cc\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChannelID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Charset" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentCharset" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CustomerVisible" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
+               },
+               "readOnly" : true
+            },
+            "Flags" : {
+               "description" : "added via include \"Flags\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
+               },
+               "readOnly" : true
+            },
+            "From" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FromRealname" : {
+               "description" : "realnames from \"From\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "InReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "IncommingTime" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MessageID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "MimeType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "References" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SenderType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SenderTypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Subject" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TicketID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TimeUnits" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "To" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ToRealname" : {
+               "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Bcc",
+            "BccRealname",
+            "Body",
+            "Cc",
+            "CcRealname",
+            "ChangeTime",
+            "ChangedBy",
+            "Channel",
+            "ChannelID",
+            "Charset",
+            "ContentCharset",
+            "ContentType",
+            "CreateTime",
+            "CreatedBy",
+            "CustomerVisible",
+            "From",
+            "FromRealname",
+            "InReplyTo",
+            "IncomingTime",
+            "MessageID",
+            "MimeType",
+            "References",
+            "ReplyTo",
+            "SenderType",
+            "SenderTypeID",
+            "Subject",
+            "TicketID",
+            "TimeUnits",
+            "To",
+            "ToRealname"
+         ]
+      },
+      "TicketHistory_json-b84d38baa5" : {
+         "$id" : "#TicketHistory",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket history object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "HistoryType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryTypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "OwnerID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "PriorityID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "QueueID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TicketID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "CreateBy",
+            "CreateTime",
+            "HistoryID",
+            "HistoryType",
+            "HistoryTypeID",
+            "Name",
+            "OwnerID",
+            "PriorityID",
+            "QueueID",
+            "StateID",
+            "TicketID",
+            "TypeID"
+         ]
+      },
+      "Ticket_json-159f7ac3d7" : {
+         "$id" : "#Ticket",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket object.",
+         "type" : "object",
+         "properties" : {
+            "Age" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ArchiveFlag" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Articles" : {
+               "description" : "added via include \"Articles\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
+               },
+               "readOnly" : true
+            },
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Changed" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContactID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
+               },
+               "readOnly" : true
+            },
+            "History" : {
+               "description" : "added via include \"History\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
+               },
+               "readOnly" : true
+            },
+            "Lock" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "LockID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "OrganisationID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Owner" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "OwnerID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "PendingTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PendingTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Priority" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PriorityID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Queue" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "QueueID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Responsible" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ResponsibleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ServiceID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "State" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "StateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TicketID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TicketNumber" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TimeUnits" : {
+               "description" : "added via include \"TimeUnits\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Title" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UnlockTimeout" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UntilTime" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Watchers" : {
+               "description" : "added via include \"Watchers\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Age",
+            "ChangeBy",
+            "Changed",
+            "ContactID",
+            "CreateBy",
+            "Created",
+            "LockID",
+            "OrganisationID",
+            "OwnerID",
+            "PendingTime",
+            "PendingTimeUnix",
+            "PriorityID",
+            "QueueID",
+            "ResponsibleID",
+            "StateID",
+            "TicketID",
+            "TicketNumber",
+            "Title",
+            "TypeID",
+            "Unseen",
+            "UntilTime"
+         ]
+      },
+      "Watcher_json-8eca247d7a" : {
+         "$id" : "#Watcher",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The watcher object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Object" : {
+               "description" : "The type of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "description" : "The ID of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Object",
+            "ObjectID",
+            "UserID"
+         ]
+      }
+   }
+}

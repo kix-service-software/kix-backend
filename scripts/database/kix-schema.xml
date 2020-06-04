@@ -439,7 +439,6 @@
     <Column Name="ticket_lock_id" Required="true" Type="SMALLINT"/>
     <Column Name="type_id" Required="false" Type="SMALLINT"/>
     <Column Name="service_id" Required="false" Type="INTEGER"/>
-    <Column Name="sla_id" Required="false" Type="INTEGER"/>
     <Column Name="user_id" Required="true" Type="INTEGER"/>
     <Column Name="responsible_user_id" Required="true" Type="INTEGER"/>
     <Column Name="ticket_priority_id" Required="true" Type="SMALLINT"/>
@@ -448,10 +447,6 @@
     <Column Name="contact_id" Required="false" Type="INTEGER"/>
     <Column Name="timeout" Required="true" Type="INTEGER"/>
     <Column Name="until_time" Required="true" Type="INTEGER"/>
-    <Column Name="escalation_time" Required="true" Type="INTEGER"/>
-    <Column Name="escalation_update_time" Required="true" Type="INTEGER"/>
-    <Column Name="escalation_response_time" Required="true" Type="INTEGER"/>
-    <Column Name="escalation_solution_time" Required="true" Type="INTEGER"/>
     <Column Name="archive_flag" Required="true" Default="0" Type="SMALLINT"/>
     <Column Name="create_time_unix" Required="true" Type="BIGINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
@@ -494,18 +489,6 @@
     </Index>
     <Index Name="ticket_ticket_priority_id">
         <IndexColumn Name="ticket_priority_id"/>
-    </Index>
-    <Index Name="ticket_escalation_time">
-        <IndexColumn Name="escalation_time"/>
-    </Index>
-    <Index Name="ticket_escalation_update_time">
-        <IndexColumn Name="escalation_update_time"/>
-    </Index>
-    <Index Name="ticket_escalation_response_time">
-        <IndexColumn Name="escalation_response_time"/>
-    </Index>
-    <Index Name="ticket_escalation_solution_time">
-        <IndexColumn Name="escalation_solution_time"/>
     </Index>
     <Index Name="ticket_create_time_unix">
         <IndexColumn Name="create_time_unix"/>
@@ -555,9 +538,6 @@
     </ForeignKey>
     <ForeignKey ForeignTable="service">
         <Reference Local="service_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="sla">
-        <Reference Local="sla_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="ticket_priority">
         <Reference Local="ticket_priority_id" Foreign="id"/>
@@ -1266,63 +1246,6 @@
     </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- sla -->
-<Table Name="sla">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="calendar_name" Required="false" Size="100" Type="VARCHAR"/>
-    <Column Name="first_response_time" Required="true" Type="INTEGER"/>
-    <Column Name="first_response_notify" Required="false" Type="SMALLINT"/>
-    <Column Name="update_time" Required="true" Type="INTEGER"/>
-    <Column Name="update_notify" Required="false" Type="SMALLINT"/>
-    <Column Name="solution_time" Required="true" Type="INTEGER"/>
-    <Column Name="solution_notify" Required="false" Type="SMALLINT"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Column Name="type_id" Required="false" Type="INTEGER" />
-    <Column Name="min_time_bet_incidents" Required="false" Type="INTEGER" />
-    <Unique Name="sla_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- sla preferences -->
-<Table Name="sla_preferences">
-    <Column Name="sla_id" Required="true" Type="INTEGER"/>
-    <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
-    <Column Name="preferences_value" Required="false" Size="250" Type="VARCHAR"/>
-    <Index Name="sla_preferences_sla_id">
-        <IndexColumn Name="sla_id"/>
-    </Index>
-    <ForeignKey ForeignTable="sla">
-        <Reference Local="sla_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- service_sla - relation service<->sla -->
-<Table Name="service_sla">
-    <Column Name="service_id" Required="true" Type="INTEGER"/>
-    <Column Name="sla_id" Required="true" Type="INTEGER"/>
-    <Unique Name="service_sla_service_sla">
-        <UniqueColumn Name="service_id"/>
-        <UniqueColumn Name="sla_id"/>
-    </Unique>
-    <ForeignKey ForeignTable="service">
-        <Reference Local="service_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="sla">
-        <Reference Local="sla_id" Foreign="id"/>
     </ForeignKey>
 </Table>
 

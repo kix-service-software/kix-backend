@@ -13,6 +13,8 @@
     "Firstname": "John",
     "Fullname": "John Doe",
     "ID":102,
+    "Lastname": "Doe",
+    "Login": "jdoe",
     "Mobile":"+49 170 111 222 333",
     "OrganisationIDs":[
       1,

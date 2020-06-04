@@ -13,8 +13,6 @@ use warnings;
 use Hash::Flatten;
 use Data::Sorting qw(:arrays);
 
-use Kernel::API::Operation;
-use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -67,6 +65,9 @@ sub RunOperation {
             Message => $Result->{Message},
         );
     }
+
+    # reset inversion of permission filter
+    $Self->{InvertPermissionFilter} = 0;
 
     # check user permissions based on property values
     # UserID 1 has God Mode if SecureMode isn't active
@@ -173,6 +174,10 @@ sub RunOperation {
                     next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
 
                     my ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+                    if ( $Operator =~ /^!(.*?)$/ ) {
+                       $Not      = 1;
+                       $Operator = $1;
+                    }
 
                     # replace string quotes
                     $Value =~ s/["']//g;
@@ -203,10 +208,11 @@ sub RunOperation {
                     }
 
                     # add a NOT filter if we should have no permission (including DENY)
-                    $Not = 1 if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} );
-
-                    if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                        $Not = 1;
+		            if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) {
+                        $Self->{InvertPermissionFilter} = 1;
+                    }
+                    elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                        $Self->{InvertPermissionFilter} = 1;
                         # also clear all existing permission filters
                         $Self->_ClearPermissionFilters();
                     }
@@ -234,11 +240,12 @@ sub RunOperation {
                 }
 
                 if ( $Self->{RequestMethod} ne 'GET' ) {
+                    $Self->{InvertPermissionFilter} = 0;
                     my %ObjectDataToFilter = %{$ObjectData};        # a deref is required here, because the filter method will change the data
 
                     # we use the permission filters in order to apply them to the given object
                     my $Result = $Self->_ApplyFilter(
-                        Data               => \%ObjectDataToFilter,       
+                        Data               => \%ObjectDataToFilter,
                         Filter             => \%Filter,
                         IsPermissionFilter => 1,
                     );
@@ -289,10 +296,10 @@ sub RunOperation {
                 }
             }
         
-            if ( $Self->{RequestMethod} eq 'GET' && IsArrayRefWithData($Self->{PermissionFilters}) ) {
-                # activate the permission filters for the GET operation
-                $Self->_ActivatePermissionFilters();        
-            }
+#            if ( $Self->{RequestMethod} eq 'GET' && IsArrayRefWithData($Self->{PermissionFilters}) ) {
+#                # activate the permission filters for the GET operation
+#                $Self->_ActivatePermissionFilters();        
+#            }
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
@@ -1110,13 +1117,14 @@ sub _Success {
         }
 
         # honor permission filters
-        if ( IsHashRefWithData( \%Param ) && IsHashRefWithData( $Self->{PermissionFilters} ) ) {
+        if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{PermissionFilters} ) ) {
             my $StartTime = Time::HiRes::time();
 
             # in case of a GET request to a collection resource, this should have been done in the filter already
             # but we will make sure nothing gets out that should not and we have to honor item resources as well
             $Self->_ApplyFilter(
                 Data               => \%Param,
+                Filter             => $Self->_GetPermissionFilter(),
                 IsPermissionFilter => 1,
             );
 
@@ -1518,7 +1526,10 @@ sub _ApplyFilter {
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             if ( $Param{IsPermissionFilter} ) {
-                $Self->_PermissionDebug( "using the following permission filter: " . Dumper( $Param{Filter} ) );            
+                $Self->_PermissionDebug( "using permission filter: " . Dumper( $Param{Filter} ) );
+                if ( $Self->{InvertPermissionFilter} ) {
+                    $Self->_PermissionDebug( "inverting permission filter" );
+                }
             }
 
             # filter each contained hash
@@ -1772,6 +1783,11 @@ sub _ApplyFilter {
                             $Match = 0;
                             last BOOLOPERATOR;
                         }
+                    }
+
+                    if ( $Param{IsPermissionFilter} && $Self->{InvertPermissionFilter} ) {
+                        # invert the match
+                        $Match = !$Match;
                     }
 
                     # all filter criteria match, add to result
@@ -2559,6 +2575,34 @@ sub _ActivatePermissionFilters {
     return 1;
 }
 
+sub _GetPermissionFilter {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{PermissionFilters} ||= [];
+
+    my %PermissionFilter;
+
+    foreach my $Filter ( @{ $Self->{PermissionFilters} } ) {
+
+        # prepare filter definition
+        my %FilterDef = (
+            Field    => $Filter->{Field},
+            Operator => $Filter->{Operator},
+            Value    => $Filter->{Value},
+            Not      => $Filter->{Not},
+        );
+
+        my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
+
+        # init filter and search if not done already
+        $PermissionFilter{ $Filter->{Object} }->{$Logical} ||= [];
+
+        # add definition to filters
+        push( @{ $PermissionFilter{ $Filter->{Object} }->{$Logical} }, \%FilterDef );
+    }
+
+    return \%PermissionFilter;
+}
 =item _ReplaceVariablesInProperyValuePermission()
 
 replaces special variables in PropertyValue permission expressions with actual value

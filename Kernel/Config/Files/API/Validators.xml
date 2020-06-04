@@ -118,7 +118,7 @@
                 <Item Key="Module">Kernel::API::Validator::HistoryTypeValidator</Item>
                 <Item Key="Validates">HistoryType,HistoryTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">MacroAction(Create|Update)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -173,7 +173,7 @@
                 <Item Key="Module">Kernel::API::Validator::MacroValidator</Item>
                 <Item Key="Validates">MacroID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">JobGet|JobDelete|JobMacroIDSearch|JobExecPlanIDSearch|JobExecPlanIDCreate|JobExecPlanIDDelete|JobMacroIDCreate|JobMacroIDDelete|MacroActionCreate|MacroActionUpdate</Item>
+                <Item Key="IgnoreOperationRegEx">JobGet|JobDelete|JobMacroIDSearch|JobExecPlanIDSearch|JobExecPlanIDCreate|JobExecPlanIDDelete|JobMacroIDCreate|JobMacroIDDelete|MacroActionCreate|MacroActionUpdate|MacroGet|MacroDelete</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -243,17 +243,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###SLAValidator" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the validator layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::API::Validator::SLAValidator</Item>
-                <Item Key="Validates">SLA,SLAID</Item>
-                <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(SLAGet|SLACreate|SLAUpdate|NotificationCreate|NotificationUpdate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Validator::Module###StateValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
@@ -261,7 +250,7 @@
                 <Item Key="Module">Kernel::API::Validator::StateValidator</Item>
                 <Item Key="Validates">State,StateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(TicketStateGet|ChecklistCreate|ChecklistUpdate|NotificationCreate|NotificationUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(TicketStateGet|NotificationCreate|NotificationUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

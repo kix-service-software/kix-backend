@@ -166,9 +166,6 @@ use Data::Dumper;
       elsif ($DecRes->{SLAID}) {
        S->{SLAID} = $DecRes->{SLAID}; 
     }
-      elsif ($DecRes->{ChecklistItemID}) {
-       S->{ChecklistItemID} = $DecRes->{ChecklistItemID}; 
-    }
       elsif ($DecRes->{NotificationID}) {
        S->{NotificationID} = $DecRes->{NotificationID}; 
     }

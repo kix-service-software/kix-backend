@@ -102,9 +102,9 @@ perform ExecPlanCreate Operation. This will return the created ExecPlanID.
                 Name    => 'Item Name',
                 Type    => '...',
                 Parameters => {                    # optional
-                    Weekdays => [0,2],                  # optional 0 = Sunday, 1 = Monday, ...
-                    Time => '10:00:00',                 # optional
-                    Events => [ 'TicketCreate', ...]    # optional
+                    Weekday => [0,2],                  # optional 0 = Sunday, 1 = Monday, ...
+                    Time    => '10:00:00',             # optional
+                    Event   => [ 'TicketCreate', ...]  # optional
                 },
                 Comment => 'Comment',              # optional
                 ValidID => 1,                      # optional

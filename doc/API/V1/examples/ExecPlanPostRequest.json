@@ -3,9 +3,9 @@
         "Comment": "some comment",
         "Name": "new execution plan",
         "Parameters": {
-            "Weekdays": [ 0,3 ],
+            "Weekday": [ 0,3 ],
             "Time": "10:00:00",
-            "Events": [ "TicketCreate" ]
+            "Event": [ "TicketCreate" ]
         },
         "Type": "Ticket",
         "ValidID": 1

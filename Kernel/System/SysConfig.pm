@@ -977,7 +977,7 @@ sub _RebuildFromFile {
                 Priority => 'error',
                 Message  => "Item has unknown type \"$Type\".",
             );    
-            next;        
+            next;
         }
 
         my ($Setting, $DefaultValue) = $Self->{OptionTypeModules}->{$Type}->ValidateSetting(
@@ -996,6 +996,24 @@ sub _RebuildFromFile {
             Default         => $DefaultValue,
             DefaultValidID  => $OptionRaw->{Valid} == 1 ? 1 : 2,
         );
+
+        # check if we have to extend an existing option (only types Hash and Array can be extended at the moment) 
+        if ( $OptionRaw->{Extend} ) {
+            # check if the option to extend exists
+            if ( !$AllOptions{ $OptionRaw->{Name} } ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to extend option \"$Option{Name}\", because it doesn't exist.",
+                );    
+                next;
+            }
+
+            # this options extends an existing option
+            $Option{Default} = $Self->{OptionTypeModules}->{$Type}->Extend(
+                Value  => $AllOptions{ $Option{Name} }->{Default},
+                Extend => $DefaultValue,
+            );
+        }
 
         # check if this is a new option
         if ( !$AllOptions{ $Option{Name} } ) {

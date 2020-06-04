@@ -11,7 +11,7 @@ package Kernel::API::Operation::V1::Ticket::TicketCreate;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(IsArrayRefWithData IsHashRefWithData IsString IsStringWithData);
+use Kernel::System::VariableCheck qw(:all);
 use  Kernel::System::EmailParser;
 
 use base qw(
@@ -126,10 +126,9 @@ perform TicketCreate Operation. This will return the created TicketID.
                 Type            => 'some type name',                              # optional
                 ServiceID       => 123,                                           # optional
                 Service         => 'some service name',                           # optional
-                SLAID           => 123,                                           # optional
-                SLA             => 'some SLA name',                               # optional
                 OwnerID         => 123,                                           # optional
                 Owner           => 'some user login',                             # optional
+                OrganisationID  => 123,                                           # optional
                 ResponsibleID   => 123,                                           # optional
                 Responsible     => 'some user login',                             # optional
                 PendingTime     => '2011-12-03 23:05:00',                         # optional
@@ -156,7 +155,7 @@ perform TicketCreate Operation. This will return the created TicketID.
                         ExcludeMuteNotificationToUserID => [1, 2, 3]                   # optional
                         DynamicFields => [                                             # optional
                             {
-                                Name   => 'some name',                                          
+                                Name   => 'some name',
                                 Value  => $Value,                                      # value type depends on the dynamic field
                             },
                             # ...
@@ -168,13 +167,13 @@ perform TicketCreate Operation. This will return the created TicketID.
                                 Filename    => 'some fine name'
                             },
                             # ...
-                        ],                    
+                        ],
                     },
                     # ...
                 ]
                 DynamicFields => [                                                     # optional
                     {
-                        Name   => 'some name',                                          
+                        Name   => 'some name',
                         Value  => $Value,                                              # value type depends on the dynamic field
                     },
                     # ...
@@ -206,7 +205,7 @@ sub Run {
         return $Self->_Error(
             Code    => 'Conflict',
             Message => "Ticket can't be locked if OwnerID is 1!",
-        );            
+        );
     }
 
     # check Ticket attribute values
@@ -346,6 +345,7 @@ sub _TicketCreate {
 
     # create new ticket
     my $TicketID = $TicketObject->TicketCreate(
+        %{ $Ticket },
         Title          => $Ticket->{Title},
         QueueID        => $Ticket->{QueueID} || '',
         Queue          => $Ticket->{Queue} || '',
@@ -354,8 +354,6 @@ sub _TicketCreate {
         Type           => $Ticket->{Type} || '',
         ServiceID      => $Ticket->{ServiceID} || '',
         Service        => $Ticket->{Service} || '',
-        SLAID          => $Ticket->{SLAID} || '',
-        SLA            => $Ticket->{SLA} || '',
         StateID        => $Ticket->{StateID} || '',
         State          => $Ticket->{State} || '',
         PriorityID     => $Ticket->{PriorityID} || '',
@@ -494,27 +492,7 @@ sub _TicketCreate {
                 Data          => {
                     TicketID => $TicketID,
                     Article  => $Article,
-                    }
-            );
-
-            if ( !$Result->{Success} ) {
-                return $Self->_Error(
-                    %{$Result},
-                    )
-            }
-        }
-    }
-
-    # create checklist
-    if ( IsHashRefWithData( $Ticket->{Checklist} ) ) {
-
-        foreach my $ChecklistItem ( @{ $Ticket->{Checklist} } ) {
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::TicketChecklistCreate',
-                Data          => {
-                    TicketID      => $TicketID,
-                    ChecklistItem => $ChecklistItem,
-                    }
+                }
             );
 
             if ( !$Result->{Success} ) {

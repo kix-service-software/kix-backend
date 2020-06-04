@@ -36,7 +36,7 @@
          "type": "object",
          "readOnly": true,
          "properties": {
-            "Weekdays": {
+            "Weekday": {
               "type": "array",
               "readOnly": true,
               "item": {
@@ -49,7 +49,7 @@
                "readOnly": true,
                "description": "time for the weekdays as \"hh:mm:ss\""
             },
-            "Events": {
+            "Event": {
                "type": "array",
                "readOnly": true,
                "item": {

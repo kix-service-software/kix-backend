@@ -79,7 +79,6 @@
                 <Item Key="Subject" Translatable="1">Subject</Item>
                 <Item Key="Queue" Translatable="1">Queue</Item>
                 <Item Key="Priority" Translatable="1">Priority</Item>
-                <Item Key="EscalationTime" Translatable="1">EscalationTime</Item>
             </Option>
         </Setting>
     </ConfigItem>
@@ -92,7 +91,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    
+
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
@@ -299,68 +298,6 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistGet" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ChecklistGet</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistGet</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="ObjectID">ChecklistID</Item>
-                <Item Key="ResponseSchema">TicketChecklistResponse</Item>
-                <Item Key="CacheType">API_tickets</Item>
-                <Item Key="CacheTypeDependency">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistSearch" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ChecklistSearch</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistSearch</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseSchema">TicketChecklistCollectionResponse</Item>
-                <Item Key="CacheType">API_tickets</Item>
-                <Item Key="CacheTypeDependency">Ticket</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistCreate" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ChecklistCreate</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistCreate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestSchema">TicketChecklistPostRequest</Item>
-                <Item Key="ResponseSchema">TicketChecklistPostPatchResponse</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistUpdate" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ChecklistUpdate</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistUpdate</Item>
-                <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestSchema">TicketChecklistPatchRequest</Item>
-                <Item Key="ResponseSchema">TicketChecklistPostPatchResponse</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ChecklistDelete" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the operation layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Name">ChecklistDelete</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::Ticket::ChecklistDelete</Item>
-                <Item Key="APIVersion">V1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Ticket::ArticleAttachmentZipGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
@@ -405,15 +342,4 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.Flags" Required="0" Valid="1">
-        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Operation">V1::Ticket::ArticleFlagGet</Item>
-                <Item Key="AddParams">TicketID,ArticleID</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-
 </kix_config>
-    

@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "#TicketArticleAttachmentPostResponse",
+    "type": "object",
+    "description": "The ID of the created ticket article attachment.",
+    "properties": {
+        "AttachmentID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "AttachmentID"
+    ]
+}

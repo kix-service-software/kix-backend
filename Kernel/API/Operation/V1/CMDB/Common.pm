@@ -97,9 +97,9 @@ sub _CheckConfigItem {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Parameter Version is invalid!",
-            );            
+            );
         }
-        
+
         # get last config item definition
         my $DefinitionData = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
             ClassID => $ConfigItem->{ClassID},
@@ -121,9 +121,9 @@ sub _CheckConfigItem {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Parameter Images is invalid!",
-            );            
+            );
         }
-        
+
         # check Images internal structure
         foreach my $ImageItem (@{$ConfigItem->{Images}}) {
             if ( !IsHashRefWithData($ImageItem) ) {
@@ -176,16 +176,16 @@ sub _CheckConfigItemVersion {
 
     my $Definition = $Param{Definition};
     my $Version    = $Param{Version};
-    
+
     if ( defined $Version->{Data} ) {
 
         if ( !IsHashRefWithData($Version->{Data}) ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Parameter Version::Data is invalid!",
-            );            
+            );
         }
-        
+
         my $DataCheckResult = $Self->_CheckData(
             Definition => $Definition,
             Data       => $Version->{Data},
@@ -194,7 +194,7 @@ sub _CheckConfigItemVersion {
             return $DataCheckResult;
         }
     }
-    
+
     # if everything is OK then return Success
     return $Self->_Success();
 }
@@ -475,7 +475,7 @@ sub ConvertDataToInternal {
 
     for my $RootKey ( sort keys %{$Data} ) {
 
-        # get attribute definition 
+        # get attribute definition
         my $AttrDef = $Self->_GetAttributeDefByKey(
             Key        => $RootKey,
             Definition => $Param{Definition},
@@ -545,19 +545,50 @@ sub ConvertDataToInternal {
             my @NewXMLParts;
             $NewXMLParts[0] = undef;
 
-            # extract the root key from the hash and assign it to content key
-            my $Content = delete $Data->{$RootKey}->{$RootKey};
+            # attribute type Attachment needs some special handling
+            if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+                my $Value = $Data->{$RootKey};
 
-            # start recursion
-            my $NewDataPart = $Self->ConvertDataToInternal(
-                Definition => $Param{Definition},
-                Data       => $Data->{$RootKey},
-                Child      => 1,
-            );
-            push @NewXMLParts, {
-                Content => $Content,
-                %{$NewDataPart},
-            };
+                # check if we have already created an instance of this type
+                if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                    # create module instance
+                    my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                    my $Object = $Kernel::OM->Get($Module);
+
+                    if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
+                        return $Self->_Error(
+                            Code    => "Operation.InternalError",
+                            Message => "Unable to create instance of attribute type module for parameter $RootKey!",
+                        );
+                    }
+                    $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                }
+
+                # check if we have a special handling method to prepare the value
+                if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('InternalValuePrepare') ) {
+                    $Value = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->InternalValuePrepare(
+                        Value => $Value
+                    );
+                }
+                push @NewXMLParts, {
+                    Content => $Value
+                };
+            } else {
+
+                # extract the root key from the hash and assign it to content key
+                my $Content = delete $Data->{$RootKey}->{$RootKey};
+
+                # start recursion
+                my $NewDataPart = $Self->ConvertDataToInternal(
+                    Definition => $Param{Definition},
+                    Data       => $Data->{$RootKey},
+                    Child      => 1,
+                );
+                push @NewXMLParts, {
+                    Content => $Content,
+                    %{$NewDataPart},
+                };
+            }
 
             # assamble the final value from the parts array
             $NewData->{$RootKey} = \@NewXMLParts;
@@ -620,7 +651,7 @@ sub ConvertDataToExternal {
 
         for my $RootHashKey ( sort keys %{$RootHash} ) {
 
-            # get attribute definition 
+            # get attribute definition
             my $AttrDef = $Self->_GetAttributeDefByKey(
                 Key        => $RootHashKey,
                 Definition => $Param{Definition},
@@ -638,7 +669,7 @@ sub ConvertDataToExternal {
                 ARRAYITEM:
                 for my $ArrayItem ( @{ $RootHash->{$RootHashKey} } ) {
                     next ARRAYITEM if !defined $ArrayItem;
-    
+
                     delete $ArrayItem->{TagKey};
 
                     $Content = delete $ArrayItem->{Content} || '';
@@ -744,7 +775,7 @@ sub ConvertDataToExternal {
                                 RootKey    => $RootHashKey,
                                 ForDisplay => $Param{ForDisplay},
                             );
-                            
+
                             if (ref $NewData->{$RootHashKey} ne 'HASH') {
                                 # prepare hash for sub result
                                 if ( $NewData->{$RootHashKey} ) {
@@ -837,7 +868,7 @@ sub _CheckDefinition {
             return $Self->_Error(
                 Code    => 'Conflict',
                 Message => "A new definition can't be created, because the definition has not been changed.",
-            );            
+            );
         }
     }
 
@@ -853,7 +884,7 @@ sub _CheckDefinition {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Syntax error in definition! ($@)",
-            );            
+            );
         }
     }
 
@@ -965,7 +996,7 @@ sub _CheckCustomerAssignedConfigItem {
             ConfigItemIDList => $IDList
         );
         my %ConfigItemIDListHash = map { $_ => 1 } @ConfigItemIDList;
-        
+
         foreach my $ConfigItemID ( @{ $IDList } ) {
 
             if ( !$ConfigItemIDListHash{$ConfigItemID} ) {
@@ -976,7 +1007,7 @@ sub _CheckCustomerAssignedConfigItem {
             }
         }
     }
-    
+
     # if everything is OK then return Success
     return $Self->_Success();
 }

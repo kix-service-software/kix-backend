@@ -1,0 +1,64 @@
+{
+    "History": [
+        {
+            "ArticleID": 0,
+            "CreateBy": 1,
+            "CreateTime": "2020-04-27 16:31:26",
+            "HistoryID": 883,
+            "HistoryType": "NewTicket",
+            "HistoryTypeID": 1,
+            "Name": "New Ticket [2020042717000016] created (Q=Service Desk::Monitoring;P=3 normal;S=new).",
+            "OwnerID": 1,
+            "PriorityID": 3,
+            "QueueID": 2,
+            "StateID": 1,
+            "TicketID": 53,
+            "TypeID": 1
+        },
+        {
+            "ArticleID": 0,
+            "CreateBy": 1,
+            "CreateTime": "2020-04-27 16:31:26",
+            "HistoryID": 884,
+            "HistoryType": "ServiceUpdate",
+            "HistoryTypeID": 32,
+            "Name": "Updated Service to %s \"NULL\" (ID=).",
+            "OwnerID": 1,
+            "PriorityID": 3,
+            "QueueID": 2,
+            "StateID": 1,
+            "TicketID": 53,
+            "TypeID": 1
+        },
+        {
+            "ArticleID": 0,
+            "CreateBy": 1,
+            "CreateTime": "2020-04-27 16:31:26",
+            "HistoryID": 886,
+            "HistoryType": "OwnerUpdate",
+            "HistoryTypeID": 18,
+            "Name": "New owner is \"someAgent\" (ID=2).",
+            "OwnerID": 2,
+            "PriorityID": 3,
+            "QueueID": 2,
+            "StateID": 1,
+            "TicketID": 53,
+            "TypeID": 1
+        },
+        {
+            "ArticleID": 38,
+            "CreateBy": 1,
+            "CreateTime": "2020-04-27 16:31:27",
+            "HistoryID": 887,
+            "HistoryType": "AddNote",
+            "HistoryTypeID": 10,
+            "Name": "Added note ()",
+            "OwnerID": 2,
+            "PriorityID": 3,
+            "QueueID": 2,
+            "StateID": 1,
+            "TicketID": 53,
+            "TypeID": 1
+        }
+    ]
+}

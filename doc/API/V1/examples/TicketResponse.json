@@ -1,0 +1,91 @@
+{
+    "Ticket": {
+        "Age": 1316865,
+        "Articles": [
+            {
+                "ArticleID": 31,
+                "Bcc": "admin@localhost",
+                "BccRealname": "admin@localhost",
+                "Body": "\nThe printer responsed with <b>Error 123</b>.\n\n",
+                "Cc": "admin@localhost",
+                "CcRealname": "admin@localhost",
+                "ChangeTime": "2020-04-22 08:19:48",
+                "ChangedBy": 1,
+                "Channel": "note",
+                "ChannelID": 1,
+                "Charset": "utf8",
+                "ContentCharset": "utf8",
+                "ContentType": "text/plain; charset=utf8",
+                "CreateTime": "2020-04-09 08:25:16",
+                "CreatedBy": 1,
+                "CustomerVisible": 1,
+                "From": "admin@localhost",
+                "FromRealname": "admin@localhost",
+                "InReplyTo": "",
+                "IncomingTime": 1586413516,
+                "MessageID": "",
+                "MimeType": "text/plain",
+                "References": "",
+                "ReplyTo": "",
+                "SenderType": "agent",
+                "SenderTypeID": 1,
+                "Subject": "The printer does not work!",
+                "TicketID": 49,
+                "TimeUnits": 0,
+                "To": "\"Some one\" <someone@somecorp.com>",
+                "ToRealname": "Some one"
+            }
+        ],
+        "ChangeBy": 1,
+        "Changed": "2020-04-24 13:23:20",
+        "ContactID": "1",
+        "CreateBy": 1,
+        "Created": "2020-04-09 08:25:15",
+        "DynamicFields": [
+            {
+                "DisplayValue": "20.04.2020 10:33",
+                "DisplayValueHTML": "20.04.2020 10:33",
+                "DisplayValueShort": "20.04.2020 10:33",
+                "ID": 5,
+                "Label": "Plan Begin",
+                "Name": "PlanBegin",
+                "PreparedValue": [
+                    "2020-04-20 10:33:00"
+                ],
+                "Value": [
+                    "2020-04-20 10:33:00"
+                ]
+            },
+            {
+                "DisplayValue": "20.04.2020 10:33",
+                "DisplayValueHTML": "20.04.2020 10:33",
+                "DisplayValueShort": "20.04.2020 10:33",
+                "ID": 6,
+                "Label": "Plan End",
+                "Name": "PlanEnd",
+                "PreparedValue": [
+                    "2020-04-20 10:33:00"
+                ],
+                "Value": [
+                    "2020-04-20 10:33:00"
+                ]
+            }
+        ],
+        "LockID": 1,
+        "OrganisationID": "1",
+        "OwnerID": 1,
+        "PendingTime": "",
+        "PendingTimeUnix": 0,
+        "PriorityID": 5,
+        "QueueID": 3,
+        "ResponsibleID": 1,
+        "ServiceID": null,
+        "StateID": 1,
+        "TicketID": 49,
+        "TicketNumber": "2020040917000014",
+        "Title": "Some title",
+        "TypeID": 1,
+        "Unseen": 0,
+        "UntilTime": 0
+    }
+}

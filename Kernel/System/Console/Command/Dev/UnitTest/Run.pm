@@ -25,6 +25,13 @@ sub Configure {
 
     $Self->Description('Executes unit tests.');
     $Self->AddOption(
+        Name        => 'plugin',
+        Description => "Refer to the plugin tests instead of the framework tests.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
         Name        => 'test',
         Description => "Run single test files, e.g. 'Ticket' or 'Ticket:Queue'.",
         Required    => 0,
@@ -116,6 +123,7 @@ sub Run {
         Name                   => $Self->GetOption('test')                       || '',
         Exclude                => $Self->GetOption('exclude')                    || '',
         Directory              => $Self->GetOption('directory')                  || '',
+        Plugin                 => $Self->GetOption('plugin')                     || '',
         Product                => $Self->GetOption('product')                    || '',
         SubmitURL              => $Self->GetOption('submit-url')                 || '',
         SubmitResultAsExitCode => $Self->GetOption('submit-result-as-exit-code') || '',

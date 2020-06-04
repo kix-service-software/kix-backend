@@ -74,7 +74,7 @@ my $QueueID1 = $QueueObject->QueueAdd(%QueueData1);
 $Self->IsNot(
     $QueueID1,
     undef,
-    "QueueAdd() - Added queue '$QueueData1{Name}' for ACL check - should not be undef"
+    "QueueAdd() - Added queue '$QueueData1{Name}' - should not be undef"
 );
 
 my $QueueID2 = $QueueObject->QueueAdd(%QueueData2);
@@ -83,7 +83,7 @@ my $QueueID2 = $QueueObject->QueueAdd(%QueueData2);
 $Self->IsNot(
     $QueueID2,
     undef,
-    "QueueAdd() - Added queue '$QueueData2{Name}' for ACL check - should not be undef"
+    "QueueAdd() - Added queue '$QueueData2{Name}' should not be undef"
 );
 
 my $QueueID3 = $QueueObject->QueueAdd(%QueueData3);
@@ -92,7 +92,7 @@ my $QueueID3 = $QueueObject->QueueAdd(%QueueData3);
 $Self->IsNot(
     $QueueID3,
     undef,
-    "QueueAdd() - Added queue '$QueueData3{Name}' for ACL check - should not be undef"
+    "QueueAdd() - Added queue '$QueueData3{Name}' - should not be undef"
 );
 
 my $TestContactLogin = $Helper->TestContactCreate();

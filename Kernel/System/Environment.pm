@@ -70,7 +70,7 @@ returns:
         Hostname     => "servername.example.com",
         OS           => "Linux",
         OSName       => "debian 7.1",
-        Path         => "/home/otrs/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games",
+        Path         => "/home/kix/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games",
         POSIX        => [
                         "Linux",
                         "servername",
@@ -78,7 +78,7 @@ returns:
                         "#1 SMP Debian 3.2.46-1",
                         "i686",
                       ],
-        User         => "otrs",
+        User         => "kix",
     );
 
 =cut
@@ -306,9 +306,9 @@ collect database information
 returns
 
     %DBInfo = (
-        Database => "otrsproduction",
+        Database => "kixdb",
         Host     => "dbserver.example.com",
-        User     => "otrsuser",
+        User     => "kixuser",
         Type     => "mysql",
         Version  => "MySQL 5.5.31-0+wheezy1",
     )

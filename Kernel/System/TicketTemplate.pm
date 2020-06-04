@@ -101,8 +101,9 @@ sub TicketTemplateGet {
     # check needed stuff
     if (!$Param{Name}) {
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message => "TicketTemplateGet: Need Name!");
+            LogPrefix => 'TicketTemplate',
+            Priority  => 'error',
+            Message   => "Need Name!");
         return;
     }
 
@@ -118,11 +119,12 @@ sub TicketTemplateGet {
 
     if (!%Result) {
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message => "TicketTemplateGet: No template with name '$Param{Name}' found!");
+            LogPrefix => 'TicketTemplate',
+            Priority  => 'error',
+            Message   => "No template with name '$Param{Name}' found!");
         return;
     }
-    
+
     return %Result;
 }
 

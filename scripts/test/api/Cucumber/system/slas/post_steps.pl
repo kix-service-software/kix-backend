@@ -44,14 +44,11 @@ Given qr/a sla$/, sub {
                 Calendar                => '...',
                 FirstResponseTime       => 120,
                 FirstResponseNotify     => 60,
-                UpdateTime              => 180,
-                UpdateNotify            => 80,
                 SolutionTime            => 580,
                 SolutionNotify          => 80,
                 ValidID                 => 1,
                 Comment                 => 'SLATest1Comment',
                 TypeID                  => 2,
-                MinTimeBetweenIncidents => 3443
             }
       }
    );
@@ -96,14 +93,11 @@ Given qr/(\d+) of sla$/, sub {
                 Calendar                => '...',
                 FirstResponseTime       => 120,
                 FirstResponseNotify     => 60,
-                UpdateTime              => 180,
-                UpdateNotify            => 80,
                 SolutionTime            => 580,
                 SolutionNotify          => 80,
                 ValidID                 => 1,
                 Comment                 => $Comment,
                 TypeID                  => 2,
-                MinTimeBetweenIncidents => 3443
             }
           }
        );
@@ -127,14 +121,11 @@ When qr/I create a sla$/, sub {
                 Calendar                => '...',
                 FirstResponseTime       => 120,
                 FirstResponseNotify     => 60,
-                UpdateTime              => 180,
-                UpdateNotify            => 80,
                 SolutionTime            => 580,
                 SolutionNotify          => 80,
                 ValidID                 => 1,
                 Comment                 => 'SLATest1Comment',
                 TypeID                  => 2,
-                MinTimeBetweenIncidents => 3443
             }
       }
    );

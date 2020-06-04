@@ -62,19 +62,23 @@ sub Run {
 
     # Catch bash completion calls
     if ( $ENV{COMP_LINE} ) {
-        $CommandName = 'Console::Command::Internal::BashCompletion';
+        $CommandName = $Kernel::OM->GetModuleFor('Console::Command::Internal::BashCompletion');
         return $Kernel::OM->Get($CommandName)->Execute(@CommandlineArguments);
     }
 
     # If we don't have any arguments OR the first argument is an option and not a command name,
     #   show the overview screen instead.
     if ( !@CommandlineArguments || substr( $CommandlineArguments[0], 0, 2 ) eq '--' ) {
-        $CommandName = 'Console::Command::List';
+        $CommandName = $Kernel::OM->GetModuleFor('Console::Command::List');
         return $Kernel::OM->Get($CommandName)->Execute(@CommandlineArguments);
     }
 
+    if ($CommandlineArguments[0] !~ m/^Console::Command::.+/) {
+        $CommandlineArguments[0] = 'Console::Command::' . $CommandlineArguments[0];
+    }
+
     # Ok, let's try to find the command.
-    $CommandName = $Kernel::OM->GetModuleFor('Console::Command::' . $CommandlineArguments[0]);
+    $CommandName = $Kernel::OM->GetModuleFor($CommandlineArguments[0]);
 
     if ( $Kernel::OM->Get('Main')->Require( $CommandName, Silent => 1 ) ) {
 
@@ -85,7 +89,9 @@ sub Run {
     }
 
     # If the command cannot be found/loaded, also show the overview screen.
-    my $CommandObject = $Kernel::OM->Get('Console::Command::List');
+    my $CommandObject = $Kernel::OM->Get(
+        $Kernel::OM->GetModuleFor('Console::Command::List')
+    );
     $CommandObject->PrintError("Could not find $CommandName.\n\n");
     $CommandObject->Execute();
     return 127;    # EXIT_CODE_COMMAND_NOT_FOUND, see http://www.tldp.org/LDP/abs/html/exitcodes.html
@@ -125,10 +131,12 @@ sub CommandGet {
         }
     }
 
-    my $CommandName = $Param{Command};
-    if ( $CommandName !~ /^Kernel::System::Console::Command::/ ) {
-        $CommandName = 'Console::Command::' . $CommandName;
+    if ($Param{Command} !~ m/^Console::Command::.+/) {
+        $Param{Command} = 'Console::Command::' . $Param{Command};
     }
+
+    # Ok, let's try to find the command.
+    my $CommandName = $Kernel::OM->GetModuleFor($Param{Command});
 
     # get command object
     my $CommandObject = $Kernel::OM->Get($CommandName);
@@ -157,22 +165,22 @@ sub CommandGet {
         my %OptionClone = %{$Option};
         delete $OptionClone{ValueRegex};
         push @ValidOptions, \%OptionClone;
-    }   
-    
+    }
+
     my @Arguments;
     if ( IsArrayRefWithData($CommandObject->{_Arguments}) ) {
         @Arguments = @{$CommandObject->{_Arguments}};
     }
-    
+
     # special handling for regexp arguments
     my @ValidArguments;
     foreach my $Arg ( @Arguments ) {
         my %ArgClone = %{$Arg};
-        delete $ArgClone{ValueRegex};     
+        delete $ArgClone{ValueRegex};
         push @ValidArguments, \%ArgClone;
-    }   
+    }
 
-    $Param{Command} =~ s/Kernel::System::Console::Command:://;
+    $Param{Command} =~ s/.+?::Console::Command::(.+?)$/$1/;
 
     my %Command = (
         Command        => $Param{Command},
@@ -207,11 +215,18 @@ sub CommandList {
     my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my @Folders = ( $Home . '/Kernel/System/Console/Command' );
-    foreach my $TmpDir (@INC) {
-        last if $TmpDir =~ /\/Custom$/;
-        my $NewDir = $TmpDir."/Kernel/System/Console/Command";
-        next if !( -e $NewDir );
-        push @Folders, $NewDir;
+
+    # add commands from plugins
+    my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
+        InitOrder => 1
+    );
+
+    foreach my $Plugin ( @Plugins ) {
+        next if ( ! -d $Plugin->{Directory} );
+        next if ( ! -d $Plugin->{Directory} . '/Kernel/System/Console/Command' );
+
+        # add plugin
+        push @Folders, $Plugin->{Directory} . '/Kernel/System/Console/Command';
     }
 
     my @CommandFiles = ();
@@ -231,8 +246,9 @@ sub CommandList {
     COMMAND_FILE:
     for my $CommandFile (@CommandFiles) {
         next COMMAND_FILE if ( $CommandFile =~ m{/Internal/}xms );
-        $CommandFile =~ s{^.*(Kernel/System.*)[.]pm$}{$1}xmsg;
+        $CommandFile =~ s{^.*(Console/Command.*)[.]pm$}{$1}xmsg;
         $CommandFile =~ s{/+}{::}xmsg;
+
         push @Commands, $CommandFile;
     }
 
@@ -271,7 +287,7 @@ sub FileList {
     );
 
     foreach my $File ( sort @Files ) {
-        next if $File =~ /\.gitkeep/;        
+        next if $File =~ /\.gitkeep/;
         next if ! -f $File;
 
         my $Filename = $File;
