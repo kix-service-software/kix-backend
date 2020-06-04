@@ -323,12 +323,12 @@ sub TableDrop {
             if ( $ConfigObject->Get('Database::ShellOutput') ) {
                 $SQL .= $Self->{'DB::Comment'}
                     . "----------------------------------------------------------\n";
-                $SQL .= $Self->{'DB::Comment'} . " drop table $Tag->{Name} cascade\n";
+                $SQL .= $Self->{'DB::Comment'} . " drop table $Tag->{Name}\n";
                 $SQL .= $Self->{'DB::Comment'}
                     . "----------------------------------------------------------\n";
             }
         }
-        $SQL .= "DROP TABLE $Tag->{Name} CASCADE";
+        $SQL .= "DROP TABLE $Tag->{Name}";
         return ($SQL);
     }
     return ();
