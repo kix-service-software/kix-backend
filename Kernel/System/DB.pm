@@ -1231,14 +1231,19 @@ sub QueryCondition {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Key Value)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
+    if ( !$Param{Key} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Key!"
+        );
+        return;
+    }
+    if ( !$Param{Value} && $Param{Value} != 0 ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need valid Value!"
+        );
+        return;
     }
 
     # get like escape string needed for some databases (e.g. oracle)

@@ -131,6 +131,7 @@ Run all tests located in scripts/test/*.t and print result to stdout.
         Name                   => 'JSON:User:Auth',  # optional, control which tests to select
         Exclude                => '(Cache|Auth)',    # optional, which tests should not be executed
         Directory              => 'Selenium',        # optional, control which tests to select
+        Plugin                 => 'KIXPro',          # optional, use the plugin directory as the base directory
         SubmitURL              => $URL,              # optional, send results to unit test result server
         SubmitResultAsExitCode => $URL,              # optional, specify if exit code should not indicate if
                                                      #   tests were ok/not ok, but if submission was successful instead.
@@ -148,6 +149,17 @@ sub Run {
 
     my %ResultSummary;
     my $Home = $Kernel::OM->Get('Config')->Get('Home');
+
+    # use a plugin as base
+    if ( $Param{Plugin} ) {
+        my @PluginList = $Kernel::OM->Get('Installation')->PluginList();
+        my %Plugins = map { $_->{Product} => $_ } @PluginList; 
+        if ( !$Plugins{$Param{Plugin}} ) {
+            print STDERR "Plugin doesn't exist!\n";
+            return;
+        }
+        $Home = $Plugins{$Param{Plugin}}->{Directory};
+    } 
 
     my $Directory = "$Home/scripts/test";
 
@@ -171,6 +183,9 @@ sub Run {
     my $Product = $Param{Product}
         || $Kernel::OM->Get('Config')->Get('Product') . " "
         . $Kernel::OM->Get('Config')->Get('Version');
+    if ( !$Param{Product} && $Param{Plugin}) {
+        $Product .= " (Plugin: $Param{Plugin})";
+    }
 
     $Self->{Product} = $Product; # we need this in the Selenium object
 
@@ -196,14 +211,14 @@ sub Run {
                 }
             }
             if (!$Use) {
-                $Self->_Print(-1, 'Tests skipped by user request');
+                #$Self->_Print(-1, 'Tests skipped by user request');
                 next FILE;
             }
         }
 
         # check if we have to exclude something
         if ($Param{Exclude} && $File =~ /$Param{Exclude}/) {
-            $Self->_Print(-1, 'Tests skipped by user request');
+            #$Self->_Print(-1, 'Tests skipped by user request');
             next FILE;
         }
 

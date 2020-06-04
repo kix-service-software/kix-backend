@@ -38,14 +38,11 @@ When qr/I update this sla$/, sub {
                 Calendar                => '...',
                 FirstResponseTime       => 120,
                 FirstResponseNotify     => 60,
-                UpdateTime              => 180,
-                UpdateNotify            => 80,
                 SolutionTime            => 580,
                 SolutionNotify          => 80,
                 ValidID                 => 1,
                 Comment                 => 'SLATest1CommentUpdate',
                 TypeID                  => 2,
-                MinTimeBetweenIncidents => 3443
             }
       }
    );

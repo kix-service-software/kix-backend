@@ -90,7 +90,6 @@ sub new {
             TN              => $TicketObject->TicketCreateNumber(), # optional
             Type            => 'Incident',            # or TypeID => 1, not required
             Service         => 'Service A',           # or ServiceID => 1, not required
-            SLA             => 'SLA A',               # or SLAID => 1, not required
             ResponsibleID   => 123,                   # not required
             ArchiveFlag     => 'y',                   # (y|n) not required
             PendingTime     => '2011-12-23 23:05:00', # optional (for pending states)
@@ -181,7 +180,7 @@ sub Run {
     my %TicketParam;
     for my $Attribute (
         qw( Title Queue QueueID Lock LockID Priority PriorityID State StateID
-        CustomerID Contact Owner OwnerID TN Type TypeID Service ServiceID SLA SLAID
+        CustomerID Contact Owner OwnerID TN Type TypeID Service ServiceID
         Responsible ResponsibleID ArchiveFlag
         )
         )

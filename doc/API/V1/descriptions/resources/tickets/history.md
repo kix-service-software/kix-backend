@@ -1,0 +1,1 @@
+This resource returns the history of a ticket.

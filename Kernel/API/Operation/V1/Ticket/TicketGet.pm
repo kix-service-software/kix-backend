@@ -130,8 +130,6 @@ one or more ticket entries in one call.
                     OwnerID            => 123,
                     Type               => 'some ticket type',
                     TypeID             => 123,
-                    SLA                => 'some sla',
-                    SLAID              => 123,
                     Service            => 'some service',
                     ServiceID          => 123,
                     Responsible        => 'some_responsible_login',
@@ -151,49 +149,6 @@ one or more ticket entries in one call.
                             Value => 'some value',
                         },
                     ],
-
-                    # (time stamps of expected escalations)
-                    EscalationResponseTime           (unix time stamp of response time escalation)
-                    EscalationUpdateTime             (unix time stamp of update time escalation)
-                    EscalationSolutionTime           (unix time stamp of solution time escalation)
-
-                    # (general escalation info of nearest escalation type)
-                    EscalationDestinationIn          (escalation in e. g. 1h 4m)
-                    EscalationDestinationTime        (date of escalation in unix time, e. g. 72193292)
-                    EscalationDestinationDate        (date of escalation, e. g. "2009-02-14 18:00:00")
-                    EscalationTimeWorkingTime        (seconds of working/service time till escalation, e. g. "1800")
-                    EscalationTime                   (seconds total till escalation of nearest escalation time type - response, update or solution time, e. g. "3600")
-
-                    # (detailed escalation info about first response, update and solution time)
-                    FirstResponseTimeEscalation      (if true, ticket is escalated)
-                    FirstResponseTimeNotification    (if true, notify - x% of escalation has reached)
-                    FirstResponseTimeDestinationTime (date of escalation in unix time, e. g. 72193292)
-                    FirstResponseTimeDestinationDate (date of escalation, e. g. "2009-02-14 18:00:00")
-                    FirstResponseTimeWorkingTime     (seconds of working/service time till escalation, e. g. "1800")
-                    FirstResponseTime                (seconds total till escalation, e. g. "3600")
-
-                    UpdateTimeEscalation             (if true, ticket is escalated)
-                    UpdateTimeNotification           (if true, notify - x% of escalation has reached)
-                    UpdateTimeDestinationTime        (date of escalation in unix time, e. g. 72193292)
-                    UpdateTimeDestinationDate        (date of escalation, e. g. "2009-02-14 18:00:00")
-                    UpdateTimeWorkingTime            (seconds of working/service time till escalation, e. g. "1800")
-                    UpdateTime                       (seconds total till escalation, e. g. "3600")
-
-                    SolutionTimeEscalation           (if true, ticket is escalated)
-                    SolutionTimeNotification         (if true, notify - x% of escalation has reached)
-                    SolutionTimeDestinationTime      (date of escalation in unix time, e. g. 72193292)
-                    SolutionTimeDestinationDate      (date of escalation, e. g. "2009-02-14 18:00:00")
-                    SolutionTimeWorkingTime          (seconds of working/service time till escalation, e. g. "1800")
-                    SolutionTime                     (seconds total till escalation, e. g. "3600")
-
-                    # if you use param Extended to get extended ticket attributes
-                    FirstResponse                   (timestamp of first response, first contact with customer)
-                    FirstResponseInMin              (minutes till first response)
-                    FirstResponseDiffInMin          (minutes till or over first response)
-
-                    SolutionTime                    (timestamp of solution time, also close time)
-                    SolutionInMin                   (minutes till solution time)
-                    SolutionDiffInMin               (minutes till or over solution time)
 
                     FirstLock                       (timestamp of first lock)
 
@@ -240,7 +195,7 @@ one or more ticket entries in one call.
                             Attachments => [
                                 <AttachmentID>
                                 # . . .
-                            ]                            
+                            ]
                             # If include=Attachments => 1 AND expand=Attachments => 1 was passed, you'll get an entry like this for each attachment:
                             Attachments => [
                                 {
@@ -271,7 +226,7 @@ one or more ticket entries in one call.
                     # If Include=History AND Expand=History was passed, the history data will be expanded (see HistoryGet for details):
                     History => [
                         {
-                            OwnerID 
+                            OwnerID
                             ArticleID
                             CreateBy
                             HistoryType
@@ -279,11 +234,11 @@ one or more ticket entries in one call.
                             StateID
                             TypeID
                             HistoryTypeID
-                            Name 
+                            Name
                             HistoryID
                             QueueID
                             TicketID
-                            PriorityID                        
+                            PriorityID
                         },
                         {
                             #. . .
@@ -328,7 +283,7 @@ sub Run {
         # add unseen information
         my %Flags = $TicketObject->TicketFlagGet(
             TicketID => $TicketID,
-            UserID   => $Self->{Authorization}->{UserID},  
+            UserID   => $Self->{Authorization}->{UserID},
         );
         $TicketRaw{Unseen} = (!exists($Flags{Seen}) || !$Flags{Seen}) ? 1 : 0;
 
@@ -398,7 +353,7 @@ sub Run {
                             DynamicFieldConfig => $DynamicFieldConfig,
                             Value              => $TicketRaw{$Attribute}
                         );
-                        
+
                         push @DynamicFields, {
                             ID                => $DynamicFieldConfig->{ID},
                             Name              => $DynamicFieldConfig->{Name},
@@ -436,6 +391,8 @@ sub Run {
         $TicketData{ContactID} = "" . $TicketData{ContactID};
         $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
 
+        $TicketData{ServiceID} = $TicketData{ServiceID} ? (0 + $TicketData{ServiceID}) : undef;
+
         # add
         push(@TicketList, \%TicketData);
     }
@@ -443,7 +400,7 @@ sub Run {
     if ( scalar(@TicketList) == 1 ) {
         return $Self->_Success(
             Ticket => $TicketList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

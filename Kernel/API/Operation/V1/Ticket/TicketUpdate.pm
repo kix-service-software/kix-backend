@@ -14,7 +14,6 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::PerfLog
     Kernel::API::Operation::V1::Ticket::Common
 );
 
@@ -109,8 +108,6 @@ perform TicketUpdate Operation. This will return the updated TicketID
                 Type          => 'some type name',                              # optional
                 ServiceID     => 123,                                           # optional
                 Service       => 'some service name',                           # optional
-                SLAID         => 123,                                           # optional
-                SLA           => 'some SLA name',                               # optional
                 StateID       => 123,                                           # optional
                 State         => 'some state name',                             # optional
                 PriorityID    => 123,                                           # optional
@@ -381,27 +378,28 @@ sub _TicketUpdate {
         }
 
         # set pending time
-        elsif ( $StateData{TypeName} =~ /^pending/i ) {
+        elsif ($StateData{TypeName} =~ /^pending/i) {
+
+            if (!(defined $TicketData{PendingTime} || defined $Ticket->{PendingTime})) {
+                return $Self->_Error(
+                    Code    => 'Object.UnableToUpdate',
+                    Message => 'Unable to update pending state without pending time!',
+                );
+            }
 
             # set pending time
-            if ( defined $Ticket->{PendingTime} ) {
+            if (defined $Ticket->{PendingTime}) {
                 my $Success = $TicketObject->TicketPendingTimeSet(
                     UserID   => $Param{UserID},
                     TicketID => $Param{TicketID},
                     String   => $Ticket->{PendingTime},
                 );
-                if ( !$Success ) {
+                if (!$Success) {
                     return $Self->_Error(
                         Code    => 'Object.UnableToUpdate',
                         Message => 'Unable to update ticket, please contact system administrator!',
                     );
                 }
-            }
-            else {
-                return $Self->_Error(
-                    Code    => 'Object.UnableToUpdate',
-                    Message => 'Unable to update pending state without pending time!',
-                );
             }
         }
 
@@ -691,7 +689,7 @@ sub _TicketUpdate {
     }
 
     return $Self->_Success(
-        TicketID => $Param{TicketID},
+        TicketID => 0 + $Param{TicketID},
     );
 }
 

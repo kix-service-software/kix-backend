@@ -102,9 +102,9 @@ perform ExecPlanUpdate Operation. This will return the updated ExecPlanID.
                 Type          => '...',                     # (optional)
                 Name          => 'Item Name',               # (optional)
                 Parameters => {                             # (optional) will be replaced entirely if given
-                    Weekdays => [0,2],                          # (optional) 0 = Sunday, 1 = Monday, ...
-                    Time => '10:00:00',                         # (optional)
-                    Events => [ 'TicketCreate', ...]            # (optional)
+                    Weekday => [0,2],                       # (optional) 0 = Sunday, 1 = Monday, ...
+                    Time    => '10:00:00',                  # (optional)
+                    Event   => [ 'TicketCreate', ...]       # (optional)
                 },
                 Comment       => 'Comment',                 # (optional)
                 ValidID       => 1,                         # (optional)

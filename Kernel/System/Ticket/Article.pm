@@ -103,7 +103,7 @@ example with "Charset & MimeType" and no "ContentType"
 
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => 123,
-        Channel          => 'note',                                 # Channel or 
+        Channel          => 'note',                                 # Channel or
         ChannelID        => 1,                                      # ChannelID
         CustomerVisible  => 0|1,                                    # optional - will be set to 1 on special conditions (only if not given)
         SenderType       => 'agent',                                # agent|system|customer
@@ -513,7 +513,7 @@ sub ArticleCreate {
             UserID    => $Param{UserID},
         );
     }
-    
+
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # add history row
@@ -730,7 +730,7 @@ sub ArticleCreate {
         # prepare body and charset
         my $Body = $Kernel::OM->Get('Output::HTML::Layout')->RichTextDocumentComplete(
             String => $Param{HTMLBody} || $Param{Body},
-        );        
+        );
 
         my $Charset = $Param{Charset};
         $Charset =~ s/plain/html/i;
@@ -759,7 +759,7 @@ sub ArticleCreate {
                 ArticleID => $ArticleID,
                 Key       => 'NotSentError',
                 Value     => $Error,
-                UserID    => $Param{UserID},                
+                UserID    => $Param{UserID},
             );
 
             # return the ArticleID since we have created the article already but just not sent
@@ -1136,6 +1136,7 @@ get first article
 
     my %Article = $TicketObject->ArticleFirstArticle(
         TicketID      => 123,
+        Extended      => 1,     # 0 or 1, see ArticleGet()
         DynamicFields => 1,     # 0 or 1, see ArticleGet()
     );
 
@@ -1161,6 +1162,43 @@ sub ArticleFirstArticle {
 
     return $Self->ArticleGet(
         ArticleID     => $Index[0],
+        Extended      => $Param{Extended},
+        DynamicFields => $Param{DynamicFields},
+    );
+}
+
+=item ArticleLastArticle()
+
+get last article
+
+    my %Article = $TicketObject->ArticleLastArticle(
+        TicketID      => 123,
+        Extended      => 1,     # 0 or 1, see ArticleGet()
+        DynamicFields => 1,     # 0 or 1, see ArticleGet()
+    );
+
+=cut
+
+sub ArticleLastArticle {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{TicketID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need TicketID!"
+        );
+        return;
+    }
+
+    # get article index
+    my @Index = $Self->ArticleIndex( TicketID => $Param{TicketID} );
+
+    # get article data
+    return if !@Index;
+
+    return $Self->ArticleGet(
+        ArticleID     => $Index[-1],
         Extended      => $Param{Extended},
         DynamicFields => $Param{DynamicFields},
     );
@@ -1619,7 +1657,7 @@ sub ArticleGet {
     # add customer visibility
     if ($CustomerVisibleSQL) {
         $SQL .= $CustomerVisibleSQL;
-    }    
+    }
 
     # add sender types
     if ($SenderTypeSQL) {
@@ -1780,7 +1818,7 @@ sub ArticleGet {
         RECIPIENT:
         for my $Key (qw( From To Cc Bcc)) {
             if (!$Part->{$Key}) {
-                $Part->{ $Key . 'Realname' } = undef;                
+                $Part->{ $Key . 'Realname' } = undef;
                 next RECIPIENT;
             }
 
@@ -2000,7 +2038,7 @@ sub _ArticleGetId {
 
 update an article
 
-Note: Keys "Body", "Subject", "From", "To", "Cc", "ReplyTo", "CustomerVisible" and "SenderType" are implemented.
+Note: Keys "Body", "Subject", "From", "To", "Cc", "Bcc", "ReplyTo", "CustomerVisible" and "SenderType" are implemented.
 
     my $Success = $TicketObject->ArticleUpdate(
         ArticleID => 123,
@@ -2062,6 +2100,7 @@ sub ArticleUpdate {
         ReplyTo       => 'a_reply_to',
         To            => 'a_to',
         Cc            => 'a_cc',
+        Bcc           => 'a_bcc',
         CustomerVisible => 'customer_visible',
         SenderTypeID  => 'article_sender_type_id',
     );
@@ -2503,6 +2542,8 @@ sub ArticleFlagSet {
             VALUES (?, ?, ?, current_timestamp, ?)',
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
     );
+
+    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # event
     my %Article = $Self->ArticleGet(

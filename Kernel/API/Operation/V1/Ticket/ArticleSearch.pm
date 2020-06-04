@@ -109,7 +109,7 @@ perform ArticleSearch Operation. This will return a article list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
+    
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @ArticleIndex = $TicketObject->ArticleIndex(

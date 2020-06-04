@@ -37,6 +37,20 @@ sub Configure {
     my ( $Self, %Param ) = @_;
 
     $Self->Description('Update the templates.pot file.');
+    $Self->AddOption(
+        Name        => 'directory',
+        Description => 'The base directory to extract from. if omitted, KIX home will be used.',
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
+    $Self->AddOption(
+        Name        => 'pot-file',
+        Description => 'The POT file to write the extract to. If omitted <Directory>/locale/templates.pot will be used.',
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
 
     return;
 }
@@ -44,10 +58,10 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Home}    = $Kernel::OM->Get('Config')->Get('Home');
-    $Self->{POTFile} = "$Self->{Home}/locale/templates.pot";
+    $Self->{Home}    = $Self->GetOption('directory') || $Kernel::OM->Get('Config')->Get('Home');
+    $Self->{POTFile} = $Self->GetOption('pot-file') || "$Self->{Home}/locale/templates.pot";
 
-    $Self->Print("<yellow>gathering Translatables and updating templates.pot file...</yellow>\n\n");
+    $Self->Print("<yellow>gathering Translatables and updating $Self->{POTFile} file...</yellow>\n\n");
 
     my %Translatables;
 
@@ -60,6 +74,10 @@ sub Run {
     %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
         Directory => "$Self->{Home}/Kernel/Config/Files",
         Source    => "SysConfig",
+    ));
+    %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
+        Directory => "$Self->{Home}/update",
+        Source    => "Update",
     ));
 
     $Self->Print(sprintf "\nextracted %i Translatables\n", (scalar keys %Translatables));
@@ -159,11 +177,15 @@ sub _ExtractFromTemplateFiles {
         Directory => $Directory,
         Filter    => '*.tt',
         Recursive => 1,
+        Silent    => 1,
     );
 
     $Self->Print("\n<yellow>extracting template files...</yellow>\n");
 
     for my $File (@TemplateList) {
+        # ignore plugins if not given
+        next if $File =~ /\/plugins\// && $Self->{Home} !~ /\/plugins/;
+
         my $Count = 0;
 
         my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
@@ -217,10 +239,24 @@ sub _ExtractFromPerlFiles {
         Directory => "$Self->{Home}/Kernel",
         Filter    => '*.pm',
         Recursive => 1,
+        Silent    => 1,
+    );
+
+    @PerlModuleList = (
+        @PerlModuleList,
+        $Kernel::OM->Get('Main')->DirectoryRead(
+            Directory => "$Self->{Home}/update",
+            Filter    => '*.pl',
+            Recursive => 1,
+            Silent    => 1,
+        )
     );
 
     FILE:
     for my $File (@PerlModuleList) {
+        # ignore plugins if not given
+        next if $File =~ /\/plugins\// && $Self->{Home} !~ /\/plugins/;
+
         my $Count = 0;
 
         next FILE if ( $File =~ m{cpan-lib}xms );
@@ -234,7 +270,7 @@ sub _ExtractFromPerlFiles {
             die "Can't open $File: $!";
         }
 
-        $File =~ s{^.*/(Kernel/)}{$1}smx;
+        $File =~ s{^.*/(Kernel/|update/)}{$1}smx;
 
         my $Content = ${$ContentRef};
 
@@ -291,11 +327,15 @@ sub _ExtractFromXMLFiles {
     my @DBXMLFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Param{Directory},
         Filter    => '*.xml',
-        Recursive => 1
+        Recursive => 1,
+        Silent    => 1,
     );
 
     FILE:
     for my $File (@DBXMLFiles) {
+        # ignore plugins if not given
+        next if $File =~ /\/plugins\// && $Self->{Home} !~ /\/plugins/;
+
         my $Count = 0;
 
         my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
@@ -307,7 +347,7 @@ sub _ExtractFromXMLFiles {
             die "Can't open $File: $!";
         }
 
-        $File =~ s{^.*/(scripts/|Kernel/)}{$1}smx;
+        $File =~ s{^.*/(scripts/|Kernel/|update/)}{$1}smx;
 
         my $Content = ${$ContentRef};
 

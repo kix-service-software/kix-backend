@@ -102,7 +102,7 @@ my $MainPackageOne = '<?xml version="1.0" encoding="utf-8" ?>
     <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
-    <File Location="bin/otrs.CheckDB.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
+    <File Location="bin/kix.CheckDB.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
     </Filelist>
     <PackageMerge Name="MergeOne" TargetVersion="2.0.0">
       <DatabaseUpgrade Type="merge">
@@ -155,7 +155,7 @@ my $MainPackageTwo = '<?xml version="1.0" encoding="utf-8" ?>
     <Filelist>
     <File Location="Test" Permission="644" Encode="Base64">aGVsbG8K</File>
     <File Location="var/Test" Permission="644" Encode="Base64">aGVsbG8K</File>
-    <File Location="bin/otrs.CheckDB.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
+    <File Location="bin/kix.CheckDB.pl" Permission="755" Encode="Base64">aGVsbG8K</File>
     </Filelist>
     <PackageMerge Name="MergeOne" TargetVersion="2.0.1">
       <DatabaseUpgrade Type="merge" Version="2.0.2">
@@ -235,7 +235,7 @@ for my $File (qw( Delete DeleteMe )) {
 }
 
 # check that the framework file still exists including the .save file
-for my $File (qw( bin/otrs.CheckDB.pl )) {
+for my $File (qw( bin/kix.CheckDB.pl )) {
     my $RealFile = $Home . '/' . $File;
     $RealFile =~ s/\/\//\//g;
     $Self->True(

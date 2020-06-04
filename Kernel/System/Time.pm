@@ -829,7 +829,7 @@ sub DestinationTime {
             my $TimeZoneObject   = DateTime::TimeZone->new(
                 name => $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} )
             );
-            $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds            
+            $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
             $Param{StartTime} += $Zone;
         }
     }
@@ -911,18 +911,6 @@ sub DestinationTime {
                 for my $WorkingHour ( $Hour .. 23 ) {
                     my $DiffDestTime = 0;
                     my $DiffWorkTime = 0;
-
-                    # check if whole day can be used
-                    if (
-                        $Hour == 0
-                        && $Minute == 0
-                        && $Second == 0
-                        && $TimeWorking{$WorkingDay}->{-1}->{'DayWorkingTime'} <= $Param{Time}
-                    ) {
-                        $DestinationTime += 24 * 60 * 60;
-                        $Param{Time}     -= $TimeWorking{$WorkingDay}->{-1}->{'DayWorkingTime'};
-                        last HOUR;
-                    }
 
                     # Working hour
                     if ( $TimeWorking{$WorkingDay}->{$WorkingHour} ) {
@@ -1056,7 +1044,7 @@ vacation day
         Year     => 2005,
         Month    => 7 || '07',
         Day      => 13,
-    );
+    );  
 
     $TimeObject->VacationCheck(
         Year     => 2005,

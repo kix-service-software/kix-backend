@@ -1,0 +1,332 @@
+{
+   "$id" : "#TicketArticle",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ticket article object.",
+   "type" : "object",
+   "properties" : {
+      "ArticleID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Attachmnets" : {
+         "description" : "added via include \"Attachments\"",
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TicketArticleAttachment_json-b812531a3e"
+         },
+         "readOnly" : true
+      },
+      "Bcc" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "BccRealname" : {
+         "description" : "realnames from \"Bcc\" (if email address has no real name, email address is used)",
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Body" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Cc" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CcRealname" : {
+         "description" : "realnames from \"Cc\" (if email address has no real name, email address is used)",
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ChangedBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChannelID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Charset" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ContentCharset" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ContentType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CreatedBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CustomerVisible" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "DynamicFields" : {
+         "description" : "added via include \"DynamicFields\"",
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/DynamicFieldValue_json-6dd322bed4"
+         },
+         "readOnly" : true
+      },
+      "Flags" : {
+         "description" : "added via include \"Flags\"",
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/TicketArticleFlag_json-80684e31b4"
+         },
+         "readOnly" : true
+      },
+      "From" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "FromRealname" : {
+         "description" : "realnames from \"From\" (if email address has no real name, email address is used)",
+         "type" : "string",
+         "readOnly" : true
+      },
+      "InReplyTo" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "IncommingTime" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "MessageID" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "MimeType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "References" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ReplyTo" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "SenderType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "SenderTypeID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Subject" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "TicketID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "TimeUnits" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "To" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ToRealname" : {
+         "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "ArticleID",
+      "Bcc",
+      "BccRealname",
+      "Body",
+      "Cc",
+      "CcRealname",
+      "ChangeTime",
+      "ChangedBy",
+      "Channel",
+      "ChannelID",
+      "Charset",
+      "ContentCharset",
+      "ContentType",
+      "CreateTime",
+      "CreatedBy",
+      "CustomerVisible",
+      "From",
+      "FromRealname",
+      "InReplyTo",
+      "IncomingTime",
+      "MessageID",
+      "MimeType",
+      "References",
+      "ReplyTo",
+      "SenderType",
+      "SenderTypeID",
+      "Subject",
+      "TicketID",
+      "TimeUnits",
+      "To",
+      "ToRealname"
+   ],
+   "definitions" : {
+      "DynamicFieldValue_json-6dd322bed4" : {
+         "$id" : "#DynamicFieldValue",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object.",
+         "type" : "object",
+         "properties" : {
+            "DisplayValue" : {
+               "description" : "prepared values ",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueHTML" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueShort" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "description" : "ID of the dynamic field",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "description" : "label of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "description" : "name of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedValue" : {
+               "description" : "prepared values - e.g. display values of a selection field instead of the keys",
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "DisplayValue",
+            "DisplayValueHTML",
+            "DisplayValueShort",
+            "ID",
+            "Label",
+            "Name",
+            "PreparedValue",
+            "Value"
+         ]
+      },
+      "TicketArticleAttachment_json-b812531a3e" : {
+         "$id" : "#TicketArticleAttachment",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article attachment object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "added via include \"Content\" (base64 encoded)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentAlternative" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Disposition" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ContentAlternative",
+            "ContentID",
+            "ContentType",
+            "Disposition",
+            "Filename",
+            "Filesize",
+            "FilesizeRaw",
+            "ID"
+         ]
+      },
+      "TicketArticleFlag_json-80684e31b4" : {
+         "$id" : "#TicketArticleFlag",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article flag object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Name",
+            "Value"
+         ]
+      }
+   }
+}

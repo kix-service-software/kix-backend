@@ -245,7 +245,7 @@ for my $Test (@Tests) {
                 if ( $RequestMethod eq 'post' ) {
 
                     # prepare CGI environment variables
-                    $ENV{REQUEST_URI}    = "http://localhost/otrs/nph-API.pl/$WebserviceAccess";
+                    $ENV{REQUEST_URI}    = "http://localhost/kix/nph-API.pl/$WebserviceAccess";
                     $ENV{REQUEST_METHOD} = 'POST';
                     $RequestData         = $CreateQueryString->(
                         $Self,
@@ -258,7 +258,7 @@ for my $Test (@Tests) {
                 else {    # GET
 
                     # prepare CGI environment variables
-                    $ENV{REQUEST_URI} = "http://localhost/otrs/nph-API.pl/$WebserviceAccess?"
+                    $ENV{REQUEST_URI} = "http://localhost/kix/nph-API.pl/$WebserviceAccess?"
                         . $CreateQueryString->(
                         $Self,
                         Data   => $Test->{RequestData},

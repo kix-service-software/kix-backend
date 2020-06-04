@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<otrs_stats>
+<kix_stats>
 <Cache>0</Cache>
 <Description>List of all tickets. Restricted by Junk Queue.</Description>
 <File></File>
@@ -23,4 +23,4 @@
 <SelectedValues>Queue</SelectedValues>
 </UseAsXvalue>
 <Valid>1</Valid>
-</otrs_stats>
+</kix_stats>

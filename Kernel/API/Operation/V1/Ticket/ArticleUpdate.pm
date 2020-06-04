@@ -103,20 +103,24 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
             TicketID  => 123,                                                  # required
             ArticleID => 123,                                                  # required
             Article  => {                                                      # required
-                Subject                         => 'some subject',             # required
-                Body                            => 'some body'                 # required
-                ContentType                     => 'some content type',        # ContentType or MimeType and Charset is requieed
-                MimeType                        => 'some mime type',           
-                Charset                         => 'some charset',           
+                Subject                         => 'some subject',             # optional
+                Body                            => 'some body'                 # optional
+                # ContentType                     => 'some content type',        # optional ContentType or MimeType and Charset is requieed
+                # MimeType                        => 'some mime type',           # optional
+                # Charset                         => 'some charset',             # optional
 
                 IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
                 TicketID                        => 123,                        # optional, used to move the article to another ticket
-                ChannelID                       => 123,                        # optional
-                Channel                         => 'some channel name',        # optional
+                # ChannelID                       => 123,                        # optional
+                # Channel                         => 'some channel name',        # optional
                 CustomerVisible                 => 0|1,                        # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 From                            => 'some from string',         # optional
+                To                              => 'some to string',           # optional
+                Cc                              => 'some cc string',           # optional
+                Bcc                             => 'some bcc string',          # optional
+                ReplyTo                         => ''                          # optional
                 TimeUnits                       => 123,                        # optional
                 DynamicFields => [                                             # optional
                     {
@@ -142,7 +146,7 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
+    
     # isolate and trim Article parameter
     my $Article = $Self->_Trim(
         Data => $Param{Data}->{Article}
@@ -217,7 +221,7 @@ sub _ArticleUpdate {
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # update normal attributes
-    foreach my $Attribute ( qw(Subject Body From ChannelID Channel CustomerVisible SenderType SenderTypeID) ) {
+    foreach my $Attribute ( qw(Subject Body From To Cc Bcc ReplyTo CustomerVisible SenderType SenderTypeID) ) {
         next if !defined $Article->{$Attribute};
 
         my $Success = $TicketObject->ArticleUpdate(

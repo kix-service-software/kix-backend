@@ -101,7 +101,7 @@ sub Output {
     $Self->{EnvRef}->{EmailFieldType}
         = $Kernel::OM->Get('Config')->Get('CheckEmailAddresses') ? 'email' : 'text';
 
-    # TODO new solution needed for extensions
+    # TODO: new solution needed for extensions
     # my @TemplateFolders = (
     #     "$Self->{CustomTemplateDir}",
     #     "$Self->{CustomStandardTemplateDir}",

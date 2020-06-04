@@ -81,8 +81,6 @@ sub new {
         UnlockTimeout       => 0,
         FirstResponseTime   => 0,
         FirstResponseNotify => 0,
-        UpdateTime          => 0,
-        UpdateNotify        => 0,
         SolutionTime        => 0,
         SolutionNotify      => 0,
         SystemAddressID     => 1,

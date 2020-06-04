@@ -131,7 +131,7 @@ Returns 1 if the values were equal, or undef otherwise.
 sub Is {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
 
-    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output} ne 'ALLURE');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(

@@ -225,3 +225,30 @@ msgstr ""
 
 msgid "Expiration Date"
 msgstr ""
+
+msgid "assigned"
+msgstr ""
+
+msgid "downloaded"
+msgstr ""
+
+msgid "rejected"
+msgstr ""
+
+msgid "accepted"
+msgstr ""
+
+msgid "processing"
+msgstr ""
+
+msgid "suspended"
+msgstr ""
+
+msgid "completed"
+msgstr ""
+
+msgid "partially executed"
+msgstr ""
+
+msgid "cancelled"
+msgstr ""

@@ -26,9 +26,6 @@ our @ObjectDependencies = (
     'Priority',
     'Queue',
     'Service',
-     # KIX4OTRS-capeIT
-    'SLA',
-    # EO KIX4OTRS-capeIT
     'State',
     'Ticket',
     'Time',
@@ -329,12 +326,6 @@ sub Run {
         $Service = $Kernel::OM->Get('Service')->ServiceLookup( ServiceID => $TicketTemplate{ServiceID} );
     }
 
-    # get sla
-    my $SLA;
-    if ( defined $TicketTemplate{SLAID} ) {
-        $SLA = $Kernel::OM->Get('SLA')->SLALookup( SLAID => $TicketTemplate{SLAID} );
-    }
-
 #rbo - T2016121190001552 - added KIX placeholders
     # get subject
     my $Subject = $GetParam{Subject};
@@ -357,7 +348,7 @@ sub Run {
         State           => $State,
         Type            => $Type    || $GetParam{'X-KIX-Type'}    || '',
         Service         => $Service || $GetParam{'X-KIX-Service'} || '',
-        SLA             => $SLA     || $GetParam{'X-KIX-SLA'}     || '',
+        SLA             => $GetParam{'X-KIX-SLA'}     || '',
         TicketTemplate  => (%TicketTemplate && $TicketTemplate{ID}) ? $TicketTemplate{ID} : '',
         OrganisationID  => $GetParam{'X-KIX-CustomerNo'},
         ContactID       => $GetParam{'X-KIX-Contact'},

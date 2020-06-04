@@ -1,0 +1,48 @@
+  displayName: Tickets
+  description: !include ../descriptions/resources/tickets.md
+  type: { collection: { typeName: Ticket } }
+  /{ticketId}:
+    type: { item: { typeName: Ticket } }
+    uriParameters:
+      ticketId:
+        displayName: TicketID
+        type: integer
+    /articles:
+      description: !include ../descriptions/resources/tickets/articles.md
+      type: { collection: { typeName: TicketArticle } }
+      /{articleId}:
+        type: { item: { typeName: TicketArticle } }
+        uriParameters:
+          articleId:
+            displayName: ArticleID
+            type: integer
+        /attachments:
+          description: !include ../descriptions/resources/tickets/articles/attachments.md
+          type: { collection: { typeName: TicketArticleAttachment } }
+          /{attachmentId}:
+            type: { item-readonly: { typeName: TicketArticleAttachment } }
+            uriParameters:
+              articleId:
+                displayName: AttachmentID
+                type: integer
+          /zip:
+            description: !include ../descriptions/resources/tickets/articles/attachments/zip.md
+            type: { item-readonly: { typeName: TicketArticleAttachmentZip } }
+        /flags:
+          description: !include ../descriptions/resources/tickets/articles/flags.md
+          type: { collection: { typeName: TicketArticleFlag } }
+          /{flagName}:
+            type: { item-nodelete: { typeName: TicketArticleFlag } }
+            uriParameters:
+              flagName:
+                displayName: FlagName
+                type: integer
+    /history:
+      description: !include ../descriptions/resources/tickets/history.md
+      type: { collection-readonly: { typeName: TicketHistory } }
+      /{historyId}:
+        type: { item-readonly: { typeName: TicketHistory } }
+        uriParameters:
+          historyId:
+            displayName: HistoryID
+            type: integer

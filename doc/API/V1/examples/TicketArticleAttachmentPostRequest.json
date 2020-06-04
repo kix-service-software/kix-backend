@@ -1,0 +1,7 @@
+{
+    "Attachment": {
+        "Content": "somebase64encodedContentString",
+        "ContentType": "image/png",
+        "Filename": "printer-error.png"
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "Attachment": {
+        "Content": "somebase64encodedContentString",
+        "ContentType": "application/zip",
+        "Filename": "Ticket_2020040917000014_Article_31.zip",
+        "Filesize": "15 Bytes",
+        "FilesizeRaw": 15
+    }
+}

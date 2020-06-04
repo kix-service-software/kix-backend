@@ -17,7 +17,6 @@ use vars (qw($Self));
 # get needed objects
 my $QueueObject   = $Kernel::OM->Get('Queue');
 my $ServiceObject = $Kernel::OM->Get('Service');
-my $SLAObject     = $Kernel::OM->Get('SLA');
 my $StateObject   = $Kernel::OM->Get('State');
 my $TicketObject  = $Kernel::OM->Get('Ticket');
 my $TimeObject    = $Kernel::OM->Get('Time');

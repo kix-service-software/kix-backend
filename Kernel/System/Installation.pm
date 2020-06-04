@@ -51,6 +51,71 @@ sub new {
     return $Self;
 }
 
+=item GetAPIWebServiceDefinition()
+
+generate the YAML for the REST API webservice
+
+    my $YAML = $InstallationObject->GetAPIWebServiceDefinition(
+        Version => 'v1'     # API version
+    );
+
+=cut
+
+sub GetAPIWebServiceDefinition {
+    my ( $Self, %Param ) = @_;
+
+    # check needed parameters
+    if ( !$Param{Version} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Version!"
+        );
+    }
+
+    my $Home = $ENV{KIX_HOME};
+    if ( !$Home ) {
+        use FindBin qw($Bin);
+        $Home = $Bin.'/..';
+        if ( $Bin =~ /^(.*?\/plugins).*?$/ ) {
+            $Home = $1.'/..';
+        }
+        $ENV{KIX_HOME} = $Home;
+    }
+
+    # get all plugins in the order of initialization
+    my @Plugins = $Self->PluginList(
+        Valid     => 1,
+        InitOrder => 1
+    );
+
+
+    # add framework itself as the first element
+    unshift @Plugins, { Directory => $Home };
+
+    my @Definition;
+
+    # get API definition of each plugin
+    foreach my $Plugin ( @Plugins ) {
+        print STDERR "plugin: $Plugin->{Directory}\n";
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
+            Directory       => $Plugin->{Directory},
+            Filename        => 'API.'.$Param{Version},
+            Result          => 'ARRAY',
+            DisableWarnings => 1,
+        );
+        if ( IsArrayRefWithData($Content) ) {
+            push @Definition, @{$Content};
+        }
+    }
+
+    # transform definition to YAML
+    my $YAML = $Self->_GenerateWebServiceYAML(
+        Definition => \@Definition
+    );
+
+    return $YAML;
+}
+
 =item PluginList()
 
 get the list of available plugins
@@ -215,7 +280,7 @@ sub Update {
                     Priority => 'error',
                     Message  => "Plugin $Plugin->{Product} doesn't exist!"
                 );
-                return;        
+                return;
             }
             # add plugin
             push @UpdateItems, { Name => $Plugin->{Product}, Directory => $Plugin->{Directory} };
@@ -512,6 +577,76 @@ sub _GetPluginDependencyCount {
     }
 
     return $DepCount;
+}
+
+sub _GenerateWebServiceYAML {
+    my ( $Self, %Param ) = @_;
+
+    # check needed parameters
+    if ( !$Param{Definition} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Definition!"
+        );
+    }
+
+    my $Template = "---
+Debugger:
+  DebugThreshold: error
+  TestMode: 0
+Description: KIX Core API
+FrameworkVersion: __VERSION__
+Provider:
+  Operation:
+__OPERATIONS__
+  Transport:
+    Config:
+      KeepAlive: ''
+      MaxLength: '10485760'
+      RouteOperationMapping:
+__ROUTES__
+    Type: HTTP::REST
+RemoteSystem: ''
+Requester:
+  Transport:
+    Type: ''
+";
+
+    my $Operations = '';
+    my $Routes = '';
+    foreach my $Line ( @{$Param{Definition}} ) {
+        chomp($Line);
+
+        # ignore comments or empty lines
+        next if ($Line =~ /^\s*#/ || $Line =~ /^\s*$/g);
+
+        my ($Route, $Method, $Operation, $Additions) = split(/\s*\|\s*/, $Line);
+        my @AdditionList = $Additions ? split(/,/, $Additions) : ();
+
+    $Operations .= "    $Operation:
+        Description: ''
+        MappingInbound:
+            Type: Simple
+        MappingOutbound:
+            Type: Simple
+        Type: $Operation\n";
+
+        if ($Additions) {
+            foreach my $Addition (@AdditionList) {
+                $Operations .= "        $Addition\n";
+            }
+        }
+
+        $Routes .= "        $Operation:
+          RequestMethod:
+          - $Method
+          Route: $Route\n";
+    }
+
+    $Template =~ s/__OPERATIONS__/$Operations/g;
+    $Template =~ s/__ROUTES__/$Routes/g;
+
+    return $Template;
 }
 
 1;

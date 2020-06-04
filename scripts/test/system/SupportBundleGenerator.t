@@ -64,7 +64,7 @@ if ( !-e $Home . '/ARCHIVE' ) {
 
 # create an ARCHIVE file on developer systems to continue working
 if ($IsDevelopmentSystem) {
-    my $ArchiveGeneratorTool = $Home . '/bin/otrs.CheckSum.pl';
+    my $ArchiveGeneratorTool = $Home . '/bin/kix.CheckSum.pl';
 
     # if tool is not present we can't continue
     if ( !-e $ArchiveGeneratorTool ) {
