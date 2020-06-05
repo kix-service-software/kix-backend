@@ -26,6 +26,10 @@
       "type": "string",
       "readOnly": true
     },
+    "ReadOnly": {
+      "type": "integer",
+      "readOnly": true
+    },
     "Value": {
       "anyOf": [
         {"type": "object"},

@@ -12,7 +12,7 @@
       "ConfigItemClass"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-01f549b109" : {
+      "ConfigItemClassDefinition_json-fb2ac7494e" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -117,13 +117,13 @@
                "readOnly" : true
             },
             "CurrentDefinition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
             },
             "Definitions" : {
                "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
+                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
                }
             },
             "ID" : {

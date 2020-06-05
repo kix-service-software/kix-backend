@@ -12,7 +12,7 @@
       "ConfigItem"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-01f549b109" : {
+      "ConfigItemClassDefinition_json-fb2ac7494e" : {
          "$id" : "#ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
@@ -65,7 +65,7 @@
             "Version"
          ]
       },
-      "ConfigItemHistory_json-f42dbc1044" : {
+      "ConfigItemHistory_json-03e59dd02e" : {
          "$id" : "#ConfigItemHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item history object.",
@@ -135,7 +135,7 @@
             "UserLogin"
          ]
       },
-      "ConfigItemImage_json-160fd282cb" : {
+      "ConfigItemImage_json-022635ed5d" : {
          "$id" : "#ConfigItemImage",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
@@ -181,7 +181,7 @@
             "ID"
          ]
       },
-      "ConfigItemVersion_json-9b23def65c" : {
+      "ConfigItemVersion_json-d27530ecc6" : {
          "$id" : "#ConfigItemVersion",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
@@ -236,7 +236,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
             },
             "DeplState" : {
                "type" : "string",
@@ -354,20 +354,20 @@
                "readOnly" : true
             },
             "CurrentVersion" : {
-               "$ref" : "#/definitions/ConfigItemVersion_json-9b23def65c"
+               "$ref" : "#/definitions/ConfigItemVersion_json-d27530ecc6"
             },
             "History" : {
                "description" : "added via include \"History\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemHistory_json-f42dbc1044"
+                  "$ref" : "#/definitions/ConfigItemHistory_json-03e59dd02e"
                }
             },
             "Images" : {
                "description" : "added via include \"Images\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemImage_json-160fd282cb"
+                  "$ref" : "#/definitions/ConfigItemImage_json-022635ed5d"
                }
             },
             "LastVersionID" : {
@@ -389,7 +389,7 @@
                "description" : "added via include \"Versions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemVersion_json-9b23def65c"
+                  "$ref" : "#/definitions/ConfigItemVersion_json-d27530ecc6"
                }
             }
          },

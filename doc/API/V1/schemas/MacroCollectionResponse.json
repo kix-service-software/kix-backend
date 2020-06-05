@@ -15,7 +15,7 @@
       "Macro"
    ],
    "definitions" : {
-      "MacroAction_json-c2a5846916" : {
+      "MacroAction_json-1c13e7e1ed" : {
          "$id" : "#MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
@@ -83,7 +83,7 @@
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-c2a5846916"
+                  "$ref" : "#/definitions/MacroAction_json-1c13e7e1ed"
                },
                "readOnly" : true
             },
