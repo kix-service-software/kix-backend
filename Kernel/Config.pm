@@ -63,6 +63,8 @@ sub new {
         use lib $ENV{KIX_HOME} . '/plugins';
     }
 
+    $Self->{ReadOnlyOptions} = {};
+
     # load settings from Config.pm
     $Self->{Config} = $Self->LoadLocalConfig($Self->{Config}->{Home}.'/config');
 
@@ -73,6 +75,7 @@ sub new {
 sub LoadLocalConfig {
     my ( $Self, $ConfigDir ) = @_;
     my %Config = %{$Self->{Config}};
+    my %FileConfig;
 
     if ( opendir(my $DIR, $ConfigDir) ) {
         # filter files and ignore file with .dist extension
@@ -89,18 +92,24 @@ sub LoadLocalConfig {
                     die;
                 }
                 
-                %Config = ( %Config, %Hash );
+                %FileConfig = ( %FileConfig, %Hash );
             }
             else {
                 print STDERR "ERROR: Can't read config file \"$File\". Aborting.\n";
                 die;
             }
         }
+
+        # all options defined in files will be readonly
+        $Self->{ReadOnlyOptions} = { map { $_ => 1 } keys %FileConfig };
     }
     else {
         print STDERR "ERROR: Can't read config directory $ConfigDir: $!\n";
         die;
     }
+
+    # merge with config
+    %Config = ( %Config, %FileConfig );
 
     return \%Config;
 }
@@ -165,6 +174,18 @@ sub LoadSysConfig {
     }
 
     return 1;
+}
+
+sub IsReadOnly {
+    my ( $Self, $What ) = @_;
+
+    return $Self->{ReadOnlyOptions}->{$What};
+}
+
+sub ReadOnlyList {
+    my ( $Self ) = @_;
+
+    return %{$Self->{ReadOnlyOptions} || {}};
 }
 
 sub Exists {

@@ -12,7 +12,7 @@
       "TranslationPattern"
    ],
    "definitions" : {
-      "TranslationLanguage_json-1b7cc59539" : {
+      "TranslationLanguage_json-b12b447f3f" : {
          "$id" : "#TranslationLanguage",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The translation language object.",
@@ -74,7 +74,7 @@
                "description" : "added via include \"Languages\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/TranslationLanguage_json-1b7cc59539"
+                  "$ref" : "#/definitions/TranslationLanguage_json-b12b447f3f"
                },
                "readOnly" : true
             },
