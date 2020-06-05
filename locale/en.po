@@ -1,38 +1,22 @@
-msgid ""
-msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-18 10:13+0000\n"
-"PO-Revision-Date: 2020-05-26 14:50+0000\n"
-"Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
-"Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
-"projects/kix18/backend-app/de/>\n"
-"Language: de\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
-
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
-msgstr "1 sehr hoch"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "2 high"
-msgstr "2 hoch"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "3 normal"
-msgstr "3 normal"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "4 low"
-msgstr "4 niedrig"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "5 very low"
-msgstr "5 sehr niedrig"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Admin Tool"
@@ -40,7 +24,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Affected Asset"
-msgstr "Betroffenes Asset"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - FUP Notification (if locked)"
@@ -160,7 +144,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Concurrent Users"
-msgstr "Gleichzeitige Nutzer"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer"
@@ -192,7 +176,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Developer Licence"
-msgstr "Entwickler Lizenz"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Docking Station"
@@ -422,7 +406,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Service Request"
-msgstr "Service Anfrage"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Single Licence"
@@ -504,10 +488,9 @@ msgstr ""
 msgid "USB Device"
 msgstr ""
 
-# ticket types
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Unclassified"
-msgstr "Unklassifiziert"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Unlimited"
@@ -597,11 +580,11 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "invalid"
-msgstr "ungültig"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "invalid-temporarily"
-msgstr "temporär ungültig"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "lock"
@@ -609,7 +592,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "new ticket"
-msgstr "neues Ticket"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "note"
@@ -617,16 +600,15 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "pending auto close"
-msgstr "warten auf erfolgreich schließen"
+msgstr ""
 
-# follow up possible
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "possible"
-msgstr "möglich"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "reject"
-msgstr "ablehnen"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -657,10 +639,9 @@ msgstr ""
 msgid "unlock"
 msgstr ""
 
-# valid
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "valid"
-msgstr "gültig"
+msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "Check to activate this date"
@@ -2273,7 +2254,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Problem"
-msgstr "Problem"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Queue for the approval of FAQ articles."
@@ -2439,7 +2420,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Alternative to"
-msgstr "Alternativ zu"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Article"
@@ -2518,7 +2499,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Child"
-msgstr "Kind"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2576,7 +2557,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Connected to"
-msgstr "Verbunden mit"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3410,7 +3391,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Depends on"
-msgstr "Hängt ab von"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3502,7 +3483,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "English"
-msgstr "Englisch"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enter your shared secret to enable two factor authentication."
@@ -3582,7 +3563,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "German"
-msgstr "Deutsch"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4066,7 +4047,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
-msgstr "Beinhaltet"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Input"
@@ -4313,11 +4294,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Parent"
-msgstr "Eltern"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Part of"
-msgstr "Teil von"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Position"
@@ -4406,7 +4387,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Relevant to"
-msgstr "Relevant für"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4423,7 +4404,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Required for"
-msgstr "Benötigt für"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -5273,7 +5254,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Incident"
-msgstr "Störung"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Incident State Type"
@@ -5748,11 +5729,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create Article"
-msgstr "Artikel erstellen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create Ticket"
-msgstr "Ticket erstellen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -5978,7 +5959,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
-msgstr "Ticket löschen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Deleted link to ticket \"%s\"."
@@ -6037,8 +6018,6 @@ msgid ""
 "English stop words for fulltext index. These words will be removed from the "
 "search index."
 msgstr ""
-"Englische Stopp-Wörter für Volltextindex. Diese Wörter werden aus dem "
-"Suchindex entfernt."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Event module registration."
@@ -6123,8 +6102,6 @@ msgid ""
 "German stop words for fulltext index. These words will be removed from the "
 "search index."
 msgstr ""
-"Deutsche Stopp-Wörter für Volltextindex. Diese Wörter werden aus dem "
-"Suchindex entfernt."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -6617,47 +6594,47 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Contact"
-msgstr "Kontakt setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Dynamic Field"
-msgstr "Dynamisches Feld setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Lock"
-msgstr "Sperrstatus setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Organisation"
-msgstr "Kunde setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Owner"
-msgstr "Bearbeiter setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Priority"
-msgstr "Priorität setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Responsible"
-msgstr "Verantwortlichen setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set State"
-msgstr "Status setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Team"
-msgstr "Team setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Title"
-msgstr "Titel setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Type"
-msgstr "Typ setzen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -6961,7 +6938,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "closed"
-msgstr "geschlossen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "customer"
@@ -6973,12 +6950,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "merged"
-msgstr "zusammengefasst"
+msgstr ""
 
-# ticket states
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "new"
-msgstr "neu"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "note-report"
@@ -6990,7 +6966,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "open"
-msgstr "offen"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "pending auto"
@@ -6998,11 +6974,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "pending reminder"
-msgstr "warten zur Erinnerung"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "removed"
-msgstr "entfernt"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "system"
@@ -7076,311 +7052,297 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Address Information"
-msgstr "Adressinformationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Assigned Contact"
-msgstr "Zugeordneter Kontakt"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Assigned Organisation"
-msgstr "Zugeordnete Organisation"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Attachment"
-msgstr "Anhang"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Attachments"
-msgstr "Anhänge"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Authorization not possible, please contact the system administrator."
 msgstr ""
-"Authorisierung nicht möglich, bitte kontaktieren Sie Ihren Administrator."
 
 #. manual entry from templates.pot.manual
 msgid "Building"
-msgstr "Gebäude"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Cannot create or update item, because it already exists."
-msgstr "Das Item kann nicht angelegt werden, da es bereits existiert."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Capacity"
-msgstr "Kapazität"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "City"
-msgstr "Stadt"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Contact"
-msgstr "Ansprechpartner"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Contact Information"
-msgstr "Kontaktinformationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Contact Role"
-msgstr "Kontaktrolle"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Could not create item, please contact the system administrator."
 msgstr ""
-"Das Item konnte nicht erstellt werden, bitte kontaktieren Sie Ihren "
-"Administrator."
 
 #. manual entry from templates.pot.manual
 msgid "Could not delete item, please contact the system administrator."
 msgstr ""
-"Das Item konnte nicht gelöscht werden, bitte kontaktieren Sie Ihren "
-"Administrator."
 
 #. manual entry from templates.pot.manual
 msgid "Could not update item, please contact the system administrator."
 msgstr ""
-"Das Item konnte nicht geändert werden, bitte kontaktieren Sie Ihren "
-"Administrator."
 
 #. manual entry from templates.pot.manual
 msgid "Country"
-msgstr "Land"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
-msgstr "Abhängige Objekte verhindern die Ausführung dieser Operation."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Description"
-msgstr "Beschreibung"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Expiration Date"
-msgstr "Ablaufdatum"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "First Usage Date"
-msgstr "Inbetriebnahme"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Floor"
-msgstr "Geschoss"
+msgstr ""
 
-# CI classes
 #. manual entry from templates.pot.manual
 msgid "General Information"
-msgstr "Allgemeine Informationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Global Location Number"
-msgstr "Globale Lokationsnummer"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Graphic Adapter"
-msgstr "Grafikkarte"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Hard Disk"
-msgstr "Festplatte"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Hardware Information"
-msgstr "Hardware Informationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "IP Address"
-msgstr "IP Adresse"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "IP over DHCP"
-msgstr "IP via DHCP"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Installed Software"
-msgstr "Installierte Software"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Licence Type"
-msgstr "Lizenztyp"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "License Information"
-msgstr "Lizenz Informationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "License Key"
-msgstr "Lizenzschlüssel"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Location"
-msgstr "Standort"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Model"
-msgstr "Modell"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Network"
-msgstr "Netzwerk"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Network Address"
-msgstr "Netzwerkadresse"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Network Information"
-msgstr "Netzwerk Informationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Network Interface"
-msgstr "Netzwerkschnittstelle"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "No"
-msgstr "Nein"
+msgstr ""
 
-# api
 #. manual entry from templates.pot.manual
 msgid "No \"Authorization\" header found."
-msgstr "Kein \"Authorization\"-Header gefunden."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "No permission to execute this operation."
-msgstr "Keine Berechtigung, um die Operation auszuführen."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "No token in \"Authorization\" header found."
-msgstr "Kein Token im \"Authorization\"-Header gefunden."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Note"
-msgstr "Notiz"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Notes"
-msgstr "Notizen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Operating System"
-msgstr "Betriebssystem"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Other Equipment"
-msgstr "Sonstige Ausstattung"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Owner Information"
-msgstr "Besitzer Informationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Parent Location"
-msgstr "Übergeordneter Standort"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Please enter a valid IPv4 address in form 123.123.123.123."
 msgstr ""
-"Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein."
 
 #. manual entry from templates.pot.manual
 msgid "Please enter decimal numbers only."
-msgstr "Bitte geben Sie nur Dezimalzahlen ein."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Product"
-msgstr "Produkt"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Quantity"
-msgstr "Anzahl"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Region"
-msgstr "Region"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Room"
-msgstr "Raum"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Room Label"
-msgstr "Raumbeschriftung"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Room Type"
-msgstr "Raumtyp"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Serial Number"
-msgstr "Seriennummer"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Software Information"
-msgstr "Software Informationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Street"
-msgstr "Straße"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Street 2"
-msgstr "Straße 2"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Subnet Mask"
-msgstr "Subnetzmaske"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "The parent item(s) cannot be found."
-msgstr "Das Elternobjekt / die Elternobjekte konnten nicht gefunden werden."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "The requested item cannot be found or is invalid."
-msgstr "Das angefragte Objekt kann nicht gefunden werden oder ist ungültig."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "The requested item cannot be found."
-msgstr "Das angefragte Objekt kann nicht gefunden werden."
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid ""
 "The resource doesn't support the requested method. Please have a look into "
 "the \"Allow\" header which methods are supported by this resource."
 msgstr ""
-"Die Ressource unterstützt die anfragte Methode nicht. Der \"Allow\"-Header "
-"enthält Informationen welche Methoden diese Ressource unterstützt."
 
 #. manual entry from templates.pot.manual
 msgid "Type"
-msgstr "Typ"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "User is not authorized. The requested operation cannot be executed."
 msgstr ""
-"Nutzer ist nicht authorisiert. Die angeforderte Operation kann nicht "
-"ausgeführt werden."
 
 #. manual entry from templates.pot.manual
 msgid "Vendor"
-msgstr "Hersteller"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Warranty Expiration Date"
-msgstr "Garantieende"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Warranty Information"
-msgstr "Garantie Informationen"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Yes"
-msgstr "Ja"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "ZIP"
-msgstr "PLZ"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "accepted"
@@ -7404,7 +7366,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "no"
-msgstr "nein"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "partially executed"
@@ -7420,60 +7382,8 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "suspended"
-msgstr "ausgesetzt"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "yes"
-msgstr "ja"
-
-# ticket priority
-#~ msgid "1 very low"
-#~ msgstr "1 sehr niedrig"
-
-#~ msgid "2 low"
-#~ msgstr "2 niedrig"
-
-#~ msgid "4 high"
-#~ msgstr "4 hoch"
-
-#~ msgid "5 very high"
-#~ msgstr "5 sehr hoch"
-
-#~ msgid "ServiceRequest"
-#~ msgstr "Serviceanfrage"
-
-# auto response type
-#~ msgid "auto reply"
-#~ msgstr "automatische Antwort"
-
-#~ msgid "auto reject"
-#~ msgstr "automatische Ablehnung"
-
-#~ msgid "auto follow up"
-#~ msgstr "automatische Rückfrage"
-
-#~ msgid "auto reply/new ticket"
-#~ msgstr "automatische Antwort / neues Ticket"
-
-#~ msgid "auto remove"
-#~ msgstr "automatisches Entfernen"
-
-# auto response
-#~ msgid "default reply (after new ticket has been created)"
-#~ msgstr "Standardantwort (nachdem ein neues Ticket erstellt wurde)"
-
-#~ msgid "default reject (after follow-up and rejected of a closed ticket)"
-#~ msgstr ""
-#~ "Standardablehnung (nachdem eine Antwort auf ein geschlossenes Ticket "
-#~ "eingegangen und diese abgelehnt wurde)"
-
-#~ msgid "default follow-up (after a ticket follow-up has been added)"
-#~ msgstr ""
-#~ "Standardantwort (nachdem eine Antwort auf ein Ticket eingegangen ist)"
-
-#~ msgid ""
-#~ "default reject/new ticket created (after closed follow-up with new ticket "
-#~ "creation)"
-#~ msgstr ""
-#~ "Standardablehnung/Neues Ticket erstellt (nachdem eine Antwort auf ein "
-#~ "geschlossenes Ticket eingegangen ist und ein neues Ticket erstellt wurde)"
+msgstr ""

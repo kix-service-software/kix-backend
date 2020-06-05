@@ -154,12 +154,12 @@ sub SendNotification {
             # generate recipient
             my %DFRecipient = (
                 Realname  => '',
-                UserEmail => $AddressLine,
+                Email => $AddressLine,
                 Type      => $Recipient{Type},
             );
 
             # check recipients
-            if ( $DFRecipient{UserEmail} && $DFRecipient{UserEmail} =~ /@/ ) {
+            if ( $DFRecipient{Email} && $DFRecipient{Email} =~ /@/ ) {
                 push (@DFRecipients, \%DFRecipient);
             }
         }
@@ -182,37 +182,29 @@ sub SendNotification {
     }
     # EO NotificationEventX-capeIT
 
-    # Verify a customer have an email
-    if ( $Recipient{Type} eq 'Customer' ) {
-        if ( !$Recipient{Email} && $Recipient{ID} ) {
-            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-                ID => $Recipient{ID},
+    # get the contact for the recipient user
+    if ( !$Recipient{Email} && $Recipient{UserID} ) {
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+            UserID => $Recipient{UserID},
+        );
+
+        if ( !$Contact{Email} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "Can't send notification because of missing "
+                    . "recipient email (UserID=$Recipient{UserID}, ContactID=$Contact{ContactID})!",
             );
-
-            if ( !$Contact{Email} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'info',
-                    Message  => "Send no customer notification because of missing "
-                        . "customer email (ContactID=$Contact{ContactID})!",
-                );
-                return;
-            }
-
-            # Set calculated email.
-            $Recipient{UserEmail} = $Contact{Email};
+            return;
         }
-        else {
-            # prepare UserEmail to be compatible with agent users
-            $Recipient{UserEmail} = $Recipient{Email};
-        }
+
+        $Recipient{Email} = $Contact{Email};
     }
 
-    return if !$Recipient{UserEmail};
-
-    return if $Recipient{UserEmail} !~ /@/;
+    return if !$Recipient{Email};
+    return if $Recipient{Email} !~ /@/;
 
     my $IsLocalAddress = $Kernel::OM->Get('SystemAddress')->SystemAddressIsLocalAddress(
-        Address => $Recipient{UserEmail},
+        Address => $Recipient{Email},
     );
 
     return if $IsLocalAddress;
@@ -335,7 +327,7 @@ sub SendNotification {
 
         my $Sent = $Kernel::OM->Get('Email')->Send(
             From       => $From,
-            To         => $Recipient{UserEmail},
+            To         => $Recipient{Email},
             Subject    => $Notification{Subject},
             MimeType   => $Notification{ContentType},
             Type       => $Notification{ContentType},
@@ -349,7 +341,7 @@ sub SendNotification {
         if ( !$Sent ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "'$Notification{Name}' notification could not be sent to agent '$Recipient{UserEmail} ",
+                Message  => "'$Notification{Name}' notification could not be sent to agent '$Recipient{Email} ",
             );
 
             return;
@@ -371,7 +363,7 @@ sub SendNotification {
         # log event
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  => "Sent agent '$Notification{Name}' notification to '$Recipient{UserEmail}'.",
+            Message  => "Sent agent '$Notification{Name}' notification to '$Recipient{Email}'.",
         );
 
         # set event data
@@ -382,7 +374,7 @@ sub SendNotification {
 
                 # KIX4OTRS-capeIT
                 # out of office-substitute notification
-                RecipientMail => $Recipient{UserEmail},
+                RecipientMail => $Recipient{Email},
                 Notification  => \%Notification,
                 Attachment    => $Param{Attachments},
 
@@ -426,7 +418,7 @@ sub SendNotification {
 
         my $Sent = $Kernel::OM->Get('Email')->Send(
             From       => $Address{Email},
-            To         => $Recipient{UserEmail},
+            To         => $Recipient{Email},
             Subject    => $Notification{Subject},
             MimeType   => $Notification{ContentType},
             Type       => $Notification{ContentType},
@@ -440,7 +432,7 @@ sub SendNotification {
         if ( !$Sent ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "'$Notification{Name}' notification could not be sent to customer '$Recipient{UserEmail} ",
+                Message  => "'$Notification{Name}' notification could not be sent to customer '$Recipient{Email} ",
             );
 
             return;
@@ -460,7 +452,7 @@ sub SendNotification {
         # log event
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  => "Sent customer '$Notification{Name}' notification to '$Recipient{UserEmail}'.",
+            Message  => "Sent customer '$Notification{Name}' notification to '$Recipient{Email}'.",
         );
 
         # set event data
@@ -618,7 +610,7 @@ sub SecurityOptionsGet {
 
         # get public keys
         @EncryptKeys = $Kernel::OM->Get('Crypt::PGP')->PublicKeySearch(
-            Search => $Param{Recipient}->{UserEmail},
+            Search => $Param{Recipient}->{Email},
         );
 
         # Get PGP method (Detached or In-line).
@@ -634,7 +626,7 @@ sub SecurityOptionsGet {
         );
 
         @EncryptKeys = $Kernel::OM->Get('Crypt::SMIME')->CertificateSearch(
-            Search => $Param{Recipient}->{UserEmail},
+            Search => $Param{Recipient}->{Email},
         );
 
         $Method   = 'SMIME';
@@ -731,7 +723,7 @@ sub SecurityOptionsGet {
         if ( !IsHashRefWithData( \%EncryptKey ) ) {
 
             my $Message
-                = "Could not encrypt notification '$Param{Notification}->{Name}' due to missing $Method encryption key for '$Param{Recipient}->{UserEmail}'";
+                = "Could not encrypt notification '$Param{Notification}->{Name}' due to missing $Method encryption key for '$Param{Recipient}->{Email}'";
 
             if ( $OnMissingEncryptionKeys eq 'Skip' ) {
 
@@ -795,9 +787,9 @@ sub CreateArticle {
         SenderType     => 'system',
         TicketID       => $Param{TicketID},
         HistoryType    => $Param{Recipient}->{Type} eq 'Agent' ? 'SendAgentNotification' : 'SendCustomerNotification',
-        HistoryComment => $Param{Recipient}->{Type} eq 'Agent' ? "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%Email" : "\%\%$Param{Recipient}->{UserEmail}",
+        HistoryComment => $Param{Recipient}->{Type} eq 'Agent' ? "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{Login}\%\%Email" : "\%\%$Param{Recipient}->{Email}",
         From           => "$Param{Address}->{RealName} <$Param{Address}->{Email}>",
-        To             => $Param{Recipient}->{UserEmail},
+        To             => $Param{Recipient}->{Email},
         Subject        => $Param{Notification}->{Subject},
         Body           => $Param{Notification}->{Body},
         MimeType       => $Param{Notification}->{ContentType},
@@ -812,7 +804,7 @@ sub CreateArticle {
     if ( !$ArticleID ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "'$Param{Notification}->{Name}' notification could not be sent to customer '$Param{Recipient}->{UserEmail} ",
+            Message  => "'$Param{Notification}->{Name}' notification could not be sent to customer '$Param{Recipient}->{Email} ",
         );
 
         return;
