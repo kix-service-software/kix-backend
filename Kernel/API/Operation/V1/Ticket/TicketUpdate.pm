@@ -688,8 +688,9 @@ sub _TicketUpdate {
         }
     }
 
+    #WORKAROUND KIX2018-3986
     return $Self->_Success(
-        TicketID => 0 + $Param{TicketID},
+        TicketID => "" . $Param{TicketID},
     );
 }
 
