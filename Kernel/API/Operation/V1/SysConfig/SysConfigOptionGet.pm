@@ -128,6 +128,8 @@ sub Run {
     # perform SysConfig search
     my %AllOptions = $Kernel::OM->Get('SysConfig')->OptionGetAll();
 
+    my %IsReadOnly = $Kernel::OM->Get('Config')->ReadOnlyList();
+
     # start loop 
     foreach my $Option ( @{$Param{Data}->{Option}} ) {
 
@@ -167,6 +169,7 @@ sub Run {
             AccessLevel     => $AllOptions{$OrgOption}->{AccessLevel},
             Context         => $AllOptions{$OrgOption}->{Context},
             ContextMetadata => $AllOptions{$OrgOption}->{ContextMetadata},
+            ReadOnly        => $IsReadOnly{$OrgOption} ? 1 : 0,
         });
     }
 

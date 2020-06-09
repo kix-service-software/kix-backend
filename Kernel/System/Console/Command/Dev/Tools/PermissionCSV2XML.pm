@@ -89,7 +89,11 @@ sub Run {
     my @Lines = @{$LinesRef};
     shift @Lines;
 
-    foreach my $Line (@Lines) {        
+    foreach my $Line (@Lines) {
+        # trim contents
+        foreach my $Column ( @{$Line} ) {
+            $Column =~ s/(^\s+|\s+$)//g;
+        }
         my $Role   = $Line->[0];
         my $Type   = $Line->[1];
         my $Target = $Line->[2];

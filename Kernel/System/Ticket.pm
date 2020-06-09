@@ -1767,6 +1767,17 @@ sub TicketQueueSet {
         }
     }
 
+    # queue lookup
+    my $Queue = $QueueObject->QueueLookup( QueueID => $Param{QueueID} );
+
+    if (!$Queue) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No queue with ID '$Param{QueueID}' exists!"
+        );
+        return;
+    }
+
     # get current ticket
     my %Ticket = $Self->TicketGet(
         %Param,
@@ -1780,24 +1791,11 @@ sub TicketQueueSet {
         return 1;
     }
 
-    # permission check
-    my %MoveList = $Self->MoveList( %Param, Type => 'move_into' );
-    if ( !$MoveList{ $Param{QueueID} } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Permission denied on TicketID: $Param{TicketID}!",
-        );
-        return;
-    }
-
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE ticket SET queue_id = ?, change_time = current_timestamp, '
             . ' change_by = ? WHERE id = ?',
         Bind => [ \$Param{QueueID}, \$Param{UserID}, \$Param{TicketID} ],
     );
-
-    # queue lookup
-    my $Queue = $QueueObject->QueueLookup( QueueID => $Param{QueueID} );
 
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
@@ -2289,7 +2287,7 @@ sub TicketServiceSet {
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
     );
-    
+
     return 1;
 }
 
@@ -2398,7 +2396,7 @@ sub TicketCustomerSet {
         Event     => 'UPDATE',
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
-    );    
+    );
 
     # if no change
     if ( !$Param{History} ) {
@@ -2452,7 +2450,7 @@ sub GetSubscribedUserIDsByQueueID {
         SQL => "SELECT distinct(user_id) FROM user_preferences WHERE preferences_key = 'MyQueues' AND preferences_value = ?",
         Bind => [ \$Param{QueueID} ],
     );
-    
+
     while ( my @Row = $DBObject->FetchrowArray() ) {
         push @UserIDs, $Row[0];
     }
@@ -3547,7 +3545,7 @@ sub TicketOwnerSet {
             Lock     => 'unlock',
             UserID   => 1,
         );
-    }    
+    }
 
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
@@ -4992,7 +4990,7 @@ sub TicketAccountTime {
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
     );
-    
+
     return 1;
 }
 

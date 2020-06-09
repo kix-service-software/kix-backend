@@ -378,27 +378,28 @@ sub _TicketUpdate {
         }
 
         # set pending time
-        elsif ( $StateData{TypeName} =~ /^pending/i ) {
+        elsif ($StateData{TypeName} =~ /^pending/i) {
+
+            if (!(defined $TicketData{PendingTime} || defined $Ticket->{PendingTime})) {
+                return $Self->_Error(
+                    Code    => 'Object.UnableToUpdate',
+                    Message => 'Unable to update pending state without pending time!',
+                );
+            }
 
             # set pending time
-            if ( defined $Ticket->{PendingTime} ) {
+            if (defined $Ticket->{PendingTime}) {
                 my $Success = $TicketObject->TicketPendingTimeSet(
                     UserID   => $Param{UserID},
                     TicketID => $Param{TicketID},
                     String   => $Ticket->{PendingTime},
                 );
-                if ( !$Success ) {
+                if (!$Success) {
                     return $Self->_Error(
                         Code    => 'Object.UnableToUpdate',
                         Message => 'Unable to update ticket, please contact system administrator!',
                     );
                 }
-            }
-            else {
-                return $Self->_Error(
-                    Code    => 'Object.UnableToUpdate',
-                    Message => 'Unable to update pending state without pending time!',
-                );
             }
         }
 

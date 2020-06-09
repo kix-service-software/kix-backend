@@ -51,6 +51,11 @@ sub new {
     bless( $Self, $Type );
 
     $Self->{ObjectName} = 'Ticket';
+    
+    # fake config for debug output
+    $Self->{OperationConfig} = {
+        Name => 'ObjectActions.Ticket'
+    };
 
     return $Self;
 }
