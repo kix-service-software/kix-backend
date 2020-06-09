@@ -145,10 +145,7 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
     }
 };
 
-Then qr/the response contains (\d+) items of type (.*?)$/, sub {
-  is(@{S->{ResponseContent}->{$2}}, $1, 'Check response item count');
-  my $Anzahl = @{S->{ResponseContent}->{$2}};
-};
+
 
 
 #=======================work=================================
