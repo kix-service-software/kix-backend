@@ -3749,7 +3749,7 @@ Thanks for your help!
           "valid": true
         },
         "property": "QueueID",
-        "name": "Assign Team / Queue",
+        "name": "Assign Team",
         "hint": "Helptext_Tickets_TicketCreate_Queue",
         "visible": false
       },
@@ -3870,7 +3870,7 @@ Thanks for your help!
           "valid": true
         },
         "property": "QueueID",
-        "name": "Assign Team / Queue",
+        "name": "Assign Team",
         "hint": "Helptext_Tickets_TicketCreate_Queue",
         "visible": false
       },
