@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/roles/:RoleID resource
 
   Scenario: update a role
     Given a role
-    Then the response code is 201 
     When I update this role with
     Then the response code is 200
 #    And the response object is RolePostPatchResponse

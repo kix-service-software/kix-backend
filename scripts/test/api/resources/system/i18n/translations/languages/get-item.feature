@@ -7,9 +7,7 @@ Feature: GET request to the /system/i18n/translations/:TranslationID/languages/:
 
   Scenario: get a specific language
     Given a i18n translation with
-    Then the response code is 201
     Given a translation language with
-    Then the response code is 201
     When I get this translation language
     Then the response code is 200
     When I delete this translation language

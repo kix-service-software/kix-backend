@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/textmodules/:TextModuleID resource
 
   Scenario: update a textmodule
     Given a textmodule
-    Then the response code is 201
     When I update this textmodule
     Then the response code is 200
 #    And the response object is ContactPostPatchResponse

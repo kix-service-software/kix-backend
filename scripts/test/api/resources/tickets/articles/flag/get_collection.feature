@@ -7,9 +7,7 @@ Feature: the /tickets/:TicketID/articles/:ArticleID/flags resource
 
   Scenario: get the list of existing article flags
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I query the article flags collection
     Then the response code is 200
     When I delete this ticket

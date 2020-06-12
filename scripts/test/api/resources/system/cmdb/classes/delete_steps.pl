@@ -26,11 +26,11 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 When qr/I delete this configitem class$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Delete(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/cmdb/classes/'.S->{ResponseContent}->{ConfigItemClassID},
+      URL   => S->{API_URL}.'/system/cmdb/classes/'.S->{ConfigItemClassID},
    );
 };

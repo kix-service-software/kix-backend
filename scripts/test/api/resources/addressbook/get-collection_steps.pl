@@ -26,7 +26,7 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 When qr/I query the collection of addressbook$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
@@ -37,24 +37,24 @@ When qr/I query the collection of addressbook$/, sub {
 
 When qr/I query the collection of addressbook with filter of (.*?)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/addressbook',
+      Token  => S->{Token},
+      URL    => S->{API_URL}.'/addressbook',
       Filter => '{"Address": {"AND": [{"Field": "EmailAddress","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
    );
 };
 
 When qr/I query the collection of addressbook with filter contains of (.*?)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/addressbook',
+      Token  => S->{Token},
+      URL    => S->{API_URL}.'/addressbook',
       Filter => '{"Address": {"AND": [{"Field": "EmailAddress","Operator": "CONTAINS","Value": "'.$1.'"}]}}',
    );
 };
 
 When qr/I query the collection of addressbook with filter and of (.*?)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/addressbook',
+      Token  => S->{Token},
+      URL    => S->{API_URL}.'/addressbook',
       Filter => '{"Address": {"AND": [{"Field": "EmailAddress","Operator": "CONTAINS","Value": "'.$1.'"}]}}',
    );
 };
@@ -69,9 +69,10 @@ When qr/I query the collection of addressbook with limit (\d+)$/, sub {
 
 When qr/I query the collection of addressbook with offset (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/addressbook',
+      Token  => S->{Token},
+      URL    => S->{API_URL}.'/addressbook',
       Offset => $1,
+      Limit  => 6,
    );
 };
 
@@ -88,16 +89,16 @@ When qr/I query the collection of addressbook with sorted by "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/addressbook',
-      Sort => $1,
+      Sort  => $1,
    );
 };
 
 When qr/I query the collection of addressbook with sorted by "(.*?)" limit (\d+) and offset (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/addressbook',
+      Token  => S->{Token},
+      URL    => S->{API_URL}.'/addressbook',
       Limit  => $2,
       Offset => $3,
-      Sort => $1,
+      Sort   => $1,
    );
 };

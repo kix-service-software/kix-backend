@@ -7,7 +7,6 @@ Feature: GET request to the /system/communication/systemaddresses/:SystemAddress
       
   Scenario: get an existing systemaddress
     Given a systemaddress
-    Then the response code is 201
     When I get this systemaddress
     Then the response code is 200
 #    And the response object is ServiceResponse

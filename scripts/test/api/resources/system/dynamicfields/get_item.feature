@@ -7,7 +7,6 @@ Feature: GET request to the /system/dynamicfields/:DynamicFieldID resource
       
   Scenario: get an existing dynamicfield
     Given a dynamicfield
-    Then the response code is 200
     When I get this dynamicfield
     Then the response code is 200
     And the attribute "DynamicField.Label" is "Due Date2ex2"    

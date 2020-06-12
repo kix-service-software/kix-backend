@@ -7,9 +7,7 @@ Feature: the /tickets/:TicketID/articles/:ArticleID resource
 
   Scenario: delete this article
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I delete this article
     Then the response code is 204
     And the response has no content

@@ -7,7 +7,6 @@ Feature: PATCH request to the /session/user/preferences/:UserPreferenceID resour
 
   Scenario: update a session user preference
     Given a session user preference
-    Then the response code is 201
     When I update this session user preference
     Then the response code is 200
     When I delete this session user preference

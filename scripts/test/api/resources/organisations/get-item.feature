@@ -7,11 +7,9 @@
 
   Scenario: get an existing organisation
     Given a organisation with Number "K12345678_test"
-    Then the response code is 201
     When I get this organisation
     Then the response code is 200
     And the attribute "Organisation.Name" is "Test Organisation_cu"
-#    And the response object is OrganisationResponse
     When I delete this organisation
     Then the response code is 204
     And the response has no content

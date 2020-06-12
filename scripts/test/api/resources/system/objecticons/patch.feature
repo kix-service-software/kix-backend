@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/objecticons/:ObjectIconID resource
 
   Scenario: update a objecticon
     Given a objecticon
-    Then the response code is 201  
     When I update this objecticon
     Then the response code is 200
 #    And the response object is ObjectIconPostPatchResponse

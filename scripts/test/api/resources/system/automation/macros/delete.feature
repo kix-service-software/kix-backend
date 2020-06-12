@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/automation/macros/:MacroID resource
 
   Scenario: delete this automation macro
     Given a automation macro
-    Then the response code is 201
     When I delete this automation macro
     Then the response code is 204
     And the response has no content

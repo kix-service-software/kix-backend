@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/ticket/ticketstates/:TicketStateID resour
 
   Scenario: delete this ticketstate
     Given a ticketstate
-    Then the response code is 201
     When I delete this ticketstate
     Then the response code is 204
     And the response has no content

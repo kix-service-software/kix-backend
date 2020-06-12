@@ -7,7 +7,6 @@ Feature: GET request to the /cmdb/configitems resource
       
   Scenario: get an existing configitem
     Given a configitem
-    Then the response code is 201
     When I get this configitem
     Then the response code is 200
     And the attribute "ConfigItem.CurDeplState" is "Production"

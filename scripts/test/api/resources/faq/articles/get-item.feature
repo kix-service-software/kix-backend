@@ -7,7 +7,6 @@
 
   Scenario: get an existing faq article
     Given a faq article
-    Then the response code is 201
     When I get this faq article
     Then the response code is 200
     And the attribute "FAQArticle.Field6" is "Comment..."

@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/communication/notifications/:NotificationI
 
   Scenario: update a notification
     Given a notification
-    Then the response code is 201
     When I update this notification
     Then the response code is 200
     When I delete this notification

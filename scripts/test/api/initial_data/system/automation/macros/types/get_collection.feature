@@ -8,7 +8,8 @@ Feature: GET request to the /system/automation/macros/types resource
   Scenario: get the list of automation macro types
     When I query the collection of automation macro types
     Then the response code is 200 
-    And the response contains 1 items of type "MacroType"
+    And the response contains 2 items of type "MacroType"
     And the response contains the following items of type MacroType
-      | Name   |
-      | Ticket |
+      | Name            |
+      | Synchronisation |
+      | Ticket          |

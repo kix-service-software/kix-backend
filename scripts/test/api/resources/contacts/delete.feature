@@ -7,9 +7,7 @@ Feature: DELETE request /contacts/:ContactID resource
 
   Scenario: delete this contact
     Given a organisation
-    Then the response code is 201
     Given a contact
-    Then the response code is 201
     When I delete this contact
     Then the response code is 204
     And the response has no content

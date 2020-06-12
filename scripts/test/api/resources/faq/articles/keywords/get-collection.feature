@@ -7,7 +7,6 @@
 
   Scenario: get the list of existing faq article keywords 
     Given a faq article
-    Then the response code is 201
     When I query the collection of faq article keywords
     Then the response code is 200
     And the response object is FAQKeywordCollectionResponse

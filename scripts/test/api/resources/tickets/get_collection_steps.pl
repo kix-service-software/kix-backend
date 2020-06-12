@@ -27,7 +27,7 @@ require '_Helper.pl';
 require '_StepsLib.pl';
 
 # feature specific steps
- 
+
 When qr/I query the collection of tickets$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},

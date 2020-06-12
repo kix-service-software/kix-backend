@@ -27,56 +27,13 @@ require '_Helper.pl';
 require '_StepsLib.pl';
 #require './_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 When qr/I query the collection of (\w+) with roleid (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
-   );
-};
-
-When qr/I query the collection of (\w+) with roleid (\d+) and a limit of (\d+)$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
-      Limit => $3,
-   );
-};
-
-When qr/I query the collection of (\w+) with roleid (\d+) and a offset of (\d+)$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token  => S->{Token},
-      URL    => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
-      Offset => $3,
-   );
-};
-
-When qr/I query the collection of (\w+) with roleid (\d+) and with a limit of (\d+) and an offset of (\d+)$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token  => S->{Token},
-      URL    => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
-      Limit  => $4,
-      Offset => $4,
-   );
-};
-
-When qr/I query the collection of (\w+) with roleid (\d+) and sorted by "(.*?)" and with a limit of (\d+) and an offset of (\d+)$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token  => S->{Token},
-      URL    => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
-      Sort   => $3,
-      Limit  => $4,
-      Offset => $5,
-   );
-};
-
-When qr/I query the collection of (\w+) with roleid (\d+) and sorted by "(.*?)" and with a limit of (\d+)$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token  => S->{Token},
-      URL    => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
-      Sort   => $3,
-      Limit  => $4,
+      Sort  => 'Permission.ID:numeric'
    );
 };
 

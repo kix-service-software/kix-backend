@@ -7,7 +7,6 @@
 
   Scenario: get the list of existing mailaccounts
     Given a mailaccount
-    Then the response code is 201 
     When I query the collection of mailaccounts 
     Then the response code is 200
     When I delete this mailaccount
@@ -16,7 +15,6 @@
 
   Scenario: get the list of existing mailaccounts
     Given 4 of mailaccount
-    Then the response code is 201 
     When I query the collection of mailaccounts with filter of filter.test
     Then the response code is 200
     And the response contains the following items of type MailAccount
@@ -28,7 +26,6 @@
     
   Scenario: get the list of existing mailaccounts with limit
     Given 4 of mailaccount
-    Then the response code is 201 
     When I query the collection of mailaccounts with a limit of 3
     Then the response code is 200
     And the response contains 3 items of type MailAccount

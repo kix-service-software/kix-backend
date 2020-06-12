@@ -7,7 +7,6 @@ Feature: GET request to the /watchers/:WatcherID resource
       
   Scenario: get a collection of existing ticket watchers
     Given a ticket
-    Then the response code is 201
     When I create a watcher
       | UserID |
       | 1      |

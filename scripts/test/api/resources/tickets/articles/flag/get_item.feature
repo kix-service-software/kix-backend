@@ -7,9 +7,7 @@ Feature: the /tickets/:TicketID/articles/:ArticleID/attachments/:AttachmentID re
       
   Scenario: get an existing article flag
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I create a article flag
       | Name                      | Value |
       | Flag__GET_RANDOM_STRING__ | on    |

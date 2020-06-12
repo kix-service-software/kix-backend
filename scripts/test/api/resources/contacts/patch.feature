@@ -7,9 +7,7 @@ Feature: PATCH request to the /contacts/:ContactID resource
 
   Scenario: update a contact
     Given a organisation
-    Then the response code is 201
     Given a contact
-    Then the response code is 201
     When I update this contact
     Then the response code is 200
     And the response object is ContactPostPatchResponse

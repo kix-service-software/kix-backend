@@ -7,10 +7,8 @@ Feature: the /tickets/:TicketID/articles resource
     
   Scenario: create a article
     Given a ticket
-    Then the response code is 201  
     When I create a article 
-      Then the response code is 201
-#    Then the response object is ConfigItemPostPatchResponse
+    Then the response code is 201
     When I delete this article
     Then the response code is 204
     When I delete this ticket

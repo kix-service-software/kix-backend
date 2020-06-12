@@ -8,11 +8,10 @@
   Scenario: get the list of existing contacts
     Given a contact 
     When I query the collection of contacts 
-    Then the response code is 200 
+    Then the response code is 200
 
   Scenario: get the list of existing contacts with filter
     Given a organisation
-    Then the response code is 201
     Given 4 of contact 
     When I query the collection of contacts with filter of "mamu_test_filter@example.org"
     Then the response code is 200
@@ -30,11 +29,11 @@
     Given 6 of organisations
     Given 4 of contact with diffrent organisation
     When I query the collection of contacts 
-    When I query the collection of contacts with filter of Firstname "Max" and Login "mamuster" 
+    When I query the collection of contacts with filter of Firstname "Tom" and Lastname "Meier"
     Then the response code is 200
     And the response contains the following items of type Contact
-        | Email                      |
-        | max.mustermann@example.org |
+        | Email                          |
+        | tmeier_test_filter@example.org |
     When delete all this contacts
     Then the response code is 204
     And the response has no content
@@ -61,7 +60,7 @@
     When I query the collection of contacts
     When I query the collection of contacts with offset 2 
     Then the response code is 200
-    And the response contains 4 items of type Contact
+    And the response contains 5 items of type Contact
     When delete all this contacts
     Then the response code is 204
     And the response has no content
@@ -89,7 +88,7 @@
     When I query the collection of contacts
     When I query the collection of contacts with sorted by "Contact.-Firstname:textual"
     Then the response code is 200
-    And the response contains 8 items of type Contact
+    And the response contains 9 items of type Contact
     When delete all this contacts
     Then the response code is 204
     And the response has no content
@@ -109,9 +108,18 @@
     And the response has no content
     When delete all this organisations
     Then the response code is 204
-    And the response has no content      
-    
-    
-    
+    And the response has no content
+
+   Scenario: get the list of existing contacts with include User
+     Given a organisation
+     Given a contact
+     When I query the collection of contacts with include User
+     Then the response code is 200
+     When delete all this contacts
+     Then the response code is 204
+     And the response has no content
+     When delete all this organisations
+     Then the response code is 204
+     And the response has no content
        
     

@@ -12,9 +12,9 @@ Feature: GET request to the /system/ticket/priorities resource
     Then the response contains 5 items of type "Priority"
     Then the response contains the following items of type Priority
       | Name        | ValidID |
-      | 1 very low  | 1       |
-      | 2 low       | 1       |
+      | 5 very low  | 1       |
+      | 4 low       | 1       |
       | 3 normal    | 1       |
-      | 4 high      | 1       |
-      | 5 very high | 1       |
+      | 2 high      | 1       |
+      | 1 very high | 1       |
 

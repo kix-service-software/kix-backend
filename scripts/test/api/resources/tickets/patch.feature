@@ -7,7 +7,6 @@ Feature: PATCH request to the /tickets/:TicketID resource
 
   Scenario: update a ticket
     Given a ticket
-    Then the response code is 201
     When I update this ticket
     Then the response code is 200
     When I delete this ticket

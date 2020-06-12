@@ -7,7 +7,6 @@
 
   Scenario: get an existing session user preference
     Given a session user preference
-    Then the response code is 201
     When I get this session user preference
     Then the response code is 200
 #    And the attribute "Contact.Lastname" is "Mustermann"

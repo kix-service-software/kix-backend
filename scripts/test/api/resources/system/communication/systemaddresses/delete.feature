@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/communication/systemaddresses/:SystemAddr
 
   Scenario: delete this systemaddress
     Given a systemaddress
-    Then the response code is 201      
     When I delete this systemaddress
     Then the response code is 204
     And the response has no content

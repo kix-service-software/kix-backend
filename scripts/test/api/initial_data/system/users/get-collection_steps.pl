@@ -26,7 +26,7 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 When qr/I query the collection of users$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(

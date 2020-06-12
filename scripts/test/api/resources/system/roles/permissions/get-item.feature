@@ -7,9 +7,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions/:PermissionID reso
 
   Scenario: get a specific permission
     Given a role
-    Then the response code is 201
     Given a permission
-    Then the response code is 201
     When I get this permission
     Then the response code is 200
 #    Then the response object is PermissionResponse

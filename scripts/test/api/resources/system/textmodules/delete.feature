@@ -7,7 +7,6 @@ Feature: DELETE request /system/textmodules/:TextModuleID resource
 
   Scenario: delete this textmodule
     When added a textmodule
-    Then the response code is 201
     When I delete this textmodule
     Then the response code is 204
     And the response has no content

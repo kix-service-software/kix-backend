@@ -7,7 +7,6 @@
 
   Scenario: get an existing objecticon
     Given a objecticon
-    Then the response code is 201
     When I get the objecticon
     Then the response code is 200
     And the response object is ObjectIconResponse

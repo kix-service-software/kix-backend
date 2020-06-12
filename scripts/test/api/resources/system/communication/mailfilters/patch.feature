@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/communication/mailfilters/:MailFilterID re
 
   Scenario: update a mailfilters
     Given a mailfilter
-    Then the response code is 201
     When I update this mailfilter
     Then the response code is 200
 #    And the response object is SystemAddressPostPatchResponse

@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/dynamicfields/:DynamicFieldID/config resou
 
   Scenario: update a dynamicfield config
     Given a dynamicfield
-    Then the response code is 200
     When I update this dynamicfield config
     Then the response code is 200
 #    And the response object is GeneralCatalogItemPostPatchResponse

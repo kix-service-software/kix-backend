@@ -52,7 +52,7 @@ use Data::Dumper;
 #print STDERR "DecRes".Dumper(keys %{$DecRes});
             push (@{S->{$Key."Array"}}, $DecRes->{$Key});
         }
-        elsif ($DecRes->{$Key}) {
+        if ($DecRes->{$Key}) {
             S->{$Key} = $DecRes->{$Key}; 
         }
     }

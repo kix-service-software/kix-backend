@@ -7,7 +7,6 @@ Feature: DELETE request to the /tickets/:TicketID/watchers/:WatcherID resource
 
   Scenario: delete this watcher
     Given a ticket
-    Then the response code is 201
     When I create a watcher
       | UserID |
       | 1      |
