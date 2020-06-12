@@ -7,7 +7,6 @@ Feature: DELETE request to the /faq/articles/:FAQArticleID resource
 
   Scenario: delete this faq article
     Given a faq article
-    Then the response code is 201
     When I delete this faq article
     Then the response code is 204
     And the response has no content

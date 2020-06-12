@@ -7,9 +7,7 @@ Feature: POST request to the /tickets/:TicketID/articles/:ArticleID/attachments 
     
   Scenario: create a article attachment
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I create a article attachment
       Then the response code is 201 
     When I delete this ticket

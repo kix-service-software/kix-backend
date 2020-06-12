@@ -42,7 +42,9 @@ When qr/I update this role with$/, sub {
       Content => {
         Role => {
             Name => "the new stats role".rand(),
-            ValidID => 1
+             Comment =>"update",
+             ValidID => 1,
+             UsageContext => 1
         }
       }
    );

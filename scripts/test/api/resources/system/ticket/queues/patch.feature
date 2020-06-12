@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/ticket/queues/:QueueID resource
 
   Scenario: update a ticket queue
     Given a ticket queue
-    Then the response code is 201
     When I update this ticket queue
     Then the response code is 200
 #    And the response object is QueuePostPatchResponse

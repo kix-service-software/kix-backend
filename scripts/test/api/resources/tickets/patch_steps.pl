@@ -34,9 +34,9 @@ When qr/I update this ticket$/, sub {
       Token   => S->{Token},
       Content => {
         Ticket => {
-            Title => "test ticket for unknown contact update",
-            ContactID => "test\@no-mail.com",
-            OrganisationID => "test\@no-mail.com",
+            Title => "test ticket patch for unknown contact update",
+            ContactID => 1,
+            OrganisationID => 1,
             StateID => 4,
             PriorityID => 3,
             QueueID => 1,
@@ -50,9 +50,9 @@ When qr/I update this ticket$/, sub {
                     Charset => "utf8",
                     ChannelID => 1,
                     SenderTypeID => 1,
-                    From => "root\@nomail.org",
+                    From => 'root@nomail.org',
                     CustomerVisible => 0,
-                    To => "contact222\@nomail.org"
+                    To => 'contact222@nomail.org'
                 }
             ]
         }

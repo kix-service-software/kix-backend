@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/ticket/ticketstates/:TicketStateID resourc
 
   Scenario: update a ticketstate
     Given a ticketstate
-    Then the response code is 201 
     When I update this ticketstate
     Then the response code is 200
     And the response object is TicketStatePostPatchResponse

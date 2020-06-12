@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/cmdb/classes resource
 
   Scenario: delete this configitem class
     Given a configitem class
-    Then the response code is 201
     When I delete this configitem class
     Then the response code is 204
     And the response has no content

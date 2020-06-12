@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/i18n/translations/:TranslationID/language
 
   Scenario: delete translation language permission
     Given a i18n translation with
-    Then the response code is 201
     When I create a translation language with
     Then the response code is 201   
     When I delete this translation language

@@ -26,7 +26,7 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 Given qr/a ticket$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
@@ -35,8 +35,8 @@ Given qr/a ticket$/, sub {
       Content => {
         Ticket => {
             Title => "test ticket for unknown contact",
-            ContactID => "test\@no-mail.com",
-            OrganisationID => "test\@no-mail.com",
+            ContactID => 1,
+            OrganisationID => 1,
             StateID => 4,
             PriorityID => 3,
             QueueID => 1,
@@ -53,8 +53,8 @@ Given qr/a ticket for organisation test$/, sub {
       Content => {
         Ticket => {
             Title => "test ticket for unknown contact",
-            ContactID => "test\@no-mail.com",
-            OrganisationID => "test\@no-mail.com",
+            ContactID => 1,
+            OrganisationID => 1,
             StateID => 4,
             PriorityID => 3,
             QueueID => 1,
@@ -75,12 +75,12 @@ Given qr/(\d+) of tickets$/, sub {
             $PriorityID = 2;
             $QueueID = 3;
         }
-        elsif ( $i == 3 ) { 
-            $Title = 'test ticket for unknown contact';
+        elsif ( $i == 3 ) {
+            $Title = 'test ticket given for unknown contact';
             $PriorityID = 2;
             $QueueID = 2;
         }
-        else { 
+        else {
             $Title = 'test ticket for'.rand();
             $PriorityID = 3;
             $QueueID = 1;
@@ -92,8 +92,8 @@ Given qr/(\d+) of tickets$/, sub {
           Content => {
             Ticket => {
                 Title => $Title,
-                ContactID => "test\@no-mail.com",
-                OrganisationID => "test\@no-mail.com",
+                ContactID => 1,
+                OrganisationID => 1,
                 StateID => 4,
                 PriorityID => $PriorityID,
                 QueueID => $QueueID,
@@ -111,8 +111,8 @@ Given qr/a ticket with one article$/, sub {
       Content => {
         Ticket => {
             Title => "test ticket for unknown contact",
-            ContactID => "test\@no-mail.com",
-            OrganisationID => "test\@no-mail.com",
+            ContactID => 1,
+            OrganisationID => 1,
             StateID => 4,
             PriorityID => 3,
             QueueID => 1,
@@ -126,9 +126,9 @@ Given qr/a ticket with one article$/, sub {
                     Charset => "utf8",
                     ChannelID => 1,
                     SenderTypeID => 1,
-                    From => "root\@nomail.org",
+                    From => 'root@nomail.org',
                     CustomerVisible => 0,
-                    To => "contact222\@nomail.org"
+                    To => 'contact222@nomail.org'
                 }
             ]
         }
@@ -139,15 +139,15 @@ Given qr/a ticket with one article$/, sub {
 
 
 Given qr/(\d+) of (\w+) with article$/, sub {
-    for ($i=0;$i<$1;$i++){	
+    for ($i=0;$i<$1;$i++){
 	   ( S->{Response}, S->{ResponseContent} ) = _Post(
 	      URL     => S->{API_URL}.'/tickets',
 	      Token   => S->{Token},
 	      Content => {
             Ticket => {
                 Title => "test ticket for unknown contact",
-                ContactID => "test\@no-mail.com",
-                OrganisationID => "test\@no-mail.com",
+                ContactID => 1,
+                OrganisationID => 1,
                 StateID => 4,
                 PriorityID => 3,
                 QueueID => 1,
@@ -161,9 +161,9 @@ Given qr/(\d+) of (\w+) with article$/, sub {
                         Charset => "utf8",
                         ChannelID => 1,
                         SenderTypeID => 1,
-                        From => "root\@nomailtest.org",
+                        From => 'root@nomailtest.org',
                         CustomerVisible => 0,
-                        To => "contact222\@nomail.org"
+                        To => 'contact222@nomail.org'
                     }
                 ]
             }
@@ -179,8 +179,8 @@ When qr/I create a ticket$/, sub {
       Content => {
         Ticket => {
             Title => "test ticket for unknown contact",
-            ContactID => "test\@no-mail.com",
-            OrganisationID => "test\@no-mail.com",
+            ContactID => 1,
+            OrganisationID => 1,
             StateID => 4,
             PriorityID => 3,
             QueueID => 1,

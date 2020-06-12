@@ -7,7 +7,6 @@ Feature: PATCH request to the /faq/articles/:FAQArticleID resource
 
   Scenario: update a faq article
     Given a faq article
-    Then the response code is 201
     When I update this faq article
     Then the response code is 200
     When I delete this faq article

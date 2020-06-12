@@ -7,9 +7,7 @@
 
   Scenario: get an existing faq article attachment
     Given a faq article
-    Then the response code is 201
     Given a faq article attachment
-    Then the response code is 201
     When I get this faq article attachment
     Then the response code is 200
     And the attribute "Attachment.Filename" is "Queue.xml"

@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/users/:UserID resource
 
   Scenario: update a user
     Given a user
-    Then the response code is 201
     When I update this user
     Then the response code is 200
     And the response object is UserPostPatchResponse

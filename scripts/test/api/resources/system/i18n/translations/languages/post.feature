@@ -7,7 +7,6 @@ Feature: POST request to the /system/i18n/translations/:PatternID/languages reso
     
   Scenario: create a translation language
     Given a i18n translation with
-    Then the response code is 201
     When I create a translation language with
     Then the response code is 201
     Then the response object is TranslationLanguagePostPatchResponse

@@ -7,7 +7,6 @@ Feature: DELETE request to the /tickets/:TicketID resource
 
   Scenario: delete this ticket
     Given a ticket
-    Then the response code is 201
     When I delete this ticket
     Then the response code is 204
     And the response has no content

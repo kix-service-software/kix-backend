@@ -7,9 +7,7 @@ Feature: DELETE request to the /faq/articles/:FAQArticleID/attachments/:FAQAttac
 
   Scenario: delete this faq article attachment
     Given a faq article
-    Then the response code is 201
     Given a faq article attachment
-    Then the response code is 201
     When I delete this faq article attachment
     Then the response code is 204
     And the response has no content

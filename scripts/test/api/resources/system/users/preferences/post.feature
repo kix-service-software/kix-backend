@@ -7,10 +7,9 @@ Feature: POST request to the /system/users/:UserID/preferences resource
     
   Scenario: added a user preference
     Given a user
+    When added a user preference
     Then the response code is 201
-     When added a user preference
-     Then the response code is 201
-     Then the response object is UserPreferencePostPatchResponse
-     When I delete this user preference
-     Then the response code is 204
+    Then the response object is UserPreferencePostPatchResponse
+    When I delete this user preference
+    Then the response code is 204
 

@@ -7,9 +7,7 @@ Feature: PATCH request to the /system/roles/:RoleID/permissions/:PermissionID re
 
   Scenario: update a role permission
     Given a role
-    Then the response code is 201
     Given a permission
-    Then the response code is 201
     When I update this permission
     Then the response code is 200
 #    Then the response object is PermissionPostPatchResponse

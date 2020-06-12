@@ -7,7 +7,6 @@ Feature: DELETE request /clientregistration/:ClientID resource
 
   Scenario: delete this clientregistration
     Given a clientregistration
-    Then the response code is 201
     When I delete this clientregistration
     Then the response code is 204
     And the response has no content

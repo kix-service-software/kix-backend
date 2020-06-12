@@ -8,8 +8,9 @@ Feature: GET request to the /system/roles/permissiontypes resource
   Scenario: get the list of permissiontypes 
     When I query the collection of roles permissiontypes
     Then the response code is 200
-    And the response contains 2 items of type "PermissionType"
+    And the response contains 3 items of type "PermissionType"
     And the response contains the following items of type PermissionType   
       | Name          | Comment                                                                                                        |
       | Resource      | Permission type that corresponds with a API resource.                                                          |
       | PropertyValue | Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1). |
+      | Property      | Permission type that restricts access on object properties (QueueID in tickets).                               |

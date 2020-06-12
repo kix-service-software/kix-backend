@@ -1,4 +1,5 @@
 use warnings;
+use strict;
 
 use Cwd;
 use lib cwd();
@@ -64,5 +65,12 @@ When qr/I query the collection of users with a limit of (\d+)$/, sub {
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/users',
       Limit => $1,
+   );
+};
+
+When qr/I query the collection of users with include (\w+)$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/system/users?include='.$1
    );
 };

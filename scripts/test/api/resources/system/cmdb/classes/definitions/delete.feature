@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/cmdb/classes/:ClassID/definitions/:Defini
 
   Scenario: delete this definition
     Given a definition with classid 4
-    Then the response code is 201
     When I delete this definition with classid 4
     Then the response code is 204
     And the response has no content

@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/services/:ServiceID resource
 
   Scenario: delete this service
     Given a service with
-    Then the response code is 201      
     When I delete this service
     Then the response code is 204
     And the response has no content

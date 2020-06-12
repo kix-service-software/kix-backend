@@ -7,9 +7,7 @@ Feature: the /tickets/:TicketID/articles resource
 
   Scenario: get the list of existing articles
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I query the articles collection
     Then the response code is 200
     When I delete this ticket
@@ -18,7 +16,6 @@ Feature: the /tickets/:TicketID/articles resource
     
   Scenario: get the list of existing articles with limit
     Given a ticket
-    Then the response code is 201
     Given 8 of articles
     When I query the articles collection with limit 4
     Then the response code is 200
@@ -29,7 +26,6 @@ Feature: the /tickets/:TicketID/articles resource
     
   Scenario: get the list of existing articles with offset
     Given a ticket
-    Then the response code is 201
     Given 8 of articles
     When I query the articles collection with offset 4
     Then the response code is 200
@@ -40,7 +36,6 @@ Feature: the /tickets/:TicketID/articles resource
     
   Scenario: get the list of existing articles with limit and offset
     Given a ticket
-    Then the response code is 201
     Given 8 of articles
     When I query the articles collection with limit 2 and offset 4
     Then the response code is 200

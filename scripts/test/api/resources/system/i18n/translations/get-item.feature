@@ -7,7 +7,6 @@ Feature: GET request to the /system/i18n/translations/:PatternID resource
       
   Scenario: get an existing translation
     Given a i18n translation with
-    Then the response code is 201
     When I get the i18n translation
     Then the response code is 200
 #    And the response object is TranslationPatternResponse

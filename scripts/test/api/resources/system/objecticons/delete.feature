@@ -7,7 +7,6 @@ Feature: DELETE request /system/objecticons/:ObjectIconID resource
 
   Scenario: delete this objecticon
     Given a objecticon
-    Then the response code is 201
     When I delete this objecticon
     Then the response code is 204
     And the response has no content

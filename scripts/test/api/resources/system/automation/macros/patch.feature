@@ -7,7 +7,7 @@ Feature: PATCH request to the /system/automation/macros/:MacroID resource
 
   Scenario: update a automation macro
     Given a automation macro
-    Then the response code is 201 
+    Then the response code is 201
     When I update this automation macro
     Then the response code is 200
     When I delete this automation macro

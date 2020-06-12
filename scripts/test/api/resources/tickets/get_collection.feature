@@ -28,11 +28,11 @@ Feature: GET request to the /tickets resource
 
   Scenario: get the list of existing tickets with filter contain
     Given 8 of tickets
-    When I query the collection of tickets with filter contains of "cont"
+    When I query the collection of tickets with filter contains of "given"
     Then the response code is 200 
     And the response contains the following items of type Ticket
-      | Title                           |
-      | test ticket for unknown contact |
+      | Title                                 |
+      | test ticket given for unknown contact |
     When delete all this tickets
     Then the response code is 204
     And the response has no content
@@ -40,11 +40,11 @@ Feature: GET request to the /tickets resource
 
   Scenario: get the list of existing tickets with filter in
     Given 8 of tickets
-    When I query the collection of tickets with AND-filter of Title "cont" and PriorityID 2 and QueueID 2
+    When I query the collection of tickets with AND-filter of Title "patch" and PriorityID 2 and QueueID 2
     Then the response code is 200 
     And the response contains the following items of type Ticket
-      | Title                           |
-      | test ticket for unknown contact |
+      | Title                                        |
+      | test ticket patch for unknown contact update |
     When delete all this tickets
     Then the response code is 204
     And the response has no content

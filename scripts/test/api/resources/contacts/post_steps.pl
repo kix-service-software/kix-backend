@@ -66,6 +66,12 @@ Given qr/(\d+) of contact$/, sub {
             $Firstname = "Tom";
             $Lastname  = "Meier"
         }
+        elsif ( $i == 4 ) {
+            $Email = "maxi.mustermann\@example.org";
+            $Login = "mamuster";
+            $Firstname = "Maxi";
+            $Lastname  = "Mustermann"
+        }
         else { 
             $Email = "mamu".rand(2)."\@example.org";
             $Login = "mamu".rand(2);

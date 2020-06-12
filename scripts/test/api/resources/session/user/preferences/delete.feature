@@ -7,7 +7,6 @@ Feature: DELETE request to the /session/user/preferences/:UserPreferenceID resou
 
   Scenario: delete this session user preference
     Given a session user preference
-    Then the response code is 201
     When I delete this session user preference
     Then the response code is 204
     And the response has no content

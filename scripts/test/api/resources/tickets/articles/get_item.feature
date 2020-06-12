@@ -7,12 +7,10 @@ Feature: the /tickets/:TicketID/articles/:ArticleID resource
       
   Scenario: get an existing article
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I get the article
     Then the response code is 200
-    And the attribute "Article.FromRealname" is "test@no-mail.com"
+    And the attribute "Article.ToRealname" is "Service Desk"
     When I delete this ticket
     Then the response code is 204
     And the response has no content

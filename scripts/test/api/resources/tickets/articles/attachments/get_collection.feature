@@ -7,11 +7,8 @@ Feature: GET request to the /tickets/:TicketID/articles/:ArticleID/attachments r
 
   Scenario: get the list of existing attachments
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     Given a article attachment
-    Then the response code is 201
     When I query the attachments collection
     Then the response code is 200
     When I delete this ticket

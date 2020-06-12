@@ -7,7 +7,6 @@ Feature: DELETE request /addressbook/:AddressID resource
 
   Scenario: delete this addressbook
     Given a addressbook
-    Then the response code is 201
     When delete all this addressbooks
     Then the response code is 204
     And the response has no content

@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/faq/categories/:FAQCategoryID resource
 
   Scenario: update a faq category
     Given a faq category
-    Then the response code is 201
     When I update this faq category
     Then the response code is 200
     When I delete this faq category

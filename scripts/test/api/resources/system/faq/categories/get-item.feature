@@ -7,7 +7,6 @@
 
   Scenario: get an existing faq category
     Given a faq category
-    Then the response code is 201
     When I get this faq category
     Then the response code is 200
     And the attribute "FAQCategory.Comment" is "TestComment"

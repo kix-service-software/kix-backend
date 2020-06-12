@@ -7,7 +7,6 @@ Feature: POST request to the /watchers resource
     
   Scenario: create a watcher
     Given a ticket
-    Then the response code is 201          
     When I create a watcher
       | UserID |
       | 1      |

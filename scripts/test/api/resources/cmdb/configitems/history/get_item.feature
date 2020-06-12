@@ -7,9 +7,7 @@ Feature: GET request to the /cmdb/configitems/history resource
       
   Scenario: get an existing history
     Given a configitem
-    Then the response code is 201
     When I query the cmdb collection of configitem historys
-    Then the response code is 200
     When I get this configitem history
     Then the response code is 200
 #    And the response object is ConfigItemHistoryResponse

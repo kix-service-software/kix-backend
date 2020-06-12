@@ -7,11 +7,8 @@ Feature: GET request to the /tickets/:TicketID/articles/:ArticleID/attachments/:
       
   Scenario: get an existing attachment
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     Given a article attachment
-    Then the response code is 201
     When I get the attachment item
     Then the response code is 200
     And the attribute "Attachment.Filename" is "ein-langer-dateiname-fuer-eine-pdf-datei-ein-langer-dateiname-fuer-eine-pdf-datei.pdf" 

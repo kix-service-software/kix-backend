@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/communication/mailaccounts/:MailAccountID 
 
   Scenario: update a mailaccount
     Given a mailaccount
-    Then the response code is 201
     When I update this mailaccount
     Then the response code is 200
     When I delete this mailaccount

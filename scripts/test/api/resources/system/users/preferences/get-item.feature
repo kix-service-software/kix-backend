@@ -7,7 +7,6 @@
 
   Scenario: get an existing user preference
     Given a user
-    Then the response code is 201
     When added a user preference
     Then the response code is 201
     When I get this preference

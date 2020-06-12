@@ -7,7 +7,6 @@ Feature: GET request to the /system/communication/mailfilters/:MailFilterID reso
       
   Scenario: get an existing mailfilter
     Given a mailfilter
-    Then the response code is 201
     When I get this mailfilter
     Then the response code is 200
 #    And the response object is ServiceResponse

@@ -7,7 +7,6 @@ Feature: POST request to the /faq/articles/:FAQArticleID/votes resource
     
   Scenario: create a faq article votes
     Given a faq article
-    Then the response code is 201
     When I create a faq article votes
     Then the response code is 201
     When I delete this faq article

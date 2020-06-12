@@ -7,7 +7,6 @@ Feature: GET request to the /system/automation/macros resource
 
   Scenario: get the list of automation macros
     Given a automation macro
-    Then the response code is 201 
     When I query the collection of automation macros
     Then the response code is 200 
     When delete all this automation macros

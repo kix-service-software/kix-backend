@@ -7,7 +7,6 @@ Feature: GET request to the /system/roles/:RoleID resource
       
   Scenario: get an existing role
     Given a role
-    Then the response code is 201 
     When I get this role
     Then the response code is 200
     And the response object is RoleResponse

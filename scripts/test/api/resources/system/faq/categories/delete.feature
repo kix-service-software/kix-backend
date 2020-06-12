@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/faq/categories/:FAQCategoryID resource
 
   Scenario: delete this faq category
     Given a faq category
-    Then the response code is 201
     When I delete this faq category
     Then the response code is 204
     And the response has no content
