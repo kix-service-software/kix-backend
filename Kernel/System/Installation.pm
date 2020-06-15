@@ -326,7 +326,7 @@ sub Update {
         my $Failed = 0;
         my $LastBuild = 0;
         BUILDNUMBER:
-        foreach my $NummericBuild (sort keys %BuildList) {
+        foreach my $NummericBuild (sort { $a cmp $b } keys %BuildList) {
             next if $NummericBuild <= $Param{SourceBuild};
             last if $NummericBuild > $Param{TargetBuild};
 
