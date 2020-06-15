@@ -53,7 +53,7 @@ sub new {
 
     # load backend
     $Self->{BackendDefault} = $Kernel::OM->Get('Config')->Get('VirtualFS::Backend')
-        || 'VirtualFS::DB';
+        || 'Kernel::System::VirtualFS::DB';
 
     if ( !$Kernel::OM->Get('Main')->Require( $Self->{BackendDefault} ) ) {
         return;
