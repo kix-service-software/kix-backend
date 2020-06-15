@@ -12,13 +12,6 @@
     Then the response code is 200
 ##    And the response object is LogFileResponse
     And the attribute "LogFile.Filename" is "TicketCounter.log"
-
-  Scenario: get an existing log last
-    When I query the collection of logs
-    Then the response code is 200
-    When I get the last log
-    Then the response code is 200
-    And the attribute "LogFile.Filename" is "install.log"
     
   Scenario: get an existing log content
     When I query the collection of logs

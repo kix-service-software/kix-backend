@@ -40,6 +40,8 @@ Given qr/a user$/, sub {
             UserLogin => "jdoe".rand(),
             UserPw => "secret1".rand(),
             UserTitle => "DR.",
+            IsAgent => 1,
+            IsCustomer => 0,
             ValidID => 1
         }
       }
@@ -93,6 +95,8 @@ Given qr/(\d+) of users$/, sub {
                     UserLogin => $UserLogin,
                     UserPw => "secret1".rand(),
                     UserTitle => "DR.",
+                    IsAgent => 1,
+                    IsCustomer => 0,
                     ValidID => 1
                 }
             }
@@ -112,6 +116,8 @@ When qr/added a user$/, sub {
             UserLogin => "jdoe".rand(),
             UserPw => "secret2".rand(),
             UserTitle => "DR.",
+            IsAgent => 1,
+            IsCustomer => 0,
             ValidID => 1
         }
       }

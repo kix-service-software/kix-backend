@@ -5,7 +5,7 @@ Feature: DELETE request to the /system/i18n/translations/:TranslationID resource
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
-  Scenario: delete this role
+  Scenario: delete this translation
     Given a i18n translation with
     When I delete this i18n translation
     Then the response code is 204

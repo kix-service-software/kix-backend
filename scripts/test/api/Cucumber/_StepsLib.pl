@@ -145,20 +145,9 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
     }
 };
 
-
-
-
 #=======================work=================================
 Then qr/the response content is$/, sub {
 	print STDERR Dumper(S->{ResponseContent});
-#    print STDERR Dumper(S->{ResponseContent}->{Permission}->[0]);
-    #print STDERR Dumper(S->{ResponseContent}->{LogFile});
-    #print STDERR Dumper(S->{ResponseContent}->{Queue}->{SubQueues}->[0]);
-#    print STDERR Dumper(S->{ResponseContent}->{Organisation}->{ID});
-#print STDERR Dumper(S->{ResponseContent}->{$2}->[$3]->{$1});
-#    print STDERR Dumper(S->{ResponseContent}->{FAQArticle}->[0]);
-#    print STDERR Dumper(S->{OrganisationIDArray});
-#    print STDERR Dumper(S->{ResponseContent}->{FAQHistory}->[0]->{Name});
 };
 
 
