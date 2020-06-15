@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/communication/mailaccounts/:MailAccountID
 
   Scenario: delete this mailaccount
     Given a mailaccount
-    Then the response code is 201
     When I delete this mailaccount
     Then the response code is 204
     And the response has no content

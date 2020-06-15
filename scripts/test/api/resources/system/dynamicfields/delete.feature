@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/dynamicfields/:DynamicFieldID resource
 
   Scenario: delete this dynamicfield
     Given a dynamicfield
-    Then the response code is 200
     When I delete this dynamicfield
     Then the response code is 204
     And the response has no content

@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/i18n/translations/:TranslationID resource
 
   Scenario: update a i18n translation
     Given a i18n translation with
-    Then the response code is 201 
     When I update this translation with
     Then the response code is 200
     And the response object is TranslationPatternPostPatchResponse

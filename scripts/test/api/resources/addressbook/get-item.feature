@@ -7,7 +7,6 @@
 
   Scenario: get an existing addressbook
     Given a addressbook
-    Then the response code is 201
     When I get this addressbook
     Then the response code is 200
     When delete all this addressbooks

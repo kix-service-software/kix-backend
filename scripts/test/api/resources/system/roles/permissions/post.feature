@@ -7,7 +7,6 @@ Feature: POST request to the /system/roles/:RoleID/permissions resource
 
   Scenario: create a role permission
     Given a role
-    Then the response code is 201
     When I create a permission
     Then the response code is 201
 #    Then the response object is PermissionPostPatchResponse

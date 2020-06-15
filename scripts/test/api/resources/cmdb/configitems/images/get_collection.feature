@@ -1,4 +1,4 @@
-Feature: GET request to the /cmdb/configitems/images resource
+Feature: GET request to the /cmdb/configitems/:ConfigitemID/images resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
@@ -7,9 +7,7 @@ Feature: GET request to the /cmdb/configitems/images resource
 
   Scenario: get the list of existing images
     Given a configitem
-    Then the response code is 201
     Given added image to a configitem
-    Then the response code is 201
     When I query the cmdb collection of images from configitem
     Then the response code is 200
 #    And the response object is ConfigItemImageCollectionResponse

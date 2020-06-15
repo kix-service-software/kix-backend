@@ -10,4 +10,3 @@
     Then the response code is 200
     And the response contains the following items of type FollowUpType
 
-

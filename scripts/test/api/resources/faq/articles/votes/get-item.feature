@@ -7,9 +7,7 @@
 
   Scenario: get an existing faq article votes
     Given a faq article
-    Then the response code is 201
     Given a faq article votes
-    Then the response code is 201
     When I get this faq article votes
     Then the response code is 200
     And the attribute "FAQVote.CreatedBy" is "Max Mustermann"

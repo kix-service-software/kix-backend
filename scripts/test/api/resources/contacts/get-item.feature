@@ -7,12 +7,9 @@
 
   Scenario: get an existing contact
     Given a organisation
-    Then the response code is 201
     Given a contact
-    Then the response code is 201
     When I get this contact
     Then the response code is 200
-#    And the response object is ContactResponse
     And the attribute "Contact.Lastname" is "Mustermann"
     When I delete this contact
     Then the response code is 204

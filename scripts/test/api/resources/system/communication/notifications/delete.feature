@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/communication/mailaccounts/:NotificationI
 
   Scenario: delete this notification
     Given a notification
-    Then the response code is 201
     When I delete this notification
     Then the response code is 204
     And the response has no content

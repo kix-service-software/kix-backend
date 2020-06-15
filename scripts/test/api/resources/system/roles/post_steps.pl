@@ -34,8 +34,10 @@ Given qr/a role$/, sub {
       Token   => S->{Token},
       Content => {
         Role => {
-            Name => "the new stats role GET",
-            ValidID => 1
+            Name         => "the new stats role GET",
+            Comment      => "...",
+            ValidID      => 1,
+            UsageContext => 1
         }
       }
    );
@@ -48,7 +50,9 @@ When qr/I create a role$/, sub {
       Content => {
         Role => {
             Name => "the new stats role".rand(),
-            ValidID => 1
+            Comment => "...",
+            ValidID => 1,
+            UsageContext => 1
         }
       }
    );

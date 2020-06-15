@@ -7,9 +7,7 @@ Feature: DELETE request to the /system/users/:UserID/preferences/:PreferenceID r
 
   Scenario: delete this user preferences
     Given a user
-    Then the response code is 201
     Given a user preference
-    Then the response code is 201
     When I delete this user preference
     Then the response code is 204
     And the response has no content

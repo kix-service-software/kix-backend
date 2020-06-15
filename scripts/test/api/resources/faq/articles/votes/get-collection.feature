@@ -7,9 +7,7 @@
 
   Scenario: get the list of existing faq article votes
     Given a faq article
-    Then the response code is 201
     Given a faq article votes
-    Then the response code is 201
     When I query the collection of faq article votes
     Then the response code is 200
     When I delete this faq article

@@ -1,4 +1,4 @@
-Feature: POST request to the /cmdb/configitems/images resource
+Feature: POST request to the /cmdb/configitems/:ConfigitemID/images resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
@@ -7,7 +7,6 @@ Feature: POST request to the /cmdb/configitems/images resource
     
   Scenario: added image to a configitem
     Given a configitem
-    Then the response code is 201
     When added image to a configitem
     Then the response code is 201
  #   Then the response object is ConfigItemImagePostResponse

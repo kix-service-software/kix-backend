@@ -7,9 +7,7 @@ Feature: GET request to the /tickets/:TicketID/history/:HistoryID resource
       
   Scenario: get an existing ticket
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I get a collection of tickethistory
     Then the response code is 200
     When I get the tickethistory

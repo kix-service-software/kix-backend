@@ -35,18 +35,8 @@ When qr/I update this automation macro action$/, sub {
       Content => {
         MacroAction => {
             Comment => "some action comment update",
-            MacroID => S->{MacroID},
             Name => "new macro action update",
-            Parameters => {
-                Body => "The text of the new article. update",
-                Contact => "testupdate@nomail.com",
-                Priority => "1 very low",
-                State => "new",
-                Team => "Service Desk",
-                Title => "Test macro actions update"
-            },
-            Type => "TicketCreate",
-            ValidID => 1
+            ValidID => 2
         }
       }
    );

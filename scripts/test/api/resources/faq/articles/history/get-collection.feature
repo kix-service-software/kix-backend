@@ -7,9 +7,7 @@
 
   Scenario: get the list of existing faq article history
     Given a faq article
-    Then the response code is 201
     When I query the collection of faq article history
-    Then the response code is 200
     When I delete this faq article
     Then the response code is 204
     And the response has no content

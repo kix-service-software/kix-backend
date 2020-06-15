@@ -7,7 +7,6 @@ Feature: DELETE request to the /cmdb/configitems resource
 
   Scenario: delete this configitem
     Given a configitem
-    Then the response code is 201
     When I delete this configitem
     Then the response code is 204
     And the response has no content

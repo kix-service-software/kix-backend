@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/communication/mailfilters/:MailFilterID r
 
   Scenario: delete this mailfilters
     Given a mailfilter
-    Then the response code is 201      
     When I delete this mailfilter
     Then the response code is 204
     And the response has no content

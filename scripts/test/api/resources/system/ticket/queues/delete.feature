@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/ticket/queues/:QueueID resource
 
   Scenario: delete this ticket queue
     Given added a ticket queue
-    Then the response code is 201
     When I delete this ticket queue
     Then the response code is 204
     And the response has no content

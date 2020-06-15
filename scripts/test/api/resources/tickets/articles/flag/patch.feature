@@ -7,9 +7,7 @@ Feature: the /tickets/:TicketID/articles/:ArticleID/flags/:FlagName resource
 
   Scenario: update a article flag
     Given a ticket
-    Then the response code is 201
     Given a article
-    Then the response code is 201
     When I create a article flag
       Then the response code is 201
     When I update this article flag

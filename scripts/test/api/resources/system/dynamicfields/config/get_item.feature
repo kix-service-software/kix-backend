@@ -7,7 +7,6 @@ Feature: GET request to the /system/dynamicfields/:DynamicFieldID/config resourc
       
   Scenario: get an existing dynamicfield
     Given a dynamicfield
-    Then the response code is 200
     When I get this dynamicfield config
     Then the response code is 200
     And the attribute "DynamicFieldConfig.DefaultValue" is "259200"

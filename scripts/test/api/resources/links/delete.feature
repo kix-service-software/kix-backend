@@ -7,7 +7,6 @@ Feature: DELETE request to the /links/:LinkID resource
 
   Scenario: delete this link
     Given a link
-    Then the response code is 201
     When I delete this link
     Then the response code is 204
     And the response has no content

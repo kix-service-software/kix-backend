@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/communication/systemaddresses/:SystemAddre
 
   Scenario: update a systemaddress
     Given a systemaddress
-    Then the response code is 201
     When I update this systemaddress
     Then the response code is 200
 #    And the response object is SystemAddressPostPatchResponse

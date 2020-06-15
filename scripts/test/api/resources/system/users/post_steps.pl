@@ -26,7 +26,7 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 Given qr/a user$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
@@ -51,7 +51,7 @@ Given qr/(\d+) of users$/, sub {
     my $UserLogin;
     my $UserLastname;
     my $UserFirstname;
-    
+
     for ($i=0;$i<$1;$i++){
         if ( $i == 2 ) {
             $UserEmail = 'test_for_filter.doe2@test.org';
@@ -77,7 +77,7 @@ Given qr/(\d+) of users$/, sub {
             $UserFirstname = 'Max';
             $UserLastname = 'Müller';
         }
-        else { 
+        else {
             $UserEmail = "john.doe1".rand()."\@example.com";
             $UserLogin = "jdoe".rand();
         }
@@ -86,15 +86,15 @@ Given qr/(\d+) of users$/, sub {
             URL     => S->{API_URL}.'/system/users',
             Token   => S->{Token},
             Content => {
-        User => {
-            UserEmail => $UserEmail,
-            UserFirstname => $UserFirstname,
-            UserLastname => $UserLastname,
-            UserLogin => $UserLogin,
-            UserPw => "secret1".rand(),
-            UserTitle => "DR.",
-            ValidID => 1
-        }
+                User => {
+                    UserEmail => $UserEmail,
+                    UserFirstname => $UserFirstname,
+                    UserLastname => $UserLastname,
+                    UserLogin => $UserLogin,
+                    UserPw => "secret1".rand(),
+                    UserTitle => "DR.",
+                    ValidID => 1
+                }
             }
          );
     }

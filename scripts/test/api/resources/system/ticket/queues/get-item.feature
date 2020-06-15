@@ -7,7 +7,6 @@
 
   Scenario: get an existing ticket queue
     Given a ticket queue
-    Then the response code is 201
     When I get this ticket queue
     Then the response code is 200
     And the attribute "Queue.Comment" is "Postmaster queue."

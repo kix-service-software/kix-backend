@@ -7,7 +7,6 @@ Feature: DELETE request /organisations/:OrganisationID resource
 
   Scenario: delete this organisation
     Given a organisation
-    Then the response code is 201
     When I delete this organisation
     Then the response code is 204
     And the response has no content

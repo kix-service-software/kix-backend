@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/services/:ServiceID resource
 
   Scenario: update a service
     Given a service with
-    Then the response code is 201
     When I update this service
     Then the response code is 200
     And the response object is ServicePostPatchResponse

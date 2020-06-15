@@ -7,7 +7,6 @@
 
   Scenario: get an existing mailaccount
     Given a mailaccount
-    Then the response code is 201
     When I get this mailaccount
     Then the response code is 200
 #    And the response object is GeneralCatalogItemResponse 

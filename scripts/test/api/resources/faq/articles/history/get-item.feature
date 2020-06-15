@@ -7,9 +7,7 @@
 
   Scenario: get an existing faq article history
     Given a faq article
-    Then the response code is 201
     When I query the collection of faq article history
-    Then the response code is 200
     When I get this faq article history
     Then the response code is 200
     And the attribute "FAQHistory.Name" is "Created"

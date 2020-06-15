@@ -29,13 +29,7 @@ require '_StepsLib.pl';
 # feature specific steps 
 
 Given qr/a watcher$/, sub {
-   my %Properties;
-   foreach my $Row ( @{ C->data } ) {
-      foreach my $Attribute ( keys %{$Row}) {
-         $Properties{$Attribute} = $Row->{$Attribute};
-      }
-   }
-  
+
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/watchers',
       Token   => S->{Token},
@@ -43,7 +37,7 @@ Given qr/a watcher$/, sub {
         Watcher => {
             Object => "Ticket",
             ObjectID => S->{TicketID},
-            UserID => $Properties{UserID}
+            UserID => 1
         }
       }
    );
@@ -51,13 +45,7 @@ Given qr/a watcher$/, sub {
 
 
 When qr/I create a watcher$/, sub {
-   my %Properties;
-   foreach my $Row ( @{ C->data } ) {
-      foreach my $Attribute ( keys %{$Row}) {
-         $Properties{$Attribute} = $Row->{$Attribute};
-      }
-   }
-  
+
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/watchers',
       Token   => S->{Token},
@@ -65,7 +53,7 @@ When qr/I create a watcher$/, sub {
         Watcher => {
             Object => "Ticket",
             ObjectID => S->{TicketID},
-            UserID => $Properties{UserID}
+            UserID => 1
         }
       }
    );

@@ -7,7 +7,6 @@
 
   Scenario: get an existing notification
     Given a notification
-    Then the response code is 201
     When I get this notification
     Then the response code is 200
 #    And the response object is GeneralCatalogItemResponse 

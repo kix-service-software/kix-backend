@@ -36,11 +36,11 @@ Given qr/a automation macro action$/, sub {
         MacroAction => {
             Comment => "some comment given action",
             MacroID => S->{MacroID},
-            Name => "new macro given action",
+            Name => "new macro given action".rand(),
             Parameters => {
                 Body => "The text of the new article.",
-                Contact => "test@nomail.com",
-                Priority => "1 very low",
+                Contact => 'test@nomail.com',
+                Priority => "5 very low",
                 State => "new",
                 Team => "Service Desk",
                 Title => "Test macro actions"
@@ -89,8 +89,8 @@ Given qr/(\d+) of automation  macro action$/, sub {
                 Name => $Name,
                 Parameters => {
                     Body => "The text of the new article.",
-                    Contact => "test@nomail.com",
-                    Priority => "1 very low",
+                    Contact => 'test@nomail.com',
+                    Priority => "5 very low",
                     State => "new",
                     Team => "Service Desk",
                     Title => "Test macro actions"
@@ -104,6 +104,7 @@ Given qr/(\d+) of automation  macro action$/, sub {
 };
 
 When qr/I create a automation macro action$/, sub {
+    print STDERR "POST".Dumper(S->{MacroID});
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/system/automation/macros/'.S->{MacroID}.'/actions',
       Token   => S->{Token},
@@ -114,8 +115,8 @@ When qr/I create a automation macro action$/, sub {
             Name => "new macro create action".rand(),
             Parameters => {
                 Body => "The text of the new article.",
-                Contact => "test@nomail.com",
-                Priority => "1 very low",
+                Contact => 'test@nomail.com',
+                Priority => "5 very low",
                 State => "new",
                 Team => "Service Desk",
                 Title => "Test macro actions"

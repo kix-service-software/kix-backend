@@ -7,7 +7,6 @@
 
   Scenario: get an existing mailaccount
     Given a link
-    Then the response code is 201
     When I get this link
     Then the response code is 200 
     And the attribute "Link.Type" is "Normal"

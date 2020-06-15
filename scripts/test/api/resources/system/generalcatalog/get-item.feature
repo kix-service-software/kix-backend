@@ -7,7 +7,6 @@
 
   Scenario: get an existing generalcatalog item
     Given a generalcatalog item
-    Then the response code is 201
     When I get this generalcatalog item
     Then the response code is 200
 #    And the response object is GeneralCatalogItemResponse 

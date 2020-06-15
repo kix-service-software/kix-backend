@@ -7,9 +7,7 @@ Feature: DELETE request to the /system/roles/:RoleID/permissions/:PermissionID r
 
   Scenario: delete role permission
     Given a role
-    Then the response code is 201
     Given a permission
-    Then the response code is 201
     When I delete this permission
     Then the response code is 204
     And the response has no content

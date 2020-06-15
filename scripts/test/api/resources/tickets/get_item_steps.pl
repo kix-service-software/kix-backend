@@ -39,7 +39,7 @@ When qr/I get this ticket with include article\s*$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/tickets/'.S->{ResponseContent}->{TicketID},
-      Include => articles,
+      Include => 'Articles',
    );
 };
 
@@ -47,7 +47,7 @@ Then qr/the response contains the following article attributes$/, sub {
     my $Object = $1;
     my $Index = 0;
      
-    foreach my $Row ( sort keys %{S->{ResponseContent}->{Ticket}->{articles}->[0]} ) {
+    foreach my $Row ( sort keys %{S->{ResponseContent}->{Ticket}->{Articles}->[0]} ) {
         foreach my $Attribute ( keys %{$Row}) {
             C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
         }

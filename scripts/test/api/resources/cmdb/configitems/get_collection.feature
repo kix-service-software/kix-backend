@@ -7,7 +7,6 @@ Feature: GET request to the /cmdb/configitems resource
 
   Scenario: get the list of existing configitems
     Given a configitem
-    Then the response code is 201
     When I query the cmdb collection of configitems
     Then the response code is 200
 #    And the response object is ConfigItemCollectionResponse

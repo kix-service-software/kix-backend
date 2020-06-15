@@ -7,7 +7,6 @@ Feature: PATCH request to the /system/generalcatalog/:GeneralCatalogItemID resou
 
   Scenario: update a generalcatalog item
     Given a generalcatalog item
-    Then the response code is 201
     When I update this generalcatalog item
     Then the response code is 200
 #    And the response object is GeneralCatalogItemPostPatchResponse

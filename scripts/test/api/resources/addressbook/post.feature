@@ -10,10 +10,11 @@ Feature: POST request /addressbook resource
      Then the response code is 201
      When delete all this addressbooks
      Then the response code is 204
+    Then the response code is 204
+    And the response has no content
 
   Scenario: I create a addressbook with a address that already exists
     When added a addressbook with address "AddressTest@local.de"
-    Then the response code is 201
     When added a addressbook with address "AddressTest@local.de"
     Then the response code is 409
     And the response object is Error
@@ -21,6 +22,8 @@ Feature: POST request /addressbook resource
     And the error message is "Cannot create address book entry. Another address with same email address already exists."
     When delete all this addressbooks
     Then the response code is 204
+    And the response has no content
+
 
 
      

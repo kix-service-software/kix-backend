@@ -26,7 +26,7 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 
 ########################################################################################################
@@ -34,20 +34,18 @@ require '_StepsLib.pl';
 ########################################################################################################
 
 When qr/I assign the user to RoleID (\d+)$/, sub {
-   my %Properties;
-   foreach my $Row ( @{ C->data } ) {
-      foreach my $Attribute ( keys %{$Row}) {
-         $Properties{$Attribute} = $Row->{$Attribute};
-      }
-   }
+#   my %Properties;
+#   foreach my $Row ( @{ C->data } ) {
+#      foreach my $Attribute ( keys %{$Row}) {
+#         $Properties{$Attribute} = $Row->{$Attribute};
+#      }
+#   }
 
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL   => S->{API_URL}.'/system/roles/'.$1.'/userids',
       Token   => S->{Token},
       Content => {
-#         Role => {
-            %Properties
-#         }
+            UserID => S->{UserID}
       }
    );
 };

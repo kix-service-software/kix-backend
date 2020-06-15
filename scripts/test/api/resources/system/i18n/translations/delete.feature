@@ -7,7 +7,6 @@ Feature: DELETE request to the /system/i18n/translations/:TranslationID resource
 
   Scenario: delete this role
     Given a i18n translation with
-    Then the response code is 201
     When I delete this i18n translation
     Then the response code is 204
     And the response has no content

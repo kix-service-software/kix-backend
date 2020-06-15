@@ -1,4 +1,4 @@
-Feature: DELETE request to the /cmdb/configitems/images resource
+Feature: DELETE request to the /cmdb/configitems/:ConfigitemID/images/:ImageID resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
@@ -7,9 +7,7 @@ Feature: DELETE request to the /cmdb/configitems/images resource
 
   Scenario: delete this image
     Given a configitem
-    Then the response code is 201
     When added image to a configitem
-    Then the response code is 201
     When I delete this image on configitemid
     Then the response code is 204
     And the response has no content

@@ -26,7 +26,7 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 Given qr/a configitem$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
@@ -53,20 +53,8 @@ Given qr/a configitem$/, sub {
 		                     "192.168.1.2",
 		                     "192.168.1.3"
 		                  ],
-		                  Attachment => [
-		                     {
-		                        Content =>  "cdfrdrfde", 
-		                        ContentType =>  "application/pdf", 
-		                        Filename =>  "/tmp/Test2.pdf" 
-		                     }
-		                  ] 
 		               }
 		            ],
-		            SectionWarranty => [
-		               {
-		                  FirstUsageDate => "04-09-2018"
-		               }
-		            ]
 		         }
 		      },
 		      Images => [
@@ -84,15 +72,15 @@ Given qr/a configitem$/, sub {
 Given qr/(\d+) of configitems$/, sub {
     my $Name;
     my $DeplStateID;
-    
+
     for ($i=0;$i<$1;$i++){
         if ( $i == 2 ) {
             $Name = 'test ci xx1111_filter';
             $DeplStateID = 12;
         }
-        else { 
+        else {
             $Name = 'test ci xx1111test'.rand();
-            $DeplStateID = 16;        
+            $DeplStateID = 16;
         }
            ( S->{Response}, S->{ResponseContent} ) = _Post(
               URL     => S->{API_URL}.'/cmdb/configitems',
@@ -118,20 +106,8 @@ Given qr/(\d+) of configitems$/, sub {
                                      "192.168.1.2",
                                      "192.168.1.3"
                                   ],
-                                  Attachment => [
-                                     {
-                                        Content =>  "cdfrdrfde", 
-                                        ContentType =>  "application/pdf", 
-                                        Filename =>  "/tmp/Test2.pdf" 
-                                     }
-                                  ] 
                                }
                             ],
-                            SectionWarranty => [
-                               {
-                                  FirstUsageDate => "04-09-2018"
-                               }
-                            ]
                          }
                       },
                       Images => [
@@ -173,20 +149,8 @@ When qr/I create a configitem$/, sub {
 		                     "192.168.1.2",
 		                     "192.168.1.3"
 		                  ],
-		                  Attachment => [
-		                     {
-		                        Content =>  "cdfrdrfde", 
-		                        ContentType =>  "application/pdf", 
-		                        Filename =>  "/tmp/Test2.pdf" 
-		                     }
-		                  ] 
 		               }
 		            ],
-		            SectionWarranty => [
-		               {
-		                  FirstUsageDate => "04-09-2018"
-		               }
-		            ]
 		         }
 		      },
 		      Images => [
@@ -201,7 +165,7 @@ When qr/I create a configitem$/, sub {
    );
 };
 
-When qr/I create a (\w+) with not existing class id$/, sub {
+When qr/I create a configitem with not existing class id$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/cmdb/configitems',
       Token   => S->{Token},
@@ -226,20 +190,8 @@ When qr/I create a (\w+) with not existing class id$/, sub {
                              "192.168.1.2",
                              "192.168.1.3"
                           ],
-                          Attachment => [
-                             {
-                                Content =>  "cdfrdrfde", 
-                                ContentType =>  "application/pdf", 
-                                Filename =>  "/tmp/Test2.pdf" 
-                             }
-                          ] 
                        }
                     ],
-                    SectionWarranty => [
-                       {
-                          FirstUsageDate => "04-09-2018"
-                       }
-                    ]
                  }
               },
               Images => [
@@ -254,7 +206,7 @@ When qr/I create a (\w+) with not existing class id$/, sub {
    );
 };
 
-When qr/I create a (\w+) with no class id$/, sub {
+When qr/I create a configitem with no class id$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/cmdb/configitems',
       Token   => S->{Token},
@@ -279,20 +231,8 @@ When qr/I create a (\w+) with no class id$/, sub {
                              "192.168.1.2",
                              "192.168.1.3"
                           ],
-                          Attachment => [
-                             {
-                                Content =>  "cdfrdrfde", 
-                                ContentType =>  "application/pdf", 
-                                Filename =>  "/tmp/Test2.pdf" 
-                             }
-                          ] 
                        }
                     ],
-                    SectionWarranty => [
-                       {
-                          FirstUsageDate => "04-09-2018"
-                       }
-                    ]
                  }
               },
               Images => [
@@ -307,7 +247,7 @@ When qr/I create a (\w+) with no class id$/, sub {
    );
 };
 
-When qr/I create a (\w+) with no incistate id$/, sub {
+When qr/I create a configitem with no incistate id$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/cmdb/configitems',
       Token   => S->{Token},
@@ -332,20 +272,8 @@ When qr/I create a (\w+) with no incistate id$/, sub {
                              "192.168.1.2",
                              "192.168.1.3"
                           ],
-                          Attachment => [
-                             {
-                                Content =>  "cdfrdrfde", 
-                                ContentType =>  "application/pdf", 
-                                Filename =>  "/tmp/Test2.pdf" 
-                             }
-                          ] 
                        }
                     ],
-                    SectionWarranty => [
-                       {
-                          FirstUsageDate => "04-09-2018"
-                       }
-                    ]
                  }
               },
               Images => [

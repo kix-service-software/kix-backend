@@ -7,7 +7,6 @@
 
   Scenario: get an existing textmodule
     Given a textmodule
-    Then the response code is 201
     When I get the textmodule
     Then the response code is 200
     And the attribute "TextModule.Text" is "this is a also a test"
