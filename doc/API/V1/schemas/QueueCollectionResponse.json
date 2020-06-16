@@ -109,7 +109,14 @@
                "readOnly" : true
             },
             "Signature" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SubQueues" : {
