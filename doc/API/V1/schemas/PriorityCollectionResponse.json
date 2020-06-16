@@ -1,5 +1,5 @@
 {
-   "$id" : "#PriorityCollectionResponse",
+   "$id" : "PriorityCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of priorities.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "Priority_json-5e38642379" : {
-         "$id" : "#Priority",
+         "$id" : "Priority",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The priority object.",
          "type" : "object",

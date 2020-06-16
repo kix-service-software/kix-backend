@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketArticleAttachmentCollectionResponse",
+   "$id" : "TicketArticleAttachmentCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of ticket article attachments.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "TicketArticleAttachment_json-b812531a3e" : {
-         "$id" : "#TicketArticleAttachment",
+         "$id" : "TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
          "type" : "object",

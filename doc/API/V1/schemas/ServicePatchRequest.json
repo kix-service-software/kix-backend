@@ -1,5 +1,5 @@
 {
-   "$id" : "#ServicePatchRequest",
+   "$id" : "ServicePatchRequest",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The service request object for update.",
    "type" : "object",

@@ -1,6 +1,6 @@
 {
    "$schema": "http://json-schema.org/draft-07/schema",
-   "$id": "#FAQHistory",
+   "$id": "FAQHistory",
    "type": "object",
    "description": "The FAQ history object.",
    "properties": {

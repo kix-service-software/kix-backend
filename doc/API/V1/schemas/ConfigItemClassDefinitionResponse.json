@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConfigItemClassDefinitionResponse",
+   "$id" : "ConfigItemClassDefinitionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for config item class definition GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "ConfigItemClassDefinition_json-066e9f3367" : {
-         "$id" : "#ConfigItemClassDefinition",
+         "$id" : "ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",

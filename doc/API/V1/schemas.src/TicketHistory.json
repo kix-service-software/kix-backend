@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#TicketHistory",
+  "$id": "TicketHistory",
   "type": "object",
   "description": "The ticket history object.",
   "properties": {

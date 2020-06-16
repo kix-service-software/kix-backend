@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#QueueResponse",
+  "$id": "QueueResponse",
   "type": "object",
   "description": "A response for queue GET request.",
   "properties": {

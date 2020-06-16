@@ -1,5 +1,5 @@
 {
-   "$id" : "#PermissionResponse",
+   "$id" : "PermissionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for permission GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "Permission_json-eb3fca7920" : {
-         "$id" : "#Permission",
+         "$id" : "Permission",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
          "type" : "object",

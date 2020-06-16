@@ -1,5 +1,5 @@
 {
-   "$id" : "#GeneralCatalogItemCollectionResponse",
+   "$id" : "GeneralCatalogItemCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of GeneralCatalog items.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "GeneralCatalogItem_json-6c8abed901" : {
-         "$id" : "#GeneralCatalogItem",
+         "$id" : "GeneralCatalogItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The GeneralCatalog item object.",
          "type" : "object",

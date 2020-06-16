@@ -1,5 +1,5 @@
 {
-   "$id" : "#Role",
+   "$id" : "Role",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The role object.",
    "type" : "object",
@@ -71,7 +71,7 @@
    ],
    "definitions" : {
       "Permission_json-eb3fca7920" : {
-         "$id" : "#Permission",
+         "$id" : "Permission",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
          "type" : "object",

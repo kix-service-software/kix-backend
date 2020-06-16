@@ -1,5 +1,5 @@
 {
-   "$id" : "#OrganisationResponse",
+   "$id" : "OrganisationResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for organisation GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "Contact_json-4841673548" : {
-         "$id" : "#Contact",
+         "$id" : "Contact",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The contact object.",
          "type" : "object",
@@ -142,7 +142,7 @@
          ]
       },
       "DynamicFieldValue_json-c39a01a9a4" : {
-         "$id" : "#DynamicFieldValue",
+         "$id" : "DynamicFieldValue",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
          "type" : "object",
@@ -203,7 +203,7 @@
          ]
       },
       "Organisation_json-c645ef6792" : {
-         "$id" : "#Organisation",
+         "$id" : "Organisation",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The organisation object.",
          "type" : "object",
@@ -300,7 +300,7 @@
          ]
       },
       "TicketArticleAttachment_json-105363e477" : {
-         "$id" : "#TicketArticleAttachment",
+         "$id" : "TicketArticleAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
          "type" : "object",
@@ -355,7 +355,7 @@
          ]
       },
       "TicketArticleFlag_json-91a9ab63f3" : {
-         "$id" : "#TicketArticleFlag",
+         "$id" : "TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
          "type" : "object",
@@ -380,7 +380,7 @@
          ]
       },
       "TicketArticle_json-59cb681d06" : {
-         "$id" : "#TicketArticle",
+         "$id" : "TicketArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
          "type" : "object",
@@ -569,7 +569,7 @@
          ]
       },
       "TicketHistory_json-f970feaedb" : {
-         "$id" : "#TicketHistory",
+         "$id" : "TicketHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
          "type" : "object",
@@ -644,7 +644,7 @@
          ]
       },
       "Ticket_json-c52d206408" : {
-         "$id" : "#Ticket",
+         "$id" : "Ticket",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
          "type" : "object",
@@ -851,7 +851,7 @@
          ]
       },
       "Watcher_json-cf85a346e4" : {
-         "$id" : "#Watcher",
+         "$id" : "Watcher",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
          "type" : "object",

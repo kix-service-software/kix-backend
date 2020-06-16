@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketArticleAttachment",
+   "$id" : "TicketArticleAttachment",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket article attachment object.",
    "type" : "object",

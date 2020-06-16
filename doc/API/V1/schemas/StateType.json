@@ -1,5 +1,5 @@
 {
-   "$id" : "#StateType",
+   "$id" : "StateType",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The state type object.",
    "type" : "object",

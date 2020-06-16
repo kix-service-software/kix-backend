@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#LinkType",
+  "$id": "LinkType",
   "type": "object",
   "description": "The link type object.",
   "properties": {

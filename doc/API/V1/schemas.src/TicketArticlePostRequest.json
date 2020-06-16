@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#TicketArticlePostRequest",
+  "$id": "TicketArticlePostRequest",
   "type": "object",
   "description": "The ticket article request object for creation.",
   "properties": {

@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketPostRequest",
+   "$id" : "TicketPostRequest",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket request object for creation.",
    "type" : "object",
@@ -68,7 +68,7 @@
    ],
    "definitions" : {
       "DynamicFieldValueSetItem_json-142e42dd10" : {
-         "$id" : "#DynamicFieldValueSetItem",
+         "$id" : "DynamicFieldValueSetItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
          "type" : "object",
@@ -108,7 +108,7 @@
          ]
       },
       "DynamicFieldValueSetItem_json-16dfcaf043" : {
-         "$id" : "#DynamicFieldValueSetItem",
+         "$id" : "DynamicFieldValueSetItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
          "type" : "object",

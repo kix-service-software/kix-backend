@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#ExecPlanPostRequest",
+  "$id": "ExecPlanPostRequest",
   "type": "object",
   "description": "The execution plan request object for creation.",
   "properties": {

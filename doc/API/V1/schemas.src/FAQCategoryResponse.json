@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#FAQCategoryResponse",
+  "$id": "FAQCategoryResponse",
   "type": "object",
   "description": "A response for execution FAQ category GET request.",
   "properties": {

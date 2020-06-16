@@ -1,5 +1,5 @@
 {
-   "$id" : "#FAQArticlePostRequest",
+   "$id" : "FAQArticlePostRequest",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The FAQ article request object for create.",
    "type" : "object",
@@ -81,7 +81,7 @@
    ],
    "definitions" : {
       "FAQAttachmentPostItem_json-dffd68f165" : {
-         "$id" : "#FAQAttachmentPostItem",
+         "$id" : "FAQAttachmentPostItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment request object for creation.",
          "type" : "object",

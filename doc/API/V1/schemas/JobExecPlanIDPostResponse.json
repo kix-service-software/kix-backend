@@ -1,5 +1,5 @@
 {
-   "$id" : "#JobExecPlanIDPostResponse",
+   "$id" : "JobExecPlanIDPostResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for job - execution plan ID POST request.",
    "type" : "object",

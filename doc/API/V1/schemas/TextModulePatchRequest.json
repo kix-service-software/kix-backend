@@ -1,5 +1,5 @@
 {
-   "$id" : "#TextModulePatchRequest",
+   "$id" : "TextModulePatchRequest",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The text module request object for update.",
    "type" : "object",

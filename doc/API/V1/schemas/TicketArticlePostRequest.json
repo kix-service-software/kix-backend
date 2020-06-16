@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketArticlePostRequest",
+   "$id" : "TicketArticlePostRequest",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket article request object for creation.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "DynamicFieldValueSetItem_json-142e42dd10" : {
-         "$id" : "#DynamicFieldValueSetItem",
+         "$id" : "DynamicFieldValueSetItem",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
          "type" : "object",

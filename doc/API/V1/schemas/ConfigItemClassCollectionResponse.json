@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConfigItemClassCollectionResponse",
+   "$id" : "ConfigItemClassCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of config item class objects.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "ConfigItemClassDefinition_json-fb2ac7494e" : {
-         "$id" : "#ConfigItemClassDefinition",
+         "$id" : "ConfigItemClassDefinition",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
@@ -69,7 +69,7 @@
          ]
       },
       "ConfigItemClass_json-70bafa8537" : {
-         "$id" : "#ConfigItemClass",
+         "$id" : "ConfigItemClass",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class object.",
          "type" : "object",

@@ -1,5 +1,5 @@
 {
-   "$id" : "#FAQVoteResponse",
+   "$id" : "FAQVoteResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for execution FAQ vote GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "FAQVote_json-481c5e8153" : {
-         "$id" : "#FAQVote",
+         "$id" : "FAQVote",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
          "type" : "object",

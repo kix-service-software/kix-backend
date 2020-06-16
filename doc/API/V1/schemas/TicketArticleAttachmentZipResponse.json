@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketArticleAttachmentZipResponse",
+   "$id" : "TicketArticleAttachmentZipResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for ticket article attachments as zip GET request.",
    "type" : "object",

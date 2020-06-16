@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#FollowUpType",
+  "$id": "FollowUpType",
   "type": "object",
   "description": "The followup type object.",
   "properties": {

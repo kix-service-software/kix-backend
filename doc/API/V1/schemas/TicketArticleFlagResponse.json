@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketArticleFlagResponse",
+   "$id" : "TicketArticleFlagResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for ticket article flag GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "TicketArticleFlag_json-80684e31b4" : {
-         "$id" : "#TicketArticleFlag",
+         "$id" : "TicketArticleFlag",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
          "type" : "object",

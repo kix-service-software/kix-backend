@@ -1,5 +1,5 @@
 {
-   "$id" : "#FAQCategory",
+   "$id" : "FAQCategory",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The FAQ category object.",
    "type" : "object",
@@ -94,7 +94,7 @@
    ],
    "definitions" : {
       "FAQArticle_json-61e393a649" : {
-         "$id" : "#FAQArticle",
+         "$id" : "FAQArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ article object.",
          "type" : "object",
@@ -240,7 +240,7 @@
          ]
       },
       "FAQArticle_json-9b318568c2" : {
-         "$id" : "#FAQArticle",
+         "$id" : "FAQArticle",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ article object.",
          "type" : "object",
@@ -386,7 +386,7 @@
          ]
       },
       "FAQAttachment_json-ec8b67bcc9" : {
-         "$id" : "#FAQAttachment",
+         "$id" : "FAQAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
          "type" : "object",
@@ -459,7 +459,7 @@
          ]
       },
       "FAQCategory_json-02f8c50b4e" : {
-         "$id" : "#FAQCategory",
+         "$id" : "FAQCategory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
          "type" : "object",
@@ -554,7 +554,7 @@
          ]
       },
       "FAQCategory_json-cc497066e1" : {
-         "$id" : "#FAQCategory",
+         "$id" : "FAQCategory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
          "type" : "object",
@@ -649,7 +649,7 @@
          ]
       },
       "FAQHistory_json-b505629552" : {
-         "$id" : "#FAQHistory",
+         "$id" : "FAQHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
          "type" : "object",
@@ -684,7 +684,7 @@
          ]
       },
       "FAQVote_json-a6c5d69008" : {
-         "$id" : "#FAQVote",
+         "$id" : "FAQVote",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
          "type" : "object",

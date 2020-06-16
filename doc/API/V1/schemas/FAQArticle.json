@@ -1,5 +1,5 @@
 {
-   "$id" : "#FAQArticle",
+   "$id" : "FAQArticle",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The FAQ article object.",
    "type" : "object",
@@ -145,7 +145,7 @@
    ],
    "definitions" : {
       "FAQAttachment_json-3b05dedc31" : {
-         "$id" : "#FAQAttachment",
+         "$id" : "FAQAttachment",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
          "type" : "object",
@@ -218,7 +218,7 @@
          ]
       },
       "FAQHistory_json-9632ee71d4" : {
-         "$id" : "#FAQHistory",
+         "$id" : "FAQHistory",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
          "type" : "object",
@@ -253,7 +253,7 @@
          ]
       },
       "FAQVote_json-481c5e8153" : {
-         "$id" : "#FAQVote",
+         "$id" : "FAQVote",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
          "type" : "object",

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#RolePostRequest",
+  "$id": "RolePostRequest",
   "type": "object",
   "description": "The role request object for creation.",
   "properties": {

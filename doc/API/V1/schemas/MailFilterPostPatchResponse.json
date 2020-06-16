@@ -1,5 +1,5 @@
 {
-   "$id" : "#MailFilterPostPatchResponse",
+   "$id" : "MailFilterPostPatchResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ID of the created or updated mail filter.",
    "type" : "object",

@@ -1,5 +1,5 @@
 {
-   "$id" : "#UserPreferenceResponse",
+   "$id" : "UserPreferenceResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for user preference GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "UserPreference_json-1166796b68" : {
-         "$id" : "#UserPreference",
+         "$id" : "UserPreference",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",
          "type" : "object",

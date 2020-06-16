@@ -1,5 +1,5 @@
 {
-   "$id" : "#MacroCollectionResponse",
+   "$id" : "MacroCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of macros.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "MacroAction_json-1c13e7e1ed" : {
-         "$id" : "#MacroAction",
+         "$id" : "MacroAction",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
          "type" : "object",
@@ -74,7 +74,7 @@
          ]
       },
       "Macro_json-c1dec42b17" : {
-         "$id" : "#Macro",
+         "$id" : "Macro",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
          "type" : "object",

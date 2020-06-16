@@ -1,5 +1,5 @@
 {
-   "$id" : "#LinkTypeCollectionResponse",
+   "$id" : "LinkTypeCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of link types.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "LinkType_json-c089c2f5c6" : {
-         "$id" : "#LinkType",
+         "$id" : "LinkType",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The link type object.",
          "type" : "object",

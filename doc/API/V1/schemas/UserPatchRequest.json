@@ -1,5 +1,5 @@
 {
-   "$id" : "#UserPatchRequest",
+   "$id" : "UserPatchRequest",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The user request object for update.",
    "type" : "object",

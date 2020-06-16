@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConsoleCommandCollectionResponse",
+   "$id" : "ConsoleCommandCollectionResponse",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of console commands.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "ConsoleCommand_json-13aae54971" : {
-         "$id" : "#ConsoleCommand",
+         "$id" : "ConsoleCommand",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The console command object.",
          "type" : "object",

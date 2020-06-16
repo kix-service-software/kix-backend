@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#MailAccountResponse",
+  "$id": "MailAccountResponse",
   "type": "object",
   "description": "A response for mail account GET request.",
   "properties": {

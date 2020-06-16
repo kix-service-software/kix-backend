@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#GeneralCatalogItemPostRequest",
+  "$id": "GeneralCatalogItemPostRequest",
   "type": "object",
   "description": "The GeneralCatalog item request object for creation.",
   "properties": {
