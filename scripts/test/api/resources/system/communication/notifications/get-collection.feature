@@ -26,12 +26,12 @@
   Scenario: get the list of existing notifications with limit
     When I query the collection of notifications with a limit of 1
     Then the response code is 200
-    And the response contains 1 items of type Notification
+    And the response contains 1 items of type "Notification"
 
   Scenario: get the list of existing notifications with sorted
     When I query the collection of notifications sorted by "Notification.-Name:textual"
     Then the response code is 200
-    And the response contains 11 items of type Notification
+    And the response contains 11 items of type "Notification"
     And the response contains the following items of type Notification
       | Name                                   |
       | Customer - New Ticket Receipt          |
@@ -49,7 +49,7 @@
   Scenario: get the list of existing notifications with sorted and limit
     When I query the collection of notifications sorted by "Notification.-Name:textual" and with a limit of 4
     Then the response code is 200
-    And the response contains 4 items of type Notification
+    And the response contains 4 items of type "Notification"
     And the response contains the following items of type Notification
       | Name                             |
       | Customer - New Ticket Receipt    |
@@ -60,4 +60,4 @@
   Scenario: get the list of existing notifications with offset
     When I query the collection of notifications with offset of 4
     Then the response code is 200
-    And the response contains 7 items of type Notification
+    And the response contains 7 items of type "Notification"

@@ -28,7 +28,7 @@
     Given 4 of mailaccount
     When I query the collection of mailaccounts with a limit of 3
     Then the response code is 200
-    And the response contains 3 items of type MailAccount
+    And the response contains 3 items of type "MailAccount"
     When I delete this mailaccount
     Then the response code is 204
     And the response has no content

@@ -21,7 +21,7 @@ Feature: GET request to the /system/ticket/states/types resource
     When I query the collection of statetypes with a limit of 4
     Then the response code is 200
     And the response object is StateTypeCollectionResponse
-    And the response contains 4 items of type StateType
+    And the response contains 4 items of type "StateType"
     And the response contains the following items of type StateType
       | Name             |
       | new              |
@@ -33,7 +33,7 @@ Feature: GET request to the /system/ticket/states/types resource
     When I query the collection of statetypes with a offset 4
     Then the response code is 200
     And the response object is StateTypeCollectionResponse
-    And the response contains 3 items of type StateType      
+    And the response contains 3 items of type "StateType"    
     And the response contains the following items of type StateType
       | Name             |
       | pending auto     |
@@ -44,7 +44,7 @@ Feature: GET request to the /system/ticket/states/types resource
     When I query the collection of statetypes with limit 2 and offset 4
     Then the response code is 200
     And the response object is StateTypeCollectionResponse
-    And the response contains 2 items of type StateType
+    And the response contains 2 items of type "StateType"
     And the response contains the following items of type StateType
       | Name             |
       | pending auto     |
@@ -54,7 +54,7 @@ Feature: GET request to the /system/ticket/states/types resource
     When I query the collection of statetypes with sorted by "StateType.-Name:textual" 
     Then the response code is 200
     And the response object is StateTypeCollectionResponse
-    And the response contains 7 items of type StateType
+    And the response contains 7 items of type "StateType"
     And the response contains the following items of type StateType
       | Name             |
       | removed          |
@@ -69,7 +69,7 @@ Feature: GET request to the /system/ticket/states/types resource
     When I query the collection of statetypes with sorted by "StateType.-Name:textual" limit 2 and offset 5
     Then the response code is 200
     And the response object is StateTypeCollectionResponse
-    And the response contains 2 items of type StateType
+    And the response contains 2 items of type "StateType"
     And the response contains the following items of type StateType
       | Name             |
       | merged           |

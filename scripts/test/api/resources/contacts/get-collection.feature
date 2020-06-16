@@ -46,7 +46,7 @@
     Given 4 of contact with diffrent organisation
     When I query the collection of contacts with limit 2 
     Then the response code is 200
-    And the response contains 2 items of type Contact
+    And the response contains 2 items of type "Contact"
     When delete all this contacts
     Then the response code is 204
     And the response has no content
@@ -60,7 +60,7 @@
     When I query the collection of contacts
     When I query the collection of contacts with offset 2 
     Then the response code is 200
-    And the response contains 5 items of type Contact
+    And the response contains 5 items of type "Contact"
     When delete all this contacts
     Then the response code is 204
     And the response has no content
@@ -74,7 +74,7 @@
     When I query the collection of contacts
     When I query the collection of contacts with limit 2 and offset 4 
     Then the response code is 200
-    And the response contains 2 items of type Contact
+    And the response contains 2 items of type "Contact"
     When delete all this contacts
     Then the response code is 204
     And the response has no content
@@ -88,7 +88,7 @@
     When I query the collection of contacts
     When I query the collection of contacts with sorted by "Contact.-Firstname:textual"
     Then the response code is 200
-    And the response contains 9 items of type Contact
+    And the response contains 9 items of type "Contact"
     When delete all this contacts
     Then the response code is 204
     And the response has no content
@@ -102,7 +102,7 @@
     When I query the collection of contacts
     When I query the collection of contacts with sorted by "Contact.-Firstname:textual" limit 2 and offset 4 
     Then the response code is 200
-    And the response contains 2 items of type Contact
+    And the response contains 2 items of type "Contact"
     When delete all this contacts
     Then the response code is 204
     And the response has no content

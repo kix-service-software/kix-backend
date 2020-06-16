@@ -20,4 +20,4 @@ Feature: GET request to the /system/roles/permissiontypes resource
   Scenario: get the list of permissiontypes with limit 
     When I query the collection of roles permissiontypes with a limit of 2
     Then the response code is 200
-    And the response contains 2 items of type PermissionType
+    And the response contains 2 items of type "PermissionType"

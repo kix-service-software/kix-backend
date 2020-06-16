@@ -39,7 +39,7 @@
     Given 8 of organisations
     When I query the collection of organisations with limit 2
     Then the response code is 200
-    And the response contains 2 items of type Organisation
+    And the response contains 2 items of type "Organisation"
     When delete all this organisations
     Then the response code is 204
 
@@ -47,7 +47,7 @@
     Given 8 of organisations
     When I query the collection of organisations with offset 2
     Then the response code is 200
-    And the response contains 7 items of type Organisation
+    And the response contains 7 items of type "Organisation"
     When delete all this organisations
     Then the response code is 204
 
@@ -55,7 +55,7 @@
     Given 8 of organisations
     When I query the collection of organisations with limit 2 and offset 4
     Then the response code is 200
-    And the response contains 2 items of type Organisation
+    And the response contains 2 items of type "Organisation"
     When delete all this organisations
     Then the response code is 204
 
@@ -63,7 +63,7 @@
     Given 7 of organisations
     When I query the collection of organisations with sorted by "Organisation.-Number:textual"
     Then the response code is 200
-    And the response contains 8 items of type Organisation
+    And the response contains 8 items of type "Organisation"
     When delete all this organisations
     Then the response code is 204
 
@@ -71,7 +71,7 @@
     Given 8 of organisations
     When I query the collection of organisations with sorted by "Organisation.-Number:textual" limit 2 and offset 4
     Then the response code is 200
-    And the response contains 2 items of type Organisation
+    And the response contains 2 items of type "Organisation"
     When delete all this organisations
     Then the response code is 204
 

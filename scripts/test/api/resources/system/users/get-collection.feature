@@ -30,6 +30,6 @@
     Given 8 of users
     When I query the collection of users with a limit of 4
     Then the response code is 200
-    And the response contains 4 items of type User
+    And the response contains 4 items of type "User"
 
       

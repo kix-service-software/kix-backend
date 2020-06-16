@@ -28,7 +28,7 @@
     When I query the collection of sendertypes with a limit of 1
     Then the response code is 200
     And the response object is SenderTypeCollectionResponse
-    And the response contains 1 items of type SenderType
+    And the response contains 1 items of type "SenderType"
     
       
       

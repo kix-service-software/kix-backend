@@ -50,7 +50,7 @@
     Given 8 of clientregistrations
     When I query the collection of clientregistration with limit 4
     Then the response code is 200
-    And the response contains 4 items of type ClientRegistration
+    And the response contains 4 items of type "ClientRegistration"
     When delete all this clientregistrations
     Then the response code is 204
     And the response has no content
@@ -59,7 +59,7 @@
     Given 8 of clientregistrations
     When I query the collection of clientregistration with offset 2
     Then the response code is 200
-    And the response contains 6 items of type ClientRegistration
+    And the response contains 7 items of type "ClientRegistration"
     When delete all this clientregistrations
     Then the response code is 204
     And the response has no content
@@ -68,7 +68,7 @@
     Given 8 of clientregistrations
     When I query the collection of clientregistration with limit 2 and offset 4
     Then the response code is 200
-    And the response contains 2 items of type ClientRegistration
+    And the response contains 2 items of type "ClientRegistration"
     When delete all this clientregistrations
     Then the response code is 204
     And the response has no content
@@ -77,7 +77,7 @@
     Given 8 of clientregistrations
     When I query the collection of clientregistration with sorted by "ClientRegistration.-ClientID:textual" limit 2 and offset 4
     Then the response code is 200
-    And the response contains 2 items of type ClientRegistration
+    And the response contains 2 items of type "ClientRegistration"
     When delete all this clientregistrations
     Then the response code is 204
     And the response has no content

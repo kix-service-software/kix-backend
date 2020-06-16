@@ -148,6 +148,8 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 #=======================work=================================
 Then qr/the response content is$/, sub {
 	print STDERR Dumper(S->{ResponseContent});
+	 my $Anzahl = @{S->{ResponseContent}->{Channel}};
+	print STDERR Dumper($Anzahl);
 };
 
 
