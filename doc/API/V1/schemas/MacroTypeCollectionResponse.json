@@ -1,5 +1,5 @@
 {
-   "$id" : "MacroTypeCollectionResponse",
+   "$id" : "MacroTypeCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of macro types.",
    "type" : "object",

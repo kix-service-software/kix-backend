@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "MacroActionTypeCollectionResponse",
+  "$id": "MacroActionTypeCollectionResponse.json",
   "type": "object",
   "description": "A list of macro action types.",
   "properties": {

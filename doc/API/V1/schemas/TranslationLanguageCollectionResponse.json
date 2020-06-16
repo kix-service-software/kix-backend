@@ -1,5 +1,5 @@
 {
-   "$id" : "TranslationLanguageCollectionResponse",
+   "$id" : "TranslationLanguageCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of translation languages.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "TranslationLanguage_json-119d3b9694" : {
-         "$id" : "TranslationLanguage",
+         "$id" : "TranslationLanguage.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The translation language object.",
          "type" : "object",

@@ -129,12 +129,16 @@ if ( -d "$Options{SchemaDirectory}" ) {
         $BundledSchema =~ s/("readOnly"\s*:\s*)(0|1)/$1$Boolean{$2}/g;
 
         # validator resulting schema against the OpenAPI spec
-        my $ValidationResult = eval {
-            $ValidatorObject->load_and_validate_schema($BundledSchema, {schema => $DraftURI});
+        my @Errors;
+        eval { 
+            @Errors = JSON::Validator->new()->schema($DraftURI)->validate($JSONObject->decode( $BundledSchema ));
         };
 
-        if ( !$ValidationResult ) {
+        if ( @Errors ) {
             print STDERR "ERROR: Unable to validate bundled schema $File against OpenAPI specification ($DraftURI).\n";
+            foreach my $Line (@Errors) {
+                 print STDERR "        $Line\n";
+            }
 
             # save for summary
             push(@ErrorFiles, {
@@ -190,17 +194,17 @@ if ( -d "$Options{ExampleDirectory}" && -d "$TargetDirectory/schemas") {
             exit 1;
         }
 
-        my @ValidationResult;
+        my @Errors;
         eval {
-            $ValidatorObject->schema($$SchemaContent);
-            @ValidationResult = $ValidatorObject->validate(
-                $JSONObject->Decode( Data => $$ExampleContent )
+            $ValidatorObject->schema($SchemaContent);
+            @Errors = $ValidatorObject->validate(
+                $JSONObject->decode( $ExampleContent )
             );
         };
 
-        if ( @ValidationResult ) {
+        if ( @Errors ) {
             print STDERR "ERROR: Unable to validate example $File against schema.\n";
-            foreach my $Line (@ValidationResult) {
+            foreach my $Line (@Errors) {
                 print STDERR "        $Line\n";
             }
 

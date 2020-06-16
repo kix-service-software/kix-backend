@@ -1,5 +1,5 @@
 {
-   "$id" : "FAQVote",
+   "$id" : "FAQVote.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The FAQ vote object.",
    "type" : "object",

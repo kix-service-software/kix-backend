@@ -1,5 +1,5 @@
 {
-   "$id" : "TicketArticle",
+   "$id" : "TicketArticle.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket article object.",
    "type" : "object",
@@ -188,7 +188,7 @@
    ],
    "definitions" : {
       "DynamicFieldValue_json-6dd322bed4" : {
-         "$id" : "DynamicFieldValue",
+         "$id" : "DynamicFieldValue.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
          "type" : "object",
@@ -249,7 +249,7 @@
          ]
       },
       "TicketArticleAttachment_json-b812531a3e" : {
-         "$id" : "TicketArticleAttachment",
+         "$id" : "TicketArticleAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
          "type" : "object",
@@ -304,7 +304,7 @@
          ]
       },
       "TicketArticleFlag_json-80684e31b4" : {
-         "$id" : "TicketArticleFlag",
+         "$id" : "TicketArticleFlag.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
          "type" : "object",

@@ -1,5 +1,5 @@
 {
-   "$id" : "ConfigItemResponse",
+   "$id" : "ConfigItemResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for config item GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "ConfigItemClassDefinition_json-fb2ac7494e" : {
-         "$id" : "ConfigItemClassDefinition",
+         "$id" : "ConfigItemClassDefinition.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
@@ -66,7 +66,7 @@
          ]
       },
       "ConfigItemHistory_json-03e59dd02e" : {
-         "$id" : "ConfigItemHistory",
+         "$id" : "ConfigItemHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item history object.",
          "type" : "object",
@@ -136,7 +136,7 @@
          ]
       },
       "ConfigItemImage_json-022635ed5d" : {
-         "$id" : "ConfigItemImage",
+         "$id" : "ConfigItemImage.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image object.",
          "type" : "object",
@@ -182,7 +182,7 @@
          ]
       },
       "ConfigItemVersion_json-d27530ecc6" : {
-         "$id" : "ConfigItemVersion",
+         "$id" : "ConfigItemVersion.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
          "type" : "object",
@@ -298,7 +298,7 @@
          ]
       },
       "ConfigItem_json-2cdec343d2" : {
-         "$id" : "ConfigItem",
+         "$id" : "ConfigItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item object.",
          "type" : "object",

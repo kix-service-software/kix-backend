@@ -1,6 +1,6 @@
 {
    "$schema": "http://json-schema.org/draft-07/schema",
-   "$id": "ExecPlan",
+   "$id": "ExecPlan.json",
    "type": "object",
    "description": "The execution plan object.",
    "properties": {

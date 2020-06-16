@@ -1,5 +1,5 @@
 {
-   "$id" : "UserPreferencePostRequest",
+   "$id" : "UserPreferencePostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The user preference request object for creation.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "UserPreferencePostItem_json-c4577df24d" : {
-         "$id" : "UserPreferencePostItem",
+         "$id" : "UserPreferencePostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference request object for creation.",
          "type" : "object",

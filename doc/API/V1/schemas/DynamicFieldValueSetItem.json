@@ -1,5 +1,5 @@
 {
-   "$id" : "DynamicFieldValueSetItem",
+   "$id" : "DynamicFieldValueSetItem.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The dynamic field value object to set it for an object.",
    "type" : "object",

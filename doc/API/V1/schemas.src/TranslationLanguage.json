@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "TranslationLanguage",
+  "$id": "TranslationLanguage.json",
   "type": "object",
   "description": "The translation language object.",
   "properties": {

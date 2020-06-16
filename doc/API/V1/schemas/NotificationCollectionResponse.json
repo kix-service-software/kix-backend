@@ -1,5 +1,5 @@
 {
-   "$id" : "NotificationCollectionResponse",
+   "$id" : "NotificationCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of notifications.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "Notification_json-56952ed1e3" : {
-         "$id" : "Notification",
+         "$id" : "Notification.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The notification object.",
          "type" : "object",

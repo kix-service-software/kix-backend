@@ -1,5 +1,5 @@
 {
-   "$id" : "ConfigItemPatchRequest",
+   "$id" : "ConfigItemPatchRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The config item object for update.",
    "type" : "object",

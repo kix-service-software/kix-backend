@@ -1,5 +1,5 @@
 {
-   "$id" : "ContactCollectionResponse",
+   "$id" : "ContactCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of contacts.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "Contact_json-6250c28310" : {
-         "$id" : "Contact",
+         "$id" : "Contact.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The contact object.",
          "type" : "object",
@@ -145,7 +145,7 @@
          ]
       },
       "DynamicFieldValue_json-c39a01a9a4" : {
-         "$id" : "DynamicFieldValue",
+         "$id" : "DynamicFieldValue.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
          "type" : "object",
@@ -206,7 +206,7 @@
          ]
       },
       "TicketArticleAttachment_json-105363e477" : {
-         "$id" : "TicketArticleAttachment",
+         "$id" : "TicketArticleAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
          "type" : "object",
@@ -261,7 +261,7 @@
          ]
       },
       "TicketArticleFlag_json-91a9ab63f3" : {
-         "$id" : "TicketArticleFlag",
+         "$id" : "TicketArticleFlag.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
          "type" : "object",
@@ -286,7 +286,7 @@
          ]
       },
       "TicketArticle_json-59cb681d06" : {
-         "$id" : "TicketArticle",
+         "$id" : "TicketArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
          "type" : "object",
@@ -475,7 +475,7 @@
          ]
       },
       "TicketHistory_json-f970feaedb" : {
-         "$id" : "TicketHistory",
+         "$id" : "TicketHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
          "type" : "object",
@@ -550,7 +550,7 @@
          ]
       },
       "Ticket_json-c52d206408" : {
-         "$id" : "Ticket",
+         "$id" : "Ticket.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
          "type" : "object",
@@ -757,7 +757,7 @@
          ]
       },
       "Watcher_json-cf85a346e4" : {
-         "$id" : "Watcher",
+         "$id" : "Watcher.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
          "type" : "object",

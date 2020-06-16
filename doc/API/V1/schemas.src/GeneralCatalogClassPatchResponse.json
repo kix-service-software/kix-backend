@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "GeneralCatalogClassPatchResponse",
+    "$id": "GeneralCatalogClassPatchResponse.json",
     "type": "object",
     "description": "The name of the updated GeneralCatalog class.",
     "properties": {

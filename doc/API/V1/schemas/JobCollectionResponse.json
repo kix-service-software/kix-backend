@@ -1,5 +1,5 @@
 {
-   "$id" : "JobCollectionResponse",
+   "$id" : "JobCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of jobs.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "ExecPlan_json-57e717fede" : {
-         "$id" : "ExecPlan",
+         "$id" : "ExecPlan.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The execution plan object.",
          "type" : "object",
@@ -98,7 +98,7 @@
          ]
       },
       "Job_json-e9ce9ba85e" : {
-         "$id" : "Job",
+         "$id" : "Job.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The job object.",
          "type" : "object",
@@ -188,7 +188,7 @@
          ]
       },
       "MacroAction_json-1c13e7e1ed" : {
-         "$id" : "MacroAction",
+         "$id" : "MacroAction.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
          "type" : "object",
@@ -246,7 +246,7 @@
          ]
       },
       "Macro_json-22c43183c2" : {
-         "$id" : "Macro",
+         "$id" : "Macro.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
          "type" : "object",

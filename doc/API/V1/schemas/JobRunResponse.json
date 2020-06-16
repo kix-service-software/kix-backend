@@ -1,5 +1,5 @@
 {
-   "$id" : "JobRunResponse",
+   "$id" : "JobRunResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for job run GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "JobRunLog_json-7ddb9237e5" : {
-         "$id" : "JobRun",
+         "$id" : "JobRun.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The job run object.",
          "type" : "object",
@@ -90,7 +90,7 @@
          ]
       },
       "JobRun_json-d0783c2145" : {
-         "$id" : "JobRun",
+         "$id" : "JobRun.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The job run object.",
          "type" : "object",

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "DynamicFieldValueSetItem",
+  "$id": "DynamicFieldValueSetItem.json",
   "type": "object",
   "description": "The dynamic field value object to set it for an object.",
   "properties": {

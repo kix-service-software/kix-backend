@@ -1,5 +1,5 @@
 {
-   "$id" : "ContactPostRequest",
+   "$id" : "ContactPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The contact request object for creation.",
    "type" : "object",

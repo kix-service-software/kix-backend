@@ -1,5 +1,5 @@
 {
-   "$id" : "ServiceResponse",
+   "$id" : "ServiceResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for service GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "Service_json-3d7ea980e3" : {
-         "$id" : "Service",
+         "$id" : "Service.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The service object.",
          "type" : "object",

@@ -1,5 +1,5 @@
 {
-   "$id" : "MailAccountPostRequest",
+   "$id" : "MailAccountPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The mail account request object for creation.",
    "type" : "object",

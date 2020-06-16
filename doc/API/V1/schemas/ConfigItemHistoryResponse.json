@@ -1,5 +1,5 @@
 {
-   "$id" : "ConfigItemHistoryCollectionResponse",
+   "$id" : "ConfigItemHistoryCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for config item history GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "ConfigItemHistory_json-666c1c3cf3" : {
-         "$id" : "ConfigItemHistory",
+         "$id" : "ConfigItemHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item history object.",
          "type" : "object",

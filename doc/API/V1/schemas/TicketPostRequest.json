@@ -1,5 +1,5 @@
 {
-   "$id" : "TicketPostRequest",
+   "$id" : "TicketPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket request object for creation.",
    "type" : "object",
@@ -68,7 +68,7 @@
    ],
    "definitions" : {
       "DynamicFieldValueSetItem_json-142e42dd10" : {
-         "$id" : "DynamicFieldValueSetItem",
+         "$id" : "DynamicFieldValueSetItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
          "type" : "object",
@@ -108,7 +108,7 @@
          ]
       },
       "DynamicFieldValueSetItem_json-16dfcaf043" : {
-         "$id" : "DynamicFieldValueSetItem",
+         "$id" : "DynamicFieldValueSetItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
          "type" : "object",
@@ -148,7 +148,7 @@
          ]
       },
       "TicketArticleAttachmentPostItem_json-15cfff7bfc" : {
-         "$id" : "#TicketArticleAttachmentPostItem",
+         "$id" : "TicketArticleAttachmentPostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object for creation.",
          "type" : "object",
@@ -171,7 +171,7 @@
          ]
       },
       "TicketArticlePostItem_json-c0eed55787" : {
-         "$id" : "#TicketArticlePostItem",
+         "$id" : "TicketArticlePostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object for creation.",
          "type" : "object",

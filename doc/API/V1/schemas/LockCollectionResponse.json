@@ -1,5 +1,5 @@
 {
-   "$id" : "LockCollectionResponse",
+   "$id" : "LockCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of ticket locks.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "Lock_json-e5e85df3b3" : {
-         "$id" : "Lock",
+         "$id" : "Lock.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket lock object.",
          "type" : "object",

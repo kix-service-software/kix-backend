@@ -1,5 +1,5 @@
 {
-   "$id" : "TextModuleCategoryCollectionResponse",
+   "$id" : "TextModuleCategoryCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of text module categories",
    "type" : "object",

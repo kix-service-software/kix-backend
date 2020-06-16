@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "AuthRequest",
+  "$id": "AuthRequest.json",
   "type": "object",
   "description": "An authorization object.",
   "properties": {

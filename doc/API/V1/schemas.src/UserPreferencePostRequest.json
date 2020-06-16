@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "UserPreferencePostRequest",
+  "$id": "UserPreferencePostRequest.json",
   "type": "object",
   "description": "The user preference request object for creation.",
   "properties": {

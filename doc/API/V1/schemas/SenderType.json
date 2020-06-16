@@ -1,5 +1,5 @@
 {
-   "$id" : "SenderType",
+   "$id" : "SenderType.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The sender type object.",
    "type" : "object",

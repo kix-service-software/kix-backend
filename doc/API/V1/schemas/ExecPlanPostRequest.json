@@ -1,5 +1,5 @@
 {
-   "$id" : "ExecPlanPostRequest",
+   "$id" : "ExecPlanPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The execution plan request object for creation.",
    "type" : "object",
@@ -34,7 +34,7 @@
    ],
    "definitions" : {
       "ExecPlanParametersPostPatchItem_json-b42102222c" : {
-         "$id" : "ExecPlanParametersPostPatchItem",
+         "$id" : "ExecPlanParametersPostPatchItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The parameters object for creation and update, for when and/or by what the corresponding job of the execution plan will be triggert.",
          "type" : "object",

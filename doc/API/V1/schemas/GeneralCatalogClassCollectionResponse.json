@@ -1,5 +1,5 @@
 {
-   "$id" : "GeneralCatalogClassCollectionResponse",
+   "$id" : "GeneralCatalogClassCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of GeneralCatalog classes",
    "type" : "object",

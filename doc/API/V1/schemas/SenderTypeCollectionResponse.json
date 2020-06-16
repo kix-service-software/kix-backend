@@ -1,5 +1,5 @@
 {
-   "$id" : "SenderTypeCollectionResponse",
+   "$id" : "SenderTypeCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of sender types.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "SenderType_json-8f7329097c" : {
-         "$id" : "SenderType",
+         "$id" : "SenderType.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The sender type object.",
          "type" : "object",

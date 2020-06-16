@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "ClientRegistration",
+    "$id": "ClientRegistration.json",
     "type": "object",
     "description": "The client registration object.",
     "properties": {

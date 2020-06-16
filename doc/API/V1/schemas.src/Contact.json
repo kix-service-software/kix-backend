@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "Contact",
+  "$id": "Contact.json",
   "type": "object",
   "description": "The contact object.",
   "properties": {

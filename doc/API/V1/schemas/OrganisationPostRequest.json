@@ -1,5 +1,5 @@
 {
-   "$id" : "OrganisationPostRequest",
+   "$id" : "OrganisationPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The organisation request object for creation.",
    "type" : "object",

@@ -1,5 +1,5 @@
 {
-   "$id" : "FAQArticlePatchRequest",
+   "$id" : "FAQArticlePatchRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The FAQ article request object for update.",
    "type" : "object",
