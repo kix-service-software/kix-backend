@@ -246,7 +246,6 @@ sub FileRead {
     my $Content;
 
     my $Location = $Param{Location} || $Param{Directory}.'/'.$Param{Filename};
-    print STDERR "Location: $Location\n";
 
     if ( !open(HANDLE, '<', $Location) ) {
         return;
