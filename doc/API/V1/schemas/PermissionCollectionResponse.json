@@ -30,14 +30,14 @@
                "readOnly" : true
             },
             "Comment" : {
-                "anyOf" : [
-                    {
-                      "type" : "string"
-                    },
-                    {
-                      "type" : "null"
-                    }
-                  ],
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "CreateBy" : {
