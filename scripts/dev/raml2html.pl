@@ -131,7 +131,9 @@ if ( -d "$Options{SchemaDirectory}" ) {
         # validator resulting schema against the OpenAPI spec
         my @Errors;
         eval { 
-            @Errors = JSON::Validator->new()->schema($DraftURI)->validate($JSONObject->decode( $BundledSchema ));
+            @Errors = JSON::Validator->schema($DraftURI)->validate(
+                $JSONObject->decode( $BundledSchema )
+            );
         };
 
         if ( @Errors ) {
@@ -196,8 +198,7 @@ if ( -d "$Options{ExampleDirectory}" && -d "$TargetDirectory/schemas") {
 
         my @Errors;
         eval {
-            $ValidatorObject->schema($SchemaContent);
-            @Errors = $ValidatorObject->validate(
+            @Errors = $ValidatorObject->schema($SchemaContent)->validate(
                 $JSONObject->decode( $ExampleContent )
             );
         };
