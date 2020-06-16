@@ -26,7 +26,7 @@
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+                  "$ref" : "#/definitions/FAQAttachment_json-69af4fe33c"
                },
                "readOnly" : true
             },
@@ -90,7 +90,7 @@
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+                  "$ref" : "#/definitions/FAQHistory_json-94a814e934"
                },
                "readOnly" : true
             },
@@ -129,7 +129,7 @@
                "description" : "added via include \"Votes\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+                  "$ref" : "#/definitions/FAQVote_json-2f00a12530"
                },
                "readOnly" : true
             }
@@ -158,7 +158,7 @@
             "ValidID"
          ]
       },
-      "FAQAttachment_json-ec8b67bcc9" : {
+      "FAQAttachment_json-69af4fe33c" : {
          "$id" : "FAQAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
@@ -231,7 +231,7 @@
             "ID"
          ]
       },
-      "FAQHistory_json-b505629552" : {
+      "FAQHistory_json-94a814e934" : {
          "$id" : "FAQHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
@@ -266,7 +266,7 @@
             "Name"
          ]
       },
-      "FAQVote_json-a6c5d69008" : {
+      "FAQVote_json-2f00a12530" : {
          "$id" : "FAQVote.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
