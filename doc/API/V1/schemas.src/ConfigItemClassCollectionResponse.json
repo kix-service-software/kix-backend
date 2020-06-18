@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#ConfigItemClassCollectionResponse",
+  "$id": "ConfigItemClassCollectionResponse.json",
   "type": "object",
   "description": "A list of config item class objects.",
   "properties": {

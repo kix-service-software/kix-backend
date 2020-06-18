@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConfigItemHistory",
+   "$id" : "ConfigItemHistory.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The config item history object.",
    "type" : "object",

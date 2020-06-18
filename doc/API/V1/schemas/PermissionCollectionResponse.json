@@ -1,5 +1,5 @@
 {
-   "$id" : "#PermissionCollectionResponse",
+   "$id" : "PermissionCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of permissions.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "Permission_json-eb3fca7920" : {
-         "$id" : "#Permission",
+         "$id" : "Permission.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
          "type" : "object",

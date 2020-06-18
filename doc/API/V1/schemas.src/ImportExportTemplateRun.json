@@ -1,6 +1,6 @@
 {
    "$schema": "http://json-schema.org/draft-07/schema",
-   "$id": "#ImportExportTemplateRun",
+   "$id": "ImportExportTemplateRun.json",
    "type": "object",
    "description": "The import export template run object.",
    "properties": {

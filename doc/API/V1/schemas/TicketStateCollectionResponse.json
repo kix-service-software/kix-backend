@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketStateCollectionResponse",
+   "$id" : "TicketStateCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of ticket states.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "TicketState_json-bf413a99fe" : {
-         "$id" : "#TicketState",
+         "$id" : "TicketState.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket state object.",
          "type" : "object",

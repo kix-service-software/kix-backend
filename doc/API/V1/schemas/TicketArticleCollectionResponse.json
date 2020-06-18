@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketArticleCollectionResponse",
+   "$id" : "TicketArticleCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of ticket articles.",
    "type" : "object",
@@ -15,8 +15,8 @@
       "Article"
    ],
    "definitions" : {
-      "DynamicFieldValue_json-c39a01a9a4" : {
-         "$id" : "#DynamicFieldValue",
+      "DynamicFieldValue_json-be71ef3dd7" : {
+         "$id" : "DynamicFieldValue.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
          "type" : "object",
@@ -76,8 +76,8 @@
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-105363e477" : {
-         "$id" : "#TicketArticleAttachment",
+      "TicketArticleAttachment_json-7600499c9c" : {
+         "$id" : "TicketArticleAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
          "type" : "object",
@@ -131,8 +131,8 @@
             "ID"
          ]
       },
-      "TicketArticleFlag_json-91a9ab63f3" : {
-         "$id" : "#TicketArticleFlag",
+      "TicketArticleFlag_json-89efa3d6a9" : {
+         "$id" : "TicketArticleFlag.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
          "type" : "object",
@@ -157,7 +157,7 @@
          ]
       },
       "TicketArticle_json-70b62a253c" : {
-         "$id" : "#TicketArticle",
+         "$id" : "TicketArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
          "type" : "object",
@@ -170,7 +170,7 @@
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-105363e477"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-7600499c9c"
                },
                "readOnly" : true
             },
@@ -236,7 +236,7 @@
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-c39a01a9a4"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-be71ef3dd7"
                },
                "readOnly" : true
             },
@@ -244,7 +244,7 @@
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-91a9ab63f3"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-89efa3d6a9"
                },
                "readOnly" : true
             },

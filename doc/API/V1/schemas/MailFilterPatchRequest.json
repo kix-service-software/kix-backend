@@ -1,5 +1,5 @@
 {
-   "$id" : "#MailFilterPatchRequest",
+   "$id" : "MailFilterPatchRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The mail filter request object for update.",
    "type" : "object",

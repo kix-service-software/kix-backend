@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "#SystemAddressPostPatchResponse",
+    "$id": "SystemAddressPostPatchResponse.json",
     "type": "object",
     "description": "The ID of the created or updated system address.",
     "properties": {

@@ -1,5 +1,5 @@
 {
-   "$id" : "#RoleResponse",
+   "$id" : "RoleResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for role GET request.",
    "type" : "object",
@@ -12,8 +12,8 @@
       "Role"
    ],
    "definitions" : {
-      "Permission_json-0f9ebcd307" : {
-         "$id" : "#Permission",
+      "Permission_json-db3c2f18ea" : {
+         "$id" : "Permission.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The permission object.",
          "type" : "object",
@@ -78,7 +78,7 @@
          ]
       },
       "Role_json-03191ce16b" : {
-         "$id" : "#Role",
+         "$id" : "Role.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The role object.",
          "type" : "object",
@@ -122,7 +122,7 @@
                "description" : "added via include \"Permissions\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Permission_json-0f9ebcd307"
+                  "$ref" : "#/definitions/Permission_json-db3c2f18ea"
                },
                "readOnly" : true
             },

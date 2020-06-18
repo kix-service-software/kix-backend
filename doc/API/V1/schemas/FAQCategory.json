@@ -1,5 +1,5 @@
 {
-   "$id" : "#FAQCategory",
+   "$id" : "FAQCategory.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The FAQ category object.",
    "type" : "object",
@@ -93,154 +93,8 @@
       "ValidID"
    ],
    "definitions" : {
-      "FAQArticle_json-61e393a649" : {
-         "$id" : "#FAQArticle",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The FAQ article object.",
-         "type" : "object",
-         "properties" : {
-            "Approved" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Attachments" : {
-               "description" : "added via include \"Attachments\"",
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
-               },
-               "readOnly" : true
-            },
-            "CategoryID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Changed" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ChangedBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ContentType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Created" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreatedBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CustomerVisible" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Field1" : {
-               "description" : "symptom",
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Field2" : {
-               "description" : "problem",
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Field3" : {
-               "description" : "solution",
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Field4" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Field5" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Field6" : {
-               "description" : "comment",
-               "type" : "string",
-               "readOnly" : true
-            },
-            "History" : {
-               "description" : "added via include \"History\"",
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
-               },
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Keywords" : {
-               "type" : "array",
-               "item" : {
-                  "type" : "string"
-               },
-               "readOnly" : true
-            },
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Number" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Title" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Votes" : {
-               "description" : "added via include \"Votes\"",
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
-               },
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "Approved",
-            "CategoryID",
-            "Changed",
-            "ChangedBy",
-            "ContentType",
-            "Created",
-            "CreatedBy",
-            "CustomerVisible",
-            "Field1",
-            "Field2",
-            "Field3",
-            "Field4",
-            "Field5",
-            "Field6",
-            "ID",
-            "Keywords",
-            "Language",
-            "Name",
-            "Number",
-            "Title",
-            "ValidID"
-         ]
-      },
       "FAQArticle_json-9b318568c2" : {
-         "$id" : "#FAQArticle",
+         "$id" : "FAQArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ article object.",
          "type" : "object",
@@ -253,7 +107,7 @@
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+                  "$ref" : "#/definitions/FAQAttachment_json-69af4fe33c"
                },
                "readOnly" : true
             },
@@ -317,7 +171,7 @@
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+                  "$ref" : "#/definitions/FAQHistory_json-94a814e934"
                },
                "readOnly" : true
             },
@@ -356,7 +210,7 @@
                "description" : "added via include \"Votes\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+                  "$ref" : "#/definitions/FAQVote_json-2f00a12530"
                },
                "readOnly" : true
             }
@@ -385,8 +239,154 @@
             "ValidID"
          ]
       },
-      "FAQAttachment_json-ec8b67bcc9" : {
-         "$id" : "#FAQAttachment",
+      "FAQArticle_json-f18fca87f6" : {
+         "$id" : "FAQArticle.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ article object.",
+         "type" : "object",
+         "properties" : {
+            "Approved" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Attachments" : {
+               "description" : "added via include \"Attachments\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/FAQAttachment_json-69af4fe33c"
+               },
+               "readOnly" : true
+            },
+            "CategoryID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Changed" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CustomerVisible" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Field1" : {
+               "description" : "symptom",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field2" : {
+               "description" : "problem",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field3" : {
+               "description" : "solution",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field4" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field5" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Field6" : {
+               "description" : "comment",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "History" : {
+               "description" : "added via include \"History\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/FAQHistory_json-94a814e934"
+               },
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Keywords" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Language" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Number" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Title" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Votes" : {
+               "description" : "added via include \"Votes\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/FAQVote_json-2f00a12530"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Approved",
+            "CategoryID",
+            "Changed",
+            "ChangedBy",
+            "ContentType",
+            "Created",
+            "CreatedBy",
+            "CustomerVisible",
+            "Field1",
+            "Field2",
+            "Field3",
+            "Field4",
+            "Field5",
+            "Field6",
+            "ID",
+            "Keywords",
+            "Language",
+            "Name",
+            "Number",
+            "Title",
+            "ValidID"
+         ]
+      },
+      "FAQAttachment_json-69af4fe33c" : {
+         "$id" : "FAQAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
          "type" : "object",
@@ -458,8 +458,8 @@
             "ID"
          ]
       },
-      "FAQCategory_json-02f8c50b4e" : {
-         "$id" : "#FAQCategory",
+      "FAQCategory_json-91ab971ead" : {
+         "$id" : "FAQCategory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
          "type" : "object",
@@ -470,7 +470,7 @@
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-f18fca87f6"
                      },
                      {
                         "type" : "integer"
@@ -528,7 +528,7 @@
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-91ab971ead"
                   },
                   {
                      "type" : "integer"
@@ -554,7 +554,7 @@
          ]
       },
       "FAQCategory_json-cc497066e1" : {
-         "$id" : "#FAQCategory",
+         "$id" : "FAQCategory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
          "type" : "object",
@@ -565,7 +565,7 @@
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-f18fca87f6"
                      },
                      {
                         "type" : "integer"
@@ -623,7 +623,7 @@
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-91ab971ead"
                   },
                   {
                      "type" : "integer"
@@ -648,8 +648,8 @@
             "ValidID"
          ]
       },
-      "FAQHistory_json-b505629552" : {
-         "$id" : "#FAQHistory",
+      "FAQHistory_json-94a814e934" : {
+         "$id" : "FAQHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
          "type" : "object",
@@ -683,8 +683,8 @@
             "Name"
          ]
       },
-      "FAQVote_json-a6c5d69008" : {
-         "$id" : "#FAQVote",
+      "FAQVote_json-2f00a12530" : {
+         "$id" : "FAQVote.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
          "type" : "object",

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#ConfigItemImageResponse",
+  "$id": "ConfigItemImageResponse.json",
   "type": "object",
   "description": "A response for config item image GET request.",
   "properties": {

@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConfigItemVersionCollectionResponse",
+   "$id" : "ConfigItemVersionCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of config item versions.",
    "type" : "object",
@@ -15,8 +15,8 @@
       "ConfigItemVersion"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-fb2ac7494e" : {
-         "$id" : "#ConfigItemClassDefinition",
+      "ConfigItemClassDefinition_json-3965c4d329" : {
+         "$id" : "ConfigItemClassDefinition.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
@@ -69,7 +69,7 @@
          ]
       },
       "ConfigItemVersion_json-360702b3f7" : {
-         "$id" : "#ConfigItemVersion",
+         "$id" : "ConfigItemVersion.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version object.",
          "type" : "object",
@@ -123,7 +123,7 @@
                "type" : "object"
             },
             "Definition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-fb2ac7494e"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-3965c4d329"
             },
             "DeplState" : {
                "type" : "string",

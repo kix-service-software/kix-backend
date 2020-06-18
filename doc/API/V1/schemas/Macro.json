@@ -1,5 +1,5 @@
 {
-   "$id" : "#Macro",
+   "$id" : "Macro.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The macro object.",
    "type" : "object",
@@ -69,7 +69,7 @@
    ],
    "definitions" : {
       "MacroAction_json-4e1b752481" : {
-         "$id" : "#MacroAction",
+         "$id" : "MacroAction.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
          "type" : "object",

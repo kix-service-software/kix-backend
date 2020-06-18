@@ -1,5 +1,5 @@
 {
-   "$id" : "#QueueResponse",
+   "$id" : "QueueResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for queue GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "Queue_json-491a3aa0ed" : {
-         "$id" : "#Priority",
+         "$id" : "Priority.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The priority object.",
          "type" : "object",

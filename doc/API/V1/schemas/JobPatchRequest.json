@@ -1,5 +1,5 @@
 {
-   "$id" : "#JobPatchRequest",
+   "$id" : "JobPatchRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The job request object for update.",
    "type" : "object",

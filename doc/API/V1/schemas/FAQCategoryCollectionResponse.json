@@ -1,5 +1,5 @@
 {
-   "$id" : "#FAQCategoryCollectionResponse",
+   "$id" : "FAQCategoryCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of all FAQ categories.",
    "type" : "object",
@@ -15,8 +15,8 @@
       "FAQCategory"
    ],
    "definitions" : {
-      "FAQArticle_json-61e393a649" : {
-         "$id" : "#FAQArticle",
+      "FAQArticle_json-f18fca87f6" : {
+         "$id" : "FAQArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ article object.",
          "type" : "object",
@@ -29,7 +29,7 @@
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQAttachment_json-ec8b67bcc9"
+                  "$ref" : "#/definitions/FAQAttachment_json-69af4fe33c"
                },
                "readOnly" : true
             },
@@ -93,7 +93,7 @@
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQHistory_json-b505629552"
+                  "$ref" : "#/definitions/FAQHistory_json-94a814e934"
                },
                "readOnly" : true
             },
@@ -132,7 +132,7 @@
                "description" : "added via include \"Votes\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/FAQVote_json-a6c5d69008"
+                  "$ref" : "#/definitions/FAQVote_json-2f00a12530"
                },
                "readOnly" : true
             }
@@ -161,8 +161,8 @@
             "ValidID"
          ]
       },
-      "FAQAttachment_json-ec8b67bcc9" : {
-         "$id" : "#FAQAttachment",
+      "FAQAttachment_json-69af4fe33c" : {
+         "$id" : "FAQAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ attachment object.",
          "type" : "object",
@@ -234,8 +234,8 @@
             "ID"
          ]
       },
-      "FAQCategory_json-02f8c50b4e" : {
-         "$id" : "#FAQCategory",
+      "FAQCategory_json-91ab971ead" : {
+         "$id" : "FAQCategory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
          "type" : "object",
@@ -246,7 +246,7 @@
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-f18fca87f6"
                      },
                      {
                         "type" : "integer"
@@ -304,7 +304,7 @@
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-91ab971ead"
                   },
                   {
                      "type" : "integer"
@@ -330,7 +330,7 @@
          ]
       },
       "FAQCategory_json-cc497066e1" : {
-         "$id" : "#FAQCategory",
+         "$id" : "FAQCategory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ category object.",
          "type" : "object",
@@ -341,7 +341,7 @@
                "items" : {
                   "anyOf" : [
                      {
-                        "$ref" : "#/definitions/FAQArticle_json-61e393a649"
+                        "$ref" : "#/definitions/FAQArticle_json-f18fca87f6"
                      },
                      {
                         "type" : "integer"
@@ -399,7 +399,7 @@
                "type" : "array",
                "items" : [
                   {
-                     "$ref" : "#/definitions/FAQCategory_json-02f8c50b4e"
+                     "$ref" : "#/definitions/FAQCategory_json-91ab971ead"
                   },
                   {
                      "type" : "integer"
@@ -424,8 +424,8 @@
             "ValidID"
          ]
       },
-      "FAQHistory_json-b505629552" : {
-         "$id" : "#FAQHistory",
+      "FAQHistory_json-94a814e934" : {
+         "$id" : "FAQHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
          "type" : "object",
@@ -459,8 +459,8 @@
             "Name"
          ]
       },
-      "FAQVote_json-a6c5d69008" : {
-         "$id" : "#FAQVote",
+      "FAQVote_json-2f00a12530" : {
+         "$id" : "FAQVote.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ vote object.",
          "type" : "object",

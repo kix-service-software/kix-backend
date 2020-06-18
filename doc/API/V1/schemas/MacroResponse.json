@@ -1,5 +1,5 @@
 {
-   "$id" : "#MacroResponse",
+   "$id" : "MacroResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for macro GET request.",
    "type" : "object",
@@ -12,8 +12,8 @@
       "Macro"
    ],
    "definitions" : {
-      "MacroAction_json-1c13e7e1ed" : {
-         "$id" : "#MacroAction",
+      "MacroAction_json-71b614e70e" : {
+         "$id" : "MacroAction.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
          "type" : "object",
@@ -71,7 +71,7 @@
          ]
       },
       "Macro_json-c1dec42b17" : {
-         "$id" : "#Macro",
+         "$id" : "Macro.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
          "type" : "object",
@@ -80,7 +80,7 @@
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-1c13e7e1ed"
+                  "$ref" : "#/definitions/MacroAction_json-71b614e70e"
                },
                "readOnly" : true
             },
