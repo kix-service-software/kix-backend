@@ -195,7 +195,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 13
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 41 items of type "Permission"
+    And the response contains 43 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                    | Value | TypeID |
       | /auth                                                                                                                                     | 1     | 1      |
@@ -204,7 +204,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /faq                                                                                                                                      | 2     | 1      |
       | /faq/*                                                                                                                                    | 0     | 1      |
       | /faq/articles                                                                                                                             | 2     | 1      |
-      | /faq/articles/*{FAQArticle.CustomerVisible EQ 1}                                                                                          | 2     | 2      |
+      | /faq/articles/*{FAQArticle.CustomerVisible NE 1}                                                                                          | 0     | 2      |
       | /faq/articles/*/votes                                                                                                                     | 3     | 1      |
       | /i18n                                                                                                                                     | 2     | 1      |
       | /links                                                                                                                                    | 2     | 1      |
@@ -224,27 +224,19 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/faq/*                                                                                                                             | 0     | 1      |
       | /system/faq/categories                                                                                                                    | 2     | 1      |
       | /system/ticket                                                                                                                            | 2     | 1      |
-      | /system/users                                                                                                                             | 1     | 1      |
+      | /system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}                                                                           | 0     | 2      |
+      | /system/users                                                                                                                             | 2     | 1      |
       | /tickets                                                                                                                                  | 3     | 1      |
-      | /tickets/*                                                                                                                                | 2     | 1      |
-      | /tickets{Ticket.ContactID EQ $CurrentUser.Contact.ID && Ticket.OrganisationID EQ $CurrentUser.Contact.PrimaryOrganisationID}              | 3     | 2      |
-      | /tickets/*{Ticket.ContactID EQ $CurrentUser.Contact.ID && Ticket.OrganisationID EQ $CurrentUser.Contact.PrimaryOrganisationID}            | 3     | 2      |
+      | /tickets/*                                                                                                                                | 6     | 1      |
+      | /tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}              | 0     | 2      |
+      | /tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}            | 0     | 2      |
       | /tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]} | 2     | 3      |
       | /tickets/*/articles                                                                                                                       | 3     | 1      |
       | /tickets/*/articles/*                                                                                                                     | 2     | 1      |
-      | /tickets/*/articles/*{Article.CustomerVisible EQ 1}                                                                                       | 2     | 2      |
+      | /tickets/*/articles/*{Article.CustomerVisible NE 1}                                                                                       | 0     | 2      |
       | /tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}                                                                                      | 2     | 3      |
       | /tickets/*/articles/*/flags                                                                                                               | 3     | 1      |
       | /system/config                                                                                                                            | 2     | 1      |
       | /system/config/*                                                                                                                          | 2     | 1      |
-      | /system/config{SysConfigOption.AccessLevel EQ external}                                                                                   | 2     | 2      |
-      | /system/config/*{SysConfigOption.AccessLevel EQ external}                                                                                 | 2     | 2      |
-
-
-
-
-
-
-
-
-
+      | /system/config{SysConfigOption.AccessLevel NE external}                                                                                   | 0     | 2      |
+      | /system/config/*{SysConfigOption.AccessLevel NE external}                                                                                 | 0     | 2      |
