@@ -77,7 +77,7 @@ sub new {
 
     $Self->{ANSI} = $Param{ANSI};
     if ($Self->{Output} eq 'Allure') {
-        $Self->{Adapter} = $Kernel::OM->Get('UnitTest::AllureAdapter')->new();
+        $Self->{Adapter} = $Kernel::OM->Get('Kernel::System::UnitTest::AllureAdapter')->new();
     }
 
     if ($Self->{Output} eq 'HTML') {

@@ -9,7 +9,7 @@ use Types::Standard qw(Num HashRef ArrayRef FileHandle);
 
 use Cwd;
 use lib (getcwd() . '/Kernel/System/UnitTest');
-use AllureAdapter;
+use Kernel::System::UnitTest::AllureAdapter;
 
 extends 'Test::BDD::Cucumber::Harness::Data';
 
