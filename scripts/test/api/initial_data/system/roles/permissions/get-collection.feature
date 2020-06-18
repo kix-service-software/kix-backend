@@ -195,7 +195,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 13
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 42 items of type "Permission"
+    And the response contains 43 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                    | Value | TypeID |
       | /auth                                                                                                                                     | 1     | 1      |
