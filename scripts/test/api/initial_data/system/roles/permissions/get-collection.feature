@@ -225,9 +225,9 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/faq/categories                                                                                                                    | 2     | 1      |
       | /system/ticket                                                                                                                            | 2     | 1      |
       | /system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}                                                                           | 0     | 2      |
-      | /system/users                                                                                                                             | 1     | 1      |
+      | /system/users                                                                                                                             | 2     | 1      |
       | /tickets                                                                                                                                  | 3     | 1      |
-      | /tickets/*                                                                                                                                | 2     | 1      |
+      | /tickets/*                                                                                                                                | 7     | 1      |
       | /tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}              | 0     | 2      |
       | /tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}            | 0     | 2      |
       | /tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]} | 2     | 3      |
