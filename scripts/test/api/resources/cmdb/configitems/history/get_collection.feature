@@ -1,4 +1,4 @@
-Feature: GET request to the /cmdb/configitems/history resource
+Feature: GET request to the /cmdb/configitems/:ConfigItemID/history resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__

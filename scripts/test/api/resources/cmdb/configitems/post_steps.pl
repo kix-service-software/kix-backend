@@ -69,6 +69,54 @@ Given qr/a configitem$/, sub {
    );
 };
 
+Given qr/a configitem with attachment$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/cmdb/configitems',
+      Token   => S->{Token},
+      Content => {
+		   ConfigItem => {
+		      ClassID => 4,
+		      Version => {
+		         Name => "test ci xx1111 attachment",
+		         DeplStateID => 16,
+		         InciStateID => 2,
+		         Data => {
+		            Vendor => "testvendor",
+		            NIC => [
+		               {
+		                  NIC => "e1000",
+		                  IPoverDHCP => [
+		                     39
+		                  ],
+		                  IPAddress => [
+		                     "192.168.1.0",
+		                     "192.168.1.1",
+		                     "192.168.1.2",
+		                     "192.168.1.3"
+		                  ],
+		                  Attachment => [
+		                     {
+		                        Content     =>  "cdfrdrfde",
+		                        ContentType =>  "application/pdf",
+		                        Filename    => "Test2.pdf"
+		                     }
+		                  ]
+		               }
+		            ],
+		         }
+		      },
+		      Images => [
+		         {
+		            Filename => "SomeImage.jpg",
+		            ContentType => "jpg",
+		            Content => "..."
+		         }
+		      ]
+		   }
+	  }
+   );
+};
+
 Given qr/(\d+) of configitems$/, sub {
     my $Name;
     my $DeplStateID;
