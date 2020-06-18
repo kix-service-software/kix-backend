@@ -982,7 +982,6 @@ sub AddCacheDependency {
         next if $Type eq $Self->{OperationConfig}->{CacheType};
 
         if ( exists $Self->{CacheDependencies}->{$Type} ) {
-            $Self->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type...already exists" );
             next;
         }
         $Self->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type" );
