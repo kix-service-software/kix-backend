@@ -98,6 +98,13 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+    $Self->AddOption(
+        Name        => 'allure-output-dir',
+        Description => "Defines where the Allure adapter should output the result files. Default: /tmp/unit-test/allure-results.",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
 }
 
 sub PreRun {
@@ -130,6 +137,7 @@ sub Run {
         Verbose                => $Self->GetOption('verbose')                    || '',
         Pretty                 => $Self->GetOption('pretty')                     || '',
         AllureIgnoreSkipped    => $Self->GetOption('allure-ignore-skipped')      || '',
+        AllureOutputDir        => $Self->GetOption('allure-output-dir')          || '',
     );
 
     if ($FunctionResult) {

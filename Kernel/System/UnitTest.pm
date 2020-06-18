@@ -359,7 +359,8 @@ sub Run {
     if ($Self->{Output} eq 'ALLURE') {
         $Self->{Adapter}->SetExecutorInfo();
         $Self->{Adapter}->AddEnvironmentInfoFromSystem();
-        $Self->{Adapter}->CreateResults('/tmp/unit-test/allure-results');
+        my $OutDir = $Self->{AllureOutputDir} || $ENV{'/tmp/unit-test/allure-results';
+        $Self->{Adapter}->CreateResults($OutDir);
     }
     return $ResultSummary{TestNotOk} ? 0 : 1;
 }
