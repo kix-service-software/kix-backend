@@ -15,7 +15,7 @@
       "User"
    ],
    "definitions" : {
-      "UserPreference_json-7fdc063bfe" : {
+      "UserPreference_json-f036ebd014" : {
          "$id" : "UserPreference.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The user preference object.",
@@ -66,7 +66,7 @@
                "description" : "added via include \"Preferences\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/UserPreference_json-7fdc063bfe"
+                  "$ref" : "#/definitions/UserPreference_json-f036ebd014"
                }
             },
             "RoleIDs" : {
