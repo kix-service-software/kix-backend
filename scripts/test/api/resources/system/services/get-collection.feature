@@ -45,7 +45,7 @@ Feature: GET request to the /system/services resource
     When I query the collection of services with a limit of 4
     Then the response code is 200
     And the response object is ServiceCollectionResponse
-    And the response contains 4 items of type Service
+    And the response contains 4 items of type "Service"
     When delete all this services
     Then the response code is 204
     And the response has no content
@@ -56,7 +56,7 @@ Feature: GET request to the /system/services resource
     When I query the collection of services with offset 4
     Then the response code is 200
     And the response object is ServiceCollectionResponse
-    And the response contains 4 items of type Service
+    And the response contains 4 items of type "Service"
     When delete all this services
     Then the response code is 204
     And the response has no content
@@ -66,7 +66,7 @@ Feature: GET request to the /system/services resource
     When I query the collection of services with limit 2 and offset 4
     Then the response code is 200
     And the response object is ServiceCollectionResponse
-    And the response contains 2 items of type Service
+    And the response contains 2 items of type "Service"
     When delete all this services
     Then the response code is 204
     And the response has no content    
@@ -76,7 +76,7 @@ Feature: GET request to the /system/services resource
     When I query the collection of services with sorted by "Service.-Names:textual"
     Then the response code is 200
     And the response object is ServiceCollectionResponse
-    And the response contains 8 items of type Service
+    And the response contains 8 items of type "Service"
     When delete all this services
     Then the response code is 204
     And the response has no content    
@@ -86,7 +86,7 @@ Feature: GET request to the /system/services resource
     When I query the collection of services with sorted by "Service.-Names:textual" limit 2 and offset 5
     Then the response code is 200
     And the response object is ServiceCollectionResponse
-    And the response contains 2 items of type Service
+    And the response contains 2 items of type "Service"
     When delete all this services
     Then the response code is 204
     And the response has no content 

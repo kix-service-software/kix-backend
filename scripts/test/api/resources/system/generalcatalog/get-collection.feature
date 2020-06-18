@@ -20,5 +20,5 @@
   Scenario: get the list of existing generalcatalog items with limit
     When I query the collection of generalcatalog items with a limit of 3
     Then the response code is 200
-    And the response contains 3 items of type GeneralCatalogItem      
+    And the response contains 3 items of type "GeneralCatalogItem"      
       

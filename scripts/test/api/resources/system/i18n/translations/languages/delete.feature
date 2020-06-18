@@ -5,7 +5,7 @@ Feature: DELETE request to the /system/i18n/translations/:TranslationID/language
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
-  Scenario: delete translation language permission
+  Scenario: delete translation language
     Given a i18n translation with
     When I create a translation language with
     Then the response code is 201   

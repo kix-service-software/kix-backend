@@ -8,7 +8,6 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
   Scenario: check is the existing ticketstates are consistent with the delivery defaults
     When I query the collection of ticketstates
     Then the response code is 200
-#Then the response content is
     And the response object is TicketStateCollectionResponse
     Then the response contains 7 items of type "TicketState"
     Then the response contains the following items of type TicketState

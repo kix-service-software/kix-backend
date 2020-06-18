@@ -22,25 +22,25 @@ Feature: GET request to the /system/ticket/priorities resource
     When I query the collection of ticket priorities with a limit of 4
     Then the response code is 200
     And the response object is PriorityCollectionResponse
-    And the response contains 4 items of type Priority
+    And the response contains 4 items of type "Priority"
     
   Scenario: get the list of existing ticket priorities with offset
     When I query the collection of ticket priorities with offset 2
     Then the response code is 200
     And the response object is PriorityCollectionResponse
-    And the response contains 5 items of type Priority
+    And the response contains 5 items of type "Priority"
     
   Scenario: get the list of existing ticket priorities with limit and offset
     When I query the collection of ticket priorities with limit 2 and offset 2
     Then the response code is 200
     And the response object is PriorityCollectionResponse
-    And the response contains 2 items of type Priority    
+    And the response contains 2 items of type "Priority"    
     
   Scenario: get the list of existing ticket priorities with sorted
     When I query the collection of ticket priorities with sorted by "Priority.-Name:textual" 
     Then the response code is 200
     And the response object is PriorityCollectionResponse
-    And the response contains 5 items of type Priority    
+    And the response contains 5 items of type "Priority"
     And the response contains the following items of type Priority
       | Name        |
       | 5 very low  |
@@ -53,7 +53,7 @@ Feature: GET request to the /system/ticket/priorities resource
     When I query the collection of ticket priorities with sorted by "PriorityAddress.-NameEmailAddress:textual" limit 2 and offset 2
     Then the response code is 200
     And the response object is PriorityCollectionResponse
-    And the response contains 2 items of type Priority      
+    And the response contains 2 items of type "Priority"    
     
     
     

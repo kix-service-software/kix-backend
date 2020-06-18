@@ -8,7 +8,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Superuser
     When I query the collection of permissions with roleid 1
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 1 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                        | Value | TypeID |
@@ -17,7 +17,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of System Admin
     When I query the collection of permissions with roleid 2
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 1 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                        | Value | TypeID |
@@ -26,7 +26,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Agent User
     When I query the collection of permissions with roleid 3
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 14 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                            | Value | TypeID |
@@ -48,7 +48,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Ticket Reader
     When I query the collection of permissions with roleid 4
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 17 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
@@ -73,7 +73,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Ticket Agent
     When I query the collection of permissions with roleid 5
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 18 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
@@ -99,7 +99,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Ticket Creator
     When I query the collection of permissions with roleid 6
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 7 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
@@ -114,7 +114,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of FAQ Reader
     When I query the collection of permissions with roleid 7
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 7 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                 | Value | TypeID |
@@ -129,7 +129,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of FAQ Editor
     When I query the collection of permissions with roleid 8
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 7 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                 | Value | TypeID |
@@ -144,7 +144,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Asset Reader
     When I query the collection of permissions with roleid 9
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 7 items of type "Permission"
     And the response contains the following items of type Permission
       | Target               | Value | TypeID |
@@ -159,7 +159,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Asset Maintainer
     When I query the collection of permissions with roleid 10
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 7 items of type "Permission"
     And the response contains the following items of type Permission
       | Target               | Value | TypeID |
@@ -174,7 +174,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer Reader
     When I query the collection of permissions with roleid 11
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 2 items of type "Permission"
     And the response contains the following items of type Permission
       | Target         | Value | TypeID |
@@ -184,7 +184,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer Manager
     When I query the collection of permissions with roleid 12
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+ #   And the response object is PermissionCollectionResponse
     And the response contains 2 items of type "Permission"
     And the response contains the following items of type Permission
       | Target         | Value | TypeID |
@@ -194,7 +194,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer
     When I query the collection of permissions with roleid 13
     Then the response code is 200
-    And the response object is PermissionCollectionResponse
+#    And the response object is PermissionCollectionResponse
     And the response contains 41 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                    | Value | TypeID |

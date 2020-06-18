@@ -55,7 +55,7 @@ When qr/I query the collection of tickets with AND-filter of Title "(.*?)" and P
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/tickets',
-      Filter => '{"Ticket": {"AND": [{"Field": "Title","Operator": "CONTAINS","Value": "'.$1.'"},{"Field": "PriorityID","Operator": "IN","Value": [1,3,4],"Type": "numeric"},{"Field": "QueueID","Operator": "EQ","Value": "'.$3.'", "Not": true}]}}',
+      Filter => '{"Ticket": {"AND": [{"Field": "Title","Operator": "CONTAINS","Value": "'.$1.'"},{"Field": "PriorityID","Operator": "IN","Value": [1,3,4],"Type": "numeric"},{"Field": "QueueID","Operator": "EQ","Value": "'.$3.'","Type": "numeric"}, "Not": true}]}}',
    );
 };
 

@@ -19,4 +19,4 @@
   Scenario: get the list of existing faq categories with limit
     When I query the collection of faq categories with a limit of 1
     Then the response code is 200 
-    And the response contains 1 items of type FAQCategory   
+    And the response contains 1 items of type "FAQCategory"   

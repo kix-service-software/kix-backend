@@ -40,7 +40,7 @@ Feature: GET request to the /cmdb/configitems resource
     Given 8 of configitems
     When I query the cmdb collection of configitems with limit 4
     Then the response code is 200
-    And the response contains 4 items of type ConfigItem
+    And the response contains 4 items of type "ConfigItem"
     When delete all of configitems
     Then the response code is 204
     And the response has no content
@@ -49,7 +49,7 @@ Feature: GET request to the /cmdb/configitems resource
     Given 8 of configitems
     When I query the cmdb collection of configitems with offset 4
     Then the response code is 200
-    And the response contains 4 items of type ConfigItem
+    And the response contains 4 items of type "ConfigItem"
     When delete all of configitems
     Then the response code is 204
     And the response has no content
@@ -58,7 +58,7 @@ Feature: GET request to the /cmdb/configitems resource
     Given 8 of configitems
     When I query the cmdb collection of configitems with limit 2 and offset 4
     Then the response code is 200
-    And the response contains 2 items of type ConfigItem
+    And the response contains 2 items of type "ConfigItem"
     When delete all of configitems
     Then the response code is 204
     And the response has no content
@@ -67,7 +67,7 @@ Feature: GET request to the /cmdb/configitems resource
     Given 8 of configitems
     When I query the cmdb collection of configitems with sorted by "ConfigItem.-CreateTime:datetime"
     Then the response code is 200
-    And the response contains 8 items of type ConfigItem
+    And the response contains 8 items of type "ConfigItem"
     When delete all of configitems
     Then the response code is 204
     And the response has no content    

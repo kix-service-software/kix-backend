@@ -51,10 +51,8 @@ When qr/I get the last log include content\s*$/, sub {
 
 Then qr/the response contains the following items of type (.*?)$/, sub {
     my @Array;
-print STDERR "POSTResponse".Dumper(S->{ResponseContent}->{LogFile}->[2]);    
   foreach my $Attribute ( sort keys %{ S->{ResponseContent}->{LogFile}->[2] } ) {
     if ($Attribute eq 'Content'){
-print STDERR "POSTResponse".Dumper($Attribute);
     C->dispatch('Then', "the Attribute Content is available");   
     }; 
   };

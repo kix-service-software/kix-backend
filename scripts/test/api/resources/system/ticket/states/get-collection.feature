@@ -22,24 +22,24 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
     When I query the collection of ticketstates with a limit of 2
     Then the response code is 200
     And the response object is TicketStateCollectionResponse 
-    And the response contains 2 items of type TicketState 
+    And the response contains 2 items of type "TicketState" 
     
   Scenario: get the list of existing ticketstates with offset
     When I query the collection of ticketstates with offset 4
     Then the response code is 200
     And the response object is TicketStateCollectionResponse 
-    And the response contains 7 items of type TicketState     
+    And the response contains 7 items of type "TicketState"   
     
   Scenario: get the list of existing ticketstates with limit and offset
     When I query the collection of ticketstates with limit 2 and offset 4
     Then the response code is 200
     And the response object is TicketStateCollectionResponse 
-    And the response contains 2 items of type TicketState      
+    And the response contains 2 items of type "TicketState"
     
   Scenario: get the list of existing ticketstates with sorted
     When I query the collection of ticketstates with sorted by "State.-Name:textual" 
     Then the response code is 200
-    And the response contains 7 items of type TicketState
+    And the response contains 7 items of type "TicketState"
     And the response contains the following items of type TicketState
       | Name               |
       | new                |
@@ -56,7 +56,7 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
     When I query the collection of ticketstates with sorted by "TicketState.-Name:textual" limit 2 and offset 5
     Then the response code is 200
     And the response object is TicketStateCollectionResponse 
-    And the response contains 2 items of type TicketState     
+    And the response contains 2 items of type "TicketState"     
     
     
     

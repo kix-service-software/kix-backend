@@ -12,17 +12,14 @@ sub _Get {
     if ( $URIParams ) {
         $URIParams = encode_json($URIParams);
     }
-use Data::Dumper;
-#print STDERR "GETResponseURIParams".Dumper($URIParams);
+
     my $ua = LWP::UserAgent->new();
     my $req = HTTP::Request->new('GET', $Param{URL}, undef, $URIParams);
     $req->header('Authorization' => 'Token ' . ($Param{Token} || ''));      
     $req->header('Content-Type' => 'application/json'); 
   
     my $Response = $ua->request($req);
-use Data::Dumper;
-#print STDERR "GETResponse".Dumper($ua->request($req));
-#print STDERR "GETResponse".Dumper(decode_json($Response->decoded_content));      
+
     return ($Response, decode_json($Response->decoded_content));
 }
 
@@ -33,23 +30,19 @@ sub _Post {
     my $req = HTTP::Request->new('POST', $Param{URL});   
     $req->header('Authorization' => 'Token ' . ($Param{Token} || ''));      
     $req->header('Content-Type' => 'application/json'); 
-use Data::Dumper;
-#print STDERR "Content".Dumper(\%Param);
+
     if ( $Param{Content} ) {
         my $JSON = _ReplacePlaceholders( encode_json($Param{Content}) );
         $req->content($JSON);
     }
-use Data::Dumper;
-#print STDERR "POSTResponse".Dumper($ua->request($req));    
+
     my $Response = $ua->request($req);
 
     my $DecRes = decode_json($Response->decoded_content);
     
     foreach my $Key (keys %{$DecRes}){
         if ($Key ne "Systeminfo") {        
-#print STDERR "DecResgesamt".Dumper($DecRes, $Key);    
-#print STDERR "DecRes".Dumper($Response);
-#print STDERR "DecRes".Dumper(keys %{$DecRes});
+
             push (@{S->{$Key."Array"}}, $DecRes->{$Key});
         }
         if ($DecRes->{$Key}) {
@@ -72,8 +65,7 @@ sub _Patch {
         my $JSON = _ReplacePlaceholders( encode_json($Param{Content}) );
         $req->content($JSON);
     }
-use Data::Dumper;
-#print STDERR "PATCHResponse".Dumper($ua->request($req));  
+
     my $Response = $ua->request($req);
     return ($Response, decode_json($Response->decoded_content));
 }
@@ -87,8 +79,7 @@ sub _Delete {
     $req->header('Content-Type' => 'application/json'); 
 
     my $Response = $ua->request($req);
-use Data::Dumper;
-#print STDERR "DeleteResponse".Dumper($ua->request($req));     
+
     return ($Response);
 }
 

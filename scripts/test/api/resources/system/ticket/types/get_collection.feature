@@ -22,19 +22,19 @@ Feature: GET request to the /system/ticket/types resource
     When I query the collection of tickettypes with a limit of 3
     Then the response code is 200
     And the response object is TicketTypeCollectionResponse
-    And the response contains 3 items of type TicketType
+    And the response contains 3 items of type "TicketType"
 
   Scenario: get the list of existing tickettypes with offset
     When I query the collection of tickettypes with offset 3
     Then the response code is 200
     And the response object is TicketTypeCollectionResponse
-    And the response contains 3 items of type TicketType
+    And the response contains 3 items of type "TicketType"
 
   Scenario: get the list of existing tickettypes with sorted
     When I query the collection of tickettypes with sorted by "TicketType.-Name:textual"
     Then the response code is 200
     And the response object is TicketTypeCollectionResponse
-    And the response contains 3 items of type TicketType
+    And the response contains 3 items of type "TicketType"
     And the response contains the following items of type TicketType
       | Name            |
       | Unclassified    |
@@ -45,11 +45,11 @@ Feature: GET request to the /system/ticket/types resource
     When I query the collection of tickettypes with sorted by "TicketType.-Name:textual" limit 2 and offset 2
     Then the response code is 200
     And the response object is TicketTypeCollectionResponse
-    And the response contains 1 items of type TicketType
+    And the response contains 1 items of type "TicketType"
     And the response contains the following items of type TicketType
       | Name            |
       | Incident        |
-    And the response contains 1 items of type TicketType
+    And the response contains 1 items of type "TicketType"
     And the response contains the following items of type TicketType
       | Name            |
       | Incident        |

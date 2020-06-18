@@ -49,7 +49,7 @@
     Given 8 of addressbooks
     When I query the collection of addressbook with limit 4
     Then the response code is 200
-    And the response contains 4 items of type Address
+    And the response contains 4 items of type "Address"
     When delete all this addressbooks
     Then the response code is 204
     And the response has no content
@@ -58,7 +58,7 @@
     Given 8 of addressbooks
     When I query the collection of addressbook with offset 4
     Then the response code is 200
-    And the response contains 6 items of type Address
+    And the response contains 6 items of type "Address"
     When delete all this addressbooks
     Then the response code is 204
     And the response has no content
@@ -67,7 +67,7 @@
      Given 8 of addressbooks
      When I query the collection of addressbook with limit 2 and offset 4
      Then the response code is 200
-     And the response contains 2 items of type Address
+     And the response contains 2 items of type "Address"
      And the response contains the following items of type Address
        | EmailAddress             |
        | test_for_filter@test.org |
@@ -80,7 +80,7 @@
      Given 8 of addressbooks
      When I query the collection of addressbook with sorted by "Address.-EmailAddress:textual"
      Then the response code is 200
-     And the response contains 10 items of type Address
+     And the response contains 10 items of type "Address"
      And the response contains the following items of type Address
        | EmailAddress                 |
        | Thomas.Tester@test.org       |
@@ -93,7 +93,7 @@
      Given 8 of addressbooks
      When I query the collection of addressbook with sorted by "Address.-EmailAddress:textual" limit 2 and offset 5
      Then the response code is 200
-     And the response contains 2 items of type Address
+     And the response contains 2 items of type "Address"
      When delete all this addressbooks
      Then the response code is 204
      And the response has no content

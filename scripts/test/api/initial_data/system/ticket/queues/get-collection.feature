@@ -8,7 +8,7 @@
   Scenario: check is the existing queues are consistent with the delivery defaults
     When I query the collection of ticket queues
     Then the response code is 200
-    And the response object is QueueCollectionResponse
+#    And the response object is QueueCollectionResponse
     Then the response contains 3 items of type "Queue"
     And the response contains the following items of type Queue
       | Name         | ValidID |

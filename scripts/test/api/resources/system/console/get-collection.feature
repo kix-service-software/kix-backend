@@ -11,9 +11,9 @@
 #    And the response object is ConsoleCommandCollectionResponse
 
   Scenario: get the list of existing console command filter
-    When I query the collection of console with filter command "Maint::Cache::Delete"
+    When I query the collection of console with filter command "Console::Command::Maint::Token::Remove"
     Then the response code is 200
 #    And the response object is ConsoleCommandCollectionResponse
     And the response contains the following items of type ConsoleCommand
-      | Command              |
-      | Maint::Cache::Delete |
+      | Command                                |
+      | Console::Command::Maint::Token::Remove |

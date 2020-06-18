@@ -19,4 +19,4 @@
   Scenario: get the list of textmodules with limit
     When I query the collection of textmodules with a limit of 1
     Then the response code is 200
-    And the response contains 1 items of type TextModule
+    And the response contains 1 items of type "TextModule"

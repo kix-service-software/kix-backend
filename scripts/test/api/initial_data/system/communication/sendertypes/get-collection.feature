@@ -8,7 +8,6 @@
  Scenario: check is the existing sendertypes are consistent with the delivery defaults
     When I query the collection of sendertypes
     Then the response code is 200
-#Then the response content is
     And the response object is SenderTypeCollectionResponse
     And the response contains 3 items of type "SenderType"
     And the response contains the following items of type SenderType

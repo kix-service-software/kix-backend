@@ -19,7 +19,7 @@ Feature: the /tickets/:TicketID/articles resource
     Given 8 of articles
     When I query the articles collection with limit 4
     Then the response code is 200
-    And the response contains 4 items of type Article
+    And the response contains 4 items of type "Article"
     When I delete this ticket
     Then the response code is 204
     And the response has no content
@@ -29,7 +29,7 @@ Feature: the /tickets/:TicketID/articles resource
     Given 8 of articles
     When I query the articles collection with offset 4
     Then the response code is 200
-    And the response contains 4 items of type Article
+    And the response contains 4 items of type "Article"
     When I delete this ticket
     Then the response code is 204
     And the response has no content 
@@ -39,7 +39,7 @@ Feature: the /tickets/:TicketID/articles resource
     Given 8 of articles
     When I query the articles collection with limit 2 and offset 4
     Then the response code is 200
-    And the response contains 2 items of type Article
+    And the response contains 2 items of type "Article"
     When I delete this ticket
     Then the response code is 204
     And the response has no content     

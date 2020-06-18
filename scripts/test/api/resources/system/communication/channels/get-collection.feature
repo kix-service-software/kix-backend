@@ -30,7 +30,7 @@
     When I query the collection of channels with a limit of 1
     Then the response code is 200
     And the response object is ChannelCollectionResponse
-    And the response contains 1 items of type Channel
+    And the response contains 1 items of type "Channel"
     
   Scenario: get the list of existing channels with sorted
     When I query the collection of channels with sorted by "Channel.Name:textual"

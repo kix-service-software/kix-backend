@@ -104,7 +104,6 @@ Given qr/(\d+) of automation  macro action$/, sub {
 };
 
 When qr/I create a automation macro action$/, sub {
-    print STDERR "POST".Dumper(S->{MacroID});
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/system/automation/macros/'.S->{MacroID}.'/actions',
       Token   => S->{Token},

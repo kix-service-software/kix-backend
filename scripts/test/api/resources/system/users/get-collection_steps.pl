@@ -36,7 +36,7 @@ When qr/I query the collection of users$/, sub {
    );
 };
 
-When qr/I query the collection of users with filter of "(.*?)"$/, sub {
+When qr/I query the collection of users with filter of UserEmail "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/users',
@@ -44,15 +44,15 @@ When qr/I query the collection of users with filter of "(.*?)"$/, sub {
    );
 };
 
-When qr/I query the collection of users with AND-filter of "(.*?)" and "(.*?)"$/, sub {  
+When qr/I query the collection of users with AND-filter of UserEmail "(.*?)" and UserLastname "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/users',
-      Filter => '{"User": {"AND": [{"Field": "UserEmail","Operator": "CONTAINS","Value": "'.$1.'"},{"Field": "UserFirstname","Operator": "STARTSWITH","Value": "'.$2.'"}]}}',
+      Filter => '{"User": {"AND": [{"Field": "UserLastname","Operator": "STARTSWITH","Value": "'.$1.'"},{"Field": "UserFirstname","Operator": "STARTSWITH","Value": "'.$2.'"}]}}',
    );
 };
 
-When qr/I query the collection of users with AND-filter of UserEmail "(.*?)" and UserID's and UserFirstname "(.*?)"$/, sub {  
+When qr/I query the collection of users with AND-filter of UserEmail "(.*?)" and UserIDs and UserFirstname "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/users',
@@ -74,3 +74,4 @@ When qr/I query the collection of users with include (\w+)$/, sub {
       URL   => S->{API_URL}.'/system/users?include='.$1
    );
 };
+
