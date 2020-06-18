@@ -76,7 +76,7 @@ sub new {
     $Self->{Output} = $Param{Output} || 'ASCII';
 
     $Self->{ANSI} = $Param{ANSI};
-    if ($Self->{Output} eq 'ALLURE') {
+    if ($Self->{Output} eq 'Allure') {
         $Self->{Adapter} = $Kernel::OM->Get('UnitTest::AllureAdapter')->new();
     }
 
@@ -356,7 +356,7 @@ sub Run {
         #     return 1;
         # }
     }
-    if ($Self->{Output} eq 'ALLURE') {
+    if ($Self->{Output} eq 'Allure') {
         $Self->{Adapter}->SetExecutorInfo();
         $Self->{Adapter}->AddEnvironmentInfoFromSystem();
         my $OutDir = $Self->{AllureOutputDir} || $ENV{'/tmp/unit-test/allure-results';
