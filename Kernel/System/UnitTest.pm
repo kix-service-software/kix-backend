@@ -74,7 +74,6 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     $Self->{Output} = $Param{Output} || 'ASCII';
-    $Self->{AllureOutputDir} = $Param{AllureOutputDir} || '/tmp/unit-test/allure-results';
 
     $Self->{ANSI} = $Param{ANSI};
     if ($Self->{Output} eq 'Allure') {
@@ -170,8 +169,9 @@ sub Run {
         $Directory =~ s/\.//g;
     }
 
-    $Self->{Verbose} = $Param{Verbose};
-    $Self->{Pretty} = $Param{Pretty};
+    $Self->{Verbose}         = $Param{Verbose};
+    $Self->{Pretty}          = $Param{Pretty};
+    $Self->{AllureOutputDir} = $Param{AllureOutputDir} || '/tmp/unit-test/allure-results';
 
     my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Directory,
