@@ -58,7 +58,7 @@
     Given 8 of addressbooks
     When I query the collection of addressbook with offset 4
     Then the response code is 200
-    And the response contains 6 items of type "Address"
+    And the response contains 4 items of type "Address"
     When delete all this addressbooks
     Then the response code is 204
     And the response has no content
@@ -67,11 +67,12 @@
      Given 8 of addressbooks
      When I query the collection of addressbook with limit 2 and offset 4
      Then the response code is 200
+Then the response content is
      And the response contains 2 items of type "Address"
      And the response contains the following items of type Address
        | EmailAddress             |
-       | test_for_filter@test.org |
        | Thomas.Tester@test.org   |
+       | test_for_filter@test.org |
      When delete all this addressbooks
      Then the response code is 204
      And the response has no content
