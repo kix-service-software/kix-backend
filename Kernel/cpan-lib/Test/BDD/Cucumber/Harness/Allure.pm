@@ -17,7 +17,7 @@ has currentContainerId => (is => 'rw');
 has currentTestId => (is => 'rw');
 has currentStepStartTime => (is => 'rw', isa => Num);
 
-my $adapter = AllureAdapter::new();
+my $adapter = Kernel::System::UnitTest::AllureAdapter::new();
 
 $adapter->SetExecutorInfo('name' => 'pherkin Cucumber');
 $adapter->AddEnvironmentInfoFromSystem;
