@@ -9,7 +9,7 @@ use Types::Standard qw(Num HashRef ArrayRef FileHandle);
 
 use Cwd;
 use lib (getcwd() . '/Kernel/System/UnitTest');
-use Kernel::System::UnitTest::AllureAdapter;
+use AllureAdapter;
 
 extends 'Test::BDD::Cucumber::Harness::Data';
 
@@ -17,7 +17,7 @@ has currentContainerId => (is => 'rw');
 has currentTestId => (is => 'rw');
 has currentStepStartTime => (is => 'rw', isa => Num);
 
-my $adapter = Kernel::System::UnitTest::AllureAdapter::new();
+my $adapter = AllureAdapter::new();
 
 $adapter->SetExecutorInfo('name' => 'pherkin Cucumber');
 $adapter->AddEnvironmentInfoFromSystem;
