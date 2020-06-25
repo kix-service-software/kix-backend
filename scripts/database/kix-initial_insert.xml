@@ -2447,12 +2447,12 @@
     <Insert Table="notification_event_item">
         <Data Key="notification_id">1</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentWritePermission</Data>
+        <Data Key="event_value" Type="Quote">AgentWritePermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">1</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentReadPermission</Data>
+        <Data Key="event_value" Type="Quote">AgentReadPermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">1</Data>
@@ -2493,12 +2493,12 @@
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentWritePermission</Data>
+        <Data Key="event_value" Type="Quote">AgentWritePermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentReadPermission</Data>
+        <Data Key="event_value" Type="Quote">AgentReadPermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
@@ -3352,7 +3352,7 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="visibility" Type="Quote">external</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
-        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Objekte sollen in KIX 18 gefunden werden.</span></p>        
+        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Objekte sollen in KIX 18 gefunden werden.</span></p>
 ]]></Data>
         <Data Key="f_field3" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Die Komplexsuche ist &uuml;ber das <b>Lupen-Symbol im Modulmen&uuml; </b><span style="font-weight:normal">und</span> &uuml;ber die Header Action auf den Dashboards erreichbar. Es &ouml;ffnet sich ein Dialogfenster. &Uuml;ber die Tabs k&ouml;nnen Sie ausw&auml;hlen, nach welchen Objekten Sie suchen wollen.</span></p>
 
@@ -9887,7 +9887,7 @@ vielen Dank für Ihre Nachricht.
 CountMin: '1'
 CountMax: '1'
 CountDefault: '1'
-DefaultValue: 
+DefaultValue:
 Link: ''
 PossibleNone: '1'
 PossibleValues:
@@ -9944,7 +9944,7 @@ CountMax: '1'
 CountDefault: '1'
 ItemSeparator: ''
 Cols: ''
-DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n 
+DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n
   \   \"description\": \"Announce shut off to all possibly affected personell directly
   or indirectly working with the device.\",\r\n    \"input\": \"ChecklistState\",\r\n
   \   \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"200\",\r\n    \"title\": \"Identify
