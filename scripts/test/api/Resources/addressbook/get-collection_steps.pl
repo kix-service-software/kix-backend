@@ -80,6 +80,7 @@ When qr/I query the collection of addressbook with limit (\d+) and offset (\d+)$
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token  => S->{Token},
       URL    => S->{API_URL}.'/addressbook',
+      Sort   => 'Address.EmailAddress:textual',
       Limit  => $1,
       Offset => $2,
    );

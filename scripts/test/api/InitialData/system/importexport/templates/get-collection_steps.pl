@@ -28,10 +28,10 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I query the collection of template templateid (\d+) runs$/, sub {
+When qr/I query the collection of importexport templates$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/importexport/templates/'.$1.'/runs',
+      URL   => S->{API_URL}.'/system/importexport/templates',
       Sort  => 'ImportExportTemplate.ID:numeric'
    );
 };
