@@ -11,12 +11,12 @@
     Then the response contains 7 items of type "ImportExportTemplate"
     And the response contains the following items of type ImportExportTemplate
       | Name                        | Object         | Format |
+      | Building (auto-created map) | ITSMConfigItem | CSV    |
+      | Computer (auto-created map) | ITSMConfigItem | CSV    |
+      | Hardware (auto-created map) | ITSMConfigItem | CSV    |
       | Location (auto-created map) | ITSMConfigItem | CSV    |
       | Network (auto-created map)  | ITSMConfigItem | CSV    |
-      | Hardware (auto-created map) | ITSMConfigItem | CSV    |
-      | Building (auto-created map) | ITSMConfigItem | CSV    |
       | Room (auto-created map)     | ITSMConfigItem | CSV    |
-      | Computer (auto-created map) | ITSMConfigItem | CSV    |
       | Software (auto-created map) | ITSMConfigItem | CSV    |
 
 

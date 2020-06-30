@@ -32,7 +32,7 @@ When qr/I query the collection of importexport templates$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/importexport/templates',
-      Sort  => 'ImportExportTemplate.ID:numeric'
+      Sort  => 'ImportExportTemplate.Name:textual'
    );
 };
 
