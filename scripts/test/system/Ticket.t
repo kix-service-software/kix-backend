@@ -16,7 +16,6 @@ use vars (qw($Self));
 
 # get needed objects
 my $QueueObject   = $Kernel::OM->Get('Queue');
-my $ServiceObject = $Kernel::OM->Get('Service');
 my $StateObject   = $Kernel::OM->Get('State');
 my $TicketObject  = $Kernel::OM->Get('Ticket');
 my $TimeObject    = $Kernel::OM->Get('Time');
@@ -103,11 +102,6 @@ $Self->Is(
     $Ticket{Lock},
     'unlock',
     'TicketGet() (Lock)',
-);
-$Self->Is(
-    $Ticket{ServiceID},
-    '',
-    'TicketGet() (ServiceID)',
 );
 
 my $DefaultTicketType = $Kernel::OM->Get('Config')->Get('Ticket::Type::Default');
@@ -1065,61 +1059,8 @@ $TypeObject->TypeUpdate(
     UserID  => 1,
 );
 
-# create a test service
-my $ServiceID = $ServiceObject->ServiceAdd(
-    Name    => 'Service' . $Helper->GetRandomID(),
-    ValidID => 1,
-    Comment => 'Unit Test Comment',
-# ---
-# ITSMCore
-# ---
-    TypeID      => 1,
-    Criticality => '3 normal',
-# ---
-    UserID  => 1,
-);
-
 # wait 1 seconds
 $Helper->FixedTimeAddSeconds(1);
-
-# set type
-my $TicketServiceSet = $TicketObject->TicketServiceSet(
-    ServiceID => $ServiceID,
-    TicketID  => $TicketID,
-    UserID    => 1,
-);
-
-$Self->True(
-    $TicketServiceSet,
-    'TicketServiceSet()',
-);
-
-# get updated ticket data
-%TicketData = $TicketObject->TicketGet(
-    TicketID => $TicketID,
-    UserID   => 1,
-);
-
-# compare current change_time with old one
-$Self->IsNot(
-    $ChangeTime,
-    $TicketData{Changed},
-    'Change_time updated in TicketServiceSet()',
-);
-
-# set as invalid the test service
-my %Service = $ServiceObject->ServiceGet(
-    ServiceID => $ServiceID,
-    UserID    => 1, 
-);
-$ServiceObject->ServiceUpdate(
-    ServiceID   => $ServiceID,
-    Name        => 'Service' . $Helper->GetRandomID(),
-    TypeID      => $Service{TypeID},
-    Criticality => $Service{Criticality},    
-    ValidID     => 2,
-    UserID      => 1,
-);
 
 # save current change_time
 $ChangeTime = $TicketData{Changed};

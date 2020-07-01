@@ -57,7 +57,7 @@ sub new {
     $Self->{Debug} = 0;
 
     # init the basic configuration to "find" ourself
-    $Self->{Config}->{Home} = $ENV{KIX_HOME} || dirname($Bin);
+    $Self->{Config}->{Home} = $ENV{KIX_HOME} || dirname($Bin) || '/opt/kix';
     if ($ENV{KIX_HOME}) {
         use lib $ENV{KIX_HOME};
         use lib $ENV{KIX_HOME} . '/plugins';

@@ -1137,7 +1137,7 @@ sub _Success {
 
             my $FieldSelector = $Self->{Fields};
             if ( IsHashRefWithData( $Self->{PermissionFieldSelector} ) ) {
-                $Self->_Debug($Self->{LevelIndent}, "using permission field selector");    
+                $Self->_Debug($Self->{LevelIndent}, "using permission field selector");
                 $FieldSelector = $Self->{PermissionFieldSelector};
             }
 

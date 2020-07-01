@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Console::Command::Admin::Contact::List;
+package Kernel::System::Console::Command::Admin::TicketType::List;
 
 use strict;
 use warnings;
@@ -14,14 +14,13 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'User',
-    'Contact',
+    'Type',
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('List contacts.');
+    $Self->Description('List ticket types.');
 
     return;
 }
@@ -29,10 +28,10 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing contacts...</yellow>\n");
+    $Self->Print("<yellow>Listing ticket types...</yellow>\n");
 
-    # get all contacts
-    my %Contacts = $Kernel::OM->Get('Contact')->ContactList(
+    # get all types
+    my %Types = $Kernel::OM->Get('Type')->TypeList(
         Valid => 0,
     );
 
@@ -42,19 +41,17 @@ sub Run {
         3 => 'no(temp)',
     );
 
-    $Self->Print("    ID Firstname            Lastname             Email                                                        UserID Valid\n");
-    $Self->Print("------ -------------------- -------------------- ------------------------------------------------------------ ------ -------- \n");
+    $Self->Print("    ID Name                                               Valid\n");
+    $Self->Print("------ -------------------------------------------------- -------- \n");
 
-    foreach my $ID ( sort { $Contacts{$a} cmp $Contacts{$b} } keys %Contacts ) {
-        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+    foreach my $ID ( sort { $Types{$a} cmp $Types{$b} } keys %Types ) {
+        my %Type = $Kernel::OM->Get('Type')->TypeGet(
             ID => $ID
         );
 
-        my $Valid = $ValidStr{$Contact{ValidID}};
-        my $AssignedUserID = ($Contact{AssignedUserID}) ? $Contact{AssignedUserID} : '-';
+        my $Valid = $ValidStr{$Type{ValidID}};
 
-        $Self->Print(sprintf("%6i %-20s %-20s %-60s %6s %-8s\n",
-            $Contact{ID}, $Contact{Firstname}, $Contact{Lastname}, $Contact{Email}, $AssignedUserID, $Valid));
+        $Self->Print(sprintf("%6i %-50s %-8s\n", $Type{ID}, $Type{Name}, $Valid));
     }
 
     $Self->Print("<green>Done</green>\n");

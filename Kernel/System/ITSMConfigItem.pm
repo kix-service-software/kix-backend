@@ -36,7 +36,6 @@ our @ObjectDependencies = (
     'LinkObject',
     'Log',
     'Main',
-    'Service',
     'User',
     'VirtualFS',
     'XML',
@@ -1799,9 +1798,6 @@ sub CurInciStateRecalc {
     # calculated from all incident link types
     my %NewConfigItemIncidentState;
 
-    # to store the relation between services and linked CIs
-    my %ServiceCIRelation;
-
     # remember the scanned config items
     my %ScannedConfigItemIDs;
 
@@ -1840,24 +1836,6 @@ sub CurInciStateRecalc {
 
             # extract incident state type
             my $InciStateType = $ScannedConfigItemIDs{$ConfigItemID}->{Type};
-
-            # find all linked services of this CI
-            my %LinkedServiceIDs = $Kernel::OM->Get('LinkObject')->LinkKeyList(
-                Object1   => 'ConfigItem',
-                Key1      => $ConfigItemID,
-                Object2   => 'Service',
-                State     => 'Valid',
-                Type      => $LinkType,
-                Direction => $LinkDirection,
-                UserID    => 1,
-            );
-
-            SERVICEID:
-            for my $ServiceID ( sort keys %LinkedServiceIDs ) {
-
-                # remember the CIs that are linked with this service
-                push @{ $ServiceCIRelation{$ServiceID} }, $ConfigItemID;
-            }
 
             next CONFIGITEMID if $InciStateType eq 'incident';
 
@@ -1952,51 +1930,6 @@ sub CurInciStateRecalc {
         $CacheObject->Delete(
             Type => $Self->{CacheType},
             Key  => 'VersionNameGet::VersionID::' . $VersionID,
-        );
-    }
-
-    # set the current incident state type for each service (influenced by linked CIs)
-    SERVICEID:
-    for my $ServiceID ( sort keys %ServiceCIRelation ) {
-
-        # set default incident state type
-        my $CurInciStateTypeFromCIs = 'operational';
-
-        # get the unique config item ids which are direcly linked to this service
-        my %UniqueConfigItemIDs = map { $_ => 1 } @{ $ServiceCIRelation{$ServiceID} };
-
-        # investigate the current incident state of each config item
-        CONFIGITEMID:
-        for my $ConfigItemID ( sort keys %UniqueConfigItemIDs ) {
-
-            # get config item data
-            my $ConfigItemData = $Self->ConfigItemGet(
-                ConfigItemID => $ConfigItemID,
-                Cache        => 0,
-            );
-
-            next CONFIGITEMID if $ConfigItemData->{CurDeplStateType} ne 'productive';
-            next CONFIGITEMID if $ConfigItemData->{CurInciStateType} eq 'operational';
-
-            # check if service must be set to 'warning'
-            if ( $ConfigItemData->{CurInciStateType} eq 'warning' ) {
-                $CurInciStateTypeFromCIs = 'warning';
-                next CONFIGITEMID;
-            }
-
-            # check if service must be set to 'incident'
-            if ( $ConfigItemData->{CurInciStateType} eq 'incident' ) {
-                $CurInciStateTypeFromCIs = 'incident';
-                last CONFIGITEMID;
-            }
-        }
-
-        # update the current incident state type from CIs of the service
-        $Kernel::OM->Get('Service')->ServicePreferencesSet(
-            ServiceID => $ServiceID,
-            Key       => 'CurInciStateTypeFromCIs',
-            Value     => $CurInciStateTypeFromCIs,
-            UserID    => 1,
         );
     }
 

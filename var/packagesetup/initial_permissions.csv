@@ -15,7 +15,6 @@
 "Agent User";"Resource";"/i18n";;"x";;;
 "Ticket Reader";"Resource";"/tickets";;"x";;;
 "Ticket Reader";"Resource";"/tickets/*/articles/*/flags";"x";"x";"x";"x";
-"Ticket Reader";"Resource";"/system/services";;"x";;;
 "Ticket Reader";"Resource";"/system/ticket/*";;;;;
 "Ticket Reader";"Resource";"/system/ticket";;"x";;;
 "Ticket Reader";"Resource";"/system/ticket/locks";;"x";;;
@@ -44,7 +43,6 @@
 "Ticket Agent";"Resource";"/system/communication/channels";;"x";;;
 "Ticket Agent";"Resource";"/system/communication/sendertypes";;"x";;;
 "Ticket Agent";"Resource";"/system/communication/systemaddresses";;"x";;;
-"Ticket Agent";"Resource";"/system/services";;"x";;;
 "Ticket Agent";"Resource";"/organisations";;"x";;;
 "Ticket Agent";"Resource";"/contacts";;"x";;;
 "Ticket Agent";"Resource";"/links";"x";"x";"x";"x";

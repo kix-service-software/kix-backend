@@ -54,7 +54,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | Target                                | Value | TypeID |
       | /tickets                              | 2     | 1      |
       | /tickets/*/articles/*/flags           | 15    | 1      |
-      | /system/services                      | 2     | 1      |
       | /system/ticket/*                      | 0     | 1      |
       | /system/ticket                        | 2     | 1      |
       | /system/ticket/locks                  | 2     | 1      |
@@ -91,7 +90,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/communication/channels        | 2     | 1      |
       | /system/communication/sendertypes     | 2     | 1      |
       | /system/communication/systemaddresses | 2     | 1      |
-      | /system/services                      | 2     | 1      |
       | /organisations                        | 2     | 1      |
       | /contacts                             | 2     | 1      |
       | /links                                | 15    | 1      |

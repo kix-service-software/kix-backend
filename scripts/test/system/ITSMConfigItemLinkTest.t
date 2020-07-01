@@ -16,7 +16,6 @@ use vars qw($Self);
 
 # get needed objects
 my $ConfigObject         = $Kernel::OM->Get('Config');
-my $ServiceObject        = $Kernel::OM->Get('Service');
 my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
 my $LinkObject           = $Kernel::OM->Get('LinkObject');
@@ -33,10 +32,8 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 my $RandomID = $Helper->GetRandomID();
 
 my $ConfigItemName = 'UnitTestConfigItemTest' . $RandomID;
-my $ServiceName    = 'UnitTestServiceTest' . $RandomID;
 
 my @ConfigItemIDs;
-my @ServiceIDs;
 
 my $CheckExpectedResults = sub {
 
@@ -63,25 +60,6 @@ my $CheckExpectedResults = sub {
                     $ConfigItem->{CurInciState},
                     $ExpectedIncidentStates{$Object}->{$NameSuffix},
                     "Check incident state of config item $NameSuffix.",
-                );
-            }
-        }
-        elsif ( $Object eq 'Service' ) {
-
-            for my $NameSuffix ( sort keys %{ $ExpectedIncidentStates{$Object} } ) {
-
-                # get service data (including the current incident state)
-                my %ServiceData = $ServiceObject->ServiceGet(
-                    ServiceID     => $ObjectNameSuffix2ID{$Object}->{$NameSuffix},
-                    IncidentState => 1,
-                    UserID        => 1,
-                );
-
-                # check the result
-                $Self->Is(
-                    $ServiceData{CurInciState},
-                    $ExpectedIncidentStates{$Object}->{$NameSuffix},
-                    "Check incident state of service $NameSuffix.",
                 );
             }
         }
@@ -164,28 +142,6 @@ for my $NameSuffix ( 1 .. 7, qw(A B C D E F G) ) {
         $VersionID,
         "Added a version for the configitem id $ConfigItemID",
     );
-}
-
-# create services
-for my $NameSuffix ( 1 .. 2 ) {
-
-    my $ServiceID = $ServiceObject->ServiceAdd(
-        Name        => $ServiceName . '_' . $NameSuffix,
-        ValidID     => 1,
-        UserID      => 1,
-        TypeID      => 1,
-        Criticality => '3 normal',
-    );
-
-    $Self->True(
-        $ServiceID,
-        "Added service id $ServiceID.",
-    );
-
-    # remember the service id
-    $ObjectNameSuffix2ID{Service}->{$NameSuffix} = $ServiceID;
-
-    push @ServiceIDs, $ServiceID;
 }
 
 # read the original setting for IncidentLinkTypeDirection

@@ -438,7 +438,6 @@
     <Column Name="queue_id" Required="true" Type="INTEGER"/>
     <Column Name="ticket_lock_id" Required="true" Type="SMALLINT"/>
     <Column Name="type_id" Required="false" Type="SMALLINT"/>
-    <Column Name="service_id" Required="false" Type="INTEGER"/>
     <Column Name="user_id" Required="true" Type="INTEGER"/>
     <Column Name="responsible_user_id" Required="true" Type="INTEGER"/>
     <Column Name="ticket_priority_id" Required="true" Type="SMALLINT"/>
@@ -535,9 +534,6 @@
     </ForeignKey>
     <ForeignKey ForeignTable="ticket_type">
         <Reference Local="type_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="service">
-        <Reference Local="service_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="ticket_priority">
         <Reference Local="ticket_priority_id" Foreign="id"/>
@@ -1028,97 +1024,6 @@
     </ForeignKey>
 </Table>
 
-<!-- standard_template - -->
-<Table Name="standard_template">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="text" Required="false" Size="10000" Type="VARCHAR"/>
-    <Column Name="content_type" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="template_type" Required="true" Size="100" Type="VARCHAR" Default="Answer"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="standard_template_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- queue_standard_template - -->
-<Table Name="queue_standard_template">
-    <Column Name="queue_id" Required="true" Type="INTEGER"/>
-    <Column Name="standard_template_id" Required="true" Type="INTEGER"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <ForeignKey ForeignTable="standard_template">
-        <Reference Local="standard_template_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="queue">
-        <Reference Local="queue_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- standard_attachment -->
-<Table Name="standard_attachment">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="content_type" Required="true" Size="250" Type="VARCHAR"/>
-    <Column Name="content" Required="true" Type="LONGBLOB"/>
-    <Column Name="filename" Required="true" Size="250" Type="VARCHAR"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="standard_attachment_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- standard_template_attachment -->
-<Table Name="standard_template_attachment">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="standard_attachment_id" Required="true" Type="INTEGER"/>
-    <Column Name="standard_template_id" Required="true" Type="INTEGER"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <ForeignKey ForeignTable="standard_template">
-        <Reference Local="standard_template_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="standard_attachment">
-        <Reference Local="standard_attachment_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <!-- auto_response_type - -->
 <Table Name="auto_response_type">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
@@ -1192,60 +1097,6 @@
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- service - service -->
-<Table Name="service">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Column Name="type_id" Required="false" Type="INTEGER" />
-    <Column Name="criticality" Required="false" Size="200" Type="VARCHAR" />
-    <Unique Name="service_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- service preferences -->
-<Table Name="service_preferences">
-    <Column Name="service_id" Required="true" Type="INTEGER"/>
-    <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
-    <Column Name="preferences_value" Required="false" Size="250" Type="VARCHAR"/>
-    <Index Name="service_preferences_service_id">
-        <IndexColumn Name="service_id"/>
-    </Index>
-    <ForeignKey ForeignTable="service">
-        <Reference Local="service_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- service_customer_user - relation customeruser<->service -->
-<Table Name="service_customer_user">
-    <Column Name="customer_user_login" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="service_id" Required="true" Type="INTEGER"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Index Name="service_customer_user_customer_user_login">
-        <IndexColumn Name="customer_user_login" Size="10"/>
-    </Index>
-    <Index Name="service_customer_user_service_id">
-        <IndexColumn Name="service_id"/>
-    </Index>
-    <ForeignKey ForeignTable="service">
-        <Reference Local="service_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
     </ForeignKey>
 </Table>
 
@@ -2072,32 +1923,6 @@
     </Index>
 </Table>
 
-<!-- cloud_service_config -->
-<Table Name="cloud_service_config">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="config" Required="true" Type="LONGBLOB"/>
-    <Column Name="config_md5" Required="true" Size="32" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="cloud_service_config_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <Unique Name="cloud_service_config_config_md5">
-        <UniqueColumn Name="config_md5"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <!-- faq -->
 <Table Name="faq_category">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
@@ -2547,19 +2372,6 @@
         <IndexColumn Name="attachment_directory_id"/>
     </Index>
 </Table>
-
-<!-- template x -->
-<Table Name="standard_templatex">
-    <Column Name="template_id" Required="true" Type="INTEGER" PrimaryKey="true"/>
-    <Column Name="t_to" Type="VARCHAR" Size="3800"/>
-    <Column Name="t_cc" Type="VARCHAR" Size="3800"/>
-    <Column Name="t_bcc" Type="VARCHAR" Size="3800"/>
-    <Column Name="t_ticket_state_id" Type="SMALLINT"/>
-    <Column Name="t_pending_time" Type="INTEGER"/>
-    <Column Name="t_pending_type" Type="INTEGER"/>
-</Table>
-
-<!-- kix4otrs -->
 
 <Table Name="kix_article_flag">
     <Column Name="article_id"  Required="true" Type="BIGINT"/>
