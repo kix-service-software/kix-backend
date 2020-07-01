@@ -152,7 +152,6 @@ Daemon::DaemonModules::SchedulerTaskWorker::Cron                              = 
 Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface                  = Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface
 DB                                                                            = Kernel::System::DB
 DFRemoteDB                                                                    = Kernel::System::DFRemoteDB
-Document                                                                      = Kernel::System::Document
 DynamicField                                                                  = Kernel::System::DynamicField
 DynamicField::Backend                                                         = Kernel::System::DynamicField::Backend
 DynamicFieldValue                                                             = Kernel::System::DynamicFieldValue
