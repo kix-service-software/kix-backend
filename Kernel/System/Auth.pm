@@ -98,7 +98,7 @@ sub new {
                     # load sync module
                     $SyncConfig->{BackendObject} = $SyncConfig->{Module}->new(
                         Config => {
-                            %{$Config->{Config}}
+                            %{$Config->{Config} || {}},
                             %{$SyncConfig->{Config} || {}}
                         }
                     );
