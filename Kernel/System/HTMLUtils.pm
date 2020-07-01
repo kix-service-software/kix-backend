@@ -86,8 +86,8 @@ sub ToAscii {
     # turn on utf8 flag (bug#10970, bug#11596 and bug#12097)
     $Kernel::OM->Get('Encode')->EncodeInput( \$Param{String} );
 
-    # get length of line for forcing line breakes
-    my $LineLength = $Self->{'Ticket::Frontend::TextAreaNote'} || 78;
+    # forcing line breaks every 78 chars
+    my $LineLength = 78;
 
     # find <a href=....> and replace it with [x]
     my $LinkList = '';

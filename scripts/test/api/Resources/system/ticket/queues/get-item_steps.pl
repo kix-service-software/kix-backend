@@ -47,7 +47,7 @@ Then qr/the response contains the following queueid of type "(.*?)"$/, sub {
     my $Object = $1;
     my $Index = 0;    
 
-    my %Row = { SubQueue => S->{ResponseContent}->{Queue}->{SubQueues}->[0]};
+    my %Row = ( SubQueue => S->{ResponseContent}->{Queue}->{SubQueues}->[0] );
     foreach my $Attribute ( keys %{$Row}) {
         C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
     }

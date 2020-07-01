@@ -18,14 +18,11 @@ our @ObjectDependencies = (
     'Contact',
     'DynamicField',
     'DynamicField::Backend',
-    # KIX4OTRS-capeIT
     'HTMLUtils',
-    # EO KIX4OTRS-capeIT
     'LinkObject',
     'Log',
     'Priority',
     'Queue',
-    'Service',
     'State',
     'Ticket',
     'Time',

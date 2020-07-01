@@ -26,7 +26,7 @@ sub Configure {
     $Self->Description('Add a user.');
     $Self->AddOption(
         Name        => 'user-name',
-        Description => "User name for the new user.",
+        Description => "User name (login) for the new user.",
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,

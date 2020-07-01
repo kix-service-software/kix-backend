@@ -13,7 +13,11 @@ package Kernel::System::Auth;
 use strict;
 use warnings;
 
+use Storable;
+
 use Kernel::Language qw(Translatable);
+
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Config',
@@ -60,19 +64,47 @@ sub new {
     my $MainObject   = $Kernel::OM->Get('Main');
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    # load auth modules
-    COUNT:
-    for my $Count ( '', 1 .. 10 ) {
+    my $AuthConfigRef = $ConfigObject->Get("Authentication");
 
-        my $GenericModule = $ConfigObject->Get("AuthModule$Count");
+    if ( !IsHashRefWithData($AuthConfigRef) ) {
+        $MainObject->Die("Invalid Authentication config!");
+    }
 
-        next COUNT if !$GenericModule;
+    # create clone to keep the original
+    $Self->{AuthConfig} =  Storable::dclone($AuthConfigRef);
 
-        if ( !$MainObject->Require($GenericModule) ) {
-            $MainObject->Die("Can't load backend module $GenericModule! $@");
+    # load auth module for each enabled config
+    foreach my $AuthReg ( sort keys %{$Self->{AuthConfig}} ) {
+        if ( !IsArrayRefWithData($Self->{AuthConfig}->{$AuthReg}) ) {
+            $MainObject->Die("Invalid Authentication config ($AuthReg)!");
         }
 
-        $Self->{"AuthBackend$Count"} = $GenericModule->new( Count => $Count );
+        foreach my $Config ( @{$Self->{AuthConfig}->{$AuthReg}} ) {
+            next if !$Config->{Enabled} || !$Config->{Module};
+
+            if ( !$MainObject->Require($Config->{Module}) ) {
+                $MainObject->Die("Can't load auth backend module $Config->{Module}! $@");
+            }
+
+            $Config->{BackendObject} = $Config->{Module}->new(Config => $Config->{Config});
+
+            if ( IsArrayRefWithData($Config->{Sync}) ) {
+                foreach my $SyncConfig ( @{$Config->{Sync}} ) {
+                    next if !$SyncConfig->{Enabled} || !$SyncConfig->{Module};
+
+                    if ( !$MainObject->Require($SyncConfig->{Module}) ) {
+                        $MainObject->Die("Can't load auth sync backend module $SyncConfig->{Module}! $@");
+                    }
+                    # load sync module
+                    $SyncConfig->{BackendObject} = $SyncConfig->{Module}->new(
+                        Config => {
+                            %{$Config->{Config} || {}},
+                            %{$SyncConfig->{Config} || {}}
+                        }
+                    );
+                }
+            }
+        }
     }
 
     # load 2factor auth modules
@@ -88,21 +120,6 @@ sub new {
         }
 
         $Self->{"AuthTwoFactorBackend$Count"} = $GenericModule->new( %{$Self}, Count => $Count );
-    }
-
-    # load sync modules
-    COUNT:
-    for my $Count ( '', 1 .. 10 ) {
-
-        my $GenericModule = $ConfigObject->Get("AuthSyncModule$Count");
-
-        next COUNT if !$GenericModule;
-
-        if ( !$MainObject->Require($GenericModule) ) {
-            $MainObject->Die("Can't load backend module $GenericModule! $@");
-        }
-
-        $Self->{"AuthSyncBackend$Count"} = $GenericModule->new( %{$Self}, Count => $Count );
     }
 
     # Initialize last error message
@@ -147,102 +164,85 @@ sub Auth {
     my $UserObject   = $Kernel::OM->Get('User');
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    # use all 11 auth backends and return on first true
     my $User;
-    COUNT:
-    for my $Count ( '', 1 .. 10 ) {
 
-        # return on no config setting
-        next COUNT if !$Self->{"AuthBackend$Count"};
+    AUTHREG:
+    foreach my $AuthReg ( sort keys %{$Self->{AuthConfig}} ) {
 
-        # check auth backend
-        $User = $Self->{"AuthBackend$Count"}->Auth(%Param);
+        CONFIG:
+        foreach my $Config ( @{$Self->{AuthConfig}->{$AuthReg}} ) {
+        
+            next CONFIG if !$Config->{Enabled} || !$Config->{BackendObject};
 
-        # next on no success
-        next COUNT if !$User;
+            # check auth backend
+            $User = $Config->{BackendObject}->Auth(%Param);
 
-        # Sync will happen before two factor authentication (if configured)
-        # because user might not exist before being created in sync (see bug #11966).
-        # A failed two factor auth after successful sync will result
-        # in a new or updated user but no information or permission leak.
+            # next on no success
+            next CONFIG if !$User;
 
-        # configured auth sync backend
-        my $AuthSyncBackend = $ConfigObject->Get("AuthModule::UseSyncBackend$Count");
-        if ( !defined $AuthSyncBackend ) {
-            $AuthSyncBackend = $ConfigObject->Get("AuthModule{$Count}::UseSyncBackend");
-        }
-
-        # for backwards compatibility, OTRS 3.1.1, 3.1.2 and 3.1.3 used this wrong format (see bug#8387)
-
-        # sync with configured auth backend
-        if ( defined $AuthSyncBackend ) {
+            # Sync will happen before two factor authentication (if configured)
+            # because user might not exist before being created in sync (see bug #11966).
+            # A failed two factor auth after successful sync will result
+            # in a new or updated user but no information or permission leak.
 
             # if $AuthSyncBackend is defined but empty, don't sync with any backend
-            if ($AuthSyncBackend) {
+            if ( IsArrayRefWithData($Config->{Sync}) ) {
 
-                # sync configured backend
-                $Self->{$AuthSyncBackend}->Sync( %Param, User => $User );
+                SYNC_CONFIG:
+                foreach my $SyncConfig ( @{$Config->{Sync}} ) {
+                    next SYNC_CONFIG if !$SyncConfig->{Enabled} || !$SyncConfig->{BackendObject};
+
+                    # sync configured backend
+                    $SyncConfig->{BackendObject}->Sync( %Param, User => $User );
+                }
             }
-        }
 
-        # use all 11 sync backends
-        else {
-            SOURCE:
+            # If we have no UserID at this point
+            # it means auth was ok but user didn't exist before
+            # and wasn't created in sync module.
+            # We will skip two factor authentication even if configured
+            # because we don't have user data to compare the otp anyway.
+            # This will not count as a failed login.
+            my $UserID = $UserObject->UserLookup(
+                UserLogin => $User,
+            );
+            last CONFIG if !$UserID;
+
+            # check 2factor auth backends
+            my $TwoFactorAuth;
+            TWOFACTORSOURCE:
             for my $Count ( '', 1 .. 10 ) {
 
                 # return on no config setting
-                next SOURCE if !$Self->{"AuthSyncBackend$Count"};
+                next TWOFACTORSOURCE if !$Self->{"AuthTwoFactorBackend$Count"};
 
-                # sync backend
-                $Self->{"AuthSyncBackend$Count"}->Sync( %Param, User => $User );
+                # 2factor backend
+                my $AuthOk = $Self->{"AuthTwoFactorBackend$Count"}->Auth(
+                    TwoFactorToken => $Param{TwoFactorToken},
+                    User           => $User,
+                    UserID         => $UserID,
+                );
+                $TwoFactorAuth = $AuthOk ? 'passed' : 'failed';
+
+                last TWOFACTORSOURCE if $AuthOk;
             }
-        }
 
-        # If we have no UserID at this point
-        # it means auth was ok but user didn't exist before
-        # and wasn't created in sync module.
-        # We will skip two factor authentication even if configured
-        # because we don't have user data to compare the otp anyway.
-        # This will not count as a failed login.
-        my $UserID = $UserObject->UserLookup(
-            UserLogin => $User,
-        );
-        last COUNT if !$UserID;
+            # if at least one 2factor auth backend was checked but none was successful,
+            # it counts as a failed login
+            if ( $TwoFactorAuth && $TwoFactorAuth ne 'passed' ) {
+                $User = undef;
+                last CONFIG;
+            }
 
-        # check 2factor auth backends
-        my $TwoFactorAuth;
-        TWOFACTORSOURCE:
-        for my $Count ( '', 1 .. 10 ) {
-
-            # return on no config setting
-            next TWOFACTORSOURCE if !$Self->{"AuthTwoFactorBackend$Count"};
-
-            # 2factor backend
-            my $AuthOk = $Self->{"AuthTwoFactorBackend$Count"}->Auth(
-                TwoFactorToken => $Param{TwoFactorToken},
-                User           => $User,
-                UserID         => $UserID,
+            # remember auth backend
+            $UserObject->SetPreferences(
+                Key    => 'UserAuthBackend',
+                Value  => $Config->{Name},
+                UserID => $UserID,
             );
-            $TwoFactorAuth = $AuthOk ? 'passed' : 'failed';
 
-            last TWOFACTORSOURCE if $AuthOk;
+            last CONFIG;
         }
-
-        # if at least one 2factor auth backend was checked but none was successful,
-        # it counts as a failed login
-        if ( $TwoFactorAuth && $TwoFactorAuth ne 'passed' ) {
-            $User = undef;
-            last COUNT;
-        }
-
-        # remember auth backend
-        $UserObject->SetPreferences(
-            Key    => 'UserAuthBackend',
-            Value  => $Count,
-            UserID => $UserID,
-        );
-
-        last COUNT;
     }
 
     # check usage context

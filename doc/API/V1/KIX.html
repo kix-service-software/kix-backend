@@ -28052,32 +28052,6 @@ pre code {
         {
             "AccessLevel": "internal",
             "ChangeBy": 1,
-            "ChangeTime": "2019-05-14 20:43:11",
-            "Comment": null,
-            "CreateBy": 1,
-            "CreateTime": "2019-05-14 20:06:07",
-            "Default": {
-                "AgentEnabledByDefault": "0",
-                "Icon": "fa fa-th-list",
-                "Module": "Kernel::System::Ticket::Event::NotificationEvent::Transport::AgentOverlay",
-                "Name": "Agent Notification (Popup/Dashboard)",
-                "Prio": "110"
-            },
-            "DefaultValidID": 1,
-            "Description": "Defines all the parameters for this notification transport.",
-            "Group": "Ticket",
-            "IsModified": 1,
-            "IsRequired": 0,
-            "ExperienceLevel": null,
-            "Name": "Notification::Transport###AgentOverlay",
-            "Setting": null,
-            "Type": "Hash",
-            "ValidID": 1,
-            "Value": null
-        },
-        {
-            "AccessLevel": "internal",
-            "ChangeBy": 1,
             "ChangeTime": "2019-05-14 20:43:17",
             "Comment": null,
             "CreateBy": 1,
@@ -28096,7 +28070,7 @@ pre code {
             "Type": "String",
             "ValidID": 2,
             "Value": null
-          }
+        }
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_config_definitions_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -28466,28 +28440,25 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "SysConfigOptionDefinition": {
+        "AccessLevel": "internal",
         "ChangeBy": 1,
-        "ChangeTime": "2019-05-14 20:43:11",
+        "ChangeTime": "2019-05-14 20:43:17",
         "Comment": null,
         "CreateBy": 1,
-        "CreateTime": "2019-05-14 20:06:07",
-        "Default": {
-            "AgentEnabledByDefault": "0",
-            "Icon": "fa fa-th-list",
-            "Module": "Kernel::System::Ticket::Event::NotificationEvent::Transport::AgentOverlay",
-            "Name": "Agent Notification (Popup/Dashboard)",
-            "Prio": "110"
-        },
-        "DefaultValidID": 1,
-        "Description": "Defines all the parameters for this notification transport.",
-        "Group": "Ticket",
+        "CreateTime": "2019-05-14 20:06:44",
+        "Default": "15",
+        "DefaultValidID": 2,
+        "Description": "Sets the timeout (in seconds) for http/ftp downloads.",
+        "Group": "Framework",
         "IsModified": 1,
-        "IsRequired": 0,
-        "Level": null,
-        "Name": "Notification::Transport###AgentOverlay",
-        "Setting": null,
-        "Type": "Hash",
-        "ValidID": 1,
+        "IsRequired": 1,
+        "ExperienceLevel": 200,
+        "Name": "WebUserAgent::Timeout",
+        "Setting": {
+            "Regex": ""
+        },
+        "Type": "String",
+        "ValidID": 2,
         "Value": null
     }
 }</code></pre></div></div><h2 class="response-title" id="system_config_definitions__option__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{

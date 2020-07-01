@@ -41,33 +41,6 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###DynamicFieldsOverviewPageShown" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the pages (in which the dynamic fields are shown) of the dynamic fields overview.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Dynamic Fields Overview Limit</Item>
-                <Item Key="Key" Translatable="1">Dynamic fields limit per page for Dynamic Fields Overview</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="10">10</Item>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                        <Item Key="35">35</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">25</Item>
-                <Item Key="PrefKey">AdminDynamicFieldsOverviewPageShown</Item>
-                <Item Key="Prio">8000</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::ObjectType###Article" Required="0" Valid="1">
         <Description Translatable="1">DynamicField object registration.</Description>
         <Group>Framework</Group>
@@ -183,39 +156,6 @@
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <String Regex="">25</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ImportExport::ObjectBackendRegistration###Service2Contact" Required="0" Valid="1">
-        <Description Translatable="1">Object backend module registration for the import/export module.</Description>
-        <Group>Framework</Group>
-        <SubGroup>ObjectBackend::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::Service2Contact</Item>
-                <Item Key="Name">Service2Contact</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ImportExport::ObjectBackendRegistration###Service" Required="0" Valid="1">
-        <Description Translatable="1">Object backend module registration for the import/export module.</Description>
-        <Group>Framework</Group>
-        <SubGroup>ObjectBackend::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::Service</Item>
-                <Item Key="Name">Service</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ImportExport::ServiceImportExport::ForceCSVMappingRecreation" Required="1" Valid="1">
-        <Description Translatable="1">Defines if CSV-mappings are re-created on next package reinstallation or upgrade if already existent.</Description>
-        <Group>Framework</Group>
-        <SubGroup>ServiceImportExport</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ExternalSupplierForwarding::ForwardFaxQueues" Required="1" Valid="1">
@@ -474,55 +414,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###ServiceViewLayout" Required="1" Valid="1">
-        <Description Translatable="1">Select service view layout.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Service view - layout</Item>
-                <Item Key="Desc" Translatable="1">Select service view layout.</Item>
-                <Item Key="Key" Translatable="1">Layout style</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="Default">Standard</Item>
-                        <Item Key="Tree">Service-Tree</Item>
-                        <Item Key="DropDown">DropDown</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">Tree</Item>
-                <Item Key="PrefKey">UserServiceViewLayout</Item>
-                <Item Key="Prio">3101</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###ServiceViewAll" Required="1" Valid="1">
-        <Description Translatable="1">Choose whether all or unlocked tickets should be shown as default.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Service view - show all tickets</Item>
-                <Item Key="Desc" Translatable="1">Choose whether to show all (locked and unlocked) tickets in service view.</Item>
-                <Item Key="Key" Translatable="1">Display mode</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="All">All (locked and unlocked) tickets</Item>
-                        <Item Key="Unlocked">Unlocked tickets only</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">Unlocked</Item>
-                <Item Key="PrefKey">UserViewAllTicketsInServiceView</Item>
-                <Item Key="Prio">3111</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FAQWorkflow::Basic" Required="1" Valid="1">
         <Description Translatable="1">Basic settings for FAQ edit workflow.</Description>
         <Group>Framework</Group>
@@ -582,17 +473,6 @@
                 <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::CustomerCompany</Item>
                 <Item Key="Name">CustomerCompany</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ImportExport::CustomerCompanyImportExport::ForceCSVMappingRecreation" Required="1" Valid="1">
-        <Description Translatable="1">Defines if CSV-mappings are re-created on next package reinstallation or upgrade if already existent.</Description>
-        <Group>Framework</Group>
-        <SubGroup>CustomerCompanyImportExport</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###MultiselectGeneralCatalog" Required="0" Valid="1">
@@ -813,25 +693,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###GenerateDashboardStats" Required="0" Valid="1" ConfigLevel="100">
-        <Description Translatable="1">Generate dashboard statistics.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">GenerateDashboardStats</Item>
-                <Item Key="Schedule">5 * * * *</Item> <!-- default: every hour on the 5th minute -->
-                <!-- Use a console command here as it does some PID handling -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Stats::Dashboard::Generate</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###TicketPendingCheck" Required="0" Valid="1" ConfigLevel="100">
         <Description Translatable="1">Process pending tickets.</Description>
         <Group>Framework</Group>
@@ -877,42 +738,6 @@
                 <Item Key="TaskName">MailAccountFetch</Item>
                 <Item Key="Schedule">*/10 * * * *</Item> <!-- default: every 10 minutes -->
                 <Item Key="Module">Kernel::System::Console::Command::Maint::PostMaster::MailAccountFetch</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###TicketAcceleratorRebuild" Required="0" Valid="1" ConfigLevel="100">
-        <Description Translatable="1">Rebuild the ticket index for AgentTicketQueue.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">TicketAcceleratorRebuild</Item>
-                <Item Key="Schedule">01 01 * * *</Item> <!-- default each day at 01:01 AM -->
-                <Item Key="Module">Kernel::System::Ticket</Item>
-                <Item Key="Function">TicketAcceleratorRebuild</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###SessionDeleteExpired" Required="0" Valid="1" ConfigLevel="100">
-        <Description Translatable="1">Delete expired sessions.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">SessionDeleteExpired</Item>
-                <Item Key="Schedule">55 */2 * * *</Item> <!-- default every 2 hours in the minute 55 -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Session::DeleteExpired</Item>
                 <Item Key="Function">Execute</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
@@ -1220,24 +1045,6 @@
                     <Array>
                         <Item>--configuration-module</Item>
                         <Item>&lt;ModuleName&gt;</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###SupportDataCollectAsynchronous" Required="1" Valid="1" ReadOnly="1" ConfigLevel="100">
-        <Description Translatable="1">Collect support data for asynchronous plug-in modules.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">SupportDataCollectAsynchronous</Item>
-                <Item Key="Schedule">1 * * * *</Item> <!-- default: every hour in minute 1 -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::SupportData::CollectAsynchronous</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
                     </Array>
                 </Item>
             </Hash>
@@ -1750,84 +1557,6 @@
             <Hash>
                 <Item Key="Module">Kernel::System::Stats::Dynamic::ITSMTicketSolutionTimeAverage</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::Type###DocumentLink" Required="1" Valid="1">
-        <Description Translatable="1">This setting defines the link type 'DocumentLink'.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SourceName">DocumentLink</Item>
-                <Item Key="TargetName">DocumentLink</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Document###Sources" Required="1" Valid="1">
-        <Description Translatable="1">Define the sources of documents. Use key in the following document settings. Prefer short keys.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Document###Backend" Required="1" Valid="1">
-        <Description Translatable="1">Specify the backend typ for document link source. Equals modul name in document backend folder.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Document###Parameters" Required="1" Valid="1">
-        <Description Translatable="1">Specify the parameters of the document source.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Document###Access" Required="1" Valid="1">
-        <Description Translatable="1">Specify groups that will have access the document source.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Document::FS###SearchType" Required="1" Valid="1">
-        <Description Translatable="1">Specify the search type in FS sources ("live" is slower but does a live search in the directory tree and updates the meta data of the resulting files in the DB, "meta" is fast but only uses the meta data stored in the DB).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <Option SelectedID="LIVE">
-                <Item Key="META">meta</Item>
-                <Item Key="LIVE">live (all OS)</Item>
-                <Item Key="LIVESYS">live (Linux only)</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Document::FS###SyncType" Required="1" Valid="1">
-        <Description Translatable="1">Specify the sync type for the periodic full sync of filesystem document sources.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <Option SelectedID="DirectorySearch">
-                <Item Key="DirectorySearch">DirectorySearch</Item>
-                <Item Key="MetaFile">MetaFile</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Document::FS###MetaFiles" Required="0" Valid="1">
-        <Description Translatable="1">Specify the path and name of the meta data file if sync type is MetaFile.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Document</SubGroup>
-        <Setting>
-            <String Regex=""></String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###ITSMConfigItemReference" Required="0" Valid="1">
@@ -2733,14 +2462,6 @@
             <String Regex="">yourhost.example.com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SupportDataCollector::HTTPHostname" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines the HTTP hostname for the support data collection with the public module 'PublicSupportDataCollector' (e.g. used from the KIX Daemon).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <String Regex=""></String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="NodeID" Required="0" Valid="0" ConfigLevel="200">
         <Description Translatable="1">Defines the cluster node identifier. This is only used in cluster configurations where there is more than one KIX frontend system. Note: only values from 1 to 99 are allowed.</Description>
         <Group>Framework</Group>
@@ -3113,14 +2834,6 @@
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
             <String Regex="">base64</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="InfoFile" Required="1" Valid="1" ConfigLevel="300">
-        <Description Translatable="1">File that is displayed in the Kernel::Modules::AgentInfo module, if located under Kernel/Output/HTML/Templates/Standard/AgentInfo.tt.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <String Regex="">AgentInfo</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TokenCheckRemoteIP" Required="1" Valid="1">
@@ -3545,22 +3258,6 @@
             <String Regex="^[0-9]{1,3}$">50</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeVacationDays" Required="1" Valid="1">
         <Description Translatable="1">Adds the permanent vacation days. Please use single digit pattern for numbers from 1 to 9 (instead of 01 - 09).</Description>
         <Group>Framework</Group>
@@ -3977,22 +3674,6 @@ Notes:
                 <Item Key="Pacific/Wallis" Translatable="0">Pacific/Wallis</Item>
                 <Item Key="UTC" Translatable="0">UTC</Item>
                 <Item Key="WET" Translatable="0">WET</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar1" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar1</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
             </Option>
         </Setting>
     </ConfigItem>
@@ -4414,22 +4095,6 @@ Notes:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar2" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar2</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeVacationDays::Calendar2" Required="1" Valid="1">
         <Description Translatable="1">Adds the permanent vacation days for the indicated calendar. Please use single digit pattern for numbers from 1 to 9 (instead of 01 - 09).</Description>
         <Group>Framework</Group>
@@ -4845,22 +4510,6 @@ Notes:
                 <Item Key="Pacific/Wallis" Translatable="0">Pacific/Wallis</Item>
                 <Item Key="UTC" Translatable="0">UTC</Item>
                 <Item Key="WET" Translatable="0">WET</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar3" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar3</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
             </Option>
         </Setting>
     </ConfigItem>
@@ -5282,22 +4931,6 @@ Notes:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar4" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar4</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeVacationDays::Calendar4" Required="1" Valid="1">
         <Description Translatable="1">Adds the permanent vacation days for the indicated calendar. Please use single digit pattern for numbers from 1 to 9 (instead of 01 - 09).</Description>
         <Group>Framework</Group>
@@ -5713,22 +5346,6 @@ Notes:
                 <Item Key="Pacific/Wallis" Translatable="0">Pacific/Wallis</Item>
                 <Item Key="UTC" Translatable="0">UTC</Item>
                 <Item Key="WET" Translatable="0">WET</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar5" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar5</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
             </Option>
         </Setting>
     </ConfigItem>
@@ -6150,22 +5767,6 @@ Notes:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar6" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar6</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeVacationDays::Calendar6" Required="1" Valid="1">
         <Description Translatable="1">Adds the permanent vacation days for the indicated calendar. Please use single digit pattern for numbers from 1 to 9 (instead of 01 - 09).</Description>
         <Group>Framework</Group>
@@ -6581,22 +6182,6 @@ Notes:
                 <Item Key="Pacific/Wallis" Translatable="0">Pacific/Wallis</Item>
                 <Item Key="UTC" Translatable="0">UTC</Item>
                 <Item Key="WET" Translatable="0">WET</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar7" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar7</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
             </Option>
         </Setting>
     </ConfigItem>
@@ -7018,22 +6603,6 @@ Notes:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar8" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar8</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeVacationDays::Calendar8" Required="1" Valid="1">
         <Description Translatable="1">Adds the permanent vacation days for the indicated calendar. Please use single digit pattern for numbers from 1 to 9 (instead of 01 - 09).</Description>
         <Group>Framework</Group>
@@ -7452,22 +7021,6 @@ Notes:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CalendarWeekDayStart::Calendar9" Required="1" Valid="1">
-        <Description Translatable="1">Define the start day of the week for the date picker for the indicated calendar.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Time::Calendar9</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">Sunday</Item>
-                <Item Key="1" Translatable="1">Monday</Item>
-                <Item Key="2" Translatable="1">Tuesday</Item>
-                <Item Key="3" Translatable="1">Wednesday</Item>
-                <Item Key="4" Translatable="1">Thursday</Item>
-                <Item Key="5" Translatable="1">Friday</Item>
-                <Item Key="6" Translatable="1">Saturday</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeVacationDays::Calendar9" Required="1" Valid="1">
         <Description Translatable="1">Adds the permanent vacation days for the indicated calendar. Please use single digit pattern for numbers from 1 to 9 (instead of 01 - 09).</Description>
         <Group>Framework</Group>
@@ -7573,17 +7126,6 @@ Notes:
             <String Translatable="1">*** out of office until %s (%s d left) ***</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SwitchToUser" Required="1" Valid="1">
-        <Description Translatable="1">Allows the administrators to login as other users, via the users administration panel.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="WebUserAgent::Timeout" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Sets the timeout (in seconds) for http/ftp downloads.</Description>
         <Group>Framework</Group>
@@ -7609,84 +7151,6 @@ Notes:
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Package::RepositoryRoot" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the location to get online repository list for additional packages. The first available result will be used.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Package::RepositoryList" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines the list of online repositories. Another installations can be used as repository, for example: Key="http://example.com/kix/public.pl?Action=PublicRepository;File=" and Content="Some Name".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Package::RepositoryAccessRegExp" Required="0" Valid="0">
-        <Description Translatable="1">Defines the IP regular expression for accessing the local repository. You need to enable this to have access to your local repository and the package::RepositoryList is required on the remote host.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <String Regex="">127\.0\.0\.1</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Package::Timeout" Required="1" Valid="1">
-        <Description Translatable="1">Sets the timeout (in seconds) for package downloads. Overwrites "WebUserAgent::Timeout".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <String Regex="">120</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Package::Proxy" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Fetches packages via proxy. Overwrites "WebUserAgent::Proxy".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <String Regex="">http://proxy.sn.no:8001/</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Package::AllowLocalModifications" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If this setting is active, local modifications will not be highlighted as errors in the package manager and support data collector.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Package::EventModulePost###99-SupportDataSend" Required="0" Valid="0">
-        <Description Translatable="1">Package event module file a scheduler task for update registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Package</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Package::Event::SupportDataSend</Item>
-                <Item Key="Event">(PackageInstall|PackageReinstall|PackageUpgrade|PackageUninstall)</Item>
-                <Item Key="Transaction">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Events###Package" Required="1" Valid="1">
-        <Description Translatable="1">List of all Package events to be displayed in the GUI.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin</SubGroup>
-        <Setting>
-            <Array>
-                <Item>PackageInstall</Item>
-                <Item>PackageReinstall</Item>
-                <Item>PackageUpgrade</Item>
-                <Item>PackageUninstall</Item>
-            </Array>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Events###DynamicField" Required="1" Valid="1">
@@ -8043,17 +7507,6 @@ You can log in via the following URL:
             </TextArea>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="System::Customer::Permission" Required="1" Valid="1">
-        <Description Translatable="1">Defines the standard permissions available for customers within the application. If more permissions are needed, you can enter them here. Permissions must be hard coded to be effective. Please ensure, when adding any of the afore mentioned permissions, that the "rw" permission remains the last entry.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Array>
-                <Item>ro</Item>
-                <Item>rw</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ReferenceData::OwnCountryList" Required="0" Valid="0">
         <Description Translatable="1">This setting allows you to override the built-in country list with your own list of countries. This is particularly handy if you just want to use a small select group of countries.</Description>
         <Group>Framework</Group>
@@ -8093,18 +7546,108 @@ You can log in via the following URL:
             <String Regex="">25</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines default auth module.</Description>
+    <ConfigItem AccessLevel="internal" Name="Authentication###000-Default" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the auth modules and their order of execution.</Description>
         <Group>Framework</Group>
         <Setting>
-            <Option Location="Kernel/System/Auth/*.pm" SelectedID="Kernel::System::Auth::DB"></Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines default auth sync module.</Description>
-        <Group>Framework</Group>
-        <Setting>
-            <Option Location="Kernel/System/Auth/Sync/LDAP.pm" SelectedID="Kernel::System::Auth::Sync::LDAP"></Option>
+            <Object><![CDATA[[
+                {
+                    "Enabled": 0,
+                    "Name": "LDAP Example",
+                    "Module": "Kernel::System::Auth::LDAP",
+                    "Config": {
+                        "Host": "ldap.example.com",
+                        "BaseDN": "dc=example,dc=com",
+                        "UID": "uid",
+                        "GroupDN": "cn=kixallow,ou=posixGroups,dc=example,dc=com",
+                        "AccessAttr": "memberUid",
+                        "UserAttr": "UID",
+                        "SearchUserDN": "cn=binduser,ou=users,dc=example,dc=com",
+                        "SearchUserPw": "some_password",
+                        "AlwaysFilter": "(!objectclass=computer)",
+                        "UserSuffix": "@domain.com",
+                        "Charset": "utf-8",
+                        "Die": 1,
+                        "Params": {
+                            "port": 389,
+                            "timeout": 120,
+                            "async": 0,
+                            "version": 3
+                        }
+                    },
+                    "Sync": [ 
+                        {
+                            "Enabled": 0,
+                            "Module": "Kernel::System::Auth::Sync::LDAP",
+                            "Config": {
+                                "GroupDNBasedRoleSync": {
+                                    "SomeDN": {
+                                        "Role1": 1,
+                                        "Role2": 0,
+                                        "Role3": 1
+                                    }
+                                },
+                                "AttributeBasedRoleSync": {
+                                    "LDAPAttribute": {
+                                        "some value": {
+                                            "Role1": 1,
+                                            "Role2": 0,
+                                            "Role3": 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "Enabled": 0,
+                    "Name": "HTTPBasicAuth Example",
+                    "Module": "Kernel::System::Auth::HTTPBasicAuth",
+                    "Config": {
+                        "Replace": "example_domain\\",
+                        "ReplaceRegExp": "^(.+?)@.+?$"
+                    }
+                },
+                {
+                    "Enabled": 0,
+                    "Name": "Radius Example",
+                    "Module": "Kernel::System::Auth::Radius",
+                    "Config": {
+                        "Host": "radiushost",
+                        "Password": "radiussecret",
+                        "Die": 1
+                    }
+                },
+                {
+                    "Enabled": 0,
+                    "Name": "Foreign Database",
+                    "Module": "Kernel::System::Auth::DB",
+                    "Config": {
+                        "DSN": "DBI:mysql:database=customerdb;host=customerdbhost",
+                        "Type": "mysql",
+                        "User": "some_user",
+                        "Password": "come_password",
+                        "CryptType": "sha2",
+                        "Table": "user",
+                        "Columns": {
+                            "ID": "id",
+                            "Login": "login",
+                            "Password": "password"
+                        }
+                    }
+                },
+                {
+                    "Enabled": 1,
+                    "Name": "Local Database",
+                    "Module": "Kernel::System::Auth::DB",
+                    "Config": {
+                        "CryptType": "sha2"
+                    }
+                }
+            ]
+            ]]>
+            </Object>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
@@ -8292,38 +7835,6 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###Skin" Required="0" Valid="0">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Skin</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Skin</Item>
-                <Item Key="Key" Translatable="1">Skin</Item>
-                <Item Key="PrefKey">UserSkin</Item>
-                <Item Key="Prio">100</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###Theme" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Theme</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Theme</Item>
-                <Item Key="Key" Translatable="1">Frontend theme</Item>
-                <Item Key="PrefKey">UserTheme</Item>
-                <Item Key="Prio">3000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PreferencesGroups###OutOfOffice" Required="0" Valid="1">
         <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
         <Group>Framework</Group>
@@ -8357,433 +7868,6 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###CSVSeparator" Required="0" Valid="0">
-        <Description Translatable="1">Gives end users the possibility to override the separator character for CSV files, defined in the translation files.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">CSV Separator</Item>
-                <Item Key="Desc" Translatable="1">Select the separator character used in CSV files (stats and searches). If you don't select a separator here, the default separator for your language will be used.</Item>
-                <Item Key="Key" Translatable="1">CSV Separator</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key=""></Item>
-                        <Item Key=",">,</Item>
-                        <Item Key=";">;</Item>
-                        <Item Key="|">|</Item>
-                        <Item Key="\t">tab</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">0</Item>
-                <Item Key="PrefKey">UserCSVSeparator</Item>
-                <Item Key="Prio">4000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelUserID" Required="1" Valid="1">
-        <Description Translatable="1">Defines the user identifier for the customer panel.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <String Regex="">1</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerGroupSupport" Required="1" Valid="1">
-        <Description Translatable="1">Activates support for customer groups.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerGroupAlwaysGroups" Required="1" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Defines the groups every contact will be in (if CustomerGroupSupport is enabled and you don't want to manage every user for these groups).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Array>
-                <Item>users</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelLostPassword" Required="1" Valid="1">
-        <Description Translatable="1">Activates lost password feature for customers.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelCreateAccount" Required="1" Valid="1">
-        <Description Translatable="1">Enables customers to create their own accounts.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelCreateAccount::MailRestrictions::Whitelist" Required="0" Valid="0">
-        <Description Translatable="1">If active, one of the regular expressions has to match the user's email address to allow registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Array>
-              <Item>\@your\.domain\.example$</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelCreateAccount::MailRestrictions::Blacklist" Required="0" Valid="0">
-        <Description Translatable="1">If active, none of the regular expressions may match the user's email address to allow registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Array>
-              <Item>\@your\.domain\.example$</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelSubjectLostPassword" Required="1" Valid="1">
-        <Description Translatable="1">Defines the subject for notification mails sent to customers, about new password.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <String Regex="">New KIX password</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelBodyLostPassword" Required="1" Valid="1">
-        <Description Translatable="1">Defines the body text for notification mails sent to customers, about new password (after using this link the new password will be sent).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <TextArea>Hi &lt;KIX_USERFIRSTNAME&gt;,
-
-
-New password: &lt;KIX_NEWPW&gt;
-
-&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN&gt;/&lt;KIX_CONFIG_ScriptAlias&gt;customer.pl
-            </TextArea>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelSubjectNewAccount" Required="1" Valid="1">
-        <Description Translatable="1">Defines the subject for notification mails sent to customers, about new account.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <String Regex="">New KIX Account!</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerPanelBodyNewAccount" Required="1" Valid="1">
-        <Description Translatable="1">Defines the body text for notification mails sent to customers, about new account.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <TextArea>Hi &lt;KIX_USERFIRSTNAME&gt;,
-
-You or someone impersonating you has created a new KIX account for
-you.
-
-Full name: &lt;KIX_USERFIRSTNAME&gt; &lt;KIX_USERLASTNAME&gt;
-User name: &lt;KIX_USERLOGIN&gt;
-Password : &lt;KIX_USERPASSWORD&gt;
-
-You can log in via the following URL. We encourage you to change your password
-via the Preferences button after logging in.
-
-&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN&gt;/&lt;KIX_CONFIG_ScriptAlias&gt;customer.pl
-            </TextArea>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the module to authenticate customers.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <Option Location="Kernel/System/ContactAuth/*.pm" SelectedID="Kernel::System::ContactAuth::DB"></Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::CryptType" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the crypt type of passwords must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="sha2">
-                <Item Key="crypt">Crypt</Item>
-                <Item Key="apr1">Apache MD5</Item>
-                <Item Key="md5">MD5-Crypt</Item>
-                <Item Key="plain">Plain</Item>
-                <Item Key="sha1">SHA-1</Item>
-                <Item Key="sha2">SHA-2</Item>
-                <Item Key="bcrypt">bcrypt</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::Table" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the table where your customer data should be stored must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">contact</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::Column::ID" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the column holding the ID must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">id</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::Column::Login" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the column holding the login must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">login</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::Column::Password" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the name of the column holding the password must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">password</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::DSN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, the DSN for the connection to the customer table must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">DBI:mysql:database=customerdb;host=customerdbhost</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::User" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, a username to connect to the customer table can be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">some_user</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::Password" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, a password to connect to the customer table can be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="" Type="Password">some_password</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::DB::Type" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "DB" was selected for Contact::AuthModule, a database driver (normally autodetection is used) can be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">mysql</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::HTTPBasicAuth::Replace" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "HTTPBasicAuth" was selected for Contact::AuthModule, you can specify to strip leading parts of user names (e. g. for domains like example_domain\user to user).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">example_domain\\</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::HTTPBasicAuth::ReplaceRegExp" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "HTTPBasicAuth" was selected for Contact::AuthModule, you can specify (by using a RegExp) to strip parts of REMOTE_USER (e. g. for to remove trailing domains). RegExp-Note, $1 will be the new Login.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">^(.+?)@.+?$</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::Host" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, the LDAP host can be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">ldap.example.com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::BaseDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, the BaseDN must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::UID" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, the user identifier must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">uid</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use KIX. Specify the group, who may access the system.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">cn=kixallow,ou=posixGroups,dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, you can specify access attributes here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">memberUid</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::UserAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="UID">
-                <Item Key="UID">UID</Item>
-                <Item Key="DN">DN</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::SearchUserDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">cn=binduser,ou=users,dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::SearchUserPw" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="" Type="Password">some_password</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::AlwaysFilter" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected, you can add a filter to each LDAP query, e.g. (mail=*), (objectclass=user) or (!objectclass=computer).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">(!objectclass=computer)</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::UserSuffix" Required="0" Valid="0" ConfigLevel="200">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">@domain.com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::Params" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="port">389</Item>
-                <Item Key="timeout">120</Item>
-                <Item Key="async">0</Item>
-                <Item Key="version">3</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::LDAP::Die" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Contact::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::Radius::Host" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "Radius" was selected for Contact::AuthModule, the radius host must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="">radiushost</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::Radius::Password" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "Radius" was selected for Contact::AuthModule, the password to authenticate to the radius host must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <String Regex="" Type="Password">radiussecret</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthModule::Radius::Die" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "Radius" was selected for Contact::AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines the two-factor module to authenticate customers.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
-        <Setting>
-            <Option Location="Kernel/System/ContactAuth/TwoFactor/*.pm" SelectedID="Kernel::System::ContactAuth::TwoFactor::GoogleAuthenticator"></Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthTwoFactorModule::SecretPreferencesKey" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the customer preferences key where the shared secret key is stored.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
-        <Setting>
-            <String Regex="">UserGoogleAuthenticatorSecretKey</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthTwoFactorModule::AllowEmptySecret" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines if customers should be allowed to login if they have no shared secret stored in their preferences and therefore are not using two-factor authentication.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Contact::AuthTwoFactorModule::AllowPreviousToken" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines if the previously valid token should be accepted for authentication. This is slightly less secure but gives users 30 seconds more time to enter their one-time password.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Contact::Auth::TwoFactor</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ContactPreferences" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the parameters for the contact preferences table.</Description>
         <Group>Framework</Group>
@@ -8815,281 +7899,6 @@ via the Preferences button after logging in.
                 <Item Key="Block">Input</Item>
                 <Item Key="PrefKey">UserGoogleAuthenticatorSecretKey</Item>
                 <Item Key="Prio">1100</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::Host" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, the LDAP host can be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">ldap.example.com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::BaseDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, the BaseDN must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UID" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, the user identifier must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">uid</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use KIX. Specify the group, who may access the system.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">cn=kixallow,ou=posixGroups,dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, you can specify access attributes here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">memberUid</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="UID">
-                <Item Key="UID">UID</Item>
-                <Item Key="DN">DN</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::SearchUserDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">cn=binduser,ou=users,dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::SearchUserPw" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="" Type="Password">some_password</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::AlwaysFilter" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected, you can add a filter to each LDAP query, e.g. (mail=*), (objectclass=user) or (!objectclass=computer).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">(!objectclass=computer)</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserSuffix" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">@domain.com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::Params" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="port">389</Item>
-                <Item Key="timeout">120</Item>
-                <Item Key="async">0</Item>
-                <Item Key="version">3</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::Die" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthSyncModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserSyncAttributeRolesDefinition" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify which LDAP attribute(s) are synced to which roles.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="LDAPAttribute">
-                    <Hash>
-                    <Item Key="ldap attribute value">
-                        <Hash>
-                            <Item Key="RoleName">1 or 0</Item>
-                        </Hash>
-                    </Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthSyncModule::LDAP::UserSyncMap" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify which LDAP attribute(s) are synced to which DB attribute.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DB-Attribute">LDAP Attribute</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::Host" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, the LDAP host can be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">ldap.example.com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::BaseDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, the BaseDN must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::UID" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, the user identifier must be specified.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">uid</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::GroupDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for Authmodule, you can check if the user is allowed to authenticate because he is in a posixGroup, e.g. user needs to be in a group xyz to use KIX. Specify the group, who may access the system.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">cn=kixallow,ou=posixGroups,dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::AccessAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify access attributes here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">memberUid</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::UserAttr" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, user attributes can be specified. For LDAP posixGroups use UID, for non LDAP posixGroups use full user DN.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="UID">
-                <Item Key="UID">UID</Item>
-                <Item Key="DN">DN</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::SearchUserDN" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the username for this special user here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">cn=binduser,ou=users,dc=example,dc=com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::SearchUserPw" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule and your users have only anonymous access to the LDAP tree, but you want to search through the data, you can do this with a user who has access to the LDAP directory. Specify the password for this special user here.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="" Type="Password">some_password</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::AlwaysFilter" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected, you can add a filter to each LDAP query, e.g. (mail=*), (objectclass=user) or (!objectclass=computer).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">(!objectclass=computer)</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::UserSuffix" Required="0" Valid="0" ConfigLevel="200">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">If "LDAP" was selected for AuthModule and if you want to add a suffix to every contact login name, specifiy it here, e. g. you just want to write the username user but in your LDAP directory exists user@domain.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <String Regex="">@domain.com</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::Params" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule and special paramaters are needed for the Net::LDAP perl module, you can specify them here. See "perldoc Net::LDAP" for more information about the parameters.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="port">389</Item>
-                <Item Key="timeout">120</Item>
-                <Item Key="async">0</Item>
-                <Item Key="version">3</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthModule::LDAP::Die" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">If "LDAP" was selected for AuthModule, you can specify if the applications will stop if e. g. a connection to a server can't be established due to network problems.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Auth</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###Language" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Language</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Interface language</Item>
-                <Item Key="Key" Translatable="1">Language</Item>
-                <Item Key="PrefKey">UserLanguage</Item>
-                <Item Key="Prio">2000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###Theme" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Theme</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Theme</Item>
-                <Item Key="Key" Translatable="1">Select your frontend Theme.</Item>
-                <Item Key="PrefKey">UserTheme</Item>
-                <Item Key="Prio">1000</Item>
                 <Item Key="Active">0</Item>
             </Hash>
         </Setting>
@@ -9670,62 +8479,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###UserQueueSelectionStyle" Required="0" Valid="1">
-        <Description Translatable="1">Defines the user preference to select the queue move selection style.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Queue selection style</Item>
-                <Item Key="Desc" Translatable="1"></Item>
-                <Item Key="Key" Translatable="1">Selection Style</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="Standard">Standard</Item>
-                        <Item Key="AutoComplete">AutoComplete</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">Standard</Item>
-                <Item Key="PrefKey">UserQueueSelectionStyle</Item>
-                <Item Key="Prio">3200</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###SearchProfile" Required="0" Valid="1">
-        <Description Translatable="1">Defines the user preference, to select search profiles from other agents.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::SearchProfile</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">My Search Profiles</Item>
-                <Item Key="Desc" Translatable="1">Select search profiles from other agents. They are sorted by category and could be copied or subscribed.</Item>
-                <Item Key="Key" Translatable="1">My Search Profiles</Item>
-                <Item Key="Prio">1100</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###SearchProfileAutoSubscribe" Required="0" Valid="1">
-        <Description Translatable="1">Defines the user preference, to auto-subscribe search profiles from other agents depending on selected categories.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::SearchProfileAutoSubscribe</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">My Auto-subscribe Search Profile Categories</Item>
-                <Item Key="Desc" Translatable="1">Auto-subscribe search profiles from other agents depending on selected categories.</Item>
-                <Item Key="Key" Translatable="1">My Auto-subscribe Search Profile Categories</Item>
-                <Item Key="Prio">1100</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PreferencesGroups###RemoveArticleFlags" Required="0" Valid="1">
         <Description Translatable="1">Defines the use preference to select article flags which could be removed after ticket close.</Description>
         <Group>Framework</Group>
@@ -9790,30 +8543,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###UseArticleColors" Required="0" Valid="1">
-        <Description Translatable="1">Defines user preference to decide whether article colors should be used.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Use article colors</Item>
-                <Item Key="Desc" Translatable="1">Select to decide whether article colors should be used.</Item>
-                <Item Key="Key" Translatable="1">Use article colors</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="1">Yes</Item>
-                        <Item Key="0">No</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">No</Item>
-                <Item Key="PrefKey">UserUseArticleColors</Item>
-                <Item Key="Prio">1310</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="OrganisationPreferences" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the parameters for the customer company preferences table.</Description>
         <Group>Framework</Group>
@@ -9832,31 +8561,6 @@ via the Preferences button after logging in.
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###ToolbarPosition" Required="1" Valid="1">
-        <Description Translatable="1">Select service view layout.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Toolbar Position</Item>
-                <Item Key="Desc" Translatable="1">Select the position of the toolbar.</Item>
-                <Item Key="Key" Translatable="1">Position</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="ToolbarRight">Right</Item>
-                        <Item Key="ToolbarLeft">Left</Item>
-                        <Item Key="ToolbarTop">Above Menu</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">Right</Item>
-                <Item Key="PrefKey">UserToolbarPosition</Item>
-                <Item Key="Prio">3100</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TextModule::CustomModules" Required="0" Valid="1">
         <Description Translatable="1">Additional and extended TextModule methods.</Description>
         <Group>Framework</Group>
@@ -9864,16 +8568,6 @@ via the Preferences button after logging in.
         <Setting>
             <Array>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AdminResponsesUploads::TextModuleDefaults" Required="0" Valid="1">
-        <Description Translatable="1">Default values for uploaded TextModules.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::TextModule</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="ValidID">1</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###RemoteDB" Required="0" Valid="1">
@@ -9885,64 +8579,6 @@ via the Preferences button after logging in.
                 <Item Key="DisplayName">RemoteDB</Item>
                 <Item Key="Module">Kernel::System::DynamicField::Driver::RemoteDB</Item>
                 <Item Key="ConfigDialog">AdminDynamicFieldRemoteDB</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Match::ExcludedTicketData::Identifier" Required="1" Valid="1">
-        <Description Translatable="1">Registers an identifier for the ticket restrictions. Value is used in the following config options.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Match::ExcludedTicketData::ActionsMatch" Required="1" Valid="1">
-        <Description Translatable="1">Defines which ticket actions have to be restricted (agent and customer frontend is possible). Key has to be one of the identifier (see above). Value defines restricted ticket actions and has to be filled at any time. Multiple actions can be separated by ;.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Match::ExcludedTicketData::DataMatch" Required="1" Valid="1">
-        <Description Translatable="1">Defines ticket match properties (e.g. type:::default). Key has to be one of the identifier (see above). Value defines matching ticket data type and its values, separated by :::. Multiple values can be separated by ;. Split multiple match criteria by |||. Leave it empty for always matching.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Match::ExcludedTicketData::DataRestricted" Required="1" Valid="1">
-        <Description Translatable="1">Defines which ticket data types have to be restricted and which values are NOT accessible. Key has to be one of the identifier (see above). Value defines ticket data type and its blacklist, separated by :::. Multiple blacklist values can be separated by ;. Split multiple ticket data restrictions by |||.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Match::ExcludedTicketData###0001-AdditionalExcludedData" Required="0" Valid="0">
-        <Description Translatable="1">Registers additional information for the ticket excluded data restrictions. Use it like the old configuration above.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="ActionsMatch">[regexp]AgentTicket.*</Item>
-                <Item Key="DataMatch">Queue:::[regexp](Misc|Junk)</Item>
-                <Item Key="DataRestricted">State:::open</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Match::ExcludedAction" Required="1" Valid="1">
-        <Description Translatable="1">Defines which ticket actions are NOT accessible (agent and customer frontend is possible). Key defines matching ticket data type and its values, separated by :::. Multiple values can be separated by ;. Split multiple match criteria by |||. Value defines ticket action blacklist. Multiple blacklist actions can be separated by ;.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="State:::[regexp]closed.*">AgentTicketLock</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -10002,99 +8638,6 @@ via the Preferences button after logging in.
                 <Item Key="0">No</Item>
                 <Item Key="1">Yes</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###QueueViewLayout" Required="1" Valid="1">
-        <Description Translatable="1">Select queue view layout.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Queue view - layout</Item>
-                <Item Key="Desc" Translatable="1">Select queue view layout.</Item>
-                <Item Key="Key" Translatable="1">Layout style</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="Default">Standard</Item>
-                        <Item Key="Tree">Queue-Tree</Item>
-                        <Item Key="DropDown">DropDown</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">Tree</Item>
-                <Item Key="PrefKey">UserQueueViewLayout</Item>
-                <Item Key="Prio">3100</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###QueueViewAll" Required="1" Valid="1">
-        <Description Translatable="1">Choose weather all or unlocked tickets should be shown as default.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Queue view - show all tickets</Item>
-                <Item Key="Desc" Translatable="1">Choose weather to show all (locked and unlocked) tickets in queueview.</Item>
-                <Item Key="Key" Translatable="1">Display mode</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="All">All (locked and unlocked) tickets</Item>
-                        <Item Key="Unlocked">Unlocked tickets only</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected"></Item>
-                <Item Key="PrefKey">UserViewAllTickets</Item>
-                <Item Key="Prio">3110</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###RedirectAfterTicketClose" Required="0" Valid="1">
-        <Description Translatable="1">Redirect after ticket close</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Screen after ticket closure</Item>
-                <Item Key="Desc" Translatable="1">Defines which page is shown after a ticket has been closed.</Item>
-                <Item Key="Key" Translatable="1">Redirect target</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="0">Last screen overview</Item>
-                        <Item Key="1">Ticket zoom</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">0</Item>
-                <Item Key="PrefKey">RedirectAfterTicketClose</Item>
-                <Item Key="Prio">3100</Item>
-                <Item Key="Active">1</Item>
-
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Frontend::Agent::CreateOptions::ViewAllOwner" Required="1" Valid="1">
-        <Description Translatable="1">Shows all owners and responsibles in selecetions.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="1">Yes</Item>
-                <Item Key="0">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Frontend::Agent::AutomaticBounceText" Required="1" Valid="1">
-        <Description Translatable="1">When a ticket is bounced, a note will be added automatically to this ticket. In this text area you can define this text.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Ticket::ViewMerge</SubGroup>
-        <Setting>
-            <TextArea>Bounced Ticket &lt;KIX_TICKET&gt; to &lt;KIX_BOUNCE_TO&gt;.</TextArea>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###ObjectReference" Required="0" Valid="1">
