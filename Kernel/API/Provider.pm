@@ -77,7 +77,8 @@ sub Run {
 
     my $Webservice;
 
-    my ($Tmp, $Entrypoint, $WebserviceName, $RequestURI) = split(/\//, $ENV{REQUEST_URI}, 4);
+    my ($Tmp, $Entrypoint, $WebserviceName, $RequestURI) = split(/\//, $ENV{REQUEST_URI}, 4);    
+    $RequestURI = URI::Escape::uri_unescape($RequestURI);
     $ENV{REQUEST_URI} = '/'.$RequestURI;
 
     if ( !$WebserviceName ) {

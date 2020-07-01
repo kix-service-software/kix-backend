@@ -130,8 +130,6 @@ one or more ticket entries in one call.
                     OwnerID            => 123,
                     Type               => 'some ticket type',
                     TypeID             => 123,
-                    Service            => 'some service',
-                    ServiceID          => 123,
                     Responsible        => 'some_responsible_login',
                     ResponsibleID      => 123,
                     Age                => 3456,
@@ -390,8 +388,6 @@ sub Run {
         #FIXME: workaround KIX2018-3308
         $TicketData{ContactID} = "" . $TicketData{ContactID};
         $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
-
-        $TicketData{ServiceID} = $TicketData{ServiceID} ? (0 + $TicketData{ServiceID}) : undef;
 
         # add
         push(@TicketList, \%TicketData);

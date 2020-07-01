@@ -212,7 +212,7 @@ When qr/I create a configitem with no class id$/, sub {
       Token   => S->{Token},
       Content => {
            ConfigItem => {
-              ClassID =>  ,
+              ClassID => undef,
               Version => {
                  Name => "test ci xx1111",
                  DeplStateID => 16,
@@ -257,7 +257,7 @@ When qr/I create a configitem with no incistate id$/, sub {
               Version => {
                  Name => "test ci xx1111",
                  DeplStateID => 16,
-                 InciStateID =>  ,
+                 InciStateID => undef,
                  Data => {
                     Vendor => "testvendor",
                     NIC => [

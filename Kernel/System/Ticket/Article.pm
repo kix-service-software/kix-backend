@@ -1614,21 +1614,6 @@ sub ArticleGet {
     # sql query
     my @Content;
     my @Bind;
-    # my $SQL = '
-    #     SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
-    #         sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
-    #         st.create_time_unix, st.ticket_state_id, st.queue_id, sa.create_time,
-    #         sa.a_content_type, sa.create_by, st.tn, article_sender_type_id, st.customer_id,
-    #         st.until_time, st.ticket_priority_id, st.customer_user_id, st.user_id,
-    #         st.responsible_user_id, sa.article_type_id,
-    #         sa.incoming_time, sa.id,
-    #         st.ticket_lock_id, st.title, st.escalation_update_time,
-    #         st.type_id, st.service_id, st.sla_id, st.escalation_response_time,
-    #         st.escalation_solution_time, st.escalation_time, st.change_time
-    #     FROM article sa
-    #     JOIN ticket st ON sa.ticket_id = st.id
-    #     WHERE ';
-
     my $SQL = '
         SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
             sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,

@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###002-TicketTemplateHandler" Required="0" Valid="1">
-        <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="">Kernel::System::Ticket::TicketTemplateHandler</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::Hook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a ticket, e.g. Ticket#, Call#, MyTicket#. The default is Ticket#.</Description>
         <Group>Ticket</Group>
@@ -67,22 +59,6 @@
         <Setting>
             <Array>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::CustomQueue" Required="1" Valid="1">
-        <Description Translatable="1">Name of custom queue. The custom queue is a queue selection of your preferred queues and can be selected in the preferences settings.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="" Translatable="1">My Queues</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::CustomService" Required="1" Valid="1">
-        <Description Translatable="1">Name of custom service. The custom service is a service selection of your preferred services and can be selected in the preferences settings.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="" Translatable="1">My Services</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::NewArticleIgnoreSystemSender" Required="1" Valid="1">
@@ -148,39 +124,6 @@
             <String Regex="" Translatable="1">Unclassified</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Service" Required="1" Valid="1">
-        <Description Translatable="1">Allows defining services and SLAs for tickets (e. g. email, desktop, network, ...), and escalation attributes for SLAs (if ticket service/SLA feature is enabled).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Service::KeepChildren" Required="1" Valid="1">
-        <Description Translatable="1">Retains all services in listings even if they are children of invalid elements.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Service::Default::UnknownCustomer" Required="1" Valid="1">
-        <Description Translatable="1">Allows default services to be selected also for non existing customers.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::ArchiveSystem" Required="1" Valid="1">
         <Description Translatable="1">Activates the ticket archive system to have a faster system by moving some tickets out of the daily scope. To search for these tickets, the archive flag has to be enabled in the ticket search.</Description>
         <Group>Ticket</Group>
@@ -211,18 +154,6 @@
             <Option SelectedID="1">
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::CustomerArchiveSystem" Required="1" Valid="1">
-        <Description Translatable="1">Activates the ticket archive system search in the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="2" Translatable="1">Yes, but hide archived tickets</Item>
             </Option>
         </Setting>
     </ConfigItem>
@@ -272,15 +203,6 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/log/TicketCounter.log</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::IndexModule" Required="1" Valid="1">
-        <Description Translatable="1">IndexAccelerator: to choose your backend TicketViewAccelerator module. "RuntimeDB" generates each queue view on the fly from ticket table (no performance problems up to approx. 60.000 tickets in total and 6.000 open tickets in the system). "StaticDB" is the most powerful module, it uses an extra ticket-index table that works like a view (recommended if more than 80.000 and 6.000 open tickets are stored in the system). Use the command "bin/kix.Console.pl Maint::Ticket::QueueIndexRebuild" for initial index creation.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option Location="Kernel/System/Ticket/IndexAccelerator/*.pm" SelectedID="Kernel::System::Ticket::IndexAccelerator::RuntimeDB">
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::StorageModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Saves the attachments of articles. "DB" stores all data in the database (not recommended for storing big attachments). "FS" stores the data on the filesystem; this is faster but the KIX applications should not be running as root. You can switch between the modules even on a system that is already in production without any loss of data. Note: Searching for attachment names is not supported when "FS" is used.</Description>
         <Group>Ticket</Group>
@@ -317,17 +239,6 @@
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::ArchiveRestore</Item>
                 <Item Key="Event">TicketStateUpdate</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###110-AcceleratorUpdate" Required="0" Valid="1">
-        <Description Translatable="1">Updates the ticket index accelerator.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::TicketAcceleratorUpdate</Item>
-                <Item Key="Event">TicketStateUpdate|TicketQueueUpdate|TicketLockUpdate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -566,16 +477,6 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Queue</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Service" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Service</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1707,7 +1608,6 @@
                 <Item Key="SendAgentNotification" Translatable="1">"%s" notification was sent to "%s" by "%s".</Item>
                 <Item Key="SendAnswer" Translatable="1">Email sent to "%s".</Item>
                 <Item Key="SendCustomerNotification" Translatable="1">Notification sent to "%s".</Item>
-                <Item Key="ServiceUpdate" Translatable="1">Updated Service to %s (ID=%s).</Item>
                 <Item Key="SetPendingTime" Translatable="1">Updated: %s</Item>
                 <Item Key="StateUpdate" Translatable="1">Old: "%s" New: "%s"</Item>
                 <Item Key="Subscribe" Translatable="1">Added subscription for user "%s".</Item>
@@ -1721,25 +1621,6 @@
                 <Item Key="Unlock" Translatable="1">Unlocked ticket.</Item>
                 <Item Key="Unsubscribe" Translatable="1">Removed subscription for user "%s".</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::TextAreaNote" Required="1" Valid="1">
-        <Description Translatable="1">Permitted width for compose note windows.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <String Regex="^[0-9]{1,3}$">78</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::CustomerDisableCompanyTicketAccess" Required="1" Valid="1">
-        <Description Translatable="1">This option will deny the access to customer company tickets, which are not created by the contact.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::AccountTime" Required="1" Valid="1">
@@ -1767,17 +1648,6 @@
         <SubGroup>Frontend::Agent</SubGroup>
         <Setting>
             <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::ShowCustomerTickets" Required="1" Valid="1">
-        <Description Translatable="1">Shows customer history tickets in AgentTicketPhone, AgentTicketEmail and AgentTicketCustomer.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
@@ -1904,154 +1774,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="System::Permission" Required="1" Valid="1">
-        <Description Translatable="1">Standard available permissions for agents within the application. If more permissions are needed, they can be entered here. Permissions must be defined to be effective. Some other good permissions have also been provided built-in: note, close, pending, customer, freetext, move, compose, responsible, forward, and bounce. Make sure that "rw" is always the last registered permission.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-                <Item>ro</Item>
-                <Item>move_into</Item>
-                <Item>create</Item>
-                <Item>note</Item>
-                <Item>owner</Item>
-                <Item>priority</Item>
-                <Item>rw</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###1-OwnerCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to grant access to the owner of a ticket.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Permission::OwnerCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::OwnerCheck::Queues" Required="0" Valid="0">
-        <Description Translatable="1">Optional queue limitation for the OwnerCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Postmaster">ro, move, note</Item>
-                <Item Key="Raw">rw</Item>
-                <Item Key="Misc">note</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###2-ResponsibleCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to grant access to the agent responsible of a ticket.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Permission::ResponsibleCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::ResponsibleCheck::Queues" Required="0" Valid="0">
-        <Description Translatable="1">Optional queue limitation for the ResponsibleCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Postmaster">ro, move, note</Item>
-                <Item Key="Raw">rw</Item>
-                <Item Key="Misc">note</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###4-WatcherCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to grant access to the watcher agents of a ticket.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Permission::WatcherCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###5-CreatorCheck" Required="0" Valid="0">
-        <Description Translatable="1">Module to grant access to the creator of a ticket.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Permission::CreatorCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::CreatorCheck::Queues" Required="0" Valid="0">
-        <Description Translatable="1">Optional queue limitation for the CreatorCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Postmaster">ro, move, note</Item>
-                <Item Key="Raw">rw</Item>
-                <Item Key="Misc">note</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission###6-InvolvedCheck" Required="0" Valid="0">
-        <Description Translatable="1">Module to grant access to any agent that has been involved in a ticket in the past (based on ticket history entries).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Permission::InvolvedCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Permission::InvolvedCheck::Queues" Required="0" Valid="0">
-        <Description Translatable="1">Optional queue limitation for the InvolvedCheck permission module. If set, permission is only granted for tickets in the specified queues.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Postmaster">ro, move, note</Item>
-                <Item Key="Raw">rw</Item>
-                <Item Key="Misc">note</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerTicket::Permission###2-ContactIDCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to grant access if the ContactID of the ticket matches the ContactID of the customer.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::CustomerPermission::ContactIDCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerTicket::Permission###3-CustomerIDCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to grant access if the CustomerID of the ticket matches the CustomerID of the customer.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::CustomerPermission::CustomerIDCheck</Item>
-                <Item Key="Required">0</Item>
-                <Item Key="Granted">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::DefineEmailFrom" Required="1" Valid="1">
         <Description Translatable="1">Defines how the From field from the emails (sent from answers and email tickets) should look like.</Description>
         <Group>Ticket</Group>
@@ -2072,63 +1794,6 @@
             <String>via</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###CustomQueue" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the CustomQueue object in the preference view of the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::CustomQueue</Item>
-                <Item Key="Column" Translatable="1">Notification Settings</Item>
-                <Item Key="Label" Translatable="1">My Queues</Item>
-                <Item Key="Desc" Translatable="1">Your queue selection of your preferred queues. You also get notified about those queues via email if enabled.</Item>
-                <Item Key="Key" Translatable="1"></Item>
-                <Item Key="Prio">1000</Item>
-                <Item Key="Permission">ro</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###CustomService" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the CustomService object in the preference view of the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::CustomService</Item>
-                <Item Key="Column" Translatable="1">Notification Settings</Item>
-                <Item Key="Label" Translatable="1">My Services</Item>
-                <Item Key="Desc" Translatable="1">Your service selection of your preferred services. You also get notified about those services via email if enabled.</Item>
-                <Item Key="Key" Translatable="1"></Item>
-                <Item Key="Prio">1000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###CreateNextMask" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the CreateNextMask object in the preference view of the agent interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column" Translatable="1">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Screen after new ticket</Item>
-                <Item Key="Desc" Translatable="1">Configure which screen should be shown after a new ticket has been created.</Item>
-                <Item Key="Key" Translatable="1">Screen</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="0">CreateTicket</Item>
-                        <Item Key="AgentTicketZoom">TicketZoom</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected"></Item>
-                <Item Key="PrefKey">UserCreateNextMask</Item>
-                <Item Key="Prio">3000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="QueuePreferences###Comment2" Required="0" Valid="0">
         <Description Translatable="1">Parameters of the example queue attribute Comment2.</Description>
         <Group>Ticket</Group>
@@ -2138,22 +1803,6 @@
                 <Item Key="Module">Kernel::Output::HTML::QueuePreferences::Generic</Item>
                 <Item Key="Label" Translatable="1">Comment2</Item>
                 <Item Key="Desc" Translatable="1">Define the queue comment 2.</Item>
-                <Item Key="Block">TextArea</Item>
-                <Item Key="Cols">50</Item>
-                <Item Key="Rows">5</Item>
-                <Item Key="PrefKey">Comment2</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ServicePreferences###Comment2" Required="0" Valid="0">
-        <Description Translatable="1">Parameters of the example service attribute Comment2.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Service::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::ServicePreferences::Generic</Item>
-                <Item Key="Label" Translatable="1">Comment2</Item>
-                <Item Key="Desc" Translatable="1">Define the service comment 2.</Item>
                 <Item Key="Block">TextArea</Item>
                 <Item Key="Cols">50</Item>
                 <Item Key="Rows">5</Item>
@@ -2181,74 +1830,6 @@
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###ShownTickets" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for the ShownTickets object in the customer preferences of the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Number of displayed tickets</Item>
-                <Item Key="Key" Translatable="1">Tickets per page</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="15">15</Item>
-                        <Item Key="20">20</Item>
-                        <Item Key="25">25</Item>
-                        <Item Key="30">30</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">25</Item>
-                <Item Key="PrefKey">UserShowTickets</Item>
-                <Item Key="Prio">4000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###RefreshTime" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for the RefreshTime object in the customer preferences of the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Ticket overview</Item>
-                <Item Key="Key" Translatable="1">Refresh interval</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="0" Translatable="1">off</Item>
-                        <Item Key="2" Translatable="1"> 2 minutes</Item>
-                        <Item Key="5" Translatable="1"> 5 minutes</Item>
-                        <Item Key="7" Translatable="1"> 7 minutes</Item>
-                        <Item Key="10" Translatable="1">10 minutes</Item>
-                        <Item Key="15" Translatable="1">15 minutes</Item>
-                    </Hash>
-                </Item>
-                <Item Key="PrefKey">UserRefreshTime</Item>
-                <Item Key="DataSelected">0</Item>
-                <Item Key="Prio">4000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerFrontend::CommonParam###Action" Required="1" Valid="1">
-        <Description Translatable="1">Defines the default used Frontend-Module if no Action parameter given in the url on the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <String Regex="">CustomerTicketOverview</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerFrontend::CommonParam###TicketID" Required="1" Valid="1">
-        <Description Translatable="1">Default ticket ID used by the system in the customer interface.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Customer</SubGroup>
-        <Setting>
-            <String Regex=""></String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-Automation" Required="0" Valid="1">
@@ -2287,7 +1868,6 @@
                 <Item>TicketUnlockTimeoutUpdate</Item>
                 <Item>TicketQueueUpdate</Item>
                 <Item>TicketTypeUpdate</Item>
-                <Item>TicketServiceUpdate</Item>
                 <Item>TicketCustomerUpdate</Item>
                 <Item>TicketOrganisationUpdate</Item>
                 <Item>TicketContactUpdate</Item>
@@ -2317,7 +1897,6 @@
                 <Item>NotificationAddNote</Item>
                 <Item>NotificationMove</Item>
                 <Item>NotificationPendingReminder</Item>
-                <Item>NotificationServiceUpdate</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -2348,18 +1927,6 @@
                 <Item>QueueCreate</Item>
                 <Item>QueueUpdate</Item>
             </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Queue::EventModulePost###130-UpdateQueue" Required="0" Valid="1">
-        <Description Translatable="1">Event module that performs an update statement on TicketIndex to rename the queue name there if needed and if StaticDB is actually used.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Queue</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Queue::Event::TicketAcceleratorUpdate</Item>
-                <Item Key="Event">QueueUpdate</Item>
-                <Item Key="Transaction">0</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Notification::Transport###Email" Required="0" Valid="1">
@@ -2548,7 +2115,6 @@
                 <Item>X-KIX-State</Item>
                 <Item>X-KIX-State-PendingTime</Item>
                 <Item>X-KIX-Type</Item>
-                <Item>X-KIX-Service</Item>
                 <Item>X-KIX-CustomerNo</Item>
                 <Item>X-KIX-Contact</Item>
                 <Item>X-KIX-SenderType</Item>
@@ -2559,7 +2125,6 @@
                 <Item>X-KIX-FollowUp-State</Item>
                 <Item>X-KIX-FollowUp-State-PendingTime</Item>
                 <Item>X-KIX-FollowUp-Type</Item>
-                <Item>X-KIX-FollowUp-Service</Item>
                 <Item>X-KIX-FollowUp-SenderType</Item>
                 <Item>X-KIX-FollowUp-ArticleType</Item>
                 <Item>X-KIX-BodyDecrypted</Item>
@@ -2910,17 +2475,6 @@ Thanks for your help!
             <String Regex="">(MAILER-DAEMON|postmaster|abuse)@.+?\..+?</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AutoResponseForWebTickets" Required="1" Valid="1">
-        <Description Translatable="1">If this option is set to 'Yes', tickets created via the web interface, via Customers or Agents, will receive an autoresponse if configured. If this option is set to 'No', no autoresponses will be sent.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0200" Required="0" Valid="1">
         <Description Translatable="1">Links 2 tickets using a "Normal" type link.</Description>
         <Group>Ticket</Group>
@@ -3054,22 +2608,6 @@ Thanks for your help!
             <Hash>
                 <Item Key="Module">Kernel::System::Stats::Dynamic::TicketSolutionResponseTime</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::HTMLArticleHeightDefault" Required="1" Valid="1">
-        <Description Translatable="1">Set the default height (in pixels) of inline HTML articles in AgentTicketZoom.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Ticket::ViewZoom</SubGroup>
-        <Setting>
-            <String Regex="^[0-9]{1,4}$">100</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::HTMLArticleHeightMax" Required="1" Valid="1">
-        <Description Translatable="1">Set the maximum height (in pixels) of inline HTML articles in AgentTicketZoom.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Ticket::ViewZoom</SubGroup>
-        <Setting>
-            <String Regex="^[0-9]{1,5}$">2500</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###TicketDynamicFieldDefault" Required="0" Valid="0">
@@ -3275,79 +2813,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="StandardTemplate::Types" Required="0" Valid="1">
-        <Description Translatable="1">Defines the list of types for templates.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Answer" Translatable="1">Answer</Item>
-                <Item Key="Create" Translatable="1">Create</Item>
-                <Item Key="Forward" Translatable="1">Forward</Item>
-                <Item Key="Email" Translatable="1">Email</Item>
-                <Item Key="PhoneCall" Translatable="1">Phone call</Item>
-                <Item Key="Note" Translatable="1">Note</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="StandardTemplate2QueueByCreating" Required="0" Valid="0">
-        <Description Translatable="1">List of default Standard Templates which are assigned automatically to new Queues upon creation.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Array>
-                <Item></Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###500-RestrictTicketActionsOnMerged" Required="0" Valid="1">
-        <Description Translatable="1">Ticket-ACL to restrict ticket actions for merged tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::RestrictTicketActionsOnMerged</Item>
-                <Item Key="ReturnType">Action</Item>
-            </Hash>
-        </Setting>
-     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::RestrictTicketActionsOnMerged::ActionsMapping" Required="1" Valid="1">
-        <Description Translatable="1">Defines allowed and not allowed actions for merged and removed tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="AgentTicketZoom">1</Item>
-                <Item Key="AgentTicketHistory">1</Item>
-                <Item Key="AgentTicketPrint">1</Item>
-                <Item Key="AgentArticleEdit">0</Item>
-                <Item Key="AgentArticleManipulate">0</Item>
-                <Item Key="AgentLinkObject">0</Item>
-                <Item Key="AgentTicketBounce">0</Item>
-                <Item Key="AgentTicketClose">0</Item>
-                <Item Key="AgentTicketCompose">0</Item>
-                <Item Key="AgentTicketCustomer">0</Item>
-                <Item Key="AgentTicketDecision">0</Item>
-                <Item Key="AgentTicketForward">0</Item>
-                <Item Key="AgentTicketDynamicField">0</Item>
-                <Item Key="AgentTicketAddtlITSMField">0</Item>
-                <Item Key="AgentTicketLock">0</Item>
-                <Item Key="AgentTicketMerge">0</Item>
-                <Item Key="AgentTicketMergeToCustomer">0</Item>
-                <Item Key="AgentTicketMove">0</Item>
-                <Item Key="AgentTicketNote">0</Item>
-                <Item Key="AgentTicketOwner">0</Item>
-                <Item Key="AgentTicketPending">0</Item>
-                <Item Key="AgentTicketPersonLink">0</Item>
-                <Item Key="AgentTicketPhone">0</Item>
-                <Item Key="AgentTicketPhoneOutbound">0</Item>
-                <Item Key="AgentTicketPriority">0</Item>
-                <Item Key="AgentTicketResponsible">0</Item>
-                <Item Key="AgentTicketWebLink">0</Item>
-                <Item Key="AgentTicketZoomTabActionCommon">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="0">
         <Description Translatable="1">Create new linked person on create new Article or Update Owner.</Description>
         <Group>Ticket</Group>
@@ -3368,14 +2833,6 @@ Thanks for your help!
                 <Item Key="Module">Kernel::System::Ticket::Event::AddToAddressBook</Item>
                 <Item Key="Event">(ArticleCreate)</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###010-TicketExtensionsKIX4OTRSITSMIncidentProblem" Required="0" Valid="1">
-        <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="">Kernel::System::Ticket::TicketExtensionsKIX4OTRSITSMIncidentProblem</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###200-CreateFAQEntry" Required="0" Valid="0">
@@ -3520,39 +2977,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Acl::Module###890-HideAgentTicketMove" Required="0" Valid="1">
-        <Description Translatable="1">Hide AgentTicketMove if service of current ticket has a configured AssignedQueue and ticket is not excluded from automatic queue assigment.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket::ServiceQueueAssignment</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Acl::HideAgentTicketMoveServiceQueueAssignment</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###300-TicketServiceQueueAssignment" Required="0" Valid="1">
-        <Description Translatable="1">Performs queue update on setting service.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket::ServiceQueueAssignment</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::TicketServiceQueueAssignment</Item>
-                <Item Key="Event">(TicketCreate|TicketServiceUpdate)</Item>
-                <Item Key="Transaction">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::ServiceQueueAssignment###TypeStateExclusions" Required="1" Valid="1">
-        <Description Translatable="1">Tickets with key Type:::State and value not null will not be moved automatically upon service update.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket::ServiceQueueAssignment</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="(000):::(TypeRegexp):::(StateRegexp)">0</Item>
-                <Item Key="(000):::(.*):::(.*)">1</Item>
-             </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###9-SystemMonitoringAcknowledgeX" Required="1" Valid="1">
         <Description Translatable="1">Ticket event module to send an acknowledge to registered system monitoring tools.</Description>
         <Group>Ticket</Group>
@@ -3561,20 +2985,6 @@ Thanks for your help!
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::SystemMonitoringAcknowledgeX</Item>
                 <Item Key="Event">TicketLockUpdate</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Notification::Transport###AgentOverlay" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this notification transport.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Admin::AdminNotificationEvent</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::NotificationEvent::Transport::AgentOverlay</Item>
-                <Item Key="Name">Agent Notification (Popup/Dashboard)</Item>
-                <Item Key="Icon">fa fa-th-list</Item>
-                <Item Key="Prio">110</Item>
-                <Item Key="AgentEnabledByDefault">0</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3613,23 +3023,6 @@ Thanks for your help!
                 <Item Key="0">Disabled</Item>
             </Option>
         </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###001-TicketExtensionsKIX4OTRS" Required="0" Valid="1">
-        <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <String Regex="">Kernel::System::Ticket::TicketExtensionsKIX4OTRS</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::DynamicField###DisabledDynamicFields" Required="0" Valid="1">
-        <Description Translatable="1">Configures which dynamic fields were disabled depending on used frontend module, attributes like service, type, state or priority and its value. The key is composed like FrontendModule:::Attribute::Value. The key should contain the names of the disabled fields using regular expressions. If dynamic fields should be hidden on empty values, use EMPTY like FrontendModule:::Attribute::EMPTY.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-            <Setting>
-                <Hash>
-                </Hash>
-            </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###330-DFTypeObjectReferenceAddLink" Required="0" Valid="1">
         <Description Translatable="1"></Description>

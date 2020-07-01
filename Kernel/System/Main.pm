@@ -96,6 +96,8 @@ sub Require {
     # find full path of module
     PREFIX:
     for my $Prefix (@INC) {
+        next PREFIX if !$Prefix;
+
         $File = $Prefix . '/' . $Module;
 
         next PREFIX if !-f $File;

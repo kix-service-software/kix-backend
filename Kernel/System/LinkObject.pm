@@ -22,11 +22,6 @@ our @ObjectDependencies = (
     'Main',
     'Time',
     'Valid',
-
-    # KIXCore-capeIT
-    'KIXUtils',
-
-    # EO KIXCore-capeIT
 );
 
 =head1 NAME
@@ -270,12 +265,19 @@ sub PossibleLinkList {
     }
 
     # get location of the backend modules
-    my $BackendLocation = $ConfigObject->Get('Home') . '/Kernel/System/LinkObject/';
+    my $BackendLocation;
 
-    # KIXCore-capeIT
-    my @KIXPackages = $Kernel::OM->Get('KIXUtils')
-        ->GetRegisteredCustomPackages( Result => 'ARRAY' );
-    # EO KIXCore-capeIT
+    my $Home = $Kernel::OM->Get('Config')->Get('Home');
+
+    my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
+        InitOrder => 1
+    );
+
+    # insert framework as fake plugin
+    unshift @Plugins, {
+        Plugin    => '',
+        Directory => $Home
+    };
 
     # check the existing objects
     POSSIBLELINK:
@@ -288,25 +290,18 @@ sub PossibleLinkList {
             # extract object
             my $Object = $PossibleLinkList{$PossibleLink}->{$Argument};
 
-            # KIXCore-capeIT
-            #next ARGUMENT if -e $BackendLocation . $Object . '.pm';
-            my $Found = 0;
-            for my $CurrPrefix (@KIXPackages) {
-                my $CheckBackendLocation =
-                    $Kernel::OM->Get('Config')->Get('Home') . "/"
-                    . $CurrPrefix
-                    . '/Kernel/System/LinkObject/';
-                if ( -e $CheckBackendLocation . $Object . '.pm' ) {
-                    $Found = 1;
+            for my $Plugin ( reverse @Plugins ) {
+                my $File = $Plugin->{Directory}."/Kernel/System/LinkObject/$Object.pm";
+
+                if ( -e $File ) {
+                    $BackendLocation = $File;
                     last;
                 }
             }
-            if ( !$Found ) {
+            if ( !$BackendLocation ) {
                 next ARGUMENT if -e $BackendLocation . $Object . '.pm';
             }
-            next ARGUMENT if $Found;
-
-            # EO KIXCore-capeIT
+            next ARGUMENT if $BackendLocation;
 
             # remove entry from list if it is invalid
             delete $PossibleLinkList{$PossibleLink};

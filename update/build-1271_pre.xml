@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableDrop Name="queue_standard_template"/>
+    <TableDrop Name="standard_template_attachment"/>
+    <TableDrop Name="standard_attachment"/>
+    <TableDrop Name="standard_template"/>
+    <TableDrop Name="standard_templatex"/>
+
+    <TableAlter Name="ticket">
+        <ColumnDrop Name="service_id"/>
+    </TableAlter>
+
+    <TableDrop Name="service_preferences"/>
+    <TableDrop Name="service_customer_user"/>
+    <TableDrop Name="service"/>
+
+    <TableDrop Name="cloud_service_config"/>
+
+</database>

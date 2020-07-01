@@ -42,7 +42,6 @@ our @ObjectDependencies = (
     'PostMaster::LoopProtection',
     'Priority',
     'Queue',
-    'Service',
     'State',
     'TemplateGenerator',
     'Time',
@@ -109,13 +108,6 @@ sub new {
         || 'Ticket::Number::AutoIncrement';
     if ( !$MainObject->RequireBaseClass($GeneratorModule) ) {
         die "Can't load ticket number generator backend module $GeneratorModule! $@";
-    }
-
-    # load ticket index generator
-    my $GeneratorIndexModule = $ConfigObject->Get('Ticket::IndexModule')
-        || 'Ticket::IndexAccelerator::RuntimeDB';
-    if ( !$MainObject->RequireBaseClass($GeneratorIndexModule) ) {
-        die "Can't load ticket index backend module $GeneratorIndexModule! $@";
     }
 
     # load article storage module
@@ -279,7 +271,6 @@ or
         Priority      => '3 normal',         # or PriorityID => 2,
         State         => 'new',              # or StateID => 5,
         Type          => 'Incident',         # or TypeID = 1 or Ticket type default (Ticket::Type::Default), not required
-        Service       => 'Service A',        # or ServiceID => 1, not required
         OrganisationID => '123465',
         ContactID     => '123' || 'customer@example.com',
         OwnerID       => 123,
@@ -427,21 +418,6 @@ sub TicketCreate {
         return;
     }
 
-    # get service object
-    my $ServiceObject = $Kernel::OM->Get('Service');
-
-    # ServiceID/Service lookup!
-    if ( !$Param{ServiceID} && $Param{Service} ) {
-        $Param{ServiceID} = $ServiceObject->ServiceLookup(
-            Name => $Param{Service},
-        );
-    }
-    elsif ( $Param{ServiceID} && !$Param{Service} ) {
-        $Param{Service} = $ServiceObject->ServiceLookup(
-            ServiceID => $Param{ServiceID},
-        );
-    }
-
     # create ticket number if none is given
     if ( !$Param{TN} ) {
         $Param{TN} = $Self->TicketCreateNumber();
@@ -465,7 +441,6 @@ sub TicketCreate {
     }
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
-    $Param{ServiceID} ||= undef;
 
     if (!$Param{ContactID} || $Param{ContactID} !~ /^\d+$/) {
         $Self->{ParserObject} = Kernel::System::EmailParser->new(
@@ -515,16 +490,16 @@ sub TicketCreate {
             INSERT INTO ticket (
                 tn, title, create_time_unix, type_id, queue_id, ticket_lock_id, user_id,
                 responsible_user_id, ticket_priority_id, ticket_state_id, timeout,
-                service_id, until_time, archive_flag, create_time, create_by, change_time, change_by,
+                until_time, archive_flag, create_time, create_by, change_time, change_by,
                 contact_id, organisation_id)
             VALUES (?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, 0,
-                    ?, 0, ?, current_timestamp, ?, current_timestamp, ?,
+                    0, ?, current_timestamp, ?, current_timestamp, ?,
                     ?, ?)',
         Bind => [
             \$Param{TN}, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
             \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
-            \$Param{ServiceID}, \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
+            \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
             \$Param{ContactID}, \$Param{OrganisationID},
         ],
     );
@@ -543,23 +518,6 @@ sub TicketCreate {
         Name         => "\%\%$Param{TN}\%\%$Param{Queue}\%\%$Param{Priority}\%\%$Param{State}\%\%$TicketID",
         CreateUserID => $Param{UserID},
     );
-
-    if ( $Kernel::OM->Get('Config')->Get('Ticket::Service') ) {
-
-        # history insert for service so that initial values can be seen
-        my $HistoryService   = $Param{Service}   || 'NULL';
-        my $HistoryServiceID = $Param{ServiceID} || '';
-        $Self->HistoryAdd(
-            TicketID     => $TicketID,
-            HistoryType  => 'ServiceUpdate',
-            Name         => "\%\%$HistoryService\%\%$HistoryServiceID\%\%NULL\%\%",
-            CreateUserID => $Param{UserID},
-        );
-    }
-
-
-    # update ticket view index
-    $Self->TicketAcceleratorAdd( TicketID => $TicketID );
 
     # log ticket creation
     $Kernel::OM->Get('Log')->Log(
@@ -656,9 +614,6 @@ sub TicketDelete {
         Key    => $Param{TicketID},
         UserID => $Param{UserID},
     );
-
-    # update ticket index
-    return if !$Self->TicketAcceleratorDelete(%Param);
 
     # update full text index
     return if !$Self->ArticleIndexDeleteTicket(%Param);
@@ -1027,8 +982,6 @@ Returns:
         OwnerID            => 123,
         Type               => 'some ticket type',
         TypeID             => 123,
-        Service            => 'some service',
-        ServiceID          => 123,
         Responsible        => 'some_responsible_login',
         ResponsibleID      => 123,
         Age                => 3456,
@@ -1121,7 +1074,7 @@ sub TicketGet {
                 SELECT st.id, st.queue_id, st.ticket_state_id, st.ticket_lock_id, st.ticket_priority_id,
                     st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
                     st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
-                    st.timeout, st.type_id, st.service_id, st.archive_flag,
+                    st.timeout, st.type_id, st.archive_flag,
                     st.create_by, st.change_by
                 FROM ticket st
                 WHERE st.id = ?',
@@ -1146,7 +1099,6 @@ sub TicketGet {
             $Ticket{Title}          = $Row[14];
             $Ticket{UnlockTimeout}  = $Row[15];
             $Ticket{TypeID}         = $Row[16] || 1;
-            $Ticket{ServiceID}      = $Row[17] || '';
             $Ticket{ArchiveFlag}    = $Row[18] ? 'y' : 'n';
             $Ticket{CreateBy}       = $Row[19];
             $Ticket{ChangeBy}       = $Row[20];
@@ -1243,14 +1195,6 @@ sub TicketGet {
 
     # get type
     $Ticket{Type} = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $Ticket{TypeID} );
-
-    # get service
-    if ( $Ticket{ServiceID} ) {
-
-        $Ticket{Service} = $Kernel::OM->Get('Service')->ServiceLookup(
-            ServiceID => $Ticket{ServiceID},
-        );
-    }
 
     # get state info
     my %StateData = $Kernel::OM->Get('State')->StateGet(
@@ -2077,204 +2021,6 @@ sub TicketTypeSet {
     # trigger event
     $Self->EventHandler(
         Event => 'TicketTypeUpdate',
-        Data  => {
-            TicketID => $Param{TicketID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
-    );
-
-    return 1;
-}
-
-=item TicketServiceList()
-
-to get all possible services for a ticket (depends on workflow, if configured)
-
-    my %Services = $TicketObject->TicketServiceList(
-        QueueID        => 123,
-        UserID         => 123,
-    );
-
-    my %Services = $TicketObject->TicketServiceList(
-        ContactID => 123,
-        QueueID        => 123,
-    );
-
-    my %Services = $TicketObject->TicketServiceList(
-        ContactID => 123,
-        TicketID       => 123,
-        UserID         => 123,
-    );
-
-Returns:
-
-    %Services = (
-        1 => 'ServiceA',
-        2 => 'ServiceB',
-        3 => 'ServiceC',
-    );
-
-=cut
-
-sub TicketServiceList {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} && !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID, ContactID or UserID and ContactID is needed!',
-        );
-        return;
-    }
-
-    # check needed stuff
-    if ( !$Param{QueueID} && !$Param{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID or TicketID!',
-        );
-        return;
-    }
-
-    # get service object
-    my $ServiceObject = $Kernel::OM->Get('Service');
-
-    my %Services;
-    if ( !$Param{ContactID} ) {
-        %Services = $ServiceObject->ServiceList(
-            UserID => 1,
-            KeepChildren =>
-                $Kernel::OM->Get('Config')->Get('Ticket::Service::KeepChildren'),
-        );
-    }
-    else {
-        %Services = $ServiceObject->ContactServiceMemberList(
-            Result            => 'HASH',
-            ContactLogin => $Param{ContactID},
-            UserID            => 1,
-        );
-    }
-
-    return %Services;
-}
-
-=item TicketServiceSet()
-
-to set a ticket service
-
-    my $Success = $TicketObject->TicketServiceSet(
-        ServiceID => 123,
-        TicketID  => 123,
-        UserID    => 123,
-    );
-
-    my $Success = $TicketObject->TicketServiceSet(
-        Service  => 'Service A',
-        TicketID => 123,
-        UserID   => 123,
-    );
-
-Events:
-    TicketServiceUpdate
-
-=cut
-
-sub TicketServiceSet {
-    my ( $Self, %Param ) = @_;
-
-    # service lookup
-    if ( $Param{Service} && !$Param{ServiceID} ) {
-        $Param{ServiceID} = $Kernel::OM->Get('Service')->ServiceLookup(
-            Name => $Param{Service},
-        );
-    }
-
-    # check needed stuff
-    for my $Needed (qw(TicketID ServiceID UserID)) {
-        if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # get current ticket
-    my %Ticket = $Self->TicketGet(
-        %Param,
-        DynamicFields => 0,
-    );
-
-    # update needed?
-    return 1 if $Param{ServiceID} eq $Ticket{ServiceID};
-
-    # permission check
-    my %ServiceList = $Self->TicketServiceList(%Param);
-    if ( $Param{ServiceID} ne '' && !$ServiceList{ $Param{ServiceID} } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Permission denied on TicketID: $Param{TicketID}!",
-        );
-        return;
-    }
-
-    # check database undef/NULL (set value to undef/NULL to prevent database errors)
-    for my $Parameter (qw(ServiceID)) {
-        if ( !$Param{$Parameter} ) {
-            $Param{$Parameter} = undef;
-        }
-    }
-
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE ticket SET service_id = ?, change_time = current_timestamp, '
-            . ' change_by = ? WHERE id = ?',
-        Bind => [ \$Param{ServiceID}, \$Param{UserID}, \$Param{TicketID} ],
-    );
-
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
-    # get new ticket data
-    my %TicketNew = $Self->TicketGet(
-        %Param,
-        DynamicFields => 0,
-    );
-    $TicketNew{Service} = $TicketNew{Service} || 'NULL';
-    $Param{ServiceID}   = $Param{ServiceID}   || '';
-    $Ticket{Service}    = $Ticket{Service}    || 'NULL';
-    $Ticket{ServiceID}  = $Ticket{ServiceID}  || '';
-
-    # history insert
-    $Self->HistoryAdd(
-        TicketID    => $Param{TicketID},
-        HistoryType => 'ServiceUpdate',
-        Name =>
-            "\%\%$TicketNew{Service}\%\%$Param{ServiceID}\%\%$Ticket{Service}\%\%$Ticket{ServiceID}",
-        CreateUserID => $Param{UserID},
-    );
-
-    # trigger notification event
-    $Self->EventHandler(
-        Event => 'NotificationServiceUpdate',
-        Data  => {
-            TicketID              => $Param{TicketID},
-            CustomerMessageParams => {},
-        },
-        UserID => $Param{UserID},
-    );
-
-    # trigger event
-    $Self->EventHandler(
-        Event => 'TicketServiceUpdate',
         Data  => {
             TicketID => $Param{TicketID},
         },
@@ -5959,43 +5705,1124 @@ sub TicketArticleStorageSwitch {
     return 1;
 }
 
-# ProcessManagement functions
+=item TicketCriticalityStringGet()
 
-=item TicketCheckForProcessType()
+Returns the tickets criticality string value.
 
-    checks wether or not the ticket is of a process type.
+  $TicketObject->TicketCriticalityStringGet(
+      %TicketData,
+      %CustomerData,
+      %ResponsibleData,
+  );
 
-    $TicketObject->TicketCheckForProcessType(
-        TicketID => 123,
+=cut
+
+sub TicketCriticalityStringGet {
+    my ( $Self, %Param ) = @_;
+
+    # get needed objects
+    my $LayoutObject       = $Kernel::OM->Get('Output::HTML::Layout');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+    my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
+
+    # init return value
+    my $RetVal = "-";
+
+    # check if value is given
+    if ( $Param{'DynamicField_ITSMCriticality'} ) {
+        # get configuration of dynamicfield
+        my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
+            Name => 'ITSMCriticality',
+        );
+
+        # get display value
+        my $ValueStrg = $BackendObject->DisplayValueRender(
+            LayoutObject       => $LayoutObject,
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $Param{'DynamicField_ITSMCriticality'},
+            HTMLOutput         => 0,
+        );
+        $RetVal = $ValueStrg->{Value};
+    }
+
+    return $RetVal;
+}
+
+=item TicketImpactStringGet()
+
+Returns the tickets impact string value.
+
+  $TicketObject->TicketImpactStringGet(
+      %TicketData,
+      %CustomerData,
+      %ResponsibleData,
+  );
+
+=cut
+
+sub TicketImpactStringGet {
+    my ( $Self, %Param ) = @_;
+
+    # get needed objects
+    my $LayoutObject       = $Kernel::OM->Get('Output::HTML::Layout');
+    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+    my $BackendObject      = $Kernel::OM->Get('DynamicField::Backend');
+
+    # init return value
+    my $RetVal = "-";
+
+    # check if value is given
+    if ( $Param{'DynamicField_ITSMImpact'} ) {
+        # get configuration of dynamicfield
+        my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
+            Name => 'ITSMImpact',
+        );
+
+        # get display value
+        my $ValueStrg = $BackendObject->DisplayValueRender(
+            LayoutObject       => $LayoutObject,
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $Param{'DynamicField_ITSMImpact'},
+            HTMLOutput         => 0,
+        );
+        $RetVal = $ValueStrg->{Value};
+    }
+
+    return $RetVal;
+}
+
+=item CommonNextStates()
+
+Returns a hash of common next states for multiple tickets (based on TicketStateWorkflow).
+
+    my %StateHash = $TicketObject->TSWFCommonNextStates(
+        TicketIDs => [ 1, 2, 3, 4], # required
+        Action => 'SomeActionName', # optional
+        UserID => 1,                # optional
     );
 
 =cut
 
-sub TicketCheckForProcessType {
+sub TSWFCommonNextStates {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{TicketIDs} || ref( $Param{TicketIDs} ) ne 'ARRAY' ) {
+        $Kernel::OM->Get('Log')
+            ->Log( Priority => 'error', Message => 'Need TicketIDs as array ref!' );
+        return;
+    }
+    $Self->{TicketObject} = $Param{TicketObject} || $Kernel::OM->Get('Ticket');
+
+    my %Result = ();
+    if ( $Param{StateType} ) {
+        %Result = $Kernel::OM->Get('State')->StateGetStatesByType(
+            StateType => $Param{StateType},
+            Result    => 'HASH',
+            Action    => $Param{Action} || '',
+            UserID    => $Param{UserID} || 1,
+        );
+    }
+    else {
+        %Result = $Kernel::OM->Get('State')->StateList(
+            UserID => $Param{UserID} || 1,
+        );
+    }
+
+    my %NextStates = ();
+    for my $CurrTID ( @{ $Param{TicketIDs} } ) {
+
+        my %States = $Kernel::OM->Get('Ticket')->TicketStateList(
+            TicketID => $CurrTID,
+            UserID => $Param{UserID} || 1,
+        );
+
+        my @CurrNextStatesArr;
+        for my $ThisState ( keys %States ) {
+            push( @CurrNextStatesArr, $States{$ThisState} );
+        }
+
+        # init next states set...
+        if ( !%NextStates ) {
+            %NextStates = map { $_ => 1 } @CurrNextStatesArr;
+        }
+
+        # check if current next states are common with previous next states...
+        else {
+            for my $CurrStateCheck ( keys(%NextStates) ) {
+
+                #remove trailing or leading spaces...
+                $CurrStateCheck =~ s/^\s+//g;
+                $CurrStateCheck =~ s/\s+$//g;
+
+                next if ( grep { $_ eq $CurrStateCheck } @CurrNextStatesArr );
+                delete( $NextStates{$CurrStateCheck} )
+            }
+        }
+
+        # end if no next states available at all..
+        last if ( !%NextStates );
+    }
+    for my $CurrStateID ( keys(%Result) ) {
+        next if ( $NextStates{ $Result{$CurrStateID} } );
+        delete( $Result{$CurrStateID} );
+    }
+
+    return %Result;
+}
+
+=item TicketQueueLinkGet()
+
+Returns a link to the queue of a given ticket.
+
+    my $Result = $TicketObject->TicketQueueLinkGet(
+        TicketID => 123,
+        UserID   => 123,
+    );
+
+=cut
+
+sub TicketQueueLinkGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
     if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TicketID!',
-        );
+        $Kernel::OM->Get('Log')
+            ->Log( Priority => 'error', Message => 'Need TicketID!' );
         return;
     }
 
-    my $DynamicFieldName = $Kernel::OM->Get('Config')->Get('Process::DynamicFieldProcessManagementProcessID');
+    my $SessionID = '';
+    if ( !$Kernel::OM->Get('Config')->Get('SessionUseCookie') && $Param{SessionID} ) {
+        $SessionID = ';' . $Param{SessionName} . '=' . $Param{SessionID};
+    }
 
-    return if !$DynamicFieldName;
-    $DynamicFieldName = 'DynamicField_' . $DynamicFieldName;
+    my $Output =
+        '<a href="?Action=AgentTicketQueue;QueueID='
+        . $Param{'QueueID'}
+        . $SessionID . '">'
+        . $Param{'Queue'} . '</a>';
 
-    # get ticket attributes
-    my %Ticket = $Self->TicketGet(
-        TicketID      => $Param{TicketID},
-        DynamicFields => 1,
+
+    return $Output;
+}
+
+=item CountArticles()
+
+Returns the number of articles of a given ticket.
+
+    my $Result = $TicketObject->CountArticles(
+        TicketID => 123,
+        UserID   => 123,
     );
 
-    # return 1 if we got process ticket
-    return 1 if $Ticket{$DynamicFieldName};
+=cut
+
+sub CountArticles {
+    my ( $Self, %Param ) = @_;
+    my $Result = 0;
+
+    my @ArticleIndexList = $Self->ArticleIndex(
+        TicketID => $Param{TicketID},
+    );
+
+    $Result = ( scalar(@ArticleIndexList) || 0 );
+
+    return $Result;
+}
+
+=item CountAttachments()
+
+Returns the number of attachments in all articles of a given ticket.
+
+    my $Result = $TicketObject->CountAttachments(
+        TicketID => 123,
+        UserID   => 123,
+    );
+
+=cut
+
+sub CountAttachments {
+    my ( $Self, %Param ) = @_;
+    my $Result = 0;
+
+    my @ArticleList = $Self->ArticleContentIndex(
+        TicketID                   => $Param{TicketID},
+        StripPlainBodyAsAttachment => 1,
+        UserID                     => $Param{UserID} || 1,
+    );
+
+    for my $Article (@ArticleList) {
+        my %AtmIndex = %{ $Article->{Atms} };
+        my @AtmKeys  = keys(%AtmIndex);
+        $Result = $Result + ( scalar(@AtmKeys) || 0 );
+    }
+
+    return $Result;
+}
+
+=item CountLinkedObjects()
+
+Returns the number of objects linked with a given ticket.
+
+    my $Result = $TicketObject->CountLinkedObjects(
+        TicketID => 123,
+        UserID   => 123,
+    );
+
+=cut
+
+sub CountLinkedObjects {
+    my ( $Self, %Param ) = @_;
+    my $Result = 0;
+    my $LinkObject = $Kernel::OM->Get('LinkObject') || undef;
+
+    if ( !$LinkObject ) {
+        $LinkObject = Kernel::System::LinkObject->new( %{$Self} );
+    }
+
+    return '' if !$LinkObject;
+
+    my %PossibleObjectsList = $LinkObject->PossibleObjectsList(
+        Object => 'Ticket',
+        UserID => 1,
+    );
+
+    # get user preferences
+    my %UserPreferences
+        = $Kernel::OM->Get('User')->GetPreferences( UserID => $Param{UserID} );
+
+    for my $CurrObject ( keys(%PossibleObjectsList) ) {
+        my %LinkList = $LinkObject->LinkKeyList(
+            Object1 => 'Ticket',
+            Key1    => $Param{TicketID},
+            Object2 => $CurrObject,
+            State   => 'Valid',
+            UserID  => 1,
+        );
+
+        # do not count merged tickets if user preference set
+        my $LinkCount = 0;
+        if ( $CurrObject eq 'Ticket' ) {
+            foreach my $ObjectID ( keys %LinkList ) {
+                my %Ticket = $Self->TicketGet( TicketID => $ObjectID );
+                next
+                    if (
+                    (
+                        !defined $UserPreferences{UserShowMergedTicketsInLinkedObjects}
+                        || !$UserPreferences{UserShowMergedTicketsInLinkedObjects}
+                    )
+                    && $Ticket{StateType} eq 'merged'
+                    );
+                $LinkCount++;
+            }
+        }
+        else {
+            $LinkCount = scalar( keys(%LinkList) );
+        }
+        $Result = $Result + ( $LinkCount || 0 );
+    }
+
+    return $Result;
+}
+
+=item GetPreviousTicketState()
+
+Returns the previous ticket state to the current one.
+
+    my $Result = $TicketObject->GetPreviousTicketState(
+        TicketID   => 123,                  # required
+        ResultType => "StateName" || "ID",  # optional
+    );
+
+=cut
+
+sub GetPreviousTicketState {
+    my ( $Self, %Param ) = @_;
+    my $Result = 0;
+
+    # check needed stuff
+    for (qw(TicketID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "Need $_!" );
+            return 0;
+        }
+    }
+
+    my $SelectValue = 'ts1.name';
+    if ( $Param{ResultType} && $Param{ResultType} eq 'ID' ) {
+        $SelectValue = 'ts1.id';
+    }
+
+    # following deprecated but kept for backward-compatibility...
+    elsif ( $Param{ResultType} && $Param{ResultType} eq 'StateID' ) {
+        $SelectValue = 'ts1.id';
+    }
+
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID},
+    );
+    return 0 if !%Ticket || !$Ticket{State};
+
+    return 0 if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => "SELECT " . $SelectValue . " FROM ticket_history th1, ticket_state ts1 " .
+            " WHERE " .
+            "   th1.id = ( " .
+            "     SELECT max(th2.id) FROM ticket_history th2, ticket_state ts2 WHERE " .
+            "     th2.ticket_id = ? AND th2.create_time = th2.change_time " .
+            "     AND th2.state_id = ts2.id AND ts2.name != ? " .
+            "   ) " .
+            "   AND ts1.id = th1.state_id ",
+        Bind => [ \$Ticket{TicketID}, \$Ticket{State} ],
+    );
+
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $Result = $Row[0];
+    }
+
+    return $Result;
+}
+
+=item ArticleMove()
+
+Moves an article to another ticket
+
+    my $Result = $TicketObject->ArticleMove(
+        TicketID  => 123,
+        ArticleID => 123,
+        UserID    => 123,
+    );
+
+Result:
+    1
+    MoveFailed
+    AccountFailed
+
+Events:
+    ArticleMove
+
+=cut
+
+sub ArticleMove {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID TicketID UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "ArticleMove: Need $Needed!" );
+            return;
+        }
+    }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
+    # update article data
+    return 'MoveFailed' if !$Kernel::OM->Get('DB')->Do(
+        SQL => "UPDATE article SET ticket_id = ?, "
+            . "change_time = current_timestamp, change_by = ? WHERE id = ?",
+        Bind => [ \$Param{TicketID}, \$Param{UserID}, \$Param{ArticleID} ],
+    );
+
+    # update time accounting data
+    return 'AccountFailed' if !$Kernel::OM->Get('DB')->Do(
+        SQL => 'UPDATE time_accounting SET ticket_id = ?, '
+            . "change_time = current_timestamp, change_by = ? WHERE article_id = ?",
+        Bind => [ \$Param{TicketID}, \$Param{UserID}, \$Param{ArticleID} ],
+    );
+
+    # clear ticket cache
+    delete $Self->{ 'Cache::GetTicket' . $Param{TicketID} };
+
+    # event
+    $Self->EventHandler(
+        Event => 'ArticleMove',
+        Data  => {
+            TicketID  => $Param{TicketID},
+            ArticleID => $Param{ArticleID},
+        },
+        UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
+    );
+
+    return 1;
+}
+
+=item ArticleCopy()
+
+Copies an article to another ticket including all attachments
+
+    my $Result = $TicketObject->ArticleCopy(
+        TicketID  => 123,
+        ArticleID => 123,
+        UserID    => 123,
+    );
+
+Result:
+    NewArticleID
+    'NoOriginal'
+    'CopyFailed'
+    'UpdateFailed'
+
+Events:
+    ArticleCopy
+
+=cut
+
+sub ArticleCopy {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID TicketID UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "ArticleCopy: Need $Needed!" );
+            return;
+        }
+    }
+
+    # get original article content
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID},
+    );
+    return 'NoOriginal' if !%Article;
+
+    # copy original article
+    my $CopyArticleID = $Self->ArticleCreate(
+        %Article,
+        TicketID       => $Param{TicketID},
+        UserID         => $Param{UserID},
+        HistoryType    => 'Misc',
+        HistoryComment => "Copied article $Param{ArticleID} from "
+            . "ticket $Article{TicketID} to ticket $Param{TicketID}",
+    );
+    return 'CopyFailed' if !$CopyArticleID;
+
+    # set article times from original article
+    return 'UpdateFailed' if !$Kernel::OM->Get('DB')->Do(
+        SQL =>
+            'UPDATE article SET create_time = ?, change_time = ?, incoming_time = ? WHERE id = ?',
+        Bind => [
+            \$Article{Created},      \$Article{Changed},
+            \$Article{IncomingTime}, \$CopyArticleID
+        ],
+    );
+
+    # copy attachments from original article
+    my %ArticleIndex = $Self->ArticleAttachmentIndex(
+        ArticleID => $Param{ArticleID},
+        UserID    => $Param{UserID},
+    );
+    for my $Index ( keys %ArticleIndex ) {
+        my %Attachment = $Self->ArticleAttachment(
+            ArticleID => $Param{ArticleID},
+            FileID    => $Index,
+            UserID    => $Param{UserID},
+        );
+        $Self->ArticleWriteAttachment(
+            %Attachment,
+            ArticleID => $CopyArticleID,
+            UserID    => $Param{UserID},
+        );
+    }
+
+    # clear ticket cache
+    delete $Self->{ 'Cache::GetTicket' . $Param{TicketID} };
+
+    # copy plain article if exists
+    if ( $Article{Channel} =~ /email/i ) {
+        my $Data = $Self->ArticlePlain(
+            ArticleID => $Param{ArticleID}
+        );
+        if ($Data) {
+            $Self->ArticleWritePlain(
+                ArticleID => $CopyArticleID,
+                Email     => $Data,
+                UserID    => $Param{UserID},
+            );
+        }
+    }
+
+    # event
+    $Self->EventHandler(
+        Event => 'ArticleCopy',
+        Data  => {
+            TicketID     => $Param{TicketID},
+            ArticleID    => $CopyArticleID,
+            OldArticleID => $Param{ArticleID},
+        },
+        UserID => $Param{UserID},
+    );
+
+    return $CopyArticleID;
+}
+
+=item ArticleFullDelete()
+
+Delete an article, its history, its plain message, and all attachments
+
+    my $Success = $TicketObject->ArticleFullDelete(
+        ArticleID => 123,
+        UserID    => 123,
+    );
+
+ATTENTION:
+    sub ArticleDelete is used in this sub, but this sub does not delete
+    article history
+
+Events:
+    ArticleFullDelete
+
+=cut
+
+sub ArticleFullDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "ArticleFullDelete: Need $Needed!" );
+            return;
+        }
+    }
+
+    # get article content
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID},
+    );
+    return if !%Article;
+
+    # clear ticket cache
+    delete $Self->{ 'Cache::GetTicket' . $Article{TicketID} };
+
+    # delete article history
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => 'DELETE FROM ticket_history WHERE article_id = ?',
+        Bind => [ \$Param{ArticleID} ],
+    );
+
+    # delete article, attachments and plain emails
+    return if !$Self->ArticleDelete(
+        ArticleID => $Param{ArticleID},
+        UserID    => $Param{UserID},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'ArticleFullDelete',
+        Data  => {
+            TicketID  => $Article{TicketID},
+            ArticleID => $Param{ArticleID},
+        },
+        UserID => $Param{UserID},
+    );
+
+    return 1;
+}
+
+=item ArticleCreateDateUpdate()
+
+Manipulates the article create date
+
+    my $Result = $TicketObject->ArticleCreateDateUpdate(
+        ArticleID => 123,
+        UserID    => 123,
+    );
+
+Events:
+    ArticleUpdate
+
+=cut
+
+sub ArticleCreateDateUpdate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID ArticleID UserID Created IncomingTime)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "ArticleCreateDateUpdate: Need $Needed!" );
+            return;
+        }
+    }
+
+    # db update
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL => "UPDATE article SET incoming_time = ?, create_time = ?,"
+            . "change_time = current_timestamp, change_by = ? WHERE id = ?",
+        Bind => [ \$Param{IncomingTime}, \$Param{Created}, \$Param{UserID}, \$Param{ArticleID} ],
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'ArticleUpdate',
+        Data  => {
+            TicketID  => $Param{TicketID},
+            ArticleID => $Param{ArticleID},
+        },
+        UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
+    );
+
+    return 1;
+}
+
+=item ArticleFlagDataSet()
+
+set ....
+
+    my $Success = $TicketObject->ArticleFlagDataSet(
+            ArticleID   => 1,
+            Key         => 'ToDo', // ArticleFlagKey
+            Keywords    => Keywords,
+            Subject     => Subject,
+            Note        => Note,
+        );
+=cut
+
+sub ArticleFlagDataSet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID Key UserID)) {
+        if ( !defined( $Param{$Needed} ) ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "ArticleFlagDataSet: Need $Needed!" );
+            return;
+        }
+    }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
+    # db quote
+    for my $Quote (qw(Notes Subject Keywords Key)) {
+        $Param{$Quote} = $Kernel::OM->Get('DB')->Quote( $Param{$Quote} );
+    }
+    for my $Quote (qw(ArticleID)) {
+        $Param{$Quote} = $Kernel::OM->Get('DB')->Quote( $Param{$Quote}, 'Integer' );
+    }
+
+    # check if update is needed
+    my %ArticleFlagData = $Self->ArticleFlagDataGet(
+        ArticleID      => $Param{ArticleID},
+        ArticleFlagKey => $Param{Key},
+        UserID         => $Param{UserID},
+    );
+
+    # return 1 if ( %ArticleFlagData && $ArticleFlagData{ $Param{TicketID} } eq $Param{Notes} );
+
+    # update action
+    if (
+        defined( $ArticleFlagData{ $Param{ArticleID} } )
+        && defined( $ArticleFlagData{ $Param{Key} } )
+        )
+    {
+        return if !$Kernel::OM->Get('DB')->Do(
+            SQL =>
+                'UPDATE kix_article_flag SET note = ?, subject = ?, keywords = ? '
+                . 'WHERE article_id = ? AND article_key = ? AND create_by = ? ',
+            Bind => [
+                \$Param{Note},      \$Param{Subject}, \$Param{Keywords},
+                \$Param{ArticleID}, \$Param{Key},     \$Param{UserID}
+            ],
+        );
+
+        # push client callback event
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+        );
+    }
+
+    # insert action
+    else {
+        return if !$Kernel::OM->Get('DB')->Do(
+            SQL =>
+                'INSERT INTO kix_article_flag (article_id, article_key, keywords, subject, note, create_by) '
+                . ' VALUES (?, ?, ?, ?, ?, ?)',
+            Bind => [
+                \$Param{ArticleID}, \$Param{Key},  \$Param{Keywords},
+                \$Param{Subject},   \$Param{Note}, \$Param{UserID}
+            ],
+        );
+
+        # push client callback event
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'CREATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+        );
+    }
+
+    return 1;
+}
+
+=item ArticleFlagDataDelete()
+
+delete ....
+
+    my $Success = $TicketObject->ArticleFlagDataDelete(
+            ArticleID   => 1,
+            Key         => 'ToDo',
+            UserID      => $UserID,  # use either UserID or AllUsers
+        );
+
+    my $Success = $TicketObject->ArticleFlagDataDelete(
+            ArticleID   => 1,
+            Key         => 'ToDo',
+            AllUsers    => 1,        # delete flag data from all users for this article
+        );
+=cut
+
+sub ArticleFlagDataDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID Key)) {
+        if ( !defined( $Param{$Needed} ) ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "ArticleFlagDataDelete: Need $Needed!" );
+            return;
+        }
+    }
+    if ( !defined $Param{UserID} && !defined $Param{AllUsers} ) {
+        $Kernel::OM->Get('Log')
+            ->Log(
+            Priority => 'error',
+            Message  => "ArticleFlagDataDelete: Need either UserID or AllUsers!"
+            );
+        return;
+    }
+
+    # get Article
+    my %Article = $Self->ArticleGet(
+        ArticleID => $Param{ArticleID}
+    );
+
+    # check if UserID or AllUsers set
+    if ( $Param{UserID} ) {
+
+        # insert action
+        return if !$Kernel::OM->Get('DB')->Do(
+            SQL =>
+                'DELETE FROM kix_article_flag'
+                . ' WHERE article_id = ? AND article_key = ? AND create_by = ? ',
+            Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
+        );
+    }
+    else {
+
+        # insert action
+        return if !$Kernel::OM->Get('DB')->Do(
+            SQL =>
+                'DELETE FROM kix_article_flag'
+                . ' WHERE article_id = ? AND article_key = ? ',
+            Bind => [ \$Param{ArticleID}, \$Param{Key} ],
+        );
+    }
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Flag',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+    );
+
+    return 1;
+}
+
+=item ArticleFlagDataGet()
+
+get ....
+
+    my $Success = $TicketObject->ArticleFlagDataGet(
+            ArticleID      => 1,
+            ArticleFlagKey => 'ToDo',
+            UserID         => 1
+        );
+=cut
+
+sub ArticleFlagDataGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID ArticleFlagKey UserID)) {
+        if ( !defined( $Param{$Needed} ) ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "ArticleFlagGet: Need $Needed!" );
+            return;
+        }
+    }
+
+    # fetch the result
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => 'SELECT article_id, article_key, subject, keywords, note, create_by'
+            . ' FROM kix_article_flag'
+            . ' WHERE article_id = ? AND article_key = ? AND create_by = ?',
+        Bind => [ \$Param{ArticleID}, \$Param{ArticleFlagKey}, \$Param{UserID} ],
+        Limit => 1,
+    );
+
+    my %ArticleFlagData;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $ArticleFlagData{ArticleID} = $Row[0];
+        $ArticleFlagData{Key}       = $Row[1];
+        $ArticleFlagData{Subject}   = $Row[2];
+        $ArticleFlagData{Keywords}  = $Row[3];
+        $ArticleFlagData{Note}      = $Row[4];
+        $ArticleFlagData{CreateBy}  = $Row[5];
+    }
+
+    return %ArticleFlagData;
+}
+
+=item SendLinkedPersonNotification()
+
+send linked person notification via email
+
+    my $Success = $TicketObject->SendLinkedPersonNotification(
+        TicketID    => 123,
+        ArticleID   => 123,
+        CustomerMessageParams => {
+            SomeParams => 'For the message!',
+        },
+        Type       => 'LinkedPersonPhoneNotification' || 'LinkedPersonNoteNotification',
+        Recipients => $UserID,
+        UserID     => 123,
+    );
+
+Events:
+    ArticleLinkedPersonNotification
+
+=cut
+
+sub SendLinkedPersonNotification {
+    my ( $Self, %Param ) = @_;
+    my @Cc;
+
+    # check needed stuff
+    for (qw(CustomerMessageParams TicketID Type Recipients UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "SendLinkedPersonNotification: Need $_!" );
+            return;
+        }
+    }
+
+    # return if no notification is active
+    return 1 if $Self->{SendNoNotification};
+
+    # proceed selected linked persons
+    return if ref $Param{Recipients} ne 'ARRAY';
+    for my $RecipientStr ( @{ $Param{Recipients} } ) {
+        my ( $RecipientType, $RecipientID ) = split( ':::', $RecipientStr );
+
+        my %User;
+        if ( $RecipientType eq 'Agent' ) {
+            %User = $Kernel::OM->Get('User')->GetUserData(
+                UserID => $RecipientID,
+            );
+        }
+        else {
+            %User = $Kernel::OM->Get('Contact')->ContactGet(
+                ID => $RecipientID,
+            );
+        }
+        next if !$User{UserEmail} || $User{UserEmail} !~ /@/;
+
+        my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
+        my %Notification = $TemplateGeneratorObject->NotificationLinkedPerson(
+            Type                  => $Param{Type},
+            TicketID              => $Param{TicketID},
+            ArticleID             => $Param{ArticleID} || '',
+            CustomerMessageParams => $Param{CustomerMessageParams},
+            RecipientID           => $RecipientID,
+            RecipientType         => $RecipientType,
+            RecipientData         => \%User,
+            UserID                => $Param{UserID},
+        );
+        next if !%Notification || !$Notification{Subject} || !$Notification{Body};
+
+        # send notify
+        $Kernel::OM->Get('Email')->Send(
+            From => $Kernel::OM->Get('Config')->Get('NotificationSenderName') . ' <'
+                . $Kernel::OM->Get('Config')->Get('NotificationSenderEmail') . '>',
+            To       => $User{UserEmail},
+            Subject  => $Notification{Subject},
+            MimeType => $Notification{ContentType} || 'text/plain',
+            Charset  => $Notification{Charset},
+            Body     => $Notification{Body},
+            Loop     => 1,
+        );
+
+        # save person name for Cc update
+        push( @Cc, $User{UserEmail} );
+
+        # write history
+        $Param{HistoryName} = 'Involved Person Phone';
+        if ( $Param{Type} eq 'InvolvedNoteNotification' ) {
+            $Param{HistoryName} = 'Involved Person Note';
+        }
+        $Self->HistoryAdd(
+            TicketID     => $Param{TicketID},
+            HistoryType  => 'SendLinkedPersonNotification',
+            Name         => "$Param{HistoryName}: $User{UserEmail}",
+            CreateUserID => $Param{UserID},
+        );
+
+        # log event
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "Sent '$Param{Type}' notification to $RecipientType '$RecipientID'.",
+        );
+
+        # event
+        $Self->EventHandler(
+            Event => 'ArticleLinkedPersonNotification',
+            Data  => {
+                RecipientID => $RecipientID,
+                TicketID    => $Param{TicketID},
+                ArticleID   => $Param{ArticleID},
+            },
+            UserID => $Param{UserID},
+        );
+    }
+
+    # update article Cc
+    if (@Cc) {
+        $Self->ArticleUpdate(
+            ArticleID => $Param{ArticleID},
+            TicketID  => $Param{TicketID},
+            Key       => 'Cc',
+            Value     => join( ',', @Cc ),
+            UserID    => $Param{UserID},
+        );
+    }
+
+    return 1;
+}
+
+=item TicketAccountedTimeDelete()
+
+deletes the accounted time of a ticket.
+
+    my $Success = $TicketObject->TicketAccountedTimeDelete(
+        TicketID    => 1234,
+        ArticleID   => 1234
+    );
+
+=cut
+
+sub TicketAccountedTimeDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')
+                ->Log( Priority => 'error', Message => "Need $Needed!" );
+            return;
+        }
+    }
+
+    # db query
+    if ( $Param{ArticleID} ) {
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL => 'DELETE FROM time_accounting WHERE ticket_id = ? AND article_id = ?',
+            Bind => [ \$Param{TicketID}, \$Param{ArticleID} ],
+        );
+    }
+    else {
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL  => 'DELETE FROM time_accounting WHERE ticket_id = ?',
+            Bind => [ \$Param{TicketID} ],
+        );
+    }
+
+    return 1;
+}
+
+sub GetLinkedTickets {
+    my ( $Self, %Param ) = @_;
+
+    my $SQL = 'SELECT DISTINCT target_key FROM link_relation WHERE source_key = ?';
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => $SQL,
+        Bind => [ \$Param{Customer} ],
+    );
+    my @TicketIDs;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        push @TicketIDs, $Row[0];
+    }
+    return @TicketIDs;
+}
+
+# Levenshtein algorithm taken from
+# http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Levenshtein_distance#Perl
+sub _CalcStringDistance {
+    my ( $Self, $StringA, $StringB ) = @_;
+    my ( $len1, $len2 ) = ( length $StringA, length $StringB );
+    return $len2 if ( $len1 == 0 );
+    return $len1 if ( $len2 == 0 );
+    my %d;
+    for ( my $i = 0; $i <= $len1; ++$i ) {
+        for ( my $j = 0; $j <= $len2; ++$j ) {
+            $d{$i}{$j} = 0;
+            $d{0}{$j} = $j;
+        }
+        $d{$i}{0} = $i;
+    }
+
+    # Populate arrays of characters to compare
+    my @ar1 = split( //, $StringA );
+    my @ar2 = split( //, $StringB );
+    for ( my $i = 1; $i <= $len1; ++$i ) {
+        for ( my $j = 1; $j <= $len2; ++$j ) {
+            my $cost = ( $ar1[ $i - 1 ] eq $ar2[ $j - 1 ] ) ? 0 : 1;
+            my $min1 = $d{ $i - 1 }{$j} + 1;
+            my $min2 = $d{$i}{ $j - 1 } + 1;
+            my $min3 = $d{ $i - 1 }{ $j - 1 } + $cost;
+            if ( $min1 <= $min2 && $min1 <= $min3 ) {
+                $d{$i}{$j} = $min1;
+            }
+            elsif ( $min2 <= $min1 && $min2 <= $min3 ) {
+                $d{$i}{$j} = $min2;
+            }
+            else {
+                $d{$i}{$j} = $min3;
+            }
+        }
+    }
+    return $d{$len1}{$len2};
 }
 
 =item TicketCalendarGet()
