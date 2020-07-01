@@ -195,7 +195,7 @@ sub Run {
     # return result    
     return $Self->_Success(
         Code         => 'Object.Created',
-        PermissionID => $PermissionID,
+        PermissionID => 0 + $PermissionID,
     );    
 }
 
