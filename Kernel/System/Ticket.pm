@@ -533,10 +533,7 @@ sub TicketCreate {
     $Self->EventHandler(
         Event => 'TicketCreate',
         Data  => {
-            TicketID => $TicketID,
-            # KIX4OTRS-capeIT
-            TicketTemplate => $Param{TicketTemplate} || '',     # info for checklist eventhandler
-            # EO KIX4OTRS-capeIT
+            TicketID => $TicketID
         },
         UserID => $Param{UserID},
     );

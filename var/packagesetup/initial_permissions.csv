@@ -92,7 +92,7 @@
 "Customer";"Resource";"/contacts";"x";"x";;;
 "Customer";"Resource";"/faq";;"x";;;
 "Customer";"Resource";"/faq/*";;;;;
-"Customer";"Resource";"/faq/articles";;"x";;;   
+"Customer";"Resource";"/faq/articles";;"x";;;
 "Customer";"PropertyValue";"/faq/articles/*{FAQArticle.CustomerVisible NE 1}";;;;;
 "Customer";"Resource";"/faq/articles/*/votes";"x";"x";;;
 "Customer";"Resource";"/i18n";;"x";;;
@@ -114,7 +114,6 @@
 "Customer";"Resource";"/system/faq/*";;;;;
 "Customer";"Resource";"/system/faq/categories";;"x";;;
 "Customer";"Resource";"/system/ticket";;"x";;;
-"Customer";"PropertyValue";"/system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}";;;;;
 "Customer";"Resource";"/system/users";;"x";;;
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
