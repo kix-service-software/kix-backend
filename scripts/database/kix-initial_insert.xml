@@ -1517,17 +1517,6 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Customer": permission _____ on /system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
     <!-- role "Customer": permission _R___ on /system/users -->
     <Insert Table="role_permission">
         <Data Key="role_id">13</Data>

@@ -112,17 +112,6 @@
       "type": "integer",
       "readOnly": true
     },
-    "ServiceID": {
-      "anyOf": [
-        {
-          "type": "integer"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "readOnly": true
-    },
     "State": {
       "type": "string",
       "readOnly": true

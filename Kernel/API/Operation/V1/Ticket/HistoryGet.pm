@@ -111,7 +111,7 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             TicketID             => '1',                                           # required
-            HistoryID            => '32,33',                                       # required, could be coma separated IDs or an Array
+            HistoryID            => '32,33',                                       # required, could be comma separated IDs or an Array
         },
     );
 

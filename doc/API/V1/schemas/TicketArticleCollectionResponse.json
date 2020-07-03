@@ -166,7 +166,7 @@
                "type" : "integer",
                "readOnly" : true
             },
-            "Attachmnets" : {
+            "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {

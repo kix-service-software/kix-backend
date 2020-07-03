@@ -96,7 +96,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID             => '32,33',                                       # required, could be coma separated IDs or an Array
+            TicketID             => '32,33',                                       # required, could be comma separated IDs or an Array
             Extended             => 0,                                             # Optional, 0 as default. Add extended data (escalation data, ...)
             include              => '...',                                         # Optional, 0 as default. Include additional objects
                                                                                    # (supported: DynamicFields, Articles)

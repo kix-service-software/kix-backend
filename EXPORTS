@@ -208,7 +208,6 @@ SystemMaintenance                                                             = 
 TemplateGenerator                                                             = Kernel::System::TemplateGenerator
 TextModule                                                                    = Kernel::System::TextModule
 Ticket                                                                        = Kernel::System::Ticket
-TicketTemplate                                                                = Kernel::System::TicketTemplate
 Time                                                                          = Kernel::System::Time
 Token                                                                         = Kernel::System::Token
 Translation                                                                   = Kernel::System::Translation
