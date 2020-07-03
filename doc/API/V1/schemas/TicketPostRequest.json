@@ -44,9 +44,6 @@
             "ResponsibleID" : {
                "type" : "integer"
             },
-            "ServiceID" : {
-               "type" : "integer"
-            },
             "StateID" : {
                "type" : "integer"
             },

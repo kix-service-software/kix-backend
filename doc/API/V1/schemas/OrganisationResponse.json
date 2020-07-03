@@ -389,7 +389,7 @@
                "type" : "integer",
                "readOnly" : true
             },
-            "Attachmnets" : {
+            "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
@@ -755,17 +755,6 @@
             },
             "ResponsibleID" : {
                "type" : "integer",
-               "readOnly" : true
-            },
-            "ServiceID" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
                "readOnly" : true
             },
             "State" : {
