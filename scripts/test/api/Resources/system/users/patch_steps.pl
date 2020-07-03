@@ -35,12 +35,7 @@ When qr/I update this user$/, sub {
       Content => {
         User => {
             UserEmail => "john.doe2".rand()."\@example.com",
-            UserFirstname => "John",
-            UserLastname => "Doe",
-            UserLogin => "jdoe".rand(),
-            UserPw => "secret2".rand(),
-            UserTitle => "DR.",
-            ValidID => 1
+            ValidID => 2
         }
       }
    );
