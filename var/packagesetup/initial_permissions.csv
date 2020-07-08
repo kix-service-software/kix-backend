@@ -12,6 +12,8 @@
 "Agent User";"Resource";"/system/communication";;"x";;;
 "Agent User";"Resource";"/system/communication/*";;;;;
 "Agent User";"Resource";"/system/communication/notifications";;"x";;;
+"Agent User";"Resource";"/system/dynamicfields";;"x";;;
+"Agent User";"Resource";"/watchers";"x";"x";"x";"x";
 "Agent User";"Resource";"/i18n";;"x";;;
 "Ticket Reader";"Resource";"/tickets";;"x";;;
 "Ticket Reader";"Resource";"/tickets/*/articles/*/flags";"x";"x";"x";"x";
@@ -59,6 +61,7 @@
 "FAQ Reader";"Resource";"/faq";;"x";;;
 "FAQ Reader";"Resource";"/faq/*";;;;;
 "FAQ Reader";"Resource";"/faq/articles";;"x";;;
+"FAQ Reader";"Resource";"/faq/articles/*/votes";"x";"x";"x";"x";
 "FAQ Reader";"Resource";"/links";;"x";;;
 "FAQ Editor";"Resource";"/system/faq";;"x";;;
 "FAQ Editor";"Resource";"/system/faq/*";;;;;
