@@ -11,8 +11,8 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
 #    And the response object is PermissionCollectionResponse
     And the response contains 1 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target                                                                                                        | Value | TypeID |
-      | /*                                                                                                            | 15    | 1      |
+      | Target | Value | TypeID |
+      | /*     | 15    | 1      |
 
   Scenario: get the list of existing permissions of System Admin
     When I query the collection of permissions with roleid 2

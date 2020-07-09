@@ -8,9 +8,9 @@ Feature: GET request to the /system/dynamicfields/types resource
   Scenario: get a collection of existing dynamicfield types
     When I get a collection of dynamicfield types
     Then the response code is 200
+    Then the response contains 14 items of type "DynamicFieldType"
     And the response contains the following items of type DynamicFieldType
       | Name                      | DisplayName               |
-      | ActivityID                | ActivityID                |
       | Checkbox                  | Checkbox                  |
       | CheckList                 | Checklist                 |
       | Contact                   | ObjectReference           |
@@ -21,9 +21,9 @@ Feature: GET request to the /system/dynamicfields/types resource
       | MultiselectGeneralCatalog | MultiselectGeneralCatalog |
       | ObjectReference           | ObjectReference           |
       | Organisation              | ObjectReference           |
-      | ProcessID                 | ProcessID                 |
       | RemoteDB                  | RemoteDB                  |
       | Text                      | Text                      |
       | TextArea                  | Textarea                  |
       | User                      | ObjectReference           |
-    
+
+

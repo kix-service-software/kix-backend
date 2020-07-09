@@ -32,5 +32,6 @@ When qr/I query the collection of dynamicfields$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/dynamicfields',
+      Sort  => 'DynamicField.Name:textual'
    );
 };
