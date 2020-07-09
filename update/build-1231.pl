@@ -15,13 +15,8 @@ use FindBin qw($Bin);
 use lib dirname($Bin);
 use lib dirname($Bin) . '/Kernel/cpan-lib';
 
-use Getopt::Std;
-use File::Path qw(mkpath);
-use Data::UUID;
-
 use Kernel::System::ObjectManager;
 use Kernel::System::VariableCheck qw(:all);
-use Kernel::System::EmailParser;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
@@ -29,7 +24,6 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
         LogPrefix => 'framework_update-to-build-1231',
     },
 );
-my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
