@@ -808,65 +808,63 @@ sub TicketSubjectBuild {
         );
         return;
     }
-    my $Subject = $Param{Subject} || '';
-    my $Action  = $Param{Action}  || 'Reply';
 
-    # cleanup of subject, remove existing ticket numbers and reply indentifier
-    if ( !$Param{NoCleanup} ) {
-        $Subject = $Self->TicketSubjectClean(%Param);
-    }
+    my $Subject = $Param{Subject} || '';
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    # get config options
-    my $TicketHook          = $ConfigObject->Get('Ticket::Hook');
-    my $TicketHookDivider   = $ConfigObject->Get('Ticket::HookDivider') || '';
-    my $TicketSubjectRe     = $ConfigObject->Get('Ticket::SubjectRe');
-    my $TicketSubjectFwd    = $ConfigObject->Get('Ticket::SubjectFwd');
-    my $TicketSubjectFormat = $ConfigObject->Get('Ticket::SubjectFormat') || 'Left';
+    my $TicketSubjectFormat = $ConfigObject->Get('Ticket::SubjectFormat') || 'Right';
 
-    # return subject for new tickets
-    if ( $Param{Type} && $Param{Type} eq 'New' ) {
-        if ( lc $TicketSubjectFormat eq 'right' ) {
-            return $Subject . " [$TicketHook$TicketHookDivider$Param{TicketNumber}]";
-        }
-        if ( lc $TicketSubjectFormat eq 'none' ) {
-            return $Subject;
-        }
-        return "[$TicketHook$TicketHookDivider$Param{TicketNumber}] " . $Subject;
-    }
+    if ( lc $TicketSubjectFormat ne 'none') {
 
-    # return subject for existing tickets
-    if ( $Action eq 'Forward' ) {
-        if ($TicketSubjectFwd) {
-            $TicketSubjectFwd .= ': ';
+        my $Action  = $Param{Action} || 'Reply';
+
+        # cleanup of subject, remove existing ticket numbers and reply indentifier
+        if ( !$Param{NoCleanup} ) {
+            $Subject = $Self->TicketSubjectClean(%Param);
         }
-        if ( lc $TicketSubjectFormat eq 'right' ) {
-            return $TicketSubjectFwd . $Subject
-                . " [$TicketHook$TicketHookDivider$Param{TicketNumber}]";
+
+        # get config options
+        my $TicketHook          = $ConfigObject->Get('Ticket::Hook');
+        my $TicketHookDivider   = $ConfigObject->Get('Ticket::HookDivider') || '';
+        my $TicketSubjectRe     = $ConfigObject->Get('Ticket::SubjectRe');
+        my $TicketSubjectFwd    = $ConfigObject->Get('Ticket::SubjectFwd');
+
+        # return subject for new tickets
+        if ( $Param{Type} && $Param{Type} eq 'New' ) {
+            if ( lc $TicketSubjectFormat eq 'right' ) {
+                return $Subject . " [$TicketHook$TicketHookDivider$Param{TicketNumber}]";
+            }
+            return "[$TicketHook$TicketHookDivider$Param{TicketNumber}] " . $Subject;
         }
-        if ( lc $TicketSubjectFormat eq 'none' ) {
-            return $TicketSubjectFwd . $Subject;
+
+        # return subject for existing tickets
+        if ( $Action eq 'Forward' ) {
+            if ($TicketSubjectFwd) {
+                $TicketSubjectFwd .= ': ';
+            }
+            if ( lc $TicketSubjectFormat eq 'right' ) {
+                return $TicketSubjectFwd . $Subject
+                    . " [$TicketHook$TicketHookDivider$Param{TicketNumber}]";
+            }
+            return $TicketSubjectFwd
+                . "[$TicketHook$TicketHookDivider$Param{TicketNumber}] "
+                . $Subject;
+        } else {
+            if ($TicketSubjectRe) {
+                $TicketSubjectRe .= ': ';
+            }
+            if ( lc $TicketSubjectFormat eq 'right' ) {
+                return $TicketSubjectRe . $Subject
+                    . " [$TicketHook$TicketHookDivider$Param{TicketNumber}]";
+            }
+            return $TicketSubjectRe
+                . "[$TicketHook$TicketHookDivider$Param{TicketNumber}] "
+                . $Subject;
         }
-        return
-            $TicketSubjectFwd
-            . "[$TicketHook$TicketHookDivider$Param{TicketNumber}] "
-            . $Subject;
     }
-    else {
-        if ($TicketSubjectRe) {
-            $TicketSubjectRe .= ': ';
-        }
-        if ( lc $TicketSubjectFormat eq 'right' ) {
-            return $TicketSubjectRe . $Subject
-                . " [$TicketHook$TicketHookDivider$Param{TicketNumber}]";
-        }
-        if ( lc $TicketSubjectFormat eq 'none' ) {
-            return $TicketSubjectRe . $Subject;
-        }
-        return $TicketSubjectRe . "[$TicketHook$TicketHookDivider$Param{TicketNumber}] " . $Subject;
-    }
+    return $Subject;
 }
 
 =item TicketSubjectClean()
@@ -912,22 +910,20 @@ sub TicketSubjectClean {
     # remove all possible ticket hook formats with []
     $Subject =~ s/\[\s*\Q$TicketHook: $Param{TicketNumber}\E\s*\]\s*//g;
     $Subject =~ s/\[\s*\Q$TicketHook:$Param{TicketNumber}\E\s*\]\s*//g;
+    $Subject =~ s/\[\s*\Q$TicketHook$Param{TicketNumber}\E\s*\]\s*//g;
     $Subject =~ s/\[\s*\Q$TicketHook$TicketHookDivider$Param{TicketNumber}\E\s*\]\s*//g;
 
     # remove all ticket numbers with []
-    if ( $ConfigObject->Get('Ticket::SubjectCleanAllNumbers') ) {
-        $Subject =~ s/\[\s*\Q$TicketHook$TicketHookDivider\E\d+?\s*\]\s*//g;
-    }
+    $Subject =~ s/\[\s*\Q$Param{TicketNumber}\E\s*\]\s*//g;
 
     # remove all possible ticket hook formats without []
-    $Subject =~ s/\Q$TicketHook: $Param{TicketNumber}\E\s*//g;
-    $Subject =~ s/\Q$TicketHook:$Param{TicketNumber}\E\s*//g;
-    $Subject =~ s/\Q$TicketHook$TicketHookDivider$Param{TicketNumber}\E\s*//g;
+    $Subject =~ s/\Q$TicketHook: $Param{TicketNumber}\E(?!\d)\s*//g;
+    $Subject =~ s/\Q$TicketHook:$Param{TicketNumber}\E(?!\d)\s*//g;
+    $Subject =~ s/\Q$TicketHook$Param{TicketNumber}\E(?!\d)\s*//g;
+    $Subject =~ s/\Q$TicketHook$TicketHookDivider$Param{TicketNumber}\E(?!\d)\s*//g;
 
     # remove all ticket numbers without []
-    if ( $ConfigObject->Get('Ticket::SubjectCleanAllNumbers') ) {
-        $Subject =~ s/\Q$TicketHook$TicketHookDivider\E\d+?\s*//g;
-    }
+    $Subject =~ s/(?<!\d)\Q$Param{TicketNumber}\E(?!\d)\s*//g;
 
     # remove leading number with configured "RE:\s" or "RE[\d+]:\s" e. g. "RE: " or "RE[4]: "
     $Subject =~ s/^($TicketSubjectRe(\[\d+\])?:\s)+//i;

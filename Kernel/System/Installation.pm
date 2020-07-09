@@ -326,14 +326,14 @@ sub Update {
         my $Failed = 0;
         my $LastBuild = 0;
         BUILDNUMBER:
-        foreach my $NummericBuild (sort { $a cmp $b } keys %BuildList) {
-            next if $NummericBuild <= $Param{SourceBuild};
-            last if $NummericBuild > $Param{TargetBuild};
+        foreach my $NumericBuild (sort { $a <=> $b } keys %BuildList) {
+            next if $NumericBuild <= $Param{SourceBuild};
+            last if $NumericBuild > $Param{TargetBuild};
 
             my $Result = $Self->_DoUpdate(
                 Name      => $UpdateItem->{Name},
                 Directory => $UpdateItem->{Directory},
-                Build     => $BuildList{$NummericBuild}
+                Build     => $BuildList{$NumericBuild}
             );
 
             if ( !$Result ) {
@@ -345,7 +345,7 @@ sub Update {
                 last BUILDNUMBER;
             }
 
-            $LastBuild = $NummericBuild;
+            $LastBuild = $NumericBuild;
         }
 
         if ( !$Failed ) {

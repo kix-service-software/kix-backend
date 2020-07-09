@@ -17,11 +17,11 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::SubjectSize" Required="1" Valid="1">
-        <Description Translatable="1">Max size of the subjects in an email reply and in some overview screens.</Description>
+        <Description Translatable="1">Max size of the subjects in an email article.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
-            <String Regex="^[0-9]{1,3}$">100</String>
+            <String Regex="^[0-9]{1,3}$">120</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::SubjectRe" Required="1" Valid="1">
@@ -29,7 +29,7 @@
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
-            <String Regex="">Re</String>
+            <String Regex="">RE</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::SubjectFwd" Required="1" Valid="1">
@@ -37,15 +37,15 @@
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
-            <String Regex="">Fwd</String>
+            <String Regex="">FW</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::SubjectFormat" Required="1" Valid="1">
-        <Description Translatable="1">The format of the subject. 'Left' means '[TicketHook#:12345] Some Subject', 'Right' means 'Some Subject [TicketHook#:12345]', 'None' means 'Some Subject' and no ticket number. In the latter case you should verify that the setting PostMaster::CheckFollowUpModule###0200-References is activated to recognize followups based on email headers.</Description>
+        <Description Translatable="1">The format of the subject. 'Left' means '[TicketHook#:12345] Some Subject', 'Right' means 'Some Subject [TicketHook#:12345]', 'None' means no automatically added ticket number (subject will be like it is). In the latter case (if not number is already included) you should verify that the setting PostMaster::CheckFollowUpModule###0200-References is activated to recognize followups based on email headers.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
-            <Option SelectedID="Left">
+            <Option SelectedID="Right">
                 <Item Key="Left" Translatable="1">Left</Item>
                 <Item Key="Right" Translatable="1">Right</Item>
                 <Item Key="None" Translatable="1">None</Item>
