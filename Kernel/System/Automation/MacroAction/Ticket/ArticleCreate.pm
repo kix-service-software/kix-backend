@@ -205,6 +205,7 @@ sub Run {
         Data     => {},
         UserID   => $Param{UserID},
     );
+
     $Param{Config}->{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{Subject},
@@ -212,6 +213,20 @@ sub Run {
         Data     => {},
         UserID   => $Param{UserID},
     );
+
+    # prepare subject if necessary
+    if ( $Param{Config}->{Channel} && $Param{Config}->{Channel} eq 'email' ) {
+        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+            TicketID => $Param{TicketID},
+        );
+        if (IsHashRefWithData(\%Ticket)) {
+            $Param{Config}->{Subject} = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
+                TicketNumber => $Ticket{TicketNumber},
+                Subject      => $Param{Config}->{Subject},
+                Type         => 'New'
+            );
+        }
+    }
 
     my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         %{ $Param{Config} },
