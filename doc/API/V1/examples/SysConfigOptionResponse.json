@@ -4,6 +4,7 @@
         "Context": null,
         "ContextMetadata": null,
         "Name": "DefaultUsedLanguages",
+        "ReadOnly": 0,
         "Value": {
             "de": "German",
             "en": "English"

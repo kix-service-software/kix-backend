@@ -101,9 +101,9 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID     => 1'                                             # required 
+            TicketID     => 1'                                             # required
             ArticleID    => 32,                                            # required
-            FlagName     => 'seen',                                        # required, could be coma separated IDs or an Array
+            FlagName     => 'seen',                                        # required, could be comma separated IDs or an Array
         },
     );
 
@@ -174,7 +174,7 @@ sub Run {
     if ( scalar(@FlagList) == 1 ) {
         return $Self->_Success(
             ArticleFlag => $FlagList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

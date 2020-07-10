@@ -106,8 +106,6 @@ perform TicketUpdate Operation. This will return the updated TicketID
                 Lock          => 'some lock name',                              # optional
                 TypeID        => 123,                                           # optional
                 Type          => 'some type name',                              # optional
-                ServiceID     => 123,                                           # optional
-                Service       => 'some service name',                           # optional
                 StateID       => 123,                                           # optional
                 State         => 'some state name',                             # optional
                 PriorityID    => 123,                                           # optional
@@ -431,67 +429,6 @@ sub _TicketUpdate {
                 Message => 'Unable to update ticket, please contact system administrator!',
             );
         }
-    }
-
-    # update Ticket->Service (allow removal)
-    my $Success;
-
-    # prevent comparison errors on undefined values
-    if ( !defined $TicketData{ServiceID} ) {
-        $TicketData{ServiceID} = '';
-    }
-    if ( !defined $Ticket->{ServiceID} ) {
-        $Ticket->{ServiceID} = '';
-    }
-
-    if ( $Ticket->{ServiceID} ne $TicketData{ServiceID} )
-    {
-        $Success = $TicketObject->TicketServiceSet(
-            ServiceID => $Ticket->{ServiceID},
-            TicketID  => $Param{TicketID},
-            UserID    => $Param{UserID},
-        );
-    }
-    else {
-
-        # data is the same as in ticket nothing to do
-        $Success = 1;
-    }
-
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Unable to update ticket, please contact system administrator!',
-        );
-    }
-
-    # prevent comparison errors on undefined values
-    if ( !defined $TicketData{SLAID} ) {
-        $TicketData{SLAID} = '';
-    }
-    if ( !defined $Ticket->{SLAID} ) {
-        $Ticket->{SLAID} = '';
-    }
-
-    if ( $Ticket->{SLAID} ne $TicketData{SLAID} )
-    {
-        $Success = $TicketObject->TicketSLASet(
-            SLAID    => $Ticket->{SLAID},
-            TicketID => $Param{TicketID},
-            UserID   => $Param{UserID},
-        );
-    }
-    else {
-
-        # data is the same as in ticket nothing to do
-        $Success = 1;
-    }
-
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code    => 'Object.UnableToUpdate',
-            Message => 'Unable to update ticket, please contact system administrator!',
-        );
     }
 
     # update Ticket->ContactID && Ticket->OrganisationID

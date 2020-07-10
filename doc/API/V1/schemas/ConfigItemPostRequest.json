@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConfigItemPostRequest",
+   "$id" : "ConfigItemPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The config item object for creation.",
    "type" : "object",
@@ -31,7 +31,7 @@
    ],
    "definitions" : {
       "ConfigItemImagePostItem_json-73d19caaba" : {
-         "$id" : "#ConfigItemImagePostItem",
+         "$id" : "ConfigItemImagePostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item image request object for creation.",
          "type" : "object",
@@ -56,7 +56,7 @@
          ]
       },
       "ConfigItemVersionPostItem_json-5e734e2dd7" : {
-         "$id" : "#ConfigItemVersionPostItem",
+         "$id" : "ConfigItemVersionPostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item version request object for creation.",
          "type" : "object",

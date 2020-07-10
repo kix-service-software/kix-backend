@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#ObjectIconResponse",
+  "$id": "ObjectIconResponse.json",
   "type": "object",
   "description": "A response for object icon GET request.",
   "properties": {

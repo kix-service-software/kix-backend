@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketPatchRequest",
+   "$id" : "TicketPatchRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket request object for update.",
    "type" : "object",
@@ -58,7 +58,7 @@
    ],
    "definitions" : {
       "DynamicFieldValueSetItem_json-16dfcaf043" : {
-         "$id" : "#DynamicFieldValueSetItem",
+         "$id" : "DynamicFieldValueSetItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
          "type" : "object",

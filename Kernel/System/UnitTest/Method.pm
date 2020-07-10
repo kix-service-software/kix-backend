@@ -54,7 +54,7 @@ if it's true, returning 1 in this case or undef, otherwise.
 sub True {
     my ( $Self, $True, $Name ) = @_;
 
-    $True = 0 if ($True < 0 && $Self->{Output} ne 'ALLURE');
+    $True = 0 if ($True && $True =~ /^\d+$/ && $True < 0 && $Self->{Output} ne 'Allure');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(
@@ -87,7 +87,7 @@ for a false value instead.
 sub False {
     my ( $Self, $False, $Name ) = @_;
 
-    $False = 0 if ($False < 0 && $Self->{Output} ne 'ALLURE');
+    $False = 0 if ($False && $False =~ /^\d+$/ && $False < 0 && $Self->{Output} ne 'Allure');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(
@@ -131,7 +131,7 @@ Returns 1 if the values were equal, or undef otherwise.
 sub Is {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
 
-    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output} ne 'ALLURE');
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output} ne 'Allure');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(
@@ -176,7 +176,7 @@ for inequality instead.
 sub IsNot {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
 
-    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output} ne 'Allure');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(
@@ -234,7 +234,7 @@ Returns 1 if the data structures are the same, or undef otherwise.
 sub IsDeeply {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
 
-    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output} ne 'Allure');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(
@@ -286,7 +286,7 @@ for inequality instead.
 sub IsNotDeeply {
     my ( $Self, $Test, $ShouldBe, $Name ) = @_;
 
-    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output} ne 'Allure');
 
     if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(

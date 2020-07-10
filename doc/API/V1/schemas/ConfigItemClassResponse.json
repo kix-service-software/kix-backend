@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConfigItemClassResponse",
+   "$id" : "ConfigItemClassResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for config item class GET request.",
    "type" : "object",
@@ -12,8 +12,8 @@
       "ConfigItemClass"
    ],
    "definitions" : {
-      "ConfigItemClassDefinition_json-01f549b109" : {
-         "$id" : "#ConfigItemClassDefinition",
+      "ConfigItemClassDefinition_json-3965c4d329" : {
+         "$id" : "ConfigItemClassDefinition.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class definition object.",
          "type" : "object",
@@ -66,7 +66,7 @@
          ]
       },
       "ConfigItemClass_json-70bafa8537" : {
-         "$id" : "#ConfigItemClass",
+         "$id" : "ConfigItemClass.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The config item class object.",
          "type" : "object",
@@ -117,13 +117,13 @@
                "readOnly" : true
             },
             "CurrentDefinition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
+               "$ref" : "#/definitions/ConfigItemClassDefinition_json-3965c4d329"
             },
             "Definitions" : {
                "description" : "added via include \"Definitions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-01f549b109"
+                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-3965c4d329"
                }
             },
             "ID" : {

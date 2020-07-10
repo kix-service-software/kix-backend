@@ -1,6 +1,6 @@
 {
   "$schema" : "http://json-schema.org/draft-07/schema",
-  "$id" : "#TicketArticleAttachmentPostItem",
+  "$id" : "TicketArticleAttachmentPostItem.json",
   "type" : "object",
   "description" : "The ticket article attachment object for creation.",
   "properties" : {

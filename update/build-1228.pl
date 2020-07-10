@@ -30,8 +30,6 @@ my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
-use vars qw(%INC);
-
 # updates permissions for role Customer
 _UpdatePermissionsForRoleCustomer();
 

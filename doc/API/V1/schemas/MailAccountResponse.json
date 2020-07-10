@@ -1,5 +1,5 @@
 {
-   "$id" : "#MailAccountResponse",
+   "$id" : "MailAccountResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for mail account GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "MailAccount_json-dcbaa55d9f" : {
-         "$id" : "#MailAccount",
+         "$id" : "MailAccount.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The mail account object.",
          "type" : "object",

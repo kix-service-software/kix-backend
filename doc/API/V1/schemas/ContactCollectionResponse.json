@@ -1,5 +1,5 @@
 {
-   "$id" : "#ContactCollectionResponse",
+   "$id" : "ContactCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of contacts.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "Contact_json-6250c28310" : {
-         "$id" : "#Contact",
+         "$id" : "Contact.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The contact object.",
          "type" : "object",
@@ -111,7 +111,7 @@
                "description" : "added via include \"Tickets\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Ticket_json-9720ce4c98"
+                  "$ref" : "#/definitions/Ticket_json-ba64a5843d"
                },
                "readOnly" : true
             },
@@ -144,8 +144,8 @@
             "ValidID"
          ]
       },
-      "DynamicFieldValue_json-95816834ee" : {
-         "$id" : "#DynamicFieldValue",
+      "DynamicFieldValue_json-be71ef3dd7" : {
+         "$id" : "DynamicFieldValue.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
          "type" : "object",
@@ -205,8 +205,8 @@
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-3fc26e02ab" : {
-         "$id" : "#TicketArticleAttachment",
+      "TicketArticleAttachment_json-7600499c9c" : {
+         "$id" : "TicketArticleAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
          "type" : "object",
@@ -260,8 +260,8 @@
             "ID"
          ]
       },
-      "TicketArticleFlag_json-73c45dc8a4" : {
-         "$id" : "#TicketArticleFlag",
+      "TicketArticleFlag_json-89efa3d6a9" : {
+         "$id" : "TicketArticleFlag.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
          "type" : "object",
@@ -285,8 +285,8 @@
             "Value"
          ]
       },
-      "TicketArticle_json-358c16fe85" : {
-         "$id" : "#TicketArticle",
+      "TicketArticle_json-1600e6953a" : {
+         "$id" : "TicketArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
          "type" : "object",
@@ -295,11 +295,11 @@
                "type" : "integer",
                "readOnly" : true
             },
-            "Attachmnets" : {
+            "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-7600499c9c"
                },
                "readOnly" : true
             },
@@ -365,7 +365,7 @@
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-be71ef3dd7"
                },
                "readOnly" : true
             },
@@ -373,7 +373,7 @@
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-89efa3d6a9"
                },
                "readOnly" : true
             },
@@ -474,8 +474,8 @@
             "ToRealname"
          ]
       },
-      "TicketHistory_json-b84d38baa5" : {
-         "$id" : "#TicketHistory",
+      "TicketHistory_json-675e6f1853" : {
+         "$id" : "TicketHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
          "type" : "object",
@@ -549,8 +549,8 @@
             "TypeID"
          ]
       },
-      "Ticket_json-9720ce4c98" : {
-         "$id" : "#Ticket",
+      "Ticket_json-ba64a5843d" : {
+         "$id" : "Ticket.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket object.",
          "type" : "object",
@@ -567,7 +567,7 @@
                "description" : "added via include \"Articles\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticle_json-358c16fe85"
+                  "$ref" : "#/definitions/TicketArticle_json-1600e6953a"
                },
                "readOnly" : true
             },
@@ -599,7 +599,7 @@
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-be71ef3dd7"
                },
                "readOnly" : true
             },
@@ -607,7 +607,7 @@
                "description" : "added via include \"History\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketHistory_json-b84d38baa5"
+                  "$ref" : "#/definitions/TicketHistory_json-675e6f1853"
                },
                "readOnly" : true
             },
@@ -663,17 +663,6 @@
                "type" : "integer",
                "readOnly" : true
             },
-            "ServiceID" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
             "State" : {
                "type" : "string",
                "readOnly" : true
@@ -727,7 +716,7 @@
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/Watcher_json-8eca247d7a"
+                  "$ref" : "#/definitions/Watcher_json-f701a2a417"
                },
                "readOnly" : true
             }
@@ -756,8 +745,8 @@
             "UntilTime"
          ]
       },
-      "Watcher_json-8eca247d7a" : {
-         "$id" : "#Watcher",
+      "Watcher_json-f701a2a417" : {
+         "$id" : "Watcher.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
          "type" : "object",

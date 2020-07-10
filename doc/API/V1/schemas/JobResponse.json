@@ -1,5 +1,5 @@
 {
-   "$id" : "#JobResponse",
+   "$id" : "JobResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for job GET request.",
    "type" : "object",
@@ -12,8 +12,8 @@
       "Job"
    ],
    "definitions" : {
-      "ExecPlan_json-cdf3609f11" : {
-         "$id" : "#ExecPlan",
+      "ExecPlan_json-7a38089203" : {
+         "$id" : "ExecPlan.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The execution plan object.",
          "type" : "object",
@@ -95,7 +95,7 @@
          ]
       },
       "Job_json-e9ce9ba85e" : {
-         "$id" : "#Job",
+         "$id" : "Job.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The job object.",
          "type" : "object",
@@ -132,7 +132,7 @@
                "description" : "assigned execution plans - added via include \"ExecPlans\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/ExecPlan_json-cdf3609f11"
+                  "$ref" : "#/definitions/ExecPlan_json-7a38089203"
                },
                "readOnly" : true
             },
@@ -156,7 +156,7 @@
                "description" : "assigned macros - added via include \"Macros\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/Macro_json-8a95f87e34"
+                  "$ref" : "#/definitions/Macro_json-4d53c91da4"
                },
                "readOnly" : true
             },
@@ -184,8 +184,8 @@
             "ValidID"
          ]
       },
-      "MacroAction_json-c2a5846916" : {
-         "$id" : "#MacroAction",
+      "MacroAction_json-71b614e70e" : {
+         "$id" : "MacroAction.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action object.",
          "type" : "object",
@@ -242,8 +242,8 @@
             "ValidID"
          ]
       },
-      "Macro_json-8a95f87e34" : {
-         "$id" : "#Macro",
+      "Macro_json-4d53c91da4" : {
+         "$id" : "Macro.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro object.",
          "type" : "object",
@@ -252,7 +252,7 @@
                "description" : "added via include \"Actions\"",
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-c2a5846916"
+                  "$ref" : "#/definitions/MacroAction_json-71b614e70e"
                },
                "readOnly" : true
             },

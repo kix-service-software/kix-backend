@@ -27,18 +27,16 @@ my $ConfigObject = $Kernel::OM->Get('Config');
 
 # configure auth backend to db
 $ConfigObject->Set(
-    Key   => 'AuthBackend',
-    Value => 'DB',
+    Key   => 'Authentication',
+    Value => {
+        "Enabled" => 1,
+        "Name" => "Local Database",
+        "Module" => "Kernel::System::Auth::DB",
+        "Config" => {
+            "CryptType" => "sha2"
+        }
+    },
 );
-
-# no additional auth backends
-for my $Count ( 1 .. 10 ) {
-
-    $ConfigObject->Set(
-        Key   => "AuthBackend$Count",
-        Value => '',
-    );
-}
 
 # disable email checks to create new user
 $ConfigObject->Set(

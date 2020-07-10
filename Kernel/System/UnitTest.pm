@@ -76,8 +76,8 @@ sub new {
     $Self->{Output} = $Param{Output} || 'ASCII';
 
     $Self->{ANSI} = $Param{ANSI};
-    if ($Self->{Output} eq 'ALLURE') {
-        $Self->{Adapter} = $Kernel::OM->Get('UnitTest::AllureAdapter')->new();
+    if ($Self->{Output} eq 'Allure') {
+        $Self->{Adapter} = $Kernel::OM->Get('Kernel::System::UnitTest::AllureAdapter')->new();
     }
 
     if ($Self->{Output} eq 'HTML') {
@@ -169,8 +169,9 @@ sub Run {
         $Directory =~ s/\.//g;
     }
 
-    $Self->{Verbose} = $Param{Verbose};
-    $Self->{Pretty} = $Param{Pretty};
+    $Self->{Verbose}         = $Param{Verbose};
+    $Self->{Pretty}          = $Param{Pretty};
+    $Self->{AllureOutputDir} = $Param{AllureOutputDir} || '/tmp/unit-test/allure-results';
 
     my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Directory,
@@ -179,7 +180,7 @@ sub Run {
     );
 
     my $StartTime = $Kernel::OM->Get('Time')->SystemTime();
-    $Self->{Adapter}->SetContainerStartTime($Self->{runningContainerId}, int(time() * 1000)) if ($Self->{Output} eq 'ALLURE');
+    $Self->{Adapter}->SetContainerStartTime($Self->{runningContainerId}, int(time() * 1000)) if ($Self->{Output} eq 'Allure');
     my $Product = $Param{Product}
         || $Kernel::OM->Get('Config')->Get('Product') . " "
         . $Kernel::OM->Get('Config')->Get('Version');
@@ -198,7 +199,7 @@ sub Run {
     $Self->{TestCountNotOk} = 0;
     FILE:
     for my $File (sort @Files) {
-        if ($Self->{Output} eq 'ALLURE') {
+        if ($Self->{Output} eq 'Allure') {
             $Self->{runningTestId} = '';
             $Self->{runningContainerId} = $Self->{Adapter}->NewContainer($File =~ /(?:.+\/test\/)(.+)/);
         }
@@ -227,12 +228,12 @@ sub Run {
 
         if (!$UnitTestFile) {
             print STDERR "ERROR: $!: $File\n";
-            $Self->_Print(0, "ERROR: $!: $File") if ($Self->{Output} ne 'ALLURE');
+            $Self->_Print(0, "ERROR: $!: $File") if ($Self->{Output} ne 'Allure');
             $Self->{OutputBuffer} = "$File is no Unit Test File! \n \$EVAL_ERROR:\n$@\n---\n\$EXTENDED_OS_ERROR\n$^E\n---\n\$CHILD_ERROR\n$?\n";
-            $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'ALLURE');
+            $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'Allure');
         }
         else {
-            $Self->_PrintHeadlineStart($File, ++$FileCount, $FileTotal) if ($Self->{Output} ne 'ALLURE');
+            $Self->_PrintHeadlineStart($File, ++$FileCount, $FileTotal) if ($Self->{Output} ne 'Allure');
 
             # create a new scope to be sure to destroy local object of the test files
             {
@@ -259,17 +260,17 @@ sub Run {
                 if (!eval ${$UnitTestFile}) {
                     $Self->{OutputBuffer} = "\$EVAL_ERROR:\n$@\n---\n\$EXTENDED_OS_ERROR\n$^E\n---\n\$CHILD_ERROR\n$?\n";
                     if ($@) {
-                        $Self->_Print(0, "ERROR: Error in $File: $@") if ($Self->{Output} ne 'ALLURE');
-                        $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'ALLURE');
+                        $Self->_Print(0, "ERROR: Error in $File: $@") if ($Self->{Output} ne 'Allure');
+                        $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'Allure');
                     }
                     else {
-                        $Self->_Print(0, "ERROR: $File did not return a true value.") if ($Self->{Output} ne 'ALLURE');
-                        $Self->{OutputBuffer} = 'Did not return a true value.\n ' . $Self->{OutputBuffer} if ($Self->{Output} eq 'ALLURE');
-                        $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'ALLURE');
+                        $Self->_Print(0, "ERROR: $File did not return a true value.") if ($Self->{Output} ne 'Allure');
+                        $Self->{OutputBuffer} = 'Did not return a true value.\n ' . $Self->{OutputBuffer} if ($Self->{Output} eq 'Allure');
+                        $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId})) if ($Self->{Output} eq 'Allure');
                     }
                 }
             }
-            if ($Self->{Output} ne 'ALLURE') {
+            if ($Self->{Output} ne 'Allure') {
                 $Self->_PrintHeadlineEnd($File);
             }
             else {
@@ -356,10 +357,10 @@ sub Run {
         #     return 1;
         # }
     }
-    if ($Self->{Output} eq 'ALLURE') {
+    if ($Self->{Output} eq 'Allure') {
         $Self->{Adapter}->SetExecutorInfo();
         $Self->{Adapter}->AddEnvironmentInfoFromSystem();
-        $Self->{Adapter}->CreateResults('/tmp/unit-test/allure-results');
+        $Self->{Adapter}->CreateResults($Self->{AllureOutputDir});
     }
     return $ResultSummary{TestNotOk} ? 0 : 1;
 }
@@ -498,14 +499,14 @@ sub _PrintSummary {
 sub _Print {
     my ($Self, $Test, $Name) = @_;
 
-    $Test = 0 if ($Test < 0 && $Self->{Output} ne 'ALLURE');
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output} ne 'Allure');
 
     $Name ||= '->>No Name!<<-';
 
     my $TestStep = $Name;
     $TestStep =~ s/^(.*?)\s\(.+?\)$/$1/s;
 
-    if ($Self->{Output} eq 'ALLURE') {
+    if ($Self->{Output} eq 'Allure') {
 
         $Self->{runningTestId} = $Self->{Adapter}->NewTest($Name, '', $Self->{runningContainerId});
         $Self->{Adapter}->SetTestSubSuite($Self->{runningTestId}, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));

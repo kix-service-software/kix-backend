@@ -71,17 +71,6 @@ sub _UpdatePermissionsForRoleCustomer {
             Permission => {
                 Role   => 'Customer',
                 Type   => 'PropertyValue',
-                Target => '/system/ticket/templates/*{TicketTemplate.CustomerVisible EQ 1}',
-            },
-            Change => {
-                Target => '/system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}',
-                Value  => 0,
-            }
-        },
-        {
-            Permission => {
-                Role   => 'Customer',
-                Type   => 'PropertyValue',
                 Target => '/tickets/*/articles/*{Article.CustomerVisible EQ 1}',
             },
             Change => {

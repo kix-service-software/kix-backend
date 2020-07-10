@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#TicketArticleAttachmentZipResponse",
+  "$id": "TicketArticleAttachmentZipResponse.json",
   "type": "object",
   "description": "A response for ticket article attachments as zip GET request.",
   "properties": {

@@ -349,50 +349,6 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::ShownAttributes" Required="1" Valid="1">
-        <Description Translatable="1">Defines which attributes are shown in customer table.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="0100::Number::Link">Number</Item>
-                <Item Key="0200::Name">Name</Item>
-                <Item Key="0300::Owner">Owner</Item>
-                <Item Key="0400::DeplState">Deployment State</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::CISearchInClasses" Required="1" Valid="1">
-        <Description Translatable="1">Defines in which CI-classes (keys) which attributes need to match the search pattern (values, comma separated if more than one attribute should be searched). For use with sub-attributes try this, key: attribute::sub-attribute, value: owner</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Computer">Owner</Item>
-                <Item Key="Hardware">Owner</Item>
-                <Item Key="Software">Owner</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::CIExcludeDeploymentStates" Required="1" Valid="1">
-        <Description Translatable="1">Defined DeploymentStates to hide ConfigItems.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
-        <Setting>
-            <Array>
-                <Item>Inactive</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="CustomerDashboardConfigItemLink::CIExcludeIncidentStates" Required="1" Valid="1">
-        <Description Translatable="1">Defined IncidentStates to hide ConfigItems.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Frontend::CustomerInformationCenter</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="AssignedConfigItemsMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines for which object type in which configitem class in which configitem attributes will be search with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon ("ParentAttribute::ChildAttribute::RelevantAttribut").</Description>

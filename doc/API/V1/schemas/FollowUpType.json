@@ -1,5 +1,5 @@
 {
-   "$id" : "#FollowUpType",
+   "$id" : "FollowUpType.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The followup type object.",
    "type" : "object",

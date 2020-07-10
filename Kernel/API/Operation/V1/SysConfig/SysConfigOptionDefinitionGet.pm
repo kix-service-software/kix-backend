@@ -132,7 +132,7 @@ sub Run {
 
         # get the SysConfig data
         my %Config = $SysConfigObject->OptionGet(
-            Name => $Option,    
+            Name => $Option,
         );
 
         if ( !IsHashRefWithData(\%Config) ) {

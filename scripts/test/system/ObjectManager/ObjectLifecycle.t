@@ -62,7 +62,6 @@ my @Objects = (
     'PID',
     'Priority',
     'Queue',
-    'Service',
     'StandardTemplate',
     'State',
     'SysConfig',

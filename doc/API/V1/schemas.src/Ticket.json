@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#Ticket",
+  "$id": "Ticket.json",
   "type": "object",
   "description": "The ticket object.",
   "properties": {
@@ -110,17 +110,6 @@
     },
     "ResponsibleID": {
       "type": "integer",
-      "readOnly": true
-    },
-    "ServiceID": {
-      "anyOf": [
-        {
-          "type": "integer"
-        },
-        {
-          "type": "null"
-        }
-      ],
       "readOnly": true
     },
     "State": {

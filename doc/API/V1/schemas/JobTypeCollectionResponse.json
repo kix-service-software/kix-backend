@@ -1,5 +1,5 @@
 {
-   "$id" : "#JobTypeCollectionResponse",
+   "$id" : "JobTypeCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of job types.",
    "type" : "object",

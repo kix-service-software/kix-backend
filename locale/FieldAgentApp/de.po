@@ -398,7 +398,7 @@ msgid "Finish Process"
 msgstr "Bearbeitung Beenden"
 
 msgid "Checkout"
-msgstr "Herunterladen"
+msgstr "Annehmen"
 
 msgid "Communication History"
 msgstr "Kommunikations-/Fallhistorie"
@@ -443,7 +443,7 @@ msgid "Deletes all locally stored ticket information and attachments"
 msgstr "Löscht alle lokal gespeicherten Ticketinformationen und Anhänge."
 
 msgid "Timetracking will be stopped autoamtically after {0} h"
-msgstr "Zeiterfassugn wird autom. naxh {0}h gestoppt."
+msgstr "Zeiterfassung wird autom. nach {0}h gestoppt."
 
 msgid "Entry is not visible on the exernal work report."
 msgstr "Eintrag ist nicht sichtbar im Arbeitsbericht (Kunde)."

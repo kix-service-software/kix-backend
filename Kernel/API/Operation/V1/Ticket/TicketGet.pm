@@ -96,7 +96,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID             => '32,33',                                       # required, could be coma separated IDs or an Array
+            TicketID             => '32,33',                                       # required, could be comma separated IDs or an Array
             Extended             => 0,                                             # Optional, 0 as default. Add extended data (escalation data, ...)
             include              => '...',                                         # Optional, 0 as default. Include additional objects
                                                                                    # (supported: DynamicFields, Articles)
@@ -130,8 +130,6 @@ one or more ticket entries in one call.
                     OwnerID            => 123,
                     Type               => 'some ticket type',
                     TypeID             => 123,
-                    Service            => 'some service',
-                    ServiceID          => 123,
                     Responsible        => 'some_responsible_login',
                     ResponsibleID      => 123,
                     Age                => 3456,
@@ -390,8 +388,6 @@ sub Run {
         #FIXME: workaround KIX2018-3308
         $TicketData{ContactID} = "" . $TicketData{ContactID};
         $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
-
-        $TicketData{ServiceID} = $TicketData{ServiceID} ? (0 + $TicketData{ServiceID}) : undef;
 
         # add
         push(@TicketList, \%TicketData);

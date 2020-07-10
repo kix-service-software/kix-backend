@@ -121,8 +121,8 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 Subject                         => 'some subject',             # required
                 Body                            => 'some body'                 # required
                 ContentType                     => 'some content type',        # ContentType or MimeType and Charset is requieed
-                MimeType                        => 'some mime type',           
-                Charset                         => 'some charset',           
+                MimeType                        => 'some mime type',
+                Charset                         => 'some charset',
 
                 IncomingTime                    => 'YYYY-MM-DD HH24:MI:SS',    # optional
                 ChannelID                       => 123,                        # optional
@@ -150,10 +150,10 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                         Filename    => 'some fine name'
                     },
                     # ...
-                ],                    
+                ],
                 DynamicFields => [                                                     # optional
                     {
-                        Name   => 'some name',                                          
+                        Name   => 'some name',
                         Value  => $Value,                                              # value type depends on the dynamic field
                     },
                     # ...
@@ -215,8 +215,8 @@ sub Run {
     }
 
     # check Article attribute values
-    my $ArticleCheck = $Self->_CheckArticle( 
-        Article => $Article 
+    my $ArticleCheck = $Self->_CheckArticle(
+        Article => $Article
     );
 
     if ( !$ArticleCheck->{Success} ) {
@@ -240,8 +240,8 @@ sub Run {
 creates a ticket with its article and sets dynamic fields and attachments if specified.
 
     my $Response = $OperationObject->_ArticleCreate(
-        Ticket       => $Ticket,                  
-        Article      => $Article,                 
+        Ticket       => $Ticket,
+        Article      => $Article,
         UserID       => 123,
     );
 
@@ -256,7 +256,7 @@ creates a ticket with its article and sets dynamic fields and attachments if spe
 
     $Response = {
         Success => 0,                         # if unexpected error
-        Code    => '...',  
+        Code    => '...',
         Message => '...'
     }
 
@@ -329,7 +329,7 @@ sub _ArticleCreate {
 
     # set Article To
     my $To;
-    if ( $Article->{To} ) { 
+    if ( $Article->{To} ) {
         $To = $Article->{To}
     }
     else {
@@ -341,6 +341,20 @@ sub _ArticleCreate {
                 QueueID => $Ticket->{QueueID},
             );
         }
+    }
+
+    # prepare subject if necessary
+    if ( $Article->{ChannelID} == 2 || (!$Article->{ChannelID} && $Article->{Channel} eq 'email') ) {
+        my $Re  = $Kernel::OM->Get('Config')->Get('Ticket::SubjectRe') || '(RE|AW)';
+        my $Fwd = $Kernel::OM->Get('Config')->Get('Ticket::SubjectFwd') || '(FW|FWD)';
+        my $IsReply   = $Article->{Subject} =~ m/^$Re:/i;
+        my $IsForward = $Article->{Subject} =~ m/^$Fwd:/i;
+        $Article->{Subject} = $TicketObject->TicketSubjectBuild(
+            TicketNumber => $Ticket->{TicketNumber},
+            Subject      => $Article->{Subject},
+            Action       => $IsForward ? 'Forward' : 'Reply',
+            Type         => (!$IsReply && !$IsForward) ? 'New' : undef
+        );
     }
 
     # prepare attachments
@@ -437,10 +451,6 @@ sub _ArticleCreate {
 1;
 
 =end Internal:
-
-
-
-
 
 =back
 

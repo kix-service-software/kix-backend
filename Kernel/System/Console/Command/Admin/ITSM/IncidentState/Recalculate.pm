@@ -18,7 +18,6 @@ use base qw(Kernel::System::Console::BaseCommand);
 our @ObjectDependencies = (
     'GeneralCatalog',
     'ITSMConfigItem',
-    'Service',
 );
 
 sub Configure {
@@ -74,43 +73,12 @@ sub Run {
 
     $Self->Print("\n<green>Ready. Recalculated $Count config items.</green>\n\n");
 
-    # get service object
-    my $ServiceObject = $Kernel::OM->Get('Service');
-
-    # get list of all services (valid and invalid)
-    my %ServiceList = $ServiceObject->ServiceList(
-        Valid  => 0,
-        UserID => 1,
-    );
-
-    my $NumberOfServices = scalar keys %ServiceList;
-
-    $Self->Print(
-        "<green>Resetting ServicePreferences 'CurInciStateTypeFromCIs' for $NumberOfServices services...</green>\n"
-    );
-
-    for my $ServiceID ( sort keys %ServiceList ) {
-
-        # update the current incident state type from CIs of the service with an empty value
-        # this is necessary to force a recalculation on a ServiceGet()
-        $ServiceObject->ServicePreferencesSet(
-            ServiceID => $ServiceID,
-            Key       => 'CurInciStateTypeFromCIs',
-            Value     => '',
-            UserID    => 1,
-        );
-    }
-
     $Self->Print("<green>Ready.</green>\n");
     return $Self->ExitCodeOk();
 
 }
 
 1;
-
-
-
-
 
 =back
 

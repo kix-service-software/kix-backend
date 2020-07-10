@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#TicketArticle",
+  "$id": "TicketArticle.json",
   "type": "object",
   "description": "The ticket article object.",
   "properties": {
@@ -8,7 +8,7 @@
       "type": "integer",
       "readOnly": true
     },
-    "Attachmnets": {
+    "Attachments": {
       "type": "array",
       "description": "added via include \"Attachments\"",
       "items": {
