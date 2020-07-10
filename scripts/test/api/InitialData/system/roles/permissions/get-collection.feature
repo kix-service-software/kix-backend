@@ -27,7 +27,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 3
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 14 items of type "Permission"
+    And the response contains 16 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                            | Value | TypeID |
       | /auth                                                                             | 1     | 1      |
@@ -43,13 +43,15 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/communication                                                             | 2     | 1      |
       | /system/communication/*                                                           | 0     | 1      |
       | /system/communication/notifications                                               | 2     | 1      |
+      | /system/dynamicfields                                                             | 2     | 1      |
+      | /watchers                                                                         | 15    | 1      |
       | /i18n                                                                             | 2     | 1      |
 
   Scenario: get the list of existing permissions of Ticket Reader
     When I query the collection of permissions with roleid 4
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 17 items of type "Permission"
+    And the response contains 16 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
       | /tickets                              | 2     | 1      |
@@ -73,7 +75,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 5
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 18 items of type "Permission"
+    And the response contains 17 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
       | /tickets                              | 15    | 1      |
@@ -112,8 +114,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of FAQ Reader
     When I query the collection of permissions with roleid 7
     Then the response code is 200
-#    And the response object is PermissionCollectionResponse
-    And the response contains 7 items of type "Permission"
+    And the response contains 8 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                 | Value | TypeID |
       | /system/faq            | 2     | 1      |
@@ -122,6 +123,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /faq                   | 2     | 1      |
       | /faq/*                 | 0     | 1      |
       | /faq/articles          | 2     | 1      |
+      | /faq/articles/*/votes  | 15    | 1      |
       | /links                 | 2     | 1      |
 
   Scenario: get the list of existing permissions of FAQ Editor
@@ -193,7 +195,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 13
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 43 items of type "Permission"
+    And the response contains 42 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                    | Value | TypeID |
       | /auth                                                                                                                                     | 1     | 1      |
@@ -222,7 +224,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/faq/*                                                                                                                             | 0     | 1      |
       | /system/faq/categories                                                                                                                    | 2     | 1      |
       | /system/ticket                                                                                                                            | 2     | 1      |
-      | /system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}                                                                           | 0     | 2      |
       | /system/users                                                                                                                             | 2     | 1      |
       | /tickets                                                                                                                                  | 3     | 1      |
       | /tickets/*                                                                                                                                | 6     | 1      |
