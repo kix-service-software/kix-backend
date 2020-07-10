@@ -24,7 +24,6 @@
 "Ticket Reader";"Resource";"/system/ticket/queues";;"x";;;
 "Ticket Reader";"Resource";"/system/ticket/states";;"x";;;
 "Ticket Reader";"Resource";"/system/ticket/types";;"x";;;
-"Ticket Reader";"Resource";"/system/ticket/slas";;"x";;;
 "Ticket Reader";"Resource";"/system/communication";;"x";;;
 "Ticket Reader";"Resource";"/system/communication/*";;;;;
 "Ticket Reader";"Resource";"/system/communication/channels";;"x";;;
@@ -39,7 +38,6 @@
 "Ticket Agent";"Resource";"/system/ticket/queues";;"x";;;
 "Ticket Agent";"Resource";"/system/ticket/states";;"x";;;
 "Ticket Agent";"Resource";"/system/ticket/types";;"x";;;
-"Ticket Agent";"Resource";"/system/ticket/slas";;"x";;;
 "Ticket Agent";"Resource";"/system/communication";;"x";;;
 "Ticket Agent";"Resource";"/system/communication/*";;;;;
 "Ticket Agent";"Resource";"/system/communication/channels";;"x";;;
