@@ -96,6 +96,8 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    $Self->{PermissionCheckOnly} = $Param{PermissionCheckOnly} ? 1 : 0;
+
     # check operation
     if ( !IsStringWithData( $Param{OperationType} ) ) {
 
@@ -111,7 +113,7 @@ sub new {
             Message => 'No OperationConfig found!',
         );
     }
-    
+
     $Self->{OperationConfig} = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Param{OperationType}};
     if ( !IsHashRefWithData($Self->{OperationConfig}) ) {
         return $Self->_Error(
@@ -142,7 +144,7 @@ sub new {
             }
         }
 
-        $Self->{Authorization} = $Param{Authorization};        
+        $Self->{Authorization} = $Param{Authorization};
     }
 
     # create validator
@@ -153,7 +155,7 @@ sub new {
             Message => "Can't load module $ValidatorModule",
         );
         return;    # bail out, this will generate 500 Error
-    }    
+    }
 
     $Self->{ValidatorObject} = $ValidatorModule->new(
         %{$Self},
@@ -188,7 +190,7 @@ sub new {
     }
 
     # add call level
-    $Self->{BackendObject}->{Level} = $Self->{Level};    
+    $Self->{BackendObject}->{Level} = $Self->{Level};
 
     return $Self;
 }
@@ -214,20 +216,23 @@ perform the selected Operation.
 =cut
 
 sub Run {
-    my ( $Self, %Param ) = @_;    
+    my ( $Self, %Param ) = @_;
 
     my $StartTime = Time::HiRes::time();
 
-    # validate data
-    my $ValidatorResult = $Self->{ValidatorObject}->Validate(
-        %Param
-    );
+    if (!$Self->{PermissionCheckOnly}) {
 
-    if ( !$ValidatorResult->{Success} ) {
-
-        return $Self->_Error(
-            %{$ValidatorResult},
+        # validate data
+        my $ValidatorResult = $Self->{ValidatorObject}->Validate(
+            %Param
         );
+
+        if ( !$ValidatorResult->{Success} ) {
+
+            return $Self->_Error(
+                %{$ValidatorResult},
+            );
+        }
     }
 
     if ( $Self->{AlteredRequestURI} && $Self->{CurrentRoute} =~ /:(.+?)$/ ) {
@@ -237,6 +242,7 @@ sub Run {
     }
 
     # start the backend
+    $Param{PermissionCheckOnly} = $Self->{PermissionCheckOnly};
     my $Result = $Self->{BackendObject}->RunOperation(%Param);
 
     my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -262,7 +268,7 @@ gather information about the Operation.
 =cut
 
 sub Options {
-    my ( $Self, %Param ) = @_;    
+    my ( $Self, %Param ) = @_;
 
     # start the backend
     return $Self->{BackendObject}->Options(%Param);
@@ -282,7 +288,7 @@ returns the cache dependencies of the backend object
 =cut
 
 sub GetCacheDependencies {
-    my ( $Self, %Param ) = @_;    
+    my ( $Self, %Param ) = @_;
 
     return $Self->{BackendObject}->{CacheDependencies};
 }
@@ -301,7 +307,7 @@ checks whether the user is allowed to execute this operation (Resource and Objec
 =cut
 
 sub _CheckPermission {
-    my ( $Self, %Param ) = @_;    
+    my ( $Self, %Param ) = @_;
 
     my $StartTime = Time::HiRes::time();
 
@@ -327,7 +333,7 @@ sub _CheckPermission {
                 $Access = 1;
                 last;
             }
-        }        
+        }
     }
 
     # return false if access is explicitly denied by token
