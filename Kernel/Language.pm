@@ -66,6 +66,11 @@ sub new {
     # 0=off; 1=on; 2=get all not translated words; 3=get all requests
     $Self->{Debug} = 0;
 
+    # define some defaults
+    $Self->{Charset}   = ['utf-8' ];
+    $Self->{Separator} = ',';
+
+
     # get needed object
     my $ConfigObject = $Kernel::OM->Get('Config');
     my $MainObject   = $Kernel::OM->Get('Main');
@@ -112,6 +117,22 @@ sub new {
     # what charset should I use (take it from translation file)!
     if ( $Self->{Charset} && ref $Self->{Charset} eq 'ARRAY' ) {
         $Self->{TranslationCharset} = $Self->{Charset}->[-1];
+    }
+
+    # set date format
+    # date formats (%A=WeekDay;%B=LongMonth;%T=Time;%D=Day;%M=Month;%Y=Year;)
+    if ($Self->{UserLanguage} =~ m/^de/) {
+        $Self->{DateFormat}          = '%D.%M.%Y %T';
+        $Self->{DateFormatLong}      = '%T - %D.%M.%Y';
+        $Self->{DateFormatShort}     = '%D.%M.%Y';
+        $Self->{DateInputFormat}     = '%D.%M.%Y';
+        $Self->{DateInputFormatLong} = '%D.%M.%Y - %T';
+    } else {
+        $Self->{DateFormat}          = '%M/%D/%Y %T';
+        $Self->{DateFormatLong}      = '%T - %M/%D/%Y';
+        $Self->{DateFormatShort}     = '%M/%D/%Y';
+        $Self->{DateInputFormat}     = '%M/%D/%Y';
+        $Self->{DateInputFormatLong} = '%M/%D/%Y - %T';
     }
 
     return $Self;
