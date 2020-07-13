@@ -396,6 +396,10 @@ sub RunOperation {
         }
     }
 
+    if( $Param{PermissionCheckOnly} ) {
+        return 1;
+    }
+
     # get parameter definitions (if available)
     my $Parameters;
     if ( $Self->can('ParameterDefinition') ) {
