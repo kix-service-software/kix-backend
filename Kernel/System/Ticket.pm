@@ -1092,9 +1092,9 @@ sub TicketGet {
             $Ticket{Title}          = $Row[14];
             $Ticket{UnlockTimeout}  = $Row[15];
             $Ticket{TypeID}         = $Row[16] || 1;
-            $Ticket{ArchiveFlag}    = $Row[18] ? 'y' : 'n';
-            $Ticket{CreateBy}       = $Row[19];
-            $Ticket{ChangeBy}       = $Row[20];
+            $Ticket{ArchiveFlag}    = $Row[17] ? 'y' : 'n';
+            $Ticket{CreateBy}       = $Row[18];
+            $Ticket{ChangeBy}       = $Row[19];
         }
     }
 
