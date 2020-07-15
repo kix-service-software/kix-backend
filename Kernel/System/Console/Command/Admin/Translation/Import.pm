@@ -74,7 +74,7 @@ sub Run {
         InitOrder => 1
     );
     my %PluginList = map { $_->{Product} => $_ } @Plugins;
-    
+
     my $Language  = $Self->GetOption('language') || '';
     my $LocaleDir = $Self->GetOption('locale-directory') || $Home.'/locale';
     my $File      = $Self->GetOption('file') || '';
@@ -84,12 +84,13 @@ sub Run {
 
     my @ImportItems;
     if ( !$Plugin ) {
+
         # add framework
         push @ImportItems, { Name => 'framework', Directory => $LocaleDir };
     }
     elsif ( $Plugin && $Plugin ne 'ALL' ) {
         my $Directory = $PluginList{$Plugin}->{Directory};
-    
+
         if ( ! -d $Directory ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -97,8 +98,9 @@ sub Run {
             );
             return;
         }
+
         # add plugin
-        push @ImportItems, { Name => $Plugin, Directory => $Directory };
+        push @ImportItems, { Name => $Plugin, Directory => $Directory . '/locale' };
     }
     elsif ( $Plugin && $Plugin eq 'ALL' ) {
         foreach my $Plugin ( @Plugins ) {
@@ -107,20 +109,23 @@ sub Run {
                     Priority => 'error',
                     Message  => "Plugin $Plugin->{Product} doesn't exist!"
                 );
-                return;        
+                return;
             }
+
             # add plugin
-            push @ImportItems, { Name => $Plugin->{Product}, Directory => $Plugin->{Directory} };
+            push @ImportItems, { Name => $Plugin->{Product}, Directory => $Plugin->{Directory} . '/locale' };
         }
     }
 
     my @POFiles;
     if ( $File ) {
+
         # only import the given file
         push @POFiles, $File;
     }
     else {
         foreach my $ImportItem ( @ImportItems ) {
+
             # get all relevant PO files in given directory
             @POFiles = $Kernel::OM->Get('Main')->DirectoryRead(
                 Directory => $ImportItem->{Directory},
@@ -130,7 +135,8 @@ sub Run {
     }
 
     foreach my $File ( sort @POFiles ) {
-        # ignore plugins
+
+        # ignore plugins if not plugin requested
         next if $File =~ /\/plugins\// && !$Plugin;
 
         my $Filename = basename $File;
@@ -158,9 +164,6 @@ sub Run {
 }
 
 1;
-
-
-
 
 =back
 
