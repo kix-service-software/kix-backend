@@ -248,6 +248,16 @@ EOF
         Directory => $Home
     };
 
+    # insert Template.pm as default
+    my $NewClassName = "Kernel::Output::HTML::Layout::Template";
+    if ( !$MainObject->RequireBaseClass($NewClassName) ) {
+        $Self->FatalDie(
+            Message => "Could not load class $NewClassName.",
+        );
+    }
+    $LayoutFiles{"Template.pm"} = "Template.pm";
+    push @ISA, $NewClassName;
+
     for my $Plugin ( @Plugins ) {
         my $LayoutDir = $Plugin->{Directory}.'/Kernel/Output/HTML';
         if ( -e "$LayoutDir" ) {
@@ -255,6 +265,7 @@ EOF
                 Directory => $LayoutDir,
                 Filter    => '*.pm',
             );
+
             for my $File (@Files) {
                 if ( ( $File !~ /Layout.pm$/ ) && !exists( $LayoutFiles{$File} ) ) {
 
