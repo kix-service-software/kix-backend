@@ -181,18 +181,7 @@
                 <Item Key="Event">(VersionCreate)</Item>
             </Hash>
         </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###502-RefreshServiceReferenceLinks" Required="0" Valid="1">
-        <Description Translatable="1">Searches for attributes of type ServiceReference in the new CIs version data and refreshes all links to that class. It deletes links to this class if the value is not existent in the CIs version data.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Core::ITSMConfigItemEvents</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::ITSMConfigItem::Event::ServiceReference_RefreshLinks</Item>
-                <Item Key="Event">(VersionCreate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
+    </ConfigItem>    
     <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###502-RefreshTicketReferenceLinks" Required="0" Valid="1">
         <Description Translatable="1">Searches for attributes of type CIClassReference in the new CIs version data and refreshes all links to that class. It deletes links to this class if the value is not existent in the CIs version data.</Description>
         <Group>ITSM</Group>
