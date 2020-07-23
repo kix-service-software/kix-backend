@@ -1,5 +1,5 @@
 {
-   "$id" : "#MacroActionTypeCollectionResponse",
+   "$id" : "MacroActionTypeCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of macro action types.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "MacroActionType_json-97379b5ff3" : {
-         "$id" : "#MacroActionType",
+         "$id" : "MacroActionType.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The macro action type object.",
          "type" : "object",

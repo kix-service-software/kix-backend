@@ -1,5 +1,5 @@
 {
-   "$id" : "#TranslationLanguagePatchRequest",
+   "$id" : "TranslationLanguagePatchRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The user translation language object for update.",
    "type" : "object",

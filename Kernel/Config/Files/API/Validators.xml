@@ -221,17 +221,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ServiceValidator" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the validator layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::API::Validator::ServiceValidator</Item>
-                <Item Key="Validates">Service,ServiceID</Item>
-                <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(ServiceGet|ServiceCreate|ServiceUpdate|NotificationCreate|NotificationUpdate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Validator::Module###SenderTypeValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>

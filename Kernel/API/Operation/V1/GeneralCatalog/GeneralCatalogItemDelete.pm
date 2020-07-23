@@ -119,18 +119,6 @@ sub Run {
                 Message => 'Cannot delete GeneralCatalogItem. A ConfigItem with this GeneralCatalogItem already exists.',
             );
         } 
-
-        my $ServiceList = $Kernel::OM->Get('Service')->ServiceSearch(
-            TypeIDs => [$GeneralCatalogItemID],
-            UserID  => $Self->{Authorization}->{UserID},
-        );
-	    
-        if ( $ServiceList) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete GeneralCatalogItem. A Service with this GeneralCatalogItem already exists.',
-            );
-        }
          	       
         # delete GeneralCatalog	    
         my $Success = $Kernel::OM->Get('GeneralCatalog')->GeneralCatalogItemDelete(

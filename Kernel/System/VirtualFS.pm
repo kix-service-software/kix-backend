@@ -53,7 +53,7 @@ sub new {
 
     # load backend
     $Self->{BackendDefault} = $Kernel::OM->Get('Config')->Get('VirtualFS::Backend')
-        || 'VirtualFS::DB';
+        || 'Kernel::System::VirtualFS::DB';
 
     if ( !$Kernel::OM->Get('Main')->Require( $Self->{BackendDefault} ) ) {
         return;
@@ -69,7 +69,8 @@ sub new {
 read a file from virtual file system
 
     my %File = $VirtualFSObject->Read(
-        Filename => '/Object/some/name.txt',
+        Filename => '/Object/some/name.txt',    # or ID
+        ID       => 123,                        # or Filename
         Mode     => 'utf8',
 
         # optional
@@ -102,7 +103,7 @@ sub Read {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Filename Mode)) {
+    for (qw(Mode)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -111,14 +112,21 @@ sub Read {
             return;
         }
     }
+    if ( !$Param{Filename} && !$Param{ID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Filename or ID!"
+        );
+        return;
+    }
 
     # lookup
-    my ( $FileID, $BackendKey, $Backend ) = $Self->_FileLookup( $Param{Filename} );
+    my ( $FileID, $BackendKey, $Backend, $Filename ) = $Self->_FileLookup(%Param);
     if ( !$BackendKey ) {
         if ( !$Param{DisableWarnings} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "No such file '$Param{Filename}'!",
+                Message  => "No such file '" . ($Param{Filename} && !$Param{ID} ? $Param{Filename} : $Param{ID}) . "'!",
             );
         }
         return;
@@ -152,6 +160,7 @@ sub Read {
     # get file
     my $Content = $Self->{Backend}->{$Backend}->Read(
         %Param,
+        Filename   => $Filename,
         BackendKey => $BackendKey,
     );
     return if !$Content;
@@ -159,17 +168,18 @@ sub Read {
     return (
         Preferences => \%Preferences,
         Content     => $Content,
+        Filename    => $Filename,
     );
 }
 
 =item Write()
 
-write a file to virtual file system
+write a file to virtual file system and returns its id
 
-    my $Success = $VirtualFSObject->Write(
+    my $FileID = $VirtualFSObject->Write(
         Content  => \$Content,
         Filename => '/Object/SomeFileName.txt',
-        Mode     => 'binary'            # (binary|utf8)
+        Mode     => 'binary',            # (binary|utf8)
 
         # optional, preferences data
         Preferences => {
@@ -197,7 +207,7 @@ sub Write {
     }
 
     # lookup
-    my ($FileID) = $Self->_FileLookup( $Param{Filename} );
+    my ($FileID) = $Self->_FileLookup( Name => $Param{Filename} );
     if ($FileID) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -216,7 +226,7 @@ sub Write {
         Bind => [ \$Param{Filename}, \$Self->{BackendDefault} ],
     );
 
-    ($FileID) = $Self->_FileLookup( $Param{Filename} );
+    ($FileID) = $Self->_FileLookup( Name => $Param{Filename} );
 
     if ( !$FileID ) {
         $Kernel::OM->Get('Log')->Log(
@@ -259,7 +269,7 @@ sub Write {
         Bind => [ \$BackendKey, \$FileID ],
     );
 
-    return 1;
+    return $FileID;
 }
 
 =item Delete()
@@ -267,7 +277,8 @@ sub Write {
 delete a file from virtual file system
 
     my $Success = $VirtualFSObject->Delete(
-        Filename => '/Object/SomeFileName.txt',
+        Filename => '/Object/some/name.txt',    # or ID
+        ID       => 123,                        # or Filename
 
         # optional
         DisableWarnings => 1,
@@ -279,23 +290,21 @@ sub Delete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Filename)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
+    if ( !$Param{Filename} && !$Param{ID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Filename or ID!"
+        );
+        return;
     }
 
     # lookup
-    my ( $FileID, $BackendKey, $Backend ) = $Self->_FileLookup( $Param{Filename} );
+    my ( $FileID, $BackendKey, $Backend, $Filename ) = $Self->_FileLookup(%Param);
     if ( !$FileID ) {
         if ( !$Param{DisableWarnings} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "No such file '$Param{Filename}'!",
+                Message  => "No such file '" . ($Param{Filename} ? $Param{Filename} : $Param{ID}) . "'!",
             );
         }
         return;
@@ -329,6 +338,7 @@ sub Delete {
     # delete file
     return $Self->{Backend}->{$Backend}->Delete(
         %Param,
+        Filename   => $Filename,
         BackendKey => $BackendKey,
     );
 }
@@ -340,7 +350,8 @@ find files in virtual file system
 only for file name
 
     my @List = $VirtualFSObject->Find(
-        Filename => '/Object/some_what/*.txt',
+        Filename  => '/Object/some_what/*.txt',
+        ReturnIDs => 1|0                            # optional, default 0, use 1 if IDs should be returned
     );
 
 only for preferences
@@ -349,6 +360,7 @@ only for preferences
         Preferences => {
             ContentType => 'text/plain',
         },
+        ReturnIDs => 1|0                            # optional, default 0, use 1 if IDs should be returned
     );
 
 for file name and for preferences
@@ -358,6 +370,7 @@ for file name and for preferences
         Preferences => {
             ContentType => 'text/plain',
         },
+        ReturnIDs => 1|0                            # optional, default 0, use 1 if IDs should be returned
     );
 
 Returns:
@@ -365,6 +378,14 @@ Returns:
     my @List = (
       '/Object/some/file.txt',
       '/Object/my.pdf',
+      ...
+    );
+
+    or if ReturnIDs = 1
+    my @List = (
+      1,
+      3,
+      ...
     );
 
 =cut
@@ -388,7 +409,7 @@ sub Find {
     my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # prepare file name search
-    my $SQLResult = 'vfs.filename';
+    my $SQLResult = $Param{ReturnIDs} ? 'vfs.id' : 'vfs.filename';
     my $SQLTable  = 'virtual_fs vfs ';
     my $SQLWhere  = '';
     my @SQLBind;
@@ -401,8 +422,8 @@ sub Find {
 
     # prepare preferences search
     if ( $Param{Preferences} ) {
-        $SQLResult = 'vfs.filename, vfsp.preferences_key, vfsp.preferences_value';
-        $SQLTable .= ', virtual_fs_preferences vfsp';
+        $SQLResult .= ', vfsp.preferences_key, vfsp.preferences_value';
+        $SQLTable  .= ', virtual_fs_preferences vfsp';
         if ($SQLWhere) {
             $SQLWhere .= ' AND ';
         }
@@ -478,34 +499,42 @@ sub Find {
 =begin Internal:
 
 returns internal meta information, unique file id, where and with what arguments the
-file is stored
+file is stored (Name or ID must be given)
 
-    my ( $FileID, $BackendKey, $Backend ) = $Self->_FileLookup( '/Object/SomeFile.txt' );
+    my ( $FileID, $BackendKey, $Backend ) = $Self->_FileLookup(
+        Name => '/Object/SomeFile.txt',
+        ID   => 123
+    );
 
 =cut
 
 sub _FileLookup {
-    my ( $Self, $Filename ) = @_;
+    my ( $Self, %Param ) = @_;
+
+    my $Where = $Param{ID} ? 'id' : 'filename';
+    my $Value = $Param{ID} ? $Param{ID} : $Param{Name};
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
     # lookup
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT id, backend_key, backend FROM virtual_fs WHERE filename = ?',
-        Bind => [ \$Filename ],
+        SQL  => 'SELECT id, backend_key, backend, filename FROM virtual_fs WHERE ' . $Where . ' = ?',
+        Bind => [ \$Value ],
     );
 
     my $FileID;
     my $BackendKey;
     my $Backend;
+    my $Filename;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $FileID     = $Row[0];
         $BackendKey = $Row[1];
         $Backend    = $Row[2];
+        $Filename    = $Row[3];
     }
 
-    return ( $FileID, $BackendKey, $Backend );
+    return ( $FileID, $BackendKey, $Backend, $Filename );
 }
 
 =end Internal:
@@ -513,10 +542,6 @@ sub _FileLookup {
 =cut
 
 1;
-
-
-
-
 
 =back
 

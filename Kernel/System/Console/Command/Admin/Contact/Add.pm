@@ -39,9 +39,9 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'primary-customer-id',
+        Name        => 'primary-organisation-id',
         # rkaiser - T#2017020290001194 - changed customer user to contact
-        Description => "The primary customer ID for the new contact.",
+        Description => "The primary organisation ID for the new contact.",
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -55,8 +55,8 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'customer-ids',
-        Description => "All customer IDs for the new contact. Separate multiple values by comma.",
+        Name        => 'organisation-ids',
+        Description => "All organisation IDs for the new contact. Separate multiple values by comma (primary organisation id must be included).",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -75,7 +75,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Adding a new customer user...</yellow>\n");
+    $Self->Print("<yellow>Adding a new contact...</yellow>\n");
 
     my $AssignedUserID;
     if ($Self->GetOption('user-login')) {
@@ -84,22 +84,25 @@ sub Run {
             Silent    => 1,
         );
     }
+
+    my @OrgIDs;
+    if ($Self->GetOption('organisation-ids')) {
+        @OrgIDs = split(/,\s*/, $Self->GetOption('organisation-ids'));
+    }
+
     if (
         !$Kernel::OM->Get('Contact')->ContactAdd(
-            Source                => 'Contact',
             Firstname             => $Self->GetOption('first-name'),
             Lastname              => $Self->GetOption('last-name'),
-            PrimaryOrganisationID => $Self->GetOption('primary-customer-id'),
-            OrganisationIDs       => $Self->GetOption('customer-ids') || $Self->GetOption('primary-customer-id'),
+            PrimaryOrganisationID => $Self->GetOption('primary-organisation-id'),
+            OrganisationIDs       => \@OrgIDs,
             Email                 => $Self->GetOption('email-address'),
             AssignedUserID        => $AssignedUserID,
             UserID                => 1,
-            ChangeUserID          => 1,
             ValidID               => 1,
         )
-    )
-    {
-        $Self->PrintError("Can't add customer user.");
+    ) {
+        $Self->PrintError("Can't add contact.");
         return $Self->ExitCodeError();
     }
 
@@ -108,9 +111,6 @@ sub Run {
 }
 
 1;
-
-
-
 
 =back
 

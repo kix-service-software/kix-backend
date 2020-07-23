@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "#SysConfigOptionPatchResponse",
+    "$id": "SysConfigOptionPatchResponse.json",
     "type": "object",
     "description": "The name of the updated SysConfig option.",
     "properties": {

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#NotificationPostRequest",
+  "$id": "NotificationPostRequest.json",
   "type": "object",
   "description": "The notification request object for creation.",
   "properties": {

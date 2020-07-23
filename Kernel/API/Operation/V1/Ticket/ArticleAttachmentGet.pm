@@ -102,9 +102,9 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID             => '1',                                           # required 
-            ArticleID            => '32',                                          # required, could be coma separated IDs or an Array
-            AttachmentID         => ':1',                                          # required, could be coma separated IDs or an Array
+            TicketID             => '1',                                           # required
+            ArticleID            => '32',                                          # required, could be comma separated IDs or an Array
+            AttachmentID         => ':1',                                          # required, could be comma separated IDs or an Array
             include              => '...',                                         # Optional, 0 as default. Include additional objects
                                                                                    # (supported: Content)
         },
@@ -164,7 +164,7 @@ sub Run {
 
     # start loop
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
-        
+
         my %Attachment = $TicketObject->ArticleAttachment(
             ArticleID          => $Param{Data}->{ArticleID},
             FileID             => $AttachmentID,
@@ -189,7 +189,7 @@ sub Run {
     if ( scalar(@AttachmentList) == 1 ) {
         return $Self->_Success(
             Attachment => $AttachmentList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

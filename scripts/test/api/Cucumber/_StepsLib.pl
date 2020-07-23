@@ -136,7 +136,7 @@ Then qr/the (.*?) header is set/, sub {
 Then qr/the response contains the following items of type (.*?)$/, sub {
     my $Object = $1;
     my $Index = 0;
- 
+
     foreach my $Row ( @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
             C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
@@ -145,21 +145,11 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
     }
 };
 
-Then qr/the response contains (\d+) items of type (.*?)$/, sub {
-  is(@{S->{ResponseContent}->{$2}}, $1, 'Check response item count');
-  my $Anzahl = @{S->{ResponseContent}->{$2}};
-};
-
-
 #=======================work=================================
 Then qr/the response content is$/, sub {
-    print STDERR Dumper(S->{ResponseContent}->{LogFile});
-    #print STDERR Dumper(S->{ResponseContent}->{Queue}->{SubQueues}->[0]);
-#    print STDERR Dumper(S->{ResponseContent}->{Organisation}->{ID});
-#print STDERR Dumper(S->{ResponseContent}->{$2}->[$3]->{$1});
-#    print STDERR Dumper(S->{ResponseContent}->{FAQArticle}->[0]);
-#    print STDERR Dumper(S->{OrganisationIDArray});
-#    print STDERR Dumper(S->{ResponseContent}->{FAQHistory}->[0]->{Name});
+	print STDERR Dumper(S->{ResponseContent});
+	 my $Anzahl = @{S->{ResponseContent}->{Channel}};
+	print STDERR Dumper($Anzahl);
 };
 
 

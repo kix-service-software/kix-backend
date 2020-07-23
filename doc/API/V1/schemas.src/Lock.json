@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#Lock",
+  "$id": "Lock.json",
   "type": "object",
   "description": "The ticket lock object.",
   "properties": {

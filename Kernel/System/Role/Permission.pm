@@ -81,7 +81,7 @@ sub PermissionTypeList {
         $SQL .= ' WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => $SQL,
     );
 
@@ -143,14 +143,14 @@ sub PermissionTypeGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM permission_type WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
     my %Result;
-    
+
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
@@ -164,7 +164,7 @@ sub PermissionTypeGet {
             ChangeBy   => $Row[7],
         );
     }
-    
+
     # no data found...
     if ( !%Result ) {
         $Kernel::OM->Get('Log')->Log(
@@ -173,14 +173,14 @@ sub PermissionTypeGet {
         );
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Result,
-    ); 
+    );
 
     return %Result;
 }
@@ -189,7 +189,7 @@ sub PermissionTypeGet {
 
 get id for permission type parameters
 
-    my $PermissionID = $RoleObject->PermissionTypeLookup(
+    my $PermissionTypeID = $RoleObject->PermissionTypeLookup(
         Name => '...'
     );
 
@@ -219,9 +219,9 @@ sub PermissionTypeLookup {
     );
     return $Cache if $Cache;
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id FROM permission_type WHERE name = ?',
-        Bind => [ 
+        Bind => [
             \$Param{Name},
         ]
     );
@@ -280,9 +280,9 @@ sub PermissionLookup {
     );
     return $Cache if $Cache;
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id FROM role_permission WHERE role_id = ? AND type_id = ? AND target = ?',
-        Bind => [ 
+        Bind => [
             \$Param{RoleID}, \$Param{TypeID}, \$Param{Target},
         ]
     );
@@ -350,14 +350,14 @@ sub PermissionGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT id, role_id, type_id, target, value, is_required, comments, create_time, create_by, change_time, change_by FROM role_permission WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
     my %Result;
-    
+
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
@@ -374,7 +374,7 @@ sub PermissionGet {
             ChangeBy   => $Row[10],
         );
     }
-    
+
     # no data found...
     if ( !%Result ) {
         $Kernel::OM->Get('Log')->Log(
@@ -383,14 +383,14 @@ sub PermissionGet {
         );
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Result,
-    ); 
+    );
 
     return %Result;
 }
@@ -436,7 +436,7 @@ sub PermissionAdd {
     $Param{IsRequired} ||= 0;
 
     # check if this is a duplicate after the change
-    my $ID = $Self->PermissionLookup( 
+    my $ID = $Self->PermissionLookup(
         RoleID => $Param{RoleID},
         TypeID => $Param{TypeID},
         Target => $Param{Target}
@@ -474,8 +474,8 @@ sub PermissionAdd {
     # get new id
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM role_permission WHERE role_id = ? AND type_id = ? AND target = ?',
-        Bind => [ 
-            \$Param{RoleID}, \$Param{TypeID}, \$Param{Target}, 
+        Bind => [
+            \$Param{RoleID}, \$Param{TypeID}, \$Param{Target},
         ],
     );
 
@@ -533,7 +533,7 @@ sub PermissionUpdate {
     );
 
     # check if this is a duplicate after the change
-    my $ID = $Self->PermissionLookup( 
+    my $ID = $Self->PermissionLookup(
         RoleID => $Data{RoleID},
         TypeID => $Param{TypeID} || $Data{TypeID},
         Target => $Param{Target} || $Data{Target},
@@ -577,13 +577,13 @@ sub PermissionUpdate {
     $Param{Target}     ||= $Data{Target};
     $Param{Value}      ||= $Data{Value} if !defined $Param{Value};
     $Param{IsRequired} ||= $Data{IsRequired} if !defined $Param{IsRequired};
-    
+
     # update role in database
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE role_permission SET type_id = ?, target = ?, value = ?, is_required = ?, comments = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{TypeID}, \$Param{Target}, \$Param{Value}, \$Param{IsRequired}, 
+            \$Param{TypeID}, \$Param{Target}, \$Param{Value}, \$Param{IsRequired},
             \$Param{Comment}, \$Param{UserID}, \$Param{ID}
         ],
     );
@@ -643,7 +643,7 @@ sub PermissionList {
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id FROM role_permission WHERE role_id = ?',
         Bind => [ \$Param{RoleID} ]
     );
@@ -698,7 +698,7 @@ sub PermissionDelete {
         SQL  => 'DELETE FROM role_permission WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-   
+
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
 
@@ -764,7 +764,7 @@ sub PermissionListForObject {
     my %PermissionTypeList = reverse $Self->PermissionTypeList();
 
     # get all relevant permissions
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => "SELECT id FROM role_permission WHERE type_id IN (SELECT id FROM permission_type WHERE name IN ('Object', 'PropertyValue'))",
     );
 
@@ -791,7 +791,7 @@ sub PermissionListForObject {
         # ignore permissions of type Resource without filters (non PropertyValue)
         next if ( $Permission{TypeID} == $PermissionTypeList{Resource} && $Permission{Target} !~ /[{}]/ );
 
-        # ignore wildcard targets on type Object 
+        # ignore wildcard targets on type Object
         next if ( $PermissionTypeList{Object} && $Permission{Target} =~ /\*/ && $Permission{TypeID} == $PermissionTypeList{Object} );
 
         # prepare target
@@ -833,7 +833,7 @@ sub ValidatePermission {
 
     # validate new PropertyValue permission
     my %PermissionTypeList = $Self->PermissionTypeList( Valid => 1 );
-    
+
     # check type
     return if !$PermissionTypeList{$Param{TypeID}};
 
@@ -881,7 +881,7 @@ sub GetReadablePermissionValue {
     my $Result;
 
     if ( $Param{Format} && $Param{Format} eq 'Long' ) {
-        my @Permissions;              
+        my @Permissions;
         foreach my $PermissionName ( sort keys %{$Self->PERMISSION} ) {
             next if ($Param{Value} & $Self->PERMISSION->{$PermissionName}) != $Self->PERMISSION->{$PermissionName};
             push(@Permissions, $PermissionName);

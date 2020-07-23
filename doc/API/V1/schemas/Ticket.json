@@ -1,5 +1,5 @@
 {
-   "$id" : "#Ticket",
+   "$id" : "Ticket.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket object.",
    "type" : "object",
@@ -112,17 +112,6 @@
          "type" : "integer",
          "readOnly" : true
       },
-      "ServiceID" : {
-         "anyOf" : [
-            {
-               "type" : "integer"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
       "State" : {
          "type" : "string",
          "readOnly" : true
@@ -206,7 +195,7 @@
    ],
    "definitions" : {
       "DynamicFieldValue_json-6dd322bed4" : {
-         "$id" : "#DynamicFieldValue",
+         "$id" : "DynamicFieldValue.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
          "type" : "object",
@@ -266,8 +255,8 @@
             "Value"
          ]
       },
-      "DynamicFieldValue_json-95816834ee" : {
-         "$id" : "#DynamicFieldValue",
+      "DynamicFieldValue_json-be71ef3dd7" : {
+         "$id" : "DynamicFieldValue.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object.",
          "type" : "object",
@@ -327,8 +316,8 @@
             "Value"
          ]
       },
-      "TicketArticleAttachment_json-3fc26e02ab" : {
-         "$id" : "#TicketArticleAttachment",
+      "TicketArticleAttachment_json-7600499c9c" : {
+         "$id" : "TicketArticleAttachment.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object.",
          "type" : "object",
@@ -382,8 +371,8 @@
             "ID"
          ]
       },
-      "TicketArticleFlag_json-73c45dc8a4" : {
-         "$id" : "#TicketArticleFlag",
+      "TicketArticleFlag_json-89efa3d6a9" : {
+         "$id" : "TicketArticleFlag.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article flag object.",
          "type" : "object",
@@ -408,7 +397,7 @@
          ]
       },
       "TicketArticle_json-70b62a253c" : {
-         "$id" : "#TicketArticle",
+         "$id" : "TicketArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object.",
          "type" : "object",
@@ -417,11 +406,11 @@
                "type" : "integer",
                "readOnly" : true
             },
-            "Attachmnets" : {
+            "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleAttachment_json-3fc26e02ab"
+                  "$ref" : "#/definitions/TicketArticleAttachment_json-7600499c9c"
                },
                "readOnly" : true
             },
@@ -487,7 +476,7 @@
                "description" : "added via include \"DynamicFields\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValue_json-95816834ee"
+                  "$ref" : "#/definitions/DynamicFieldValue_json-be71ef3dd7"
                },
                "readOnly" : true
             },
@@ -495,7 +484,7 @@
                "description" : "added via include \"Flags\"",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/TicketArticleFlag_json-73c45dc8a4"
+                  "$ref" : "#/definitions/TicketArticleFlag_json-89efa3d6a9"
                },
                "readOnly" : true
             },
@@ -597,7 +586,7 @@
          ]
       },
       "TicketHistory_json-5eb9de8d63" : {
-         "$id" : "#TicketHistory",
+         "$id" : "TicketHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
          "type" : "object",
@@ -672,7 +661,7 @@
          ]
       },
       "Watcher_json-6ed30f83c4" : {
-         "$id" : "#Watcher",
+         "$id" : "Watcher.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The watcher object.",
          "type" : "object",

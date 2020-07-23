@@ -31,7 +31,7 @@ sub Run {
 
     $Self->Print("<yellow>Listing contacts...</yellow>\n");
 
-    # get all users
+    # get all contacts
     my %Contacts = $Kernel::OM->Get('Contact')->ContactList(
         Valid => 0,
     );
@@ -42,13 +42,8 @@ sub Run {
         3 => 'no(temp)',
     );
 
-    my %BoolStr = (
-        0 => 'no',
-        1 => 'yes',
-    );
-
-    $Self->Print("    ID Firstname            Lastname             Email                          UserID\n");
-    $Self->Print("------ -------------------- -------------------- ------------------------------ ------\n");
+    $Self->Print("    ID Firstname            Lastname             Email                                                        UserID Valid\n");
+    $Self->Print("------ -------------------- -------------------- ------------------------------------------------------------ ------ -------- \n");
 
     foreach my $ID ( sort { $Contacts{$a} cmp $Contacts{$b} } keys %Contacts ) {
         my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
@@ -58,8 +53,8 @@ sub Run {
         my $Valid = $ValidStr{$Contact{ValidID}};
         my $AssignedUserID = ($Contact{AssignedUserID}) ? $Contact{AssignedUserID} : '-';
 
-        $Self->Print(sprintf("%6i %-20s %-20s %-30s %6s\n",
-            $Contact{ID}, $Contact{Firstname}, $Contact{Lastname}, $Contact{Email}, $AssignedUserID));
+        $Self->Print(sprintf("%6i %-20s %-20s %-60s %6s %-8s\n",
+            $Contact{ID}, $Contact{Firstname}, $Contact{Lastname}, $Contact{Email}, $AssignedUserID, $Valid));
     }
 
     $Self->Print("<green>Done</green>\n");

@@ -19,11 +19,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::DependingDynamicField
+Kernel::System::SysConfig::Event::LogSysConfigChanges
 
 =head1 SYNOPSIS
 
-DependingDynamicField backend
+SysConfig change logger
 
 =head1 PUBLIC INTERFACE
 

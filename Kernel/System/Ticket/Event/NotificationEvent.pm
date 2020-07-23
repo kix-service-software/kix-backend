@@ -610,7 +610,7 @@ sub _RecipientsGet {
                         my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                             UserID              => $UserID,
                             Target              => '/tickets/' . $Ticket{TicketID},
-                            UsageContect        => 'Agent',
+                            UsageContext        => 'Agent',
                             RequestedPermission => 'READ'
                         );
                         if ( $Granted ) {

@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketArticlePostRequest",
+   "$id" : "TicketArticlePostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ticket article request object for creation.",
    "type" : "object",
@@ -12,8 +12,8 @@
       "Article"
    ],
    "definitions" : {
-      "DynamicFieldValueSetItem_json-89f4203892" : {
-         "$id" : "#DynamicFieldValueSetItem",
+      "DynamicFieldValueSetItem_json-e62db88bff" : {
+         "$id" : "DynamicFieldValueSetItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The dynamic field value object to set it for an object.",
          "type" : "object",
@@ -52,8 +52,8 @@
             "Value"
          ]
       },
-      "TicketArticleAttachmentPostItem_json-436743dd0d" : {
-         "$id" : "#TicketArticleAttachmentPostItem",
+      "TicketArticleAttachmentPostItem_json-2fe64bc536" : {
+         "$id" : "TicketArticleAttachmentPostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article attachment object for creation.",
          "type" : "object",
@@ -76,7 +76,7 @@
          ]
       },
       "TicketArticlePostItem_json-c0eed55787" : {
-         "$id" : "#TicketArticlePostItem",
+         "$id" : "TicketArticlePostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket article object for creation.",
          "type" : "object",
@@ -84,7 +84,7 @@
             "Attachments" : {
                "type" : "array",
                "item" : {
-                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-436743dd0d"
+                  "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-2fe64bc536"
                }
             },
             "AutoResponseType" : {
@@ -117,7 +117,7 @@
                "description" : "list of dynamic field values to be set",
                "type" : "array",
                "items" : {
-                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-89f4203892"
+                  "$ref" : "#/definitions/DynamicFieldValueSetItem_json-e62db88bff"
                }
             },
             "ExcludeMuteNotificationToUserID" : {

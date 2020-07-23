@@ -170,6 +170,24 @@ sub Run {
         );
     }
 
+    if ( $Macro->{Exec} && IsArrayRefWithData($Macro->{Exec}->{ObjectIDs})) {
+        for ( @{ $Macro->{Exec}->{ObjectIDs} } ) {
+            my $Result = $Kernel::OM->Get('Automation')->MacroExecute(
+                ID          => $Param{Data}->{MacroID},
+                ObjectID    => $_,
+                UserID      => $Self->{Authorization}->{UserID}
+            );
+
+            print STDERR Data::Dumper::Dumper($Result);
+
+            if ( !$Result ) {
+                return $Self->_Error(
+                    Code => 'Error executing macro for ObjectID $_',
+                );
+            }
+        }
+    }
+
     # return result
     return $Self->_Success(
         MacroID => 0 + $Param{Data}->{MacroID},

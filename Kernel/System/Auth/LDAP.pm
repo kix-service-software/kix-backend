@@ -32,65 +32,18 @@ sub new {
     # Debug 0=off 1=on
     $Self->{Debug} = 0;
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    # get ldap preferences
-    $Self->{Count} = $Param{Count} || '';
-    $Self->{Die} = $ConfigObject->Get( 'AuthModule::LDAP::Die' . $Param{Count} );
-    if ( $ConfigObject->Get( 'AuthModule::LDAP::Host' . $Param{Count} ) ) {
-        $Self->{Host} = $ConfigObject->Get( 'AuthModule::LDAP::Host' . $Param{Count} );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need AuthModule::LDAP::Host$Param{Count} in Kernel/Config.pm",
-        );
-        return;
-    }
-    if ( defined( $ConfigObject->Get( 'AuthModule::LDAP::BaseDN' . $Param{Count} ) ) ) {
-        $Self->{BaseDN} = $ConfigObject->Get( 'AuthModule::LDAP::BaseDN' . $Param{Count} );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need AuthModule::LDAP::BaseDN$Param{Count} in Kernel/Config.pm",
-        );
-        return;
-    }
-    if ( $ConfigObject->Get( 'AuthModule::LDAP::UID' . $Param{Count} ) ) {
-        $Self->{UID} = $ConfigObject->Get( 'AuthModule::LDAP::UID' . $Param{Count} );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need AuthModule::LDAP::UID$Param{Count} in Kernel/Config.pm",
-        );
-        return;
-    }
-    $Self->{SearchUserDN} = $ConfigObject->Get( 'AuthModule::LDAP::SearchUserDN' . $Param{Count} ) || '';
-    $Self->{SearchUserPw} = $ConfigObject->Get( 'AuthModule::LDAP::SearchUserPw' . $Param{Count} ) || '';
-    $Self->{GroupDN}      = $ConfigObject->Get( 'AuthModule::LDAP::GroupDN' . $Param{Count} )
-        || '';
-    $Self->{AccessAttr} = $ConfigObject->Get( 'AuthModule::LDAP::AccessAttr' . $Param{Count} )
-        || 'memberUid';
-    $Self->{UserAttr} = $ConfigObject->Get( 'AuthModule::LDAP::UserAttr' . $Param{Count} )
-        || 'DN';
-    $Self->{UserSuffix}    = $ConfigObject->Get( 'AuthModule::LDAP::UserSuffix' . $Param{Count} )    || '';
-    $Self->{UserLowerCase} = $ConfigObject->Get( 'AuthModule::LDAP::UserLowerCase' . $Param{Count} ) || 0;
-    $Self->{DestCharset}   = $ConfigObject->Get( 'AuthModule::LDAP::Charset' . $Param{Count} )
-        || 'utf-8';
-
-    # ldap filter always used
-    $Self->{AlwaysFilter} = $ConfigObject->Get( 'AuthModule::LDAP::AlwaysFilter' . $Param{Count} ) || '';
-
-    # Net::LDAP new params
-    if ( $ConfigObject->Get( 'AuthModule::LDAP::Params' . $Param{Count} ) ) {
-        $Self->{Params} = $ConfigObject->Get( 'AuthModule::LDAP::Params' . $Param{Count} );
-    }
-    else {
-        $Self->{Params} = {};
-    }
+    $Self->{Die}          = $Param{Config}->{Die} || 1;
+    $Self->{Host}         = $Param{Config}->{Host} || '';
+    $Self->{BaseDN}       = $Param{Config}->{BaseDN} || '';
+    $Self->{UID}          = $Param{Config}->{UID} || '';
+    $Self->{SearchUserDN} = $Param{Config}->{SearchUserDN} || '';
+    $Self->{SearchUserPw} = $Param{Config}->{SearchUserPw} || '';
+    $Self->{GroupDN}      = $Param{Config}->{GroupDN} || '';
+    $Self->{AccessAttr}   = $Param{Config}->{AccessAttr} || 'memberUid';
+    $Self->{UserAttr}     = $Param{Config}->{UserAttr} || 'DN';
+    $Self->{DestCharset}  = $Param{Config}->{Charset} || 'utf-8';
+    $Self->{AlwaysFilter} = $Param{Config}->{AlwaysFilter} || '';
+    $Self->{Params}       = $Param{Config}->{Params} || {};
 
     return $Self;
 }

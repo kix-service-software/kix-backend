@@ -1,5 +1,5 @@
 {
-   "$id" : "#SystemAddressPostRequest",
+   "$id" : "SystemAddressPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The system address request object for creation.",
    "type" : "object",

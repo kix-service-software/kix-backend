@@ -78,6 +78,7 @@ sub Run {
     my $Webservice;
 
     my ($Tmp, $Entrypoint, $WebserviceName, $RequestURI) = split(/\//, $ENV{REQUEST_URI}, 4);
+    $RequestURI = URI::Escape::uri_unescape($RequestURI);
     $ENV{REQUEST_URI} = '/'.$RequestURI;
 
     if ( !$WebserviceName ) {
@@ -130,7 +131,7 @@ sub Run {
             Message => "Can't load module $DebuggerModule",
         );
         return;    # bail out, this will generate 500 Error
-    }    
+    }
     $Self->{DebuggerObject} = $DebuggerModule->new(
         DebuggerConfig    => $Webservice->{Config}->{Debugger},
         WebserviceID      => $WebserviceID,
@@ -161,7 +162,7 @@ sub Run {
             Message => "Can't load module $TransportModule",
         );
         return;    # bail out, this will generate 500 Error
-    }    
+    }
     $Self->{TransportObject} = $TransportModule->new(
         DebuggerObject  => $Self->{DebuggerObject},
         TransportConfig => $ProviderConfig->{Transport},
@@ -215,90 +216,6 @@ sub Run {
         }
     }
 
-    # check if we have to respond to an OPTIONS request instead of executing the operation
-    if ( $ProcessRequestResult{RequestMethod} && $ProcessRequestResult{RequestMethod} eq 'OPTIONS' ) {
-        my $Data;
-
-        # add information about each available method
-        foreach my $Method ( sort keys %{$ProcessRequestResult{AvailableMethods}} ) {
-
-            # create an operation object for each allowed method and ask it for options
-            my $Operation = $ProcessRequestResult{AvailableMethods}->{$Method}->{Operation}; 
-
-            my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
-            if ( !$Kernel::OM->Get('Main')->Require($OperationModule) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message => "Can't load module $OperationModule",
-                );
-                return;    # bail out, this will generate 500 Error
-            }    
-
-            my $OperationObject = $OperationModule->new(
-                DebuggerObject          => $Self->{DebuggerObject},
-                APIVersion              => $Webservice->{Config}->{APIVersion},
-                Operation               => $Operation,
-                OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
-                WebserviceID            => $WebserviceID,
-                AvailableMethods        => $ProcessRequestResult{AvailableMethods},
-                OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
-                RequestMethod           => $Method,
-                CurrentRoute            => $ProcessRequestResult{Route},
-                RequestURI              => $ProcessRequestResult{RequestURI},
-                Authorization           => $Authorization,
-            );
-
-            # if operation init failed, bail out
-            if ( ref $OperationObject ne $OperationModule ) {
-                # only bail out if it's not a 403
-                if ( $OperationObject->{Code} ne 'Forbidden' ) {
-                    return $Self->_GenerateErrorResponse(
-                        %{$OperationObject},
-                    );
-                }
-            }
-            else {
-                # get options from operation
-                my $OptionsResult = $OperationObject->Options();
-                my %OptionsData = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
-
-                $Data->{Methods}->{$Method} = {
-                    %OptionsData,
-                    Route               => $ProcessRequestResult{AvailableMethods}->{$Method}->{Route},
-                    AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
-                }
-            }
-        }
-
-        # add information about sub-resources
-        my $CurrentRoute = $ProcessRequestResult{Route};
-        $CurrentRoute = '' if $CurrentRoute eq '/';
-        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessRequestResult{ResourceOperationRouteMapping}});
-        if ( @ChildResources ) {
-            $Data->{Resources} = \@ChildResources;
-        }
-
-        my $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
-            Success => 1,
-            Data    => $Data,
-            Additional => {
-                AddHeader => {
-                    Allow => join(', ', sort keys %{$Data->{Methods}}),
-                }
-            }
-        );
-
-        if ( !$FunctionResult->{Success} ) {
-            $Self->_Error(
-                Code    => 'Provider.InternalError',
-                Message => 'Response could not be sent',
-                Data    => $FunctionResult->{ErrorMessage},
-            );
-        }
-
-        return;
-    }
-
     #
     # Map the incoming data based on the configured mapping
     #
@@ -320,7 +237,7 @@ sub Run {
                 Message => "Can't load module $MappingModule",
             );
             return;    # bail out, this will generate 500 Error
-        }    
+        }
         my $MappingInObject = $MappingModule->new(
             DebuggerObject => $Self->{DebuggerObject},
             Operation      => $Operation,
@@ -361,6 +278,100 @@ sub Run {
         );
     }
 
+    # check if we have to respond to an OPTIONS request instead of executing the operation
+    if ( $ProcessRequestResult{RequestMethod} && $ProcessRequestResult{RequestMethod} eq 'OPTIONS' ) {
+        my $Data;
+
+        # add information about each available method
+        foreach my $Method ( sort keys %{$ProcessRequestResult{AvailableMethods}} ) {
+
+            # create an operation object for each allowed method and ask it for options
+            my $Operation = $ProcessRequestResult{AvailableMethods}->{$Method}->{Operation};
+
+            my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
+            if ( !$Kernel::OM->Get('Main')->Require($OperationModule) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message => "Can't load module $OperationModule",
+                );
+                return;    # bail out, this will generate 500 Error
+            }
+
+            my $OperationObject = $OperationModule->new(
+                DebuggerObject          => $Self->{DebuggerObject},
+                APIVersion              => $Webservice->{Config}->{APIVersion},
+                Operation               => $Operation,
+                OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
+                WebserviceID            => $WebserviceID,
+                AvailableMethods        => $ProcessRequestResult{AvailableMethods},
+                OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
+                RequestMethod           => $Method,
+                CurrentRoute            => $ProcessRequestResult{Route},
+                RequestURI              => $ProcessRequestResult{RequestURI},
+                Authorization           => $Authorization,
+                PermissionCheckOnly     => 1
+            );
+
+            # if operation init failed, bail out
+            if ( ref $OperationObject ne $OperationModule ) {
+                # only bail out if it's not a 403
+                if ( $OperationObject->{Code} ne 'Forbidden' ) {
+                    return $Self->_GenerateErrorResponse(
+                        %{$OperationObject},
+                    );
+                }
+            }
+            else {
+
+                my $OperationResult = $OperationObject->Run(
+                    Data    => $FunctionResult->{Data}
+                );
+
+                if ( $OperationResult eq 1 ) {
+                    # get options from operation
+                    my $OptionsResult = $OperationObject->Options();
+                    my %OptionsData = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
+
+                    $Data->{Methods}->{$Method} = {
+                        %OptionsData,
+                        Route               => $ProcessRequestResult{AvailableMethods}->{$Method}->{Route},
+                        AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
+                    }
+                } else {
+                    return;
+                }
+            }
+        }
+
+        # add information about sub-resources
+        my $CurrentRoute = $ProcessRequestResult{Route};
+        $CurrentRoute = '' if $CurrentRoute eq '/';
+        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessRequestResult{ResourceOperationRouteMapping}});
+        if ( @ChildResources ) {
+            $Data->{Resources} = \@ChildResources;
+        }
+
+        my $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
+            Success => 1,
+            Data    => $Data,
+            Additional => {
+                AddHeader => {
+                    Allow => join(', ', sort keys %{$Data->{Methods}}),
+                }
+            }
+        );
+
+        if ( !$FunctionResult->{Success} ) {
+            $Self->_Error(
+                Code    => 'Provider.InternalError',
+                Message => 'Response could not be sent',
+                Data    => $FunctionResult->{ErrorMessage},
+            );
+        }
+
+        return;
+    }
+
     #
     # Execute actual operation.
     #
@@ -371,7 +382,7 @@ sub Run {
             Message => "Can't load module $OperationModule",
         );
         return;    # bail out, this will generate 500 Error
-    }    
+    }
 
     my $OperationObject = $OperationModule->new(
         DebuggerObject          => $Self->{DebuggerObject},
@@ -432,7 +443,7 @@ sub Run {
                 Message => "Can't load module $MappingModule",
             );
             return;    # bail out, this will generate 500 Error
-        }    
+        }
         my $MappingOutObject = $MappingModule->new(
             DebuggerObject => $Self->{DebuggerObject},
             Operation      => $Operation,

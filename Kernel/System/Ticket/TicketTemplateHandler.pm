@@ -184,13 +184,12 @@ sub TicketTemplateGet {
     # get frontend template data
     return () if !$Self->{DBObject}->Prepare(
         SQL =>
-            'SELECT f_agent, f_customer, customer_portal_group_id FROM kix_ticket_template WHERE id = ?',
+            'SELECT f_agent, f_customer FROM kix_ticket_template WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         $Template{Agent}    = $Row[0];
         $Template{Customer} = $Row[1];
-        $Template{CustomerPortalGroupID} = $Row[2];
     }
 
     # set ticket template cache
@@ -292,9 +291,6 @@ sub TicketTemplateCreate {
         }
     }
 
-    # prepare CustomerPortalGroupID
-    $Param{Data}->{CustomerPortalGroupID} ||= 0;
-
     # create YAML object
     my $YAMLObject = $Kernel::OM->Get('YAML');
 
@@ -352,9 +348,9 @@ sub TicketTemplateCreate {
         # do update meta data
         return if !$Self->{DBObject}->Do(
             SQL =>
-                'UPDATE kix_ticket_template SET name = ?, f_agent = ?, f_customer = ?, customer_portal_group_id = ? ' .
+                'UPDATE kix_ticket_template SET name = ?, f_agent = ?, f_customer = ? ' .
                 'WHERE id = ?',
-            Bind => [ \$Data{Name}, \$Data{Agent}, \$Data{Customer}, \$Data{CustomerPortalGroupID}, \$Param{ID} ],
+            Bind => [ \$Data{Name}, \$Data{Agent}, \$Data{Customer}, \$Param{ID} ],
         );
     }
 
@@ -367,7 +363,7 @@ sub TicketTemplateCreate {
                 . 'f_agent, f_customer, customer_portal_group_id) '
                 . 'VALUES (?, 1, current_timestamp, ?, current_timestamp, ?, ?, ?, ?)',
             Bind => [
-                \$Param{Name}, \$Param{UserID}, \$Param{UserID}, \$Data{Agent}, \$Data{Customer}, \$Data{CustomerPortalGroupID}
+                \$Param{Name}, \$Param{UserID}, \$Param{UserID}, \$Data{Agent}, \$Data{Customer} 
             ],
         );
 
@@ -474,9 +470,6 @@ sub TicketTemplateUpdate {
         return;
     }
 
-    # prepare CustomerPortalGroupID
-    $Param{Data}->{CustomerPortalGroupID} ||= 0; 
-
     # create YAML object
     my $YAMLObject = $Kernel::OM->Get('YAML');
 
@@ -538,9 +531,9 @@ sub TicketTemplateUpdate {
     #update meta data
     return if !$Self->{DBObject}->Do(
         SQL =>
-            'UPDATE kix_ticket_template SET name = ?, f_agent = ?, f_customer = ?, customer_portal_group_id = ? ' .
+            'UPDATE kix_ticket_template SET name = ?, f_agent = ?, f_customer = ? ' .
             'WHERE id = ?',
-        Bind => [ \$Data{Name}, \$Data{Agent}, \$Data{Customer}, \$Data{CustomerPortalGroupID}, \$Data{ID} ],
+        Bind => [ \$Data{Name}, \$Data{Agent}, \$Data{Customer}, \$Data{ID} ],
     );
 
     # clear ticket cache

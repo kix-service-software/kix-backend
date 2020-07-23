@@ -406,6 +406,28 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <!-- role "Agent User": permission _R___ on /system/dynamicfields-->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/system/dynamicfields]]></Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Agent User": permission CRUD_ on /watchers -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/watchers</Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
     <!-- role "Agent User": permission _R___ on /i18n -->
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
@@ -434,17 +456,6 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles/*/flags]]></Data>
         <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/services -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/services]]></Data>
-        <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -521,17 +532,6 @@
         <Data Key="role_id">4</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/system/ticket/types]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/ticket/slas -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/slas]]></Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -692,17 +692,6 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/ticket/slas -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/slas]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
     <!-- role "Ticket Agent": permission _R___ on /system/communication -->
     <Insert Table="role_permission">
         <Data Key="role_id">5</Data>
@@ -752,17 +741,6 @@
         <Data Key="role_id">5</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/system/communication/systemaddresses]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/services -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/services]]></Data>
         <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -940,6 +918,17 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/faq/articles]]></Data>
         <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "FAQ Reader": permission CRUD_ on /faq/articles/*/votes -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">7</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote">/faq/articles/*/votes</Data>
+        <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -1534,17 +1523,6 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/system/ticket]]></Data>
         <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/templates/*{TicketTemplate.CustomerVisible NE 1}]]></Data>
-        <Data Key="value">0</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -2447,12 +2425,12 @@
     <Insert Table="notification_event_item">
         <Data Key="notification_id">1</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentWritePermission</Data>
+        <Data Key="event_value" Type="Quote">AgentWritePermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">1</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentReadPermission</Data>
+        <Data Key="event_value" Type="Quote">AgentReadPermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">1</Data>
@@ -2493,12 +2471,12 @@
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentWritePermission</Data>
+        <Data Key="event_value" Type="Quote">AgentWritePermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentReadPermission</Data>
+        <Data Key="event_value" Type="Quote">AgentReadPermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">2</Data>
@@ -2651,6 +2629,11 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">6</Data>
+        <Data Key="event_key" Type="Quote">Events</Data>
+        <Data Key="event_value" Type="Quote">TicketResponsibleUpdate</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">6</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentResponsible</Data>
     </Insert>
@@ -2735,16 +2718,6 @@
         <Data Key="notification_id">8</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentMyQueues</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">8</Data>
-        <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentWritePermissions</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">8</Data>
-        <Data Key="event_key" Type="Quote">Recipients</Data>
-        <Data Key="event_value" Type="Quote">AgentReadPermissions</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">8</Data>
@@ -3352,7 +3325,7 @@ Im mittleren Inhaltsbereich finden Sie ganz oben verschiedene objektunabh&auml;n
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="visibility" Type="Quote">external</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
-        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Objekte sollen in KIX 18 gefunden werden.</span></p>        
+        <Data Key="f_field2" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Objekte sollen in KIX 18 gefunden werden.</span></p>
 ]]></Data>
         <Data Key="f_field3" Type="Quote"><![CDATA[<p><span style="font-family:Carlito,sans-serif">Die Komplexsuche ist &uuml;ber das <b>Lupen-Symbol im Modulmen&uuml; </b><span style="font-weight:normal">und</span> &uuml;ber die Header Action auf den Dashboards erreichbar. Es &ouml;ffnet sich ein Dialogfenster. &Uuml;ber die Tabs k&ouml;nnen Sie ausw&auml;hlen, nach welchen Objekten Sie suchen wollen.</span></p>
 
@@ -9887,7 +9860,7 @@ vielen Dank für Ihre Nachricht.
 CountMin: '1'
 CountMax: '1'
 CountDefault: '1'
-DefaultValue: 
+DefaultValue:
 Link: ''
 PossibleNone: '1'
 PossibleValues:
@@ -9944,7 +9917,7 @@ CountMax: '1'
 CountDefault: '1'
 ItemSeparator: ''
 Cols: ''
-DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n 
+DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n
   \   \"description\": \"Announce shut off to all possibly affected personell directly
   or indirectly working with the device.\",\r\n    \"input\": \"ChecklistState\",\r\n
   \   \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"200\",\r\n    \"title\": \"Identify
