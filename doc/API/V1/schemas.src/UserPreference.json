@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#UserPreference",
+  "$id": "UserPreference.json",
   "type": "object",
   "description": "The user preference object.",
   "properties": {

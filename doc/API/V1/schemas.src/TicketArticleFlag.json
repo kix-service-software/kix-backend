@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#TicketArticleFlag",
+  "$id": "TicketArticleFlag.json",
   "type": "object",
   "description": "The ticket article flag object.",
   "properties": {

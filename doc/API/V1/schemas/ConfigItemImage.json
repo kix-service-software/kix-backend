@@ -1,5 +1,5 @@
 {
-   "$id" : "#ConfigItemImage",
+   "$id" : "ConfigItemImage.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The config item image object.",
    "type" : "object",

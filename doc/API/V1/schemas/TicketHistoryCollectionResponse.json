@@ -1,5 +1,5 @@
 {
-   "$id" : "#TicketHistoryCollectionResponse",
+   "$id" : "TicketHistoryCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of ticket history entries.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "TicketHistory_json-5eb9de8d63" : {
-         "$id" : "#TicketHistory",
+         "$id" : "TicketHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The ticket history object.",
          "type" : "object",

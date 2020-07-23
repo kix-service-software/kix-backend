@@ -15,6 +15,7 @@ use warnings;
 
 use Net::LDAP;
 use Net::LDAP::Util qw(escape_filter_value);
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Config',
@@ -33,57 +34,22 @@ sub new {
     # Debug 0=off 1=on
     $Self->{Debug} = 0;
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    # get ldap preferences
-    if ( !$ConfigObject->Get( 'AuthSyncModule::LDAP::Host' . $Param{Count} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need AuthSyncModule::LDAP::Host$Param{Count} in Kernel/Config.pm",
-        );
-        return;
-    }
-    if ( !defined $ConfigObject->Get( 'AuthSyncModule::LDAP::BaseDN' . $Param{Count} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need AuthSyncModule::LDAP::BaseDN$Param{Count} in Kernel/Config.pm",
-        );
-        return;
-    }
-    if ( !$ConfigObject->Get( 'AuthSyncModule::LDAP::UID' . $Param{Count} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need AuthSyncModule::LDAP::UID$Param{Count} in Kernel/Config.pm",
-        );
-        return;
-    }
-    $Self->{Count}        = $Param{Count} || '';
-    $Self->{Die}          = $ConfigObject->Get( 'AuthSyncModule::LDAP::Die' . $Param{Count} );
-    $Self->{Host}         = $ConfigObject->Get( 'AuthSyncModule::LDAP::Host' . $Param{Count} );
-    $Self->{BaseDN}       = $ConfigObject->Get( 'AuthSyncModule::LDAP::BaseDN' . $Param{Count} );
-    $Self->{UID}          = $ConfigObject->Get( 'AuthSyncModule::LDAP::UID' . $Param{Count} );
-    $Self->{SearchUserDN} = $ConfigObject->Get( 'AuthSyncModule::LDAP::SearchUserDN' . $Param{Count} ) || '';
-    $Self->{SearchUserPw} = $ConfigObject->Get( 'AuthSyncModule::LDAP::SearchUserPw' . $Param{Count} ) || '';
-    $Self->{GroupDN}      = $ConfigObject->Get( 'AuthSyncModule::LDAP::GroupDN' . $Param{Count} )
-        || '';
-    $Self->{AccessAttr} = $ConfigObject->Get( 'AuthSyncModule::LDAP::AccessAttr' . $Param{Count} )
-        || 'memberUid';
-    $Self->{UserAttr} = $ConfigObject->Get( 'AuthSyncModule::LDAP::UserAttr' . $Param{Count} )
-        || 'DN';
-    $Self->{DestCharset} = $ConfigObject->Get( 'AuthSyncModule::LDAP::Charset' . $Param{Count} )
-        || 'utf-8';
-
-    # ldap filter always used
-    $Self->{AlwaysFilter} = $ConfigObject->Get( 'AuthSyncModule::LDAP::AlwaysFilter' . $Param{Count} ) || '';
-
-    # Net::LDAP new params
-    if ( $ConfigObject->Get( 'AuthSyncModule::LDAP::Params' . $Param{Count} ) ) {
-        $Self->{Params} = $ConfigObject->Get( 'AuthSyncModule::LDAP::Params' . $Param{Count} );
-    }
-    else {
-        $Self->{Params} = {};
-    }
+    $Self->{Die}                    = $Param{Config}->{Die} || 1;
+    $Self->{Host}                   = $Param{Config}->{Host} || '';
+    $Self->{BaseDN}                 = $Param{Config}->{BaseDN} || '';
+    $Self->{UID}                    = $Param{Config}->{UID} || '';
+    $Self->{SearchUserDN}           = $Param{Config}->{SearchUserDN} || '';
+    $Self->{SearchUserPw}           = $Param{Config}->{SearchUserPw} || '';
+    $Self->{GroupDN}                = $Param{Config}->{GroupDN} || '';
+    $Self->{AccessAttr}             = $Param{Config}->{AccessAttr} || 'memberUid';
+    $Self->{UserAttr}               = $Param{Config}->{UserAttr} || 'DN';
+    $Self->{DestCharset}            = $Param{Config}->{Charset} || 'utf-8';
+    $Self->{AlwaysFilter}           = $Param{Config}->{AlwaysFilter} || '';
+    $Self->{Params}                 = $Param{Config}->{Params} || {};
+    $Self->{Config}                 = $Param{Config}->{Config} || {};
+    $Self->{ContactUserSync}        = $Param{Config}->{ContactUserSync} || {};
+    $Self->{GroupDNBasedRoleSync}   = $Param{Config}->{GroupDNBasedRoleSync} || {};
+    $Self->{AttributeBasedRoleSync} = $Param{Config}->{AttributeBasedRoleSync} || {};
 
     return $Self;
 }
@@ -190,6 +156,7 @@ sub Sync {
     # get needed objects
     my $UserObject   = $Kernel::OM->Get('User');
     my $ConfigObject = $Kernel::OM->Get('Config');
+    my $ContactObject = $Kernel::OM->Get('Contact');
 
     # get current user id
     my $UserID = $UserObject->UserLookup(
@@ -197,47 +164,29 @@ sub Sync {
         Silent    => 1,
     );
 
-    # system permissions
-    my %PermissionsEmpty =
-        map { $_ => 0 } @{ $ConfigObject->Get('System::Permission') };
-
-    # get RoleObject
-    my $RoleObject = $Kernel::OM->Get('Role');
-
-    # get system roles and create lookup
-    my %SystemRoles = $RoleObject->RoleList( Valid => 1 );
-    my %SystemRolesByName = reverse %SystemRoles;
+    my $ContactID;
 
     # sync user from ldap
-    my $UserSyncMap = $ConfigObject->Get( 'AuthSyncModule::LDAP::UserSyncMap' . $Self->{Count} );
-    if ($UserSyncMap) {
+    my $ContactUserSync = $Self->{ContactUserSync};
+
+    if (IsHashRefWithData($ContactUserSync)) {
 
         # get whole user dn
         my %SyncUser;
-        for my $Entry ( $Result->all_entries() ) {
-            for my $Key ( sort keys %{$UserSyncMap} ) {
+        for my $Entry ($Result->all_entries()) {
+            for my $Key (sort keys %{$ContactUserSync}) {
 
-                # detect old config setting
-                if ( $Key =~ m{ \A (?: Firstname | Lastname | Email ) }xms ) {
-                    $Key = 'User' . $Key;
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => 'Old config setting detected, please use the new one '
-                            . 'from Kernel/Config/Defaults.pm (User* has been added!).',
-                    );
-                }
-
-                my $AttributeNames = $UserSyncMap->{$Key};
-                if ( ref $AttributeNames ne 'ARRAY' ) {
-                    $AttributeNames = [$AttributeNames];
+                my $AttributeNames = $ContactUserSync->{$Key};
+                if (ref $AttributeNames ne 'ARRAY') {
+                    $AttributeNames = [ $AttributeNames ];
                 }
                 ATTRIBUTE_NAME:
-                for my $AttributeName ( @{$AttributeNames} ) {
-                    if ( $AttributeName =~ /^_/ ) {
-                        $SyncUser{$Key} = substr( $AttributeName, 1 );
+                for my $AttributeName (@{$AttributeNames}) {
+                    if ($AttributeName =~ /^SET:/i) {
+                        $SyncUser{$Key} = substr($AttributeName, 4);
                         last ATTRIBUTE_NAME;
                     }
-                    elsif ( $Entry->get_value($AttributeName) ) {
+                    elsif ($Entry->get_value($AttributeName)) {
                         $SyncUser{$Key} = $Entry->get_value($AttributeName);
                         last ATTRIBUTE_NAME;
                     }
@@ -249,31 +198,20 @@ sub Sync {
                     'utf-8',
                 );
             }
-            if ( $Entry->get_value('userPassword') ) {
-                $SyncUser{UserPw} = $Entry->get_value('userPassword');
-
-                # e. g. set utf-8 flag
-                $SyncUser{UserPw} = $Self->_ConvertFrom(
-                    $SyncUser{UserPw},
-                    'utf-8',
-                );
-            }
         }
 
         # add new user
-        if ( %SyncUser && !$UserID ) {
+        if (%SyncUser && !$UserID) {
             $UserID = $UserObject->UserAdd(
-                UserTitle => 'Mr/Mrs',
-                UserLogin => $Param{User},
+                UserLogin    => $Param{User},
                 %SyncUser,
-                UserType     => 'User',
                 ValidID      => 1,
                 ChangeUserID => 1,
             );
-            if ( !$UserID ) {
+            if (!$UserID) {
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Can't create user '$Param{User}' ($UserDN) in RDBMS!",
+                    Priority  => 'error',
+                    Message   => "Can't create user '$Param{User}' ($UserDN) in RDBMS!",
                 );
 
                 # take down session
@@ -281,23 +219,51 @@ sub Sync {
                 return;
             }
             else {
+                if ($SyncUser{Email}) {
+                    my %ContactData = $ContactObject->ContactSearch(
+                        PostMasterSearch => $SyncUser{Email},
+                        Silent           => 1,
+                    );
+                    if ($ContactData{AssignedUserID} && $ContactData{AssignedUserID} != $UserID) {
+                        $Kernel::OM->Get('Log')->Log(
+                            LogPrefix => 'LDAP2Contact',
+                            Priority  => 'error',
+                            Message   => "Can't assign user '$Param{User}' ($UserDN) to contact ($ContactData{ID}) in RDBMS! Contact already is already assigned.",
+                        );
+
+                        # take down session
+                        $LDAP->unbind();
+                        return;
+                    }
+                    $ContactID = $ContactObject->ContactAdd(
+                        %SyncUser,
+                        AssignedUserID        => $UserID,
+                        PrimaryOrganisationID => 1,
+                        ValidID               => 1,
+                        UserID                => 1,
+                    );
+                }
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'notice',
-                    Message  => "Initial data for '$Param{User}' ($UserDN) created in RDBMS.",
+                    LogPrefix => 'LDAP2Contact',
+                    Priority  => 'notice',
+                    Message   => "Initial data for '$Param{User}' ($UserDN) created in RDBMS.",
                 );
             }
         }
 
-        # update user attributes (only if changed)
+        # update user attributes and contact attributes (only if changed)
         elsif (%SyncUser) {
 
             # get user data
-            my %UserData = $UserObject->GetUserData( User => $Param{User} );
+            my %UserData = $UserObject->GetUserData(User => $Param{User});
+            my %ContactData = $ContactObject->ContactGet(
+                UserID => $UserData{UserID},
+            );
 
-            # check for changes
+            # check for changes on user
             my $AttributeChange;
             ATTRIBUTE:
-            for my $Attribute ( sort keys %SyncUser ) {
+            for my $Attribute (sort keys %SyncUser) {
                 next ATTRIBUTE if $SyncUser{$Attribute} eq $UserData{$Attribute};
                 $AttributeChange = 1;
                 last ATTRIBUTE;
@@ -306,28 +272,50 @@ sub Sync {
             if ($AttributeChange) {
                 $UserObject->UserUpdate(
                     %UserData,
-                    UserID    => $UserID,
-                    UserLogin => $Param{User},
+                    UserPw       => undef,
+                    UserID       => $UserID,
+                    UserLogin    => $Param{User},
                     %SyncUser,
                     UserType     => 'User',
                     ChangeUserID => 1,
                 );
             }
+
+            # check for changes on contact
+            $AttributeChange = 0;
+            ATTRIBUTE:
+            for my $Attribute (sort keys %SyncUser) {
+                next ATTRIBUTE if $SyncUser{$Attribute} eq $ContactData{$Attribute};
+                $AttributeChange = 1;
+                last ATTRIBUTE;
+            }
+
+            if ($AttributeChange) {
+                $ContactObject->ContactUpdate(
+                    %ContactData,
+                    %SyncUser,
+                    UserID         => 1,
+                    AssignedUserID => $UserID,
+                );
+            }
         }
     }
+
+    # get RoleObject
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    # get system roles and create lookup
+    my %SystemRoles = $RoleObject->RoleList( Valid => 1 );
+    my %SystemRolesByName = reverse %SystemRoles;
 
     # variable to store role permissions from ldap
     my %RolePermissionsFromLDAP;
 
-    # sync ldap group 2 kix role permissions
-    my $UserSyncRolesDefinition = $ConfigObject->Get(
-        'AuthSyncModule::LDAP::UserSyncRolesDefinition' . $Self->{Count}
-    );
-    if ($UserSyncRolesDefinition) {
+    if ( IsHashRefWithData($Self->{GroupDNBasedRoleSync}) ) {
 
         # read and remember roles from ldap
         GROUPDN:
-        for my $GroupDN ( sort keys %{$UserSyncRolesDefinition} ) {
+        for my $GroupDN ( sort keys %{$Self->{GroupDNBasedRoleSync}} ) {
 
             # search if we're allowed to
             my $Filter;
@@ -368,7 +356,7 @@ sub Sync {
             }
 
             # remember role permissions
-            my %SyncRoles = %{ $UserSyncRolesDefinition->{$GroupDN} };
+            my %SyncRoles = %{ $Self->{GroupDNBasedRoleSync}->{$GroupDN} };
             SYNCROLE:
             for my $SyncRole ( sort keys %SyncRoles ) {
 
@@ -376,10 +364,7 @@ sub Sync {
                 if ( !$SystemRolesByName{$SyncRole} ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
-                        Message =>
-                            "Invalid role '$SyncRole' in "
-                            . "'AuthSyncModule::LDAP::UserSyncRolesDefinition"
-                            . "$Self->{Count}'!",
+                        Message => "Invalid role '$SyncRole' in GroupDNBasedRoleSync!"
                     );
                     next SYNCROLE;
                 }
@@ -391,11 +376,7 @@ sub Sync {
         }
     }
 
-    # sync ldap attribute 2 kix role permissions
-    my $UserSyncAttributeRolesDefinition = $ConfigObject->Get(
-        'AuthSyncModule::LDAP::UserSyncAttributeRolesDefinition' . $Self->{Count}
-    );
-    if ($UserSyncAttributeRolesDefinition) {
+    if ( IsHashRefWithData($Self->{AttributeBasedRoleSync}) ) {
 
         # build filter
         my $Filter = "($Self->{UID}=" . escape_filter_value( $Param{User} ) . ')';
@@ -412,7 +393,7 @@ sub Sync {
             );
         }
         else {
-            my %SyncConfig = %{$UserSyncAttributeRolesDefinition};
+            my %SyncConfig = %{$Self->{AttributeBasedRoleSync}};
             for my $Attribute ( sort keys %SyncConfig ) {
 
                 my %AttributeValues = %{ $SyncConfig{$Attribute} };
@@ -443,9 +424,7 @@ sub Sync {
                                 $Kernel::OM->Get('Log')->Log(
                                     Priority => 'notice',
                                     Message =>
-                                        "Invalid role '$SyncRole' in "
-                                        . "'AuthSyncModule::LDAP::UserSyncAttributeRolesDefinition"
-                                        . "$Self->{Count}'!",
+                                        "Invalid role '$SyncRole' in AttributeBasedGroupDNBasedRoleSync!",
                                 );
                                 next SYNCROLE;
                             }

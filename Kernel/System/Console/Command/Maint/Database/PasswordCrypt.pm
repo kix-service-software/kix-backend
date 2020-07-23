@@ -22,7 +22,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Makes a database password unreadable for inclusion in Kernel/Config.pm.');
+    $Self->Description('Makes a database password unreadable for inclusion in config files.');
     $Self->AddArgument(
         Name        => 'password',
         Description => "The database password to be crypted.",

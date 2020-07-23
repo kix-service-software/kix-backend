@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#SysConfigOption",
+  "$id": "SysConfigOption.json",
   "type": "object",
   "description": "The SysConfig option object.",
   "properties": {
@@ -24,6 +24,10 @@
     },
     "Name": {
       "type": "string",
+      "readOnly": true
+    },
+    "ReadOnly": {
+      "type": "integer",
       "readOnly": true
     },
     "Value": {

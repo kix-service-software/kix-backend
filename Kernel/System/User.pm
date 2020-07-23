@@ -29,7 +29,6 @@ our @ObjectDependencies = (
     'Encode',
     'Log',
     'Main',
-    'SearchProfile',
     'Time',
     'Valid',
 );
@@ -540,15 +539,6 @@ sub UserUpdate {
         $Self->SetPassword(
             UserLogin => $Param{UserLogin},
             PW        => $Param{UserPw}
-        );
-    }
-
-    # update search profiles if the UserLogin changed
-    if ( lc $OldUserLogin ne lc $Param{UserLogin} ) {
-        $Kernel::OM->Get('SearchProfile')->SearchProfileUpdateUserLogin(
-            Base         => 'TicketSearch',
-            UserLogin    => $OldUserLogin,
-            NewUserLogin => $Param{UserLogin},
         );
     }
 
@@ -1216,7 +1206,7 @@ sub PermissionList {
 
     # fetch the result
     my %Result;
-    while ( my @Row = $DBObject->FetchrowArray() ) {        
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         $Result{ $Row[0] } = $Row[1];
     }
 
@@ -1296,7 +1286,7 @@ sub RoleList {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         # check if this role is valid for the given usage context
         next if ( $Param{UsageContext} && ($Row[1] & Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}) != Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})} );
-        
+
         push(@Result, $Row[0]);
     }
 
@@ -1318,7 +1308,7 @@ returns true if the requested permission is granted
     my ($Granted, $ResultingPermission) = $UserObject->CheckResourcePermission(
         UserID              => 123,                     # required
         UsageContext        => 'Agent'|'Customer'       # required
-        Target              => '/tickets',              # required 
+        Target              => '/tickets',              # required
         RequestedPermission => 'READ'                   # required
     );
 

@@ -526,7 +526,7 @@ sub OptionUpdate {
 
     # do the db update...
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => "UPDATE sysconfig set 
+        SQL  => "UPDATE sysconfig SET 
                  name = ?, context = ?, context_metadata = ?, description = ?, access_level = ?, 
                  experience_level = ?, type = ?, group_name = ?, setting = ?, is_required = ?, 
                  is_modified = ?, default_value = ?, value = ?, comments = ?, default_valid_id = ?, valid_id = ?, 
@@ -535,7 +535,7 @@ sub OptionUpdate {
             \$Param{Name}, \$Param{Context}, \$Param{ContextMetadata}, \$Param{Description}, 
             \$Param{AccessLevel}, \$Param{ExperienceLevel}, \$Param{Type}, \$Param{Group}, 
             \$Param{Setting}, \$Param{IsRequired}, \$IsModified, \$Param{Default}, \$Param{Value}, 
-            \$Param{Comment},, \$Param{DefaultValidID}, \$Param{ValidID}, \$Param{UserID}, \$Param{Name}
+            \$Param{Comment}, \$Param{DefaultValidID}, \$Param{ValidID}, \$Param{UserID}, \$Param{Name}
         ],
     );
 
@@ -962,6 +962,7 @@ sub _RebuildFromFile {
     my %ExistingKeys;
     OPTIONRAW:
     for my $OptionRaw ( @{ $Self->{XMLConfig} } ) {
+
         # ignore options without name
         next if !$OptionRaw->{Name};
 

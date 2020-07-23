@@ -20,7 +20,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Create a new role permission.');
+    $Self->Description('Update a role permission.');
     $Self->AddOption(
         Name        => 'role-name',
         Description => 'Name of the role.',

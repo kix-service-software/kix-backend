@@ -1,5 +1,5 @@
 {
-   "$id" : "#FAQHistoryResponse",
+   "$id" : "FAQHistoryResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for execution FAQ history GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "FAQHistory_json-9632ee71d4" : {
-         "$id" : "#FAQHistory",
+         "$id" : "FAQHistory.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The FAQ history object.",
          "type" : "object",

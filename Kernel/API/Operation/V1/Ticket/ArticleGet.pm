@@ -99,12 +99,12 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID             => '1',                                           # required 
-            ArticleID            => '32,33',                                       # required, could be coma separated IDs or an Array
+            TicketID             => '1',                                           # required
+            ArticleID            => '32,33',                                       # required, could be comma separated IDs or an Array
             include              => '...',                                         # Optional, 0 as default. Include additional objects
                                                                                    # (supported: DynamicFields, Attachments)
             expand               => 0,                                             # Optional, 0 as default. Expand referenced objects
-                                                                                   # (supported: Attachments) 
+                                                                                   # (supported: Attachments)
         },
     );
 
@@ -145,7 +145,7 @@ one or more ticket entries in one call.
                     Attachments => [
                         <AttachmentID>
                         # . . .
-                    ]                            
+                    ]
                     # If include=Attachments => 1 AND expand=Attachments => 1 was passed, you'll get an entry like this for each attachment:
                     Attachments => [
                         {
@@ -187,21 +187,21 @@ sub Run {
             DynamicFields      => $Param{Data}->{include}->{DynamicFields},
             UserID             => $Self->{Authorization}->{UserID},
         );
-        
+
         # check if article exists
         if ( !%ArticleRaw ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
-        
+
 	    # check if article belongs to the given ticket
 	    if ( $ArticleRaw{TicketID} != $Param{Data}->{TicketID} ) {
 	        return $Self->_Error(
 	            Code => 'Object.NotFound',
 	        );
 	    }
-    
+
         my %ArticleData;
         my @DynamicFields;
 
@@ -255,7 +255,7 @@ sub Run {
     if ( scalar(@ArticleList) == 1 ) {
         return $Self->_Success(
             Article => $ArticleList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

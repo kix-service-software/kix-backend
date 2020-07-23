@@ -1,5 +1,5 @@
 {
-   "$id" : "#MailFilterResponse",
+   "$id" : "MailFilterResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for mail filter GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "MailFilter_json-fff9539f5f" : {
-         "$id" : "#MailFilter",
+         "$id" : "MailFilter.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The mail filter object.",
          "type" : "object",

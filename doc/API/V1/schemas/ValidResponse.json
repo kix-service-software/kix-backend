@@ -1,5 +1,5 @@
 {
-   "$id" : "#ValidResponse",
+   "$id" : "ValidResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for valid GET request.",
    "type" : "object",
@@ -13,7 +13,7 @@
    ],
    "definitions" : {
       "Valid_json-ac696cc881" : {
-         "$id" : "#Valid",
+         "$id" : "Valid.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The valid object.",
          "type" : "object",

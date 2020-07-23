@@ -1,5 +1,5 @@
 {
-   "$id" : "#QueueCollectionResponse",
+   "$id" : "QueueCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of queues.",
    "type" : "object",
@@ -16,7 +16,7 @@
    ],
    "definitions" : {
       "Queue_json-491a3aa0ed" : {
-         "$id" : "#Priority",
+         "$id" : "Priority.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
          "description" : "The priority object.",
          "type" : "object",
@@ -109,7 +109,14 @@
                "readOnly" : true
             },
             "Signature" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "SubQueues" : {

@@ -25,6 +25,8 @@ use lib "$Bin/../..";
 use lib "$Bin/../../Kernel/cpan-lib";
 use lib "$Bin/../../plugins";
 
+$ENV{KIX_HOME} = "$Bin/../.." if !$ENV{KIX_HOME};
+
 use Kernel::API::Provider;
 use Kernel::System::ObjectManager;
 

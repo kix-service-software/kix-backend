@@ -124,8 +124,6 @@ perform TicketCreate Operation. This will return the created TicketID.
                 Lock            => 'some lock name',                              # optional
                 TypeID          => 123,                                           # optional
                 Type            => 'some type name',                              # optional
-                ServiceID       => 123,                                           # optional
-                Service         => 'some service name',                           # optional
                 OwnerID         => 123,                                           # optional
                 Owner           => 'some user login',                             # optional
                 OrganisationID  => 123,                                           # optional
@@ -352,8 +350,6 @@ sub _TicketCreate {
         Lock           => 'unlock',
         TypeID         => $Ticket->{TypeID} || '',
         Type           => $Ticket->{Type} || '',
-        ServiceID      => $Ticket->{ServiceID} || '',
-        Service        => $Ticket->{Service} || '',
         StateID        => $Ticket->{StateID} || '',
         State          => $Ticket->{State} || '',
         PriorityID     => $Ticket->{PriorityID} || '',

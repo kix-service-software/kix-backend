@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "#Permission",
+  "$id": "Permission.json",
   "type": "object",
   "description": "The permission object.",
   "properties": {
@@ -13,7 +13,14 @@
       "readOnly": true
     },
     "Comment": {
-      "type": "string",
+      "anyOf" : [
+        {
+          "type" : "string"
+        },
+        {
+          "type" : "null"
+        }
+      ],
       "readOnly": true
     },
     "CreateBy": {

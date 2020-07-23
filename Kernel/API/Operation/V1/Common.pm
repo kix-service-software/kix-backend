@@ -396,6 +396,10 @@ sub RunOperation {
         }
     }
 
+    if( $Param{PermissionCheckOnly} ) {
+        return 1;
+    }
+
     # get parameter definitions (if available)
     my $Parameters;
     if ( $Self->can('ParameterDefinition') ) {
@@ -982,7 +986,6 @@ sub AddCacheDependency {
         next if $Type eq $Self->{OperationConfig}->{CacheType};
 
         if ( exists $Self->{CacheDependencies}->{$Type} ) {
-            $Self->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type...already exists" );
             next;
         }
         $Self->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type" );
@@ -1138,7 +1141,7 @@ sub _Success {
 
             my $FieldSelector = $Self->{Fields};
             if ( IsHashRefWithData( $Self->{PermissionFieldSelector} ) ) {
-                $Self->_Debug($Self->{LevelIndent}, "using permission field selector");    
+                $Self->_Debug($Self->{LevelIndent}, "using permission field selector");
                 $FieldSelector = $Self->{PermissionFieldSelector};
             }
 
