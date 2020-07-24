@@ -91,7 +91,7 @@ sub new {
         my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $LogDir,
             Filter    => $Basename.'*',
-            Silent    => 1, 
+            Silent    => 1,
         );
 
         # rotate all other log files
@@ -103,7 +103,7 @@ sub new {
         @Files = sort { $FileModTime{$a} cmp $FileModTime{$b} } keys %FileModTime;
         my $FileCount = @Files;
         foreach my $File ( @Files ) {
-            last if $FileCount == $Keep;
+            last if $FileCount <= $Keep;
             unlink($File);
             $FileCount--;
         }
@@ -150,7 +150,7 @@ sub Log {
             my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
                 Directory => $LogDir,
                 Filter    => $Filename.'_*',
-                Silent    => 1, 
+                Silent    => 1,
             );
 
             # rotate all other log files
@@ -158,12 +158,12 @@ sub Log {
                 if ( $File =~ /^(.*?)_(\d+)$/ ) {
                     my $Basename   = $1;
                     my $NewCounter = $2;
-                    rename($File, $Basename . '_' . ++$NewCounter); 
+                    rename($File, $Basename . '_' . ++$NewCounter);
                 }
             }
 
             # rotate the first file
-            rename($Self->{LogFile}, "$Self->{LogFile}_1"); 
+            rename($Self->{LogFile}, "$Self->{LogFile}_1");
         }
     }
 

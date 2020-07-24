@@ -302,7 +302,7 @@ msgid "15 min"
 msgstr "15 min"
 
 msgid "Task"
-msgstr "Ausgabe"
+msgstr "Aufgabe"
 
 msgid "work report (customer)"
 msgstr "Arbeitsbericht (Kunde)"
