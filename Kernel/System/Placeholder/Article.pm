@@ -175,6 +175,9 @@ sub _ReplaceArticlePlaceholders {
             #     Subject      => $Param{Article}->{Subject},
             #     Size         => $CharLength
             # );
+
+            next if !$Param{Article}->{$Attribute};
+             
             my $AttributeValue = $Param{Article}->{$Attribute};
             $AttributeValue    =~ s/^(.{$CharLength}).*$/$1 [...]/;
             $Param{Text}       =~ s/$Tag\[.+?\]$Self->{End}/$AttributeValue/g;

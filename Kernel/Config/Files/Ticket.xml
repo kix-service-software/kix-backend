@@ -2115,7 +2115,7 @@
                 <Item>X-KIX-State</Item>
                 <Item>X-KIX-State-PendingTime</Item>
                 <Item>X-KIX-Type</Item>
-                <Item>X-KIX-CustomerNo</Item>
+                <Item>X-KIX-Organisation</Item>
                 <Item>X-KIX-Contact</Item>
                 <Item>X-KIX-SenderType</Item>
                 <Item>X-KIX-ArticleType</Item>
