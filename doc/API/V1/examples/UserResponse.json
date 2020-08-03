@@ -2,10 +2,49 @@
     "User": {
         "ChangeBy": 1,
         "ChangeTime": "2020-01-20 11:30:26",
+        "Contact": {
+            "AssignedUserID": 3,
+            "ChangeBy": 1,
+            "ChangeTime": "2020-01-20 11:59:04",
+            "City": null,
+            "Comment": "",
+            "Country": "Germany",
+            "CreateBy": 1,
+            "CreateTime": "2020-01-20 11:51:50",
+            "Email": "jdoe@john-doe.com",
+            "Fax": null,
+            "Firstname": "John",
+            "Fullname": "John Doe",
+            "ID": 5,
+            "Lastname": "Doe",
+            "Mobile": null,
+            "OrganisationIDs": [
+                15
+            ],
+            "Phone": null,
+            "PrimaryOrganisationID": 15,
+            "Street": "somewhere avenue 1",
+            "Title": "",
+            "UserID": 5,
+            "ValidID": 1,
+            "Zip": null
+        },
         "CreateBy": 1,
         "CreateTime": "2020-01-20 11:30:26",
         "IsAgent": 1,
         "IsCustomer": 0,
+        "Preferences": [
+            {
+                "ID": "UserLanguage",
+                "UserID": 5,
+                "Value": "en"
+            }
+        ],
+        "RoleIDs": [
+            2,
+            13
+        ],
+        "UsageContext": 1,
         "UserComment": null,
         "UserID": 3,
         "UserLogin": "jdoe",

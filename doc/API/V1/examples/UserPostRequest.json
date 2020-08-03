@@ -1,11 +1,12 @@
 {
     "User": {
-        "UserEmail": "john.doe@example.com",
-        "UserFirstname": "John",
-        "UserLastname": "Doe",
+        "IsAgent": 1,
+        "IsCustomer": 0,
         "UserLogin": "jdoe",
-        "UserPw": "secret",
-        "UserTitle": "Dr.",
+        "UserPw": "s3cr37-p4ssw0rD",
+        "RoleIDs": [
+            3
+        ],
         "ValidID": 1
     }
 }
