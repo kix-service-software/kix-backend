@@ -25,14 +25,15 @@ require '_Helper.pl';
 
 # require our common library
 require '_StepsLib.pl';
+#require './_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
-When qr/I query the cmdb collection of classes$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
+When qr/I query the collection of (\w+) with roleid (\d+)$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _OPTION(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/cmdb/classes',
-      Sort  => 'ConfigItemClass.Name:textual'
+      URL   => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
+      Sort  => 'Permission.ID:numeric'
    );
 };
 
