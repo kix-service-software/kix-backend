@@ -248,12 +248,6 @@
 /organisations/:OrganisationID                                                 |   PATCH           | V1::Organisation::OrganisationUpdate
 /organisations/:OrganisationID/contacts                                        |   GET             | V1::Organisation::OrganisationContactSearch
 /organisations/:OrganisationID/tickets                                         |   GET             | V1::Organisation::OrganisationTicketSearch
-/searchprofiles                                                                |   GET             | V1::SearchProfile::SearchProfileSearch
-/searchprofiles                                                                |   POST            | V1::SearchProfile::SearchProfileCreate
-/searchprofiles/:SearchProfileID                                               |   DELETE          | V1::SearchProfile::SearchProfileDelete
-/searchprofiles/:SearchProfileID                                               |   GET             | V1::SearchProfile::SearchProfileGet
-/searchprofiles/:SearchProfileID                                               |   PATCH           | V1::SearchProfile::SearchProfileUpdate
-/searchprofiles/categories                                                     |   GET             | V1::SearchProfile::SearchProfileCategorySearch
 /session                                                                       |   DELETE          | V1::Session::SessionDelete
 /session                                                                       |   GET             | V1::Session::SessionGet
 /session/user                                                                  |   GET             | V1::Session::UserGet

@@ -914,7 +914,9 @@ sub ContactSearch {
 
     # check cache
     my $CacheKey = "ContactSearch::${Valid}::";
-    foreach my $Key ( qw(OrganisationIDs AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals) ) {
+    foreach my $Key (
+        qw(OrganisationIDs AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals EmailIn)
+    ) {
         $CacheKey .= '::'.($Param{$Key} || '');
     }
     my $Data = $Kernel::OM->Get('Cache')->Get(
@@ -991,7 +993,7 @@ sub ContactSearch {
         }
         $Where .= "co.org_id = ?";
         push(@Bind, \$Param{OrganisationID});
-    }    
+    }
     elsif ( $Param{OrganisationIDs} && IsArrayRefWithData($Param{OrganisationIDs}) ) {
         $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
         if ( defined $Where ) {
@@ -1000,7 +1002,7 @@ sub ContactSearch {
         my @BindVars;
         foreach my $OrgID ( @{$Param{OrganisationIDs}} ) {
             push(@BindVars, '?');
-            push(@Bind, \$OrgID);        
+            push(@Bind, \$OrgID);
         }
         $Where .= "(co.org_id IN ( " . join(',', @BindVars) . " ))";
     }
@@ -1026,6 +1028,23 @@ sub ContactSearch {
 
         $Where .= "c.email = ?";
         push(@Bind, \$Param{EmailEquals});
+    }
+    elsif ($Param{EmailIn}) {
+
+        if ( defined $Where ) {
+            $Where .= " AND ";
+        }
+
+        if (!IsArrayRefWithData($Param{EmailIn})) {
+            $Param{EmailIn} = [$Param{EmailIn}];
+        }
+
+        my @BindVars;
+        foreach my $Mail ( @{$Param{EmailIn}} ) {
+            push(@BindVars, '?');
+            push(@Bind, \$Mail);
+        }
+        $Where .= "(c.email IN ( " . join(',', @BindVars) . " ))";
     }
     elsif ($Param{Login}) {
         $Join = 'LEFT JOIN users u ON c.user_id = u.id';

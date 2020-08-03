@@ -225,6 +225,32 @@ sub Run {
                         ID => (keys %List)[0],
                     );
                 }
+
+                # create a new contact if no existing contact was found for the given "from"
+                if ( !$ContactData{ID} ) {
+                    my $ParserObject = Kernel::System::EmailParser->new(
+                        Mode => 'Standalone',
+                    );
+                    my $ContactEmailRealname = $ParserObject->GetRealname(
+                        Email => $GetParam{EmailFrom}
+                    );
+                    my @NameChunks = split(' ', $ContactEmailRealname);
+
+                    my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
+                        Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
+                        Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
+                        Email                 => lc( $GetParam{EmailFrom} ),
+                        PrimaryOrganisationID => undef,
+                        ValidID               => 1,
+                        UserID                => 1,
+                    );
+
+                    my $ContactObject = $Kernel::OM->Get('Contact');
+
+                    %ContactData = $ContactObject->ContactGet(
+                        ID => $ContactID
+                    );
+                }
             }
         }
 
@@ -638,7 +664,7 @@ sub Run {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
         my $Key = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
-        
+
         if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
 
             # get dynamic field config
