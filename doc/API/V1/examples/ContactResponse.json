@@ -1,42 +1,52 @@
 {
-  "Contact": {
-    "AssignedUserID": 3,
-    "ChangeBy":1,
-    "ChangeTime":"2019-03-12 18:26:07",
-    "City":"Musterstadt",
-    "Comment":"",
-    "Country":"Germany",
-    "CreateBy":1,
-    "CreateTime":"2018-11-01 15:13:53",
-    "Email": "john.doe@example.com",
-    "Fax":"",
-    "Firstname": "John",
-    "Fullname": "John Doe",
-    "ID":102,
-    "Lastname": "Doe",
-    "Login": "jdoe",
-    "Mobile":"+49 170 111 222 333",
-    "OrganisationIDs":[
-      1,
-      2
-    ],
-    "Phone":"+49 123 45 67 8",
-    "PrimaryOrganisationID":1,
-    "Street":"Musterstraße 1",
-    "Title":"Herr",
-    "User": {
-      "ChangeBy": 1,
-      "ChangeTime": "2018-10-01 12:01:53",
-      "CreateBy": 1,
-      "CreateTime": "2019-03-15 18:59:54",
-      "IsAgent": 1,
-      "IsCustomer": 0,
-      "UserComment": null,
-      "UserID": 3,
-      "UserLogin": "jdoe",
-      "ValidID": 1
-    },
-    "ValidID":1,
-    "Zip":"12345"
-  }
+    "Contact": {
+        "AssignedConfigItems": [
+            33
+        ],
+        "AssignedUserID": 3,
+        "ChangeBy": 1,
+        "ChangeTime": "2019-03-12 18:26:07",
+        "City": "Musterstadt",
+        "Comment": "",
+        "Country": "Germany",
+        "CreateBy": 1,
+        "CreateTime": "2018-11-01 15:13:53",
+        "Email": "john.doe@example.com",
+        "Fax": "",
+        "Firstname": "John",
+        "Fullname": "John Doe",
+        "ID": 102,
+        "Lastname": "Doe",
+        "Login": "jdoe",
+        "Mobile": "+49 170 111 222 333",
+        "OrganisationIDs": [
+            1,
+            2
+        ],
+        "Phone": "+49 123 45 67 8",
+        "PrimaryOrganisationID": 1,
+        "Street": "Musterstraße 1",
+        "TicketStats": {
+            "EscalatedCount": 0,
+            "NewCount": 2,
+            "OpenCount": 4,
+            "PendingReminderCount": 1
+        },
+        "Title": "Herr",
+        "User": {
+            "ChangeBy": 1,
+            "ChangeTime": "2018-10-01 12:01:53",
+            "CreateBy": 1,
+            "CreateTime": "2019-03-15 18:59:54",
+            "IsAgent": 1,
+            "IsCustomer": 0,
+            "UsageContext": 1,
+            "UserComment": null,
+            "UserID": 3,
+            "UserLogin": "jdoe",
+            "ValidID": 1
+        },
+        "ValidID": 1,
+        "Zip": "12345"
+    }
 }
