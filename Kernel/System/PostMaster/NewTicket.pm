@@ -590,6 +590,7 @@ sub Run {
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $TicketID,
         Channel          => $GetParam{'X-KIX-Channel'} || $Channel,
+        CustomerVisible  => 1,
         SenderType       => $GetParam{'X-KIX-SenderType'},
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},

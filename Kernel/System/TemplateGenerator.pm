@@ -764,10 +764,15 @@ sub NotificationEvent {
         # EO KIX4OTRS-capeIT
     );
 
+    my $Re  = $Kernel::OM->Get('Config')->Get('Ticket::SubjectRe') || '(RE|AW)';
+    my $Fwd = $Kernel::OM->Get('Config')->Get('Ticket::SubjectFwd') || '(FW|FWD)';
+    my $AsReply   = $Notification{Subject} =~ m/^$Re:/i;
+    my $AsForward = $Notification{Subject} =~ m/^$Fwd:/i;
     $Notification{Subject} = $TicketObject->TicketSubjectBuild(
         TicketNumber => $Ticket{TicketNumber},
         Subject      => $Notification{Subject} || '',
-        Type         => 'New',
+        Action       => $AsForward ? 'Forward' : undef,
+        Type         => (!$AsReply && !$AsForward) ? 'New' : undef
     );
 
     # add URLs and verify to be full HTML document

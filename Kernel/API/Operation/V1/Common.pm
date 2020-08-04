@@ -74,6 +74,35 @@ sub RunOperation {
     # also ignore all this if we have been told to ignore permissions
     if ( !$Self->{IgnorePermissions} && $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
 
+        # check the necessary permission of the parent object if needed 
+        if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) ) {
+
+            # determine which method to use
+            my $Method = $Self->{RequestMethod} eq 'GET' ? 'GET' : 'PATCH';
+
+            # get the config of the parent operation to determine the primary object ID attribute
+            my $OperationConfig = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Self->{ParentMethodOperationMapping}->{$Method}};
+
+            my $Data = $OperationConfig->{ObjectID} ? {
+                    $OperationConfig->{ObjectID} => $Param{Data}->{$OperationConfig->{ObjectID}},
+                } : $Param{Data};
+
+            my $ExecResult = $Self->ExecOperation(
+                RequestMethod       => $Method,
+                OperationType       => $Self->{ParentMethodOperationMapping}->{$Method},
+                Data                => $Data,
+                IgnoreInclude       => 1,       # we don't need any includes 
+                IgnoreExpand        => 1,       # we don't need any expands
+                PermissionCheckOnly => 1,       # do not change any data
+            );
+
+            if ( !IsHashRefWithData($ExecResult) || !$ExecResult->{Success} ) {
+                return $Self->_Error(
+                    Code => 'Object.NoPermission',
+                );
+            }
+        }
+
         # we have to check the permission only for the current request method
         # all other permissions are irrelevant (except DENY)
 
@@ -394,10 +423,10 @@ sub RunOperation {
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
         }
-    }
 
-    if( $Param{PermissionCheckOnly} ) {
-        return 1;
+        if ( $Param{PermissionCheckOnly} && $Self->{RequestMethod} =~ /^(POST|PATCH|DELETE)$/ ) {
+            return $Self->_Success();
+        }
     }
 
     # get parameter definitions (if available)
@@ -1244,6 +1273,9 @@ helper function to execute another operation to work with its result.
         Data                     => {},                                 # required
         IgnorePermissions        => 1,                                  # optional
         SuppressPermissionErrors => 1,                                  # optional
+        IgnoreInclude            => 1,                                  # optional
+        IgnoreExpand             => 1,                                  # optional
+        PermissionCheckOnly      => 1,                                  # optional
     );
 
 =cut
@@ -1281,7 +1313,11 @@ sub ExecOperation {
 
     # prepare RequestURI
     my $RequestURI = $TransportConfig->{RouteOperationMapping}->{$Param{OperationType}}->{Route};
+    my $CurrentRoute = $RequestURI;
     $RequestURI =~ s/:(\w*)/$Param{Data}->{$1}/egx;
+
+    # TODO: the following code is nearly identical to the code used in Transport::REST, method ProviderProcessRequest -> should be generalized
+    # maybe another solution to execute operations / API calls is needed
 
     # determine available methods
     my %AvailableMethods;
@@ -1299,6 +1335,50 @@ sub ExecOperation {
             Operation => $CurrentOperation,
             Route     => $RouteMapping{Route}
         };
+    }
+
+    # get direct sub-resource for generic including
+    my %OperationRouteMapping = (
+        $Param{OperationType} => $CurrentRoute
+    );
+    for my $Op ( sort keys %{ $TransportConfig->{RouteOperationMapping} } ) {
+        # ignore invalid config
+        next if !IsHashRefWithData( $TransportConfig->{RouteOperationMapping}->{$Op} );
+        # ignore non-search or -get operations
+        next if $Op !~ /(Search|Get)$/;
+        # ignore anything that has nothing to do with the current Ops route
+        if ( $CurrentRoute ne '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
+            next;
+        }
+        elsif ( $CurrentRoute eq '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
+            next;
+        }
+
+        $OperationRouteMapping{$Op} = $TransportConfig->{RouteOperationMapping}->{$Op}->{Route};
+    }
+
+    # determine parent mapping as well
+    my $ParentObjectRoute = $CurrentRoute;
+    $ParentObjectRoute =~ s/^((.*?):(\w+))\/(.+?)$/$1/g;
+    $ParentObjectRoute = '' if $ParentObjectRoute eq $CurrentRoute;
+
+    my %ParentMethodOperationMapping;
+    if ( $ParentObjectRoute ) {
+        for my $Op ( sort keys %{ $TransportConfig->{RouteOperationMapping} } ) {
+            # ignore invalid config
+            next if !IsHashRefWithData( $TransportConfig->{RouteOperationMapping}->{$Op} );
+
+            # ignore anything that has nothing to do with the parent Ops route
+            if ( $ParentObjectRoute ne '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute\/$/ ) {
+                next;
+            }
+            elsif ( $ParentObjectRoute eq '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute[:a-zA-Z_]+$\//g ) {
+                next;
+            }
+
+            my $Method = $TransportConfig->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
+            $ParentMethodOperationMapping{$Method} = $Op;
+        }
     }
 
     # init new Operation object
@@ -1319,8 +1399,9 @@ sub ExecOperation {
         RequestMethod            => $Param{RequestMethod} || $Self->{RequestMethod},
         AvailableMethods         => \%AvailableMethods,
         RequestURI               => $RequestURI,
-        CurrentRoute             => $TransportConfig->{RouteOperationMapping}->{$Param{OperationType}}->{Route},
-        OperationRouteMapping    => $Self->{OperationRouteMapping},
+        CurrentRoute             => $CurrentRoute,
+        OperationRouteMapping    => \%OperationRouteMapping,
+        ParentMethodOperationMapping => \%ParentMethodOperationMapping,
         Authorization            => $Self->{Authorization},
         Level                    => ($Self->{Level} || 0) + 1,
         IgnorePermissions        => $Param{IgnorePermissions},
@@ -1344,14 +1425,21 @@ sub ExecOperation {
         }
     } 
 
+    # do we have to add includes and expands
+    if ( !$Param{IgnoreInclude} ) {
+        $AdditionalData{include} = $Self->{RequestData}->{include};
+    }
+    if ( !$Param{IgnoreExpand} ) {
+        $AdditionalData{expand} = $Self->{RequestData}->{expand};
+    }
+
     my $Result = $OperationObject->Run(
         Data    => {
             %{$Param{Data}},
             %AdditionalData,
-            include => $Self->{RequestData}->{include},
-            expand  => $Self->{RequestData}->{expand},
         },
-        IgnorePermissions => $Param{IgnorePermissions},
+        IgnorePermissions   => $Param{IgnorePermissions},
+        PermissionCheckOnly => $Param{PermissionCheckOnly},
     );
 
     # check result and add cachetype if neccessary

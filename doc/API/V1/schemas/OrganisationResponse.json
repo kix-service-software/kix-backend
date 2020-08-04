@@ -18,6 +18,25 @@
          "description" : "The contact object.",
          "type" : "object",
          "properties" : {
+            "AssignedConfigItems" : {
+               "description" : "A list of asset IDs, added via include \"AssignedConfigItems\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "number"
+               },
+               "readOnly" : true
+            },
+            "AssignedUserID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -27,7 +46,14 @@
                "readOnly" : true
             },
             "City" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "Comment" : {
@@ -42,7 +68,14 @@
                "readOnly" : true
             },
             "Country" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "CreateBy" : {
@@ -58,7 +91,14 @@
                "readOnly" : true
             },
             "Fax" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "Firstname" : {
@@ -82,7 +122,14 @@
                "readOnly" : true
             },
             "Mobile" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "OrganisationIDs" : {
@@ -93,7 +140,14 @@
                "readOnly" : true
             },
             "Phone" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             },
             "PrimaryOrganisationID" : {
@@ -101,7 +155,37 @@
                "readOnly" : true
             },
             "Street" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "TicketStats" : {
+               "description" : "An object with numbers for new, open, pending and escalated tickets of this contact.",
+               "type" : "object",
+               "properties" : {
+                  "EscalatedCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "NewCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "OpenCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "PendingReminderCount" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  }
+               },
                "readOnly" : true
             },
             "Tickets" : {
@@ -116,29 +200,48 @@
                "type" : "string",
                "readOnly" : true
             },
+            "User" : {
+               "$ref" : "#/definitions/User_json-dc5cda6d1e"
+            },
             "ValidID" : {
                "type" : "integer",
                "readOnly" : true
             },
             "Zip" : {
-               "type" : "string",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
                "readOnly" : true
             }
          },
          "required" : [
+            "AssignedUserID",
             "ChangeBy",
             "ChangeTime",
-            "PrimaryOrganisationID",
-            "OrganisationIDs",
+            "City",
+            "Comment",
+            "Country",
             "CreateBy",
             "CreateTime",
+            "Email",
+            "Fax",
             "Firstname",
             "Fullname",
-            "Email",
             "ID",
             "Lastname",
-            "Login",
-            "ValidID"
+            "Mobile",
+            "OrganisationIDs",
+            "Phone",
+            "PrimaryOrganisationID",
+            "Street",
+            "Title",
+            "ValidID",
+            "Zip"
          ]
       },
       "DynamicFieldValue_json-be71ef3dd7" : {
@@ -837,6 +940,125 @@
             "TypeID",
             "Unseen",
             "UntilTime"
+         ]
+      },
+      "UserPreference_json-f036ebd014" : {
+         "$id" : "UserPreference.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "UserID",
+            "Value"
+         ]
+      },
+      "User_json-dc5cda6d1e" : {
+         "$id" : "User.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The user object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Contact" : {
+               "$ref" : "#/definitions/Contact_json-42a224855a"
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "IsAgent" : {
+               "description" : "Defines if user can use the agent portal.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IsCustomer" : {
+               "description" : "Defines if user can use the self service portal (customer portal).",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Preferences" : {
+               "description" : "added via include \"Preferences\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/UserPreference_json-f036ebd014"
+               },
+               "readOnly" : true
+            },
+            "RoleIDs" : {
+               "description" : "added via include \"RoleIDs\"",
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               },
+               "readOnly" : true
+            },
+            "UsageContext" : {
+               "description" : "Shows for which context the user is enabled (1 = agent portal; 2 = self service portal; 3 = both).",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserComment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UserLogin" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "IsAgent",
+            "IsCustomer",
+            "UsageContext",
+            "UserComment",
+            "UserID",
+            "UserLogin",
+            "ValidID"
          ]
       },
       "Watcher_json-f701a2a417" : {
