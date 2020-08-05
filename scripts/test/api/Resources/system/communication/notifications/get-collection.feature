@@ -31,13 +31,9 @@
   Scenario: get the list of existing notifications with sorted
     When I query the collection of notifications sorted by "Notification.-Name:textual"
     Then the response code is 200
-    And the response contains 15 items of type "Notification"
+    And the response contains 11 items of type "Notification"
     And the response contains the following items of type Notification
       | Name                                     |
-      | Notify Solution Warning To Team          |
-      | Notify Solution Escalation To Team       |
-      | Notify First Response Warning To Team    |
-      | Notify First Response Escalation To Team |
       | Customer - New Ticket Receipt            |
       | Agent - Ticket Move Notification         |
       | Agent - Responsible Assignment           |
@@ -55,13 +51,13 @@
     Then the response code is 200
     And the response contains 4 items of type "Notification"
     And the response contains the following items of type Notification
-      | Name                                     |
-      | Notify Solution Warning To Team          |
-      | Notify Solution Escalation To Team       |
-      | Notify First Response Warning To Team    |
-      | Notify First Response Escalation To Team |
+      | Name                             |
+      | Customer - New Ticket Receipt    |
+      | Agent - Ticket Move Notification |
+      | Agent - Responsible Assignment   |
+      | Agent - Reminder (if unlocked)   |
 
   Scenario: get the list of existing notifications with offset
     When I query the collection of notifications with offset of 4
     Then the response code is 200
-    And the response contains 11 items of type "Notification"
+    And the response contains 7 items of type "Notification"
