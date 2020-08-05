@@ -1558,7 +1558,7 @@ sub CronTaskSummary {
     return $Self->RecurrentTaskSummary(
         Type        => 'Cron',
         DisplayType => 'cron',
-        TaskLookup  => \%TaskLookup,
+        TaskLookup  => \%TaskLookup
     );
 }
 
@@ -1634,7 +1634,7 @@ sub AutomationTaskToExecute {
                 Params   => {
                     ID     => $JobID,
                     UserID => 1,
-                },                
+                },
             },
         );
     }
@@ -1676,6 +1676,7 @@ sub AutomationTaskSummary {
     return $Self->RecurrentTaskSummary(
         Type        => 'AsynchronousExecutor',
         DisplayType => 'automation',
+        TaskLookup  => \%TaskLookup
     );
 }
 

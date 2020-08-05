@@ -305,11 +305,11 @@ sub Run {
                 WebserviceID            => $WebserviceID,
                 AvailableMethods        => $ProcessRequestResult{AvailableMethods},
                 OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
+                ParentMethodOperationMapping => $ProcessRequestResult{ParentMethodOperationMapping},
                 RequestMethod           => $Method,
                 CurrentRoute            => $ProcessRequestResult{Route},
                 RequestURI              => $ProcessRequestResult{RequestURI},
                 Authorization           => $Authorization,
-                PermissionCheckOnly     => 1
             );
 
             # if operation init failed, bail out
@@ -324,10 +324,11 @@ sub Run {
             else {
 
                 my $OperationResult = $OperationObject->Run(
-                    Data    => $FunctionResult->{Data}
+                    Data                => $FunctionResult->{Data},
+                    PermissionCheckOnly => 1
                 );
 
-                if ( $OperationResult eq 1 ) {
+                if ( $OperationResult->{Success} ) {
                     # get options from operation
                     my $OptionsResult = $OperationObject->Options();
                     my %OptionsData = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
@@ -338,7 +339,9 @@ sub Run {
                         AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
                     }
                 } else {
-                    return;
+                    return $Self->_GenerateErrorResponse(
+                        %{$OperationResult},
+                    );
                 }
             }
         }
@@ -392,6 +395,7 @@ sub Run {
         WebserviceID            => $WebserviceID,
         AvailableMethods        => $ProcessRequestResult{AvailableMethods},
         OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
+        ParentMethodOperationMapping => $ProcessRequestResult{ParentMethodOperationMapping},
         AvailableMethods        => $ProcessRequestResult{AvailableMethods},
         RequestMethod           => $ProcessRequestResult{RequestMethod},
         CurrentRoute            => $ProcessRequestResult{Route},

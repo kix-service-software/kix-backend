@@ -945,25 +945,31 @@ sub GetDatabaseFunction {
 generate database-specific sql syntax (e. g. CREATE TABLE ...)
 
     my @SQL = $DBObject->SQLProcessor(
-        Database =>
-            [
-                Tag  => 'TableCreate',
-                Name => 'table_name',
-            ],
-            [
-                Tag  => 'Column',
-                Name => 'col_name',
-                Type => 'VARCHAR',
-                Size => 150,
-            ],
-            [
-                Tag  => 'Column',
-                Name => 'col_name2',
-                Type => 'INTEGER',
-            ],
-            [
-                Tag => 'TableEnd',
-            ],
+        Database => [
+            {
+                Tag     => 'TableCreate',
+                Name    => 'table_name',
+                TagType => 'Start'
+            },
+            {
+                Tag      => 'Column',
+                Name     => 'col_name',
+                Type     => 'VARCHAR',
+                Required => 'false',
+                Size     => 150,
+                TagType  => 'Start'
+            },
+            {
+                Tag     => 'Column',
+                Name    => 'col_name2',
+                Type    => 'INTEGER',
+                TagType => 'Start'
+            },
+            {
+                Tag     => 'TableCreate',
+                TagType => 'End'
+            }
+        ]
     );
 
 =cut
@@ -973,7 +979,6 @@ sub SQLProcessor {
 
     my @SQL;
     if ( $Param{Database} && ref $Param{Database} eq 'ARRAY' ) {
-
         my @Table;
         for my $Tag ( @{ $Param{Database} } ) {
 

@@ -72,6 +72,7 @@ create an object.
         OperationType   => 'V1::Ticket::TicketCreate',    # the local operation backend to use
         WebserviceID    => $WebserviceID,                 # ID of the currently used web service
         OperationRouteMapping => {},                      # required
+        ParentMethodOperationMapping => {}                # required
         NoAuthorizationNeeded => 1                        # optional
     );
 
@@ -84,7 +85,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject Operation OperationType OperationRouteMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
+    for my $Needed (qw(DebuggerObject Operation OperationType OperationRouteMapping ParentMethodOperationMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
             return $Self->_Error(
@@ -95,8 +96,6 @@ sub new {
 
         $Self->{$Needed} = $Param{$Needed};
     }
-
-    $Self->{PermissionCheckOnly} = $Param{PermissionCheckOnly} ? 1 : 0;
 
     # check operation
     if ( !IsStringWithData( $Param{OperationType} ) ) {
@@ -185,7 +184,7 @@ sub new {
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
     # pass information to backend
-    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping AvailableMethods IgnorePermissions SuppressPermissionErrors) ) {
+    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping ParentMethodOperationMapping AvailableMethods IgnorePermissions SuppressPermissionErrors) ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
     }
 
@@ -203,6 +202,7 @@ perform the selected Operation.
         Data => {                               # data payload before Operation
             ...
         },
+        PermissionCheckOnly => 1                # optional
     );
 
     $Result = {
@@ -220,7 +220,7 @@ sub Run {
 
     my $StartTime = Time::HiRes::time();
 
-    if (!$Self->{PermissionCheckOnly}) {
+    if ( !$Param{PermissionCheckOnly} ) {
 
         # validate data
         my $ValidatorResult = $Self->{ValidatorObject}->Validate(
@@ -242,7 +242,6 @@ sub Run {
     }
 
     # start the backend
-    $Param{PermissionCheckOnly} = $Self->{PermissionCheckOnly};
     my $Result = $Self->{BackendObject}->RunOperation(%Param);
 
     my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
