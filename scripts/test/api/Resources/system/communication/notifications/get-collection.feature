@@ -31,33 +31,37 @@
   Scenario: get the list of existing notifications with sorted
     When I query the collection of notifications sorted by "Notification.-Name:textual"
     Then the response code is 200
-    And the response contains 11 items of type "Notification"
+    And the response contains 15 items of type "Notification"
     And the response contains the following items of type Notification
-      | Name                                   |
-      | Customer - New Ticket Receipt          |
-      | Agent - Ticket Move Notification       |
-      | Agent - Responsible Assignment         |
-      | Agent - Reminder (if unlocked)         |
-      | Agent - Reminder (if locked)           |
-      | Agent - Owner Assignment               |
-      | Agent - New Ticket Notification        |
-      | Agent - New Note Notification          |
-      | Agent - Lock Timeout                   |
-      | Agent - FUP Notification (if unlocked) |
-      | Agent - FUP Notification (if locked)   |
+      | Name                                     |
+      | Notify Solution Warning To Team          |
+      | Notify Solution Escalation To Team       |
+      | Notify First Response Warning To Team    |
+      | Notify First Response Escalation To Team |
+      | Customer - New Ticket Receipt            |
+      | Agent - Ticket Move Notification         |
+      | Agent - Responsible Assignment           |
+      | Agent - Reminder (if unlocked)           |
+      | Agent - Reminder (if locked)             |
+      | Agent - Owner Assignment                 |
+      | Agent - New Ticket Notification          |
+      | Agent - New Note Notification            |
+      | Agent - Lock Timeout                     |
+      | Agent - FUP Notification (if unlocked)   |
+      | Agent - FUP Notification (if locked)     |
 
   Scenario: get the list of existing notifications with sorted and limit
     When I query the collection of notifications sorted by "Notification.-Name:textual" and with a limit of 4
     Then the response code is 200
     And the response contains 4 items of type "Notification"
     And the response contains the following items of type Notification
-      | Name                             |
-      | Customer - New Ticket Receipt    |
-      | Agent - Ticket Move Notification |
-      | Agent - Responsible Assignment   |
-      | Agent - Reminder (if unlocked)   |
+      | Name                                     |
+      | Notify Solution Warning To Team          |
+      | Notify Solution Escalation To Team       |
+      | Notify First Response Warning To Team    |
+      | Notify First Response Escalation To Team |
 
   Scenario: get the list of existing notifications with offset
     When I query the collection of notifications with offset of 4
     Then the response code is 200
-    And the response contains 7 items of type "Notification"
+    And the response contains 11 items of type "Notification"

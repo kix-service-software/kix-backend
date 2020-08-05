@@ -9,7 +9,7 @@ Feature: GET request to the /system/cmdb/classes resource
     When I query the cmdb collection of classes
     Then the response code is 200
     And the response object is ConfigItemClassCollectionResponse
-    And the response contains 8 items of type "ConfigItemClass"
+    And the response contains 7 items of type "ConfigItemClass"
     And the response contains the following items of type ConfigItemClass
       | Name     |
       | Building |
@@ -18,7 +18,6 @@ Feature: GET request to the /system/cmdb/classes resource
       | Location |
       | Network  |
       | Room     |
-      | Service  |
       | Software |
 
 

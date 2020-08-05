@@ -51,7 +51,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 4
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 16 items of type "Permission"
+    And the response contains 15 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
       | /tickets                              | 2     | 1      |
@@ -63,7 +63,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/ticket/queues                 | 2     | 1      |
       | /system/ticket/states                 | 2     | 1      |
       | /system/ticket/types                  | 2     | 1      |
-      | /system/ticket/slas                   | 2     | 1      |
       | /system/communication                 | 2     | 1      |
       | /system/communication/*               | 0     | 1      |
       | /system/communication/channels        | 2     | 1      |
@@ -75,7 +74,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 5
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 17 items of type "Permission"
+    And the response contains 16 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
       | /tickets                              | 15    | 1      |
@@ -86,7 +85,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/ticket/queues                 | 2     | 1      |
       | /system/ticket/states                 | 2     | 1      |
       | /system/ticket/types                  | 2     | 1      |
-      | /system/ticket/slas                   | 2     | 1      |
       | /system/communication                 | 2     | 1      |
       | /system/communication/*               | 0     | 1      |
       | /system/communication/channels        | 2     | 1      |
@@ -239,3 +237,4 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/config/*                                                                                                                          | 2     | 1      |
       | /system/config{SysConfigOption.AccessLevel NE external}                                                                                   | 0     | 2      |
       | /system/config/*{SysConfigOption.AccessLevel NE external}                                                                                 | 0     | 2      |
+      | /system/objecticons                                                                                                                       | 2     | 1      |

@@ -12,18 +12,15 @@ Feature: GET request to the /system/dynamicfields resource
   Scenario: get the list of existing dynamicfields
     When I query the collection of dynamicfields
     Then the response code is 200
-    Then the response contains 10 items of type "DynamicField"
+    Then the response contains 7 items of type "DynamicField"
     And the response contains the following items of type DynamicField
       | Name                         | Label                  | FieldType               | ObjectType |
       | AffectedAsset                | Affected Asset         | ITSMConfigItemReference | Ticket     |
-      | AnonymiseTicket              | Anonymise Ticket       | Multiselect             | Ticket     |
-      | ChildTickets                 | Child Tickets          | TicketReference         | Ticket     |
-      | CloseCode                    | Close Code             | Multiselect             | Ticket     |
       | MobileProcessingChecklist010 | Checklist 01           | CheckList               | Ticket     |
       | MobileProcessingChecklist020 | Checklist 02           | CheckList               | Ticket     |
       | MobileProcessingState        | Mobile Processing      | Multiselect             | Ticket     |
-      | ParentTickets                | Parent Tickets         | TicketReference         | Ticket     |
-      | RelatedTickets               | Related Tickets        | TicketReference         | Ticket     |
+      | PlanBegin                    | Plan Begin             | DateTime                | Ticket     |
+      | PlanEnd                      | Plan End               | DateTime                | Ticket     |
       | RiskAssumptionRemark         | Risk Assumption Remark | TextArea                | Ticket     |
 
 

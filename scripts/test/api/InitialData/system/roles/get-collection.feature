@@ -9,11 +9,10 @@ Feature: GET request to the /system/roles resource
     When I query the collection of roles
     Then the response code is 200
     And the response object is RoleCollectionResponse
-    And the response contains 14 items of type "Role"
+    And the response contains 13 items of type "Role"
     And the response contains the following items of type Role
       | Name                               | Comment                                                                                                                                                                      | ValidID |
       | Agent User                         | allows to login in both frontend- and backend application but does not grant any further permissions                                                                         | 1       |
-      | Anonymous Self Service Portal User | Role for the anonymous usage of the Self Service Portal prior the real user login                                                                                            | 1       |
       | Asset Maintainer                   | same as Asset-Reader, but additionally  allows to create new or update any existing asset entry and allows to CREATE, UPDATE, DELETE links                                   | 1       |
       | Asset Reader                       | allows to read any asset information in any asset class and allows to READ links                                                                                             | 1       |
       | Customer                           | allows the customer to login and read ticket, FAQ and asset data, allows to create FAQ votes, allows to change data of the personal user, allows to set ticket article flags | 1       |
