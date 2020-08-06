@@ -74,7 +74,7 @@ sub RunOperation {
     # also ignore all this if we have been told to ignore permissions
     if ( !$Self->{IgnorePermissions} && $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
 
-        # check the necessary permission of the parent object if needed 
+        # check the necessary permission of the parent object if needed
         if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) ) {
 
             # determine which method to use
@@ -91,7 +91,7 @@ sub RunOperation {
                 RequestMethod       => $Method,
                 OperationType       => $Self->{ParentMethodOperationMapping}->{$Method},
                 Data                => $Data,
-                IgnoreInclude       => 1,       # we don't need any includes 
+                IgnoreInclude       => 1,       # we don't need any includes
                 IgnoreExpand        => 1,       # we don't need any expands
                 PermissionCheckOnly => 1,       # do not change any data
             );
@@ -192,13 +192,13 @@ sub RunOperation {
                 my @Parts = $1;
                 if ( $Parts[0] =~ /&&/ ) {
                     @Parts = split(/\s+&&\s+/, $Parts[0]);
-                
+
                     # the single parts of the permission are a part of a logical AND
                     $UseAnd = 1;
                 }
 
                 my $Not = 0;
-                my %Filter;                
+                my %Filter;
                 foreach my $Part ( @Parts ) {
                     next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
 
@@ -324,10 +324,10 @@ sub RunOperation {
                     last PERMISSION;
                 }
             }
-        
+
 #            if ( $Self->{RequestMethod} eq 'GET' && IsArrayRefWithData($Self->{PermissionFilters}) ) {
 #                # activate the permission filters for the GET operation
-#                $Self->_ActivatePermissionFilters();        
+#                $Self->_ActivatePermissionFilters();
 #            }
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -385,8 +385,8 @@ sub RunOperation {
                     $Self->{PermissionFieldSelector}->{$Object} = [ $Self->{OperationConfig}->{ObjectID} || 'ID' ] if !exists $Self->{PermissionFieldSelector}->{$Object};
 
                     my $Ignore = '';
-                    if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} 
-                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} 
+                    if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
+                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
                     ) {
                         # access is denied, so we have to add an ignore selector for this attribute
                         $Ignore = '!'
@@ -404,8 +404,8 @@ sub RunOperation {
                     );
 
                     # if the attribute exists in the data hash we have to check whether the needed permission is granted
-                    if ( exists $FlatData->{$Attribute} && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} 
-                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) 
+                    if ( exists $FlatData->{$Attribute} && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
+                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} )
                     ) {
                         $Self->_PermissionDebug( sprintf("request data doesn't match the required criteria - denying request") );
 
@@ -423,10 +423,10 @@ sub RunOperation {
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
         }
+    }
 
-        if ( $Param{PermissionCheckOnly} && $Self->{RequestMethod} =~ /^(POST|PATCH|DELETE)$/ ) {
-            return $Self->_Success();
-        }
+    if ( $Param{PermissionCheckOnly} ) {
+        return $Self->_Success();
     }
 
     # get parameter definitions (if available)
@@ -1090,12 +1090,12 @@ sub _Success {
     if ( !$Param{IsOptionsResponse} ) {
         if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
             my $StartTime = Time::HiRes::time();
-            
+
             $Self->_ApplyFilter(
                 Data   => \%Param,
                 Filter => $Self->{Search}
             );
-            
+
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
             $Self->_Debug($Self->{LevelIndent}, sprintf("search in API layer took %i ms", $TimeDiff));
         }
@@ -1389,7 +1389,7 @@ sub ExecOperation {
             Message => "Can't load module $OperationModule",
         );
         return;    # bail out, this will generate 500 Error
-    }    
+    }
 
     my $OperationObject = $OperationModule->new(
         DebuggerObject           => $Self->{DebuggerObject},
@@ -1420,10 +1420,10 @@ sub ExecOperation {
     # check and prepare additional data
     my %AdditionalData;
     if ( $OperationObject->{OperationConfig}->{AdditionalUriParameters} ) {
-        foreach my $AddParam ( sort split(/\s*,\s*/, $OperationObject->{OperationConfig}->{AdditionalUriParameters}) ) {            
+        foreach my $AddParam ( sort split(/\s*,\s*/, $OperationObject->{OperationConfig}->{AdditionalUriParameters}) ) {
             $AdditionalData{$AddParam} = $Self->{RequestData}->{$AddParam};
         }
-    } 
+    }
 
     # do we have to add includes and expands
     if ( !$Param{IgnoreInclude} ) {
@@ -1886,7 +1886,7 @@ sub _ApplyFilter {
                         push @FilteredResult, $ObjectItem;
                     }
                 }
-            }            
+            }
             if ( $Param{IsPermissionFilter} && IsHashRefWithData( $Param{Data}->{$Object} ) ) {
 
                 # if we are in the permission filter mode and have prepared something in the beginning, check if we have an item in the filtered result
@@ -1919,8 +1919,8 @@ sub _ApplyFieldSelector {
         if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
 
             my @Fields = (
-                @{ $Param{Fields}->{$Object} }, 
-                keys %{ $Self->{Include} }, 
+                @{ $Param{Fields}->{$Object} },
+                keys %{ $Self->{Include} },
             );
 
             # extract filtered fields from hash
@@ -1963,8 +1963,8 @@ sub _ApplyFieldSelector {
                 if ( ref($ObjectItem) eq 'HASH' ) {
 
                     my @Fields = (
-                        @{ $Param{Fields}->{$Object} }, 
-                        keys %{ $Self->{Include} } , 
+                        @{ $Param{Fields}->{$Object} },
+                        keys %{ $Self->{Include} } ,
                     );
 
                     # extract filtered fields from hash
@@ -2580,7 +2580,7 @@ sub _CacheRequest {
 
 =item _AddPermissionFilterForObject()
 
-adds a permission filter 
+adds a permission filter
 
     my $Return = $CommonObject->_AddPermissionFilterForObject(
         Filter    => {},            # optional, if given the method adds the new filter the the existing one
