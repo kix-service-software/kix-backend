@@ -87,7 +87,7 @@ sub ParameterDefinition {
         'Job' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -107,17 +107,17 @@ perform JobUpdate Operation. This will return the updated JobID.
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            JobID  => 123,       # ID of the updated Job 
+            JobID  => 123,       # ID of the updated Job
         },
     };
-   
+
 =cut
 
 
@@ -129,7 +129,7 @@ sub Run {
         Data => $Param{Data}->{Job}
     );
 
-    # check if Job exists 
+    # check if Job exists
     my %JobData = $Kernel::OM->Get('Automation')->JobGet(
         ID => $Param{Data}->{JobID},
     );
@@ -149,19 +149,19 @@ sub Run {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => "Cannot update job. Another job with the same name '$Job->{Name}' already exists.",
-            );    		
+            );
         }
     }
 
     # update Job
     my $Success = $Kernel::OM->Get('Automation')->JobUpdate(
-        ID       => $Param{Data}->{JobID},    
+        ID       => $Param{Data}->{JobID},
         Type     => $Job->{Type} || $JobData{Type},
         Name     => $Job->{Name} || $JobData{Name},
         Filter   => exists $Job->{Filter} ? $Job->{Filter} : $JobData{Filter},
         Comment  => exists $Job->{Comment} ? $Job->{Comment} : $JobData{Comment},
         ValidID  => exists $Job->{ValidID} ? $Job->{ValidID} : $JobData{ValidID},
-        UserID   => $Self->{Authorization}->{UserID},                        
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -173,12 +173,12 @@ sub Run {
     if ( $Job->{Exec} ) {
         my $Success = $Kernel::OM->Get('Automation')->JobExecute(
             ID     => $Param{Data}->{JobID},
-            UserID => $Self->{Authorization}->{UserID},
+            UserID => 1,
         );
 
         if ( !$Success ) {
             my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
-                Type => 'error', 
+                Type => 'error',
                 What => 'Message',
             );
             return $Self->_Error(
@@ -188,10 +188,10 @@ sub Run {
         }
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         JobID => 0 + $Param{Data}->{JobID},
-    );    
+    );
 }
 
 1;
