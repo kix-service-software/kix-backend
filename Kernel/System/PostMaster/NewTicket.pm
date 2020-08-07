@@ -154,6 +154,9 @@ sub Run {
         if (%OrgList) {
             $GetParam{'X-KIX-Organisation'} = (keys %OrgList)[0];
         }
+        else {
+            $GetParam{'X-KIX-Organisation'} = undef;
+        }
     }
 
     if ( $GetParam{'X-KIX-Contact'} ) {
