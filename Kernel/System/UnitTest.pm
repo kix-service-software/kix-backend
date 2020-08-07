@@ -571,7 +571,7 @@ sub _Print {
                     $Self->{Content} .= "<span style='color:green;cursor:pointer' title='($Self->{TestCount}) OK: $TestStep'>&#x25FC</span>";
                 }
             }
-            elsif ($Self->{Output} eq 'ASCII') {
+            elsif ($Self->{Output}->{ASCII}) {
                 if ($Self->{Verbose}) {
                     print {$Self->{OriginalSTDOUT}} " " . $Self->_Color('green', "\n OK") . " $Self->{TestCount} - $PrintName\n";
                 }
