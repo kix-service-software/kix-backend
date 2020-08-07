@@ -73,14 +73,14 @@ sub new {
 
     $Self->{Debug} = $Param{Debug} || 0;
 
-    $Self->{Output} = $Param{Output} || 'ASCII';
+    $Self->{Output} = { map {$_ => 1} split(/,/, $Param{Output} || 'ASCII') };
 
     $Self->{ANSI} = $Param{ANSI};
-    if ($Self->{Output} eq 'Allure') {
+    if ($Self->{Output}->{Allure}) {
         $Self->{Adapter} = $Kernel::OM->Get('Kernel::System::UnitTest::AllureAdapter')->new();
     }
 
-    if ($Self->{Output} eq 'HTML') {
+    if ($Self->{Output}->{HTML}) {
         print "
 <html>
 <head>
@@ -199,7 +199,7 @@ sub Run {
     $Self->{TestCountNotOk} = 0;
     FILE:
     for my $File (sort @Files) {
-        if ($Self->{Output} eq 'Allure') {
+        if ($Self->{Output}->{Allure}) {
             $Self->{runningTestId} = '';
             $Self->{runningContainerId} = $Self->{Adapter}->NewContainer($File =~ /(?:.+\/test\/)(.+)/);
         }
@@ -332,7 +332,7 @@ sub Run {
     }
     $XML .= "</kix_test>\n";
 
-    if ($Self->{Output} eq 'XML') {
+    if ($Self->{Output}->{XML}) {
         print $XML;
     }
 
@@ -357,7 +357,7 @@ sub Run {
         #     return 1;
         # }
     }
-    if ($Self->{Output} eq 'Allure') {
+    if ($Self->{Output}->{Allure}) {
         $Self->{Adapter}->SetExecutorInfo();
         $Self->{Adapter}->AddEnvironmentInfoFromSystem();
         $Self->{Adapter}->CreateResults($Self->{AllureOutputDir});
@@ -374,11 +374,11 @@ sub _PrintHeadlineStart {
     my $Home = $Kernel::OM->Get('Config')->Get('Home');
     $Name =~ s/^$Home\/scripts\/test\///;
 
-    if ($Self->{Output} eq 'HTML') {
+    if ($Self->{Output}->{HTML}) {
         $Self->{Content} .= "<tr><td nowrap style='width:60px;text-align:right'>$FileCount/$FileTotal</td>";
         $Self->{Content} .= "<td nowrap style='width:500px'>$Name</td><td>";
     }
-    elsif ($Self->{Output} eq 'ASCII') {
+    elsif ($Self->{Output}->{ASCII}) {
         printf("(%4i/%i) %s ", $FileCount, $FileTotal, $Name);
     }
 
@@ -410,7 +410,7 @@ sub _PrintHeadlineEnd {
     }
     $Self->{Duration}->{$Name} = $Duration;
 
-    if ($Self->{Output} eq 'HTML') {
+    if ($Self->{Output}->{HTML}) {
         if ($Self->{CurrentColor}) {
             $Self->{Content} .= "</span>";
         }
@@ -424,7 +424,7 @@ sub _PrintHeadlineEnd {
         $Self->{Content} .= "<td style='width:50px;color:$Color'>$Result</td>\n";
         $Self->{Content} .= "</tr>\n";
     }
-    elsif ($Self->{Output} eq 'ASCII') {
+    elsif ($Self->{Output}->{ASCII}) {
         if ($Self->{Pretty} || $Self->{Verbose}) {
             print {$Self->{OriginalSTDOUT}} "\n";
         }
@@ -447,7 +447,7 @@ sub _PrintSummary {
     my ($Self, %ResultSummary) = @_;
 
     # show result
-    if ($Self->{Output} eq 'HTML') {
+    if ($Self->{Output}->{HTML}) {
         print "</table>\n";
         print "<table width='600' border='0'>\n";
         if ($ResultSummary{TestNotOk}) {
@@ -468,7 +468,7 @@ sub _PrintSummary {
         print "<tr><td>Test FAILED:</td><td>$ResultSummary{TestNotOk}</td></tr>\n";
         print "</table><br>\n";
     }
-    elsif ($Self->{Output} eq 'ASCII') {
+    elsif ($Self->{Output}->{ASCII}) {
         print "=====================================================================\n";
         print " Product:     $ResultSummary{Product}\n";
         print " Test Time:   $ResultSummary{TimeTaken} s\n";
@@ -506,7 +506,7 @@ sub _Print {
     my $TestStep = $Name;
     $TestStep =~ s/^(.*?)\s\(.+?\)$/$1/s;
 
-    if ($Self->{Output} eq 'Allure') {
+    if ($Self->{Output}->{Allure}) {
 
         $Self->{runningTestId} = $Self->{Adapter}->NewTest($Name, '', $Self->{runningContainerId});
         $Self->{Adapter}->SetTestSubSuite($Self->{runningTestId}, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));
@@ -551,7 +551,7 @@ sub _Print {
             $PrintName = substr($PrintName, 0, 1000) . "...";
         }
 
-        if ($Self->{Output} eq 'ASCII' && $Self->{Verbose}) {
+        if ($Self->{Output}->{ASCII} && $Self->{Verbose}) {
             print {$Self->{OriginalSTDOUT}} $Self->{OutputBuffer};
         }
 
@@ -563,7 +563,7 @@ sub _Print {
 
             $Self->{TestCountOk}++;
 
-            if ($Self->{Output} eq 'HTML') {
+            if ($Self->{Output}->{HTML}) {
                 if ($Self->{Verbose}) {
                     $Self->{Content} .= "<span style='color:green'>OK</span> $Self->{TestCount} - $PrintName<br/>";
                 }
@@ -587,7 +587,7 @@ sub _Print {
             $Self->{XML}->{Test}->{ $Self->{XMLUnit} }->{Result} = 'FAILED';
 
             $Self->{TestCountNotOk}++;
-            if ($Self->{Output} eq 'HTML') {
+            if ($Self->{Output}->{HTML}) {
                 if ($Self->{Verbose}) {
                     $Self->{Content} .= "<span style='color:red'>FAILED</span> $Self->{TestCount} - $PrintName<br/>";
                 }
@@ -595,7 +595,7 @@ sub _Print {
                     $Self->{Content} .= "<span style='color:red;cursor:pointer' title='($Self->{TestCount}) FAILED: $TestStep'>&#x25FC</span>";
                 }
             }
-            elsif ($Self->{Output} eq 'ASCII') {
+            elsif ($Self->{Output}->{ASCII}) {
                 if ($Self->{Verbose}) {
                     print {$Self->{OriginalSTDOUT}} "\n";
                     print {$Self->{OriginalSTDOUT}} " "
@@ -638,7 +638,7 @@ ANSI output is available and active, otherwise the text stays unchanged.
 sub _Color {
     my ($Self, $Color, $Text) = @_;
 
-    if ($Self->{Output} eq 'HTML') {
+    if ($Self->{Output}->{HTML}) {
         if (!$Self->{CurrentColor}) {
             $Text = "<span style='color:$Color'>$Text";
         }
@@ -647,7 +647,7 @@ sub _Color {
         }
         $Self->{CurrentColor} = $Color;
     }
-    elsif ($Self->{Output} eq 'ASCII') {
+    elsif ($Self->{Output}->{ASCII} ) {
         return $Text if !$Self->{ANSI};
         return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');
     }
