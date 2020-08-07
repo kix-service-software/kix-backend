@@ -49,7 +49,8 @@ sub Run {
 
     return $Kernel::OM->Get('Automation')->ExecuteJobsForEvent(
         %Param,
-        Type => $Param{Config}->{Type},
+        Type   => $Param{Config}->{Type},
+        UserID => 1,        # always execute with privileged user
     );
 }
 
