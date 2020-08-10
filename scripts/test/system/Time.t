@@ -485,7 +485,6 @@ for my $Test (@DestinationTime) {
 
     # get system time
     my $SystemTimeDestination = $TimeObject->TimeStamp2SystemTime( String => $Test->{StartTime} );
-    print STDERR "SystemTimeDestination: $SystemTimeDestination\n";
 
     # check system time
     if ( $Test->{StartTimeSystem} ) {

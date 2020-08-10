@@ -35,7 +35,7 @@ $Kernel::OM->Get('Config')->Set(
 );
 
 my @ContactIDs;
-my $OrgIDs;
+my %OrgIDs;
 
 # add two customer users
 for ( 1 .. 2 ) {

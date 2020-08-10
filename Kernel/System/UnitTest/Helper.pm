@@ -175,6 +175,7 @@ sub TestUserCreate {
     local $ConfigObject->{CheckEmailAddresses} = 0;
 
     # create test user
+    my $OrgID;
     my $TestUserID;
     my $TestUserLogin;
     my $TestUserContactID;
@@ -191,13 +192,20 @@ sub TestUserCreate {
             IsAgent      => 1,
         );
 
+        $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
+            Number  => $Self->GetRandomID(),
+            Name    => 'testorg-'.$Self->GetRandomID(),
+            ValidID => 1,
+            UserID  => 1,
+        );
+
         $TestUserContactID =  $Kernel::OM->Get('Contact')->ContactAdd(
             AssignedUserID        => $TestUserID,
             Firstname             => $TestUserLogin,
             Lastname              => $TestUserLogin,
             Email                 => $TestUserLogin . '@localunittest.com',
-            PrimaryOrganisationID => 1,
-            OrganisationIDs       => [ 1 ],
+            PrimaryOrganisationID => $OrgID,
+            OrganisationIDs       => [ $OrgID ],
             ValidID               => 1,
             UserID                => 1,
         );
@@ -214,7 +222,7 @@ sub TestUserCreate {
     $Self->{TestUsers} ||= [];
     push( @{ $Self->{TestUsers} }, $TestUserID );
 
-    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserLogin (UserID $TestUserID, ContactID $TestUserContactID)" );
+    $Self->{UnitTestObject}->True( 1, "Created test user $TestUserLogin (UserID $TestUserID, ContactID $TestUserContactID, OrgID $OrgID)" );
 
     # Add user to roles
     ROLE_NAME:
@@ -357,10 +365,11 @@ sub TestRoleCreate {
 
     # add ticket_read role
     my $RoleID = $RoleObject->RoleAdd(
-        Name    => $Param{Name},
-        Comment => $Param{Comment},
-        ValidID => $Param{ValidID} || 1,
-        UserID  => 1,
+        Name         => $Param{Name},
+        UsageContext => $Param{UsageContext} || Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+        Comment      => $Param{Comment},
+        ValidID      => $Param{ValidID} || 1,
+        UserID       => 1,
     );
 
     die 'Could not create test role' if !$RoleID;
@@ -752,6 +761,31 @@ sub UseTmpArticleDir {
     $Self->{TmpArticleDir} = $TmpArticleDir;
 
     return 1;
+}
+
+=item StartWebserver()
+
+mock a webserver
+
+=cut
+
+sub StartWebserver {
+    my ( $Self, %Param ) = @_;
+
+    use Test::Fake::HTTPD;
+ 
+    my $httpd = Test::Fake::HTTPD->new(
+        timeout     => 5,
+        daemon_args => { },
+    );
+    
+    $httpd->run(sub {
+        my $req = shift;
+        print STDERR Data::Dumper::Dumper($req);
+        [ 200, [ 'Content-Type', 'text/plain' ], [ 'Mock HTTP server' ] ];
+    });
+
+    return $httpd;
 }
 
 1;

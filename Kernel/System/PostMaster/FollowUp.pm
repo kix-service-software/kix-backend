@@ -71,11 +71,12 @@ sub Run {
 
     # Check if owner of ticket is still valid
     my %UserInfo = $Kernel::OM->Get('User')->GetUserData(
-        UserID => $Ticket{OwnerID},
+        UserID        => $Ticket{OwnerID},
+        NoOutOfOffice => 0,
     );
 
     # 1) check user, out of office, unlock ticket
-    if ( $UserInfo{OutOfOfficeMessage} ) {
+    if ( $UserInfo{Preferences}->{OutOfOfficeMessage} ) {
         $TicketObject->TicketLockSet(
             TicketID => $Param{TicketID},
             Lock     => 'unlock',

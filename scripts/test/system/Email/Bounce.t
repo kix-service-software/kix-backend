@@ -16,7 +16,7 @@ use vars (qw($Self));
 
 $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 local $ENV{TZ} = 'UTC';

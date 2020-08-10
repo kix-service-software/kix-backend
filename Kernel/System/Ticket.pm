@@ -105,14 +105,14 @@ sub new {
 
     # load ticket number generator
     my $GeneratorModule = $ConfigObject->Get('Ticket::NumberGenerator')
-        || 'Ticket::Number::AutoIncrement';
+        || 'Kernel::System::Ticket::Number::AutoIncrement';
     if ( !$MainObject->RequireBaseClass($GeneratorModule) ) {
         die "Can't load ticket number generator backend module $GeneratorModule! $@";
     }
 
     # load article storage module
     my $StorageModule = $ConfigObject->Get('Ticket::StorageModule')
-        || 'Ticket::ArticleStorageDB';
+        || 'Kernel::System::Ticket::ArticleStorageDB';
     if ( !$MainObject->RequireBaseClass($StorageModule) ) {
         die "Can't load ticket storage backend module $StorageModule! $@";
     }
@@ -124,7 +124,7 @@ sub new {
 
     # load article search index module
     my $SearchIndexModule = $ConfigObject->Get('Ticket::SearchIndexModule')
-        || 'Ticket::ArticleSearchIndex::RuntimeDB';
+        || 'Kernel::System::Ticket::ArticleSearchIndex::RuntimeDB';
     if ( !$MainObject->RequireBaseClass($SearchIndexModule) ) {
         die "Can't load ticket search index backend module $SearchIndexModule! $@";
     }
@@ -442,6 +442,23 @@ sub TicketCreate {
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
 
+    if ($Param{OrganisationID} && $Param{OrganisationID} !~ /^\d+$/) {
+        # create organisation if it doesn't exist
+        my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            Number => $Param{OrganisationID}
+        );
+        if (!$OrgID) {
+            $Param{OrganisationID} = $Kernel::OM->Get('Organisation')->OrganisationAdd(
+                Number => $Param{OrganisationID},
+                Name   => $Param{OrganisationID},
+                UserID => 1,
+            );
+        }
+        else {
+            $Param{OrganisationID} = $OrgID;
+        }
+    }
+
     if (!$Param{ContactID} || $Param{ContactID} !~ /^\d+$/) {
         $Self->{ParserObject} = Kernel::System::EmailParser->new(
             Mode => 'Standalone',
@@ -480,9 +497,6 @@ sub TicketCreate {
             $Param{ContactID} = $ExistingContactID;
         }
     }
-
-    $Param{OrganisationID} = ($Param{OrganisationID}) ? $Param{OrganisationID} : undef;
-
 
     # create db record
     return if !$Kernel::OM->Get('DB')->Do(
@@ -5418,11 +5432,11 @@ sub TicketArticleStorageSwitch {
         # We cannot have two ticket objects with different base classes.
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',
-            Value => 'Ticket::' . $Param{Source},
+            Value => 'Kernel::System::Ticket::' . $Param{Source},
         );
 
         my $TicketObjectSource = Kernel::System::Ticket->new();
-        if ( !$TicketObjectSource || !$TicketObjectSource->isa( 'Ticket::' . $Param{Source} ) ) {
+        if ( !$TicketObjectSource || !$TicketObjectSource->isa( 'Kernel::System::Ticket::' . $Param{Source} ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Could not create Kernel::System::Ticket::" . $Param{Source},
@@ -5474,13 +5488,13 @@ sub TicketArticleStorageSwitch {
         # create target object
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',
-            Value => 'Ticket::' . $Param{Destination},
+            Value => 'Kernel::System::Ticket::' . $Param{Destination},
         );
 
         my $TicketObjectDestination = Kernel::System::Ticket->new();
         if (
             !$TicketObjectDestination
-            || !$TicketObjectDestination->isa( 'Ticket::' . $Param{Destination} )
+            || !$TicketObjectDestination->isa( 'Kernel::System::Ticket::' . $Param{Destination} )
             )
         {
             $Kernel::OM->Get('Log')->Log(
@@ -5645,11 +5659,11 @@ sub TicketArticleStorageSwitch {
         # remove source attachments
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',
-            Value => 'Ticket::' . $Param{Source},
+            Value => 'Kernel::System::Ticket::' . $Param{Source},
         );
 
         $TicketObjectSource = Kernel::System::Ticket->new();
-        if ( !$TicketObjectSource || !$TicketObjectSource->isa( 'Ticket::' . $Param{Source} ) ) {
+        if ( !$TicketObjectSource || !$TicketObjectSource->isa( 'Kernel::System::Ticket::' . $Param{Source} ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => "error",
                 Message  => "Could not create Kernel::System::Ticket::" . $Param{Source},

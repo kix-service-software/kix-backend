@@ -107,6 +107,7 @@ sub Run {
 
     # replace KIX_CONFIG tags
     for my $Key ( keys %{ $Self->{Config} } ) {
+        next if !$Self->{Config}->{$Key};
         $Self->{Config}->{$Key} =~ s{<KIX_CONFIG_(.+?)>}{$Self->{Config}->Get($2)}egx;
     }
 

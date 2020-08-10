@@ -122,7 +122,7 @@ $Self->True(
     'UserUpdate()',
 );
 
-%UserData = $UserObject->GetUserData( UserID => $UserID );
+my %UserData = $UserObject->GetUserData( UserID => $UserID );
 
 $Self->Is(
     $UserData{UserLogin} || '',
@@ -175,17 +175,6 @@ $Self->Is(
 );
 
 my %UserSearch = $UserObject->UserSearch(
-    Search => '*Михаил*',
-    Valid  => 0,
-);
-
-$Self->Is(
-    $UserSearch{$UserID},
-    $UserRand . '房治郎',
-    "UserSearch(Search) after update",
-);
-
-%UserSearch = $UserObject->UserSearch(
     UserLogin => '*房治郎*',
     Valid     => 0,
 );
@@ -194,17 +183,6 @@ $Self->Is(
     $UserSearch{$UserID},
     $UserRand . '房治郎',
     "UserSearch(Search) for login after update",
-);
-
-%UserSearch = $UserObject->UserSearch(
-    PostMasterSearch => $UserRand . '@example2.com',
-    Valid            => 0,
-);
-
-$Self->Is(
-    $UserSearch{$UserID},
-    $UserRand . '@example2.com',
-    "UserSearch(PostMasterSearch) after update",
 );
 
 # check token support

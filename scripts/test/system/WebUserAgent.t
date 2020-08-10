@@ -179,7 +179,7 @@ for my $Test (@Tests) {
 
         $Self->Is(
             ref $WebUserAgentObject,
-            'WebUserAgent',
+            'Kernel::System::WebUserAgent',
             "$Test->{Name} - WebUserAgent object creation",
         );
 
