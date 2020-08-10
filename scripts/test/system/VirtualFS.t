@@ -117,7 +117,7 @@ for my $Backend (qw( FS DB )) {
 
     $ConfigObject->Set(
         Key   => 'VirtualFS::Backend',
-        Value => 'VirtualFS::' . $Backend,
+        Value => 'Kernel::System::VirtualFS::' . $Backend,
     );
 
     # get a new virtual fs object
