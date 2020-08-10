@@ -72,7 +72,7 @@ sub new {
 
     # init all validators
     my $ValidatorList = $Kernel::OM->Get('Config')->Get('API::Validator::Module');
-    
+
     foreach my $Validator (sort keys %{$ValidatorList}) {
         if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/ ) {
             # next validator if this one doesn't consider our current operation
@@ -84,9 +84,9 @@ sub new {
         }
 
         if ( !$Kernel::OM->Get('Main')->Require($ValidatorList->{$Validator}->{Module}) ) {
-            return $Self->_Error( 
+            return $Self->_Error(
                 Code    => 'Validator.InternalError',
-                Message => "Validator $ValidatorList->{$Validator}->{Module} not found." 
+                Message => "Validator $ValidatorList->{$Validator}->{Module} not found."
             );
         }
         my $BackendObject = $ValidatorList->{$Validator}->{Module}->new( %{$Self} );
@@ -140,8 +140,15 @@ sub Validate {
     # validate attributes
     ATTRIBUTE:
     foreach my $Attribute ( sort keys %{$Param{Data}} ) {
-        # ignore given but null values - we don't need to validate those 
+
+        # ignore given but null values - we don't need to validate those
         next if !defined $Param{Data}->{$Attribute};
+
+        # ignore placeholder values
+        next if $Param{Data}->{$Attribute} =~ m/^<KIX_.+>$/;
+        if ($Param{Data}->{$Attribute} =~ m/^\d+$/) {
+            $Param{Data}->{$Attribute} = 0 + $Param{Data}->{$Attribute};
+        }
 
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
@@ -152,7 +159,7 @@ sub Validate {
             );
             if ( !IsHashRefWithData($Result) || !$Result->{Success} ) {
                 last ATTRIBUTE;
-            }   
+            }
         }
         else {
             # we don't have a valdator for this attribute itself, just traverse if necessary
@@ -176,7 +183,7 @@ sub Validate {
                 if ( !IsHashRefWithData($ValidationResult) || !$ValidationResult->{Success} ) {
                     $Result = $ValidationResult;
                     last ATTRIBUTE;
-                }                
+                }
             }
         }
     }
