@@ -210,7 +210,6 @@ sub Run {
                 Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
                 Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
                 Email                 => lc( $GetParam{SenderEmailAddress} ),
-                PrimaryOrganisationID => $GetParam{'SenderEmailAddress'},
                 ValidID               => 1,
                 UserID                => 1,
             );
