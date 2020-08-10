@@ -195,8 +195,8 @@ sub _Log {
     my $JobID         = $Self->{JobID};
     my $RunID         = $Self->{RunID};
     my $MacroID       = $Self->{MacroID};
-    my $MacroActionID = $Self->{MacroActionID};        
-    my $ObjectID      = $Self->{ObjectID};        
+    my $MacroActionID = $Self->{MacroActionID};
+    my $ObjectID      = $Self->{ObjectID};
 
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
