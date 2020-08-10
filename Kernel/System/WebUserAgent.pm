@@ -182,7 +182,6 @@ sub Request {
     }
 
     # set timeout
-    print STDERR "setting Timeout: $Self->{Timeout}\n";
     $UserAgent->timeout( $Self->{Timeout} );
 
     # get database object
@@ -195,7 +194,6 @@ sub Request {
 
     # set proxy
     if ( $Self->{Proxy} ) {
-    print STDERR "setting Proxy: $Self->{Proxy}\n";
         $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Self->{Proxy} );
     }
 

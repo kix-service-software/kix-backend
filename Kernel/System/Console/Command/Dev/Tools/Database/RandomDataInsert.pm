@@ -13,6 +13,7 @@ package Kernel::System::Console::Command::Dev::Tools::Database::RandomDataInsert
 use strict;
 use warnings;
 
+use Kernel::System::Role;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Console::BaseCommand);
@@ -433,6 +434,7 @@ sub RoleCreate {
         my $Name = 'fill-up-role' . int( rand(100_000_000) );
         my $ID   = $Kernel::OM->Get('Role')->RoleAdd(
             Name    => $Name,
+            UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
             ValidID => 1,
             UserID  => 1,
         );
