@@ -158,13 +158,13 @@ for my $URL ( @{$RepositoryRoot} ) {
     push @Tests, \%NewEntry;
 }
 
-my %Intervall = (
-    1 => 3,
-    2 => 15,
-    3 => 60,
-    4 => 60 * 3,
-    5 => 60 * 6,
-);
+# my %Intervall = (
+#     1 => 3,
+#     2 => 15,
+#     3 => 60,
+#     4 => 60 * 3,
+#     5 => 60 * 6,
+# );
 
 TEST:
 for my $Test (@Tests) {
@@ -198,7 +198,8 @@ for my $Test (@Tests) {
 
             if ( $Try < 5 && $Status eq 500 && $Test->{ErrorNumber} ne 500 ) {
 
-                sleep $Intervall{$Try};
+                #sleep $Intervall{$Try};
+                sleep 3;
 
                 next TRY;
             }
