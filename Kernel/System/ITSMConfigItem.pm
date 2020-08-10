@@ -545,6 +545,13 @@ sub ConfigItemAdd {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event      => 'CREATE',
+        Namespace  => 'CMDB.ConfigItem',
+        ObjectID   => $ConfigItemID,
+    );
+
     return $ConfigItemID;
 }
 
@@ -605,6 +612,13 @@ sub ConfigItemUpdate {
             Comment      => $Param{ConfigItemID} . '%%' . $Param{Number},
         },
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event      => 'UPDATE',
+        Namespace  => 'CMDB.ConfigItem',
+        ObjectID   => $Param{ConfigItemID},
     );
 
     return 1;
@@ -730,6 +744,13 @@ sub ConfigItemDelete {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event      => 'DELETE',
+        Namespace  => 'CMDB.ConfigItem',
+        ObjectID   => $Param{ConfigItemID},
     );
 
     return $Success;

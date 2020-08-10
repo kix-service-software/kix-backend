@@ -96,6 +96,8 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $ConfigObject = $Kernel::OM->Get('Config');
+
     # get config options, use defaults unless value specified
     if ( $Param{JobConfig} && ref $Param{JobConfig} eq 'HASH' ) {
 
