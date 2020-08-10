@@ -66,32 +66,6 @@ sub _Replace {
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_NUMBER $Self->{End}/$Param{Ticket}->{TicketNumber}/gixms;
         $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Param{Ticket}->{Queue}/gixms;
 
-        # TODO: still necessary?
-        # KIXBase-capeIT
-        if ( $Param{Ticket}->{Service} && $Param{Text} ) {
-            my $LevelSeparator        = $Kernel::OM->Get('Config')->Get('TemplateGenerator::LevelSeparator');
-            my $ServiceLevelSeparator = '::';
-            if ( $LevelSeparator && ref($LevelSeparator) eq 'HASH' && $LevelSeparator->{Service} ) {
-                $ServiceLevelSeparator = $LevelSeparator->{Service};
-            }
-            my @Service = split( $ServiceLevelSeparator, $Param{Ticket}->{Service} );
-
-            my $MatchPattern = $Self->{Start} . "KIX_TICKET_Service_Level_(.*?)" . $Self->{End};
-            while ( $Param{Text} =~ /$MatchPattern/ ) {
-                my $ReplacePattern = $Self->{Start} . "KIX_TICKET_Service_Level_" . $1 . $Self->{End};
-                my $Level = ( $1 eq 'MAX' ) ? -1 : ($1) - 1;
-                if ( $Service[$Level] ) {
-                    $Param{Text} =~ s/$ReplacePattern/$Service[$Level]/gixms
-                }
-                else {
-                    $Param{Text} =~ s/$ReplacePattern/-/gixms
-                }
-
-            }
-        }
-
-        # EO KIXBase-capeIT
-
         # replace it
         $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %{ $Param{Ticket} } );
     }
