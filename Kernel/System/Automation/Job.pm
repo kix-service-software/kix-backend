@@ -460,13 +460,19 @@ sub JobDelete {
         return;
     }
 
-    # delete relations with ExecPlans
+    # delete runs
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => 'DELETE FROM job_run WHERE job_id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
+    # delete exec plan assignments
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_exec_plan WHERE job_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
-    # delete relations with Macros
+    # delete macro assignments
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_macro WHERE job_id = ?',
         Bind => [ \$Param{ID} ],

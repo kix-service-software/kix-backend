@@ -13,6 +13,7 @@ package Kernel::System::Console::Command::Dev::Tools::Database::RandomDataInsert
 use strict;
 use warnings;
 
+use Kernel::System::Role;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Console::BaseCommand);
@@ -101,7 +102,7 @@ sub Run {
     # set dummy sendmail module to avoid notifications
     $Kernel::OM->Get('Config')->Set(
         Key   => 'SendmailModule',
-        Value => 'Email::DoNotSendEmail',
+        Value => 'Kernel::System::Email::DoNotSendEmail',
     );
     $Kernel::OM->Get('Config')->Set(
         Key   => 'CheckEmailAddresses',
@@ -433,6 +434,7 @@ sub RoleCreate {
         my $Name = 'fill-up-role' . int( rand(100_000_000) );
         my $ID   = $Kernel::OM->Get('Role')->RoleAdd(
             Name    => $Name,
+            UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
             ValidID => 1,
             UserID  => 1,
         );

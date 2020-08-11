@@ -17,7 +17,7 @@ use vars (qw($Self));
 # prevent mails send
 $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 # get helper object

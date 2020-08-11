@@ -24,26 +24,14 @@ $Kernel::OM->ObjectParamAdd(
 );
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $ZZZAAuto = $Kernel::OM->Get('Config')->Get('Home') . '/Kernel/Config/Files/ZZZAAuto.pm';
-my $Before   = File::stat::stat($ZZZAAuto);
-sleep 2;
-
 # get command object
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Config::Rebuild');
 my $ExitCode      = $CommandObject->Execute();
-
-my $After = File::stat::stat($ZZZAAuto);
 
 $Self->Is(
     $ExitCode,
     0,
     "Exit code",
-);
-
-$Self->IsNot(
-    $Before->ctime(),
-    $After->ctime(),
-    "ZZZAAuto ctime",
 );
 
 # cleanup cache is done by RestoreDatabase

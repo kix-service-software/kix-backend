@@ -246,7 +246,7 @@ sub Run {
                 "Ignored Email (From: $GetParam->{'From'}, Message-ID: $GetParam->{'Message-ID'}) "
                 . "because the X-KIX-Ignore is set (X-KIX-Ignore: $GetParam->{'X-KIX-Ignore'})."
         );
-        return (5);
+        return ([5]);
     }
 
     # ----------------------

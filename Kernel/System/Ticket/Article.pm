@@ -192,7 +192,7 @@ sub ArticleCreate {
                 return;
             }
         }
-        my $Charset = '';
+        my $Charset = 'utf-8';
         if ( $Param{ContentType} =~ /charset=/i ) {
             $Charset = $Param{ContentType};
             $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;

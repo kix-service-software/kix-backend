@@ -13,6 +13,8 @@ use warnings;
 
 use utf8;
 
+use Kernel::System::Role::Permission;
+
 use vars (qw($Self));
 
 # get config object
@@ -203,12 +205,12 @@ my $UserLogin4 = $Helper->TestUserCreate(
     Roles => ["example-role$RandomID", "ticket_read_$RandomID"]
 );
 
-my %UserContactData4 serObject->GetUserData(
+my %UserContactData4 = $UserObject->GetUserData(
     User => $UserLogin4,
 );
 
-my %UserContactData4 = $ContactObject->ContactGet(
-    UserID => $UserContactData4{ID},
+%UserContactData4 = $ContactObject->ContactGet(
+    UserID => $UserContactData4{UserID},
 );
 
 # create a new contact for current test
@@ -219,9 +221,10 @@ my %Contact = $ContactObject->ContactGet(
 );
 
 #create a new organisation for current test
-my $OrgID = $OrgaObject->OrgansationAdd(
-    Name   => 'Dummy Orga',
-    Number => 'DUMMY',
+my $OrgID = $OrgaObject->OrganisationAdd(
+    Name    => 'Dummy Orga',
+    Number  => 'DUMMY',
+    ValidID => 1,
 );
 
 # get queue object
@@ -1210,7 +1213,7 @@ my $SetUserNotificationPreference = sub {
 my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
 
 my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
 
 my $Count = 0;
 my $NotificationID;

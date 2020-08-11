@@ -39,7 +39,7 @@ $Self->True(
 # use DoNotSendEmail email backend
 $Success = $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 $Self->True(
     $Success,
@@ -124,7 +124,7 @@ $Self->True(
 );
 
 my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
 
 # create add note notification
 my $NotificationID = $NotificationEventObject->NotificationAdd(
