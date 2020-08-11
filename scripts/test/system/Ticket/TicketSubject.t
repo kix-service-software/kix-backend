@@ -34,7 +34,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         );
         $ConfigObject->Set(
             Key   => 'Ticket::NumberGenerator',
-            Value => 'Ticket::Number::DateChecksum',
+            Value => 'Kernel::System::Ticket::Number::DateChecksum',
         );
         $ConfigObject->Set(
             Key   => 'Ticket::SubjectRe',
@@ -48,7 +48,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $Self->True(
-            $TicketObject->isa('Ticket::Number::DateChecksum'),
+            $TicketObject->isa('Kernel::System::Ticket::Number::DateChecksum'),
             "TicketObject loaded the correct backend",
         );
 

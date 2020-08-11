@@ -29,7 +29,7 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 my @Tests = (
     {
         Name        => '.txt',
-        Location    => 'scripts/test/sample/VirtualFS/VirtualFS-Test1.txt',
+        Location    => 'scripts/test/system/sample/VirtualFS/VirtualFS-Test1.txt',
         Filename    => 'TEST/File.txt',
         Mode        => 'utf8',
         MD5         => '26ea4a608d77c62ed0e4b0f8952c9df2',
@@ -56,7 +56,7 @@ my @Tests = (
     },
     {
         Name        => '.pdf',
-        Location    => 'scripts/test/sample/VirtualFS/VirtualFS-Test2.pdf',
+        Location    => 'scripts/test/system/sample/VirtualFS/VirtualFS-Test2.pdf',
         Filename    => 'me_t o_alal.pdf',
         Mode        => 'binmode',
         MD5         => '5ee767f3b68f24a9213e0bef82dc53e5',
@@ -84,7 +84,7 @@ my @Tests = (
     },
     {
         Name        => '.xls',
-        Location    => 'scripts/test/sample/VirtualFS/VirtualFS-Test3.xls',
+        Location    => 'scripts/test/system/sample/VirtualFS/VirtualFS-Test3.xls',
         Filename    => 'me_t o_alal.xls',
         Mode        => 'binmode',
         MD5         => '39fae660239f62bb0e4a29fe14ff5663',
@@ -117,7 +117,7 @@ for my $Backend (qw( FS DB )) {
 
     $ConfigObject->Set(
         Key   => 'VirtualFS::Backend',
-        Value => 'VirtualFS::' . $Backend,
+        Value => 'Kernel::System::VirtualFS::' . $Backend,
     );
 
     # get a new virtual fs object
@@ -160,6 +160,7 @@ for my $Backend (qw( FS DB )) {
             $File{Content},
             "$Backend Read() - $Test->{Name}",
         );
+
         $MD5Sum = $MainObject->MD5sum( String => $File{Content} );
         $Self->Is(
             $MD5Sum || '',

@@ -210,7 +210,6 @@ sub Run {
                 Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
                 Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
                 Email                 => lc( $GetParam{SenderEmailAddress} ),
-                PrimaryOrganisationID => $GetParam{'SenderEmailAddress'},
                 ValidID               => 1,
                 UserID                => 1,
             );
@@ -249,7 +248,7 @@ sub Run {
 
     # get ticket owner
     if ( $GetParam{'X-KIX-OwnerID'} ) {
-        # check if is an existing UserID
+        # check if it's an existing UserID
         my $TmpOwnerID = $Kernel::OM->Get('User')->UserLookup(
             UserID => $GetParam{'X-KIX-OwnerID'},
         );
@@ -285,6 +284,17 @@ sub Run {
         );
 
         $Opts{ResponsibleID} = $TmpResponsibleID || $Opts{ResponsibleID};
+    }
+
+    # check channel
+    if ( $GetParam{'X-KIX-Channel'} ) {
+        # check if it's an existing Channel
+        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup(
+            Name => $GetParam{'X-KIX-Channel'},
+        );
+        if ( !$ChannelID ) {
+            $GetParam{'X-KIX-Channel'} = undef;
+        }
     }
 
     # get ticket object

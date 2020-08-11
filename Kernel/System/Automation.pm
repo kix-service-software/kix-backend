@@ -236,7 +236,7 @@ sub _Log {
     # log in system log
     $Kernel::OM->Get('Log')->Log(
         Priority => $Param{Priority},
-        Message  => "$Param{Message} (Job: $JobInfo, RunID: $RunID, Macro: $MacroInfo, MacroAction: $MacroActionInfo)",
+        Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $RunID || '', $MacroInfo, $MacroActionInfo),
     );
 
     return 1;

@@ -28,7 +28,7 @@ for my $Backend (qw(AutoIncrement Date DateChecksum Random)) {
 
         $ConfigObject->Set(
             Key   => 'Ticket::NumberGenerator',
-            Value => 'Ticket::Number::' . $Backend,
+            Value => 'Kernel::System::Ticket::Number::' . $Backend,
         );
         $ConfigObject->Set(
             Key   => 'Ticket::SubjectFormat',
@@ -38,7 +38,7 @@ for my $Backend (qw(AutoIncrement Date DateChecksum Random)) {
         my $TicketObject = $Kernel::OM->Get('Ticket');
 
         $Self->True(
-            $TicketObject->isa( 'Ticket::Number::' . $Backend ),
+            $TicketObject->isa( 'Kernel::System::Ticket::Number::' . $Backend ),
             "TicketObject loaded the correct backend",
         );
 

@@ -63,12 +63,6 @@ my $GeneralCatalogItemID = $GeneralCatalogObject->ItemAdd(
     UserID  => 1,
 );
 
-$GeneralCatalogObject->GeneralCatalogPreferencesSet(
-    ItemID => $GeneralCatalogItemID,
-    Key    => 'Permission',
-    Value  => 5,
-);
-
 $Self->True(
     $GeneralCatalogItemID,
     "Test general catalog item is created - $GeneralCatalogItemID ",

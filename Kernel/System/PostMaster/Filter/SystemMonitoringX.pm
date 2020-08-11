@@ -110,7 +110,7 @@ sub Run {
     # replace KIX_CONFIG tags
     for my $Key ( keys %{ $Self->{Config} } ) {
         next if !$Self->{Config}->{$Key};
-        $Self->{Config}->{$Key} =~ s{<KIX_CONFIG_(.+?)>}{print STDERR "Match: $1\n";$ConfigObject->Get($1) || ''}egx;
+        $Self->{Config}->{$Key} =~ s{<KIX_CONFIG_(.+?)>}{$Self->{Config}->Get($2)}egx;
     }
 
     # see, whether to-address is of interest regarding system-monitoring

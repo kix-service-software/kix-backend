@@ -223,7 +223,7 @@ my @Tests = (
 );
 
 my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Ticket::Event::NotificationEvent');
+my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
 
 my $Count = 0;
 for my $Test (@Tests) {

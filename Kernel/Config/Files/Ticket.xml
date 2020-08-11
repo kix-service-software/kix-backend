@@ -2118,7 +2118,7 @@
                 <Item>X-KIX-Organisation</Item>
                 <Item>X-KIX-Contact</Item>
                 <Item>X-KIX-SenderType</Item>
-                <Item>X-KIX-ArticleType</Item>
+                <Item>X-KIX-Channel</Item>
                 <Item>X-KIX-FollowUp-Priority</Item>
                 <Item>X-KIX-FollowUp-Queue</Item>
                 <Item>X-KIX-FollowUp-Lock</Item>
@@ -2126,7 +2126,7 @@
                 <Item>X-KIX-FollowUp-State-PendingTime</Item>
                 <Item>X-KIX-FollowUp-Type</Item>
                 <Item>X-KIX-FollowUp-SenderType</Item>
-                <Item>X-KIX-FollowUp-ArticleType</Item>
+                <Item>X-KIX-FollowUp-Channel</Item>
                 <Item>X-KIX-BodyDecrypted</Item>
                 <Item>X-KIX-TicketTemplate</Item>
             </Array>

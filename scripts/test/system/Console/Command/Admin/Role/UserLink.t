@@ -12,6 +12,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Kernel::System::Role;
+
 use vars (qw($Self));
 
 my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Role::UserLink');
@@ -60,8 +62,9 @@ $Self->True(
 );
 
 # add role
-my $RoleID = $Kernel::OM->Get('Group')->RoleAdd(
+my $RoleID = $Kernel::OM->Get('Role')->RoleAdd(
     Name    => $RoleRand,
+    UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
     ValidID => 1,
     UserID  => 1,
 );

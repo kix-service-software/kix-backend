@@ -66,7 +66,7 @@ sub new {
 
     # get configured backend module
     my $GenericModule = $Kernel::OM->Get('Config')->Get('SendmailModule')
-        || 'Email::Sendmail';
+        || 'Kernel::System::Email::Sendmail';
 
     # get backend object
     $Self->{Backend} = $Kernel::OM->Get($GenericModule);
