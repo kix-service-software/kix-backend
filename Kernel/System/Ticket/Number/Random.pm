@@ -81,8 +81,8 @@ sub GetTNByString {
         $SystemID = $ConfigObject->Get('SystemID');
     }
 
-    my $TicketHook        = $ConfigObject->Get('Ticket::Hook');
-    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider');
+    my $TicketHook        = $ConfigObject->Get('Ticket::Hook') || '';
+    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider') || '';
 
     # check current setting
     if ( $String =~ /\Q$TicketHook$TicketHookDivider\E($SystemID\d{2,20})/i ) {
@@ -115,8 +115,8 @@ sub GetTNArrayByString {
         $SystemID = $ConfigObject->Get('SystemID');
     }
 
-    my $TicketHook        = $ConfigObject->Get('Ticket::Hook');
-    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider');
+    my $TicketHook        = $ConfigObject->Get('Ticket::Hook') || '';
+    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider') || '';
 
     # check current setting
     if ( $String =~ /\Q$TicketHook$TicketHookDivider\E($SystemID\d{2,20})/i ) {

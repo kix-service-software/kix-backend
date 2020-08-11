@@ -127,7 +127,7 @@ my $SourcePath
     = $Kernel::OM->Get('Config')->Get('Home') . "/scripts/test/system/sample/ImportExport/TemplateExport.csv";
 
 # test command with wrong template number
-$ExitCode = $CommandObject->Execute( '--template-number', $Helper->GetRandomID(), $SourcePath . 'TemplateExport.csv' );
+$ExitCode = $CommandObject->Execute( '--template-number', $Helper->GetRandomID(), $SourcePath );
 
 $Self->Is(
     $ExitCode,

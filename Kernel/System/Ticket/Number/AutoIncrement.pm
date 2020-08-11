@@ -130,8 +130,8 @@ sub GetTNByString {
         $SystemID = $ConfigObject->Get('SystemID');
     }
 
-    my $TicketHook        = $ConfigObject->Get('Ticket::Hook');
-    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider');
+    my $TicketHook        = $ConfigObject->Get('Ticket::Hook') || '';
+    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider') || '';
     my $MinSize           = $ConfigObject->Get('Ticket::NumberGenerator::AutoIncrement::MinCounterSize')
         || $ConfigObject->Get('Ticket::NumberGenerator::MinCounterSize')
         || 5;
@@ -167,8 +167,8 @@ sub GetTNArrayByString {
         $SystemID = $ConfigObject->Get('SystemID');
     }
 
-    my $TicketHook        = $ConfigObject->Get('Ticket::Hook');
-    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider');
+    my $TicketHook        = $ConfigObject->Get('Ticket::Hook') || '';
+    my $TicketHookDivider = $ConfigObject->Get('Ticket::HookDivider') || '';
     my $MinSize           = $ConfigObject->Get('Ticket::NumberGenerator::AutoIncrement::MinCounterSize')
         || $ConfigObject->Get('Ticket::NumberGenerator::MinCounterSize')
         || 5;
