@@ -196,7 +196,7 @@ for my $Test (@Tests) {
     # prevent mails send
     $Helper->ConfigSettingChange(
         Key   => 'SendmailModule',
-        Value => 'Email::DoNotSendEmail',
+        Value => 'Kernel::System::Email::DoNotSendEmail',
         Valid => 1,
     );
 

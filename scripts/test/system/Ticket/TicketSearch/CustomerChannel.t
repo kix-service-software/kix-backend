@@ -32,7 +32,7 @@ $ConfigObject->Set(
 
 $ConfigObject->Set(
     Key   => 'Ticket::StorageModule',
-    Value => 'Ticket::ArticleStorageDB',
+    Value => 'Kernel::System::Ticket::ArticleStorageDB',
 );
 
 my $UserID = 1;
@@ -57,7 +57,7 @@ for my $TitleDataItem ( 'Ticket One Title', 'Ticket Two Title' ) {
         Priority     => '3 normal',
         State        => 'new',
         CustomerID   => '123465' . $RandomID,
-        Contact => 'customerOne@example.com',
+        Contact      => 'customerOne@example.com',
         OwnerID      => 1,
         UserID       => 1,
     );
@@ -65,7 +65,7 @@ for my $TitleDataItem ( 'Ticket One Title', 'Ticket Two Title' ) {
     # sanity check
     $Self->True(
         $TicketID,
-        "$Module TicketCreate() successful for Ticket ID $TicketID",
+        "$TitleDataItem TicketCreate() successful for Ticket ID $TicketID",
     );
 
     # get the Ticket entry
@@ -77,7 +77,7 @@ for my $TitleDataItem ( 'Ticket One Title', 'Ticket Two Title' ) {
 
     $Self->True(
         IsHashRefWithData( \%TicketEntry ),
-        "$Module TicketGet() successful for Local TicketGet ID $TicketID",
+        "$TitleDataItem TicketGet() successful for Local TicketGet ID $TicketID",
     );
 
     push @TicketIDs, $TicketID;
@@ -159,7 +159,7 @@ for my $Test (@Tests) {
     $Self->IsDeeply(
         \@FoundTicketIDs,
         $Test->{ExpectedResults},
-        "$Module $Test->{Name} TicketSearch() -"
+        "$Test->{Name} TicketSearch() -"
     );
 }
 

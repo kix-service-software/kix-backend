@@ -96,6 +96,8 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $ConfigObject = $Kernel::OM->Get('Config');
+
     # get config options, use defaults unless value specified
     if ( $Param{JobConfig} && ref $Param{JobConfig} eq 'HASH' ) {
 
@@ -107,6 +109,7 @@ sub Run {
 
     # replace KIX_CONFIG tags
     for my $Key ( keys %{ $Self->{Config} } ) {
+        next if !$Self->{Config}->{$Key};
         $Self->{Config}->{$Key} =~ s{<KIX_CONFIG_(.+?)>}{$Self->{Config}->Get($2)}egx;
     }
 

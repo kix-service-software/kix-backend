@@ -87,11 +87,11 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{Contact} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
-                next if ( 
+                next if (
                     !($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} =~ m/^(PrimaryOrganisationID|AssignedUserID|UserID)$/)
                     && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|Login|OrganisationIDs)$/
                 );
-                next if ($SearchItem->{Operator} eq 'IN' && $SearchItem->{Field} ne 'OrganisationIDs');
+                next if ($SearchItem->{Operator} eq 'IN' && $SearchItem->{Field} !~ m/(OrganisationIDs|Email)/);
 
                 if (!$ContactSearch{$SearchType}) {
                     $ContactSearch{$SearchType} = [];
@@ -129,8 +129,12 @@ sub Run {
                         $SearchParam{LoginEquals} = $Value;
                     } elsif ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationIDs)$/ ) {
                         $SearchParam{ $SearchItem->{Field} } = $Value;
-                    } elsif ($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Email') {
-                        $SearchParam{EmailEquals} = $Value;
+                    } elsif ($SearchItem->{Field} eq 'Email') {
+                        if ($SearchItem->{Operator} eq 'EQ') {
+                            $SearchParam{EmailEquals} = $Value;
+                        } elsif ($SearchItem->{Operator} eq 'IN') {
+                            $SearchParam{EmailIn} = $Value;
+                        }
                     } elsif ($SearchItem->{Field} eq 'Email') {
                         $SearchParam{PostMasterSearch} = $Value;
                     } elsif ($SearchItem->{Field} eq 'PrimaryOrganisationID') {

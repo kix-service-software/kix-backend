@@ -39,18 +39,6 @@ $Self->True(
     'check for configuration setting "Home"',
 );
 
-my $ConfigChecksum  = $ConfigObject->ConfigChecksum();
-my $ConfigChecksum2 = $ConfigObject->ConfigChecksum();
-$Self->True(
-    $ConfigChecksum,
-    'ConfigChecksum()',
-);
-$Self->Is(
-    $ConfigChecksum,
-    $ConfigChecksum2,
-    'ConfigChecksum()',
-);
-
 # loads the defaults values
 $ConfigObject->LoadDefaults();
 

@@ -7,6 +7,10 @@
     "Contact": {
       "type": "object",
       "properties": {
+        "AssignedUserID": {
+          "description": "Id of an user, but should not be already in use for another contact.",
+          "type": "integer"
+        },
         "City": {
           "type": "string"
         },
@@ -28,9 +32,6 @@
         "Lastname": {
           "type": "string"
         },
-        "Login": {
-          "type": "string"
-        },
         "Mobile": {
           "type": "string"
         },
@@ -39,9 +40,6 @@
           "items": {
             "type": "integer"
           }
-        },
-        "Password": {
-          "type": "string"
         },
         "Phone": {
           "type": "string"

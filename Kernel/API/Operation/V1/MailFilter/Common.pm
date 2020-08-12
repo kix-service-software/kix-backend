@@ -76,7 +76,7 @@ sub _CheckMailFilter {
 
     if ( !IsArrayRefWithData( $MailFilter->{Match} ) ) {
     }
-        
+
     my $Index = 1;
     for my $Match ( @{ $MailFilter->{Match} } ) {
         for my $KeyValue (qw(Key Value)) {
@@ -93,6 +93,15 @@ sub _CheckMailFilter {
                 Message => "Email header '$Match->{Key}' is not supported!"
             );
         }
+
+        my $regex = eval { qr/$Match->{Value}/ };
+        if ( $@ ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Element $Match->{Key} of Match has not a valid Regex value ($Match->{Value})!"
+            );
+        }
+
         $Index++;
     }
 

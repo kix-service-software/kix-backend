@@ -170,7 +170,7 @@
     </Unique>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>    
+    </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
@@ -194,10 +194,10 @@
     </Index>
     <ForeignKey ForeignTable="permission_type">
         <Reference Local="type_id" Foreign="id"/>
-    </ForeignKey>    
+    </ForeignKey>
     <ForeignKey ForeignTable="roles">
         <Reference Local="role_id" Foreign="id"/>
-    </ForeignKey>    
+    </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
@@ -870,7 +870,7 @@
     <Column Name="a_reply_to" Required="false" Size="500" Type="VARCHAR"/>
     <Column Name="a_to" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_cc" Required="false" Size="3800" Type="VARCHAR"/>
-    <Column Name="a_bcc" Required="false" Size="3800" Type="VARCHAR"/>    
+    <Column Name="a_bcc" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_subject" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_message_id" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_message_id_md5" Required="false" Size="32" Type="VARCHAR"/>
@@ -1523,6 +1523,7 @@
     </Index>
 </Table>
 <Table Name="virtual_fs_preferences">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="virtual_fs_id" Required="true" Type="BIGINT"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="preferences_value" Required="false" Size="350" Type="VARCHAR"/>
@@ -2331,7 +2332,7 @@
         <Reference Local="create_by" Foreign="id" />
     </ForeignKey>
 </Table>
-        
+
 <!-- itsm attribute collection -->
 <Table Name="attachment_directory">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
@@ -2551,7 +2552,7 @@
     <Index Name="customer_portal_group_valid_id">
         <IndexColumn Name="valid_id"/>
     </Index>
-</Table>    
+</Table>
 
 <!-- client_registration - api client registration information -->
 <Table Name="client_registration">
@@ -2672,7 +2673,7 @@
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>    
+    </ForeignKey>
     <Index Name="sysconfig_name">
         <IndexColumn Name="name"/>
     </Index>

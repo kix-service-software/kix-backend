@@ -24,13 +24,13 @@ my $DBObject = $Kernel::OM->Get('DB');
 my @Tests = (
     {
         Name   => 'SELECT with named columns',
-        Data   => 'SELECT id, name FROM groups',
+        Data   => 'SELECT id, name FROM roles',
         Result => [qw(id name)],
     },
     {
         Name   => 'SELECT with all columns',
-        Data   => 'SELECT * FROM groups',
-        Result => [qw(id name comments valid_id create_time create_by change_time change_by)],
+        Data   => 'SELECT * FROM roles',
+        Result => [qw(id name comments usage_context valid_id create_time create_by change_time change_by)],
     },
 );
 

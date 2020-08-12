@@ -54,10 +54,10 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'output',
-        Description => "Select output format (ASCII|HTML|XML|Allure).",
+        Description => "Select output format (ASCII|HTML|XML|Allure).Separate multiple formats by comma.",
         Required    => 0,
         HasValue    => 1,
-        ValueRegex  => qr/^(ASCII|HTML|XML|Allure)$/smx,
+        ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'submit-url',

@@ -74,7 +74,7 @@ $ConfigObject->Set(
 );
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 # check if openssl is located there

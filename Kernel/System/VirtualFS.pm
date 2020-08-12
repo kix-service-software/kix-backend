@@ -226,7 +226,7 @@ sub Write {
         Bind => [ \$Param{Filename}, \$Self->{BackendDefault} ],
     );
 
-    ($FileID) = $Self->_FileLookup( Name => $Param{Filename} );
+    ($FileID) = $Self->_FileLookup( Filename => $Param{Filename} );
 
     if ( !$FileID ) {
         $Kernel::OM->Get('Log')->Log(
@@ -499,11 +499,11 @@ sub Find {
 =begin Internal:
 
 returns internal meta information, unique file id, where and with what arguments the
-file is stored (Name or ID must be given)
+file is stored (Filename or ID must be given)
 
     my ( $FileID, $BackendKey, $Backend ) = $Self->_FileLookup(
-        Name => '/Object/SomeFile.txt',
-        ID   => 123
+        Filename => '/Object/SomeFile.txt',
+        ID       => 123
     );
 
 =cut
@@ -512,7 +512,7 @@ sub _FileLookup {
     my ( $Self, %Param ) = @_;
 
     my $Where = $Param{ID} ? 'id' : 'filename';
-    my $Value = $Param{ID} ? $Param{ID} : $Param{Name};
+    my $Value = $Param{ID} ? $Param{ID} : $Param{Filename};
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');

@@ -24,7 +24,7 @@ my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 $HelperObject->ConfigSettingChange(
     Valid => 1,
     Key   => 'Ticket::StorageModule',
-    Value => 'Ticket::ArticleStorageDB',
+    Value => 'Kernel::System::Ticket::ArticleStorageDB',
 );
 
 # create isolated time environment during test

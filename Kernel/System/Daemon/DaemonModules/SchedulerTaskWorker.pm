@@ -216,7 +216,7 @@ sub Run {
                 exit 1;
             }
 
-            my $TaskHandlerModule = 'Daemon::DaemonModules::SchedulerTaskWorker::' . $Task{Type};
+            my $TaskHandlerModule = $Kernel::OM->GetModuleFor('Daemon::DaemonModules::SchedulerTaskWorker::' . $Task{Type});
 
             my $TaskHandlerObject;
             eval {

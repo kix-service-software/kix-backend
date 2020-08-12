@@ -221,6 +221,7 @@ sub ProviderProcessRequest {
         }
     }
 
+    # TODO: the following code is nearly identical to the code used in Operation::V1::Common, method ExecOperation -> should be generalized
     # determine all the  allowed methods
     my %AvailableMethods;
     for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
@@ -276,6 +277,30 @@ sub ProviderProcessRequest {
         $ResourceOperationRouteMapping{$Op} = $Config->{RouteOperationMapping}->{$Op}->{Route};
     }
 
+    # determine parent mapping as well
+    my $ParentObjectRoute = $CurrentRoute;
+    $ParentObjectRoute =~ s/^((.*?):(\w+))\/(.+?)$/$1/g;
+    $ParentObjectRoute = '' if $ParentObjectRoute eq $CurrentRoute;
+
+    my %ParentMethodOperationMapping;
+    if ( $ParentObjectRoute ) {
+        for my $Op ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+            # ignore invalid config
+            next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$Op} );
+
+            # ignore anything that has nothing to do with the parent Ops route
+            if ( $ParentObjectRoute ne '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute\/$/ ) {
+                next;
+            }
+            elsif ( $ParentObjectRoute eq '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute[:a-zA-Z_]+$\//g ) {
+                next;
+            }
+
+            my $Method = $Config->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
+            $ParentMethodOperationMapping{$Method} = $Op;
+        }
+    }
+
     # combine query params with URIData params, URIData has more precedence
     if (%QueryParams) {
         %URIData = ( %QueryParams, %URIData, );
@@ -299,6 +324,7 @@ sub ProviderProcessRequest {
             AvailableMethods => \%AvailableMethods,
             RequestMethod  => $RequestMethod,
             ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
+            ParentMethodOperationMapping => \%ParentMethodOperationMapping,
             Data      => {
                 %URIData,
             },
@@ -390,6 +416,7 @@ sub ProviderProcessRequest {
         AvailableMethods => \%AvailableMethods,
         RequestMethod  => $RequestMethod,
         ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
+        ParentMethodOperationMapping => \%ParentMethodOperationMapping,
         Data           => $ReturnData,
     );
 }
