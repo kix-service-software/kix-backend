@@ -154,9 +154,11 @@ sub Run {
         if (%OrgList) {
             $GetParam{'X-KIX-Organisation'} = (keys %OrgList)[0];
         }
-        else {
-            $GetParam{'X-KIX-Organisation'} = undef;
-        }
+    }
+
+    if ( !$GetParam{'X-KIX-Organisation'} ) {
+        # make sure it's undef an no empty string, so that the result is a NULL value in the DB
+        $GetParam{'X-KIX-Organisation'} = undef;
     }
 
     if ( $GetParam{'X-KIX-Contact'} ) {
