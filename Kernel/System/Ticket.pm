@@ -457,6 +457,8 @@ sub TicketCreate {
         else {
             $Param{OrganisationID} = $OrgID;
         }
+    } else {
+        $Param{OrganisationID} = undef;
     }
 
     if (!$Param{ContactID} || $Param{ContactID} !~ /^\d+$/) {
