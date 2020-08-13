@@ -430,43 +430,43 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     my @Tests = (
                         {
                             Key    => 'DynamicField_TicketFreeKey1',
-                            Result => 'Test',
+                            Result => [ 'Test' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeText1',
-                            Result => 'ABC',
+                            Result => [ 'ABC' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeKey2',
-                            Result => 'Test2',
+                            Result => [ 'Test2' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeText2',
-                            Result => 'ABC2',
+                            Result => [ 'ABC2' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime1',
-                            Result => '2008-01-12 13:14:15',
+                            Result => [ '2008-01-12 13:14:15' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime2',
-                            Result => '2008-01-12 13:15:16',
+                            Result => [ '2008-01-12 13:15:16' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime3',
-                            Result => '2008-01-12 13:16:17',
+                            Result => [ '2008-01-12 13:16:17' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime4',
-                            Result => '2008-01-12 13:17:18',
+                            Result => [ '2008-01-12 13:17:18' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime5',
-                            Result => '2008-01-12 13:18:19',
+                            Result => [ '2008-01-12 13:18:19' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime6',
-                            Result => '2008-01-12 13:19:20',
+                            Result => [ '2008-01-12 13:19:20' ],
                         },
                     );
                     for my $Test (@Tests) {
