@@ -457,7 +457,10 @@ sub TicketCreate {
         else {
             $Param{OrganisationID} = $OrgID;
         }
-    } else {
+    }
+
+    if ( !$Param{OrganisationID} ) {
+        # make sure it's undef and no empty string, so that the result is a NULL value in the DB
         $Param{OrganisationID} = undef;
     }
 
