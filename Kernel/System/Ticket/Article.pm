@@ -212,6 +212,9 @@ sub ArticleCreate {
         $Param{MimeType} = $MimeType || $Param{MimeType};
     }
 
+    # fallback for Charset
+    $Param{Charset} //= 'utf-8';
+
     # for the event handler, before any actions have taken place
     my %OldTicketData = $Self->TicketGet(
         TicketID      => $Param{TicketID},

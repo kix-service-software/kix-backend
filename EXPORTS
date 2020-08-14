@@ -147,6 +147,7 @@ Crypt::PGP                                                                    = 
 Crypt::SMIME                                                                  = Kernel::System::Crypt::SMIME
 CSV                                                                           = Kernel::System::CSV
 Daemon::SchedulerDB                                                           = Kernel::System::Daemon::SchedulerDB
+Daemon::DaemonModules::SchedulerCronTaskManager                               = Kernel::System::Daemon::DaemonModules::SchedulerCronTaskManager
 Daemon::DaemonModules::SchedulerTaskWorker                                    = Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker
 Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor              = Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor
 Daemon::DaemonModules::SchedulerTaskWorker::Cron                              = Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::Cron
