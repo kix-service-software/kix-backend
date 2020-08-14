@@ -106,13 +106,17 @@ sub RunOperation {
         $Self->{PermissionFilteredObjects} = {};
 
         # check if we have permission for this object
-        my $Result =  $Self->_CheckObjectPermission();
+        my $Result =  $Self->_CheckObjectPermission(
+            Data => $Param{Data},
+        );
         if ( !$Result->{Success} ) {
             return $Result;
         }
 
         # check if we have permission for specific properties of this object
-        $Result =  $Self->_CheckPropertyPermission();
+        $Result =  $Self->_CheckPropertyPermission(
+            Data => $Param{Data},
+        );
         if ( !$Result->{Success} ) {
             return $Result;
         }
@@ -1623,7 +1627,7 @@ sub _ApplyFieldSelector {
         if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
 
             my @Fields = (
-                @{ $Param{Fields}->{$Object} },
+                @{ $Param{Fields}->{$Object} || [] },
                 keys %{ $Self->{Include} },
             );
 
@@ -2286,7 +2290,9 @@ sub _CacheRequest {
 
 check object permissions
 
-    my $Return = $CommonObject->_CheckObjectPermission();
+    my $Return = $CommonObject->_CheckObjectPermission(
+        Data => {}          # optional
+    );
 
     $Return = _Success if granted
 
@@ -2528,7 +2534,9 @@ sub _CheckObjectPermission {
 
 check property permissions
 
-    my $Return = $CommonObject->_CheckPropertyPermission();
+    my $Return = $CommonObject->_CheckPropertyPermission(
+        Data => {}              # optional
+    );
 
     $Return = _Success if granted
 
@@ -2652,8 +2660,9 @@ sub _CheckPropertyPermission {
                 );
 
                 # check if the attribute exists in the Data hash
-                $Attribute =~ s/\*/.*?/g;
-                my $AttributeExists = grep /^$Attribute$/, keys %{$FlatData};
+                my $LookupAttribute = $Attribute;
+                $LookupAttribute =~ s/\*/.*?/g;
+                my $AttributeExists = grep /^$LookupAttribute$/, keys %{$FlatData};
 
                 # if the attribute exists in the data hash we have to check whether the needed permission is granted
                 if ( $AttributeExists && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
@@ -2801,17 +2810,17 @@ sub _GetPermissionFilter {
 
     return \%PermissionFilter;
 }
-=item _ReplaceVariablesInProperyValuePermission()
+=item _ReplaceVariablesInPermission()
 
-replaces special variables in PropertyValue permission expressions with actual value
+replaces special variables in permission expressions with actual value
 
-    my $ReplacedData = $CommonObject->_ReplaceVariablesInProperyValuePermission(
+    my $ReplacedData = $CommonObject->_ReplaceVariablesInPermission(
         Data => '...'
     );
 
 =cut
 
-sub _ReplaceVariablesInProperyValuePermission {
+sub _ReplaceVariablesInPermission {
     my ( $Self, %Param ) = @_;
     my $Result = $Param{Data};
 
