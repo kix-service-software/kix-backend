@@ -95,14 +95,11 @@ sub Run {
         $Value += $PossiblePermissions{$Permission};
     }
 
-    my $IsRequired = $Self->GetOption('required') || 'no';
-
     my $PermissionID = $Kernel::OM->Get('Role')->PermissionAdd(
         RoleID     => $Self->{RoleID},
         TypeID     => $Self->{PermissionTypeID},
         Target     => $Self->GetOption('target') || '',
         Value      => $Value,
-        IsRequired => ($IsRequired eq 'yes'),
         Comment    => $Self->GetOption('comment') || '',
         UserID     => 1,
     );
