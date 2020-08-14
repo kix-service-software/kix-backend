@@ -16,7 +16,7 @@ use Kernel::System::Role;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Role::UserLink');
+my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Role::AssignUser');
 
 my ( $Result, $ExitCode );
 
