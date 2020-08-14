@@ -101,7 +101,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Console::Command::Admin::Group::Add',
+                Module   => 'Console::Command::Admin::Role::Add',
                 Function => 'Test',
                 Params   => ['--no-ansi'],
             },
@@ -114,7 +114,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Console::Command::Admin::Group::Add',
+                Module   => 'Console::Command::Admin::Role::Add',
                 Function => 'Execute',
                 Params   => ['-h'],
             },

@@ -221,7 +221,8 @@ for my $Test (@Tests) {
 
             if ( $Try < 5 && ( !$Response{Content} || !$Status || $Status ne 200 ) ) {
 
-                sleep $Intervall{$Try};
+                #sleep $Intervall{$Try};
+                sleep 3;
 
                 next TRY;
             }
