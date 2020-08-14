@@ -32,9 +32,9 @@ use vars qw(%INC);
 
 # updates permissions for role Customer
 _UpdatePermissionsForRoleSystemAdmin();
+_UpdatePermissionsForRoleTicketAgent();
 
 exit 0;
-
 
 sub _UpdatePermissionsForRoleSystemAdmin {
     # get database object
@@ -80,6 +80,79 @@ sub _UpdatePermissionsForRoleSystemAdmin {
                 Role   => 'System Admin',
                 Type   => 'Resource',
                 Target => '/organisations'
+            },
+            Change => {
+                Value => 2,
+            }
+        }
+    );
+
+    foreach my $Update ( @PermissionUpdates ) {
+        my $RoleID = $RoleList{$Update->{Permission}->{Role}};
+        if (!$RoleID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find role "'.$Update->{Permission}->{Role}.'"!'
+            );
+            next;
+        }
+        my $PermissionTypeID = $PermissionTypeList{$Update->{Permission}->{Type}};
+        if (!$PermissionTypeID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find permission type "'.$Update->{Permission}->{Type}.'"!'
+            );
+            next;
+        }
+
+        my $PermissionID = $RoleObject->PermissionLookup(
+            RoleID => $RoleID,
+            TypeID => $PermissionTypeID,
+            Target => $Update->{Permission}->{Target}
+        );
+        # nothing to do
+        next if !$PermissionID;
+
+        my $Success = $RoleObject->PermissionUpdate(
+            ID     => $PermissionID,
+            UserID => 1,
+            %{$Update->{Change}}
+        );
+
+        if (!$Success) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
+            );
+        }
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "Updated permission ID $PermissionID!"
+            );
+        }
+    }
+
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
+
+    return 1;
+}
+
+sub _UpdatePermissionsForRoleTicketAgent {
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    my %RoleList           = reverse $RoleObject->RoleList();
+    my %PermissionTypeList = reverse $RoleObject->PermissionTypeList();
+
+    my @PermissionUpdates = (
+        {
+            Permission => {
+                Role   => 'Ticket Agent',
+                Type   => 'Resource',
+                Target => '/system/textmodules'
             },
             Change => {
                 Value => 2,
