@@ -40,7 +40,7 @@ sub new {
 
     $Self->{Config} = $ConfigObject->Get('Cache::Module::Redis');
     if ( $Self->{Config} ) {
-        $Self->_initRedis();
+        $Self->_InitRedis();
     }
 
     return $Self;
@@ -49,7 +49,7 @@ sub new {
 sub Set {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed (qw(Type Key Value TTL)) {
+    for my $Needed (qw(Type Key Value)) {
         if ( !defined $Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -61,8 +61,8 @@ sub Set {
 
     return if !$Self->{RedisObject};
 
-    my $PreparedKey = $Self->_prepareRedisKey(%Param);
-    my $TTL = $Param{TTL};
+    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+    my $TTL = $Param{TTL} // 0;
     if ( IsHashRefWithData($Self->{Config}->{OverrideTTL}) ) {
         foreach my $TypePattern (keys %{$Self->{Config}->{OverrideTTL}}) {
             if ($Param{Type} =~ /^$TypePattern$/g) {
@@ -78,11 +78,20 @@ sub Set {
         $Value = '__base64::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );     
     }
 
-    my $Result = $Self->{RedisObject}->setex(
-        $PreparedKey, 
-        $TTL, 
-        $Value,
-    );
+    my $Result;
+    if ( $TTL > 0 ) {
+        $Result = $Self->{RedisObject}->setex(
+            $PreparedKey, 
+            $TTL, 
+            $Value,
+        );
+    }
+    else {
+        $Result = $Self->{RedisObject}->set(
+            $PreparedKey, 
+            $Value,
+        );
+    }
 
     if ( $Self->{Config}->{Debug} ) {
         $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
@@ -104,7 +113,7 @@ sub Get {
 
     return if !$Self->{RedisObject};
 
-    my $PreparedKey = $Self->_prepareRedisKey(%Param);
+    my $PreparedKey = $Param{RawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
 
     my $Value = $Self->{RedisObject}->get(
         $PreparedKey,
@@ -135,7 +144,7 @@ sub Delete {
     return if ( !$Self->{RedisObject} );
 
     return $Self->{RedisObject}->del(
-        $Self->_prepareRedisKey(%Param)
+        $Self->_PrepareRedisKey(%Param)
     );
 }
 
@@ -188,15 +197,29 @@ sub CleanUp {
     }
 }
 
-=item _initMemCache()
+sub GetKeysForType {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Type)) {
+        if ( !defined $Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            return;
+        }
+    }
+
+    return $Self->{RedisObject}->keys($Param{Type}.'::*');
+}
+
+=item _InitRedis()
 
 initialize connection to Redis
 
-    my $Value = $CacheInternalObject->_initRedis();
+    my $Value = $CacheInternalObject->_InitRedis();
 
 =cut
 
-sub _initRedis {
+sub _InitRedis {
     my ( $Self, %Param ) = @_;
 
     my %InitParams = (
@@ -210,19 +233,19 @@ sub _initRedis {
     return 1;
 }
 
-=item _prepareRedisKey()
+=item _PrepareRedisKey()
 
 Use MD5 digest of Key (to prevent special and possibly unsupported characters in key);
 we use here algo similar to original one from FileStorable.pm.
 (thanks to Informatyka Boguslawski sp. z o.o. sp.k., http://www.ib.pl/ for testing and contributing the MD5 change)
 
-    my $PreparedKey = $CacheInternalObject->_prepareRedisKey(
+    my $PreparedKey = $CacheInternalObject->_PrepareRedisKey(
         'SomeKey',
     );
 
 =cut
 
-sub _prepareRedisKey {
+sub _PrepareRedisKey {
     my ( $Self, %Param ) = @_;
 
     if ($Param{Raw}) {
