@@ -25,7 +25,7 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # prevent mails send
 $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 my @Tests = (
@@ -101,7 +101,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Console::Command::Admin::Group::Add',
+                Module   => 'Console::Command::Admin::Role::Add',
                 Function => 'Test',
                 Params   => ['--no-ansi'],
             },
@@ -114,7 +114,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Console::Command::Admin::Group::Add',
+                Module   => 'Console::Command::Admin::Role::Add',
                 Function => 'Execute',
                 Params   => ['-h'],
             },

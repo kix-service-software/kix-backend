@@ -195,8 +195,8 @@ sub _Log {
     my $JobID         = $Self->{JobID};
     my $RunID         = $Self->{RunID};
     my $MacroID       = $Self->{MacroID};
-    my $MacroActionID = $Self->{MacroActionID};        
-    my $ObjectID      = $Self->{ObjectID};        
+    my $MacroActionID = $Self->{MacroActionID};
+    my $ObjectID      = $Self->{ObjectID};
 
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
@@ -236,7 +236,7 @@ sub _Log {
     # log in system log
     $Kernel::OM->Get('Log')->Log(
         Priority => $Param{Priority},
-        Message  => "$Param{Message} (Job: $JobInfo, RunID: $RunID, Macro: $MacroInfo, MacroAction: $MacroActionInfo)",
+        Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $RunID || '', $MacroInfo, $MacroActionInfo),
     );
 
     return 1;

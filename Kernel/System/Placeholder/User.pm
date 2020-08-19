@@ -115,6 +115,16 @@ sub _ReplaceUserPlaceholder {
         UserID        => $Param{UseUserID},
         NoOutOfOffice => 1,
     );
+
+    # FIXME: just temporary, should be accessed via subattribut like <KIX_CURRENT_Preferences_SomePreference>
+    my $Languages = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');
+    if (IsHashRefWithData($Languages) && $User{Preferences}->{UserLanguage}) {
+        $User{UserLanguage} = $Languages->{$User{Preferences}->{UserLanguage}} || $User{Preferences}->{UserLanguage};
+    }
+    if ($User{Preferences}->{UserLastLoginTimestamp}) {
+        $User{UserLastLogin} = $User{Preferences}->{UserLastLoginTimestamp};
+    }
+
     my %ContactOfUser = $Kernel::OM->Get('Contact')->ContactGet(
         UserID => $Param{UseUserID},
     );

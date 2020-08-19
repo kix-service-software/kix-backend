@@ -13,6 +13,7 @@ use utf8;
 use vars (qw($Self));
 
 use Kernel::API::Debugger;
+use Kernel::System::Role;
 use Kernel::API::Validator::RoleValidator;
 
 my $DebuggerObject = Kernel::API::Debugger->new(
@@ -43,6 +44,7 @@ my $RoleRandom = 'testrole' . $Helper->GetRandomID();
 # create role
 my $RoleID = $Kernel::OM->Get('Role')->RoleAdd(
     Name    => $RoleRandom,
+    UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
     ValidID => 1,
     UserID  => 1,
 );

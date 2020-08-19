@@ -7,31 +7,19 @@
     "User": {
       "type": "object",
       "properties": {
+        "IsAgent": {
+          "type": "integer"
+        },
+        "IsCustomer": {
+          "type": "integer"
+        },
         "UserComment": {
-          "type": "string"
-        },
-        "UserEmail": {
-          "type": "string"
-        },
-        "UserFirstname": {
-          "type": "string"
-        },
-        "UserLastname": {
           "type": "string"
         },
         "UserLogin": {
           "type": "string"
         },
-        "UserMobile": {
-          "type": "string"
-        },
-        "UserPhone": {
-          "type": "string"
-        },
         "UserPw": {
-          "type": "string"
-        },
-        "UserTitle": {
           "type": "string"
         },
         "ValidID": {

@@ -62,24 +62,8 @@ sub Run {
     my $Comment          = $Param{Comment} || '';
     my $AutoResponseType = $Param{AutoResponseType} || '';
 
-    # KIX4OTRS-capeIT
-    # get ticket template
-    my %TicketTemplate;
-    if ( $GetParam{'X-KIX-TicketTemplate'} ) {
-        %TicketTemplate = $Kernel::OM->Get('Ticket')->TicketTemplateGet(
-            Name => $GetParam{'X-KIX-TicketTemplate'},
-        );
-    }
-
-    # EO KIX4OTRS-capeIT
-
     # get queue id and name
-    # KIX4OTRS-capeIT
-    # my $QueueID = $Param{QueueID} || die "need QueueID!";
-    my $QueueID = $TicketTemplate{QueueID} || $Param{QueueID} || die "need QueueID!";
-
-    # EO KIX4OTRS-capeIT
-
+    my $QueueID = $Param{QueueID} || die "need QueueID!";
     my $Queue = $Kernel::OM->Get('Queue')->QueueLookup(
         QueueID => $QueueID,
     );
@@ -88,17 +72,7 @@ sub Run {
     my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get state
-    # KIX4OTRS-capeIT
-    # my $State = $ConfigObject->Get('PostmasterDefaultState') || 'new';
-    my $State;
-    if ( defined $TicketTemplate{StateID} ) {
-        $State = $Kernel::OM->Get('State')->StateLookup( StateID => $TicketTemplate{StateID} );
-    }
-    else {
-        $State = $ConfigObject->Get('PostmasterDefaultState') || 'new';
-    }
-
-    # EO KIX4OTRS-capeIT
+    my $State = $ConfigObject->Get('PostmasterDefaultState') || 'new';
 
     if ( $GetParam{'X-KIX-State'} ) {
 
@@ -118,18 +92,7 @@ sub Run {
     }
 
     # get priority
-    # KIX4OTRS-capeIT
-    # my $Priority = $Self->{ConfigObject}->Get('PostmasterDefaultPriority') || '3 normal';
-    my $Priority;
-    if ( defined $TicketTemplate{PriorityID} ) {
-        $Priority
-            = $Kernel::OM->Get('Priority')->PriorityLookup( PriorityID => $TicketTemplate{PriorityID} );
-    }
-    else {
-        $Priority = $ConfigObject->Get('PostmasterDefaultPriority') || '3 normal';
-    }
-
-    # EO KIX4OTRS-capeIT
+    my $Priority = $ConfigObject->Get('PostmasterDefaultPriority') || '3 normal';
 
     if ( $GetParam{'X-KIX-Priority'} ) {
 
@@ -175,83 +138,87 @@ sub Run {
         );
     }
 
-    # get customer id if X-KIX-CustomerNo is given
-    if ( $GetParam{'X-KIX-CustomerNo'} ) {
+    # get customer id if X-KIX-Organisation is given
+    if ( $GetParam{'X-KIX-Organisation'} ) {
 
         # get organisation object
         my $OrgObject = $Kernel::OM->Get('Organisation');
 
-        # search organisation based on X-KIX-CustomerNo
+        # search organisation based on X-KIX-Organisation
         my %OrgList = $OrgObject->OrganisationSearch(
-            Number => $GetParam{'X-KIX-CustomerNo'},
+            Number => $GetParam{'X-KIX-Organisation'},
             Limit  => 1,
             Valid  => 0
         );
 
         if (%OrgList) {
-            $GetParam{'X-KIX-CustomerNo'} = (keys %OrgList)[0];
+            $GetParam{'X-KIX-Organisation'} = (keys %OrgList)[0];
         }
     }
 
-    # get customer user data form From: (sender address)
-    if ( !$GetParam{'X-KIX-Contact'} ) {
+    if ( !$GetParam{'X-KIX-Organisation'} ) {
+        # make sure it's undef and no empty string, so that the result is a NULL value in the DB
+        $GetParam{'X-KIX-Organisation'} = undef;
+    }
+
+    if ( $GetParam{'X-KIX-Contact'} ) {
+        # transform X-KIX-Contact to ID
+        my %List = $Kernel::OM->Get('Contact')->ContactSearch(
+            PostMasterSearch => $GetParam{'X-KIX-Contact'},
+            Limit            => 1,
+            Valid            => 0
+        );
+
+        if ( %List ) {
+            $GetParam{'X-KIX-Contact'} = (keys %List)[0];
+        }
+        else {
+            # we can't assign a contact to it, clear it to give was to the fallback
+            $GetParam{'X-KIX-Contact'} = undef;
+        }
+    }
+
+    # if no contact found, get contact from sender address
+    if ( !$GetParam{'X-KIX-Contact'} && $GetParam{SenderEmailAddress} ) {
 
         my %ContactData;
-        if ( $GetParam{From} ) {
 
-            my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine(
-                Line => $GetParam{From},
+        # get customer user object
+        my $ContactObject = $Kernel::OM->Get('Contact');
+
+        my %List = $ContactObject->ContactSearch(
+            PostMasterSearch => lc( $GetParam{SenderEmailAddress} ),
+            Limit            => 1,
+            Valid            => 0
+        );
+
+        if ( %List ) {
+            %ContactData = $ContactObject->ContactGet(
+                ID => (keys %List)[0],
+            );
+        }
+
+        # create a new contact if no existing contact was found for the given "from"
+        if ( !$ContactData{ID} ) {
+            my $ParserObject = Kernel::System::EmailParser->new(
+                Mode => 'Standalone',
+            );
+            my $ContactEmailRealname = $ParserObject->GetRealname(
+                Email => $GetParam{SenderEmailAddress}
+            );
+            my @NameChunks = split(' ', $ContactEmailRealname);
+
+            my $ContactID = $ContactObject->ContactAdd(
+                Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
+                Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
+                Email                 => lc( $GetParam{SenderEmailAddress} ),
+                ValidID               => 1,
+                UserID                => 1,
             );
 
-            for my $Address (@EmailAddresses) {
-                $GetParam{EmailFrom} = $Self->{ParserObject}->GetEmailAddress(
-                    Email => $Address,
-                );
-            }
-
-            if ( $GetParam{EmailFrom} ) {
-
-                # get customer user object
-                my $ContactObject = $Kernel::OM->Get('Contact');
-
-                my %List = $ContactObject->ContactSearch(
-                    PostMasterSearch => lc( $GetParam{EmailFrom} ),
-                    Limit            => 1,
-                    Valid            => 0
-                );
-
-                if ( %List ) {
-                    %ContactData = $ContactObject->ContactGet(
-                        ID => (keys %List)[0],
-                    );
-                }
-
-                # create a new contact if no existing contact was found for the given "from"
-                if ( !$ContactData{ID} ) {
-                    my $ParserObject = Kernel::System::EmailParser->new(
-                        Mode => 'Standalone',
-                    );
-                    my $ContactEmailRealname = $ParserObject->GetRealname(
-                        Email => $GetParam{EmailFrom}
-                    );
-                    my @NameChunks = split(' ', $ContactEmailRealname);
-
-                    my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
-                        Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
-                        Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
-                        Email                 => lc( $GetParam{EmailFrom} ),
-                        PrimaryOrganisationID => undef,
-                        ValidID               => 1,
-                        UserID                => 1,
-                    );
-
-                    my $ContactObject = $Kernel::OM->Get('Contact');
-
-                    %ContactData = $ContactObject->ContactGet(
-                        ID => $ContactID
-                    );
-                }
-            }
+            %ContactData = $ContactObject->ContactGet(
+                ID => $ContactID
+            );
         }
 
         # take PrimaryOrganisationID from contact lookup or from "from" field
@@ -261,70 +228,58 @@ sub Run {
             # notice that Login is from contact data
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Take Login ($ContactData{ID}) from contact based on ($GetParam{'EmailFrom'}).",
+                Message  => "Take Login ($ContactData{ID}) from contact based on ($GetParam{'SenderEmailAddress'}).",
             );
         }
-        if ( $ContactData{PrimaryOrganisationID} && !$GetParam{'X-KIX-CustomerNo'} ) {
-            $GetParam{'X-KIX-CustomerNo'} = $ContactData{PrimaryOrganisationID};
+        if ( $ContactData{PrimaryOrganisationID} && !$GetParam{'X-KIX-Organisation'} ) {
+            $GetParam{'X-KIX-Organisation'} = $ContactData{PrimaryOrganisationID};
 
-            # notice that PrimaryOrganisationID is from customer source backend
+            # notice that PrimaryOrganisationID is from contact
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "Take PrimaryOrganisationID ($ContactData{PrimaryOrganisationID})"
-                    . " from contact based on ($GetParam{'EmailFrom'}).",
+                    . " from contact based on ($GetParam{'SenderEmailAddress'}).",
             );
         }
     }
-    else {
-        # transform X-KIX-Contact to ID
-        my %ContactData;
 
-        # get contact object
-        my $ContactObject = $Kernel::OM->Get('Contact');
-
-        my %List = $ContactObject->ContactSearch(
-            PostMasterSearch => $GetParam{'X-KIX-Contact'},
-            Limit            => 1,
-            Valid            => 0
-        );
-
-        if ( %List ) {
-            $GetParam{'X-KIX-Contact'} = (keys %List)[0];
-        }
-    }
-
-    # if there is no customer user found!
+    # if there is still no customer user found, take the senders email address
     if ( !$GetParam{'X-KIX-Contact'} ) {
         $GetParam{'X-KIX-Contact'} = $GetParam{SenderEmailAddress};
     }
 
     # get ticket owner
-    # KIX4OTRS-capeIT
-    my $OwnerID = $GetParam{'X-KIX-OwnerID'} || $TicketTemplate{OwnerID} || $Param{InmailUserID};
+    if ( $GetParam{'X-KIX-OwnerID'} ) {
+        # check if it's an existing UserID
+        my $TmpOwnerID = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $GetParam{'X-KIX-OwnerID'},
+        );
+        $GetParam{'X-KIX-OwnerID'} = $TmpOwnerID;
+    }
 
-    # EO KIX4OTRS-capeIT
-    if ( $GetParam{'X-KIX-Owner'} ) {
+    if ( !$GetParam{'X-KIX-OwnerID'} && $GetParam{'X-KIX-Owner'} ) {
 
         my $TmpOwnerID = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $GetParam{'X-KIX-Owner'},
         );
 
-        $OwnerID = $TmpOwnerID || $OwnerID;
+        $GetParam{'X-KIX-OwnerID'} = $TmpOwnerID;
     }
 
+    # handle optional things
     my %Opts;
+
     if ( $GetParam{'X-KIX-ResponsibleID'} ) {
-        $Opts{ResponsibleID} = $GetParam{'X-KIX-ResponsibleID'};
+        $Opts{ResponsibleID} = $Param{InmailUserID};
+
+        # check if is an existing UserID
+        my $TmpOwnerID = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $GetParam{'X-KIX-ResponsibleID'},
+        );
+        $Opts{ResponsibleID} = $TmpOwnerID || $Opts{ResponsibleID};
     }
 
-    # KIX4OTRS-capeIT
-    elsif ( defined $TicketTemplate{ResponsibleID} ) {
-        $Opts{ResponsibleID} = $TicketTemplate{ResponsibleID};
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    if ( $GetParam{'X-KIX-Responsible'} ) {
+    if ( !$Opts{ResponsibleID} && $GetParam{'X-KIX-Responsible'} ) {
 
         my $TmpResponsibleID = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $GetParam{'X-KIX-Responsible'},
@@ -333,49 +288,33 @@ sub Run {
         $Opts{ResponsibleID} = $TmpResponsibleID || $Opts{ResponsibleID};
     }
 
+    # check channel
+    if ( $GetParam{'X-KIX-Channel'} ) {
+        # check if it's an existing Channel
+        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup(
+            Name => $GetParam{'X-KIX-Channel'},
+        );
+        if ( !$ChannelID ) {
+            $GetParam{'X-KIX-Channel'} = undef;
+        }
+    }
+
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    # KIX4OTRS-capeIT
-    # get ticket type
-    my $Type;
-    if ( $ConfigObject->Get('Ticket::Type') && defined $TicketTemplate{TypeID} ) {
-        $Type = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $TicketTemplate{TypeID} );
-    }
-
-    # get service
-    my $Service;
-    if ( defined $TicketTemplate{ServiceID} ) {
-        $Service = $Kernel::OM->Get('Service')->ServiceLookup( ServiceID => $TicketTemplate{ServiceID} );
-    }
-
-#rbo - T2016121190001552 - added KIX placeholders
-    # get subject
-    my $Subject = $GetParam{Subject};
-    if ( defined $TicketTemplate{Subject}
-        && $TicketTemplate{Subject} =~ m/(.*?)<KIX_EMAIL_SUBJECT>(.*)/g )
-    {
-        $Subject = $1 . $Subject . $3;
-    }
-
-    # EO KIX4OTRS-capeIT
 
     # create new ticket
     my $NewTn    = $TicketObject->TicketCreateNumber();
     my $TicketID = $TicketObject->TicketCreate(
         TN              => $NewTn,
-        Title           => $Subject,
-        QueueID         => $QueueID || $TicketTemplate{QueueID},
+        Title           => $GetParam{Subject},
+        QueueID         => $QueueID,
         Lock            => $GetParam{'X-KIX-Lock'} || 'unlock',
         Priority        => $Priority,
         State           => $State,
-        Type            => $Type    || $GetParam{'X-KIX-Type'}    || '',
-        Service         => $Service || $GetParam{'X-KIX-Service'} || '',
-        SLA             => $GetParam{'X-KIX-SLA'}     || '',
-        TicketTemplate  => (%TicketTemplate && $TicketTemplate{ID}) ? $TicketTemplate{ID} : '',
-        OrganisationID  => $GetParam{'X-KIX-CustomerNo'},
+        Type            => $GetParam{'X-KIX-Type'}    || '',
+        OrganisationID  => $GetParam{'X-KIX-Organisation'},
         ContactID       => $GetParam{'X-KIX-Contact'},
-        OwnerID         => $OwnerID,
+        OwnerID         => $GetParam{'X-KIX-OwnerID'} || $Param{InmailUserID},
         UserID          => $Param{InmailUserID},
         %Opts,
     );
@@ -391,7 +330,7 @@ sub Run {
         print "TicketID: $TicketID\n";
         print "Priority: $Priority\n";
         print "State: $State\n";
-        print "OrganisationID: ".$GetParam{'X-KIX-CustomerNo'}."\n";
+        print "OrganisationID: ".$GetParam{'X-KIX-Organisation'}."\n";
         print "ContactID: ".$GetParam{'X-KIX-Contact'}."\n";
         for my $Value (qw(Type Service SLA Lock)) {
 
@@ -564,38 +503,17 @@ sub Run {
         }
     }
 
-    # # KIX4OTRS-capeIT
-    # # get body
-    # my $Body = $GetParam{Body};
-    # my $RichTextUsed = $ConfigObject->Get('Frontend::RichText');
-    # if ( defined $TicketTemplate{Body} ) {
-    #     if ( $RichTextUsed && $TicketTemplate{Body} =~ m/(.*?)&lt;KIX_EMAIL_BODY&gt;(.*)/msg ) {
-    #         $Body = $1 . $Body . $3;
-    #         $GetParam{'Content-Type'} = 'text/html';
-    #     }
-    #     elsif ( !$RichTextUsed && $TicketTemplate{Body} =~ m/(.*?)<KIX_EMAIL_BODY>(.*)/msg ) {
-    #         $Body = $1 . $Body . $3;
-    #     }
-    # }
-
-    # get channel
-    my $Channel;
-    if ( defined $TicketTemplate{Channel} ) {
-        $Channel = $Kernel::OM->Get('Channel')->ChannelLookup( ID => $TicketTemplate{Channel} );
-    }
-
-    # EO KIX4OTRS-capeIT
-
     # do article db insert
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $TicketID,
-        Channel          => $GetParam{'X-KIX-Channel'} || $Channel,
+        Channel          => $GetParam{'X-KIX-Channel'} || 'email',
+        CustomerVisible  => 1,
         SenderType       => $GetParam{'X-KIX-SenderType'},
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
         Cc               => $GetParam{Cc},
-        Subject          => $Subject,
+        Subject          => $GetParam{Subject},
         MessageID        => $GetParam{'Message-ID'},
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},

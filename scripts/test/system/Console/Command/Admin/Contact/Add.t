@@ -28,6 +28,15 @@ $Kernel::OM->Get('Config')->Set(
     Value => 0,
 );
 
+# create test organisation
+my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
+    Number  => $Helper->GetRandomID(),
+    Name    => $Helper->GetRandomID(),
+    ValidID => 1,
+    UserID  => 1,
+);
+
+
 # try to execute command without any options
 my $ExitCode = $CommandObject->Execute();
 $Self->Is(
@@ -40,7 +49,7 @@ $Self->Is(
 $ExitCode = $CommandObject->Execute(
     '--user-name', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--primary-customer-id', 'Test', '--customer-ids', 'Test'
+    '--primary-organisation-id', $OrgID, 'Test',
 );
 $Self->Is(
     $ExitCode,
@@ -52,12 +61,12 @@ $Self->Is(
 $ExitCode = $CommandObject->Execute(
     '--user-name', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--primary-customer-id', 'Test', '--customer-ids', 'Test'
+    '--primary-organisation-id', 'Test',
 );
 $Self->Is(
     $ExitCode,
     1,
-    "Minimum options (user already exists)",
+    "Minimum options (contact already exists)",
 );
 
 # cleanup is done by RestoreDatabase

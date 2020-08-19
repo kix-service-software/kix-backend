@@ -60,7 +60,27 @@ for my $ModuleFile (@BackendModuleFiles) {
         );
 
         # get a new cache object
-        my $CacheObject = $Kernel::OM->Get('Cache');
+        my $CacheObject;
+
+        # initiate redis mock server
+        if ( $Module eq 'Redis' ) {
+            # set the filestorable so that the redis cache BE doesn't bail out becuase of no connection to a live redis server
+            $ConfigObject->Set(
+                Key   => 'Cache::Module',
+                Value => "Kernel::System::Cache::FileStorable",
+            );
+            $CacheObject = $Kernel::OM->Get('Cache');
+                    $ConfigObject->Set(
+                Key   => 'Cache::Module',
+                Value => "Kernel::System::Cache::$Module",
+            );
+            # replace the redis object
+            my $MockObject = $Kernel::OM->Get('Kernel::System::UnitTest::RedisMock');
+            $CacheObject->{CacheObject}->{RedisObject} = $MockObject;
+        }
+        else {
+            $CacheObject = $Kernel::OM->Get('Cache');
+        }
 
         next MODULEFILE if !$CacheObject;
 
@@ -71,12 +91,6 @@ for my $ModuleFile (@BackendModuleFiles) {
         $CacheObject->Configure(
             CacheInMemory => 0,
         );
-
-        # initiate redis mock server
-        if ( $Module eq 'Redis' ) {
-            my $MockObject = $Kernel::OM->Get('UnitTest::RedisMock');
-            $CacheObject->{CacheObject}->{RedisObject} = $MockObject;
-        }
 
         # set fixed time
         if ( $FixedTimeCompatibleBackends{$Module} ) {

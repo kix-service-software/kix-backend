@@ -10,6 +10,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Kernel::System::Role;
+
 use vars (qw($Self));
 
 # get role object
@@ -38,6 +40,7 @@ my %RoleIDByRoleName = (
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleObject->RoleAdd(
         Name    => $RoleName,
+        UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
         ValidID => 1,
         UserID  => 1,
     );
@@ -56,6 +59,7 @@ for my $RoleName ( sort keys %RoleIDByRoleName ) {
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleObject->RoleAdd(
         Name    => $RoleName,
+        UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
         ValidID => 1,
         UserID  => 1,
     );
@@ -142,6 +146,7 @@ delete $RoleIDByRoleName{$RoleNameToChange};
 # try to add role with previous name
 my $RoleID1 = $RoleObject->RoleAdd(
     Name    => $RoleNameToChange,
+    UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
     ValidID => 1,
     UserID  => 1,
 );
@@ -158,6 +163,7 @@ if ($RoleID1) {
 # try to add role with changed name
 $RoleID1 = $RoleObject->RoleAdd(
     Name    => $ChangedRoleName,
+    UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
     ValidID => 1,
     UserID  => 1,
 );
@@ -170,6 +176,7 @@ $Self->False(
 my $RoleName2 = $ChangedRoleName . 'update';
 my $RoleID2   = $RoleObject->RoleAdd(
     Name    => $RoleName2,
+    UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
     ValidID => 1,
     UserID  => 1,
 );

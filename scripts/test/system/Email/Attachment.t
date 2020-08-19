@@ -55,7 +55,7 @@ my $AttachmentNumber = scalar @{$AttachmentReference};
 # do not really send emails
 $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 # test scenarios. added only one attachment.

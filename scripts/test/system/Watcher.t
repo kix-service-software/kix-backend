@@ -134,7 +134,7 @@ $Self->True(
     Object   => 'Ticket',
     ObjectID => $TicketIDs[1],
 );
-my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
+%Watchers = map { $_->{UserID} => $_ } @WatcherList;
 $Self->False(
     $Watchers{ $TestUserIDs[0] } || 0,
     'WatcherList - first user',

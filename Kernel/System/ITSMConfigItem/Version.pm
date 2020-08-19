@@ -1305,7 +1305,7 @@ sub VersionDelete {
             $Kernel::OM->Get('ClientRegistration')->NotifyClients(
                 Event     => 'DELETE',
                 Namespace => 'CMDB.ConfigItem.Version',
-                ObjectID  => $Param{ConfigItemID}.'::'.$VersionID,
+                ObjectID  => $ConfigItemID.'::'.$VersionID,
             );
         }
     }

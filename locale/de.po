@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-06-23 21:41+0000\n"
-"PO-Revision-Date: 2020-07-20 11:51+0000\n"
+"PO-Revision-Date: 2020-08-13 13:51+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
@@ -136,15 +136,15 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "CheckList"
-msgstr ""
+msgstr "Checkliste"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Checklist 01"
-msgstr ""
+msgstr "Checkliste 01"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Checklist 02"
-msgstr ""
+msgstr "Checkliste 02"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Client Application"
@@ -284,7 +284,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Mobile Processing"
-msgstr ""
+msgstr "Mobile Bearbeitung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Modem"
@@ -394,7 +394,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Risk Assumption Remark"
-msgstr ""
+msgstr "Gefahrenübergang"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Router"
@@ -1795,7 +1795,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checklist"
-msgstr ""
+msgstr "Checkliste"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -5523,23 +5523,23 @@ msgstr "PLZ"
 
 #. manual entry from templates.pot.manual
 msgid "accepted"
-msgstr ""
+msgstr "Entgegengenommen"
 
 #. manual entry from templates.pot.manual
 msgid "assigned"
-msgstr ""
+msgstr "Zugewiesen"
 
 #. manual entry from templates.pot.manual
 msgid "cancelled"
-msgstr ""
+msgstr "Abgebrochen"
 
 #. manual entry from templates.pot.manual
 msgid "completed"
-msgstr ""
+msgstr "Abgeschlossen"
 
 #. manual entry from templates.pot.manual
 msgid "downloaded"
-msgstr ""
+msgstr "Herungergeladen"
 
 #. manual entry from templates.pot.manual
 msgid "no"
@@ -5547,19 +5547,19 @@ msgstr "nein"
 
 #. manual entry from templates.pot.manual
 msgid "partially executed"
-msgstr ""
+msgstr "Teilweise bearbeitet"
 
 #. manual entry from templates.pot.manual
 msgid "processing"
-msgstr ""
+msgstr "In Bearbeitung"
 
 #. manual entry from templates.pot.manual
 msgid "rejected"
-msgstr ""
+msgstr "Abgelehnt"
 
 #. manual entry from templates.pot.manual
 msgid "suspended"
-msgstr "ausgesetzt"
+msgstr "Ausgesetzt"
 
 #. manual entry from templates.pot.manual
 msgid "yes"

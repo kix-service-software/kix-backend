@@ -37,7 +37,7 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
 
     $ConfigObject->Set(
         Key   => 'Ticket::StorageModule',
-        Value => 'Ticket::' . $SourceBackend,
+        Value => 'Kernel::System::Ticket::' . $SourceBackend,
     );
 
     my $TicketObject = $Kernel::OM->Get('Ticket');

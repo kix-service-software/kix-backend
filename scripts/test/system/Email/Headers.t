@@ -17,7 +17,7 @@ use vars (qw($Self));
 # do not really send emails
 $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 # Check that long references and in-reply-to headers are correctly split across lines.

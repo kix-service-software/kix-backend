@@ -34,7 +34,7 @@ for my $Backend (qw(DB FS)) {
 
     $ConfigObject->Set(
         Key   => 'Ticket::StorageModule',
-        Value => 'Ticket::ArticleStorage' . $Backend,
+        Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
     );
 
     my $Location = $ConfigObject->Get('Home')
