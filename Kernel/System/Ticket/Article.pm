@@ -192,7 +192,7 @@ sub ArticleCreate {
                 return;
             }
         }
-        my $Charset = '';
+        my $Charset = 'utf-8';
         if ( $Param{ContentType} =~ /charset=/i ) {
             $Charset = $Param{ContentType};
             $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
@@ -211,6 +211,9 @@ sub ArticleCreate {
         # only change if we extracted a mime type
         $Param{MimeType} = $MimeType || $Param{MimeType};
     }
+
+    # fallback for Charset
+    $Param{Charset} //= 'utf-8';
 
     # for the event handler, before any actions have taken place
     my %OldTicketData = $Self->TicketGet(

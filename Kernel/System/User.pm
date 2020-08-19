@@ -291,7 +291,7 @@ sub GetUserData {
                     $Preferences{OutOfOfficeEndDay}
                 );
                 my $Till = int( ( $TimeEnd - $Time ) / 60 / 60 / 24 );
-                $Data{OutOfOfficeMessage}
+                $Preferences{OutOfOfficeMessage}
                     = sprintf( $OutOfOfficeMessageTemplate, $TillDate, $Till );
             }
 

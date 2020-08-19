@@ -36,7 +36,7 @@ $ConfigObject->Set(
 # do not really send emails
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 # add system address

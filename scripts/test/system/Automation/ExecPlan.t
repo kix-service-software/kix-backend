@@ -153,7 +153,7 @@ $Self->True(
     'ExecPlanUpdate() for changing parameters of execution plan.',
 );
 
-my %ExecPlan = $AutomationObject->ExecPlanGet( ID => $ExecPlanIDToChange );
+%ExecPlan = $AutomationObject->ExecPlanGet( ID => $ExecPlanIDToChange );
 
 $Self->True(
     $ExecPlan{Parameters},

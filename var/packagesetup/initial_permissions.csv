@@ -46,6 +46,7 @@
 "Ticket Agent";"Resource";"/organisations";;"x";;;
 "Ticket Agent";"Resource";"/contacts";;"x";;;
 "Ticket Agent";"Resource";"/links";"x";"x";"x";"x";
+"Ticket Agent";"Resource";"/system/textmodules";;"x";;;
 "Ticket Creator";"Resource";"/tickets";"x";;;;
 "Ticket Creator";"Resource";"/system/ticket";;"x";;;
 "Ticket Creator";"Resource";"/system/communication";;"x";;;
@@ -87,6 +88,10 @@
 "Customer Manager";"Resource";"/organisations";"x";"x";"x";"x";
 "Customer Manager";"Resource";"/contacts";"x";"x";"x";"x";
 "System Admin";"Resource";"/system";"x";"x";"x";"x";
+"System Admin";"Resource";"/auth";"x";;;;
+"System Admin";"Resource";"/session";"x";"x";"x";"x";
+"System Admin";"Resource";"/contacts";"x";"x";"x";"x";
+"System Admin";"Resource";"/organisations";;"x";;;
 "Superuser";"Resource";"/*";"x";"x";"x";"x";
 "Customer";"Resource";"/auth";"x";;;;
 "Customer";"Resource";"/cmdb";;"x";;;

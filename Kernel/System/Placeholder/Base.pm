@@ -82,11 +82,10 @@ sub ReplacePlaceholder {
             || 'en';
     }
 
-    $Self->{Start} = '<';
-    $Self->{End}   = '>';
+    # allow both styles but do not capture it
+    $Self->{Start} = '(?><|&lt;)';
+    $Self->{End}   = '(?>>|&gt;)';
     if ( $Param{RichText} ) {
-        $Self->{Start} = '&lt;';
-        $Self->{End}   = '&gt;';
         $Param{Text} =~ s/(\n|\r)//g;
     }
 

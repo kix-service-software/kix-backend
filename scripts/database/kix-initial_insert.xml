@@ -780,6 +780,17 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <!-- role "Ticket Agent": permission R_ on /system/textmodules -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">5</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/system/textmodules]]></Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
     <!-- role "Ticket Creator": permission C____ on /tickets -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
@@ -1226,6 +1237,50 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/system]]></Data>
         <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /auth -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/auth]]></Data>
+        <Data Key="value">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /session -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/session]]></Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /contacts -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
+        <Data Key="value">7</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /organisations -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/organisations]]></Data>
+        <Data Key="value">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -9912,11 +9967,6 @@ DefaultValue: ''
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 ---
-CountMin: '1'
-CountMax: '1'
-CountDefault: '1'
-ItemSeparator: ''
-Cols: ''
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n
   \   \"description\": \"Announce shut off to all possibly affected personell directly
   or indirectly working with the device.\",\r\n    \"input\": \"ChecklistState\",\r\n
@@ -9935,8 +9985,6 @@ DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\
   that equipment isolation is effective\",\r\n    \"description\": \"Before starting
   maintenance or repair tasks ensure that isolation is working.\",\r\n    \"input\":
   \"ChecklistState\",\r\n    \"value\": \"\"\r\n  }\r\n]"
-RegExList: []
-Rows: ''
         ]]></Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -9953,10 +10001,6 @@ Rows: ''
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
         <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
-CountMin: '1'
-CountMax: '1'
-CountDefault: '1'
-ItemSeparator: ''
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
   \ {\r\n    \"id\": \"200\",\r\n    \"title\": \"task 2\",\r\n    \"description\":

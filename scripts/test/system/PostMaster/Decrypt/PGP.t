@@ -44,7 +44,7 @@ $ConfigObject->Set(
 
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 
 # Check if GPG is located there.

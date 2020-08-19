@@ -12,6 +12,7 @@ use utf8;
 
 use vars (qw($Self));
 
+use Kernel::System::Role;
 use Kernel::System::Role::Permission qw(:all);
 
 # get helper object
@@ -43,6 +44,7 @@ for my $RoleCount ( 1 .. 3 ) {
     my $RoleName = 'test-permission-role-' . $RoleNameRandomPartBase . '-' . $RoleCount;
     my $RoleID   = $RoleObject->RoleAdd(
         Name    => $RoleName,
+        UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
         ValidID => 1,
         UserID  => 1,
     );

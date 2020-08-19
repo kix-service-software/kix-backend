@@ -29,13 +29,17 @@ my $ConfigObject = $Kernel::OM->Get('Config');
 $ConfigObject->Set(
     Key   => 'Authentication',
     Value => {
-        "Enabled" => 1,
-        "Name" => "Local Database",
-        "Module" => "Kernel::System::Auth::DB",
-        "Config" => {
-            "CryptType" => "sha2"
-        }
-    },
+        '000-Default' => [
+            {
+                "Enabled" => 1,
+                "Name" => "Local Database",
+                "Module" => "Kernel::System::Auth::DB",
+                "Config" => {
+                    "CryptType" => "sha2"
+                },
+            }
+        ]
+    }
 );
 
 # disable email checks to create new user

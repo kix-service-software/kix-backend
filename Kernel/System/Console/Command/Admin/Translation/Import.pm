@@ -99,8 +99,10 @@ sub Run {
             return;
         }
 
-        # add plugin
-        push @ImportItems, { Name => $Plugin, Directory => $Directory . '/locale' };
+        if ( -d $Directory . '/locale' ) {
+            # add plugin
+            push @ImportItems, { Name => $Plugin, Directory => $Directory . '/locale' };
+        }
     }
     elsif ( $Plugin && $Plugin eq 'ALL' ) {
         foreach my $Plugin ( @Plugins ) {
@@ -111,6 +113,8 @@ sub Run {
                 );
                 return;
             }
+
+            next if ! -d $Plugin->{Directory} . '/locale';
 
             # add plugin
             push @ImportItems, { Name => $Plugin->{Product}, Directory => $Plugin->{Directory} . '/locale' };
@@ -134,13 +138,20 @@ sub Run {
         }
     }
 
+    my $PreviousDir = ''; 
     foreach my $File ( sort @POFiles ) {
 
         # ignore plugins if not plugin requested
         next if $File =~ /\/plugins\// && !$Plugin;
 
         my $Filename = basename $File;
+        my $Dirname  = dirname $File;
         my ($Language) = split(/\./, $Filename);
+
+        if ( $Dirname ne $PreviousDir ) {
+            $Self->Print("  importing from directory $Dirname\n");
+            $PreviousDir = $Dirname;
+        }
 
         $Self->Print("    importing $Filename...");
 
@@ -154,7 +165,7 @@ sub Run {
             $Self->Print("<green>$CountOK/$CountTotal</green>\n");
         }
         else {
-            $Self->PrintError("$CountOK/$CountTotal\n");
+            $Self->Print("<red>$CountOK/$CountTotal</red>\n");
         }
     }
 

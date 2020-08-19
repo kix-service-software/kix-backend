@@ -276,7 +276,7 @@
                 <Item Key="Name">ConfigItemHistoryGet</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemHistoryGet</Item>
                 <Item Key="APIHistory">V1</Item>
-                <Item Key="ObjectID">HistoryID</Item>
+                <Item Key="ObjectID">HistoryEntryID</Item>
                 <Item Key="ResponseSchema">ConfigItemHistoryResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
@@ -310,6 +310,6 @@
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
             </Hash>
         </Setting>
-    </ConfigItem>    
+    </ConfigItem>
 
 </kix_config>

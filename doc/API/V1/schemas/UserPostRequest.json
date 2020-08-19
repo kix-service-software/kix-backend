@@ -7,6 +7,12 @@
       "User" : {
          "type" : "object",
          "properties" : {
+            "IsAgent" : {
+               "type" : "integer"
+            },
+            "IsCustomer" : {
+               "type" : "integer"
+            },
             "Preferences" : {
                "type" : "array",
                "item" : {
@@ -22,28 +28,11 @@
             "UserComment" : {
                "type" : "string"
             },
-            "UserEmail" : {
-               "type" : "string"
-            },
-            "UserFirstname" : {
-               "type" : "string"
-            },
-            "UserLastname" : {
-               "type" : "string"
-            },
             "UserLogin" : {
                "type" : "string"
             },
-            "UserMobile" : {
-               "type" : "string"
-            },
-            "UserPhone" : {
-               "type" : "string"
-            },
             "UserPw" : {
-               "type" : "string"
-            },
-            "UserTitle" : {
+               "description" : "A random password will be generated if not given.",
                "type" : "string"
             },
             "ValidID" : {
@@ -51,10 +40,7 @@
             }
          },
          "required" : [
-            "UserLogin",
-            "UserFirstname",
-            "UserLastname",
-            "UserEmail"
+            "UserLogin"
          ]
       }
    },

@@ -128,6 +128,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         ID                    => $ContactID,
         Firstname             => 'Firstname Test Update' . $Key,
         Lastname              => 'Lastname Test Update' . $Key,
+        Email                 => 'test@example.org' . $Key,
         PrimaryOrganisationID => $OrganisationIDForUpdate,
         OrganisationIDs       => [
             $OrganisationIDForUpdate
@@ -532,7 +533,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     #update customer user
-    my $Update = $ContactObject->ContactUpdate(
+    $Update = $ContactObject->ContactUpdate(
         ID                    => $ContactID,
         Firstname             => 'Firstname Update' . $ContactID,
         Lastname              => 'Lastname Update' . $ContactID,

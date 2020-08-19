@@ -101,7 +101,7 @@ sub OrganisationAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Number Name)) {
+    for (qw(Number Name UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -110,6 +110,8 @@ sub OrganisationAdd {
             return;
         }
     }
+
+    $Param{ValidID} //= 1;
 
     return if !$Kernel::OM->Get('DB')->Do(
         SQL  => "INSERT INTO organisation "

@@ -155,7 +155,7 @@ sub _Replace {
         );
     }
 
-    # cleanup all not needed <KIX_AGENT_ tags
+    # cleanup all not needed <KIX_CUSTOMER_ tags
     $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
 
     return $Param{Text};
@@ -167,17 +167,13 @@ sub _ReplaceArticlePlaceholders {
     # replace <KIX_$Param{Tag}_Subject/Body[]> tags
     for my $Attribute ( qw(Subject Body) ) {
         my $Tag = $Param{Tag} . $Attribute;
-        if ( $Param{Text} =~ /$Tag\[(.+?)\]$Self->{End}/g ) {
+
+        if ( $Param{Text} =~ /$Tag\_(.+?)$Self->{End}/g ) {
             my $CharLength = $1;
-            # TODO: necessary?
-            # my $Subject     = $Self->{TicketObject}->TicketSubjectClean(
-            #     TicketNumber => $Param{Ticket}->{TicketNumber},
-            #     Subject      => $Param{Article}->{Subject},
-            #     Size         => $CharLength
-            # );
             my $AttributeValue = $Param{Article}->{$Attribute};
-            $AttributeValue    =~ s/^(.{$CharLength}).*$/$1 [...]/;
-            $Param{Text}       =~ s/$Tag\[.+?\]$Self->{End}/$AttributeValue/g;
+            $AttributeValue =~ s/^(.{$CharLength}).*$/$1 [...]/;
+
+            $Param{Text}    =~ s/$Tag\_.+?$Self->{End}/$AttributeValue/g;
         }
     }
 

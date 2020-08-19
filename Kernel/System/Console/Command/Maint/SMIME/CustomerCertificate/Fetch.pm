@@ -115,8 +115,8 @@ sub Run {
 
     my $ContactObject = $Kernel::OM->Get('Contact');
 
-    # Check customer user for UserSMIMECertificate property (Limit = ContactSearchListLimit from customer backend)
-    my %Contacts = $ContactObject->CustomerSearch(
+    # Check customer user for UserSMIMECertificate property
+    my %Contacts = $ContactObject->ContactSearch(
         PostMasterSearch => '*',
     );
 

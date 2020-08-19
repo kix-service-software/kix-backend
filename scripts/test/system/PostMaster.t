@@ -203,7 +203,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 },
                 Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-                    'X-KIX-Queue'        => 'Misc',
+                    'X-KIX-Queue'        => 'Service Desk',
                     'X-KIX-TicketKey1'   => 'Key1',
                     'X-KIX-TicketValue1' => 'Text1',
                 },
@@ -342,15 +342,15 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     my @Tests = (
                         {
                             Key    => 'Queue',
-                            Result => 'Misc',
+                            Result => 'Service Desk',
                         },
                         {
                             Key    => 'DynamicField_TicketFreeKey1',
-                            Result => 'Key1',
+                            Result => [ 'Key1' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeText1',
-                            Result => 'Text1',
+                            Result => [ 'Text1' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeKey2',
@@ -362,19 +362,28 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                         },
                         {
                             Key    => 'DynamicField_TicketFreeKey3',
-                            Result => 'Key3',
+                            Result => [ 'Key3' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeText3',
-                            Result => 'Text3',
+                            Result => [ 'Text3' ],
                         },
                     );
                     for my $Test (@Tests) {
-                        $Self->Is(
-                            $Ticket{ $Test->{Key} },
-                            $Test->{Result},
-                            $NamePrefix . " $Test->{Key} check",
-                        );
+                        if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Result} ) {
+                            $Self->IsDeeply(
+                                $Ticket{ $Test->{Key} },
+                                $Test->{Result},
+                                $NamePrefix . " $Test->{Key} check",
+                            );
+                        }
+                        else {
+                            $Self->Is(
+                                $Ticket{ $Test->{Key} },
+                                $Test->{Result},
+                                $NamePrefix . " $Test->{Key} check",
+                            );
+                        }
                     }
                 }
 
@@ -421,51 +430,60 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     my @Tests = (
                         {
                             Key    => 'DynamicField_TicketFreeKey1',
-                            Result => 'Test',
+                            Result => [ 'Test' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeText1',
-                            Result => 'ABC',
+                            Result => [ 'ABC' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeKey2',
-                            Result => 'Test2',
+                            Result => [ 'Test2' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeText2',
-                            Result => 'ABC2',
+                            Result => [ 'ABC2' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime1',
-                            Result => '2008-01-12 13:14:15',
+                            Result => [ '2008-01-12 13:14:15' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime2',
-                            Result => '2008-01-12 13:15:16',
+                            Result => [ '2008-01-12 13:15:16' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime3',
-                            Result => '2008-01-12 13:16:17',
+                            Result => [ '2008-01-12 13:16:17' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime4',
-                            Result => '2008-01-12 13:17:18',
+                            Result => [ '2008-01-12 13:17:18' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime5',
-                            Result => '2008-01-12 13:18:19',
+                            Result => [ '2008-01-12 13:18:19' ],
                         },
                         {
                             Key    => 'DynamicField_TicketFreeTime6',
-                            Result => '2008-01-12 13:19:20',
+                            Result => [ '2008-01-12 13:19:20' ],
                         },
                     );
                     for my $Test (@Tests) {
-                        $Self->Is(
-                            $Article{ $Test->{Key} } || '',
-                            $Test->{Result} || '-',
-                            $NamePrefix . " $Test->{Key} check",
-                        );
+                        if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Value} ) {
+                            $Self->IsDeeply(
+                                $Article{ $Test->{Key} },
+                                $Test->{Result},
+                                $NamePrefix . " $Test->{Key} check",
+                            );
+                        }
+                        else {
+                            $Self->Is(
+                                $Article{ $Test->{Key} },
+                                $Test->{Result},
+                                $NamePrefix . " $Test->{Key} check",
+                            );
+                        }
                     }
                 }
 
@@ -529,7 +547,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     push @Content, $Line;
                 }
                 $ConfigObject->Set(
-                    Key   => 'PostmasterFollowUp',
+                    Key   => 'PostmasterFollowUpState',
                     Value => 'new'
                 );
                 {
@@ -662,6 +680,11 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     $NamePrefix . ' Run() - FollowUp/TicketID',
                 );
 
+                $ConfigObject->Set(
+                    Key   => 'PostmasterFollowUpState',
+                    Value => 'open'
+                );
+
                 # send follow up #5
                 @Content = ();
                 for my $Line (@ContentNew) {
@@ -725,10 +748,6 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     }
                     push @Content, $Line;
                 }
-                $ConfigObject->Set(
-                    Key   => 'PostmasterFollowUpStateClosed',
-                    Value => 'new'
-                );
                 {
                     my $PostMasterObject = Kernel::System::PostMaster->new(
                         Email => \@Content,
@@ -789,14 +808,14 @@ my @Tests = (
         },
         Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-            'X-KIX-Queue'        => 'Misc',
+            'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey1'   => 'Key1',
             'X-KIX-TicketValue1' => 'Text1',
             'X-KIX-TicketKey3'   => 'Key3',
             'X-KIX-TicketValue3' => 'Text3',
         },
         Check => {
-            Queue                        => 'Misc',
+            Queue                        => 'Service Desk',
             DynamicField_TicketFreeKey3  => 'Key3',
             DynamicField_TicketFreeText3 => 'Text3',
         },
@@ -808,14 +827,14 @@ my @Tests = (
         },
         Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-            'X-KIX-Queue'        => 'Misc',
+            'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey1'   => 'Key1#2',
             'X-KIX-TicketValue1' => 'Text1#2',
             'X-KIX-TicketKey4'   => 'Key4#2',
             'X-KIX-TicketValue4' => 'Text4#2',
         },
         Check => {
-            Queue                        => 'Misc',
+            Queue                        => 'Service Desk',
             DynamicField_TicketFreeKey1  => 'Key1#2',
             DynamicField_TicketFreeText1 => 'Text1#2',
         },
@@ -827,7 +846,7 @@ my @Tests = (
         },
         Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-            'X-KIX-Queue'        => 'Misc',
+            'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey1'   => 'Key1#3',
             'X-KIX-TicketValue1' => 'Text1#3',
             'X-KIX-TicketKey3'   => 'Key3#3',
@@ -999,12 +1018,12 @@ Some Content in Body
         },
         Set => {
 #rbo - T2016121190001552 - renamed X-OTRS headers
-            'X-KIX-Queue'        => 'Misc',
+            'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey6'   => 'Key6#1',
             'X-KIX-TicketValue6' => 'Text6#1',
         },
         Check => {
-            Queue                        => 'Misc',
+            Queue                        => 'Service Desk',
             DynamicField_TicketFreeKey6  => 'Key6#1',
             DynamicField_TicketFreeText6 => 'Text6#1',
         },

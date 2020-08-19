@@ -71,11 +71,12 @@ sub Run {
 
     # Check if owner of ticket is still valid
     my %UserInfo = $Kernel::OM->Get('User')->GetUserData(
-        UserID => $Ticket{OwnerID},
+        UserID        => $Ticket{OwnerID},
+        NoOutOfOffice => 0,
     );
 
     # 1) check user, out of office, unlock ticket
-    if ( $UserInfo{OutOfOfficeMessage} ) {
+    if ( $UserInfo{Preferences}->{OutOfOfficeMessage} ) {
         $TicketObject->TicketLockSet(
             TicketID => $Param{TicketID},
             Lock     => 'unlock',
@@ -465,13 +466,23 @@ sub Run {
             last if ( $GetParam{'X-KIX-FollowUp-Channel'} eq 'email' );
         }
     }
-
     # EO KIX4OTRS-capeIT
+
+    # check channel
+    if ( $GetParam{'X-KIX-FollowUp-Channel'} ) {
+        # check if it's an existing Channel
+        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup(
+            Name => $GetParam{'X-KIX-FollowUp-Channel'},
+        );
+        if ( !$ChannelID ) {
+            $GetParam{'X-KIX-FollowUp-Channel'} = undef;
+        }
+    }
 
     # do db insert
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $Param{TicketID},
-        Channel          => $GetParam{'X-KIX-FollowUp-Channel'},
+        Channel          => $GetParam{'X-KIX-FollowUp-Channel'} || 'email',
         CustomerVisible  => $GetParam{CustomerVisible},
         SenderType       => $GetParam{'X-KIX-FollowUp-SenderType'},
         From             => $GetParam{From},
@@ -482,7 +493,7 @@ sub Run {
         MessageID        => $GetParam{'Message-ID'},
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},
-        ContentType      => $GetParam{'Content-Type'},
+        ContentType      => $GetParam{'Content-Type'} || 'text/html',
         Body             => $GetParam{Body},
         UserID           => $Param{InmailUserID},
         HistoryType      => 'FollowUp',

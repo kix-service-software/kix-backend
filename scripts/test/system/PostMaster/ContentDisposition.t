@@ -145,7 +145,7 @@ for my $Test (@Tests) {
 
         $ConfigObject->Set(
             Key   => 'Ticket::StorageModule',
-            Value => 'Ticket::ArticleStorage' . $Backend,
+            Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
         );
 
         my $Location = $ConfigObject->Get('Home')
