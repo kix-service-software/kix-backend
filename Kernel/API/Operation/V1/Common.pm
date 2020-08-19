@@ -1628,7 +1628,7 @@ sub _ApplyFieldSelector {
 
             my @Fields = (
                 @{ $Param{Fields}->{$Object} || [] },
-                keys %{ $Self->{Include} || {} },
+                keys %{ $Self->{Include} },
             );
 
             # extract filtered fields from hash
@@ -1671,8 +1671,8 @@ sub _ApplyFieldSelector {
                 if ( ref($ObjectItem) eq 'HASH' ) {
 
                     my @Fields = (
-                        @{ $Param{Fields}->{$Object} },
-                        keys %{ $Self->{Include} || {} } ,
+                        @{ $Param{Fields}->{$Object} || [] },
+                        keys %{ $Self->{Include} } ,
                     );
 
                     # extract filtered fields from hash
@@ -1877,7 +1877,7 @@ sub _ApplyInclude {
     if ( IsHashRefWithData( $Self->{OperationRouteMapping} ) ) {
         my %ReverseOperationRouteMapping = reverse %{ $Self->{OperationRouteMapping} };
 
-        foreach my $Include ( keys %{ $Self->{Include} || {} } ) {
+        foreach my $Include ( keys %{ $Self->{Include} } ) {
             next if !$Self->{OperationRouteMapping}->{ $Self->{OperationType} };
 
             my $IncludeOperation = $ReverseOperationRouteMapping{ "$Self->{OperationRouteMapping}->{$Self->{OperationType}}/" . lc($Include) };
@@ -1928,7 +1928,7 @@ sub _ApplyInclude {
     # handle generic includes
     my $GenericIncludes = $Kernel::OM->Get('Config')->Get('API::Operation::GenericInclude');
     if ( IsHashRefWithData($GenericIncludes) ) {
-        foreach my $Include ( keys %{ $Self->{Include} || {} } ) {
+        foreach my $Include ( keys %{ $Self->{Include} } ) {
             next if !$GenericIncludes->{$Include};
             next if $GenericIncludes->{$Include}->{IgnoreOperationRegEx} && $Self->{OperationType} =~ /$GenericIncludes->{$Include}->{IgnoreOperationRegEx}/;
 
