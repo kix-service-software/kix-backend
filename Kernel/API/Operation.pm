@@ -394,7 +394,7 @@ sub _CheckPermission {
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
 
     my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
+    $Self->_PermissionDebug(sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
 
     return ($Granted, @AllowedMethods);
 }
