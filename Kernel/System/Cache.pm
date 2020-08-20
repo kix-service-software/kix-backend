@@ -505,16 +505,17 @@ sub GetCacheStats {
     my ( $Self, %Param ) = @_;
     my $Result;
 
-    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Config')->Get('Home').'/var/tmp',
-        Filter    => 'CacheStats.*',
+    my @Keys = $Self->{CacheObject}->GetKeysForType(
+        Type => 'CacheStats'
     );
-    foreach my $File (@Files) {
-        my $Content = $Kernel::OM->Get('Main')->FileRead(
-            Location => $File,
+
+    foreach my $Key (@Keys) {
+        my $CacheStats = $Self->{CacheObject}->Get(
+            Type   => 'CacheStats',
+            Key    => $Key,
+            RawKey => 1,
         );
-        if ($Content && $$Content) {
-            my $CacheStats = eval { Storable::thaw( ${$Content} ) };
+        if ( $CacheStats ) {
             foreach my $Type (keys %{$CacheStats}) {
                 if (!exists $Result->{$Type}) {
                     $Result->{$Type}->{AccessCount}  = 0;
@@ -545,20 +546,9 @@ delete the cache statistics
 sub DeleteCacheStats {
     my ( $Self, %Param ) = @_;
 
-    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Config')->Get('Home').'/var/tmp',
-        Filter    => 'CacheStats.*',
+    return $Self->{CacheObject}->CleanUp(
+        Type => 'CacheStats'
     );
-    foreach my $File (@Files) {
-        my $Result = $Kernel::OM->Get('Main')->FileDelete(
-            Location => $File,
-        );
-        if (!$Result) {
-            return;
-        }
-    }
-
-    return 1;
 }
 
 =item _HandleDependingCacheTypes()
@@ -624,61 +614,50 @@ sub _UpdateCacheStats {
     # do nothing if cache stats are not enabled
     return if !$Kernel::OM->Get('Config')->Get('Cache::Stats');
 
-    # read stats from disk if empty
-    my $Filename = $Kernel::OM->Get('Config')->Get('Home').'/var/tmp/CacheStats.'.$$;
-    if ( !$Self->{CacheStats} && -f $Filename ) {
-        my $Content = $Kernel::OM->Get('Main')->FileRead(
-            Location        => $Filename,
-            DisableWarnings => 1,
-        );
-        if ($Content && $$Content) {
-            $Self->{CacheStats} = eval { Storable::thaw( ${$Content} ) };
-        }
-    }
+    # read stats
+    my $CacheStats = $Self->{CacheObject}->Get(
+        Type => 'CacheStats',
+        Key  => $$,
+    ) || {};
 
     # add to stats
     if ( $Param{Operation} eq 'Set' ) {
-        $Self->{CacheStats}->{$Param{Type}}->{KeyCount}++;
+        $CacheStats->{$Param{Type}}->{KeyCount}++;
     }
     elsif ( $Param{Operation} eq 'Get' ) {
-        $Self->{CacheStats}->{$Param{Type}}->{AccessCount}++;
+        $CacheStats->{$Param{Type}}->{AccessCount}++;
         if ($Param{Result} eq 'HIT') {
-            $Self->{CacheStats}->{$Param{Type}}->{HitCount}++
+            $CacheStats->{$Param{Type}}->{HitCount}++
         }
     }
     elsif ( $Param{Operation} eq 'Delete' ) {
-        if ($Self->{CacheStats}->{$Param{Type}}->{KeyCount}) {
-            $Self->{CacheStats}->{$Param{Type}}->{KeyCount}--;
+        if ($CacheStats->{$Param{Type}}->{KeyCount}) {
+            $CacheStats->{$Param{Type}}->{KeyCount}--;
         }
-        $Self->{CacheStats}->{$Param{Type}}->{DeleteCount}++;
+        $CacheStats->{$Param{Type}}->{DeleteCount}++;
     }
     elsif ( $Param{Operation} eq 'CleanUp' ) {
         if ( $Param{Type} ) {
-            $Self->{CacheStats}->{$Param{Type}}->{KeyCount} = 0;
-            $Self->{CacheStats}->{$Param{Type}}->{CleanupCount}++;
+            $CacheStats->{$Param{Type}}->{KeyCount} = 0;
+            $CacheStats->{$Param{Type}}->{CleanupCount}++;
         }
         else {
             # clear stats of each type and incease cleanup counter
-            foreach my $Type ( keys %{$Self->{CacheStats}} ) {
-                foreach my $Key ( keys %{$Self->{CacheStats}->{$Type}} ) {
+            foreach my $Type ( keys %{$CacheStats} ) {
+                foreach my $Key ( keys %{$CacheStats->{$Type}} ) {
                     next if $Key eq 'CleanupCount';
-                    $Self->{CacheStats}->{$Type}->{$Key} = 0;
+                    $CacheStats->{$Type}->{$Key} = 0;
                 }
-                $Self->{CacheStats}->{$Type}->{CleanupCount}++;
+                $CacheStats->{$Type}->{CleanupCount}++;
             }
         }
     }
 
-    # store to disk
-    my $Content = '';
-    if ( $Self->{CacheStats} ) {
-        $Content = Storable::nfreeze($Self->{CacheStats});
-    }
-
-    $Kernel::OM->Get('Main')->FileWrite(
-        Directory => $Kernel::OM->Get('Config')->Get('Home').'/var/tmp',
-        Filename  => 'CacheStats.'.$$,
-        Content   => \$Content,
+    # store updated stats
+    $Self->{CacheObject}->Set(
+        Type  => 'CacheStats',
+        Key   => $$,
+        Value => $CacheStats,
     );
 
     return 1;
