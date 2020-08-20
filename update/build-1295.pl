@@ -52,24 +52,7 @@ sub _MigrateMobileProcessingChecklistDynamicFields {
             my $Success = $Self->{DynamicFieldObject}->DynamicFieldUpdate(
                 %{$DynamicFieldConfig},
                 Config  => {
-                    DefaultValue => "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n
-    \   \"description\": \"Announce shut off to all possibly affected personell directly
-    or indirectly working with the device.\",\r\n    \"input\": \"ChecklistState\",\r\n
-    \   \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"200\",\r\n    \"title\": \"Identify
-    energy source(s)\",\r\n    \"description\": \"Check for connected external and internal
-    energy sources.\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n
-    \ },\r\n  {\r\n    \"id\": \"300\",\r\n    \"title\": \"Isolate energy source(s)\",\r\n
-    \   \"description\": \"Document measures you took in order to isolate energy source(s).\",\r\n
-    \   \"input\": \"ChecklistState\",\r\n    \"value\": \"-\",\r\n    \"sub\": [{\r\n
-    \     \"id\": \"210\",\r\n      \"title\": \"Isolation by\",\r\n      \"input\":
-    \"Text\",\r\n      \"value\": \"\"\r\n    }]\r\n  },\r\n  {\r\n    \"id\": \"400\",\r\n
-    \   \"title\": \"Lock & Tag energy source(s)\",\r\n    \"description\": \"Lock energy
-    sources to avoid accidential re-energizing while working on the device. Tag the
-    device as out of order due to maintenance actions.\",\r\n    \"input\": \"ChecklistState\",\r\n
-    \   \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"500\",\r\n    \"title\": \"Ensure
-    that equipment isolation is effective\",\r\n    \"description\": \"Before starting
-    maintenance or repair tasks ensure that isolation is working.\",\r\n    \"input\":
-    \"ChecklistState\",\r\n    \"value\": \"\"\r\n  }\r\n]"
+                    DefaultValue => "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n\n       \"description\": \"Announce shut off to all possibly affected personell directly or indirectly working with the device.\",\r\n    \"input\": \"ChecklistState\",\r\n\n       \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"200\",\r\n    \"title\": \"Identify energy source(s)\",\r\n    \"description\": \"Check for connected external and internal energy sources.\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n\n     },\r\n  {\r\n    \"id\": \"300\",\r\n    \"title\": \"Isolate energy source(s)\",\r\n\n       \"description\": \"Document measures you took in order to isolate energy source(s).\",\r\n\n       \"input\": \"ChecklistState\",\r\n    \"value\": \"-\",\r\n    \"sub\": [{\r\n\n         \"id\": \"210\",\r\n      \"title\": \"Isolation by\",\r\n      \"input\":\n    \"Text\",\r\n      \"value\": \"\"\r\n    }]\r\n  },\r\n  {\r\n    \"id\": \"400\",\r\n\n       \"title\": \"Lock & Tag energy source(s)\",\r\n    \"description\": \"Lock energy sources to avoid accidential re-energizing while working on the device. Tag the device as out of order due to maintenance actions.\",\r\n    \"input\": \"ChecklistState\",\r\n\n       \"value\": \"-\"\r\n  },\r\n  {\r\n    \"id\": \"500\",\r\n    \"title\": \"Ensure that equipment isolation is effective\",\r\n    \"description\": \"Before starting maintenance or repair tasks ensure that isolation is working.\",\r\n    \"input\":\n    \"ChecklistState\",\r\n    \"value\": \"\"\r\n  }\r\n]"
                 },
                 UserID     => 1
             );
