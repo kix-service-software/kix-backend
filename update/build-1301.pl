@@ -33,6 +33,7 @@ use vars qw(%INC);
 # updates permissions for role Customer
 _UpdatePermissionsForRoleSystemAdmin();
 _UpdatePermissionsForRoleTicketAgent();
+_UpdatePermissionsForRoleCustomer();
 
 exit 0;
 
@@ -202,28 +203,122 @@ sub _UpdatePermissionsForRoleTicketAgent {
             TypeID => $PermissionTypeID,
             Target => $Update->{Permission}->{Target}
         );
-        # nothing to do
-        next if !$PermissionID;
 
-        my $Success = $RoleObject->PermissionUpdate(
-            ID     => $PermissionID,
-            UserID => 1,
-            %{$Update->{Change}}
-        );
+        # Update existing permission
+        if($PermissionID) {
 
-        if (!$Success) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to update permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
+            my $Success = $RoleObject->PermissionUpdate(
+                ID     => $PermissionID,
+                UserID => 1,
+                %{$Update->{Change}}
             );
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'info',
-                Message  => "Updated permission ID $PermissionID!"
+
+            if (!$Success) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to update permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
+                );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "Updated permission ID $PermissionID!"
+                );
+            }
+        } else {
+            # create permission
+            my $Success = $RoleObject->PermissionAdd(
+                RoleID     => $RoleID,
+                TypeID     => $PermissionTypeID,
+                Target     => $Update->{Permission}->{Target},
+                Value      => $Update->{Change}->{Value},
+                UserID => 1
             );
+
+            if (!$Success) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to create permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
+                );
+            }
         }
     }
+
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
+
+    return 1;
+}
+
+sub _UpdatePermissionsForRoleCustomer {
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    my %RoleList           = reverse $RoleObject->RoleList();
+    my %PermissionTypeList = reverse $RoleObject->PermissionTypeList();
+
+    my @PermissionUpdates = (
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'Resource',
+                Target => '/tickets/*'
+            },
+            Change => {
+                Value => 6,
+            }
+        }
+    );
+
+    foreach my $Update ( @PermissionUpdates ) {
+        my $RoleID = $RoleList{$Update->{Permission}->{Role}};
+        if (!$RoleID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find role "'.$Update->{Permission}->{Role}.'"!'
+            );
+            next;
+        }
+        my $PermissionTypeID = $PermissionTypeList{$Update->{Permission}->{Type}};
+        if (!$PermissionTypeID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find permission type "'.$Update->{Permission}->{Type}.'"!'
+            );
+            next;
+        }
+
+        my $PermissionID = $RoleObject->PermissionLookup(
+            RoleID => $RoleID,
+            TypeID => $PermissionTypeID,
+            Target => $Update->{Permission}->{Target}
+        );
+
+        # Update existing permission
+        if($PermissionID) {
+
+            my $Success = $RoleObject->PermissionUpdate(
+                ID     => $PermissionID,
+                UserID => 1,
+                %{$Update->{Change}}
+            );
+
+            if (!$Success) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to update permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
+                );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "Updated permission ID $PermissionID!"
+                );
+            }
+        }
+
+        }
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
