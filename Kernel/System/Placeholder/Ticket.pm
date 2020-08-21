@@ -66,6 +66,19 @@ sub _Replace {
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_NUMBER $Self->{End}/$Param{Ticket}->{TicketNumber}/gixms;
         $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Param{Ticket}->{Queue}/gixms;
 
+        if ( !$Param{Ticket}->{Contact} && $Param{Ticket}->{ContactID} ) {
+            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+                ID => $Param{Ticket}->{ContactID}
+            );
+            $Param{Ticket}->{Contact} = IsHashRefWithData(\%Contact) ? $Contact{Fullname} : '';
+        }
+        if ( !$Param{Ticket}->{Organisation} && $Param{Ticket}->{OrganisationID} ) {
+            my %Org = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                ID => $Param{Ticket}->{OrganisationID}
+            );
+            $Param{Ticket}->{Organisation} = IsHashRefWithData(\%Org) ? $Org{Name} : '';
+        }
+
         # replace it
         $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %{ $Param{Ticket} } );
     }

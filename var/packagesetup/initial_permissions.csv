@@ -46,6 +46,7 @@
 "Ticket Agent";"Resource";"/organisations";;"x";;;
 "Ticket Agent";"Resource";"/contacts";;"x";;;
 "Ticket Agent";"Resource";"/links";"x";"x";"x";"x";
+"Ticket Agent";"Resource";"/system/textmodules";;"x";;;
 "Ticket Creator";"Resource";"/tickets";"x";;;;
 "Ticket Creator";"Resource";"/system/ticket";;"x";;;
 "Ticket Creator";"Resource";"/system/communication";;"x";;;
