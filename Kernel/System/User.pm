@@ -1476,6 +1476,21 @@ sub _CheckResourcePermissionForRole {
         "checking $Param{RequestedPermission} permission for role $Param{RoleID} on target $Param{Target}"
     );
 
+    if ( exists $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
+        
+        if ( IsArrayRefWithData($Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
+            my $Granted = $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'denied';
+            $Self->_PermissionDebug(
+                "using cache for role $Param{RoleID} on target $Param{Target}: $Param{RequestedPermission} = $Granted"
+            );
+        }
+        else {
+            $Self->_PermissionDebug(
+                "using cache for role $Param{RoleID} on target $Param{Target}: $Param{RequestedPermission} = denied by explicit DENY"
+            );
+        }
+    }
+
     my %PermissionList = $Self->PermissionList(
         UserID   => $Param{UserID},
         RoleID   => $Param{RoleID},
@@ -1561,14 +1576,17 @@ sub _CheckResourcePermissionForRole {
     );
 
     # check if we have a DENY
-    return 0
-        if ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} )
-        == Kernel::System::Role::Permission->PERMISSION->{DENY};
+    if ( ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+        $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = 0;
+        return 0;
+    }
 
     my $Granted
         = ( $ResultingPermission
             & Kernel::System::Role::Permission->PERMISSION->{ $Param{RequestedPermission} } )
         == Kernel::System::Role::Permission->PERMISSION->{ $Param{RequestedPermission} };
+
+    $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ $Granted, $ResultingPermission ];
 
     return ( $Granted, $ResultingPermission );
 }

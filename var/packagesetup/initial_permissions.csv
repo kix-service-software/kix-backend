@@ -92,7 +92,11 @@
 "System Admin";"Resource";"/session";"x";"x";"x";"x";
 "System Admin";"Resource";"/contacts";"x";"x";"x";"x";
 "System Admin";"Resource";"/organisations";;"x";;;
+"System Admin";"PropertyValue";"/*{}";"x";"x";"x";"x";
+"System Admin";"Property";"/*{}";"x";"x";"x";"x";
 "Superuser";"Resource";"/*";"x";"x";"x";"x";
+"Superuser";"PropertyValue";"/*{}";"x";"x";"x";"x";
+"Superuser";"Property";"/*{}";"x";"x";"x";"x";
 "Customer";"Resource";"/auth";"x";;;;
 "Customer";"Resource";"/cmdb";;"x";;;
 "Customer";"Resource";"/contacts";"x";"x";;;

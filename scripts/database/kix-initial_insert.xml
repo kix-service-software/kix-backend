@@ -262,7 +262,6 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
-<!-- role_permission -->
     <!-- role "Agent User": permission C____ on /auth -->
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
@@ -406,7 +405,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Agent User": permission _R___ on /system/dynamicfields-->
+    <!-- role "Agent User": permission _R___ on /system/dynamicfields -->
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
@@ -421,7 +420,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">3</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/watchers</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/watchers]]></Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -938,7 +937,7 @@
     <Insert Table="role_permission">
         <Data Key="role_id">7</Data>
         <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote">/faq/articles/*/votes</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/faq/articles/*/votes]]></Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -1242,7 +1241,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "System Admin": permission CRUD_ on /auth -->
+    <!-- role "System Admin": permission C____ on /auth -->
     <Insert Table="role_permission">
         <Data Key="role_id">2</Data>
         <Data Key="type_id">1</Data>
@@ -1269,13 +1268,13 @@
         <Data Key="role_id">2</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
-        <Data Key="value">7</Data>
+        <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "System Admin": permission CRUD_ on /organisations -->
+    <!-- role "System Admin": permission _R___ on /organisations -->
     <Insert Table="role_permission">
         <Data Key="role_id">2</Data>
         <Data Key="type_id">1</Data>
@@ -1286,11 +1285,55 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <!-- role "System Admin": permission CRUD_ on /*{} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "System Admin": permission CRUD_ on /*{} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">2</Data>
+        <Data Key="type_id">3</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
     <!-- role "Superuser": permission CRUD_ on /* -->
     <Insert Table="role_permission">
         <Data Key="role_id">1</Data>
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/*]]></Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Superuser": permission CRUD_ on /*{} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">1</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
+        <Data Key="value">15</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Superuser": permission CRUD_ on /*{} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">1</Data>
+        <Data Key="type_id">3</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
         <Data Key="value">15</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -1539,6 +1582,17 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <!-- role "Customer": permission _R___ on /system/objecticons -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">13</Data>
+        <Data Key="type_id">1</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
+        <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
     <!-- role "Customer": permission _R___ on /system/faq -->
     <Insert Table="role_permission">
         <Data Key="role_id">13</Data>
@@ -1748,18 +1802,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Customer": permission _R___ on  /system/objecticons-->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-
+    
 <!-- ticket_state_type -->
     <Insert Table="ticket_state_type">
         <Data Key="id" Type="AutoIncrement">1</Data>
