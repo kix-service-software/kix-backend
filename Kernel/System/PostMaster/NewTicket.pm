@@ -157,7 +157,7 @@ sub Run {
     }
 
     if ( !$GetParam{'X-KIX-Organisation'} ) {
-        # make sure it's undef an no empty string, so that the result is a NULL value in the DB
+        # make sure it's undef and no empty string, so that the result is a NULL value in the DB
         $GetParam{'X-KIX-Organisation'} = undef;
     }
 

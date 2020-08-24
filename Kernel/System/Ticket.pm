@@ -459,6 +459,11 @@ sub TicketCreate {
         }
     }
 
+    if ( !$Param{OrganisationID} ) {
+        # make sure it's undef and no empty string, so that the result is a NULL value in the DB
+        $Param{OrganisationID} = undef;
+    }
+
     if (!$Param{ContactID} || $Param{ContactID} !~ /^\d+$/) {
         $Self->{ParserObject} = Kernel::System::EmailParser->new(
             Mode => 'Standalone',
