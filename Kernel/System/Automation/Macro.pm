@@ -122,7 +122,7 @@ sub MacroGet {
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT id, name, type, exec_order, comments, valid_id, create_time, create_by, change_time, change_by FROM macro WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -164,7 +164,7 @@ sub MacroGet {
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Result,
-    ); 
+    );
 
     return %Result;
 }
@@ -202,7 +202,7 @@ sub MacroAdd {
     $Param{Comment} ||= '';
 
     # check if this is a duplicate after the change
-    my $ID = $Self->MacroLookup( 
+    my $ID = $Self->MacroLookup(
         Name => $Param{Name},
     );
     if ( $ID ) {
@@ -228,8 +228,8 @@ sub MacroAdd {
     # get new id
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM macro WHERE name = ?',
-        Bind => [ 
-            \$Param{Name}, 
+        Bind => [
+            \$Param{Name},
         ],
     );
 
@@ -290,7 +290,7 @@ sub MacroUpdate {
 
     # check if this is a duplicate after the change
     if ($Param{Name}) {
-        my $ID = $Self->MacroLookup( 
+        my $ID = $Self->MacroLookup(
             Name => $Param{Name},
         );
         if ( $ID && $ID != $Param{ID} ) {
@@ -360,6 +360,7 @@ returns a hash of all macros
 
     my %Macros = $AutomationObject->MacroList(
         Valid => 1          # optional
+        Type  => 'Ticket'   # optional
     );
 
 the result looks like
@@ -390,12 +391,18 @@ sub MacroList {
 
     my $SQL = 'SELECT id, name FROM macro';
 
+    my @Bind;
     if ( $Param{Valid} ) {
         $SQL .= ' WHERE valid_id = 1'
     }
+    if ( $Param{Type} ) {
+        $SQL .= $Param{Valid} ? ' AND type = ?' : ' WHERE type = ?';
+        push(@Bind, \$Param{Type});
+    }
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
-        SQL => $SQL
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => $SQL,
+        Bind => \@Bind
     );
 
     my %Result;
@@ -439,7 +446,7 @@ sub MacroDelete {
     }
 
     # check if this macro exists
-    my $ID = $Self->MacroLookup( 
+    my $ID = $Self->MacroLookup(
         ID => $Param{ID},
     );
     if ( !$ID ) {
@@ -517,7 +524,7 @@ sub MacroIsExecutable {
             Priority => 'error',
             Message  => "No such macro with ID $Param{ID}!"
         );
-        return;        
+        return;
     }
 
     return IsArrayRefWithData($Macro{ExecOrder});
@@ -563,7 +570,7 @@ sub MacroExecute {
             Priority => 'error',
             Message  => "No such macro with ID $Param{ID}!"
         );
-        return;        
+        return;
     }
 
     if ( !IsArrayRefWithData($Macro{ExecOrder}) ) {
@@ -629,15 +636,15 @@ sub _LoadMacroTypeBackend {
                 Message  => "No macro backend modules found!",
             );
             return;
-        }        
+        }
 
-        my $Backend = $Backends->{$Param{Name}}->{Module}; 
+        my $Backend = $Backends->{$Param{Name}}->{Module};
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
-            );   
+            );
             return;
         }
 
@@ -646,14 +653,14 @@ sub _LoadMacroTypeBackend {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
             return;
         }
 
         # add referrer data
         $BackendObject->{JobID} = $Self->{JobID};
 
-        $Self->{MacroTypeModules}->{$Param{Name}} = $BackendObject;        
+        $Self->{MacroTypeModules}->{$Param{Name}} = $BackendObject;
     }
 
     return $Self->{MacroTypeModules}->{$Param{Name}};
