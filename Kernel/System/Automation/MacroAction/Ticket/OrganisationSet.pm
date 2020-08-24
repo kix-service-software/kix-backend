@@ -49,9 +49,9 @@ sub Describe {
 
     $Self->Description(Kernel::Language::Translatable('Sets the organisation of a ticket.'));
     $Self->AddOption(
-        Name        => 'Organisation',
+        Name        => 'OrganisationNumberOrID',
         Label       => Kernel::Language::Translatable('Organisation'),
-        Description => Kernel::Language::Translatable('The number of the organisation to be set.'),
+        Description => Kernel::Language::Translatable('The ID or number of the organisation to be set.'),
         Required    => 1,
     );
 
@@ -66,7 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            Organisation => 'test',
+            OrganisationNumberOrID => 'test',
         },
         UserID   => 123,
     );
@@ -91,7 +91,7 @@ sub Run {
 
     my $Organisation = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
-        Text     => $Param{Config}->{Organisation},
+        Text     => $Param{Config}->{OrganisationNumberOrID},
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
@@ -101,9 +101,23 @@ sub Run {
         Number => $Organisation,
         Silent => 1
     );
+    if ( !$OrganisationID && $Organisation =~ m/^\d+$/ ) {
+        my $OrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            ID     => $Organisation,
+            Silent => 1
+        );
+        if ($OrgNumber) {
+            $OrganisationID = $Organisation;
+        }
+    }
 
     if ( !$OrganisationID ) {
-        $OrganisationID = $Organisation;
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't update ticket $Param{TicketID} - can't find organisation with \"$Param{Config}->{OrganisationNumberOrID}\"!",
+            UserID   => $Param{UserID}
+        );
+        return;
     }
 
     # do nothing if the desired organisation is already set
@@ -120,7 +134,7 @@ sub Run {
     if ( !$Success ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the organisation \"$Param{Config}->{Organisation}\" failed!",
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the organisation \"$Param{Config}->{OrganisationNumberOrID}\" failed!",
             UserID   => $Param{UserID}
         );
         return;
