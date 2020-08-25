@@ -49,9 +49,9 @@ sub Describe {
 
     $Self->Description(Kernel::Language::Translatable('Sets the responsible of a ticket.'));
     $Self->AddOption(
-        Name        => 'Responsible',
+        Name        => 'ResponsibleLoginOrID',
         Label       => Kernel::Language::Translatable('Responsible'),
-        Description => Kernel::Language::Translatable('The login of the agent to be set.'),
+        Description => Kernel::Language::Translatable('The ID or login of the agent to be set.'),
         Required    => 1,
     );
 
@@ -66,7 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            Responsible => 'test',
+            ResponsibleLoginOrID => 'test',
         },
         UserID   => 123,
     );
@@ -91,21 +91,30 @@ sub Run {
 
     my $Responsible = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
-        Text     => $Param{Config}->{Responsible},
+        Text     => $Param{Config}->{ResponsibleLoginOrID},
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
     );
 
-    # set the new responsible
     my $UserID = $Kernel::OM->Get('User')->UserLookup(
-        UserLogin => $Responsible
+        UserLogin => $Responsible,
+        Silent    => 1
     );
+    if ( !$UserID && $Responsible =~ m/^\d+$/ ) {
+        my $ResponsibleLogin = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $Responsible,
+            Silent => 1
+        );
+        if ($ResponsibleLogin) {
+            $UserID = $Responsible;
+        }
+    }
 
     if ( !$UserID ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - can't find user with login \"$Param{Config}->{Responsible}\"!",
+            Message  => "Couldn't update ticket $Param{TicketID} - can't find user with \"$Param{Config}->{ResponsibleLoginOrID}\"!",
             UserID   => $Param{UserID}
         );
         return;
@@ -125,7 +134,7 @@ sub Run {
     if ( !$Success ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the responsible \"$Param{Config}->{Responsible}\" failed!",
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the responsible \"$Param{Config}->{ResponsibleLoginOrID}\" failed!",
             UserID   => $Param{UserID}
         );
         return;

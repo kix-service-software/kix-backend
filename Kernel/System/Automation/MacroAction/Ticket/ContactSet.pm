@@ -49,9 +49,9 @@ sub Describe {
 
     $Self->Description(Kernel::Language::Translatable('Sets the contact (and its primary organisation as organisation) of a ticket.'));
     $Self->AddOption(
-        Name        => 'Contact',
+        Name        => 'ContactEmailOrID',
         Label       => Kernel::Language::Translatable('Contact'),
-        Description => Kernel::Language::Translatable('The email of the contact to be set.'),
+        Description => Kernel::Language::Translatable('The ID or email of the contact to be set.'),
         Required    => 1,
     );
 
@@ -66,7 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            Contact => 'test',
+            ContactEmailOrID => 'test',
         },
         UserID   => 123,
     );
@@ -91,34 +91,46 @@ sub Run {
 
     my $Contact = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
-        Text     => $Param{Config}->{Contact},
+        Text     => $Param{Config}->{ContactEmailOrID},
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
     );
 
-    my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-        Email  => $Contact,
-        Silent => 1
-    );
-
-    my $OrganisationID;
-    if ($ContactID) {
-        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-            ID => $ContactID
+    my $ContactID;
+    if ( $Contact =~ m/^\d+$/ ) {
+        my $ContactMail = $Kernel::OM->Get('Contact')->ContactLookup(
+            ID     => $Contact,
+            Silent => 1
         );
-        if ( %Contact ) {
-            $OrganisationID = $Contact{PrimaryOrganisationID};
+        if ($ContactMail) {
+            $ContactID = $Contact;
         }
     } else {
-        $ContactID = $Contact;
-        $OrganisationID = $Contact;
+        $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+            Email  => $Contact,
+            Silent => 1
+        );
+    }
+
+    if (!$ContactID) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't update ticket $Param{TicketID} - no contact found with \"$Param{Config}->{ContactEmailOrID}\"",
+            UserID   => $Param{UserID}
+        );
+        return;
     }
 
     # do nothing if the desired contact is already set
     if ( $ContactID eq $Ticket{ContactID} ) {
         return 1;
     }
+
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+        ID => $ContactID
+    );
+    my $OrganisationID = $Contact{PrimaryOrganisationID};
 
     my $Success = $TicketObject->TicketCustomerSet(
         TicketID       => $Param{TicketID},
@@ -130,7 +142,7 @@ sub Run {
     if ( !$Success ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the contact \"$Param{Config}->{Contact}\" failed!",
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the contact \"$Param{Config}->{ContactEmailOrID}\" failed!",
             UserID   => $Param{UserID}
         );
         return;
