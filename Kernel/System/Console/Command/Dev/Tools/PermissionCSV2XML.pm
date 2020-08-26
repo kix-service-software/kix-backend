@@ -61,7 +61,7 @@ sub Run {
 
     my %PermissionTypeList = (
         'Resource'         => 1,
-        'PropertyValue'    => 2,
+        'Object'    => 2,
         'Property'         => 3,
     );
 
