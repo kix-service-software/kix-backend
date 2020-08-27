@@ -1624,12 +1624,14 @@ sub _ApplyFieldSelector {
             $Object = (sort keys %{$Param{Data}})[0];
         }
 
-        if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
+        my %Tmp = map { $_ => 1 } (
+            @{ $Param{Fields}->{'*'} || [] },
+            @{ $Param{Fields}->{$Object} || [] },
+            keys %{ $Self->{Include} } ,
+        );
+        my @Fields = sort keys %Tmp;
 
-            my @Fields = (
-                @{ $Param{Fields}->{$Object} || [] },
-                keys %{ $Self->{Include} },
-            );
+        if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
 
             # extract filtered fields from hash
             my %NewObject;
@@ -1669,12 +1671,6 @@ sub _ApplyFieldSelector {
             # filter keys in each contained hash
             foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
-
-                    my @Fields = (
-                        @{ $Param{Fields}->{$Object} || [] },
-                        keys %{ $Self->{Include} } ,
-                    );
-
                     # extract filtered fields from hash
                     my %NewObjectItem;
                     my @FieldsToRemove;
