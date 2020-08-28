@@ -121,10 +121,10 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
                 Cc                              => 'some cc string',           # optional
                 Bcc                             => 'some bcc string',          # optional
                 ReplyTo                         => ''                          # optional
-                TimeUnits                       => 123,                        # optional
+                TimeUnit                        => 123,                        # optional
                 DynamicFields => [                                             # optional
                     {
-                        Name   => 'some name',                                          
+                        Name   => 'some name',
                         Value  => $Value,                                      # value type depends on the dynamic field
                     },
                     # ...
@@ -146,7 +146,7 @@ perform ArticleUpdate Operation. This will return the updated ArticleID
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # isolate and trim Article parameter
     my $Article = $Self->_Trim(
         Data => $Param{Data}->{Article}
@@ -270,8 +270,9 @@ sub _ArticleUpdate {
         }
     }
 
-    # check if we have to update the TimeUnits
-    if ( IsStringWithData($Article->{TimeUnits}) ) {
+    # check if we have to update the TimeUnit
+    if ( IsStringWithData($Article->{TimeUnit}) ) {
+
         # delete old time account values
         my $DeleteSuccess = $TicketObject->TicketAccountedTimeDelete(
             TicketID  => $Param{TicketID},
@@ -281,7 +282,7 @@ sub _ArticleUpdate {
         if ( !$DeleteSuccess ) {
             return $Self->_Error(
                 Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article",
+                Message      => "Unable to update article (TimeUnit)",
             );
         }
 
@@ -289,14 +290,14 @@ sub _ArticleUpdate {
         my $UpdateSuccess = $TicketObject->TicketAccountTime(
             TicketID  => $Param{TicketID},
             ArticleID => $Param{ArticleID},
-            TimeUnit  => $Article->{TimeUnits},
+            TimeUnit  => $Article->{TimeUnit},
             UserID    => $Param{UserID},
         );
 
         if ( !$UpdateSuccess ) {
             return $Self->_Error(
                 Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article",
+                Message      => "Unable to update article (TimeUnit)",
             );
         }
     }

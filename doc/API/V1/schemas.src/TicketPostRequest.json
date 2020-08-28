@@ -47,6 +47,9 @@
         "StateID": {
           "type": "integer"
         },
+        "TimeUnit" : {
+          "type" : "integer"
+        },
         "Title": {
           "type": "string"
         },

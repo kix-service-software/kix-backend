@@ -1623,36 +1623,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::AccountTime" Required="1" Valid="1">
-        <Description Translatable="1">Activates time accounting.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::TimeUnits" Required="1" Valid="1">
-        <Description Translatable="1">Sets the prefered time units (e.g. work units, hours, minutes).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <String Regex="" Translatable="1"> (work units)</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::NeedAccountedTime" Required="1" Valid="1">
-        <Description Translatable="1">Defines if time accounting is mandatory in the agent interface. If activated, a note must be entered for all ticket actions (no matter if the note itself is configured as active or is originally mandatory for the individual ticket action screen).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::ResponseFormat" Required="1" Valid="1">
         <Description Translatable="1">Defines the format of responses in the ticket compose screen of the agent interface ([% Data.OrigFrom | html %] is From 1:1, [% Data.OrigFromName | html %] is only realname of From).</Description>
         <Group>Ticket</Group>

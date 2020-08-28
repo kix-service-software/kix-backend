@@ -40,8 +40,10 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my %ValidData = (
     '#01 integer' => '10',
-    '#02 float with dot' => '10.0',
-    '#03 float with comma' => '10,0',
+    '#02 negative integer' => '-10',
+    '#03 zero' => '0',
+    # '#04 float with dot' => '10.0',
+    # '#05 float with comma' => '10,0'
 );
 
 my %InvalidData = (
