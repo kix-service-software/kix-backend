@@ -397,6 +397,7 @@ sub _ArticleCreate {
 
         },
         Attachment     => $Article->{Attachments},
+        TimeUnits      => $Article->{TimeUnit}
     );
 
     if ( !$ArticleID ) {
@@ -408,16 +409,6 @@ sub _ArticleCreate {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => $Error,
-        );
-    }
-
-    # time accounting
-    if ( $Article->{TimeUnit} ) {
-        $TicketObject->TicketAccountTime(
-            TicketID  => $Ticket->{TicketID},
-            ArticleID => $ArticleID,
-            TimeUnit  => $Article->{TimeUnit},
-            UserID    => $Param{UserID},
         );
     }
 

@@ -98,7 +98,7 @@ perform TicketUpdate Operation. This will return the updated TicketID
     my $Result = $OperationObject->Run(
         Data => {
             TicketID          => 123,                                           # required
-            Ticket            => {                                                            
+            Ticket            => {
                 Title         => 'some ticket title',                           # optional
                 QueueID       => 123,                                           # Optional
                 Queue         => 'some queue name',                             # Optional
@@ -117,6 +117,7 @@ perform TicketUpdate Operation. This will return the updated TicketID
                 ContactID      => 'some customer user login',                   # optional
                 OrganisationID => 'some customer',                              # optional
                 PendingTime   => '2011-12-03 23:05:00',                         # optional
+                TimeUnit      => 123                                            # optional
                 DynamicFields => [                                              # optional
                     {
                         Name   => 'some name',
@@ -157,15 +158,15 @@ sub Run {
         return $Self->_Error(
             Code    => 'Conflict',
             Message => "Ticket can't be locked if OwnerID is 1!",
-        );            
+        );
     }
 
     # check Ticket attribute values
-    my $TicketCheck = $Self->_CheckTicket( 
+    my $TicketCheck = $Self->_CheckTicket(
         Ticket => {
             %TicketData,
             %{$Ticket},
-        } 
+        }
     );
 
     if ( !$TicketCheck->{Success} ) {
@@ -177,7 +178,7 @@ sub Run {
     # everything is ok, let's update the ticket
     my $Result = $Self->_TicketUpdate(
         TicketID => $Param{Data}->{TicketID},
-        Ticket   => {            
+        Ticket   => {
             StateID => (!$Ticket->{State} && !$Ticket->{StateID}) ? $TicketData{StateID} : undef,
             %{$Ticket}
         },
@@ -603,6 +604,17 @@ sub _TicketUpdate {
                 Message => 'Unable to update ticket, please contact system administrator!',
             );
         }
+    }
+
+    # time accounting
+    if ( $Ticket->{TimeUnit} ) {
+
+        # add new entry (no edit of accounted time)
+        $TicketObject->TicketAccountTime(
+            TicketID  => $Param{TicketID},
+            TimeUnit  => $Ticket->{TimeUnit},
+            UserID    => $Param{UserID},
+        );
     }
 
     # set dynamic fields

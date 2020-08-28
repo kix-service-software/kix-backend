@@ -78,7 +78,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
     my @MacroTypes;
-    
+
     if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Automation::MacroType')) ) {
         @MacroTypes = sort keys %{ $Kernel::OM->Get('Config')->Get('Automation::MacroType') };
     }
@@ -94,7 +94,7 @@ sub ParameterDefinition {
         },
         'Macro::Name' => {
             Required => 1
-        },   
+        },
     }
 }
 
@@ -124,7 +124,7 @@ perform MacroCreate Operation. This will return the created MacroID.
 
     $Result = {
         Success => 1,                       # 0 or 1
-        Code    => '',                      # 
+        Code    => '',                      #
         Message => '',                      # in case of error
         Data    => {                        # result data payload after Operation
             MacroID  => '',    # ID of the created Macro
@@ -181,6 +181,22 @@ sub Run {
             );
 
             if ( !$Result->{Success} ) {
+
+                # cleanup
+                # delete macro actions
+                for my $ActionID (@ExecOrder) {
+                    $Kernel::OM->Get('Automation')->MacroActionDelete(
+                        ID     => $ActionID,
+                        UserID => $Self->{Authorization}->{UserID},
+                    );
+                }
+
+                # delete macro
+                $Kernel::OM->Get('Automation')->MacroDelete(
+                    ID     => $MacroID,
+                    UserID => $Self->{Authorization}->{UserID},
+                );
+
                 return $Self->_Error(
                     %{$Result},
                 )

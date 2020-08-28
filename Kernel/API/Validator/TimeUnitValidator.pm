@@ -102,7 +102,10 @@ sub Validate {
 
     my $Valid;
     if ( $Param{Attribute} eq 'TimeUnit' ) {
-        $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A \d+([.,]\d+)? \z}xms;
+
+        # TODO: only accept integer - for now
+        # $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A -?\d+([.,]\d+)? \z}xms;
+        $Valid = $Param{Data}->{$Param{Attribute}} =~ m/^-?\d+$/;
     }
     else {
         return $Self->_Error(
@@ -115,10 +118,10 @@ sub Validate {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => "Validation of attribute $Param{Attribute} failed!",
-        );        
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;

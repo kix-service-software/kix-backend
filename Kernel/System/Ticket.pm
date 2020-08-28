@@ -258,25 +258,27 @@ creates a new ticket
         OrganisationID => '123465',
         ContactID    => 123 || 'customer@example.com',
         OwnerID      => 123,
-        UserID       => 123,
+        TimeUnit     => 123,              # optional
+        UserID       => 123
     );
 
 or
 
     my $TicketID = $TicketObject->TicketCreate(
-        TN            => $TicketObject->TicketCreateNumber(), # optional
-        Title         => 'Some Ticket Title',
-        Queue         => 'Raw',              # or QueueID => 123,
-        Lock          => 'unlock',
-        Priority      => '3 normal',         # or PriorityID => 2,
-        State         => 'new',              # or StateID => 5,
-        Type          => 'Incident',         # or TypeID = 1 or Ticket type default (Ticket::Type::Default), not required
+        TN             => $TicketObject->TicketCreateNumber(), # optional
+        Title          => 'Some Ticket Title',
+        Queue          => 'Raw',              # or QueueID => 123,
+        Lock           => 'unlock',
+        Priority       => '3 normal',         # or PriorityID => 2,
+        State          => 'new',              # or StateID => 5,
+        Type           => 'Incident',         # or TypeID = 1 or Ticket type default (Ticket::Type::Default), not required
         OrganisationID => '123465',
-        ContactID     => '123' || 'customer@example.com',
-        OwnerID       => 123,
-        ResponsibleID => 123,                # not required
-        ArchiveFlag   => 'y',                # (y|n) not required
-        UserID        => 123,
+        ContactID      => '123' || 'customer@example.com',
+        OwnerID        => 123,
+        ResponsibleID  => 123,                # not required
+        ArchiveFlag    => 'y',                # (y|n) not required
+        TimeUnit       => 123,                # optional
+        UserID         => 123
     );
 
 Events:
@@ -545,6 +547,15 @@ sub TicketCreate {
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
 
+    # time accounting
+    if ( $Param{TimeUnit} ) {
+        $Self->TicketAccountTime(
+            TicketID  => $TicketID,
+            TimeUnit  => $Param{TimeUnit},
+            UserID    => $Param{UserID},
+        );
+    }
+
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
@@ -663,6 +674,11 @@ sub TicketDelete {
             %Param,
         );
     }
+
+    # delete accounted time
+    my $Success = $Self->TicketAccountedTimeDelete(
+        TicketID => $Param{TicketID}
+    );
 
     # delete ticket
     return if !$DBObject->Do(
@@ -4654,7 +4670,10 @@ sub TicketAccountedTimeGet {
     my $AccountedTime = 0;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Row[0] =~ s/,/./g;
-        $AccountedTime = $AccountedTime + $Row[0];
+
+        # TODO: use integer - for now
+        # $AccountedTime = $AccountedTime + $Row[0];
+        $AccountedTime = $AccountedTime + int($Row[0]);
     }
 
     return $AccountedTime;
@@ -4666,7 +4685,7 @@ account time to a ticket.
 
     my $Success = $TicketObject->TicketAccountTime(
         TicketID  => 1234,
-        ArticleID => 23542,
+        ArticleID => 23542,      # optional
         TimeUnit  => '4.5',
         UserID    => 1,
     );
@@ -4680,8 +4699,8 @@ sub TicketAccountTime {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(TicketID ArticleID TimeUnit UserID)) {
-        if ( !$Param{$Needed} ) {
+    for my $Needed (qw(TicketID TimeUnit UserID)) {
+        if ( !defined $Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
@@ -4693,7 +4712,7 @@ sub TicketAccountTime {
     # check some wrong formats
     $Param{TimeUnit} =~ s/,/\./g;
     $Param{TimeUnit} =~ s/ //g;
-    $Param{TimeUnit} =~ s/^(\d{1,10}\.\d\d).+?$/$1/g;
+    $Param{TimeUnit} =~ s/^(-?\d{1,10}\.\d\d).+?$/$1/g;
     chomp $Param{TimeUnit};
 
     # get database object
@@ -6748,7 +6767,7 @@ deletes the accounted time of a ticket.
 
     my $Success = $TicketObject->TicketAccountedTimeDelete(
         TicketID    => 1234,
-        ArticleID   => 1234
+        ArticleID   => 1234     # optional
     );
 
 =cut
