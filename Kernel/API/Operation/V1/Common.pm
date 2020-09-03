@@ -2307,6 +2307,7 @@ sub _CheckObjectPermission {
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},
         Types        => [ 'Object' ],
+        Valid        => 1
     );
 
     # get all relevant permissions
@@ -2551,6 +2552,7 @@ sub _CheckPropertyPermission {
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},
         Types        => [ 'Property' ],
+        Valid        => 1
     );
 
     # get all relevant permissions
