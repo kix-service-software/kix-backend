@@ -58,7 +58,7 @@ sub Describe {
     $Self->AddOption(
         Name        => 'ContactEmailOrID',
         Label       => Kernel::Language::Translatable('Contact'),
-        Description => Kernel::Language::Translatable('The ID or login of the contact of the new ticket.'),
+        Description => Kernel::Language::Translatable('The ID or email of the contact of the new ticket.'),
         Required    => 1,
     );
     $Self->AddOption(
@@ -121,6 +121,12 @@ sub Describe {
         Description => Kernel::Language::Translatable('The name of the type of the new ticket. Configured default will be used (Ticket::Type::Default) if omitted.'),
         Required    => 0,
     );
+    $Self->AddOption(
+        Name        => 'DynamicFieldList',
+        Label       => Kernel::Language::Translatable('Dynamic Fields'),
+        Description => Kernel::Language::Translatable('The dynamic fields of the new ticket.'),
+        Required    => 0,
+    );
     delete $Self->{Definition}->{Options}->{Subject};
 
     return;
@@ -143,11 +149,16 @@ Example:
             Contact       => 'someContactLogin',
 
             # optional parameter
-            Owner           => 'someUserLogin',            # if omitted, current user is used
-            Organisation    => 'someOrganisationNumber',   # if omitted, primary organisation of contact is used
-            Type            => 'Incident',
-            Responsible     => 'someUserLogin',
-            PendingTimeDiff => 3600 ,                      # optional (for pending states)
+            Owner            => 'someUserLogin',            # if omitted, current user is used
+            Organisation     => 'someOrganisationNumber',   # if omitted, primary organisation of contact is used
+            Type             => 'Incident',
+            Responsible      => 'someUserLogin',
+            PendingTimeDiff  => 3600 ,                      # optional (for pending states)
+            DynamicFieldList => [
+                [ 'DynamicFieldName', 'Value' ],
+                [ ... ],
+                ...
+            ]
 
             # article parameter, see ArticleCreate
         },
@@ -310,6 +321,8 @@ sub Run {
             Diff     => $Param{Config}->{PendingTimeDiff},
         );
     }
+
+    $Self->_SetDynamicFields(%Param, NewTicketID => $TicketID);
 
     # remember ticket definition
     my $TicketDef = $Self->{Definition}->{Options};
@@ -530,6 +543,59 @@ sub _CheckTicketParams {
     }
 
     return 1;
+}
+
+sub _SetDynamicFields {
+    my ( $Self, %Param ) = @_;
+
+    # set dynamic fields
+    if ( $Param{NewTicketID} && IsArrayRefWithData( $Param{Config}->{DynamicFieldList} ) ) {
+
+        my $TemplateGeneratorObject   = $Kernel::OM->Get('TemplateGenerator');
+        my $DynamicFieldBakcendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+        # get the dynamic fields
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+            Valid      => 1,
+            ObjectType => [ 'Ticket' ],
+        );
+
+        # create a Dynamic Fields lookup table (by name)
+        my %DynamicFieldLookup;
+        for my $DynamicField ( @{$DynamicFieldList} ) {
+            next if !$DynamicField;
+            next if !IsHashRefWithData($DynamicField);
+            next if !$DynamicField->{Name};
+            $DynamicFieldLookup{ $DynamicField->{Name} } = $DynamicField;
+        }
+
+        DYNAMICFIELD:
+        foreach my $DynamicField ( @{ $Param{Config}->{DynamicFieldList} } ) {
+            next if (
+                !IsArrayRefWithData($DynamicField)
+                || !$DynamicField->[0]
+                || !IsHashRefWithData( $DynamicFieldLookup{$DynamicField->[0]} )
+            );
+
+            my $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
+                RichText => 0,
+                Text     => $DynamicField->[1],
+                TicketID => $Param{TicketID}, # id of start ticket
+                Data     => {},
+                UserID   => $Param{UserID},
+            );
+
+            # check value structure
+            next if ( !IsString( $Value ) && ref $Value ne 'ARRAY' && defined($Value) );
+
+            my $Success = $DynamicFieldBakcendObject->ValueSet(
+                DynamicFieldConfig => $DynamicFieldLookup{$DynamicField->[0]},
+                ObjectID           => $Param{NewTicketID},
+                Value              => $Value,
+                UserID             => $Param{UserID},
+            );
+        }
+    }
 }
 
 1;
