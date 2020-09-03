@@ -36,6 +36,12 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+    $Self->AddOption(
+        Name        => 'active',
+        Description => 'Only list active permissions (ignore non-valid roles).',
+        Required    => 0,
+        HasValue    => 0,
+    );
 
     return;
 }
@@ -58,12 +64,14 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Compact = $Self->GetOption('compact') || 0;
+    my $Compact    = $Self->GetOption('compact') || 0;
+    my $OnlyActive = $Self->GetOption('active') || 0;
 
     $Self->Print("<yellow>Listing permissions of user $Self->{UserLogin}...</yellow>\n");
 
     my %PermissionList = $Kernel::OM->Get('User')->PermissionList(
         UserID => $Self->{UserID},
+        Valid  => $OnlyActive,
     );
 
     if ( !$Compact ) {
@@ -89,9 +97,11 @@ sub Run {
                 }
                 elsif ( $Key eq 'RoleID' ) {
                     $Label = 'Role';
-                    $Value = $Kernel::OM->Get('Role')->RoleLookup(
-                        RoleID => $Value,
+                    my %Role = $Kernel::OM->Get('Role')->RoleGet(
+                        ID => $Value,
                     );
+                    $Value = $Role{Name};
+                    $Value .= ' (inactive)' if $Role{ValidID} != 1;
                 }
                 elsif ( $Key =~ /IsRequired/ ) {
                     $Value = $Permission{$Key} ? 'yes' : 'no';
@@ -130,11 +140,13 @@ sub Run {
             my $IsRequired = $Permission->{IsRequired} ? 'yes' : '';
 
             # prepare role
-            my $Role = $Kernel::OM->Get('Role')->RoleLookup(
-                RoleID => $Permission->{RoleID},
+            my %Role = $Kernel::OM->Get('Role')->RoleGet(
+                ID => $Permission->{RoleID},
             );
+            my $RoleName = $Role{Name};
+            $RoleName .= ' (inactive)' if $Role{ValidID} != 1;
 
-            $Self->Print(sprintf("%6i %-25s %-25s %8s %6s %-80s\n", $ID, $PermissionType{Name}, $Role, $IsRequired, $Value, $Permission->{Target}));
+            $Self->Print(sprintf("%6i %-25s %-25s %8s %6s %-80s\n", $ID, $PermissionType{Name}, $RoleName, $IsRequired, $Value, $Permission->{Target}));
 
             if ( $Permission->{Comment} ) {
                 $Self->Print(sprintf("%74s %s\n","", "(Comment: $Permission->{Comment})"));
