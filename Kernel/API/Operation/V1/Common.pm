@@ -1315,6 +1315,12 @@ sub _ApplyFilter {
             $ObjectData = [ $Param{Data}->{$Object} ];
         }
         if ( IsArrayRefWithData($ObjectData) ) {
+            # ignore lists of scalars
+            if ( !IsHashRefWithData($ObjectData->[0]) ) {
+                $Self->_Debug($Self->{LevelIndent}, "$Object is a list of scalars, not going to filter");
+                next OBJECT;
+            }
+
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             if ( $Param{IsPermissionFilter} ) {
