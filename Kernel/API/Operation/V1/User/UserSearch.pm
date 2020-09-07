@@ -145,6 +145,7 @@ sub Run {
                 # perform User search
                 my %SearchResult = $Kernel::OM->Get('User')->UserSearch(
                     %SearchParam,
+                    Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
                     Valid => 0
                 );
 
@@ -231,7 +232,7 @@ sub Run {
         }
 
         my @ResultList = IsArrayRef($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
-        
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 User => \@ResultList,
