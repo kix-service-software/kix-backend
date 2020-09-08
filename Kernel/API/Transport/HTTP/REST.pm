@@ -118,12 +118,10 @@ sub ProviderProcessRequest {
     my %URIData;
     my $RequestURI = $ENV{REQUEST_URI};
     $RequestURI =~ s{(\/.*)$}{$1}xms;
-
     # remove any query parameter form the URL
     # e.g. from /Ticket/1/2?UserLogin=user&Password=secret
     # to /Ticket/1/2?
-    $RequestURI =~ s{([^?]+)(.+)?}{$1};
-
+    $RequestURI =~ s{([^?]+)(.+)?}{$1}xms;
     # remember the query parameters e.g. ?UserLogin=user&Password=secret
     my $QueryParamsStr = $2 || '';
     my %QueryParams;

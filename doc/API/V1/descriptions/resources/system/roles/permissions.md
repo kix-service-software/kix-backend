@@ -3,8 +3,8 @@ For each existing role permissions can be created. A permission item has a ```Ty
 |ID|Permission Type|Permission Target|Example|
 |-|-|-|-|
 |1|Resource|collection resource URI|```/tickets```|
-|2|Object|item resource URI|```/tickets/123```|
-|3|PropertyValue|&lt;ObjectType&gt;.&lt;Property&gt; EQ &lt;Value&gt;|```Ticket.QueueID EQ 123```|
+|2|Object|item resource URI&#123;&lt;ObjectType&gt;.&lt;Property&gt; &lt;Operator&gt; &lt;Value&gt;&#125;|```/tickets/*{Ticket.QueueID EQ 123}```<br/>```/tickets/*{Ticket.QueueID EQ 123 || Ticket.QueueID EQ 4}```|
+|3|Property|item resource URI&#123;&lt;ObjectType&gt;.&#091;&lt;PropertyList&gt;&#093;&#125;|```/tickets/*{Ticket.[Title,QueueID,!TicketNumber]}```|
 
 The permission value itself is a bitmask with the following values:
 

@@ -4,6 +4,11 @@
   "type": "object",
   "description": "The ticket object.",
   "properties": {
+    "AccountedTime": {
+      "type": "integer",
+      "description": "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+      "readOnly": true
+    },
     "Age": {
       "type": "integer",
       "readOnly": true
@@ -130,11 +135,6 @@
     },
     "TicketNumber": {
       "type": "string",
-      "readOnly": true
-    },
-    "TimeUnits": {
-      "type": "integer",
-      "description": "added via include \"TimeUnits\"",
       "readOnly": true
     },
     "Title": {

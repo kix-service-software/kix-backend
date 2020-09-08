@@ -1315,6 +1315,12 @@ sub _ApplyFilter {
             $ObjectData = [ $Param{Data}->{$Object} ];
         }
         if ( IsArrayRefWithData($ObjectData) ) {
+            # ignore lists of scalars
+            if ( !IsHashRefWithData($ObjectData->[0]) ) {
+                $Self->_Debug($Self->{LevelIndent}, "$Object is a list of scalars, not going to filter");
+                next OBJECT;
+            }
+
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             if ( $Param{IsPermissionFilter} ) {
@@ -1624,12 +1630,14 @@ sub _ApplyFieldSelector {
             $Object = (sort keys %{$Param{Data}})[0];
         }
 
-        if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
+        my %Tmp = map { $_ => 1 } (
+            @{ $Param{Fields}->{'*'} || [] },
+            @{ $Param{Fields}->{$Object} || [] },
+            keys %{ $Self->{Include} } ,
+        );
+        my @Fields = sort keys %Tmp;
 
-            my @Fields = (
-                @{ $Param{Fields}->{$Object} || [] },
-                keys %{ $Self->{Include} },
-            );
+        if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
 
             # extract filtered fields from hash
             my %NewObject;
@@ -1669,12 +1677,6 @@ sub _ApplyFieldSelector {
             # filter keys in each contained hash
             foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
-
-                    my @Fields = (
-                        @{ $Param{Fields}->{$Object} || [] },
-                        keys %{ $Self->{Include} } ,
-                    );
-
                     # extract filtered fields from hash
                     my %NewObjectItem;
                     my @FieldsToRemove;
@@ -2306,11 +2308,12 @@ sub _CheckObjectPermission {
     # get list of permission types
     my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
 
-    # get all PropertyValue and Property permissions for this user
+    # get all Object and Property permissions for this user
     my %Permissions = $Kernel::OM->Get('User')->PermissionList(
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},
-        Types        => [ 'PropertyValue' ],
+        Types        => [ 'Object' ],
+        Valid        => 1
     );
 
     # get all relevant permissions
@@ -2354,7 +2357,7 @@ sub _CheckObjectPermission {
             if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
 
                 my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
+                $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
 
                 # no success, simply return what we got
                 return $GetResult;
@@ -2392,7 +2395,7 @@ sub _CheckObjectPermission {
             foreach my $Part ( @Parts ) {
                 if ( $Part eq $Parts[0] ) {
                     # only print this information once
-                    $Self->_PermissionDebug( sprintf( "found relevant permission (PropertyValue) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+                    $Self->_PermissionDebug( sprintf( "found relevant permission (Object) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
                 }
 
                 my ( $Object, $Attribute, $Operator, $Value );
@@ -2416,7 +2419,7 @@ sub _CheckObjectPermission {
                             $Value = \@ValueParts;
                         }
                         else {
-                            $Self->_PermissionDebug( sprintf("Value part of PropertyValue permission on target \"%s\" is invalid!", $Permission->{Target}) );
+                            $Self->_PermissionDebug( sprintf("Value part of Object permission on target \"%s\" is invalid!", $Permission->{Target}) );
                             $Self->_Error(
                                 Code    => 'InternalError',
                                 Message => 'Permission value is invalid!',
@@ -2490,7 +2493,7 @@ sub _CheckObjectPermission {
                             Format => 'Short'
                         );
 
-                        $Self->_PermissionDebug("resulting PropertyValue permission: $ResultingPermissionShort");
+                        $Self->_PermissionDebug("resulting Object permission: $ResultingPermissionShort");
 
                         # check if we have a DENY already
                         if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
@@ -2508,7 +2511,7 @@ sub _CheckObjectPermission {
                         $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
 
                         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
+                        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
 
                         # return 403, because we don't have permission to execute this
                         return $Self->_Error(
@@ -2524,7 +2527,7 @@ sub _CheckObjectPermission {
         }
 
         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
+        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
     }
 
     return $Self->_Success();
@@ -2550,11 +2553,12 @@ sub _CheckPropertyPermission {
     # get list of permission types
     my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
 
-    # get all PropertyValue and Property permissions for this user
+    # get all Object and Property permissions for this user
     my %Permissions = $Kernel::OM->Get('User')->PermissionList(
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},
         Types        => [ 'Property' ],
+        Valid        => 1
     );
 
     # get all relevant permissions
@@ -2766,7 +2770,7 @@ sub _ActivatePermissionFilters {
 
         my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
 
-# TODO: don't work with search right now because ticket DB search can't cope with the negated PropertyValue filters
+# TODO: don't work with search right now because ticket DB search can't cope with the negated Object filters
         # init filter and search if not done already
         $Self->{Filter}->{ $Filter->{Object} }->{$Logical} ||= [];
 #        $Self->{Search}->{ $Filter->{Object} }->{$Logical} ||= [];

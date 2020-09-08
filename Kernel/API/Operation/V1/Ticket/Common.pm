@@ -352,7 +352,7 @@ sub _CheckTicket {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Parameter Ticket::Articles is invalid!",
-            );            
+            );
         }
 
         # check Article internal structure
@@ -368,8 +368,8 @@ sub _CheckTicket {
             my $ArticleCheck = $Self->_CheckArticle( Article => $ArticleItem );
 
             if ( !$ArticleCheck->{Success} ) {
-                return $Self->_Error( 
-                    %{$ArticleCheck} 
+                return $Self->_Error(
+                    %{$ArticleCheck}
                 );
             }
         }
@@ -381,7 +381,7 @@ sub _CheckTicket {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Parameter Ticket::DynamicFields is invalid!",
-            );            
+            );
         }
 
         # check DynamicField internal structure
@@ -394,14 +394,14 @@ sub _CheckTicket {
             }
 
             # check DynamicField attribute values
-            my $DynamicFieldCheck = $Self->_CheckDynamicField( 
+            my $DynamicFieldCheck = $Self->_CheckDynamicField(
                 DynamicField => $DynamicFieldItem,
                 ObjectType   => 'Ticket'
             );
 
             if ( !$DynamicFieldCheck->{Success} ) {
-                return $Self->_Error( 
-                    %{$DynamicFieldCheck} 
+                return $Self->_Error(
+                    %{$DynamicFieldCheck}
                 );
             }
         }
@@ -450,28 +450,6 @@ sub _CheckArticle {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    # check Article->TimeUnit
-    # TimeUnit could be required or not depending on sysconfig option
-    if (
-        ( !defined $Article->{TimeUnit} || !IsStringWithData( $Article->{TimeUnit} ) )
-        && $ConfigObject->{'Ticket::Frontend::AccountTime'}
-        && $ConfigObject->{'Ticket::Frontend::NeedAccountedTime'}
-        )
-    {
-        return $Self->_Error(
-            Code    => 'BadRequest',
-            Message => "Required parameter TimeUnit is missing!",
-        );
-    }
-    if ( $Article->{TimeUnit} ) {
-        if ( !$Self->ValidateTimeUnit( %{$Article} ) ) {
-            return $Self->_Error(
-                Code    => 'BadRequest',
-                Message => "Parameter TimeUnit is invalid!",
-            );
-        }
-    }
-
     # check Article->NoAgentNotify
     if ( $Article->{NoAgentNotify} && $Article->{NoAgentNotify} ne '1' ) {
         return $Self->_Error(
@@ -516,7 +494,7 @@ sub _CheckArticle {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Parameter Article::Attachments is invalid!",
-            );            
+            );
         }
 
         # check Attachment internal structure
@@ -532,8 +510,8 @@ sub _CheckArticle {
             my $AttachmentCheck = $Self->_CheckAttachment( Attachment => $AttachmentItem );
 
             if ( !$AttachmentCheck->{Success} ) {
-                return $Self->_Error( 
-                    %{$AttachmentCheck} 
+                return $Self->_Error(
+                    %{$AttachmentCheck}
                 );
             }
         }
@@ -545,7 +523,7 @@ sub _CheckArticle {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => "Parameter Article::DynamicFields is invalid!",
-            );            
+            );
         }
 
         # check DynamicField internal structure
@@ -558,14 +536,14 @@ sub _CheckArticle {
             }
 
             # check DynamicField attribute values
-            my $DynamicFieldCheck = $Self->_CheckDynamicField( 
+            my $DynamicFieldCheck = $Self->_CheckDynamicField(
                 DynamicField => $DynamicFieldItem,
                 ObjectType   => 'Article'
             );
 
             if ( !$DynamicFieldCheck->{Success} ) {
-                return $Self->_Error( 
-                    %{$DynamicFieldCheck} 
+                return $Self->_Error(
+                    %{$DynamicFieldCheck}
                 );
             }
         }

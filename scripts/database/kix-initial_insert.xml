@@ -243,7 +243,7 @@
     </Insert>
     <Insert Table="permission_type">
         <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">PropertyValue</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Object</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1).</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -433,6 +433,28 @@
         <Data Key="type_id">1</Data>
         <Data Key="target" Type="Quote"><![CDATA[/i18n]]></Data>
         <Data Key="value">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Agent User": permission _____ on /system/config/*{SysConfigOption.AccessLevel EQ confidential} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/system/config/*{SysConfigOption.AccessLevel EQ confidential}]]></Data>
+        <Data Key="value">0</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <!-- role "Agent User": permission _____ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential} -->
+    <Insert Table="role_permission">
+        <Data Key="role_id">3</Data>
+        <Data Key="type_id">2</Data>
+        <Data Key="target" Type="Quote"><![CDATA[/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential}]]></Data>
+        <Data Key="value">0</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>

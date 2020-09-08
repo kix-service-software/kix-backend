@@ -4676,6 +4676,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -4802,11 +4807,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -6130,6 +6130,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -6256,11 +6261,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -7198,6 +7198,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -7324,11 +7329,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -10938,6 +10938,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -11064,11 +11069,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -12227,6 +12227,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -12353,11 +12358,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -13700,6 +13700,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -13826,11 +13831,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -14545,6 +14545,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -14671,11 +14676,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -15736,6 +15736,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -15862,11 +15867,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -16783,7 +16783,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="session_user_preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="tickets" class="panel-title">Tickets</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources and generic includes this resource supports the following additional includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>TimeUnits</code></td><td>Adds the sum of all TimeUnits of all articles</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_tickets" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/tickets</span> <span class="methods"><a href="#tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="session_user_preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="tickets" class="panel-title">Tickets</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources and generic includes this resource supports the following additional includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>AccountedTime</code></td><td>Adds the sum of all time units of the ticket and its articles</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_tickets" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/tickets</span> <span class="methods"><a href="#tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "TicketCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of tickets.",
@@ -17211,6 +17211,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -17337,11 +17342,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -17605,6 +17605,9 @@ pre code {
                "type" : "integer"
             },
             "StateID" : {
+               "type" : "integer"
+            },
+            "TimeUnit" : {
                "type" : "integer"
             },
             "Title" : {
@@ -18367,6 +18370,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -18493,11 +18501,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -18767,6 +18770,10 @@ pre code {
                "type" : "integer"
             },
             "StateID" : {
+               "type" : "integer"
+            },
+            "TimeUnit" : {
+               "description" : "Value will be combined with existing value for this ticket (negative values are possible).",
                "type" : "integer"
             },
             "Title" : {
@@ -36725,7 +36732,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_roles__roleid__userids__userid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_roles__roleid__userids__userid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_roles__roleid__permissions" class="panel"><div class="resource-description"><p>For each existing role permissions can be created. A permission item has a <code>TypeID</code> which references a permission type defined in the resource <a href="#roles_permissiontypes_get"><code>/roles/permissiontypes</code></a>. Additionally the target for the permission has to be defined. Each permission type has its own target schema. The following table lists the possible targets for each default permission type.</p><table class="table"><thead><tr><th>ID</th><th>Permission Type</th><th>Permission Target</th><th>Example</th></tr></thead><tbody><tr><td>1</td><td>Resource</td><td>collection resource URI</td><td><code>/tickets</code></td></tr><tr><td>2</td><td>Object</td><td>item resource URI</td><td><code>/tickets/123</code></td></tr><tr><td>3</td><td>PropertyValue</td><td>&lt;ObjectType&gt;.&lt;Property&gt; EQ &lt;Value&gt;</td><td><code>Ticket.QueueID EQ 123</code></td></tr></tbody></table><p>The permission value itself is a bitmask with the following values:</p><table class="table"><thead><tr><th>Value</th><th>Permission</th></tr></thead><tbody><tr><td><code>0x0000</code></td><td>NONE</td></tr><tr><td><code>0x0001</code></td><td>CREATE</td></tr><tr><td><code>0x0002</code></td><td>READ</td></tr><tr><td><code>0x0004</code></td><td>UPDATE</td></tr><tr><td><code>0x0008</code></td><td>DELETE</td></tr><tr><td><code>0xf000</code></td><td>DENY</td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/roles/{roleId}</span><span class="uri">/permissions</span> <span class="methods"><a href="#system_roles__roleid__permissions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_roles__roleid__permissions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_roles__roleid__permissions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/roles/{roleId}</span><span class="uri">/permissions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_roles__roleid__permissions_get_request" data-toggle="tab">Request</a></li><li><a href="#system_roles__roleid__permissions_get_response" data-toggle="tab">Response</a></li><li><a href="#system_roles__roleid__permissions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_roles__roleid__permissions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_roles__roleid__permissions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_roles__roleid__permissions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PermissionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="system_roles__roleid__userids__userid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_roles__roleid__userids__userid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_roles__roleid__permissions" class="panel"><div class="resource-description"><p>For each existing role permissions can be created. A permission item has a <code>TypeID</code> which references a permission type defined in the resource <a href="#roles_permissiontypes_get"><code>/roles/permissiontypes</code></a>. Additionally the target for the permission has to be defined. Each permission type has its own target schema. The following table lists the possible targets for each default permission type.</p><table class="table"><thead><tr><th>ID</th><th>Permission Type</th><th>Permission Target</th><th>Example</th></tr></thead><tbody><tr><td>1</td><td>Resource</td><td>collection resource URI</td><td><code>/tickets</code></td></tr><tr><td>2</td><td>Object</td><td>item resource URI&#123;&lt;ObjectType&gt;.&lt;Property&gt; &lt;Operator&gt; &lt;Value&gt;&#125;</td><td><code>/tickets/*{Ticket.QueueID EQ 123}</code><br>```/tickets/*{Ticket.QueueID EQ 123</td></tr><tr><td>3</td><td>Property</td><td>item resource URI&#123;&lt;ObjectType&gt;.&#091;&lt;PropertyList&gt;&#093;&#125;</td><td><code>/tickets/*{Ticket.[Title,QueueID,!TicketNumber]}</code></td></tr></tbody></table><p>The permission value itself is a bitmask with the following values:</p><table class="table"><thead><tr><th>Value</th><th>Permission</th></tr></thead><tbody><tr><td><code>0x0000</code></td><td>NONE</td></tr><tr><td><code>0x0001</code></td><td>CREATE</td></tr><tr><td><code>0x0002</code></td><td>READ</td></tr><tr><td><code>0x0004</code></td><td>UPDATE</td></tr><tr><td><code>0x0008</code></td><td>DELETE</td></tr><tr><td><code>0xf000</code></td><td>DENY</td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/roles/{roleId}</span><span class="uri">/permissions</span> <span class="methods"><a href="#system_roles__roleid__permissions_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_roles__roleid__permissions_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_roles__roleid__permissions_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/roles/{roleId}</span><span class="uri">/permissions</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_roles__roleid__permissions_get_request" data-toggle="tab">Request</a></li><li><a href="#system_roles__roleid__permissions_get_response" data-toggle="tab">Response</a></li><li><a href="#system_roles__roleid__permissions_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_roles__roleid__permissions_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">roleId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_roles__roleid__permissions_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_roles__roleid__permissions_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: PermissionCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "PermissionCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of permissions.",
@@ -41518,6 +41525,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -41644,11 +41656,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
@@ -42814,6 +42821,11 @@ pre code {
          "description" : "The ticket object.",
          "type" : "object",
          "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Age" : {
                "type" : "integer",
                "readOnly" : true
@@ -42940,11 +42952,6 @@ pre code {
             },
             "TicketNumber" : {
                "type" : "string",
-               "readOnly" : true
-            },
-            "TimeUnits" : {
-               "description" : "added via include \"TimeUnits\"",
-               "type" : "integer",
                "readOnly" : true
             },
             "Title" : {
