@@ -32,7 +32,7 @@ sub new {
     # Debug 0=off 1=on
     $Self->{Debug} = 0;
 
-    $Self->{Die}          = $Param{Config}->{Die} || 1;
+    $Self->{Die}          = $Param{Config}->{Die} // 1;
     $Self->{Host}         = $Param{Config}->{Host} || '';
     $Self->{BaseDN}       = $Param{Config}->{BaseDN} || '';
     $Self->{UID}          = $Param{Config}->{UID} || '';
