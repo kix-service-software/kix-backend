@@ -58,15 +58,6 @@ Given qr/a automation macro without action$/, sub {
       Token   => S->{Token},
       Content => {
         Macro => {
-#            Actions => [
-#                {
-#                    Comment => "some comment".rand(),
-#                    Name => "new macro".rand(),
-#                    Parameters => {},
-#                    Type => "Ticket",
-#                    ValidID => 1
-#                }
-#            ],
             Comment => "some comment".rand(),
             Name => "new macro".rand(),
             Type => "Ticket",
@@ -133,15 +124,6 @@ When qr/I create a automation macro$/, sub {
       Token   => S->{Token},
       Content => {
         Macro => {
-#            Actions => [
-#                {
-#                    Comment => "some comment".rand(),
-#                    Name => "new macro".rand(),
-#                    Parameters => {},
-#                    Type => "Ticket",
-#                    ValidID => 1
-#                }
-#            ],
             Comment => "some comment",
             Name => "new macro",
             Type => "Ticket",
