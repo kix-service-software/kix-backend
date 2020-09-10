@@ -5190,10 +5190,6 @@ msgid "Property"
 msgstr ""
 
 #. Update: update/build-807_pre.xml
-msgid "Object"
-msgstr ""
-
-#. Update: update/build-807_pre.xml
 msgid "Permission type for the relationship of queues and tickets."
 msgstr ""
 
