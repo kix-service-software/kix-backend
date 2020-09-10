@@ -66,6 +66,11 @@ sub _Replace {
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_NUMBER $Self->{End}/$Param{Ticket}->{TicketNumber}/gixms;
         $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Param{Ticket}->{Queue}/gixms;
 
+        if ( !$Param{Ticket}->{AccountedTime} && $Param{Text} =~ m/AccountedTime/) {
+            $Param{Ticket}->{AccountedTime} = $Kernel::OM->Get('Ticket')->TicketAccountedTimeGet(
+                TicketID => $Param{TicketID},
+            );
+        }
         if ( !$Param{Ticket}->{Contact} && $Param{Ticket}->{ContactID} ) {
             my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                 ID => $Param{Ticket}->{ContactID}

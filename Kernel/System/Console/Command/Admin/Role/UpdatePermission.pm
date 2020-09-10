@@ -37,7 +37,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'type',
-        Description => 'The new type of the permission (Resource, PropertyValue, Property).',
+        Description => 'The new type of the permission (Resource, Object, Property).',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,

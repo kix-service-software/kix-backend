@@ -164,7 +164,7 @@ sub Run {
     if ( !$ValidationResult ) {
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "Cannot create permission. The permission target doesn't match the possible ones for type PropertyValue.",
+            Message => "Cannot create permission. The permission target doesn't match the possible ones for type Object.",
         );
     }
 

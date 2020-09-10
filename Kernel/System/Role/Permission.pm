@@ -554,7 +554,7 @@ sub PermissionUpdate {
     if ( !$ValidationResult ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "The permission target doesn't match the possible ones for type PropertyValue.",
+            Message  => "The permission target doesn't match the possible ones for type Object.",
         );
         return;
     }
@@ -718,7 +718,7 @@ sub PermissionDelete {
 returns a two lists of directly assigned permissions für the given object
 
     my %Permissions = $UserObject->PermissionsListForObject(
-        RelevantPropertyValuePermissions => [ 'Queue-to-Ticket' ]
+        RelevantObjectPermissions => [ 'Queue-to-Ticket' ]
         Target       => '/queue/1',
         ObjectID     => 123
         ObjectIDAttr => 'QueueID',
@@ -746,16 +746,16 @@ sub PermissionListForObject {
         }
     }
 
-    # prepare relevant PropertyValue patterns
-    my %RelevantPropertyValuePermissions;
-    if ( IsArrayRefWithData($Param{RelevantPropertyValuePermissions}) ) {
-        my $Config = $Kernel::OM->Get('Config')->Get('Permission::PropertyValue');
+    # prepare relevant Object patterns
+    my %RelevantObjectPermissions;
+    if ( IsArrayRefWithData($Param{RelevantObjectPermissions}) ) {
+        my $Config = $Kernel::OM->Get('Config')->Get('Permission::Object');
         if ( IsHashRefWithData($Config) ) {
-            foreach my $Key ( @{$Param{RelevantPropertyValuePermissions}} ) {
+            foreach my $Key ( @{$Param{RelevantObjectPermissions}} ) {
                 foreach my $Pattern ( values %{$Config->{$Key}} ) {
                     my $PreparedPattern = $Pattern;
                     $PreparedPattern =~ s/<$Param{ObjectIDAttr}>/$Param{ObjectID}/g;
-                    $RelevantPropertyValuePermissions{$PreparedPattern} = 1;
+                    $RelevantObjectPermissions{$PreparedPattern} = 1;
                 }
             }
         }
@@ -765,7 +765,7 @@ sub PermissionListForObject {
 
     # get all relevant permissions
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => "SELECT id FROM role_permission WHERE type_id IN (SELECT id FROM permission_type WHERE name IN ('Object', 'PropertyValue'))",
+        SQL  => "SELECT id FROM role_permission WHERE type_id IN (SELECT id FROM permission_type WHERE name IN ('Object', 'Object'))",
     );
 
     my @PermissionIDs;
@@ -788,7 +788,7 @@ sub PermissionListForObject {
             return;
         }
 
-        # ignore permissions of type Resource without filters (non PropertyValue)
+        # ignore permissions of type Resource without filters (non Object)
         next if ( $Permission{TypeID} == $PermissionTypeList{Resource} && $Permission{Target} !~ /[{}]/ );
 
         # ignore wildcard targets on type Object
@@ -807,8 +807,8 @@ sub PermissionListForObject {
             push(@AssignedPermissions, \%Permission);
         }
 
-        # check for PropertyValue permission (depending objects)
-        if ( $RelevantPropertyValuePermissions{$Permission{Target}} ) {
+        # check for Object permission (depending objects)
+        if ( $RelevantObjectPermissions{$Permission{Target}} ) {
             push(@DependingObjectsPermissions, \%Permission);
         }
     }
@@ -831,20 +831,20 @@ returns true if the permission is valid
 sub ValidatePermission {
     my ( $Self, %Param ) = @_;
 
-    # validate new PropertyValue permission
+    # validate new Object permission
     my %PermissionTypeList = $Self->PermissionTypeList( Valid => 1 );
 
     # check type
     return if !$PermissionTypeList{$Param{TypeID}};
 
-    if ( $PermissionTypeList{$Param{TypeID}} eq 'PropertyValue' ) {
+    if ( $PermissionTypeList{$Param{TypeID}} eq 'Object' ) {
         # check if the target contains a filter expression and the pattern matches the required format
-        if ( $Param{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/ ) {
+        if ( $Param{Target} !~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
             return;
         }
     } elsif ( $PermissionTypeList{$Param{TypeID}} eq 'Property' ) {
         # check if the target contains a filter expression and the pattern matches the required format
-        if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/ ) {
+        if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
             return;
         }
     }

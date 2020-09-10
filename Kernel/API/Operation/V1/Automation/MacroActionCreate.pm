@@ -110,7 +110,7 @@ perform MacroActionCreate Operation. This will return the created MacroActionID.
 
     $Result = {
         Success => 1,                       # 0 or 1
-        Code    => '',                      # 
+        Code    => '',                      #
         Message => '',                      # in case of error
         Data    => {                        # result data payload after Operation
             MacroActionID  => '',    # ID of the created MacroAction
@@ -145,7 +145,7 @@ sub Run {
         Parameters => $MacroAction->{Parameters},
         Comment    => $MacroAction->{Comment} || '',
         ValidID    => $MacroAction->{ValidID} || 1,
-        UserID     => $Self->{Authorization}->{UserID},              
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     if ( !$MacroActionID ) {
@@ -153,12 +153,12 @@ sub Run {
             Code => 'Object.UnableToCreate',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         MacroActionID => 0 + $MacroActionID,
-    );    
+    );
 }
 
 

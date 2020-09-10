@@ -73,10 +73,10 @@ This will return a list with objects.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @RelevantPropertyValuePermissions = split(/\s*,\s*/, ($Param{OperationConfig}->{RelevantPropertyValuePermissions} || ''));
+    my @RelevantObjectPermissions = split(/\s*,\s*/, ($Param{OperationConfig}->{RelevantObjectPermissions} || ''));
 
     my %Permissions = $Kernel::OM->Get('Role')->PermissionListForObject(
-        RelevantPropertyValuePermissions => \@RelevantPropertyValuePermissions,
+        RelevantObjectPermissions => \@RelevantObjectPermissions,
         Target        => $Param{RequestURI},
         ObjectID      => $Param{ObjectID},
         ObjectIDAttr  => $Param{OperationConfig}->{ObjectID},

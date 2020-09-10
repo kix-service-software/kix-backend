@@ -1134,9 +1134,10 @@ return a list of all permission of a given user
 
     my %List = $UserObject->PermissionList(
         UserID => 123
+        UsageContext => 'Agent'|'Customer',
         RoleID => 456,                           # optional, restrict result to this role
-        Types  => [ 'Resource', 'Object' ]       # optional
-        UsageContext => 'Agent'|'Customer'
+        Types  => [ 'Resource', 'Object' ],      # optional
+        Valid  => 1                              # optional
     );
 
 =cut
@@ -1153,12 +1154,16 @@ sub PermissionList {
         return;
     }
 
+    # set default value
+    my $Valid = $Param{Valid} ? 1 : 0;
+
     # check cache
     my $CacheKey
         = 'PermissionList::'
         . ( $Param{UserID} || '' ) . '::'
         . ( $Param{RoleID} || '' ) . '::'
         . ( $Param{UsageContext} || '' ) . '::'
+        . $Valid . '::'
         . ( IsArrayRefWithData( $Param{Types} ) ? join( '::', @{ $Param{Types} } ) : '' );
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
@@ -1170,8 +1175,11 @@ sub PermissionList {
     my @RoleIDs = $Self->RoleList(
         UserID       => $Param{UserID},
         UsageContext => $Param{UsageContext},
+        Valid        => $Valid
     );
 
+    return () if !@RoleIDs;
+    
     # get all permissions from every valid role the user is assigned to
     my @Bind;
 
@@ -1236,6 +1244,7 @@ return a list of all roles of a given user
     my @RoleIDs = $UserObject->RoleList(
         UserID       => 123,                    # required
         UsageContext => 'Agent'|'Customer'      # optional, if not given, all assigned roles will be returned
+        Valid        => 1,                      # optional
     );
 
 =cut
@@ -1254,8 +1263,11 @@ sub RoleList {
         }
     }
 
+    # set default value
+    my $Valid = $Param{Valid} ? 1 : 0;
+
     # check cache
-    my $CacheKey = 'RoleList::' . $Param{UserID} . '::' . ($Param{UsageContext} || '');
+    my $CacheKey = 'RoleList::' . $Param{UserID} . '::' . $Valid . '::' . ($Param{UsageContext} || '');
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1273,7 +1285,11 @@ sub RoleList {
     push @Bind, \$Param{UserID};
 
     # create sql
-    my $SQL = 'SELECT u.role_id, r.usage_context FROM role_user u LEFT JOIN roles r ON r.id = u.role_id  WHERE u.user_id = ?';
+    my $SQL = 'SELECT u.role_id, r.usage_context FROM role_user u LEFT JOIN roles r ON r.id = u.role_id WHERE u.user_id = ?';
+
+    if ( $Valid ) {
+        $SQL .= ' AND valid_id = 1';
+    }
 
     # get data
     return if !$DBObject->Prepare(
@@ -1337,15 +1353,16 @@ sub CheckResourcePermission {
         "checking $Param{RequestedPermission} permission for target $Param{Target}");
 
     # get list of all roles to resolve names
-    my %RoleList = $Kernel::OM->Get('Role')->RoleList();
+    my %RoleList = $Kernel::OM->Get('Role')->RoleList( Valid => 1 );
 
     # get all roles the user is assigned to
     my @UserRoleList = $Self->RoleList(
         UserID       => $Param{UserID},
-        UsageContext => $Param{UsageContext}
+        UsageContext => $Param{UsageContext},
+        Valid        => 1,
     );
 
-    $Self->_PermissionDebug("roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($RoleList{$_} || '')."\" (ID $_)" } sort @UserRoleList));
+    $Self->_PermissionDebug("active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($RoleList{$_} || '')."\" (ID $_)" } sort @UserRoleList));
 
     # check the permission for each target level (from top to bottom) and role
     my $ResultingPermission;
@@ -1476,6 +1493,21 @@ sub _CheckResourcePermissionForRole {
         "checking $Param{RequestedPermission} permission for role $Param{RoleID} on target $Param{Target}"
     );
 
+    if ( exists $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
+        
+        if ( IsArrayRefWithData($Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
+            my $Granted = $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'denied';
+            $Self->_PermissionDebug(
+                "using cache for role $Param{RoleID} on target $Param{Target}: $Param{RequestedPermission} = $Granted"
+            );
+        }
+        else {
+            $Self->_PermissionDebug(
+                "using cache for role $Param{RoleID} on target $Param{Target}: $Param{RequestedPermission} = denied by explicit DENY"
+            );
+        }
+    }
+
     my %PermissionList = $Self->PermissionList(
         UserID   => $Param{UserID},
         RoleID   => $Param{RoleID},
@@ -1561,14 +1593,17 @@ sub _CheckResourcePermissionForRole {
     );
 
     # check if we have a DENY
-    return 0
-        if ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} )
-        == Kernel::System::Role::Permission->PERMISSION->{DENY};
+    if ( ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+        $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = 0;
+        return 0;
+    }
 
     my $Granted
         = ( $ResultingPermission
             & Kernel::System::Role::Permission->PERMISSION->{ $Param{RequestedPermission} } )
         == Kernel::System::Role::Permission->PERMISSION->{ $Param{RequestedPermission} };
+
+    $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ $Granted, $ResultingPermission ];
 
     return ( $Granted, $ResultingPermission );
 }

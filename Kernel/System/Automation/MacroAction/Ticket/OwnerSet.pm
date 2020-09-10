@@ -49,9 +49,9 @@ sub Describe {
 
     $Self->Description(Kernel::Language::Translatable('Sets the owner of a ticket.'));
     $Self->AddOption(
-        Name        => 'Owner',
+        Name        => 'OwnerLoginOrID',
         Label       => Kernel::Language::Translatable('Owner'),
-        Description => Kernel::Language::Translatable('The login of the agent to be set.'),
+        Description => Kernel::Language::Translatable('The ID or login of the agent to be set.'),
         Required    => 1,
     );
 
@@ -66,7 +66,7 @@ Example:
     my $Success = $Object->Run(
         TicketID => 123,
         Config   => {
-            Owner => 'test',
+            OwnerLoginOrID => 'test',
         },
         UserID   => 123,
     );
@@ -91,21 +91,30 @@ sub Run {
 
     my $Owner = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
-        Text     => $Param{Config}->{Owner},
+        Text     => $Param{Config}->{OwnerLoginOrID},
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
     );
 
-    # set the new owner
     my $UserID = $Kernel::OM->Get('User')->UserLookup(
         UserLogin => $Owner,
+        Silent    => 1
     );
+    if ( !$UserID && $Owner =~ m/^\d+$/ ) {
+        my $OwnerLogin = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $Owner,
+            Silent => 1
+        );
+        if ($OwnerLogin) {
+            $UserID = $Owner;
+        }
+    }
 
     if ( !$UserID ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - can't find user with login \"$Param{Config}->{Owner}\"!",
+            Message  => "Couldn't update ticket $Param{TicketID} - can't find user with \"$Param{Config}->{OwnerLoginOrID}\"!",
             UserID   => $Param{UserID}
         );
         return;
@@ -125,7 +134,7 @@ sub Run {
     if ( !$Success ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - setting the owner \"$Param{Config}->{Owner}\" failed!",
+            Message  => "Couldn't update ticket $Param{TicketID} - setting the owner \"$Param{Config}->{OwnerLoginOrID}\" failed!",
             UserID   => $Param{UserID}
         );
         return;

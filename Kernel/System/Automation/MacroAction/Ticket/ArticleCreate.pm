@@ -97,9 +97,9 @@ sub Describe {
         Required    => 1,
     );
     $Self->AddOption(
-        Name        => 'TimeUnits',
-        Label       => Kernel::Language::Translatable('TimeUnits'),
-        Description => Kernel::Language::Translatable('The time units to add for the new article.'),
+        Name        => 'AccountTime',
+        Label       => Kernel::Language::Translatable('Account Time'),
+        Description => Kernel::Language::Translatable('An integer value which will be accounted for the new article (as minutes).'),
         Required    => 0,
     );
     # FIXME: add if necessary
@@ -230,8 +230,9 @@ sub Run {
 
     my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         %{ $Param{Config} },
-        TicketID => $Param{TicketID},
-        UserID   => $Param{UserID},
+        TimeUnits => $Param{Config}->{AccountTime},
+        TicketID  => $Param{TicketID},
+        UserID    => $Param{UserID},
     );
 
     if ( !$ArticleID ) {
@@ -262,10 +263,14 @@ sub ValidateConfig {
 
     return if !$Self->SUPER::ValidateConfig(%Param);
 
-    if ( $Param{Config}->{TimeUnits} && !IsNumber( $Param{Config}->{TimeUnits} ) ) {
+    if (
+        $Param{Config}->{AccountTime}
+        # && !IsNumber( $Param{Config}->{AccountTime} )
+        && $Param{Config}->{AccountTime} !~ m/^-?\d+$/
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Validation of parameter \"TimeUnits\" failed."
+            Message  => "Validation of parameter \"AccountTime\" failed."
         );
         return;
     }

@@ -378,9 +378,9 @@ sub Run {
             $TicketData{DynamicFields} = [];
         }
 
-        # include TimeUnits if requested
-        if ( $Param{Data}->{include}->{TimeUnits} ) {
-            $TicketData{TimeUnits} = $TicketObject->TicketAccountedTimeGet(
+        # include AccountedTime if requested
+        if ( $Param{Data}->{include}->{AccountedTime} ) {
+            $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
                 TicketID => $TicketID,
             );
         }

@@ -348,9 +348,9 @@ sub RoleUpdate {
         ],
     );
 
-    # delete cache
+    # delete whole cache if the roles ValidID changes. otherwise cleanup the type only
     $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
+        Type => ( $Param{ValidID} && $RoleData{ValidID} != $Param{ValidID} ) ? undef : $Self->{CacheType}
     );
 
     # push client callback event
@@ -462,10 +462,8 @@ sub RoleDelete {
         Bind => [ \$Param{ID} ],
     );
 
-    # delete cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
+    # cleanup whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(

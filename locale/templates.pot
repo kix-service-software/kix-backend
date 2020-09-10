@@ -363,7 +363,7 @@ msgid "Production"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "PropertyValue"
+msgid "Object"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -2671,7 +2671,7 @@ msgid "Registration of a execution plan type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a supported permission of type PropertyValue."
+msgid "Registration of a supported permission of type Object."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml

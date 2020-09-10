@@ -130,6 +130,7 @@ perform TicketCreate Operation. This will return the created TicketID.
                 ResponsibleID   => 123,                                           # optional
                 Responsible     => 'some user login',                             # optional
                 PendingTime     => '2011-12-03 23:05:00',                         # optional
+                TimeUnit        => 123,                                           # optional
                 Articles        => [                                              # optional
                     {
                         Subject                         => 'some subject',

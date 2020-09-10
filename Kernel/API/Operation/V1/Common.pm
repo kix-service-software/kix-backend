@@ -52,8 +52,7 @@ initialize and run the current operation
 
 sub RunOperation {
     my ( $Self, %Param ) = @_;
-    my %PermissionFilteredObjects;
-
+    
     # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
@@ -103,325 +102,23 @@ sub RunOperation {
             }
         }
 
-        # we have to check the permission only for the current request method
-        # all other permissions are irrelevant (except DENY)
+        # init meta data
+        $Self->{PermissionFilteredObjects} = {};
 
-        # get the relevant permission for the current request method
-        my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
-
-        # get all PropertyValue and Property permissions for this user
-        my %Permissions = $Kernel::OM->Get('User')->PermissionList(
-            UserID       => $Self->{Authorization}->{UserID},
-            UsageContext => $Self->{Authorization}->{UserType},
-            Types        => [ 'PropertyValue', 'Property' ],
+        # check if we have permission for this object
+        my $Result =  $Self->_CheckObjectPermission(
+            Data => $Param{Data},
         );
-
-        # get all relevant permissions
-        my @RelevantPropertyPermissions;
-        my @RelevantPropertyValuePermissions;
-        foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
-
-            # ignore targets without filter expression (resource permission)
-            next if $Permission->{Target} !~ /[{}]/;
-
-            # prepare target
-            my $Target = $Permission->{Target};
-            $Target =~ s/\*/.*?/g;
-            $Target =~ s/\//\\\//g;
-            $Target =~ s/\{.*?\}$//g;
-
-            # only match the current RequestURI
-            next if $Self->{RequestURI} !~ /^$Target$/;
-
-            # extract property value permission
-            if ( $Permission->{Target} =~ /^.*?\{(\w+)\.(\w+)\s+(\w+)\s+(.*?)\}$/ ) {
-                push @RelevantPropertyValuePermissions, $Permission;
-            }
-            elsif ( $Permission->{Target} =~ /^.*?\{(\w+)\.\[(.*?)\]\}$/ ) {
-                push @RelevantPropertyPermissions, $Permission;
-            }
+        if ( !$Result->{Success} ) {
+            return $Result;
         }
 
-        # do something if we have at least one PropertyValue permission
-        if ( IsArrayRefWithData(\@RelevantPropertyValuePermissions) ) {
-
-            my $StartTime = Time::HiRes::time();
-
-            # load the object data (if we have to)
-            my $ObjectData = {};
-            if ( $Self->{RequestMethod} eq 'POST' ) {
-                # we need some special handling here since we don't have an object in the DB yet
-                # so we have to use the object given in the request data
-                $ObjectData = $Param{Data};
-            }
-            elsif ( $Self->{RequestMethod} ne 'GET' && IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
-                # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
-                # a GET request will be handled differently
-                my $GetResult = $Self->ExecOperation(
-                    RequestMethod     => 'GET',
-                    OperationType     => $Self->{AvailableMethods}->{GET}->{Operation},
-                    Data              => $Param{Data},
-                    IgnorePermissions => 1,
-                );
-
-                if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
-
-                    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
-
-                    # no success, simply return what we got
-                    return $GetResult;
-                }
-
-                $ObjectData = $GetResult->{Data};
-            }
-
-            my $ResultingPermission = -1;
-
-            # check each permission
-            PERMISSION:
-            foreach my $Permission ( @RelevantPropertyValuePermissions ) {
-
-                # extract property value permission
-                next if $Permission->{Target} !~ /^.*?\{(.*?)\}$/;
-
-                # every permission will be a part of a logical OR
-                my $UseAnd = 0;
-
-                # check for && and split accordingly
-                my @Parts = $1;
-                if ( $Parts[0] =~ /&&/ ) {
-                    @Parts = split(/\s+&&\s+/, $Parts[0]);
-
-                    # the single parts of the permission are a part of a logical AND
-                    $UseAnd = 1;
-                }
-
-                my $Not = 0;
-                my %Filter;
-                foreach my $Part ( @Parts ) {
-                    next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
-
-                    my ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
-                    if ( $Operator =~ /^!(.*?)$/ ) {
-                       $Not      = 1;
-                       $Operator = $1;
-                    }
-
-                    # replace string quotes
-                    $Value =~ s/["']//g;
-
-                    if ( $Part eq $Parts[0] ) {
-                        # only print this information once
-                        $Self->_PermissionDebug( sprintf( "found relevant permission (PropertyValue) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
-                    }
-
-                    # prepare value for IN operator
-                    if ( $Operator eq 'IN' ) {
-                        if ( $Value =~ /^\[(.*?)\]$/ ) {
-                            my @ValueParts = map { $_ = $Self->_ReplaceVariablesInProperyValuePermission(Data => $_) } split(/\s*,\s*/, $1);
-                            $Value = \@ValueParts;
-                        }
-                        else {
-                            $Self->_PermissionDebug( sprintf("Value part of PropertyValue permission on target \"%s\" is invalid!", $Permission->{Target}) );
-                            $Self->_Error(
-                                Code    => 'InternalError',
-                                Message => 'Permission value is invalid!',
-                            );
-                        }
-                    }
-                    else {
-                        $Value = $Self->_ReplaceVariablesInProperyValuePermission(
-                            Data => $Value
-                        );
-                    }
-
-                    # add a NOT filter if we should have no permission (including DENY)
-		            if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) {
-                        $Self->{InvertPermissionFilter} = 1;
-                    }
-                    elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                        $Self->{InvertPermissionFilter} = 1;
-                        # also clear all existing permission filters
-                        $Self->_ClearPermissionFilters();
-                    }
-
-                    # add a filter accordingly
-                    my %Result = $Self->_AddPermissionFilterForObject(
-                        Filter   => \%Filter,
-                        Object   => $Object,
-                        Field    => $Attribute,
-                        Operator => $Operator,
-                        Value    => $Value,
-                        Not      => $Not,
-                        UseAnd   => $UseAnd,
-                    );
-                    if ( !%Result ) {
-
-                        return $Self->_Error(
-                            Code    => 'InternalError',
-                            Message => 'Unable to add permission filter!',
-                        );
-                    }
-
-                    # save info that this object is permission filtered for later use
-                    $PermissionFilteredObjects{$Object} = 1;
-                }
-
-                if ( $Self->{RequestMethod} ne 'GET' ) {
-                    $Self->{InvertPermissionFilter} = 0;
-                    my %ObjectDataToFilter = %{$ObjectData};        # a deref is required here, because the filter method will change the data
-
-                    # we use the permission filters in order to apply them to the given object
-                    my $Result = $Self->_ApplyFilter(
-                        Data               => \%ObjectDataToFilter,
-                        Filter             => \%Filter,
-                        IsPermissionFilter => 1,
-                    );
-
-                    # if the filtered object is undef then the filter doesn't match and we have to determine what to do depending on the desired permission
-                    foreach my $FilteredObject ( sort keys %PermissionFilteredObjects ) {
-                        if ( (!$Not && defined $ObjectDataToFilter{$FilteredObject}) || ($Not && !defined $ObjectDataToFilter{$FilteredObject}) ) {
-                            # init Result
-                            $ResultingPermission = 0 if $ResultingPermission == -1;
-
-                            $ResultingPermission |= $Permission->{Value};
-
-                            my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
-                                Value  => $ResultingPermission,
-                                Format => 'Short'
-                            );
-
-                            $Self->_PermissionDebug("resulting PropertyValue permission: $ResultingPermissionShort");
-
-                            # check if we have a DENY already
-                            if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                                $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
-                                last PERMISSION;
-                            }
-                        }
-                    }
-
-                    if ( $ResultingPermission != -1 ) {
-                       # check if we have the desired permission
-                        my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission->PERMISSION->{$PermissionName};
-
-                        if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                            $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
-
-                            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
-
-                            # return 403, because we don't have permission to execute this
-                            return $Self->_Error(
-                                Code => 'Forbidden',
-                            );
-                        }
-                    }
-                }
-                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                    # if we have a GET request and a DENY permission we can stop here and just use the DENY filter
-                    last PERMISSION;
-                }
-            }
-
-#            if ( $Self->{RequestMethod} eq 'GET' && IsArrayRefWithData($Self->{PermissionFilters}) ) {
-#                # activate the permission filters for the GET operation
-#                $Self->_ActivatePermissionFilters();
-#            }
-
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (PropertyValue) for $Self->{RequestURI} took %i ms", $TimeDiff));
-        }
-
-        # do something if we have at least one Property permission
-        if ( IsArrayRefWithData(\@RelevantPropertyPermissions) ) {
-
-            my $StartTime = Time::HiRes::time();
-
-            # inspect the object data
-            my $ObjectData = {};
-            if ( $Self->{RequestMethod} =~ /^POST|PATCH$/ ) {
-                # we have to use the object given in the request data
-                $ObjectData = $Param{Data};
-            }
-
-            my $ResultingPermission = -1;
-
-            # check each permission and merge them for each attribute
-            my %AttributePermissions;
-            PERMISSION:
-            foreach my $Permission ( @RelevantPropertyPermissions ) {
-
-                # extract property value permission
-                next if $Permission->{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/;
-
-                my ( $Object, $Attributes) = ( $1, $2 );
-                my @AttributeList = split(/\s*,\s*/, $Attributes);
-
-                $Self->_PermissionDebug( sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
-
-                foreach my $Attribute (sort @AttributeList) {
-                    # init
-                    $AttributePermissions{"$Object.$Attribute"} = 0 if !exists $AttributePermissions{"$Object.$Attribute"};
-                    $AttributePermissions{"$Object.$Attribute"} |= $Permission->{Value};
-                }
-            }
-
-            foreach my $Attribute ( sort keys %AttributePermissions ) {
-
-                my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
-                    Value  => $AttributePermissions{$Attribute},
-                    Format => 'Short'
-                );
-
-                $Self->_PermissionDebug("resulting Property permission for property \"$Attribute\": $ResultingPermissionShort");
-
-                if ( $Self->{RequestMethod} eq 'GET' ) {
-                    # add attribute to field selector
-                    my ($Object, $AttributeName) = split(/\./, $Attribute, 2);
-
-                    # init field selector
-                    $Self->{PermissionFieldSelector}->{$Object} = [ $Self->{OperationConfig}->{ObjectID} || 'ID' ] if !exists $Self->{PermissionFieldSelector}->{$Object};
-
-                    my $Ignore = '';
-                    if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
-                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
-                    ) {
-                        # access is denied, so we have to add an ignore selector for this attribute
-                        $Ignore = '!'
-                    }
-                    push @{$Self->{PermissionFieldSelector}->{$Object}}, "$Ignore$AttributeName";
-                }
-                else {
-                    # we need a flat data structure to easily find the attributes
-                    my $FlatData = Hash::Flatten::flatten(
-                        $Param{Data},
-                        {
-                            HashDelimiter  => '.',
-                            ArrayDelimiter => ':'
-                        }
-                    );
-
-                    # if the attribute exists in the data hash we have to check whether the needed permission is granted
-                    if ( exists $FlatData->{$Attribute} && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
-                        || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} )
-                    ) {
-                        $Self->_PermissionDebug( sprintf("request data doesn't match the required criteria - denying request") );
-
-                        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
-
-                        # return 403, because we don't have permission to execute this
-                        return $Self->_Error(
-                            Code => 'Forbidden',
-                        );
-                    }
-                }
-            }
-
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
+        # check if we have permission for specific properties of this object
+        $Result =  $Self->_CheckPropertyPermission(
+            Data => $Param{Data},
+        );
+        if ( !$Result->{Success} ) {
+            return $Result;
         }
     }
 
@@ -483,9 +180,9 @@ sub RunOperation {
     }
 
     # check the result for filtered objects
-    if ( $Self->{RequestMethod} eq 'GET' && !$Self->{SuppressPermissionErrors} && IsHashRefWithData($Result) && $Result->{Success} && %PermissionFilteredObjects ) {
+    if ( $Self->{RequestMethod} eq 'GET' && !$Self->{SuppressPermissionErrors} && IsHashRefWithData($Result) && $Result->{Success} && IsHashRefWithData($Self->{PermissionFilteredObjects}) ) {
 
-        foreach my $Object ( keys %PermissionFilteredObjects ) {
+        foreach my $Object ( keys %{$Self->{PermissionFilteredObjects}} ) {
             next if !exists $Result->{Data}->{$Object};
 
             # if the filtered object is undef then we don't have permission to read it
@@ -1605,6 +1302,10 @@ sub _ApplyFilter {
 
     OBJECT:
     foreach my $Object ( keys %{$Filter} ) {
+        if ( $Object eq '*' ) {
+            # wildcard
+            $Object = (sort keys %{$Param{Data}})[0];
+        }
         my $ObjectData = $Param{Data}->{$Object};
 
         if ( $Param{IsPermissionFilter} && IsHashRefWithData( $Param{Data}->{$Object} ) ) {
@@ -1614,6 +1315,12 @@ sub _ApplyFilter {
             $ObjectData = [ $Param{Data}->{$Object} ];
         }
         if ( IsArrayRefWithData($ObjectData) ) {
+            # ignore lists of scalars
+            if ( !IsHashRefWithData($ObjectData->[0]) ) {
+                $Self->_Debug($Self->{LevelIndent}, "$Object is a list of scalars, not going to filter");
+                next OBJECT;
+            }
+
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             if ( $Param{IsPermissionFilter} ) {
@@ -1636,212 +1343,214 @@ sub _ApplyFilter {
                         my $BoolOperatorMatch = 1;
 
                         FILTER:
-                        foreach my $FilterItem ( @{ $Filter->{$Object}->{$BoolOperator} } ) {
+                        foreach my $FilterItem ( @{ $Filter->{$Object}->{$BoolOperator} } ) {                           
                             my $FilterMatch = 1;
 
-                            # if filter attributes are not contained in the response, check if it references a sub-structure
-                            if ( !exists( $ObjectItem->{ $FilterItem->{Field} } ) ) {
+                            if ( !$FilterItem->{AlwaysTrue} ) {
+                                # if filter attributes are not contained in the response, check if it references a sub-structure
+                                if ( !exists( $ObjectItem->{ $FilterItem->{Field} } ) ) {
 
-                                if ( $FilterItem->{Field} =~ /\./ ) {
+                                    if ( $FilterItem->{Field} =~ /\./ ) {
 
-                                    # yes it does, filter sub-structure
-                                    my ( $SubObject, $SubField ) = split( /\./, $FilterItem->{Field}, 2 );
-                                    my $SubData = {
-                                        $SubObject => IsArrayRefWithData( $ObjectItem->{$SubObject} ) ? $ObjectItem->{$SubObject} : [ $ObjectItem->{$SubObject} ]
-                                    };
-                                    my %SubFilter = %{$FilterItem};
-                                    $SubFilter{Field} = $SubField;
+                                        # yes it does, filter sub-structure
+                                        my ( $SubObject, $SubField ) = split( /\./, $FilterItem->{Field}, 2 );
+                                        my $SubData = {
+                                            $SubObject => IsArrayRefWithData( $ObjectItem->{$SubObject} ) ? $ObjectItem->{$SubObject} : [ $ObjectItem->{$SubObject} ]
+                                        };
+                                        my %SubFilter = %{$FilterItem};
+                                        $SubFilter{Field} = $SubField;
 
-                                    # continue if the sub-structure attribute exists
-                                    if ( exists( $ObjectItem->{$SubObject} ) ) {
+                                        # continue if the sub-structure attribute exists
+                                        if ( exists( $ObjectItem->{$SubObject} ) ) {
 
-                                        # execute filter on sub-structure
-                                        $Self->_ApplyFilter(
-                                            Data   => $SubData,
-                                            Filter => {
-                                                $SubObject => {
-                                                    OR => [
-                                                        \%SubFilter
-                                                        ]
+                                            # execute filter on sub-structure
+                                            $Self->_ApplyFilter(
+                                                Data   => $SubData,
+                                                Filter => {
+                                                    $SubObject => {
+                                                        OR => [
+                                                            \%SubFilter
+                                                            ]
+                                                        }
                                                     }
-                                                }
-                                        );
+                                            );
 
-                                        # check filtered SubData
-                                        if ( !IsArrayRefWithData( $SubData->{$SubObject} ) ) {
+                                            # check filtered SubData
+                                            if ( !IsArrayRefWithData( $SubData->{$SubObject} ) ) {
 
-                                            # the filter didn't match the sub-structure
+                                                # the filter didn't match the sub-structure
+                                                $FilterMatch = 0;
+                                            }
+                                        }
+                                        else {
+                                            # the sub-structure attribute doesn't exist, ignore this item
                                             $FilterMatch = 0;
                                         }
                                     }
                                     else {
-                                        # the sub-structure attribute doesn't exist, ignore this item
+                                        # filtered attribute not found, ignore this item
                                         $FilterMatch = 0;
                                     }
                                 }
                                 else {
-                                    # filtered attribute not found, ignore this item
-                                    $FilterMatch = 0;
-                                }
-                            }
-                            else {
-                                my $FieldValue  = $ObjectItem->{ $FilterItem->{Field} } || '';
-                                my $FilterValue = $FilterItem->{Value};
-                                my $Type        = $FilterItem->{Type} || 'STRING';
+                                    my $FieldValue  = $ObjectItem->{ $FilterItem->{Field} } || '';
+                                    my $FilterValue = $FilterItem->{Value};
+                                    my $Type        = $FilterItem->{Type} || 'STRING';
 
-                                # check if the value references a field in our hash and take its value in this case
-                                if ( $FilterValue && $FilterValue =~ /^\$(.*?)$/ ) {
-                                    $FilterValue = exists( $ObjectItem->{$1} ) ? $ObjectItem->{$1} : undef;
-                                }
-                                elsif ($FilterValue) {
+                                    # check if the value references a field in our hash and take its value in this case
+                                    if ( $FilterValue && $FilterValue =~ /^\$(.*?)$/ ) {
+                                        $FilterValue = exists( $ObjectItem->{$1} ) ? $ObjectItem->{$1} : undef;
+                                    }
+                                    elsif ($FilterValue) {
 
-                                    # replace wildcards with valid RegEx in FilterValue
-                                    $FilterValue =~ s/\*/.*?/g;
-                                }
-                                else {
-                                    $FilterValue = undef;
-                                }
-
-                                my @FieldValues = ($FieldValue);
-                                if ( IsArrayRefWithData($FieldValue) ) {
-                                    @FieldValues = @{$FieldValue}
-                                }
-
-                                # handle multiple FieldValues (array)
-                                FIELDVALUE:
-                                foreach my $FieldValue (@FieldValues) {
-                                    $FilterMatch = 1;
-
-                                    # prepare date compare
-                                    if ( $Type eq 'DATE' ) {
-
-                                        # convert values to unixtime
-                                        my ( $DatePart, $TimePart ) = split( /\s+/, $FieldValue );
-                                        $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                                            String => $DatePart . ' 12:00:00',
-                                        );
-                                        my ( $FilterDatePart, $FilterTimePart ) = split( /\s+/, $FilterValue );
-                                        $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                                            String => $FilterDatePart . ' 12:00:00',
-                                        );
-
-                                        # handle this as a numeric compare
-                                        $Type = 'NUMERIC';
+                                        # replace wildcards with valid RegEx in FilterValue
+                                        $FilterValue =~ s/\*/.*?/g;
+                                    }
+                                    else {
+                                        $FilterValue = undef;
                                     }
 
-                                    # prepare datetime compare
-                                    elsif ( $Type eq 'DATETIME' ) {
-
-                                        # convert values to unixtime
-                                        $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                                            String => $FieldValue,
-                                        );
-                                        $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                                            String => $FilterValue,
-                                        );
-
-                                        # handle this as a numeric compare
-                                        $Type = 'NUMERIC';
+                                    my @FieldValues = ($FieldValue);
+                                    if ( IsArrayRefWithData($FieldValue) ) {
+                                        @FieldValues = @{$FieldValue}
                                     }
 
-                                    # equal (=)
-                                    if ( $FilterItem->{Operator} eq 'EQ' ) {
-                                        if ( !$FilterValue && $FieldValue ) {
-                                            $FilterMatch = 0
-                                        }
-                                        elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) ne ( $FilterValue || '' ) ) {
-                                            $FilterMatch = 0;
-                                        }
-                                        elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) != ( $FilterValue || '' ) ) {
-                                            $FilterMatch = 0;
-                                        }
-                                    }
+                                    # handle multiple FieldValues (array)
+                                    FIELDVALUE:
+                                    foreach my $FieldValue (@FieldValues) {
+                                        $FilterMatch = 1;
 
-                                    # not equal (!=)
-                                    elsif ( $FilterItem->{Operator} eq 'NE' ) {
-                                        if ( !$FilterValue && !$FieldValue ) {
-                                            $FilterMatch = 0
-                                        }
-                                        elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) eq ( $FilterValue || '' ) ) {
-                                            $FilterMatch = 0;
-                                        }
-                                        elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) == ( $FilterValue || '' ) ) {
-                                            $FilterMatch = 0;
-                                        }
-                                    }
+                                        # prepare date compare
+                                        if ( $Type eq 'DATE' ) {
 
-                                    # less than (<)
-                                    elsif ( $FilterItem->{Operator} eq 'LT' ) {
-                                        if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
-                                            $FilterMatch = 0;
-                                        }
-                                    }
+                                            # convert values to unixtime
+                                            my ( $DatePart, $TimePart ) = split( /\s+/, $FieldValue );
+                                            $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                                String => $DatePart . ' 12:00:00',
+                                            );
+                                            my ( $FilterDatePart, $FilterTimePart ) = split( /\s+/, $FilterValue );
+                                            $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                                String => $FilterDatePart . ' 12:00:00',
+                                            );
 
-                                    # greater than (>)
-                                    elsif ( $FilterItem->{Operator} eq 'GT' ) {
-                                        if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
-                                            $FilterMatch = 0;
+                                            # handle this as a numeric compare
+                                            $Type = 'NUMERIC';
                                         }
-                                    }
 
-                                    # less than or equal (<=)
-                                    elsif ( $FilterItem->{Operator} eq 'LTE' ) {
-                                        if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
-                                            $FilterMatch = 0;
+                                        # prepare datetime compare
+                                        elsif ( $Type eq 'DATETIME' ) {
+
+                                            # convert values to unixtime
+                                            $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                                String => $FieldValue,
+                                            );
+                                            $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                                String => $FilterValue,
+                                            );
+
+                                            # handle this as a numeric compare
+                                            $Type = 'NUMERIC';
                                         }
-                                    }
 
-                                    # greater than or equal (>=)
-                                    elsif ( $FilterItem->{Operator} eq 'GTE' ) {
-                                        if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
-                                            $FilterMatch = 0;
-                                        }
-                                    }
-
-                                    # value is contained in an array or values
-                                    elsif ( $FilterItem->{Operator} eq 'IN' ) {
-                                        $FilterMatch = 0;
-                                        foreach $FilterValue ( @{$FilterValue} ) {
-                                            if ( $Type eq 'NUMERIC' ) {
-                                                next if $FilterValue != $FieldValue + 0;
+                                        # equal (=)
+                                        if ( $FilterItem->{Operator} eq 'EQ' ) {
+                                            if ( !$FilterValue && $FieldValue ) {
+                                                $FilterMatch = 0
                                             }
-                                            next if $FilterValue ne $FieldValue;
-                                            $FilterMatch = 1;
+                                            elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) ne ( $FilterValue || '' ) ) {
+                                                $FilterMatch = 0;
+                                            }
+                                            elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) != ( $FilterValue || '' ) ) {
+                                                $FilterMatch = 0;
+                                            }
                                         }
-                                    }
 
-                                    # the string contains a part
-                                    elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {
-                                        my $FilterValueQuoted = quotemeta $FilterValue;
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted/i ) {
+                                        # not equal (!=)
+                                        elsif ( $FilterItem->{Operator} eq 'NE' ) {
+                                            if ( !$FilterValue && !$FieldValue ) {
+                                                $FilterMatch = 0
+                                            }
+                                            elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) eq ( $FilterValue || '' ) ) {
+                                                $FilterMatch = 0;
+                                            }
+                                            elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) == ( $FilterValue || '' ) ) {
+                                                $FilterMatch = 0;
+                                            }
+                                        }
+
+                                        # less than (<)
+                                        elsif ( $FilterItem->{Operator} eq 'LT' ) {
+                                            if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                                $FilterMatch = 0;
+                                            }
+                                        }
+
+                                        # greater than (>)
+                                        elsif ( $FilterItem->{Operator} eq 'GT' ) {
+                                            if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                                $FilterMatch = 0;
+                                            }
+                                        }
+
+                                        # less than or equal (<=)
+                                        elsif ( $FilterItem->{Operator} eq 'LTE' ) {
+                                            if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                                $FilterMatch = 0;
+                                            }
+                                        }
+
+                                        # greater than or equal (>=)
+                                        elsif ( $FilterItem->{Operator} eq 'GTE' ) {
+                                            if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                                $FilterMatch = 0;
+                                            }
+                                        }
+
+                                        # value is contained in an array or values
+                                        elsif ( $FilterItem->{Operator} eq 'IN' ) {
                                             $FilterMatch = 0;
+                                            foreach $FilterValue ( @{$FilterValue} ) {
+                                                if ( $Type eq 'NUMERIC' ) {
+                                                    next if $FilterValue != $FieldValue + 0;
+                                                }
+                                                next if $FilterValue ne $FieldValue;
+                                                $FilterMatch = 1;
+                                            }
                                         }
-                                    }
 
-                                    # the string starts with the part
-                                    elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
-                                        my $FilterValueQuoted = quotemeta $FilterValue;
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValueQuoted/i ) {
-                                            $FilterMatch = 0;
+                                        # the string contains a part
+                                        elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {
+                                            my $FilterValueQuoted = quotemeta $FilterValue;
+                                            if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted/i ) {
+                                                $FilterMatch = 0;
+                                            }
                                         }
-                                    }
 
-                                    # the string ends with the part
-                                    elsif ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
-                                        my $FilterValueQuoted = quotemeta $FilterValue;
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted$/i ) {
-                                            $FilterMatch = 0;
+                                        # the string starts with the part
+                                        elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
+                                            my $FilterValueQuoted = quotemeta $FilterValue;
+                                            if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValueQuoted/i ) {
+                                                $FilterMatch = 0;
+                                            }
                                         }
-                                    }
 
-                                    # the string matches the pattern
-                                    elsif ( $FilterItem->{Operator} eq 'LIKE' ) {
-                                        if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/im ) {
-                                            $FilterMatch = 0;
+                                        # the string ends with the part
+                                        elsif ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
+                                            my $FilterValueQuoted = quotemeta $FilterValue;
+                                            if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted$/i ) {
+                                                $FilterMatch = 0;
+                                            }
                                         }
-                                    }
 
-                                    last FIELDVALUE if $FilterMatch;
+                                        # the string matches the pattern
+                                        elsif ( $FilterItem->{Operator} eq 'LIKE' ) {
+                                            if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/im ) {
+                                                $FilterMatch = 0;
+                                            }
+                                        }
+
+                                        last FIELDVALUE if $FilterMatch;
+                                    }
                                 }
                             }
 
@@ -1916,12 +1625,19 @@ sub _ApplyFieldSelector {
     }
 
     foreach my $Object ( keys %{ $Param{Fields} } ) {
-        if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
+        if ( $Object eq '*') {
+            # wildcard
+            $Object = (sort keys %{$Param{Data}})[0];
+        }
 
-            my @Fields = (
-                @{ $Param{Fields}->{$Object} },
-                keys %{ $Self->{Include} },
-            );
+        my %Tmp = map { $_ => 1 } (
+            @{ $Param{Fields}->{'*'} || [] },
+            @{ $Param{Fields}->{$Object} || [] },
+            keys %{ $Self->{Include} } ,
+        );
+        my @Fields = sort keys %Tmp;
+
+        if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
 
             # extract filtered fields from hash
             my %NewObject;
@@ -1961,12 +1677,6 @@ sub _ApplyFieldSelector {
             # filter keys in each contained hash
             foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
-
-                    my @Fields = (
-                        @{ $Param{Fields}->{$Object} },
-                        keys %{ $Self->{Include} } ,
-                    );
-
                     # extract filtered fields from hash
                     my %NewObjectItem;
                     my @FieldsToRemove;
@@ -2578,18 +2288,423 @@ sub _CacheRequest {
     return 1;
 }
 
+=item _CheckObjectPermission()
+
+check object permissions
+
+    my $Return = $CommonObject->_CheckObjectPermission(
+        Data => {}          # optional
+    );
+
+    $Return = _Success if granted
+
+=cut
+sub _CheckObjectPermission {
+    my ( $Self, %Param ) = @_;
+
+    # get the relevant permission for the current request method
+    my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
+
+    # get list of permission types
+    my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
+
+    # get all Object and Property permissions for this user
+    my %Permissions = $Kernel::OM->Get('User')->PermissionList(
+        UserID       => $Self->{Authorization}->{UserID},
+        UsageContext => $Self->{Authorization}->{UserType},
+        Types        => [ 'Object' ],
+        Valid        => 1
+    );
+
+    # get all relevant permissions
+    my @RelevantPermissions;
+    foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
+
+        # prepare target
+        my $Target = $Permission->{Target};
+        $Target =~ s/\*/.*?/g;
+        $Target =~ s/\//\\\//g;
+        $Target =~ s/\{.*?\}$//g;
+
+        # only match the current RequestURI
+        next if $Self->{RequestURI} !~ /^$Target$/;
+
+        push @RelevantPermissions, $Permission;
+    }
+
+    # do something if we have at least one permission
+    if ( IsArrayRefWithData(\@RelevantPermissions) ) {
+
+        my $StartTime = Time::HiRes::time();
+
+        # load the object data (if we have to)
+        my $ObjectData = {};
+        if ( $Self->{RequestMethod} eq 'POST' ) {
+            # we need some special handling here since we don't have an object in the DB yet
+            # so we have to use the object given in the request data
+            $ObjectData = $Param{Data};
+        }
+        elsif ( $Self->{RequestMethod} ne 'GET' && IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
+            # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
+            # a GET request will be handled differently
+            my $GetResult = $Self->ExecOperation(
+                RequestMethod     => 'GET',
+                OperationType     => $Self->{AvailableMethods}->{GET}->{Operation},
+                Data              => $Param{Data},
+                IgnorePermissions => 1,
+            );
+
+            if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+
+                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
+                # no success, simply return what we got
+                return $GetResult;
+            }
+
+            $ObjectData = $GetResult->{Data};
+        }
+
+        my $ResultingPermission = -1;
+
+        # check each permission
+        PERMISSION:
+        foreach my $Permission ( @RelevantPermissions ) {
+
+            # extract property value permission
+            next if $Permission->{Target} !~ /^.*?\{(.*?)\}$/;
+
+            # check for "Wildcard" target (empty restriction)
+            my $WildcardTarget = 1 if $1 =~ /^\s*$/;
+
+            # every permission will be a part of a logical OR
+            my $UseAnd = 0;
+
+            # check for && and split accordingly
+            my @Parts = $1 || '';
+            if ( $Parts[0] =~ /&&/ ) {
+                @Parts = split(/\s+&&\s+/, $Parts[0]);
+
+                # the single parts of the permission are a part of a logical AND
+                $UseAnd = 1;
+            }
+
+            my $Not = 0;
+            my %Filter;
+            foreach my $Part ( @Parts ) {
+                if ( $Part eq $Parts[0] ) {
+                    # only print this information once
+                    $Self->_PermissionDebug( sprintf( "found relevant permission (Object) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+                }
+
+                my ( $Object, $Attribute, $Operator, $Value );
+
+                if ( !$WildcardTarget ) {
+                    next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
+
+                    ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+                    if ( $Operator =~ /^!(.*?)$/ ) {
+                        $Not      = 1;
+                        $Operator = $1;
+                    }
+
+                    # replace string quotes
+                    $Value =~ s/["']//g;
+
+                    # prepare value for IN operator
+                    if ( $Operator eq 'IN' ) {
+                        if ( $Value =~ /^\[(.*?)\]$/ ) {
+                            my @ValueParts = map { $_ = $Self->_ReplaceVariablesInPermission(Data => $_) } split(/\s*,\s*/, $1);
+                            $Value = \@ValueParts;
+                        }
+                        else {
+                            $Self->_PermissionDebug( sprintf("Value part of Object permission on target \"%s\" is invalid!", $Permission->{Target}) );
+                            $Self->_Error(
+                                Code    => 'InternalError',
+                                Message => 'Permission value is invalid!',
+                            );
+                        }
+                    }
+                    else {
+                        $Value = $Self->_ReplaceVariablesInPermission(
+                            Data => $Value
+                        );
+                    }
+                }
+                else {
+                    $Object = '*';
+                }
+
+                # add a NOT filter if we should have no permission (including DENY)
+                if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) {
+                    $Self->{InvertPermissionFilter} = 1;
+                }
+                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                    $Self->{InvertPermissionFilter} = 1;
+                    # also clear all existing permission filters
+                    $Self->_ClearPermissionFilters();
+                }
+
+                # add a filter accordingly
+                my %Result = $Self->_AddPermissionFilterForObject(
+                    Filter     => \%Filter,
+                    Object     => $Object,
+                    Field      => $Attribute,
+                    Operator   => $Operator,
+                    Value      => $Value,
+                    Not        => $Not,
+                    UseAnd     => $UseAnd,
+                    AlwaysTrue => $WildcardTarget,
+                );
+                if ( !%Result ) {
+
+                    return $Self->_Error(
+                        Code    => 'InternalError',
+                        Message => 'Unable to add permission filter!',
+                    );
+                }
+
+                # save info that this object is permission filtered for later use
+                $Self->{PermissionFilteredObjects}->{$Object} = 1;
+            }
+
+            if ( $Self->{RequestMethod} ne 'GET' ) {
+                $Self->{InvertPermissionFilter} = 0;
+                my %ObjectDataToFilter = %{$ObjectData};        # a deref is required here, because the filter method will change the data
+
+                # we use the permission filters in order to apply them to the given object
+                my $Result = $Self->_ApplyFilter(
+                    Data               => \%ObjectDataToFilter,
+                    Filter             => \%Filter,
+                    IsPermissionFilter => 1,
+                );
+
+                # if the filtered object is undef then the filter doesn't match and we have to determine what to do depending on the desired permission
+                foreach my $FilteredObject ( sort keys %{$Self->{PermissionFilteredObjects}} ) {
+                    if ( (!$Not && defined $ObjectDataToFilter{$FilteredObject}) || ($Not && !defined $ObjectDataToFilter{$FilteredObject}) ) {
+                        # init Result
+                        $ResultingPermission = 0 if $ResultingPermission == -1;
+
+                        $ResultingPermission |= $Permission->{Value};
+
+                        my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
+                            Value  => $ResultingPermission,
+                            Format => 'Short'
+                        );
+
+                        $Self->_PermissionDebug("resulting Object permission: $ResultingPermissionShort");
+
+                        # check if we have a DENY already
+                        if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                            $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                            last PERMISSION;
+                        }
+                    }
+                }
+
+                if ( $ResultingPermission != -1 ) {
+                    # check if we have the desired permission
+                    my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission->PERMISSION->{$PermissionName};
+
+                    if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                        $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
+
+                        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
+                        # return 403, because we don't have permission to execute this
+                        return $Self->_Error(
+                            Code => 'Forbidden',
+                        );
+                    }
+                }
+            }
+            elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                # if we have a GET request and a DENY permission we can stop here and just use the DENY filter
+                last PERMISSION;
+            }
+        }
+
+        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
+    }
+
+    return $Self->_Success();
+}
+
+=item _CheckPropertyPermission()
+
+check property permissions
+
+    my $Return = $CommonObject->_CheckPropertyPermission(
+        Data => {}              # optional
+    );
+
+    $Return = _Success if granted
+
+=cut
+sub _CheckPropertyPermission {
+    my ( $Self, %Param ) = @_;
+
+    # get the relevant permission for the current request method
+    my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
+
+    # get list of permission types
+    my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
+
+    # get all Object and Property permissions for this user
+    my %Permissions = $Kernel::OM->Get('User')->PermissionList(
+        UserID       => $Self->{Authorization}->{UserID},
+        UsageContext => $Self->{Authorization}->{UserType},
+        Types        => [ 'Property' ],
+        Valid        => 1
+    );
+
+    # get all relevant permissions
+    my @RelevantPermissions;
+    foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
+
+        # prepare target
+        my $Target = $Permission->{Target};
+        $Target =~ s/\*/.*?/g;
+        $Target =~ s/\//\\\//g;
+        $Target =~ s/\{.*?\}$//g;
+
+        # only match the current RequestURI
+        next if $Self->{RequestURI} !~ /^$Target$/;
+
+        push @RelevantPermissions, $Permission;
+    }
+
+    # do something if we have at least one permission
+    if ( IsArrayRefWithData(\@RelevantPermissions) ) {
+
+        my $StartTime = Time::HiRes::time();
+
+        # inspect the object data
+        my $ObjectData = {};
+        if ( $Self->{RequestMethod} =~ /^POST|PATCH$/ ) {
+            # we have to use the object given in the request data
+            $ObjectData = $Param{Data};
+        }
+
+        my $ResultingPermission = -1;
+
+        # check each permission and merge them for each attribute
+        my %AttributePermissions;
+        PERMISSION:
+        foreach my $Permission ( @RelevantPermissions ) {
+
+            # check for "Wildcard" target (empty restriction)
+            my $WildcardTarget = 1 if $Permission->{Target} =~ /^.*?\{\}$/;
+
+            my ( $Object, $Attributes, @AttributeList);
+
+            if ( !$WildcardTarget ) {
+                # extract property value permission
+                next if $Permission->{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/;
+
+                ( $Object, $Attributes) = ( $1, $2 );
+                @AttributeList = split(/\s*,\s*/, $Attributes);
+            }
+            else {
+                $Object = '*';
+                @AttributeList = ( '*' ); 
+            }
+
+            $Self->_PermissionDebug( sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+
+            foreach my $Attribute (sort @AttributeList) {
+                # init
+                $AttributePermissions{"$Object.$Attribute"} = 0 if !exists $AttributePermissions{"$Object.$Attribute"};
+                $AttributePermissions{"$Object.$Attribute"} |= $Permission->{Value};
+            }
+        }
+
+        # if there is a wildcard permission we need to applay it to all non wildcard permissions
+        foreach my $Attribute ( sort keys %AttributePermissions ) {
+            next if $Attribute eq '*.*';
+            $AttributePermissions{$Attribute} |= $AttributePermissions{'*.*'};
+        }
+
+        foreach my $Attribute ( sort keys %AttributePermissions ) {
+
+            my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
+                Value  => $AttributePermissions{$Attribute},
+                Format => 'Short'
+            );
+
+            $Self->_PermissionDebug("resulting Property permission for property \"$Attribute\": $ResultingPermissionShort");
+
+            if ( $Self->{RequestMethod} eq 'GET' ) {
+                # add attribute to field selector
+                my ($Object, $AttributeName) = split(/\./, $Attribute, 2);
+
+                # init field selector
+                $Self->{PermissionFieldSelector}->{$Object} = [ $Self->{OperationConfig}->{ObjectID} || 'ID' ] if !exists $Self->{PermissionFieldSelector}->{$Object};
+
+                my $Ignore = '';
+                if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
+                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
+                ) {
+                    # access is denied, so we have to add an ignore selector for this attribute
+                    $Ignore = '!'
+                }
+                push @{$Self->{PermissionFieldSelector}->{$Object}}, "$Ignore$AttributeName";
+            }
+            else {
+                # we need a flat data structure to easily find the attributes
+                my $FlatData = Hash::Flatten::flatten(
+                    $Param{Data},
+                    {
+                        HashDelimiter  => '.',
+                        ArrayDelimiter => ':'
+                    }
+                );
+
+                # check if the attribute exists in the Data hash
+                my $LookupAttribute = $Attribute;
+                $LookupAttribute =~ s/\*/.*?/g;
+                my $AttributeExists = grep /^$LookupAttribute$/, keys %{$FlatData};
+
+                # if the attribute exists in the data hash we have to check whether the needed permission is granted
+                if ( $AttributeExists && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
+                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} )
+                ) {
+                    $Self->_PermissionDebug( sprintf("request data doesn't match the required criteria - denying request") );
+
+                    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
+                    # return 403, because we don't have permission to execute this
+                    return $Self->_Error(
+                        Code => 'Forbidden',
+                    );
+                }
+            }
+        }
+
+        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
+    }
+
+    return $Self->_Success();
+}
+
 =item _AddPermissionFilterForObject()
 
 adds a permission filter
 
     my $Return = $CommonObject->_AddPermissionFilterForObject(
-        Filter    => {},            # optional, if given the method adds the new filter the the existing one
-        Object    => 'Ticket',
-        Field     => 'QueueID',
-        Operator  => 'EQ',
-        Value     => 12,
-        Not       => 0|1,
-        UseAnd    => 0|1
+        Filter     => {},            # optional, if given the method adds the new filter the the existing one
+        Object     => 'Ticket',
+        Field      => 'QueueID',
+        Operator   => 'EQ',
+        Value      => 12,
+        Not        => 0|1,
+        UseAnd     => 0|1,
+        AlwaysTrue => 1              # optional, used for Wildcards
     );
 
     $Return = %Filter
@@ -2600,18 +2715,22 @@ sub _AddPermissionFilterForObject {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(Object Field Operator Value)) {
-        if ( !defined $Param{$Needed} ) {
+    if ( !$Param{AlwaysTrue} ) {
+        for my $Needed (qw(Object Field Operator Value)) {
+            if ( !defined $Param{$Needed} ) {
 
-            # use Forbidden here to prevent access to data
-            return;
+                # use Forbidden here to prevent access to data
+                return;
+            }
         }
+        use Data::Dumper;
+        $Self->_PermissionDebug( "adding permission filter: " . Dumper( \%Param ) );
+    }
+    else {
+        $Self->_PermissionDebug( "adding ALWAYS TRUE filter" );
     }
 
     my $Logical = $Param{UseAnd} ? 'AND' : 'OR';
-
-    use Data::Dumper;
-    $Self->_PermissionDebug( "adding permission filter: " . Dumper( \%Param ) );
 
     # init PermissionFilters if not done already
     $Self->{PermissionFilters} ||= [];
@@ -2642,15 +2761,16 @@ sub _ActivatePermissionFilters {
 
         # prepare filter definition
         my %FilterDef = (
-            Field    => $Filter->{Field},
-            Operator => $Filter->{Operator},
-            Value    => $Filter->{Value},
-            Not      => $Filter->{Not},
+            Field      => $Filter->{Field},
+            Operator   => $Filter->{Operator},
+            Value      => $Filter->{Value},
+            Not        => $Filter->{Not},
+            AlwaysTrue => $Filter->{AlwaysTrue},
         );
 
         my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
 
-# TODO: don't work with search right now because ticket DB search can't cope with the negated PropertyValue filters
+# TODO: don't work with search right now because ticket DB search can't cope with the negated Object filters
         # init filter and search if not done already
         $Self->{Filter}->{ $Filter->{Object} }->{$Logical} ||= [];
 #        $Self->{Search}->{ $Filter->{Object} }->{$Logical} ||= [];
@@ -2694,17 +2814,17 @@ sub _GetPermissionFilter {
 
     return \%PermissionFilter;
 }
-=item _ReplaceVariablesInProperyValuePermission()
+=item _ReplaceVariablesInPermission()
 
-replaces special variables in PropertyValue permission expressions with actual value
+replaces special variables in permission expressions with actual value
 
-    my $ReplacedData = $CommonObject->_ReplaceVariablesInProperyValuePermission(
+    my $ReplacedData = $CommonObject->_ReplaceVariablesInPermission(
         Data => '...'
     );
 
 =cut
 
-sub _ReplaceVariablesInProperyValuePermission {
+sub _ReplaceVariablesInPermission {
     my ( $Self, %Param ) = @_;
     my $Result = $Param{Data};
 

@@ -11,11 +11,11 @@ Feature: GET request to the /system/roles/permissiontypes resource
 #    And the response object is PermissionTypeCollectionResponse   
 
   Scenario: get the list of permissiontypes with filter 
-    When I query the collection of roles permissiontypes with filter of PropertyValue
+    When I query the collection of roles permissiontypes with filter of Object
     Then the response code is 200  
     And the response contains the following items of type PermissionType
       | Name          | Comment                                                                                                        |
-      | PropertyValue | Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1). |
+      | Object | Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1). |
 
   Scenario: get the list of permissiontypes with limit 
     When I query the collection of roles permissiontypes with a limit of 2
