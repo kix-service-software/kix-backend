@@ -9,47 +9,53 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 1
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 1 items of type "Permission"
+    And the response contains 3 items of type "Permission"
     And the response contains the following items of type Permission
       | Target | Value | TypeID |
       | /*     | 15    | 1      |
+      | /*{}   | 15    | 2      |
+      | /*{}   | 15    | 3      |
 
   Scenario: get the list of existing permissions of System Admin
     When I query the collection of permissions with roleid 2
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 5 items of type "Permission"
+    And the response contains 7 items of type "Permission"
     And the response contains the following items of type Permission
       | Target          | Value | TypeID |
       | /system         | 15    | 1      |
       | /auth           | 1     | 1      |
       | /session        | 15    | 1      |
-      | /contacts       | 7     | 1      |
+      | /contacts       | 15    | 1      |
       | /organisations  | 2     | 1      |
+      | /*{}            | 15    | 2      |
+      | /*{}            | 15    | 3      |
 
   Scenario: get the list of existing permissions of Agent User
     When I query the collection of permissions with roleid 3
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 16 items of type "Permission"
+    And the response contains 18 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target                                                                            | Value | TypeID |
-      | /auth                                                                             | 1     | 1      |
-      | /session                                                                          | 15    | 1      |
-      | /system                                                                           | 2     | 1      |
-      | /system/*                                                                         | 0     | 1      |
-      | /system/users                                                                     | 2     | 1      |
-      | /system/config                                                                    | 2     | 1      |
-      | /system/objectdefinitions                                                         | 2     | 1      |
-      | /system/valid                                                                     | 2     | 1      |
-      | /system/objecticons                                                               | 2     | 1      |
-      | /system/generalcatalog                                                            | 2     | 1      |
-      | /system/communication                                                             | 2     | 1      |
-      | /system/communication/*                                                           | 0     | 1      |
-      | /system/communication/notifications                                               | 2     | 1      |
-      | /system/dynamicfields                                                             | 2     | 1      |
-      | /watchers                                                                         | 15    | 1      |
-      | /i18n                                                                             | 2     | 1      |
+      | Target                                                                              | Value | TypeID |
+      | /auth                                                                               | 1     | 1      |
+      | /session                                                                            | 15    | 1      |
+      | /system                                                                             | 2     | 1      |
+      | /system/*                                                                           | 0     | 1      |
+      | /system/users                                                                       | 2     | 1      |
+      | /system/config                                                                      | 2     | 1      |
+      | /system/objectdefinitions                                                           | 2     | 1      |
+      | /system/valid                                                                       | 2     | 1      |
+      | /system/objecticons                                                                 | 2     | 1      |
+      | /system/generalcatalog                                                              | 2     | 1      |
+      | /system/communication                                                               | 2     | 1      |
+      | /system/communication/*                                                             | 0     | 1      |
+      | /system/communication/notifications                                                 | 2     | 1      |
+      | /system/dynamicfields                                                               | 2     | 1      |
+      | /watchers                                                                           | 15    | 1      |
+      | /i18n                                                                               | 2     | 1      |
+      | /system/config/*{SysConfigOption.AccessLevel EQ confidential}                       | 0     | 2      |
+      | /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential} | 0     | 2      |
 
   Scenario: get the list of existing permissions of Ticket Reader
     When I query the collection of permissions with roleid 4
@@ -78,7 +84,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 5
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 16 items of type "Permission"
+    And the response contains 17 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
       | /tickets                              | 15    | 1      |
@@ -97,6 +103,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /organisations                        | 2     | 1      |
       | /contacts                             | 2     | 1      |
       | /links                                | 15    | 1      |
+      | /system/textmodules                   | 2     | 1      |
 
   Scenario: get the list of existing permissions of Ticket Creator
     When I query the collection of permissions with roleid 6
@@ -222,6 +229,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/communication/notifications                                                                                                       | 2     | 1      |
       | /system/communication/sendertypes                                                                                                         | 2     | 1      |
       | /system/communication/systemaddresses                                                                                                     | 2     | 1      |
+      | /system/objecticons                                                                                                                       | 2     | 1      |
       | /system/faq                                                                                                                               | 2     | 1      |
       | /system/faq/*                                                                                                                             | 0     | 1      |
       | /system/faq/categories                                                                                                                    | 2     | 1      |
@@ -241,4 +249,3 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/config/*                                                                                                                          | 2     | 1      |
       | /system/config{SysConfigOption.AccessLevel NE external}                                                                                   | 0     | 2      |
       | /system/config/*{SysConfigOption.AccessLevel NE external}                                                                                 | 0     | 2      |
-      | /system/objecticons                                                                                                                       | 2     | 1      |

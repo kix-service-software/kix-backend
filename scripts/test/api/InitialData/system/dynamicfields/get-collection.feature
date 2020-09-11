@@ -22,8 +22,7 @@ Feature: GET request to the /system/dynamicfields resource
       | PlanBegin                    | Plan Begin             | DateTime                | Ticket     |
       | PlanEnd                      | Plan End               | DateTime                | Ticket     |
       | RiskAssumptionRemark         | Risk Assumption Remark | TextArea                | Ticket     |
-
-
+    
 
 
 
