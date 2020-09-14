@@ -277,7 +277,6 @@ or
         OwnerID        => 123,
         ResponsibleID  => 123,                # not required
         ArchiveFlag    => 'y',                # (y|n) not required
-        TimeUnit       => 123,                # optional
         UserID         => 123
     );
 
@@ -546,15 +545,6 @@ sub TicketCreate {
         Message  => "New Ticket [$Param{TN}/" . substr( $Param{Title}, 0, 15 ) . "] created "
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
-
-    # time accounting
-    if ( $Param{TimeUnit} ) {
-        $Self->TicketAccountTime(
-            TicketID  => $TicketID,
-            TimeUnit  => $Param{TimeUnit},
-            UserID    => $Param{UserID},
-        );
-    }
 
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
@@ -1021,6 +1011,7 @@ Returns:
         Changed            => '2010-10-27 20:15:15',
         ChangeBy           => 123,
         ArchiveFlag        => 'y',
+        AccountedTime      => 123 || undef               # in minutes
 
         # If DynamicFields => 1 was passed, you'll get an entry like this for each dynamic field:
         DynamicField_X     => 'value_x',
@@ -1103,7 +1094,7 @@ sub TicketGet {
                     st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
                     st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
                     st.timeout, st.type_id, st.archive_flag,
-                    st.create_by, st.change_by
+                    st.create_by, st.change_by, accounted_time
                 FROM ticket st
                 WHERE st.id = ?',
             Bind  => [ \$Param{TicketID} ],
@@ -1130,6 +1121,7 @@ sub TicketGet {
             $Ticket{ArchiveFlag}    = $Row[17] ? 'y' : 'n';
             $Ticket{CreateBy}       = $Row[18];
             $Ticket{ChangeBy}       = $Row[19];
+            $Ticket{AccountedTime}  = $Row[20];
         }
     }
 
@@ -4663,16 +4655,13 @@ sub TicketAccountedTimeGet {
 
     # db query
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT time_unit FROM time_accounting WHERE ticket_id = ?',
+        SQL  => 'SELECT SUM(time_unit) FROM time_accounting WHERE ticket_id = ?',
         Bind => [ \$Param{TicketID} ],
     );
 
     my $AccountedTime = 0;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Row[0] =~ s/,/./g;
-
-        # TODO: use integer - for now
-        # $AccountedTime = $AccountedTime + $Row[0];
         $AccountedTime = $AccountedTime + int($Row[0]);
     }
 
@@ -4718,13 +4707,6 @@ sub TicketAccountTime {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    # update change time
-    return if !$DBObject->Do(
-        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
-            . ' change_by = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$Param{TicketID} ],
-    );
-
     # db quote
     $Param{TimeUnit} = $DBObject->Quote( $Param{TimeUnit}, 'Number' );
 
@@ -4738,11 +4720,19 @@ sub TicketAccountTime {
         ],
     );
 
+    my $AccountedTime = $Self->TicketAccountedTimeGet( TicketID => $Param{TicketID} );
+
+    # update ticket data
+    return if !$DBObject->Do(
+        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
+            . ' change_by = ?, accounted_time = ? WHERE id = ?',
+        Bind => [ \$Param{UserID}, \$AccountedTime, \$Param{TicketID} ],
+    );
+
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # add history
-    my $AccountedTime = $Self->TicketAccountedTimeGet( TicketID => $Param{TicketID} );
     $Self->HistoryAdd(
         TicketID     => $Param{TicketID},
         ArticleID    => $Param{ArticleID},
