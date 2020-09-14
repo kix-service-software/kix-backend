@@ -560,6 +560,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###AccountedTime" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::TicketSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::AccountedTime</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndexModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). Runtime will do full-text searches on live data (it works fine for up to 50.000 tickets). StaticDB will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/kix.Console.pl Maint::Ticket::FulltextIndexRebuild".</Description>
         <Group>Ticket</Group>
@@ -2557,16 +2567,6 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Stats::Dynamic::TicketList</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Stats::DynamicObjectRegistration###TicketAccountedTime" Required="0" Valid="1">
-        <Description Translatable="1">Module to generate accounted time ticket statistics.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Stats</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Stats::Dynamic::TicketAccountedTime</Item>
             </Hash>
         </Setting>
     </ConfigItem>

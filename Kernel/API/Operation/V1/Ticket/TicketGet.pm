@@ -379,7 +379,7 @@ sub Run {
         }
 
         # include AccountedTime if requested
-        if ( $Param{Data}->{include}->{AccountedTime} ) {
+        if ( $Param{Data}->{include}->{AccountedTime} && !defined $TicketData{AccountedTime} ) {
             $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
                 TicketID => $TicketID,
             );
