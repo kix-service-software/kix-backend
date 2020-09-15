@@ -7567,7 +7567,7 @@ You can log in via the following URL:
                         "AlwaysFilter": "(!objectclass=computer)",
                         "UserSuffix": "@domain.com",
                         "Charset": "utf-8",
-                        "Die": 1,
+                        "Die": 0,
                         "Params": {
                             "port": 389,
                             "timeout": 120,
@@ -7616,7 +7616,7 @@ You can log in via the following URL:
                     "Config": {
                         "Host": "radiushost",
                         "Password": "radiussecret",
-                        "Die": 1
+                        "Die": 0
                     }
                 },
                 {
