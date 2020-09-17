@@ -110,12 +110,6 @@ sub Run {
         ObjectType => ['Ticket'],
     );
 
-    # create a dynamic field config lookup table
-    my %DynamicFieldConfigLookup;
-    for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
-        $DynamicFieldConfigLookup{ $DynamicFieldConfig->{Name} } = $DynamicFieldConfig;
-    }
-
     NOTIFICATION:
     for my $ID (@IDs) {
 
@@ -126,9 +120,8 @@ sub Run {
         # verify ticket and article conditions
         my $PassFilter = $Self->_NotificationFilter(
             %Param,
-            Ticket                   => \%Ticket,
-            Notification             => \%Notification,
-            DynamicFieldConfigLookup => \%DynamicFieldConfigLookup,
+            Ticket       => \%Ticket,
+            Notification => \%Notification,
         );
 
         next NOTIFICATION if !$PassFilter;
@@ -389,115 +382,42 @@ sub _NotificationFilter {
     my ( $Self, %Param ) = @_;
 
     # check needed params
-    for my $Needed (qw(Ticket Notification DynamicFieldConfigLookup)) {
+    for my $Needed (qw(Data Notification)) {
         return if !$Param{$Needed};
     }
 
-    # set local values
-    my %Notification = %{ $Param{Notification} };
+    my $Filter = $Param{Notification}->{Filter};
 
-    # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
-    KEY:
-    for my $Key ( sort keys %{ $Notification{Data} } ) {
-
-        # ignore not ticket or article related attributes
-        next KEY if $Key !~ /^(Ticket|Article)::(.*?)$/;
-
-        # store extracted attribute name
-        my $Attribute = $2;
-
-        my %Article;
-        if ( $Param{Data}->{ArticleID} ) {
-            %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
-                ArticleID     => $Param{Data}->{ArticleID},
-                UserID        => $Param{UserID},
-                DynamicFields => 0,
-            );
-        }
-
-        # ignore anything that isn't ok
-        next KEY if !$Notification{Data}->{$Key};
-        next KEY if !@{ $Notification{Data}->{$Key} };
-        next KEY if !defined $Notification{Data}->{$Key}->[0];
-        my $Match = 0;
-
-        VALUE:
-        for my $Value ( @{ $Notification{Data}->{$Key} } ) {
-
-            next VALUE if !defined $Value;
-
-            if ( $Key =~ /^Ticket::/ ) {
-
-                # check if key is a search dynamic field
-                if ( $Attribute =~ m{\A DynamicField_(.*?)$}xms ) {
-
-                    # remove search prefix
-                    my $DynamicFieldName = $1;
-
-                    # get the dynamic field config for this field
-                    my $DynamicFieldConfig = $Param{DynamicFieldConfigLookup}->{$DynamicFieldName};
-
-                    last VALUE if !$DynamicFieldConfig;
-
-                    my $IsNotificationEventCondition = $DynamicFieldBackendObject->HasBehavior(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Behavior           => 'IsNotificationEventCondition',
-                    );
-
-                    last VALUE if !$IsNotificationEventCondition;
-
-                    # Get match value from the dynamic field backend, if applicable (bug#12257).
-                    my $MatchValue;
-                    my $SearchFieldParameter = $DynamicFieldBackendObject->SearchFieldParameterBuild(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Profile            => {
-                            $Key => $Value,
-                        },
-                    );
-                    if ( defined $SearchFieldParameter->{Parameter}->{Equals} ) {
-                        $MatchValue = $SearchFieldParameter->{Parameter}->{Equals};
-                    }
-                    else {
-                        $MatchValue = $Value;
-                    }
-
-                    $Match = $DynamicFieldBackendObject->ObjectMatch(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Value              => $MatchValue,
-                        ObjectAttributes   => $Param{Ticket},
-                    );
-
-                    last VALUE if $Match;
-                }
-                else {
-
-                    if ( $Param{Ticket}->{$Attribute} && $Value eq $Param{Ticket}->{$Attribute} ) {
-                        $Match = 1;
-                        last VALUE;
-                    }
-                }
-            }
-            elsif ( $Key =~ /^Article::/ ) {
-                # only accept relevant events
-                next KEY if $Param{Event} !~ /ArticleCreate|ArticleSend/ || !IsHashRefWithData(\%Article);
-
-                if ( $Article{$Attribute} && $Attribute =~ /(Body|Subject)/ && $Article{$Attribute} =~ /\Q$Value\E/i ) {
-                    $Match = 1;
-                    last VALUE;
-                }
-                elsif ( $Article{$Attribute} && $Value eq $Article{$Attribute} ) {
-                    $Match = 1;
-                    last VALUE;
-                }
-            }
-        }
-
-        return if !$Match;
+    # create or extend the filter with the ArticleID or TicketID
+    if ( $Param{Data}->{ArticleID} ) {
+        # add ArticleID to filter 
+        $Filter //= {};
+        $Filter->{AND} //= [];
+        push @{$Filter->{AND}}, {
+            Field    => 'ArticleID',
+            Operator => 'EQ',
+            Value    => $Param{Data}->{ArticleID}
+        };
+    }
+    elsif ( $Param{Ticket}->{TicketID} ) {
+        # add TicketID to filter 
+        $Filter //= {};
+        $Filter->{AND} //= [];
+        push @{$Filter->{AND}}, {
+            Field    => 'TicketID',
+            Operator => 'EQ',
+            Value    => $Param{Data}->{TicketID}
+        };
     }
 
-    return 1;
+    # do the search
+    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+        Result => 'ARRAY',
+        Search => $Filter,
+        Limit  => 1,
+    );
+
+    return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};
 }
 
 sub _RecipientsGet {
@@ -592,10 +512,10 @@ sub _RecipientsGet {
                 }
                 elsif ( $Recipient eq 'AgentWatcher' ) {
 
-                    # its checked on TicketWatchGet function
-                    push @{ $Notification{Data}->{RecipientAgents} }, $TicketObject->TicketWatchGet(
-                        TicketID => $Param{Data}->{TicketID},
-                        Result   => 'ARRAY',
+                    # its checked on WatcherList function
+                    push @{ $Notification{Data}->{RecipientAgents} }, map { $_->{UserID} } $Kernel::OM->Get('Watcher')->WatcherList(
+                        Object   => 'Ticket',
+                        ObjectID => $Param{Data}->{TicketID},
                     );
                 }
                 elsif ( $Recipient eq 'AgentReadPermissions' ) {

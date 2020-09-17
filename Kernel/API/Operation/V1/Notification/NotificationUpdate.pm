@@ -172,6 +172,7 @@ sub Run {
         Name           => $Notification->{Name} || $NotificationData{Name},
         Comment        => exists $Notification->{Comment} ? $Notification->{Comment} : $NotificationData{Comment},
         Data           => $Notification->{Data} || $NotificationData{Data},
+        Filter         => $Notification->{Filter} || $NotificationData{Filter},
         Message        => $Notification->{Message} || $NotificationData{Message},
         ValidID        => $Notification->{ValidID} || $NotificationData{ValidID},
         UserID         => $Self->{Authorization}->{UserID},

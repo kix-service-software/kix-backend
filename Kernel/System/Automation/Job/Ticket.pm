@@ -65,176 +65,37 @@ sub Run {
         }
     }
 
-    my @TicketIDs;
+    my $Filter =  $Param{Filter};
 
-    # execute a ticket search if we have no ObjectIDs given
-    if ( IsHashRefWithData($Param{Data}) && $Param{Data}->{TicketID} ) {
-        @TicketIDs = $Param{Data}->{TicketID};
+    # create or extend the filter with the ArticleID or TicketID
+    if ( IsHashRefWithData($Param{Data}) && $Param{Data}->{ArticleID} ) {
+        # add ArticleID to filter 
+        $Filter //= {};
+        $Filter->{AND} //= [];
+        push @{$Filter->{AND}}, {
+            Field    => 'ArticleID',
+            Operator => 'EQ',
+            Value    => $Param{Data}->{ArticleID}
+        };
     }
-    else {
-        @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Result => 'ARRAY'
-        );
+    elsif ( IsHashRefWithData($Param{Data}) && $Param{Data}->{TicketID} ) {
+        # add TicketID to filter 
+        $Filter //= {};
+        $Filter->{AND} //= [];
+        push @{$Filter->{AND}}, {
+            Field    => 'TicketID',
+            Operator => 'EQ',
+            Value    => $Param{Data}->{TicketID}
+        };
     }
 
-    # filter given objects
-    if ( IsHashRefWithData($Param{Filter}) ) {
-
-        # get dynamic fields
-        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-            Valid      => 1,
-            ObjectType => ['Ticket'],
-        );
-
-        # create a dynamic field config lookup table
-        my %DynamicFieldConfigLookup;
-        for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
-            $DynamicFieldConfigLookup{ $DynamicFieldConfig->{Name} } = $DynamicFieldConfig;
-        }
-
-        my @Result;
-        foreach my $TicketID ( sort @TicketIDs ) {
-            my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-                TicketID      => $TicketID,
-                UserID        => $Param{UserID},
-                DynamicFields => 1
-            );
-
-            if ( !%Ticket ) {
-                $Kernel::OM->Get('Automation')->LogError(
-                    Referrer => $Self,
-                    Message  => "Ticket with ID $TicketID not found!",
-                    UserID   => $Param{UserID},
-                );                
-                return;
-            }
-
-            my $Accepted = $Self->_Filter(
-                Data   => $Param{Data},
-                Ticket => \%Ticket,
-                Filter => $Param{Filter},
-                UserID => $Param{UserID},
-                DynamicFieldConfigLookup => \%DynamicFieldConfigLookup
-            );
-
-            if ( $Accepted ) {
-                push @Result, $TicketID;
-            }
-        }
-        @TicketIDs = @Result;
-    }
+    # do the search
+    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+        Result => 'ARRAY',
+        Search => $Filter,
+    );
 
     return @TicketIDs;
-}
-
-sub _Filter {
-    my ( $Self, %Param ) = @_;
-
-    # check needed params
-    for my $Needed (qw(Ticket Filter UserID DynamicFieldConfigLookup)) {
-        return if !$Param{$Needed};
-    }
-
-    # get dynamic field backend object
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
-    KEY:
-    for my $Key ( sort keys %{ $Param{Filter} } ) {
-
-        # ignore not ticket or article related attributes
-        next KEY if $Key !~ /^(Ticket|Article)::(.*?)$/;
-
-        # store extracted attribute name
-        my $Attribute = $2;
-
-        my %Article;
-        if ( $Param{Data}->{ArticleID} ) {
-            %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
-                ArticleID     => $Param{Data}->{ArticleID},
-                UserID        => $Param{UserID},
-                DynamicFields => 0,
-            );
-        }
-
-        # ignore anything that isn't ok
-        next KEY if !$Param{Filter}->{$Key};
-        next KEY if !@{ $Param{Filter}->{$Key} };
-        next KEY if !defined $Param{Filter}->{$Key}->[0];
-        my $Match = 0;
-
-        VALUE:
-        for my $Value ( @{ $Param{Filter}->{$Key} } ) {
-            next VALUE if !defined $Value;
-
-            if ( $Key =~ /^Ticket::/ ) {
-                # check if key is a search dynamic field
-                if ( $Attribute =~ m{\A DynamicField_(.*?)$}xms ) {
-
-                    # remove search prefix
-                    my $DynamicFieldName = $1;
-
-                    # get the dynamic field config for this field
-                    my $DynamicFieldConfig = $Param{DynamicFieldConfigLookup}->{$DynamicFieldName};
-
-                    last VALUE if !$DynamicFieldConfig;
-
-                    # here we are using the same behaviour as in NotificationEvent at the moment
-                    my $IsNotificationEventCondition = $DynamicFieldBackendObject->HasBehavior(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Behavior           => 'IsNotificationEventCondition',
-                    );
-
-                    last VALUE if !$IsNotificationEventCondition;
-
-                    # Get match value from the dynamic field backend, if applicable (bug#12257).
-                    my $MatchValue;
-                    my $SearchFieldParameter = $DynamicFieldBackendObject->SearchFieldParameterBuild(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Profile            => {
-                            $Key => $Value,
-                        },
-                    );
-                    if ( defined $SearchFieldParameter->{Parameter}->{Equals} ) {
-                        $MatchValue = $SearchFieldParameter->{Parameter}->{Equals};
-                    }
-                    else {
-                        $MatchValue = $Value;
-                    }
-
-                    $Match = $DynamicFieldBackendObject->ObjectMatch(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Value              => $MatchValue,
-                        ObjectAttributes   => $Param{Ticket},
-                    );
-
-                    last VALUE if $Match;
-                }
-                else {
-
-                    if ( $Param{Ticket}->{$Attribute} && $Value eq $Param{Ticket}->{$Attribute} ) {
-                        $Match = 1;
-                        last VALUE;
-                    }
-                }
-            }
-            elsif ( $Key =~ /^Article::/ ) {
-                next KEY if !IsHashRefWithData(\%Article);
-
-                if ( $Article{$Attribute} && $Attribute =~ /(Body|Subject)/ && $Article{$Attribute} =~ /\Q$Value\E/i ) {
-                    $Match = 1;
-                    last VALUE;
-                }
-                elsif ( $Article{$Attribute} && $Value eq $Article{$Attribute} ) {
-                    $Match = 1;
-                    last VALUE;
-                }
-            }
-        }
-
-        return if !$Match;
-    }
-
-    return 1;
 }
 
 1;
