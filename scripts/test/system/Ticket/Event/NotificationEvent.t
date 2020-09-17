@@ -14,6 +14,7 @@ use warnings;
 use utf8;
 
 use Kernel::System::Role::Permission;
+use Kernel::System::VariableCheck qw(:all);
 
 use vars (qw($Self));
 
@@ -446,7 +447,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         SetOutOfOffice          => 1,
@@ -491,7 +492,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         SetOutOfOffice          => 1,
@@ -519,7 +520,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -542,7 +543,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         SetUserNotificationPreference => {
@@ -624,7 +625,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -646,7 +647,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -668,7 +669,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -690,11 +691,11 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
             {
                 ToArray => [ $UserContactData4{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -716,7 +717,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -738,7 +739,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -760,7 +761,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -783,11 +784,11 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
             {
                 ToArray => ['test@kixexample.com'],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -827,11 +828,11 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
             {
                 ToArray => [ $UserContactData4{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -854,11 +855,11 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
             {
                 ToArray => [ $UserContactData4{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -881,7 +882,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [$Contact{Email}],
             },
         ],
@@ -892,10 +893,13 @@ my @Tests = (
         Data => {
             Events         => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientEmail => ['test@kixexample.com'],
-
-            # Filter by unchecked checkbox dynamic field value. Note that the search value (-1) is
-            #   different than the match value (0). See bug#12257 for more information.
-            'Ticket::DynamicField_DFT1' . $RandomID => [0],
+        },
+        Filter => {
+            AND => [
+                # Filter by unchecked checkbox dynamic field value. Note that the search value (-1) is
+                #   different than the match value (0). See bug#12257 for more information.
+                { Field => 'Ticket::DynamicField_DFT1' . $RandomID, Operator => 'EQ', Value => 0 }
+            ]
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -908,7 +912,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => ['test@kixexample.com'],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -918,7 +922,11 @@ my @Tests = (
         Data => {
             Events             => [ 'ArticleCreate' ],
             RecipientEmail     => ['test@kixexample.com'],
-            'Article::Subject' => ['subject te'],
+        },
+        Filter => {
+            AND => [
+                { Field => 'Subject', Operator => 'EQ', Value => 'subject te' }
+            ]
         },
         Config => {
             Event => 'ArticleCreate',
@@ -932,7 +940,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ 'test@kixexample.com' ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -942,7 +950,11 @@ my @Tests = (
         Data => {
             Events             => [ 'ArticleCreate' ],
             RecipientEmail     => ['test@kixexample.com'],
-            'Article::ChannelID' => [1],
+        },
+        Filter => {
+            AND => [
+                { Field => 'ChannelID', Operator => 'EQ', Value => 1 }
+            ]
         },
         Config => {
             Event => 'ArticleCreate',
@@ -956,7 +968,7 @@ my @Tests = (
         ExpectedResults => [
             {
                 ToArray => [ 'test@kixexample.com' ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
             },
         ],
         Success => 1,
@@ -966,8 +978,12 @@ my @Tests = (
         Data => {
             Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientAgents    => [$UserID],
-            Channel            => ['note'],
             CreateArticle      => [1],
+        },
+        Filter => {
+            AND => [
+                { Field => 'ChannelID', Operator => 'EQ', Value => 1 }
+            ]
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -979,7 +995,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [ $UserContactData{Email} ],
             },
         ],
@@ -990,8 +1006,12 @@ my @Tests = (
         Data => {
             Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             Recipients         => ['Customer'],
-            Channel            => ['note'],
             CreateArticle      => [1],
+        },
+        Filter => {
+            AND => [
+                { Field => 'ChannelID', Operator => 'EQ', Value => 1 }
+            ]
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -1003,7 +1023,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [$Contact{Email}],
             },
         ],
@@ -1014,9 +1034,13 @@ my @Tests = (
         Data => {
             Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             RecipientAgents    => [$UserID],
-            Channel            => ['note'],
-            VisibleForCustomer => [1],
             CreateArticle      => [1],
+        },
+        Filter => {
+            AND => [
+                { Field => 'ChannelID', Operator => 'EQ', Value => 1 },
+                { Field => 'CustomerVisible', Operator => 'EQ', Value => 1 },
+            ]
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -1028,7 +1052,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [ $UserContactData{Email} ],
             },
         ],
@@ -1039,9 +1063,13 @@ my @Tests = (
         Data => {
             Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             Recipients         => ['Customer'],
-            Channel            => ['note'],
-            VisibleForCustomer => [1],
             CreateArticle      => [1],
+        },
+        Filter => {
+            AND => [
+                { Field => 'ChannelID', Operator => 'EQ', Value => 1 },
+                { Field => 'CustomerVisible', Operator => 'EQ', Value => 1 },
+            ]
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
@@ -1053,7 +1081,7 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Body    => "JobName $TicketID Email::Test $UserContactData{Firstname}=\n",
                 ToArray => [$Contact{Email}],
             },
         ],
@@ -1250,6 +1278,7 @@ for my $Test (@Tests) {
         Name    => "JobName$Count-$RandomID",
         Comment => 'An optional comment',
         Data    => $Test->{Data},
+        Filter  => $Test->{Filter},
         Message => (!$Test->{ContentType} || $Test->{ContentType} ne 'text/html') ? {
             en => {
                 Subject     => 'JobName',

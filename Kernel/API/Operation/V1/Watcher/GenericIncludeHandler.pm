@@ -84,6 +84,9 @@ sub Run {
         }
     }
 
+    # only numeric IDs
+    return if $Param{ObjectID} !~ /\d+$/;
+
     # perform watcher search
     my @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
         Object   => $Param{Object},
