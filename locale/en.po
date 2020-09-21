@@ -1,3 +1,19 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-21 10:53+0000\n"
+"PO-Revision-Date: 2020-09-21 10:53+0000\n"
+"Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
+"Language-Team: English <http://translate.kix18.docker.vm.devel.cape-it.de/"
+"projects/kix18/backend-app/en/>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 3.9.1\n"
+
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
 msgstr ""
@@ -911,11 +927,17 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "The name of the dynamic field."
-msgstr ""
+msgstr "The name (=internal designation) of the dynamic field to be set."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "The value for the dynamic field to be set."
 msgstr ""
+"The \"value\" for the dynamic field to be set. Field type \"Selection\" "
+"expects the key of the value to be set, field type \"AssetReference\" "
+"expects the Asset ID, field type TicketReference expects the Ticket ID, "
+"field type \"Checklist\" expects the appropriate JSON-format, field type \""
+"Date\" expects the format <YYYY-MM-DD 00:00:00>, field type \"DateTime\" "
+"expects the format <YYYY-MM-DD hh:mm:ss>."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Asset Reference Dynamic Field"
@@ -928,7 +950,7 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid ""
 "Fetch value from attachments and use them to set dynamic fields of ticket."
-msgstr ""
+msgstr "Fetch value from assets and use them to set dynamic fields of ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Force"
@@ -939,10 +961,14 @@ msgid ""
 "If set the dynamic field values will be overwritten whether or not the asset "
 "atribute is empty or the dynamic field has already a value."
 msgstr ""
+"If set, the dynamic field values will be overwritten whether or not the "
+"asset attribute is empty or the dynamic field already has a value."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "The mapping which asset attribute will set which ticket dynamic field."
 msgstr ""
+"The mapping which asset attribute will set which ticket dynamic field. "
+"Expected Format: \"<WriteToDFKey> - <AssetAttributeKey>\""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "The name of the dynamic field which contains the relevant asset ID."
@@ -954,7 +980,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "The lock state to be set."
-msgstr ""
+msgstr "The name of the lock state to be set."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
 msgid "Sets the organisation of a ticket."
@@ -962,7 +988,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
 msgid "The ID or number of the organisation to be set."
-msgstr ""
+msgstr "The ID or CNO of the organisation to be set."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
 msgid "Sets the owner of a ticket."
@@ -1067,6 +1093,8 @@ msgid ""
 "The ID or number of the organisation of the new ticket. Primary organisation "
 "of contact will be used if omitted."
 msgstr ""
+"The ID or CNO of the organisation of the new ticket. Primary organisation of "
+"contact will be used if omitted."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The dynamic fields of the new ticket."
@@ -1074,7 +1102,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The lock state of the new ticket."
-msgstr ""
+msgstr "The name of the lock state of the new ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The name of the priority of the new ticket."
