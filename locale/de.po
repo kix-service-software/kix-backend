@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-09-10 10:24+0000\n"
-"PO-Revision-Date: 2020-09-15 07:52+0000\n"
+"PO-Revision-Date: 2020-09-21 10:53+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
 "projects/kix18/backend-app/de/>\n"
@@ -830,30 +830,38 @@ msgstr ""
 msgid ""
 "(Optional) The channel of the new article. \"note\" will be used if omitted."
 msgstr ""
+"(Optional) Der Kanal des neuen Artikels. \"Notiz\" wird automatisch gesetzt, "
+"wenn hier kein Wert gewählt wird."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
 "(Optional) The email address of the sender for the new article. Agent data "
 "will be used if omitted."
 msgstr ""
+"(Optional) Die E-Mail Adresse des Senders dieses neuen Artikels. Die Daten "
+"des Agenten werden benutzt, wenn hier nichts eingegeben wird."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) The email addresses of the Bcc receiver of the new article."
 msgstr ""
+"(Optional) Die E-Mail Adressen der \"Bcc\"-Empfänger des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) The email addresses of the Cc receiver of the new article."
 msgstr ""
+"(Optional) Die E-Mail Adresssen der \"Cc\"-Empfänger des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) The email addresses of the receiver of the new article."
-msgstr ""
+msgstr "(Optional) Die E-Mail Adressen der Empfänger des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
 "(Optional) The sender type of the new article. \"agent\" will be used if "
 "omitted."
 msgstr ""
+"(Optional) Der Sender-Typ des neuen Artikels. \"Agent\" wird genutzt, wenn "
+"hier nichts gewählt wird."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Account Time"
@@ -863,6 +871,8 @@ msgstr "Zeit buchen"
 msgid ""
 "An integer value which will be accounted for the new article (as minutes)."
 msgstr ""
+"Ein ganzzahliger Wert, welcher für den neuen Artikel gebucht wird (in "
+"Minuten)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Bcc"
@@ -898,7 +908,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The subject of the new article."
-msgstr ""
+msgstr "Der Betreff des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The text of the new article."
@@ -915,7 +925,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
 msgid "The ID or email of the contact to be set."
-msgstr ""
+msgstr "Die ID oder E-Mail Adresse des Kontakes, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Dynamic Field Name"
@@ -932,10 +942,18 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "The name of the dynamic field."
 msgstr ""
+"Der Name (=interner Bezeichner) des dynamischen Feldes, welches gesetzt "
+"werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "The value for the dynamic field to be set."
 msgstr ""
+"Der \"value\" des dynamischen Feldes, welches gesetzt werden soll. Feldtyp \""
+"Selection\" erwartet den \"key\" des zu setzenden Wertes, Feldtyp \""
+"AssetReference\" erwartet die Asset ID, Feldtyp \"TicketReference\" erwartet "
+"die Ticket ID, Feldtyp \"Checklist\" erwartet das entsprechende JSON-Format, "
+"Feldtyp \"Date\" erwartet das Format <YYYY-MM-DD 00:00:00>, Feldtyp \""
+"DateTime\" das Format <YYYY-MM-DD hh:mm:ss>."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Asset Reference Dynamic Field"
@@ -949,6 +967,8 @@ msgstr ""
 msgid ""
 "Fetch value from attachments and use them to set dynamic fields of ticket."
 msgstr ""
+"Rufen Sie Werte von Assets ab, um diese in dynamischen Feldern an Tickets zu "
+"setzen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Force"
@@ -959,14 +979,21 @@ msgid ""
 "If set the dynamic field values will be overwritten whether or not the asset "
 "atribute is empty or the dynamic field has already a value."
 msgstr ""
+"Wenn gesetzt, wird das dynamische Feld überschrieben, egal ob das "
+"entsprechende Asset Attribut leer ist oder das dynamische Feld bereits einen "
+"Wert enthält."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "The mapping which asset attribute will set which ticket dynamic field."
 msgstr ""
+"Mapping, welches Asset Attribut in welches dynamische Feld gespeichert wird. "
+"Erwartetes Format: \"<WriteToDFKey> - <AssetAttributeKey>\""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "The name of the dynamic field which contains the relevant asset ID."
 msgstr ""
+"Der Name des dynamischen Feldes, welcher die Asset ID enthält, die verwendet "
+"werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "Sets the lock state of a ticket."
@@ -975,6 +1002,8 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "The lock state to be set."
 msgstr ""
+"Der Name des Sperrstatus, der gesetzt werden soll. (Achtung: Übersetzungen "
+"des Namens sind nicht möglich)"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
 msgid "Sets the organisation of a ticket."
@@ -982,7 +1011,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
 msgid "The ID or number of the organisation to be set."
-msgstr ""
+msgstr "Die ID oder KNR des Kunden, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
 msgid "Sets the owner of a ticket."
@@ -995,6 +1024,8 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/PrioritySet.pm
 msgid "The name of the priority to be set."
 msgstr ""
+"Der Name der Priorität, die gesetzt werden soll. (Achtung: Übersetzungen des "
+"Namens sind nicht möglich)"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
 msgid "Sets the responsible of a ticket."
@@ -1002,7 +1033,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
 msgid "The ID or login of the agent to be set."
-msgstr ""
+msgstr "Die ID oder der Login des Agenten, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "Sets the state of a ticket."
@@ -1011,6 +1042,8 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "The name of the state to be set."
 msgstr ""
+"Der Name des Status, der gesetzt wird. (Achtung: Übersetzungen des Namens "
+"sind nicht möglich)"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
 msgid "Sets the team of a ticket."
@@ -1018,13 +1051,16 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
 msgid "The name of the team to be set."
-msgstr ""
+msgstr "Der Name des Teams, das gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
 "(Optional) The pending time in seconds. Will be added to the actual time "
 "when the macro action is executed. Used for pending states only."
 msgstr ""
+"(Optional) Warten-Zeit in Sekunden. Wird zum jeweiligen Zeitpunkt addiert, "
+"zu dem die Macro Action ausgeführt wird. Wird nur für Status vom Statustyp \""
+"Warten\" genutzt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Creates an ticket."
@@ -1048,7 +1084,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Pending Time Difference"
-msgstr ""
+msgstr "\"Warten\" - Zeitdifferenz"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Priority"
@@ -1068,7 +1104,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID or email of the contact of the new ticket."
-msgstr ""
+msgstr "Die ID oder E-Mail Adresse des Kontaktes für das neue Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1081,42 +1117,50 @@ msgid ""
 "The ID or login of the responsible of the new ticket. Root user (ID = 1) "
 "will be used if omitted."
 msgstr ""
+"Die ID oder Login des Agenten, der als Verantwortlicher an dem neuen Ticket "
+"gesetzt werden soll. Wenn leer, wird \"root\" (ID=1) gesetzt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
 "The ID or number of the organisation of the new ticket. Primary organisation "
 "of contact will be used if omitted."
 msgstr ""
+"ID oder KNR des Kunden des neuen Tickets. Wenn nicht ausgefüllt, wird der "
+"primäre Kunde des Kontakes genutzt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The dynamic fields of the new ticket."
-msgstr ""
+msgstr "Die dynamischen Felder, die an dem neuen Ticket gesetzt werden sollen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The lock state of the new ticket."
-msgstr ""
+msgstr "Der Name des Sperrstatus des neuen Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The name of the priority of the new ticket."
 msgstr ""
+"Der Name der Priorität des neuen Tickets. (Achtung: Übersetzungen des Namens "
+"sind nicht möglich)"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The name of the state of the new ticket."
-msgstr ""
+msgstr "Der Name des Status für das neue Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The name of the team of the new ticket."
-msgstr ""
+msgstr "Der Name des Teams für das neue Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
 "The name of the type of the new ticket. Configured default will be used "
 "(Ticket::Type::Default) if omitted."
 msgstr ""
+"Der Name des Typs für das neue Ticket. Wenn nicht gefüllt, wird der "
+"konfigurierte Default des Systems genutzt (Ticket::Type::Default)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The title of the new ticket and subject of the first article."
-msgstr ""
+msgstr "Der Titel des neuen Tickets und Betreff des ersten Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "Sets the title of a ticket."
@@ -1124,7 +1168,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "The new title of a ticket to be set."
-msgstr ""
+msgstr "Der neue Titel der Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "Title"
@@ -1136,7 +1180,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TypeSet.pm
 msgid "The name of the type to be set."
-msgstr ""
+msgstr "Der Name des Typs, der gesetzt wird."
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "Configuration Options Reference"
