@@ -912,10 +912,12 @@ sub ContactSearch {
         $Valid = 0;
     }
 
+    $Param{OrganisationIDs} = join(',',$Param{OrganisationIDs}) if ($Param{OrganisationIDs} && IsArrayRefWithData($Param{OrganisationIDs}));
+
     # check cache
     my $CacheKey = "ContactSearch::${Valid}::";
     foreach my $Key (
-        qw(OrganisationIDs AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals EmailIn)
+        qw(OrganisationIDs OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals EmailIn)
     ) {
         $CacheKey .= '::'.($Param{$Key} || '');
     }
