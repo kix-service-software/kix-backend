@@ -9,7 +9,7 @@ Feature: POST request /contacts resource
     Given a organisation
     When added a contact
     Then the response code is 201
-    Then the response object is ContactPostPatchResponse
+#    Then the response object is ContactCollectionResponse
     When I delete this contact
     Then the response code is 204
     When I delete this organisation

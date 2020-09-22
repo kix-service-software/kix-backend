@@ -15,3 +15,14 @@ Feature: POST request to the /system/automation/macros/:MacroID/actions resource
     When I delete this automation macro
     Then the response code is 204
 
+  Scenario: create a automation macro action (error)
+    Given a automation macro without action
+    Then the response code is 201
+    When I create a automation macro action with no ContactEmailOrID
+    Then the response code is 400
+    And the response object is Error
+    And the error code is "Object.UnableToCreate"
+    And the error message is "Could not create item, please contact the system administrator."
+    When I delete this automation macro
+    Then the response code is 204
+

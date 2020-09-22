@@ -47,7 +47,6 @@ Feature: GET request to the /system/cmdb/classes resource
     And the response contains the following items of type ConfigItemClass
       | Name     |
       | Software |
-      | Service  |
       | Room     |
       | Network  |
       | Location |

@@ -29,6 +29,7 @@ require '_StepsLib.pl';
 # feature specific steps 
 
 When qr/I query the cmdb collection of configitem historys$/, sub {
+   print STDERR "ConfigItemID_pl".Dumper(S->{ConfigItemID});
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}.'/history',

@@ -13,7 +13,6 @@
   Scenario: get the list of existing console command filter
     When I query the collection of console with filter command "Console::Command::Maint::Ticket::UnlockTicket"
     Then the response code is 200
-#    And the response object is ConsoleCommandCollectionResponse
     And the response contains the following items of type ConsoleCommand
       | Command                                       |
       | Console::Command::Maint::Ticket::UnlockTicket |

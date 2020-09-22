@@ -7,7 +7,10 @@ Feature: GET request to the /cmdb/configitems/:ConfigItemID/history/:HistoryID r
       
   Scenario: get an existing history
     Given a configitem
+Then the response content is
     When I query the cmdb collection of configitem historys
+    Then the response content is
+    Then the response content history is
     When I get this configitem history
     Then the response code is 200
 #    And the response object is ConfigItemHistoryResponse

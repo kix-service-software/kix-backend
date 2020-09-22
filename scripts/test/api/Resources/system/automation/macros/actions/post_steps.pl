@@ -124,3 +124,26 @@ When qr/I create a automation macro action$/, sub {
    );
 };
 
+When qr/I create a automation macro action with no ContactEmailOrID$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/automation/macros/'.S->{MacroID}.'/actions',
+        Token   => S->{Token},
+        Content => {
+            MacroAction => {
+                Comment => "some comment create action".rand(),
+                MacroID => S->{MacroID},
+                Parameters => {
+                    Body => "The text of the new article.",
+                    Priority => "5 very low",
+                    State => "new",
+                    Team => "Service Desk",
+                    Title => "Test macro actions"
+                },
+                Type => "TicketCreate",
+                ValidID => 1
+            }
+        }
+    );
+};
+
+

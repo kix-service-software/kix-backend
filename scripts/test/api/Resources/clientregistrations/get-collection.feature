@@ -9,6 +9,7 @@
     Given 8 of clientregistrations
     When I query the collection of clientregistration
     Then the response code is 200
+#    Then the response object is ClientRegistrationCollectionResponse
     When delete all this clientregistrations
     Then the response code is 204
     And the response has no content

@@ -101,3 +101,37 @@ Then qr/the response contains the following items Class ITSM::Core::IncidentStat
         $Index++
     }
 };
+
+Then qr/the response contains (\d+) items type GeneralCatalogItem of Class (.*?)$/, sub {
+    my @GeneralCatalogItem;
+
+    foreach my $Row ( @{S->{ResponseContent}->{GeneralCatalogItem}} ) {
+        if ($Row->{Class} eq $2) {
+            push (@GeneralCatalogItem, $Row->{Name});
+        }
+    }
+
+    is(@GeneralCatalogItem, $1, 'Check response item count');
+    my $Anzahl = @GeneralCatalogItem;
+};
+
+Then qr/the response contains the following items Class (.*?) of type GeneralCatalogItem$/, sub {
+    my $Object = "GeneralCatalogItem";
+    my $Index = 0;
+    my @GeneralCatalogItem;
+
+    foreach my $Row ( @{S->{ResponseContent}->{GeneralCatalogItem}} ) {
+        if ($Row->{Class} eq $1) {
+            push (@GeneralCatalogItem, $Row);
+        }
+    }
+
+    S->{ResponseContent}->{GeneralCatalogItem} = \@GeneralCatalogItem;
+
+    foreach my $Row ( @{ C->data } ) {
+        foreach my $Attribute ( keys %{$Row}) {
+            C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+        }
+        $Index++
+    }
+};
