@@ -4661,8 +4661,10 @@ sub TicketAccountedTimeGet {
 
     my $AccountedTime = 0;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Row[0] =~ s/,/./g;
-        $AccountedTime = $AccountedTime + int($Row[0]);
+        if (@Row && $Row[0]) {
+            $Row[0] =~ s/,/./g;
+            $AccountedTime = $AccountedTime + int($Row[0]);
+        }
     }
 
     return $AccountedTime;
