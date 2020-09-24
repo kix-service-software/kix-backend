@@ -9,7 +9,7 @@
     When I query the collection of faq articles keywords
     Then the response code is 200
 Then the response content is
-    Then the response contains 3 items of type "FAQKeyword"
+    Then the response contains 1 items of type "FAQKeyword"
     And the response contains the following items of type FAQKeyword
       | Keyword |
       | sprache |
