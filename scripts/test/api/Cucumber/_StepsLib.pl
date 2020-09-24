@@ -139,7 +139,10 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 
     foreach my $Row ( @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
-            C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+            if (!defined($Row->{$Attribute})) {
+                $Row->{$Attribute} = '-';
+                C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+            }
         }
         $Index++
     }
@@ -150,7 +153,13 @@ Then qr/the response content is$/, sub {
 	print STDERR Dumper(S->{ResponseContent});
 };
 
+#=============================================================
 
+Then qr/the response content history is$/, sub {
+    S->{HistoryEntryID} = S->{ResponseContent}->{ConfigItemHistoryItem}->[0]->{HistoryEntryID};
+#	print STDERR "HistoryEntryID".Dumper(S->{ResponseContent}->{ConfigItemHistoryItem}->[0]->{HistoryEntryID});
+#    print STDERR "HistoryEntryIDxxx".Dumper(S->{HistoryEntryID});
+};
 
 1;
 
