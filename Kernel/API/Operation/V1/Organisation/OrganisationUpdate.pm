@@ -88,6 +88,9 @@ sub ParameterDefinition {
             Type     => 'HASH',
             Required => 1
         },
+        'Organisation::Zip' => {
+            Type     => 'STRING'
+        }
     }
 }
 

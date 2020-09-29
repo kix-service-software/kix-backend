@@ -154,8 +154,15 @@ Returns:
         Name    => 'Agent::Move',
         Data => {
             Events => [ 'TicketQueueUpdate' ],
-            ...
-            Queue => [ 'SomeQueue' ],
+        },
+        Filter => {
+            AND => [
+                {
+                    Field => 'QueueID',
+                    Operator => 'EQ',
+                    Value => 1,
+                }
+            ]
         },
         Message => {
             en => {
@@ -197,7 +204,7 @@ sub NotificationGet {
 
     # general query structure
     my $SQL = '
-        SELECT id, name, valid_id, comments, create_time, create_by, change_time, change_by
+        SELECT id, name, filter, valid_id, comments, create_time, create_by, change_time, change_by
         FROM notification_event
         WHERE ';
 
@@ -220,15 +227,23 @@ sub NotificationGet {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Data{ID}         = $Row[0];
         $Data{Name}       = $Row[1];
-        $Data{ValidID}    = $Row[2];
-        $Data{Comment}    = $Row[3];
-        $Data{CreateTime} = $Row[4];
-        $Data{CreateBy}   = $Row[5];
-        $Data{ChangeTime} = $Row[6];
-        $Data{ChangeBy}   = $Row[7];
+        $Data{Filter}     = $Row[2];
+        $Data{ValidID}    = $Row[3];
+        $Data{Comment}    = $Row[4];
+        $Data{CreateTime} = $Row[5];
+        $Data{CreateBy}   = $Row[6];
+        $Data{ChangeTime} = $Row[7];
+        $Data{ChangeBy}   = $Row[8];
     }
 
     return if !%Data;
+
+    if ( $Data{Filter} ) {
+        # decode JSON
+        $Data{Filter} = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Data{Filter}
+        );
+    }
 
     # get notification event item data
     $DBObject->Prepare(
@@ -274,8 +289,15 @@ adds a new notification to the database
         Name => 'Agent::OwnerUpdate',
         Data => {
             Events => [ 'TicketQueueUpdate' ],
-            ...
-            Queue => [ 'SomeQueue' ],
+        },
+        Filter => {
+            AND => [
+                {
+                    Field => 'QueueID',
+                    Operator => 'EQ',
+                    Value => 1,
+                }
+            ]
         },
         Message => {
             en => {
@@ -353,14 +375,22 @@ sub NotificationAdd {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
+    # prepare filter as JSON
+    my $Filter;
+    if ( $Param{Filter} ) {
+        $Filter = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{Filter}
+        );
+    }
+
     # insert data into db
     return if !$DBObject->Do(
         SQL => '
             INSERT INTO notification_event
-                (name, valid_id, comments, create_time, create_by, change_time, change_by)
-            VALUES (?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+                (name, filter, valid_id, comments, create_time, create_by, change_time, change_by)
+            VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{ValidID}, \$Param{Comment},
+            \$Param{Name}, \$Filter, \$Param{ValidID}, \$Param{Comment},
             \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -440,8 +470,15 @@ update a notification in database
         Name    => 'Agent::OwnerUpdate',
         Data => {
             Events => [ 'TicketQueueUpdate' ],
-            ...
-            Queue => [ 'SomeQueue' ],
+        },
+        Filter => {
+            AND => [
+                {
+                    Field => 'QueueID',
+                    Operator => 'EQ',
+                    Value => 1,
+                }
+            ]
         },
         Message => {
             en => {
@@ -507,16 +544,24 @@ sub NotificationUpdate {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
+    # prepare filter as JSON
+    my $Filter;
+    if ( $Param{Filter} ) {
+        $Filter = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{Filter}
+        );
+    }
+
     # update data in db
     return if !$DBObject->Do(
         SQL => '
             UPDATE notification_event
-            SET name = ?, valid_id = ?, comments = ?, change_time = current_timestamp, change_by = ?
+            SET name = ?, filter = ?, valid_id = ?, comments = ?, change_time = current_timestamp, change_by = ?
             WHERE id = ?',
         Bind => [
-            \$Param{Name},    \$Param{ValidID},
-            \$Param{Comment}, \$Param{UserID},
-            \$Param{ID},
+            \$Param{Name},    \$Filter,
+            \$Param{ValidID}, \$Param{Comment},
+            \$Param{UserID},  \$Param{ID},
         ],
     );
 

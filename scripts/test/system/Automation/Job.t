@@ -213,7 +213,9 @@ my $JobID = $AutomationObject->JobAdd(
     Name    => 'job-with-filter-'.$NameRandom,
     Type    => 'Ticket',
     Filter  => {
-        Dummy => [ 'this is a test' ]
+        AND => [
+            { Field => 'Dummy', Operator => 'EQ', Value => 'this is a test' }
+        ]
     },
     ValidID => 1,
     UserID  => 1,
@@ -232,7 +234,9 @@ my %Job = $AutomationObject->JobGet(
 $Self->IsDeeply(
     $Job{Filter},
     {
-        Dummy => [ 'this is a test' ]
+        AND => [
+            { Field => 'Dummy', Operator => 'EQ', Value => 'this is a test' }
+        ]
     },
     'JobGet() for new job with filter',
 );
@@ -242,8 +246,10 @@ my $Result = $AutomationObject->JobUpdate(
     ID => $JobID,
     %Job,
     Filter  => {
-        Dummy => [ 'this is a test' ],
-        Dummy2 => [ 'this is a second test' ]
+        AND => [
+            { Field => 'Dummy', Operator => 'EQ', Value => 'this is a test' },
+            { Field => 'Dummy2', Operator => 'EQ', Value => 'this is a second test' }
+        ]
     },
     UserID  => 1,
 );
