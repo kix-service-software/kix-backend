@@ -117,7 +117,6 @@ perform TicketUpdate Operation. This will return the updated TicketID
                 ContactID      => 'some customer user login',                   # optional
                 OrganisationID => 'some customer',                              # optional
                 PendingTime   => '2011-12-03 23:05:00',                         # optional
-                TimeUnit      => 123                                            # optional
                 DynamicFields => [                                              # optional
                     {
                         Name   => 'some name',
@@ -604,17 +603,6 @@ sub _TicketUpdate {
                 Message => 'Unable to update ticket, please contact system administrator!',
             );
         }
-    }
-
-    # time accounting
-    if ( $Ticket->{TimeUnit} ) {
-
-        # add new entry (no edit of accounted time)
-        $TicketObject->TicketAccountTime(
-            TicketID  => $Param{TicketID},
-            TimeUnit  => $Ticket->{TimeUnit},
-            UserID    => $Param{UserID},
-        );
     }
 
     # set dynamic fields

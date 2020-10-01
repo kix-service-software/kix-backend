@@ -65,27 +65,25 @@ sub Run {
 
     my %Translatables;
 
-    %Translatables = ( %Translatables, $Self->_ExtractFromTemplateFiles );
-    %Translatables = ( %Translatables, $Self->_ExtractFromPerlFiles );
-    %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
+    %Translatables = ( $Self->_ExtractFromTemplateFiles, %Translatables );
+    %Translatables = ( $Self->_ExtractFromPerlFiles, %Translatables );
+    %Translatables = ( $Self->_ExtractFromXMLFiles(
         Directory => "$Self->{Home}/scripts/database",
         Source    => "Database",
-    ));
-    %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
+    ), %Translatables);
+    %Translatables = ( $Self->_ExtractFromXMLFiles(
         Directory => "$Self->{Home}/Kernel/Config/Files",
         Source    => "SysConfig",
-    ));
-    %Translatables = ( %Translatables, $Self->_ExtractFromXMLFiles(
+    ), %Translatables);
+    %Translatables = ( $Self->_ExtractFromXMLFiles(
         Directory => "$Self->{Home}/update",
         Source    => "Update",
-    ));
+    ), %Translatables);
 
     $Self->Print(sprintf "\nextracted %i Translatables\n", (scalar keys %Translatables));
 
-    my $Items;
     {
         $DisableWarnings = 1;
-        $Items = Locale::PO->load_file_ashash($Self->{POTFile});
         my $ManualItems = Locale::PO->load_file_ashash($Self->{POTFile} . '.manual');
         $DisableWarnings = 0;
 

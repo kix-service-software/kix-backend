@@ -447,6 +447,7 @@
     <Column Name="timeout" Required="true" Type="INTEGER"/>
     <Column Name="until_time" Required="true" Type="INTEGER"/>
     <Column Name="archive_flag" Required="true" Default="0" Type="SMALLINT"/>
+    <Column Name="accounted_time" Required="false" Type="INTEGER"/>
     <Column Name="create_time_unix" Required="true" Type="BIGINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
@@ -1342,6 +1343,7 @@
 <Table Name="notification_event">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

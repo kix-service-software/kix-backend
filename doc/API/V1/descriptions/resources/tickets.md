@@ -4,4 +4,4 @@ In addition to its sub-resources and generic includes this resource supports the
 
 |Include|Description|
 |-|-|
-|```AccountedTime```|Adds the sum of all time units of the ticket and its articles|
+|```AccountedTime```|Adds the sum of all time units for the ticket (its articles)|

@@ -50,6 +50,10 @@ sub GetSupportedAttributes {
 
     return {
         Search => [
+            'ArticleID',
+            'ChannelID',
+            'SenderTypeID',
+            'CustomerVisible',
             'From',
             'To',
             'Cc',
@@ -58,6 +62,9 @@ sub GetSupportedAttributes {
             'ArticleCreateTime'
         ],
         Sort => [
+            'ChannelID',
+            'SenderTypeID',
+            'CustomerVisible',
             'From',
             'To',
             'Cc',
@@ -100,6 +107,10 @@ sub Search {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
+        'ArticleID'         => 'id',
+        'ChannelID'         => 'channel_id',
+        'SenderTypeID'      => 'article_sender_type_id',
+        'CustomerVisible'   => 'customer_visible',
         'From'              => 'a_from',
         'To'                => 'a_to',
         'Cc'                => 'a_cc',
@@ -158,6 +169,38 @@ sub Search {
             push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
         }
     }
+    elsif ( $Param{Search}->{Field} =~ /ArticleID|ChannelID|SenderTypeID|CustomerVisible/ ) {
+
+        my %OperatorMap = (
+            'EQ'  => '=',
+            'LT'  => '<',
+            'GT'  => '>',
+            'LTE' => '<=',
+            'GTE' => '>=',
+            'IN'  => 'IN',
+        );
+
+        if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
+            );
+            return;
+        }
+
+        # prepare Value if needed
+        my $Value = $Param{Search}->{Value};
+        if ( $OperatorMap{$Param{Search}->{Operator}} eq 'IN' ) {
+            $Value = '('.(join(',', @{$Value})).')';
+        }
+
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, 'art_left.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+            push( @SQLWhere, 'art_right.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+        } else {
+            push( @SQLWhere, 'art.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+        }
+    }
     else {
         my $Field      = $AttributeMapping{$Param{Search}->{Field}};
         my $FieldValue = $Param{Search}->{Value};
@@ -207,7 +250,7 @@ sub Search {
             push( @SQLWhere, $Where[0] . ' LIKE ' . $Where[1] );
         }
     }
-    
+
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {
         if ( $Param{BoolOperator} eq 'OR') {
@@ -221,7 +264,7 @@ sub Search {
     return {
         SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
-    };        
+    };
 }
 
 =item Sort()
@@ -244,6 +287,10 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
+        'ArticleID'         => 'art.id',
+        'ChannelID'         => 'art.channel_id',
+        'SenderTypeID'      => 'art.sender_type_id',
+        'CustomerVisible'   => 'art.customer_visible',
         'From'              => 'art.a_from',
         'To'                => 'art.a_to',
         'Cc'                => 'art.a_cc',

@@ -160,6 +160,7 @@ sub Run {
         Name    => $Notification->{Name},
         Comment => $Notification->{Comment} || '',
         Data    => $Notification->{Data} || {},
+        Filter  => $Notification->{Filter} || undef,
         Message => $Notification->{Message} || {},
         ValidID => $Notification->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},

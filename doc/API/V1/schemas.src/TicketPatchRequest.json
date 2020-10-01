@@ -44,10 +44,6 @@
         "StateID": {
           "type": "integer"
         },
-        "TimeUnit" : {
-          "type" : "integer",
-          "description": "Value will be combined with existing value for this ticket (negative values are possible)."
-        },
         "Title": {
           "type": "string"
         },

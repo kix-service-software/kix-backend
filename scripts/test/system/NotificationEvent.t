@@ -56,7 +56,11 @@ my @Tests = (
             Comment => 'Just something for test',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -101,7 +105,11 @@ my @Tests = (
             Comment => 'Just something for test',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             ValidID => 1,
         },
@@ -116,7 +124,11 @@ my @Tests = (
             Comment => 'Just something for test',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -143,7 +155,11 @@ my @Tests = (
             Comment => 'Just something for test',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -170,7 +186,11 @@ my @Tests = (
             Comment => 'Just something for test',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -197,7 +217,11 @@ my @Tests = (
             Comment => 'Just something for test',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -219,7 +243,11 @@ my @Tests = (
             Comment => 'This is a test comment.',
             Data    => {
                 Events => [ 'AnEventForThisTest' . $RandomID ],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -246,7 +274,11 @@ my @Tests = (
             Comment => 'This is a test comment.',
             Data    => {
                 Events => [ 'AnEventForThisTest' . $RandomID ],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -274,7 +306,11 @@ my @Tests = (
             Comment => 'This is a test comment.',
             Data    => {
                 Events => [ 'AnEventForThisTest' . $RandomID ],
-                Queue  => ['SomeQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -296,7 +332,11 @@ my @Tests = (
             Comment => 'Just something for test modified',
             Data    => {
                 Events => [ 'AnEventForThisTest' . $RandomID ],
-                Queue  => ['ADifferentQueue'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeOtherQueue' },
+                ]
             },
             Message => {
                 en => {
@@ -324,7 +364,11 @@ my @Tests = (
             Comment => 'Just something for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -346,7 +390,11 @@ my @Tests = (
             Comment => 'Just something modified for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events => [ 'AnEventForThisTest' . $RandomID ],
-                Queue  => ['ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -372,7 +420,11 @@ my @Tests = (
             Comment => 'Just something for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events => ['TicketQueueUpdate'],
-                Queue  => ['SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -394,7 +446,11 @@ my @Tests = (
             Comment => 'Just something modified for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events => [ 'AnEventForThisTest' . $RandomID ],
-                Queue  => ['ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -420,8 +476,12 @@ my @Tests = (
             Comment => 'Just something for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events           => ['TicketQueueUpdate'],
-                Queue            => ['SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
                 NotificationType => ['Ticket'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -443,8 +503,12 @@ my @Tests = (
             Comment => 'Just something modified for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events           => [ 'AnEventForThisTest' . $RandomID ],
-                Queue            => ['ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
                 NotificationType => ['Ticket'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -470,8 +534,12 @@ my @Tests = (
             Comment => 'Just something for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events           => ['TicketQueueUpdate'],
-                Queue            => ['SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
                 NotificationType => ['UnitTestType'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -493,8 +561,12 @@ my @Tests = (
             Comment => 'Just something modified for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events           => [ 'AnEventForThisTest' . $RandomID ],
-                Queue            => ['ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
                 NotificationType => ['UnitTestType'],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -520,8 +592,12 @@ my @Tests = (
             Comment => 'Just something for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events           => ['TicketQueueUpdate'],
-                Queue            => ['SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
                 NotificationType => [ 'UnitTestType' . $RandomID ],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'SomeQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
@@ -543,8 +619,12 @@ my @Tests = (
             Comment => 'Just something modified for test-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ',
             Data    => {
                 Events           => [ 'AnEventForThisTest' . $RandomID ],
-                Queue            => ['ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ'],
                 NotificationType => [ 'UnitTestType' . $RandomID ],
+            },
+            Filter => {
+                AND => [
+                    { Field => 'Queue', Operator => 'EQ', Value => 'ADifferentQueue-äüßÄÖÜ€исáéíúúÁÉÍÚñÑ' },
+                ]
             },
             Message => {
                 en => {
