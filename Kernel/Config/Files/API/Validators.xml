@@ -63,7 +63,7 @@
                 <Item Key="Module">Kernel::API::Validator::ContactValidator</Item>
                 <Item Key="Validates">ContactID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(ContactGet|ContactCreate|ContactUpdate|NotificationCreate|NotificationUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(ContactGet|ContactDelete|ContactCreate|ContactUpdate|NotificationCreate|NotificationUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

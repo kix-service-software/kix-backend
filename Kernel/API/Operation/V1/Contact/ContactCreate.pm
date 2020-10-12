@@ -83,10 +83,10 @@ sub ParameterDefinition {
         'Contact' => {
             Type     => 'HASH',
             Required => 1
-        },          
+        },
         'Contact::Firstname' => {
             Required => 1
-        },            
+        },
         'Contact::Lastname' => {
             Required => 1
         },
@@ -107,10 +107,10 @@ perform ContactCreate Operation. This will return the created ContactID.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            ContactID  => '',                       # ContactID 
+            ContactID  => '',                       # ContactID
         },
     };
 
@@ -179,18 +179,9 @@ sub Run {
     }
 
     if (IsArrayRefWithData($Contact->{OrganisationIDs})) {
-        my @OrgIDs;
-        # check if primary OrganisationID is contained in assigned OrganisationIDs
-        @OrgIDs = @{$Contact->{OrganisationIDs}};
-        if (!grep /$Contact->{PrimaryOrganisationID}/, @OrgIDs) {
-            return $Self->_Error(
-                Code    => 'BadRequest',
-                Message => 'Validation failed. Primary organisation ID "' . $Contact->{PrimaryOrganisationID} .
-                    '" is not available in assigned organisation IDs "' . (join(", ", @OrgIDs)) . '".',
-            );
-        }
+
         # check if each assigned orga exists and is valid
-        foreach my $OrgID (@OrgIDs) {
+        foreach my $OrgID ( @{ $Contact->{OrganisationIDs} } ) {
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
@@ -200,6 +191,11 @@ sub Run {
                     Message => 'Validation failed. No valid organisation found for assigned organisation ID "' . $OrgID . '".',
                 );
             }
+        }
+
+        # check if primary OrganisationID is contained in assigned OrganisationIDs
+        if ($Contact->{PrimaryOrganisationID} && !grep /$Contact->{PrimaryOrganisationID}/, @{ $Contact->{OrganisationIDs } } ) {
+            push(@{ $Contact->{OrganisationIDs} }, $Contact->{PrimaryOrganisationID});
         }
     }
     else {
@@ -211,18 +207,18 @@ sub Run {
         %{$Contact},
         ValidID         => $Contact->{ValidID} || 1,
         UserID          => $Self->{Authorization}->{UserID},
-    );    
+    );
     if ( !$ContactID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create Contact, please contact the system administrator',
         );
     }
-    
+
     return $Self->_Success(
         Code   => 'Object.Created',
         ContactID => 0 + $ContactID,
-    );    
+    );
 }
 
 1;
