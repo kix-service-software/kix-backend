@@ -65,9 +65,6 @@ sub RunOperation {
         );
     }
 
-    # reset inversion of permission filter
-    $Self->{InvertPermissionFilter} = 0;
-
     # check user permissions based on property values
     # UserID 1 has God Mode if SecureMode isn't active
     # also ignore all this if we have been told to ignore permissions
@@ -1301,18 +1298,19 @@ sub _ApplyFilter {
     my $Filter = $Param{Filter} || $Self->{Filter};
 
     OBJECT:
-    foreach my $Object ( keys %{$Filter} ) {
+    foreach my $FilterObject ( keys %{$Filter} ) {
+        my $Object = $FilterObject;
         if ( $Object eq '*' ) {
             # wildcard
             $Object = (sort keys %{$Param{Data}})[0];
         }
         my $ObjectData = $Param{Data}->{$Object};
 
-        if ( $Param{IsPermissionFilter} && IsHashRefWithData( $Param{Data}->{$Object} ) ) {
+        if ( $Param{IsPermissionFilter} && IsHashRefWithData( $ObjectData ) ) {
 
             # if we do permission filtering and the relevant object is a hashref then its a request to an item resource
             # we have to prepare something so the filter can handle it
-            $ObjectData = [ $Param{Data}->{$Object} ];
+            $ObjectData = [ $ObjectData ];
         }
         if ( IsArrayRefWithData($ObjectData) ) {
             # ignore lists of scalars
@@ -1325,9 +1323,6 @@ sub _ApplyFilter {
 
             if ( $Param{IsPermissionFilter} ) {
                 $Self->_PermissionDebug( "using permission filter: " . Dumper( $Param{Filter} ) );
-                if ( $Self->{InvertPermissionFilter} ) {
-                    $Self->_PermissionDebug( "inverting permission filter" );
-                }
             }
 
             # filter each contained hash
@@ -1339,11 +1334,11 @@ sub _ApplyFilter {
                     my $Match = 1;
 
                     BOOLOPERATOR:
-                    foreach my $BoolOperator ( keys %{ $Filter->{$Object} } ) {
+                    foreach my $BoolOperator ( keys %{ $Filter->{$FilterObject} } ) {
                         my $BoolOperatorMatch = 1;
 
                         FILTER:
-                        foreach my $FilterItem ( @{ $Filter->{$Object}->{$BoolOperator} } ) {                           
+                        foreach my $FilterItem ( @{ $Filter->{$FilterObject}->{$BoolOperator} } ) {                           
                             my $FilterMatch = 1;
 
                             if ( !$FilterItem->{AlwaysTrue} ) {
@@ -1583,11 +1578,6 @@ sub _ApplyFilter {
                             $Match = 0;
                             last BOOLOPERATOR;
                         }
-                    }
-
-                    if ( $Param{IsPermissionFilter} && $Self->{InvertPermissionFilter} ) {
-                        # invert the match
-                        $Match = !$Match;
                     }
 
                     # all filter criteria match, add to result
@@ -2438,10 +2428,10 @@ sub _CheckObjectPermission {
 
                 # add a NOT filter if we should have no permission (including DENY)
                 if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) {
-                    $Self->{InvertPermissionFilter} = 1;
+                    $Not = 1;
                 }
                 elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                    $Self->{InvertPermissionFilter} = 1;
+                    $Not = 1;
                     # also clear all existing permission filters
                     $Self->_ClearPermissionFilters();
                 }
@@ -2470,7 +2460,6 @@ sub _CheckObjectPermission {
             }
 
             if ( $Self->{RequestMethod} ne 'GET' ) {
-                $Self->{InvertPermissionFilter} = 0;
                 my %ObjectDataToFilter = %{$ObjectData};        # a deref is required here, because the filter method will change the data
 
                 # we use the permission filters in order to apply them to the given object
@@ -2750,42 +2739,6 @@ sub _AddPermissionFilterForObject {
     return %Filter;
 }
 
-sub _ActivatePermissionFilters {
-    my ( $Self, %Param ) = @_;
-
-    $Self->{PermissionFilters} ||= [];
-
-    use Data::Dumper;
-    $Self->_PermissionDebug( "activating permission filters");
-    foreach my $Filter ( @{ $Self->{PermissionFilters} } ) {
-
-        # prepare filter definition
-        my %FilterDef = (
-            Field      => $Filter->{Field},
-            Operator   => $Filter->{Operator},
-            Value      => $Filter->{Value},
-            Not        => $Filter->{Not},
-            AlwaysTrue => $Filter->{AlwaysTrue},
-        );
-
-        my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
-
-# TODO: don't work with search right now because ticket DB search can't cope with the negated Object filters
-        # init filter and search if not done already
-        $Self->{Filter}->{ $Filter->{Object} }->{$Logical} ||= [];
-#        $Self->{Search}->{ $Filter->{Object} }->{$Logical} ||= [];
-
-        # add definition to filters
-        push( @{ $Self->{Filter}->{ $Filter->{Object} }->{$Logical} }, \%FilterDef );
-#        push( @{ $Self->{Search}->{ $Filter->{Object} }->{$Logical} }, \%FilterDef );
-    }
-
-    $Self->_PermissionDebug( "filter after activation of permission filters: " . Dumper( $Self->{Filter} ) );
-    $Self->_PermissionDebug( "search after activation of permission filters: " . Dumper( $Self->{Search} ) );
-
-    return 1;
-}
-
 sub _GetPermissionFilter {
     my ( $Self, %Param ) = @_;
 
@@ -2797,10 +2750,11 @@ sub _GetPermissionFilter {
 
         # prepare filter definition
         my %FilterDef = (
-            Field    => $Filter->{Field},
-            Operator => $Filter->{Operator},
-            Value    => $Filter->{Value},
-            Not      => $Filter->{Not},
+            Field      => $Filter->{Field},
+            Operator   => $Filter->{Operator},
+            Value      => $Filter->{Value},
+            Not        => $Filter->{Not},
+            AlwaysTrue => $Filter->{AlwaysTrue}
         );
 
         my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
