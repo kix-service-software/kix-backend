@@ -44,19 +44,19 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my %RoleList = (
-        'Superuser'        => 1,
-        'System Admin'     => 2,
-        'Agent User'       => 3,
-        'Ticket Reader'    => 4,
-        'Ticket Agent'     => 5,
-        'Ticket Creator'   => 6,
-        'FAQ Reader'       => 7,
-        'FAQ Editor'       => 8,
-        'CMDB Reader'      => 9,
-        'CMDB Maintainer'  => 10,
-        'Customer Reader'  => 11,
-        'Customer Manager' => 12,
-        'Customer'         => 13,
+        'Superuser'              => 1,
+        'System Admin'           => 2,
+        'Agent User'             => 3,
+        'Ticket Reader'          => 4,
+        'Ticket Agent'           => 5,
+        'Webform Ticket Creator' => 6,
+        'FAQ Reader'             => 7,
+        'FAQ Editor'             => 8,
+        'CMDB Reader'            => 9,
+        'CMDB Maintainer'        => 10,
+        'Customer Reader'        => 11,
+        'Customer Manager'       => 12,
+        'Customer'               => 13,
     );
 
     my %PermissionTypeList = (
