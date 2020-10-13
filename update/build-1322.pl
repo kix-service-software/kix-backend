@@ -33,8 +33,6 @@ use vars qw(%INC);
 # updates permissions for role Customer
 _UpdatePermissionsForRoleSystemAdmin();
 
-exit 0;
-
 sub _UpdatePermissionsForRoleSystemAdmin {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
