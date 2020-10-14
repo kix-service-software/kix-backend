@@ -1322,7 +1322,7 @@ sub _ApplyFilter {
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             if ( $Param{IsPermissionFilter} ) {
-                $Self->_PermissionDebug( "using permission filter: " . Dumper( $Param{Filter} ) );
+                $Self->_PermissionDebug($Self->{LevelIndent}, "using permission filter: " . Dumper( $Param{Filter} ) );
             }
 
             # filter each contained hash
@@ -1994,8 +1994,7 @@ sub _ApplyInclude {
                 }
             }
 
-            $Kernel::OM->Get('Cache')
-                ->_Debug( $Self->{LevelIndent}, "    type $Self->{OperationConfig}->{CacheType} has dependencies to: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
+            $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "    type $Self->{OperationConfig}->{CacheType} has dependencies to: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
         }
     }
 
@@ -2312,7 +2311,7 @@ sub _CheckObjectPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/.*?/g;
+        $Target =~ s/\*/\w+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2385,7 +2384,7 @@ sub _CheckObjectPermission {
             foreach my $Part ( @Parts ) {
                 if ( $Part eq $Parts[0] ) {
                     # only print this information once
-                    $Self->_PermissionDebug( sprintf( "found relevant permission (Object) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+                    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf( "found relevant permission (Object) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
                 }
 
                 my ( $Object, $Attribute, $Operator, $Value );
@@ -2409,7 +2408,7 @@ sub _CheckObjectPermission {
                             $Value = \@ValueParts;
                         }
                         else {
-                            $Self->_PermissionDebug( sprintf("Value part of Object permission on target \"%s\" is invalid!", $Permission->{Target}) );
+                            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Value part of Object permission on target \"%s\" is invalid!", $Permission->{Target}) );
                             $Self->_Error(
                                 Code    => 'InternalError',
                                 Message => 'Permission value is invalid!',
@@ -2482,11 +2481,11 @@ sub _CheckObjectPermission {
                             Format => 'Short'
                         );
 
-                        $Self->_PermissionDebug("resulting Object permission: $ResultingPermissionShort");
+                        $Self->_PermissionDebug($Self->{LevelIndent}, "resulting Object permission: $ResultingPermissionShort");
 
                         # check if we have a DENY already
                         if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                            $Self->_PermissionDebug("DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                            $Self->_PermissionDebug($Self->{LevelIndent}, "DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
                             last PERMISSION;
                         }
                     }
@@ -2497,7 +2496,7 @@ sub _CheckObjectPermission {
                     my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission->PERMISSION->{$PermissionName};
 
                     if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
-                        $Self->_PermissionDebug( sprintf("object doesn't match the required criteria - denying request") );
+                        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
 
                         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
                         $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
@@ -2556,7 +2555,7 @@ sub _CheckPropertyPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/.*?/g;
+        $Target =~ s/\*/\w+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2602,7 +2601,7 @@ sub _CheckPropertyPermission {
                 @AttributeList = ( '*' ); 
             }
 
-            $Self->_PermissionDebug( sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+            $Self->_PermissionDebug($Self->{LevelIndent},  sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
 
             foreach my $Attribute (sort @AttributeList) {
                 # init
@@ -2614,7 +2613,7 @@ sub _CheckPropertyPermission {
         # if there is a wildcard permission we need to applay it to all non wildcard permissions
         foreach my $Attribute ( sort keys %AttributePermissions ) {
             next if $Attribute eq '*.*';
-            $AttributePermissions{$Attribute} |= $AttributePermissions{'*.*'};
+            $AttributePermissions{$Attribute} |= $AttributePermissions{'*.*'} || 0;
         }
 
         foreach my $Attribute ( sort keys %AttributePermissions ) {
@@ -2624,7 +2623,7 @@ sub _CheckPropertyPermission {
                 Format => 'Short'
             );
 
-            $Self->_PermissionDebug("resulting Property permission for property \"$Attribute\": $ResultingPermissionShort");
+            $Self->_PermissionDebug($Self->{LevelIndent}, "resulting Property permission for property \"$Attribute\": $ResultingPermissionShort");
 
             if ( $Self->{RequestMethod} eq 'GET' ) {
                 # add attribute to field selector
@@ -2661,7 +2660,7 @@ sub _CheckPropertyPermission {
                 if ( $AttributeExists && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
                     || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} )
                 ) {
-                    $Self->_PermissionDebug( sprintf("request data doesn't match the required criteria - denying request") );
+                    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("request data doesn't match the required criteria - denying request") );
 
                     my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
                     $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
@@ -2713,10 +2712,10 @@ sub _AddPermissionFilterForObject {
             }
         }
         use Data::Dumper;
-        $Self->_PermissionDebug( "adding permission filter: " . Dumper( \%Param ) );
+        $Self->_PermissionDebug($Self->{LevelIndent}, "adding permission filter: " . Dumper( \%Param ) );
     }
     else {
-        $Self->_PermissionDebug( "adding ALWAYS TRUE filter" );
+        $Self->_PermissionDebug($Self->{LevelIndent}, "adding ALWAYS TRUE filter" );
     }
 
     my $Logical = $Param{UseAnd} ? 'AND' : 'OR';
@@ -2839,11 +2838,13 @@ sub _Debug {
 }
 
 sub _PermissionDebug {
-    my ( $Self, $Message ) = @_;
+    my ( $Self, $Indent, $Message ) = @_;
 
     return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
 
-    printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
+    $Indent ||= '';
+
+    printf STDERR "(%5i) %-15s %s%s\n", $$, "[Permission]", $Indent, $Message;
 }
 
 
