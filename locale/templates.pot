@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-09-10 10:24+0000\n"
+"POT-Creation-Date: 2020-10-12 11:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -511,10 +511,6 @@ msgid "Ticket Agent"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Ticket Creator"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
 msgstr ""
 
@@ -567,6 +563,10 @@ msgid "Warning"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Webform Ticket Creator"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Workplace"
 msgstr ""
 
@@ -583,6 +583,10 @@ msgid "allows to change/edit any system configuration found in the Admin-Module,
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to create new tickets by using the \"Customer Portal Light\" webform mechanism"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "allows to login in both frontend- and backend application but does not grant any further permissions"
 msgstr ""
 
@@ -592,10 +596,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "allows to read any asset information in any asset class and allows to READ links"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "allows to read any information required to create a ticket (queues, types, priorities, etc.), allows to create new tickets and allows to CREATE links"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -3712,10 +3712,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module to filter encrypted bodies of incoming messages."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module to generate accounted time ticket statistics."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

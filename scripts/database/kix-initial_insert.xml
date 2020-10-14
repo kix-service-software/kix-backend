@@ -132,8 +132,8 @@
     </Insert>
     <Insert Table="roles">
         <Data Key="id" Type="AutoIncrement">6</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Ticket Creator</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">allows to read any information required to create a ticket (queues, types, priorities, etc.), allows to create new tickets and allows to CREATE links</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Webform Ticket Creator</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows to create new tickets by using the "Customer Portal Light" webform mechanism</Data>
         <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -812,7 +812,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission C____ on /tickets -->
+    <!-- role "Webform Ticket Creator": permission C____ on /tickets -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -823,7 +823,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/ticket -->
+    <!-- role "Webform Ticket Creator": permission _R___ on /system/ticket -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -834,7 +834,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication -->
+    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -845,7 +845,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _____ on /system/communication/* -->
+    <!-- role "Webform Ticket Creator": permission _____ on /system/communication/* -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -856,7 +856,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication/channels -->
+    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication/channels -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -867,7 +867,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication/sendertypes -->
+    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication/sendertypes -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
@@ -878,7 +878,7 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <!-- role "Ticket Creator": permission _R___ on /system/communication/systemaddresses -->
+    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication/systemaddresses -->
     <Insert Table="role_permission">
         <Data Key="role_id">6</Data>
         <Data Key="type_id">1</Data>
