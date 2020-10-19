@@ -134,9 +134,9 @@ sub Run {
                             $SearchParam{EmailEquals} = $Value;
                         } elsif ($SearchItem->{Operator} eq 'IN') {
                             $SearchParam{EmailIn} = $Value;
+                        } else {
+                            $SearchParam{PostMasterSearch} = $Value;
                         }
-                    } elsif ($SearchItem->{Field} eq 'Email') {
-                        $SearchParam{PostMasterSearch} = $Value;
                     } elsif ($SearchItem->{Field} eq 'PrimaryOrganisationID') {
                         $SearchParam{OrganisationID} = $Value;
                     } elsif ($SearchItem->{Field} eq 'UserLogin') {
