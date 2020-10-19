@@ -2,6 +2,6 @@
     "Article": {
         "CustomerVisible": 2,
         "TicketID": 42,
-        "TimeUnits": 6789
+        "TimeUnit": 6789
     }
 }
