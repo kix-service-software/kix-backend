@@ -117,19 +117,6 @@ sub ObjectAttributesGet {
             },
         },
         {
-            Key   => 'DefaultPassword',
-            Name  => 'Password Suffix (pw=login+suffix - only import)',
-            Input => {
-                Type         => 'Text',
-                Required     => 0,
-                Size         => 50,
-                MaxLength    => 250,
-                ValueDefault => $Kernel::OM->Get('Config')->Get(
-                    'UserImport::DefaultPassword',
-                    )
-            },
-        },
-        {
             Key   => 'NumberOfCustomQueues',
             Name  => 'Max. number of Custom Queues',
             Input => {
@@ -663,14 +650,6 @@ sub ImportDataSave {
         # set defaults
         delete $UserData{ID};
 
-        # default UserPw
-        if ( !$UserData{UserPw} || $UserData{UserPw} eq '-' ) {
-            $UserData{UserPw} = $UserData{UserLogin} . (
-                $ObjectData->{DefaultPassword} || $Kernel::OM->Get('Config')->Get(
-                    'UserImport::DefaultPassword'
-                    )
-                )
-        }
         $Result = $Kernel::OM->Get('User')->UserAdd(
             %UserData,
             ChangeUserID => $Param{UserID},
