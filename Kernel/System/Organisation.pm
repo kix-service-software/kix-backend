@@ -136,8 +136,8 @@ sub OrganisationAdd {
     # find ID of new item
     $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT id FROM organisation WHERE number = ?',
-        Bind  => [ 
-            \$Param{Number} 
+        Bind  => [
+            \$Param{Number}
         ],
         Limit => 1,
     );
@@ -151,7 +151,7 @@ sub OrganisationAdd {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
-    );    
+    );
 
     # trigger event
     $Self->EventHandler(
@@ -168,7 +168,7 @@ sub OrganisationAdd {
         Event     => 'CREATE',
         Namespace => 'Organisation',
         ObjectID  => $OrgID,
-    );    
+    );
 
     # return data
     return $OrgID;
@@ -429,8 +429,8 @@ sub OrganisationUpdate {
     }
 
     # check if organisation exists
-    my %Organisation = $Self->OrganisationGet( 
-        ID => $Param{ID} 
+    my %Organisation = $Self->OrganisationGet(
+        ID => $Param{ID}
     );
     if ( !%Organisation ) {
         $Kernel::OM->Get('Log')->Log(
@@ -473,7 +473,7 @@ sub OrganisationUpdate {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
-    );    
+    );
 
     # trigger event
     $Self->EventHandler(
@@ -561,7 +561,6 @@ sub OrganisationSearch {
 
         my @Parts = split /\+/, $Param{Search}, 6;
         for my $Part (@Parts) {
-            $Part = '*' . $Part . '*';
             $Part =~ s/\*/%/g;
             $Part =~ s/%%/%/g;
 
@@ -677,7 +676,7 @@ sub OrganisationDelete {
         SQL  => 'DELETE FROM organisation WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-   
+
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}

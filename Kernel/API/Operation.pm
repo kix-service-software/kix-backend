@@ -337,7 +337,7 @@ sub _CheckPermission {
 
     # return false if access is explicitly denied by token
     if ( !$Access ) {
-        $Self->_PermissionDebug("RequestURI: $Self->{RequestURI}, requested permission: $RequestedPermission --> permission denied by token");
+        $Self->_PermissionDebug($Self->{LevelIndent}, "RequestURI: $Self->{RequestURI}, requested permission: $RequestedPermission --> permission denied by token");
         return;
     }
 
@@ -362,7 +362,7 @@ sub _CheckPermission {
             Format => 'Short'
         );
 
-        $Self->_PermissionDebug(sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $AllowedPermissionShort, ($AllowedPermission||0)));
+        $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $AllowedPermissionShort, ($AllowedPermission||0)));
 
         if ( $Granted ) {
             # build new list of allowed (item) resources
@@ -378,7 +378,7 @@ sub _CheckPermission {
             Value  => $AllowedPermission || 0,
             Format => 'Short'
         );
-        $Self->_PermissionDebug(sprintf("altered RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $AllowedPermissionShort, ($AllowedPermission||0)));
+        $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("altered RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $AllowedPermissionShort, ($AllowedPermission||0)));
     }
 
     my @AllowedMethods;
@@ -394,7 +394,7 @@ sub _CheckPermission {
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
 
     my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-    $Self->_PermissionDebug(sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
+    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
 
     return ($Granted, @AllowedMethods);
 }
@@ -410,11 +410,13 @@ sub _Debug {
 }
 
 sub _PermissionDebug {
-    my ( $Self, $Message ) = @_;
+    my ( $Self, $Indent, $Message ) = @_;
 
     return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
 
-    printf STDERR "(%5i) %-15s %s\n", $$, "[Permission]", $Message;
+    $Indent ||= '';
+
+    printf STDERR "(%5i) %-15s %s%s\n", $$, "[Permission]", $Indent, $Message;
 }
 
 1;

@@ -945,7 +945,6 @@ sub ContactSearch {
 
         my @Parts = split /\+/, $Param{Search}, 6;
         for my $Part (@Parts) {
-            $Part = '*' . $Part . '*';
             $Part =~ s/\*/%/g;
             $Part =~ s/%%/%/g;
 

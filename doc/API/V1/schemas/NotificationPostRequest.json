@@ -28,6 +28,9 @@
                   }
                }
             },
+            "Filter" : {
+               "type" : "object"
+            },
             "Message" : {
                "type" : "object",
                "patternProperties" : {

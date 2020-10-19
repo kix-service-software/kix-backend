@@ -73,7 +73,7 @@ perform OrganisationSearch Operation. This will return a Organisation list.
             Organisation => [
                 {
                 },
-                {                    
+                {
                 }
             ],
         },
@@ -84,27 +84,123 @@ perform OrganisationSearch Operation. This will return a Organisation list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # perform Organisation search
-    my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
-        Valid  => 0,
-    );
+    my %OrgList = ();
 
-    if (IsHashRefWithData(\%OrganisationSearch)) {
-        
+    # TODO: filter search - currently not all properties are possible
+    my %OrgSearch;
+    if ( IsHashRefWithData( $Self->{Search}->{Organisation} ) ) {
+        for my $SearchType ( keys %{ $Self->{Search}->{Organisation} } ) {
+            for my $SearchItem ( @{ $Self->{Search}->{Organisation}->{$SearchType} } ) {
+                next if ($SearchItem->{Operator} eq 'IN');
+                next if ($SearchItem->{Field} !~ m/^(Fulltext|Name|Number)$/);
+
+                if (!$OrgSearch{$SearchType}) {
+                    $OrgSearch{$SearchType} = [];
+                }
+                push( @{$OrgSearch{$SearchType}}, $SearchItem );
+            }
+        }
+    }
+
+    # prepare search if given
+    if ( IsHashRefWithData( \%OrgSearch ) ) {
+        for my $SearchType ( keys %OrgSearch ) {
+            my %SearchTypeResult;
+            for my $SearchItem ( @{ $OrgSearch{$SearchType} } ) {
+                my %SearchResult;
+                next if( !$SearchItem->{Field} );
+
+                # prepare search params..
+                my $Value = $SearchItem->{Value};
+
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
+                    $Value = '*' . $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                    $Value = $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                    $Value = '*' . $Value;
+                } elsif ( $SearchItem->{Operator} eq 'LIKE' ) {
+                    $Value = $Value . '*';
+                    if( $Kernel::OM->Get('Config')->Get('OrganisationSearch::UseWildcardPraefix') ) {
+                        $Value = '*' . $Value;
+                    }
+                }
+
+                my %SearchParam;
+
+                if ($SearchItem->{Field} eq 'Number') {
+                    $SearchParam{Number} = $Value;
+                } elsif ($SearchItem->{Field} eq 'Name') {
+                    $SearchParam{Name} = $Value;
+                } else {
+                    $SearchParam{Search} = $Value;
+                }
+
+                # perform search...
+                %SearchResult = $Kernel::OM->Get('Organisation')->OrganisationSearch(
+                    %SearchParam,
+                    Valid => 0
+                );
+
+                # merge results
+                if ( $SearchType eq 'AND' ) {
+                    if ( !%SearchTypeResult ) {
+                        %SearchTypeResult = %SearchResult;
+                    }
+                    else {
+
+                        # remove aIDs from collected results, not contained in current...
+                        for my $Key ( keys %SearchTypeResult ) {
+                            delete $SearchTypeResult{$Key} if !exists $SearchResult{$Key};
+                        }
+                    }
+                }
+                elsif ( $SearchType eq 'OR' ) {
+                    %SearchTypeResult = (
+                        %SearchTypeResult,
+                        %SearchResult,
+                    );
+                }
+            }
+
+            if ( !%OrgList ) {
+                %OrgList = %SearchTypeResult;
+            } else {
+
+                # combine both results by AND
+                # remove all IDs from type result that we don't have in this search
+                for my $Key ( keys %OrgList ) {
+                    delete $OrgList{$Key} if !exists $SearchTypeResult{$Key};
+                }
+            }
+        }
+    } else {
+
+        # get full organisation list
+        %OrgList = $Kernel::OM->Get('Organisation')->OrganisationSearch(
+            Valid  => 0,
+        );
+    }
+
+
+    if (IsHashRefWithData(\%OrgList)) {
+
         # get already prepared Organisation data from OrganisationGet operation
         my $OrganisationGetResult = $Self->ExecOperation(
             OperationType            => 'V1::Organisation::OrganisationGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                OrganisationID => join(',', sort keys %OrganisationSearch),
+                OrganisationID => join(',', sort keys %OrgList),
             }
         );
         if ( !IsHashRefWithData($OrganisationGetResult) || !$OrganisationGetResult->{Success} ) {
             return $OrganisationGetResult;
         }
 
-        my @ResultList = IsArrayRef($OrganisationGetResult->{Data}->{Organisation}) ? @{$OrganisationGetResult->{Data}->{Organisation}} : ( $OrganisationGetResult->{Data}->{Organisation} );
-        
+        my @ResultList = IsArrayRef($OrganisationGetResult->{Data}->{Organisation}) ?
+            @{$OrganisationGetResult->{Data}->{Organisation}} :
+            ( $OrganisationGetResult->{Data}->{Organisation} );
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Organisation => \@ResultList,

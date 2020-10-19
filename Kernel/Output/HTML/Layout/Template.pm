@@ -127,16 +127,15 @@ sub Output {
         $Param{TemplateFileTT} .= "$Param{TemplateFile}.tt";
     }
 
-    # take templates from string/array
-    elsif ( defined $Param{Template} && ref $Param{Template} eq 'ARRAY' ) {
+    if ( defined $Param{Template} && ref $Param{Template} eq 'ARRAY' ) {
         for ( @{ $Param{Template} } ) {
             $TemplateString .= $_;
         }
-    }
-    elsif ( defined $Param{Template} ) {
+    } elsif ( defined $Param{Template} ) {
         $TemplateString = $Param{Template};
     }
-    else {
+
+    if ( !$Param{TemplateFileTT} && !$TemplateString ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Template or TemplateFile Param!',
@@ -198,7 +197,7 @@ sub Output {
 
     my $Output;
     my $Success = $Self->{TemplateObject}->process(
-        $Param{TemplateFileTT} // \$TemplateString,
+        $TemplateString ? \$TemplateString : $Param{TemplateFileTT},
         {
             Data => $Param{Data} // {},
             global => {

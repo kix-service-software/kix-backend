@@ -94,7 +94,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /contacts                             | 2     | 1      |
       | /links                                | 15    | 1      |
 
-  Scenario: get the list of existing permissions of Ticket Creator
+  Scenario: get the list of existing permissions of Webform Ticket Creator
     When I query the collection of permissions with roleid 6
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
