@@ -229,15 +229,24 @@ sub SendNotification {
             $EmailTemplate = 'Default';
         }
 
+        my $TemplateString = $ConfigObject->Get('Notification::Template');
+        if ($TemplateString =~ /^\s*$/) {
+            $TemplateString = undef;
+        }
+
         # generate HTML
         $Notification{Body} = $LayoutObject->Output(
+            Template     => $TemplateString || undef,
             TemplateFile => "Notification/Email/$EmailTemplate",
             Data         => {
                 TicketID => $Param{TicketID},
                 Body     => $Notification{Body},
-                Subject  => $Notification{Subject},
+                Subject  => $Notification{Subject}
             },
         );
+
+        # remove script tags
+        $Notification{Body} =~ s/<script.*?>.*?<\/script>//gs;
     }
 
     if (
@@ -398,13 +407,13 @@ sub SendNotification {
             TicketID => $Param{TicketID},
         );
         my $QueueID = $Ticket{QueueID};
-        
+
         # get queue
         my %Queue = $QueueObject->QueueGet(
             ID => $QueueID,
         );
 
-        my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress( 
+        my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress(
             QueueID => $QueueID
         );
 
