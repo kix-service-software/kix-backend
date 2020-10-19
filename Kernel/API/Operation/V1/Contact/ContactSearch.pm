@@ -109,20 +109,20 @@ sub Run {
 
                 my %SearchResult;
 
+                my $Value = $SearchItem->{Value};
+
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
+                    $Value = '*' . $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                    $Value = $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                    $Value = '*' . $Value;
+                }
+
                 # perform Contact search
                 if ( $SearchItem->{Field} eq 'Fulltext' ) {
-                    %SearchResult = $Self->_DoFulltextSearch( Search => $SearchItem->{Value} );
+                    %SearchResult = $Self->_DoFulltextSearch( Search => $Value );
                 } else {
-                    my $Value = $SearchItem->{Value};
-
-                    if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
-                        $Value = '*' . $Value . '*';
-                    } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
-                        $Value = $Value . '*';
-                    } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
-                        $Value = '*' . $Value;
-                    }
-
                     my %SearchParam;
 
                     if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Login' ) {
@@ -235,7 +235,11 @@ sub _DoFulltextSearch {
             my @AndCombinedGroups = split( /\+|\&/, $OrCombined );
             for my $AndSearchString (@AndCombinedGroups) {
 
-                $AndSearchString = '*' . $AndSearchString . '*';
+                $AndSearchString = $AndSearchString . '*';
+                if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPraefix') ) {
+                    $AndSearchString = '*' . $AndSearchString;
+                }
+
                 my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                     Search => $AndSearchString,
                     Valid  => 0

@@ -254,7 +254,7 @@ sub ImportValuePrepare {
 
         # search for Organisation data
         my %OrganisationSearchList = $Self->{OrganisationObject}->OrganisationSearch(
-            Search => $Param{Value},
+            Search => '*' . $Param{Value} . '*',
             Limit  => 500,
         );
 

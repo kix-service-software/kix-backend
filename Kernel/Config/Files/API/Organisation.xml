@@ -23,7 +23,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">OrganisationCollectionResponse</Item>
-                <Item Key="CacheType">API_organisations</Item>                
+                <Item Key="CacheType">API_organisations</Item>
                 <Item Key="CacheTypeDependency">Organisation</Item>
             </Hash>
         </Setting>
@@ -75,7 +75,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationContactSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ContactCollectionResponse</Item>
-                <Item Key="CacheType">API_organisations</Item>                
+                <Item Key="CacheType">API_organisations</Item>
                 <Item Key="CacheTypeDependency">Contact</Item>
             </Hash>
         </Setting>
@@ -89,7 +89,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::Organisation::OrganisationTicketSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">TicketCollectionResponse</Item>
-                <Item Key="CacheType">API_organisations</Item>                
+                <Item Key="CacheType">API_organisations</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
             </Hash>
         </Setting>
@@ -116,6 +116,17 @@
             <Hash>
                 <Item Key="Operation">V1::CMDB::ConfigItemGet</Item>
             </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="public" Name="OrganisationSearch::UseWildcardPraefix" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable wildcard praefix for organisation search.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
 </kix_config>

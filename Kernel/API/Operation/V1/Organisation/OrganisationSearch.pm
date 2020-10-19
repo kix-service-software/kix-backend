@@ -119,6 +119,11 @@ sub Run {
                     $Value = $Value . '*';
                 } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
                     $Value = '*' . $Value;
+                } elsif ( $SearchItem->{Operator} eq 'LIKE' ) {
+                    $Value = $Value . '*';
+                    if( $Kernel::OM->Get('Config')->Get('OrganisationSearch::UseWildcardPraefix') ) {
+                        $Value = '*' . $Value;
+                    }
                 }
 
                 my %SearchParam;
