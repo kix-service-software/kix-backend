@@ -70,26 +70,34 @@ sub RunOperation {
     # also ignore all this if we have been told to ignore permissions
     if ( !$Self->{IgnorePermissions} && $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
 
-        # check the necessary permission of the parent object if needed
-        if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) ) {
+        # determine which method to use
+        my $RequestMethodOrigin = $Param{RequestMethodOrigin};
+        my $ParentCheckMethod = ($Param{RequestMethodOrigin} || $Self->{RequestMethod}) eq 'GET' ? 'GET' : 'PATCH';
 
-            # determine which method to use
-            my $Method = $Self->{RequestMethod} eq 'GET' ? 'GET' : 'PATCH';
+        # if we don't have a 
+        if ( !$Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} && $Self->{ParentMethodOperationMapping}->{GET} ) {
+            $RequestMethodOrigin = $ParentCheckMethod if !$RequestMethodOrigin;
+            $ParentCheckMethod = 'GET';
+        }
+
+        # check the necessary permission of the parent object if needed
+        if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) && $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} ) {
 
             # get the config of the parent operation to determine the primary object ID attribute
-            my $OperationConfig = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Self->{ParentMethodOperationMapping}->{$Method}};
+            my $OperationConfig = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Self->{ParentMethodOperationMapping}->{$ParentCheckMethod}};
 
             my $Data = $OperationConfig->{ObjectID} ? {
                     $OperationConfig->{ObjectID} => $Param{Data}->{$OperationConfig->{ObjectID}},
                 } : $Param{Data};
 
             my $ExecResult = $Self->ExecOperation(
-                RequestMethod       => $Method,
-                OperationType       => $Self->{ParentMethodOperationMapping}->{$Method},
-                Data                => $Data,
-                IgnoreInclude       => 1,       # we don't need any includes
-                IgnoreExpand        => 1,       # we don't need any expands
-                PermissionCheckOnly => 1,       # do not change any data
+                RequestMethod         => $ParentCheckMethod,
+                RequestMethodOrigin   => $RequestMethodOrigin,
+                OperationType         => $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod},
+                Data                  => $Data,
+                IgnoreInclude         => 1,       # we don't need any includes
+                IgnoreExpand          => 1,       # we don't need any expands
+                PermissionCheckOnly   => 1,       # do not change any data
             );
 
             if ( !IsHashRefWithData($ExecResult) || !$ExecResult->{Success} ) {
@@ -119,7 +127,7 @@ sub RunOperation {
         }
     }
 
-    if ( $Param{PermissionCheckOnly} ) {
+    if ( $Self->{PermissionCheckOnly} && $Self->{RequestMethod} ne 'GET' ) {
         return $Self->_Success();
     }
 
@@ -877,28 +885,30 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", $TimeDiff));
         }
 
-        # honor a generic include, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
-            my $StartTime = Time::HiRes::time();
+        if ( !$Self->{PermissionCheckOnly} ) {
+            # honor a generic include, if we have one
+            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
+                my $StartTime = Time::HiRes::time();
 
-            $Self->_ApplyInclude(
-                Data => \%Param,
-            );
+                $Self->_ApplyInclude(
+                    Data => \%Param,
+                );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", $TimeDiff));
-        }
+                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", $TimeDiff));
+            }
 
-        # honor an expander, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
-            my $StartTime = Time::HiRes::time();
+            # honor an expander, if we have one
+            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
+                my $StartTime = Time::HiRes::time();
 
-            $Self->_ApplyExpand(
-                Data => \%Param,
-            );
+                $Self->_ApplyExpand(
+                    Data => \%Param,
+                );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
+                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
+            }
         }
 
         # cache request without offset and limit if CacheType is set for this operation
@@ -1091,6 +1101,7 @@ sub ExecOperation {
         OperationType            => $Param{OperationType},
         WebserviceID             => $Self->{WebserviceID},
         RequestMethod            => $Param{RequestMethod} || $Self->{RequestMethod},
+        RequestMethodOrigin      => $Param{RequestMethodOrigin},
         AvailableMethods         => \%AvailableMethods,
         RequestURI               => $RequestURI,
         CurrentRoute             => $CurrentRoute,
@@ -2311,7 +2322,7 @@ sub _CheckObjectPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/\w+/g;
+        $Target =~ s/\*/\\w+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2555,7 +2566,7 @@ sub _CheckPropertyPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/\w+/g;
+        $Target =~ s/\*/\\w+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
