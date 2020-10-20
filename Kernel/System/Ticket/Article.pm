@@ -1303,11 +1303,11 @@ sub ArticleIndex {
     }
 
     if ($UseCache) {
-        $Kernel::OM->Get('Cache')->Set(
-            Type  => $Self->{CacheType},
-            TTL   => $Self->{CacheTTL},
-            Key   => $CacheKey,
-            Value => \@Index,
+        $Self->_TicketCacheSet(
+            Type     => $Self->{CacheType},
+            TTL      => $Self->{CacheTTL},
+            Key      => $CacheKey,
+            Value    => \@Index,
         );
     }
 
@@ -2531,14 +2531,15 @@ sub ArticleFlagSet {
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
     );
 
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
-
     # event
     my %Article = $Self->ArticleGet(
         ArticleID     => $Param{ArticleID},
         UserID        => $Param{UserID},
         DynamicFields => 0,
     );
+
+    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+
     $Self->EventHandler(
         Event => 'ArticleFlagSet',
         Data  => {

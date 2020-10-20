@@ -20,14 +20,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Sends all outstanding notifications to the given client. If no client-id is given, all clients will be considered.');
-    $Self->AddOption(
-        Name        => 'client-id',
-        Description => "The ID of the registered client.",
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
+    $Self->Description('Sends all outstanding notifications to the relevant clients.');
 
     return;
 }
@@ -35,50 +28,18 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Sending notifications...</yellow>\n");
+    $Self->Print("<yellow>Sending client notifications...</yellow>\n");
 
-    my $ClientID = $Self->GetOption('client-id') || '';
-
-    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList(
-        Notifiable => 1
-    );
-    if ( !$ClientList ) {
-        $Self->PrintError("Unable to determine notifiable clients.\n");
-        return $Self->ExitCodeError();
-    }
-    my %NotifiableClients = map { $_ => 1 } @{$ClientList};
-
-    my @ClientIDs;
-    if ( $ClientID ) {
-        push(@ClientIDs, $ClientID);
+    my $Result = $Kernel::OM->Get('ClientRegistration')->NotificationSend();
+    if ( !$Result ) {
+        $Self->PrintError("Unable to send notifications.\n");
     }
     else {
-        if ( ref $ClientList eq 'ARRAY' ) {
-            @ClientIDs = @{$ClientList};
-        }
-    }
-
-    foreach my $ClientID ( sort @ClientIDs ) {
-        $Self->Print("notifying client $ClientID\n");
-
-        if ( !$NotifiableClients{$ClientID} ) {
-            $Self->PrintError("No registration for this client exists or the client doesn't accept notifications. Ignoring this client.\n");
-            next;
-        }
-
-        my $Result = $Kernel::OM->Get('ClientRegistration')->NotificationSend(
-            ClientID => $ClientID
+        my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'info',
+            What => 'Message',
         );
-        if ( !$Result ) {
-            $Self->PrintError("Unable to send notifications.\n");
-        }
-        else {
-            my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
-                Type => 'info',
-                What => 'Message',
-            );
-            $Self->Print($Message."\n");
-        }
+        $Self->Print($Message."\n");
     }
 
     $Self->Print("<green>Done.</green>\n");

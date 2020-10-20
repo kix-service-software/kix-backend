@@ -54,10 +54,10 @@ sub Run {
         $Self->Print(sprintf("%02i %-30s %-5s %-50s %-80s\n", ++$Count, $Plugin->{Product}, $Plugin->{BuildNumber}, ($Plugin->{Requires} || ''), $Plugin->{Description}));
     }
 
-    my $Clients = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
-    if ( IsArrayRefWithData($Clients) ) {
+    my @ClientIDs = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
+    if ( IsArrayRefWithData(\@ClientIDs) ) {
         CLIENT:
-        foreach my $ClientID ( sort @{$Clients} ) {
+        foreach my $ClientID ( sort @ClientIDs ) {
             my %ClientData = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
                 ClientID => $ClientID
             );

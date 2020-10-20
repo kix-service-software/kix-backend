@@ -11,7 +11,9 @@ package Kernel::API::Operation::V1::Common;
 use strict;
 use warnings;
 use Hash::Flatten;
+use File::Basename;
 use Data::Sorting qw(:arrays);
+use Storable;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -974,7 +976,7 @@ helper function to execute another operation to work with its result.
 
     my $Return = $CommonObject->ExecOperation(
         OperationType            => '...',                              # required
-        Data                     => {},                                 # required
+        Data                     => {},                                 # optional
         IgnorePermissions        => 1,                                  # optional
         SuppressPermissionErrors => 1,                                  # optional
         IgnoreInclude            => 1,                                  # optional
@@ -988,7 +990,7 @@ sub ExecOperation {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(OperationType Data)) {
+    for my $Needed (qw(OperationType)) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'ExecOperation.MissingParameter',
@@ -1140,7 +1142,7 @@ sub ExecOperation {
 
     my $Result = $OperationObject->Run(
         Data    => {
-            %{$Param{Data}},
+            %{$Param{Data} || {}},
             %AdditionalData,
         },
         IgnorePermissions   => $Param{IgnorePermissions},
@@ -2836,6 +2838,120 @@ sub _ReplaceVariablesInPermission {
     }
 
     return $Result;
+}
+
+sub _RunParallel {
+    my ( $Self, $Sub, %Param ) = @_;
+
+    # check needed stuff
+    if ( !ref $Sub eq 'CODE' ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Sub as a function ref!",
+        );
+        return;
+    }
+
+    for my $Needed (qw(Items)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    use threads;
+    use threads::shared;
+    use Thread::Queue;
+
+    my $NumWorkers = $Kernel::OM->Get('Config')->Get('API::Parallelity') || 4;
+
+    my $WorkQueue : shared;
+    $WorkQueue = Thread::Queue->new();
+    my $ResultQueue : shared;
+    $ResultQueue = Thread::Queue->new();
+
+    $Self->_Debug("executing with parallel algorithm ($NumWorkers workers)");
+
+    # create parallel instances
+    my %Workers;
+    foreach my $WorkerID ( 1..$NumWorkers ) {
+        $Workers{$WorkerID}, threads->create(
+            sub {
+                my ( $Self, %Param ) = @_;
+
+                local $Kernel::OM = Kernel::System::ObjectManager->new(
+                    'Log' => {
+                        LogPrefix => 'runworker#'.$Param{WorkerID},
+                    },
+                );
+
+                while ( (my $Item = $Param{WorkQueue}->dequeue) ne "END_OF_QUEUE" ) {
+                    my $Result = $Sub->($Self, Item => $Item, %Param);
+
+                    $ResultQueue->enqueue(Storable::freeze {
+                        Item   => $Item,
+                        Result => $Result, 
+                    });
+                }
+            }, 
+            $Self, 
+            %Param,
+            WorkQueue   => $WorkQueue,
+            ResultQueue => $ResultQueue,
+            WorkerID    => $WorkerID,
+        );
+    }
+
+    $WorkQueue->enqueue(@{$Param{Items}});
+
+    foreach ( 1..$NumWorkers ) {
+        $WorkQueue->enqueue("END_OF_QUEUE");
+    }
+
+    foreach my $t ( threads->list() ) {
+        $t->join();
+    }
+
+    # sync thread output
+    my %ResultHash;
+    while ( my $Result = Storable::thaw $ResultQueue->dequeue_nb() ) {
+        $ResultHash{$Result->{Item}} = $Result->{Result};
+    }
+
+    my @Result;
+    foreach my $Item ( @{$Param{Items}} ) {
+        next if !$ResultHash{$Item};
+        push @Result, $ResultHash{$Item};
+    }
+
+    return @Result;
+}
+
+sub _CanRunParallel {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Items)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    # check if deactivated
+    return 0 if !$Kernel::OM->Get('Config')->Get('API::Parallelity');
+
+    my $NumWorkers = $Kernel::OM->Get('Config')->Get('API::Parallelity') || 4;
+    my $MinChecksPerWorker = $Kernel::OM->Get('Config')->Get('API::MinTasksPerWorker') || 10;
+
+    return 1 if ( scalar(@{$Param{Items}}) >= $NumWorkers * $MinChecksPerWorker );
+    return 0;
 }
 
 sub _Debug {

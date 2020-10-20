@@ -13,15 +13,7 @@ package Kernel::System::JSON;
 use strict;
 use warnings;
 
-# on PerlEx JSON::XS causes problems so force JSON::PP as backend
-# see http://bugs.otrs.org/show_bug.cgi?id=7337
-BEGIN {
-    if ( $ENV{GATEWAY_INTERFACE} && $ENV{GATEWAY_INTERFACE} =~ m{\A CGI-PerlEx}xmsi ) {
-        $ENV{PERL_JSON_BACKEND} = 'JSON::PP';
-    }
-}
-
-use JSON;
+use JSON::MaybeXS qw(is_bool);
 
 our @ObjectDependencies = (
     'Log',
@@ -86,7 +78,7 @@ sub Encode {
     }
 
     # create json object
-    my $JSONObject = JSON->new();
+    my $JSONObject = JSON::MaybeXS->new();
 
     $JSONObject->allow_nonref(1);
 
@@ -134,7 +126,7 @@ sub Decode {
     return if !defined $Param{Data};
 
     # create json object
-    my $JSONObject = JSON->new();
+    my $JSONObject = JSON::MaybeXS->new();
 
     $JSONObject->allow_nonref(1);
 
@@ -215,7 +207,7 @@ sub _BooleansProcess {
     my ( $Self, %Param ) = @_;
 
     # convert scalars if needed
-    if ( JSON::is_bool( $Param{JSON} ) ) {
+    if ( JSON::MaybeXS::is_bool( $Param{JSON} ) ) {
         $Param{JSON} = ( $Param{JSON} ? 1 : 0 );
     }
 

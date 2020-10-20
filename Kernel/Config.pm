@@ -26,6 +26,8 @@ use lib dirname($Bin) . '/../plugins';
 
 use Exporter qw(import);
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @EXPORT = qw(Translatable);
 
 our @ObjectDependencies = (
@@ -121,9 +123,21 @@ sub LoadSysConfig {
     # return if the ObjectManager is not yet initialized
     return if !$Kernel::OM;
 
-    $Self->{SysConfigLoaded} = 1;
-
     my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+
+    # check cache
+    my $CacheKey = 'Config';
+    my $CacheResult = $Kernel::OM->Get('Cache')->Get(
+        Type => $SysConfigObject->{CacheType},
+        Key  => $CacheKey
+    );
+    if ( IsHashRefWithData($CacheResult) ) {
+        $Self->{SysConfigLoaded} = 1;
+        $Self->{Config} = $CacheResult;
+        return 1;
+    }
+
+    $Self->{SysConfigLoaded} = 1;
 
     # load the current config
     my %SysConfig = $SysConfigObject->ValueGetAll( Valid => 1 );
@@ -172,6 +186,14 @@ sub LoadSysConfig {
         print STDERR "($$) ERROR: $Home/RELEASE does not exist! This file is needed by core components of KIX and the system will not work without this file.\n";
         die;
     }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $SysConfigObject->{CacheType},
+        TTL   => $SysConfigObject->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Self->{Config},
+    );
 
     return 1;
 }

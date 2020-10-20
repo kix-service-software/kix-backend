@@ -704,6 +704,11 @@ sub DESTROY {
 
     # Make sure $Kernel::OM is still available in the destructor
     local $Kernel::OM = $Self;
+
+    # send outstanding notifications to registered clients
+    $Self->Get('ClientRegistration')->NotificationSend();
+
+    # discard all objects
     $Self->ObjectsDiscard();
 }
 

@@ -1207,6 +1207,14 @@ msgid "Cache time in seconds for the web service config backend."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
+msgid "Defines how many tasks are needed per thread (see API::Parallelity) to use the parallel alogorithm."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Defines how many threads should be used for parallel tasks."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
 msgid "Defines the location where the JSON schema files are located."
 msgstr ""
 
