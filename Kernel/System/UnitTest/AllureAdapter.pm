@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 use Data::UUID;
-use JSON::XS;
+use JSON::MaybeXS;
 
 our @ObjectDependencies = ();
 

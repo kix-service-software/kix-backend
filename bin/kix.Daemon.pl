@@ -13,6 +13,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Getopt::Long;
 use File::Basename;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
@@ -22,15 +23,6 @@ use lib dirname($RealBin) . '/plugins';
 use File::Path qw();
 use Time::HiRes qw(sleep);
 use Fcntl qw(:flock);
-
-our $IsWin32 = 0; 
-if ( $^O eq 'MSWin32' ) {
-    eval { 
-        require Win32; 
-        require Win32::Process; 
-    } or last;
-    $IsWin32 = 1;
-}
 
 use Kernel::System::ObjectManager;
 
@@ -42,31 +34,27 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
     },
 );
 
-if ( !$IsWin32 ) {
-    # Don't allow to run these scripts as root, except we are in a test run
-    if ( $> == 0 && !$ENV{UnitTest} ) {    # $EFFECTIVE_USER_ID
-        print STDERR
-            "Error: You cannot run kix.Daemon.pl as root. Please run it as the apache user or with the help of su:\n";
-        print STDERR "  su -c \"bin/kix.Daemon.pl ...\" -s /bin/bash <apache user>\n";
-        exit 1;
-    }
+# Don't allow to run these scripts as root, except we are in a test run
+if ( $> == 0 && !$ENV{UnitTest} ) {    # $EFFECTIVE_USER_ID
+    print STDERR
+        "Error: You cannot run kix.Daemon.pl as root.";
+    exit 1;
 }
+
+my %Options;
+GetOptions(
+    'debug=s'      => \$Options{Debug},
+    'force'        => \$Options{Force},
+    'no-daemonize' => \$Options{NoDaemon},
+    'help'         => \$Options{Help},
+);
 
 # get config object
 my $ConfigObject = $Kernel::OM->Get('Config');
 
-# get the NodeID from the SysConfig settings, this is used on High Availability systems.
-my $NodeID = $ConfigObject->Get('NodeID') || 1;
-
-# check NodeID, if does not match its impossible to continue
-if ( $NodeID !~ m{ \A \d+ \z }xms && $NodeID > 0 && $NodeID < 1000 ) {
-    print STDERR "NodeID '$NodeID' is invalid. Change the NodeID to a number between 1 and 999.";
-    exit 1;
-}
-
 # get pid directory
 my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
-my $PIDFile = $PIDDir . "Daemon-NodeID-$NodeID.pid";
+my $PIDFile = $PIDDir . "Daemon.pid";
 my $PIDFH;
 
 # get default log directory
@@ -81,7 +69,7 @@ if ( !-d $LogDir ) {
     }
 }
 
-if ( !@ARGV ) {
+if ( !@ARGV || $Options{Help} ) {
     PrintUsage();
     exit 0;
 }
@@ -93,68 +81,41 @@ my $ForceStop;
 # check for debug mode
 my %DebugDaemons;
 my $Debug;
-if (
-    ((lc $ARGV[0] eq 'start') || (lc $ARGV[0] eq '--child') || (lc $ARGV[0] eq '--module'))
-    && (($ARGV[1] && lc $ARGV[1] eq '--debug') || ($ARGV[3] && lc $ARGV[3] eq '--debug')) 
-    )
-{
+if ( $Options{Debug} ) {
     $Debug = 1;
 
     # if no more arguments, then use debug mode for all daemons
-    if ( !$ARGV[2] ) {
+    if ( lc $Options{Debug} eq 'all' ) {
         $DebugDaemons{All} = 1;
     }
 
     # otherwise set debug mode specific for named daemons
     else {
 
-        ARGINDEX:
-        for my $ArgIndex ( 2 .. 99 ) {
-
-            # stop checking if there are no more arguments
-            last ARGINDEX if !$ARGV[$ArgIndex];
-
-            # remember debug mode for each daemon
-            $DebugDaemons{ $ARGV[$ArgIndex] } = 1;
+        # remember debug mode for each daemon
+        foreach my $Daemon ( split(/,/, $Options{Debug}) ) {
+            $DebugDaemons{ $Daemon } = 1;
         }
     }
 }
-elsif (
-    lc $ARGV[0] eq 'stop'
-    && $ARGV[1]
-    && lc $ARGV[1] eq '--force'
-    )
-{
+
+my $Command = $ARGV[0];
+
+if ( $Options{Force} ) {
     $ForceStop = 1;
-}
-elsif ( $ARGV[0] ne '--module' && $ARGV[1] ) {
-    print STDERR "Invalid option: $ARGV[1]\n\n";
-    PrintUsage();
-    exit 0;
 }
 
 # check for action
-if ( lc $ARGV[0] eq 'start' ) {
+if ( lc $Command eq 'start' ) {
     exit 1 if !Start();
     exit 0;
 }
-elsif ( lc $ARGV[0] eq 'stop' ) {
+elsif ( lc $Command eq 'stop' ) {
     exit 1 if !Stop();
     exit 0;
 }
-elsif ( lc $ARGV[0] eq 'status' ) {
+elsif ( lc $Command eq 'status' ) {
     exit 1 if !Status();
-    exit 0;
-}
-elsif ( lc $ARGV[0] eq '--child' ) {
-    exit 1 if !_Run();
-    exit 0;
-}
-elsif ( lc $ARGV[0] eq '--module' ) {
-    exit 1 if !_RunModule(
-        Module     => $ARGV[1],
-        ModuleName => $ARGV[2]
-    );
     exit 0;
 }
 else {
@@ -164,17 +125,16 @@ else {
 
 sub PrintUsage {
     my $UsageText = "Usage:\n";
-    $UsageText .= " kix.Daemon.pl <ACTION> [--debug] [--force]\n";
+    $UsageText .= " kix.Daemon.pl [--debug=<SchedulerModules>] [--force] [--no-daemonize] <ACTION>\n";
     $UsageText .= "\nActions:\n";
     $UsageText .= sprintf " %-30s - %s", 'start', 'Starts the daemon process' . "\n";
     $UsageText .= sprintf " %-30s - %s", 'stop', 'Stops the daemon process' . "\n";
     $UsageText .= sprintf " %-30s - %s", 'status', 'Shows daemon process current state' . "\n";
-    $UsageText .= sprintf " %-30s - %s", 'help', 'Shows this help screen' . "\n";
     $UsageText .= "\nNote:\n";
     $UsageText
         .= " In debug mode if a daemon module is specified the debug mode will be activated only for that daemon.\n";
     $UsageText .= " Debug information is stored in the daemon log files localed under: $LogDir\n";
-    $UsageText .= "\n kix.Daemon.pl start --debug SchedulerTaskWorker SchedulerCronTaskManager\n\n";
+    $UsageText .= "\n kix.Daemon.pl start --debug=all|SchedulerTaskWorker,SchedulerCronTaskManager,...\n\n";
     $UsageText
         .= "\n Forced stop reduces the time the main daemon waits other daemons to stop from normal 30 seconds to 5.\n";
     $UsageText .= "\n kix.Daemon.pl stop --force\n\n";
@@ -184,7 +144,7 @@ sub PrintUsage {
 }
 
 sub Start {
-    if (!$IsWin32) {
+    if ( !$Options{NoDaemon} ) {
         # create a fork of the current process
         # parent gets the PID of the child
         # child gets PID = 0
@@ -192,34 +152,13 @@ sub Start {
 
         # check if fork was not possible
         die "Cannot create daemon process: $!" if !defined $DaemonPID || $DaemonPID < 0;
-    
+
         # close parent gracefully
         exit 0 if $DaemonPID;
-        
-        # run Child
-        _Run();
     }
-    else {
-        my $ChildProcess;
-        my $Home = $Kernel::OM->Get('Config')->Get('Home');
-        my $Debug = join(' ', keys %DebugDaemons);
-        
-        Win32::Process::Create(
-            $ChildProcess, 
-            $ENV{COMSPEC},
-            "/c wperl $Home/bin/kix.Daemon.pl --child --debug ".$Debug, 
-            0, 
-            0x00000008,    # DETACHED_PROCESS
-            "."
-        );
-        my $DaemonPID = $ChildProcess->GetProcessID();
-        
-        # check if fork was not possible
-        die "Cannot create daemon process: $!" if !defined $DaemonPID || $DaemonPID < 0;
-    
-        # close parent gracefully
-        return 0;
-    }
+
+    # run Child
+    _Run();
 }
 
 sub Stop {
@@ -231,22 +170,12 @@ sub Stop {
 
         if ($ForceStop) {
 
-            if (!$IsWin32) {
-                # send TERM signal to running daemon
-                kill 15, $RunningDaemonPID;
-            }
-            else {
-                Win32::Process::KillProcess($RunningDaemonPID, 1);
-            }
+            # send TERM signal to running daemon
+            kill 15, $RunningDaemonPID;
         }
         else {
-            if (!$IsWin32) {
-                # send INT signal to running daemon
-                kill 2, $RunningDaemonPID;
-            }
-            else {
-                Win32::Process::KillProcess($RunningDaemonPID, 1);
-            }
+            # send INT signal to running daemon
+            kill 2, $RunningDaemonPID;
         }
     }
 
@@ -273,14 +202,7 @@ sub Status {
             if ($RegisteredPID) {
 
                 # check if process is running
-                my $RunningPID;
-                if (!$IsWin32) {
-                    $RunningPID = kill 0, $RegisteredPID;
-                }
-                else {
-                    my $ProcessObj;
-                    $RunningPID = Win32::Process::Open($ProcessObj, $RegisteredPID, 1);
-                }
+                my $RunningPID = kill 0, $RegisteredPID;
 
                 if ($RunningPID) {
                     print STDOUT "Daemon running\n";
@@ -347,14 +269,7 @@ sub _Run {
             next MODULE if !$Module;
 
             # check if daemon is still alive
-            my $RunningPID;
-            if (!$IsWin32) {
-                $RunningPID = kill 0, $DaemonModules{$Module}->{PID};
-            }
-            else {
-                my $ProcessObj;
-                $RunningPID = Win32::Process::Open($ProcessObj, $DaemonModules{$Module}->{PID}, 1);
-            }
+            my $RunningPID = kill 0, $DaemonModules{$Module}->{PID};
             
             if ( $DaemonModules{$Module}->{PID} && !$RunningPID ) {
                 $DaemonModules{$Module}->{PID} = 0;
@@ -362,27 +277,8 @@ sub _Run {
 
             next MODULE if $DaemonModules{$Module}->{PID};
 
-            my $ChildPID;
-
-            if (!$IsWin32) {
-                # fork daemon process
-                $ChildPID = fork;
-            }
-            else {
-                my $ChildProcess;
-                my $Home = $Kernel::OM->Get('Config')->Get('Home');
-                my $Debug = join(' ', keys %DebugDaemons);
-                                
-                Win32::Process::Create(
-                    $ChildProcess, 
-                    $ENV{COMSPEC},
-                    "/c wperl $Home/bin/kix.Daemon.pl --module \"$Module\" \"$DaemonModules{$Module}->{Name}\" --debug ".$Debug, 
-                    0, 
-                    0x00000008,    # DETACHED_PROCESS
-                    "."
-                );
-                $ChildPID = $ChildProcess->GetProcessID();
-            }
+            # fork daemon process
+            my $ChildPID = fork;
 
             if ( !$ChildPID ) {
 
@@ -404,11 +300,6 @@ sub _Run {
         # sleep 0.1 seconds to protect the system of a 100% CPU usage if one daemon
         # module is damaged and produces hard errors
         sleep 0.1;
-        
-        # in windows sleep even more, otherwise the CPU load will be too high
-        if ($IsWin32) {
-            sleep 5;
-        }
     }
 
     # send all daemon processes a stop signal
@@ -422,12 +313,7 @@ sub _Run {
             print STDOUT "Send stop signal to $Module with PID $DaemonModules{$Module}->{PID}\n";
         }
 
-        if (!$IsWin32) {
-            kill 2, $DaemonModules{$Module}->{PID};
-        }
-        else {
-            Win32::Process::KillProcess($DaemonModules{$Module}->{PID}, 1);
-        }
+        kill 2, $DaemonModules{$Module}->{PID};
     }
 
     # wait for active daemon processes to stop (typically 30 secs, or just 5 if forced)
@@ -442,14 +328,7 @@ sub _Run {
             next MODULE if !$DaemonModules{$Module}->{PID};
 
             # check if PID is still alive
-            my $RunningPID;
-            if (!$IsWin32) {
-                $RunningPID = kill 0, $DaemonModules{$Module}->{PID};
-            }
-            else {
-                my $ProcessObj;
-                $RunningPID = Win32::Process::Open($ProcessObj, $DaemonModules{$Module}->{PID}, 1);
-            }
+            my $RunningPID = kill 0, $DaemonModules{$Module}->{PID};
             
             if ( !$RunningPID ) {
 
@@ -480,12 +359,7 @@ sub _Run {
 
         print STDOUT "Killing $Module with PID $DaemonModules{$Module}->{PID}\n";
 
-        if (!$IsWin32) {
-           kill 9, $DaemonModules{$Module};
-        }
-        else {
-            Win32::Process::KillProcess($DaemonModules{$Module}->{PID}, 1);
-        }
+        kill 9, $DaemonModules{$Module};
     }
 
     # remove current log files without content
@@ -570,10 +444,6 @@ sub _RunModule {
         for my $Method ( 'PreRun', 'Run', 'PostRun' ) {
             last LOOP if !eval { $DaemonObject->$Method() };
         }
-        
-        # in Win32 exit this loop to restart the whole process
-        # otherwise zombies will remain when parent gets stopped
-        last LOOP if ($IsWin32);
     }
     
     return 0;

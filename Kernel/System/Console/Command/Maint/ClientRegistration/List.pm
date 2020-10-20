@@ -30,11 +30,7 @@ sub Run {
 
     $Self->Print("<yellow>Listing registered clients...</yellow>\n");
 
-    my @ClientIDs;
-    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
-    if ( ref $ClientList eq 'ARRAY' ) {
-        @ClientIDs = @{$ClientList};
-    }
+    my @ClientIDs = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
 
     foreach my $ClientID ( sort @ClientIDs ) {
         my %ClientRegistration = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(

@@ -822,27 +822,27 @@ sub Dump {
     # strings as latin1/8bit instead of utf8. Use Storable module used for
     # workaround.
     # -> http://rt.cpan.org/Ticket/Display.html?id=28607
-    if ( $Type eq 'binary' ) {
+    # if ( $Type eq 'binary' ) {
 
-        # Clone the data because we need to disable the utf8 flag in all
-        # reference variables and do not to want to do this in the orig.
-        # variables because they will still used in the system.
-        my $DataNew = Storable::dclone( \$Data );
+    #     # Clone the data because we need to disable the utf8 flag in all
+    #     # reference variables and do not to want to do this in the orig.
+    #     # variables because they will still used in the system.
+    #     my $DataNew = Storable::dclone( \$Data );
 
-        # Disable utf8 flag.
-        $Self->_Dump($DataNew);
+    #     # Disable utf8 flag.
+    #     $Self->_Dump($DataNew);
 
-        # Dump it as binary strings.
-        my $String = Data::Dumper::Dumper( ${$DataNew} );    ## no critic
+    #     # Dump it as binary strings.
+    #     my $String = Data::Dumper::Dumper( ${$DataNew} );    ## no critic
 
-        # Enable utf8 flag.
-        Encode::_utf8_on($String);
+    #     # Enable utf8 flag.
+    #     Encode::_utf8_on($String);
 
-        # reset indention
-        $Data::Dumper::Indent = 1;
+    #     # reset indention
+    #     $Data::Dumper::Indent = 1;
 
-        return $String;
-    }
+    #     return $String;
+    # }
 
     # fallback if Storable can not be loaded
     my $Result = Data::Dumper::Dumper($Data);                      ## no critic
@@ -1098,6 +1098,7 @@ sub _Dump {
 
     # data is a hash reference
     if ( ref ${$Data} eq 'HASH' ) {
+        print STDERR Data::Dumper::Dumper($Data);
         KEY:
         for my $Key ( sort keys %{ ${$Data} } ) {
             next KEY if !defined ${$Data}->{$Key};

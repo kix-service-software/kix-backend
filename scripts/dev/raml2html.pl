@@ -13,7 +13,7 @@ use warnings;
 use Cwd;
 use Getopt::Long;
 use File::Basename;
-use JSON;
+use JSON::MaybeXS;
 use JSON::Validator;
 
 my %Options;
@@ -51,7 +51,7 @@ if ( $Options{Help} || %Missing ) {
 my @ErrorFiles;
 my $TargetDirectory = dirname($Options{OutputFile}) || '.';
 
-my $JSONObject      = JSON->new();
+my $JSONObject      = JSON::MaybeXS->new();
 my $ValidatorObject = JSON::Validator->new();
 
 $JSONObject->allow_nonref( 1 );

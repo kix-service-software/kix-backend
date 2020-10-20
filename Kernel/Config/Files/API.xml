@@ -20,6 +20,20 @@
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Parallelity" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines how many threads should be used for parallel tasks. Enter 0 to deactivate.</Description>
+        <Group>API</Group>
+        <Setting>
+            <String Regex="">4</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::MinTasksPerWorker" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines how many tasks are needed per thread (see API::Parallelity) to use the parallel alogorithm.</Description>
+        <Group>API</Group>
+        <Setting>
+            <String Regex="">10</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###999-API" Required="0" Valid="1">
         <Description Translatable="1">Performs the configured action for each event (as an Invoker) for each configured Webservice.</Description>
         <Setting>

@@ -287,30 +287,29 @@ sub TicketSearch {
     }
 
     # check cache
-    my $CacheObject;
-    if ( $Param{CacheTTL} ) {
-        $CacheObject = $Kernel::OM->Get('Cache');
-        my $CacheData = $CacheObject->Get(
-            Type => 'TicketSearch',
-            Key  => $SQL . $Result . $Param{Limit},
-        );
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
-        if ( defined $CacheData ) {
-            if ( ref $CacheData eq 'HASH' ) {
-                return %{$CacheData};
-            }
-            elsif ( ref $CacheData eq 'ARRAY' ) {
-                return @{$CacheData};
-            }
-            elsif ( ref $CacheData eq '' ) {
-                return $CacheData;
-            }
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Invalid ref ' . ref($CacheData) . '!'
-            );
-            return;
+    my $CacheKey = $SQL . $Result . ($Param{Limit} || '');
+    my $CacheData = $CacheObject->Get(
+        Type => 'Ticket',
+        Key  => $CacheKey,
+    );
+
+    if ( defined $CacheData ) {
+        if ( ref $CacheData eq 'HASH' ) {
+            return %{$CacheData};
         }
+        elsif ( ref $CacheData eq 'ARRAY' ) {
+            return @{$CacheData};
+        }
+        elsif ( ref $CacheData eq '' ) {
+            return $CacheData;
+        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Invalid ref ' . ref($CacheData) . '!'
+        );
+        return;
     }
 
     # database query
@@ -332,12 +331,25 @@ sub TicketSearch {
         $Tickets{ $Row[0] } = $Row[1];
     }
 
+    # set ticket cache
+    if ( $CacheObject ) {
+        my $TicketObject = $Kernel::OM->Get('Ticket');
+        foreach my $TicketID ( @TicketIDs ) {
+            $TicketObject->_TicketCacheSet(
+                TicketID       => $TicketID,
+                Type           => 'Ticket',
+                Key            => $CacheKey,
+                OnlyUpdateMeta => 1,
+            );
+        }
+    }
+
     # return COUNT
     if ( $Result eq 'COUNT' ) {
         if ($CacheObject) {
             $CacheObject->Set(
-                Type  => 'TicketSearch',
-                Key   => $SQL . $Result . $Param{Limit},
+                Type  => 'Ticket',
+                Key   => $CacheKey,
                 Value => $Count,
                 TTL   => $Param{CacheTTL} || 60 * 4,
             );
@@ -349,8 +361,8 @@ sub TicketSearch {
     elsif ( $Result eq 'HASH' ) {
         if ($CacheObject) {
             $CacheObject->Set(
-                Type  => 'TicketSearch',
-                Key   => $SQL . $Result . $Param{Limit},
+                Type  => 'Ticket',
+                Key   => $CacheKey,
                 Value => \%Tickets,
                 TTL   => $Param{CacheTTL} || 60 * 4,
             );
@@ -362,8 +374,8 @@ sub TicketSearch {
     else {
         if ($CacheObject) {
             $CacheObject->Set(
-                Type  => 'TicketSearch',
-                Key   => $SQL . $Result . $Param{Limit},
+                Type  => 'Ticket',
+                Key   => $CacheKey,
                 Value => \@TicketIDs,
                 TTL   => $Param{CacheTTL} || 60 * 4,
             );
@@ -392,79 +404,12 @@ sub _CreatePermissionSQL {
     my ( $Self, %Param ) = @_;
     my $SQLWhere = '1=1';
 
-    if ( !$Param{UserID} && !$Param{UserType} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No user information for permission check!',
-        );
-        return;
-    }
-
-    # TODO!!! rbo-190327
-    # # permission check and restrictions
-    # my %GroupList;
-    # if ( $Param{UserID} && $Param{UserID} != 1 && $Param{UserType} eq 'Agent' ) {
-
-    #     # get users groups
-    #     %GroupList = $Kernel::OM->Get('Group')->PermissionUserGet(
-    #         UserID => $Param{UserID},
-    #         Type   => $Param{Permission} || 'ro',
+    # if ( !$Param{UserID} && !$Param{UserType} ) {
+    #     $Kernel::OM->Get('Log')->Log(
+    #         Priority => 'error',
+    #         Message  => 'No user information for permission check!',
     #     );
-
-    #     # return if we have no permissions
-    #     return if !%GroupList;
-    # }
-    # if ( $Param{UserID} && $Param{UserType} eq 'Customer' ) {
-
-    #     my $DBObject = $Kernel::OM->Get('DB');
-
-    #     # get customer groups
-    #     %GroupList = $Kernel::OM->Get('CustomerGroup')->GroupMemberList(
-    #         UserID => $Param{UserID},
-    #         Type   => $Param{Permission} || 'ro',
-    #         Result => 'HASH',
-    #     );
-
-    #     # return if we have no permissions
-    #     return if !%GroupList;
-
-    #     # get all customer ids
-    #     $SQLWhere = '(';
-    #     my @CustomerIDs = $Kernel::OM->Get('Contact')->CustomerIDs(
-    #         User => $Param{UserID},
-    #     );
-
-    #     if (@CustomerIDs) {
-
-    #         my $Lower = '';
-    #         if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
-    #             $Lower = 'LOWER';
-    #         }
-
-    #         $SQLWhere .= "$Lower(st.customer_id) IN (";
-    #         my $Exists = 0;
-
-    #         for (@CustomerIDs) {
-
-    #             if ($Exists) {
-    #                 $SQLWhere  .= ', ';
-    #             }
-    #             else {
-    #                 $Exists = 1;
-    #             }
-    #             $SQLWhere  .= "$Lower('" . $DBObject->Quote($_) . "')";
-    #         }
-    #         $SQLWhere  .= ') OR ';
-    #     }
-
-    #     # get all own tickets
-    #     my $UserIDQuoted = $DBObject->Quote( $Param{UserID} );
-    #     $SQLWhere  .= "st.customer_user_id = '$UserIDQuoted') ";
-    # }
-
-    # # add group ids to sql string
-    # if (%GroupList) {
-    #     $SQLWhere = 'sq.group_id IN ('.(join(',', sort keys %GroupList)).')';
+    #     return;
     # }
 
     return $SQLWhere;

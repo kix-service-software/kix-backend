@@ -85,15 +85,15 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform ClientRegistration search
-    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
+    my @ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
 
 	# get already prepared ClientRegistration data from ClientRegistrationGet operation
-    if ( IsArrayRefWithData($ClientList) ) {  	
+    if ( IsArrayRefWithData(\@ClientList) ) {  	
         my $ClientRegistrationGetResult = $Self->ExecOperation(
             OperationType            => 'V1::ClientRegistration::ClientRegistrationGet',
             SuppressPermissionErrors => 1,
             Data      => {
-                ClientID => join(',', @{$ClientList}),
+                ClientID => join(',', @ClientList),
             }
         );    
 

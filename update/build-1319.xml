@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="client_registration">
+        <ColumnDrop Name="notification_interval"/>
+        <ColumnDrop Name="last_notification_timestamp"/>
+    </TableAlter>
+
+    <TableDrop Name="client_notification"/>
+
+</database>
