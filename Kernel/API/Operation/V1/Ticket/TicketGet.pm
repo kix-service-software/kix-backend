@@ -255,142 +255,31 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
     my @TicketList;
 
-    # start loop
-    for my $TicketID ( @{$Param{Data}->{TicketID}} ) {
-
-        # get the Ticket
-        my %TicketRaw = $TicketObject->TicketGet(
-            TicketID      => $TicketID,
-            DynamicFields => $Param{Data}->{include}->{DynamicFields},
-            Extended      => $Param{Data}->{extended},
-            UserID        => $Self->{Authorization}->{UserID},
+    if ( $Self->_CanRunParallel(Items => $Param{Data}->{TicketID}) ) { 
+        @TicketList = $Self->_RunParallel(
+            \&_GetTicketData,
+            Items => $Param{Data}->{TicketID},
+            %Param,
         );
-
-        if ( !IsHashRefWithData( \%TicketRaw ) ) {
-
-            return $Self->_Error(
-                Code => 'Object.NotFound',
-            );
-        }
-
-        # add unseen information
-        my %Flags = $TicketObject->TicketFlagGet(
-            TicketID => $TicketID,
-            UserID   => $Self->{Authorization}->{UserID},
-        );
-        $TicketRaw{Unseen} = (!exists($Flags{Seen}) || !$Flags{Seen}) ? 1 : 0;
-
-        my %TicketData;
-        my @DynamicFields;
-
-        # inform API caching about a new dependency
-        $Self->AddCacheDependency(Type => 'DynamicField');
-
-        # remove all dynamic fields from main ticket hash and set them into an array.
-        ATTRIBUTE:
-        for my $Attribute ( sort keys %TicketRaw ) {
-
-            if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
-                if ( $TicketRaw{$Attribute} ) {
-                    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
-                        Name => $1,
-                    );
-                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
-
-                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
-                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
-
-                        # get prepared value
-                        my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
-                            DynamicFieldConfig => $DynamicFieldConfig,
-                            Key                => $TicketRaw{$Attribute},
-                        );
-
-                        # get display value string
-                        my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
-                            DynamicFieldConfig => $DynamicFieldConfig,
-                            Value              => $TicketRaw{$Attribute}
-                        );
-
-                        if (!IsHashRefWithData($DisplayValue)) {
-                            my $Separator = ', ';
-                            if (
-                                IsHashRefWithData($DynamicFieldConfig) &&
-                                IsHashRefWithData($DynamicFieldConfig->{Config}) &&
-                                defined $DynamicFieldConfig->{Config}->{ItemSeparator}
-                            ) {
-                                $Separator = $DynamicFieldConfig->{Config}->{ItemSeparator};
-                            }
-
-                            my @Values;
-                            if ( ref $DFPreparedValue eq 'ARRAY' ) {
-                                @Values = @{ $DFPreparedValue };
-                            }
-                            else {
-                                @Values = ($DFPreparedValue);
-                            }
-
-                            $DisplayValue = {
-                                Value => join($Separator, @Values)
-                            };
-                        }
-
-                        # get html display value string
-                        my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
-                            DynamicFieldConfig => $DynamicFieldConfig,
-                            Value              => $TicketRaw{$Attribute},
-                        );
-
-                        # get short display value string
-                        my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
-                            DynamicFieldConfig => $DynamicFieldConfig,
-                            Value              => $TicketRaw{$Attribute}
-                        );
-
-                        push @DynamicFields, {
-                            ID                => $DynamicFieldConfig->{ID},
-                            Name              => $DynamicFieldConfig->{Name},
-                            Label             => $DynamicFieldConfig->{Label},
-                            Value             => $TicketRaw{$Attribute},
-                            DisplayValue      => $DisplayValue->{Value},
-                            DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
-                            DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
-                            PreparedValue     => $DFPreparedValue
-                        };
-                    }
-                }
-                next ATTRIBUTE;
-            }
-
-            $TicketData{$Attribute} = $TicketRaw{$Attribute};
-        }
-
-        # add dynamic fields array into 'DynamicFields' hash key if any
-        if (@DynamicFields) {
-            $TicketData{DynamicFields} = \@DynamicFields;
-        }
-        else {
-            $TicketData{DynamicFields} = [];
-        }
-
-        # include AccountedTime if requested
-        if ( $Param{Data}->{include}->{AccountedTime} && !defined $TicketData{AccountedTime} ) {
-            $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
+    }
+    else {
+        # start loop
+        for my $TicketID ( @{$Param{Data}->{TicketID}} ) {
+            my $TicketData = $Self->_GetTicketData(
                 TicketID => $TicketID,
+                Data     => $Param{Data}
             );
+            if ( IsHashRefWithData($TicketData) ) {
+                push @TicketList, $TicketData;
+            }
+            else {
+                return $Self->_Error(
+                    Code => 'Object.NotFound',
+                );
+            }
         }
-
-        # FIXME: workaround KIX2018-3308
-        $TicketData{ContactID} = $TicketData{ContactID} ? "$TicketData{ContactID}" : '';
-        $TicketData{OrganisationID} = $TicketData{OrganisationID} ? "$TicketData{OrganisationID}" : '';
-
-        # add
-        push(@TicketList, \%TicketData);
     }
 
     if ( scalar(@TicketList) == 1 ) {
@@ -402,6 +291,137 @@ sub Run {
     return $Self->_Success(
         Ticket => \@TicketList,
     );
+}
+
+sub _GetTicketData {
+    my ( $Self, %Param ) = @_;
+
+    my $TicketID = $Param{Item} || $Param{TicketID};
+
+    my $TicketObject = $Kernel::OM->Get('Ticket');
+
+    # get the Ticket
+    my %TicketRaw = $TicketObject->TicketGet(
+        TicketID      => $TicketID,
+        DynamicFields => $Param{Data}->{include}->{DynamicFields},
+        Extended      => $Param{Data}->{extended},
+        UserID        => $Self->{Authorization}->{UserID},
+    );
+
+    if ( !IsHashRefWithData( \%TicketRaw ) ) {
+        return;
+    }
+
+    # add unseen information
+    my %Flags = $TicketObject->TicketFlagGet(
+        TicketID => $TicketID,
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+    $TicketRaw{Unseen} = (!exists($Flags{Seen}) || !$Flags{Seen}) ? 1 : 0;
+
+    my %TicketData;
+    my @DynamicFields;
+
+    # inform API caching about a new dependency
+    $Self->AddCacheDependency(Type => 'DynamicField');
+
+    # remove all dynamic fields from main ticket hash and set them into an array.
+    ATTRIBUTE:
+    for my $Attribute ( sort keys %TicketRaw ) {
+
+        if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
+            if ( $TicketRaw{$Attribute} ) {
+                my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                    Name => $1,
+                );
+                if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                    # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                    next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+                    # get prepared value
+                    my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        Key                => $TicketRaw{$Attribute},
+                    );
+
+                    # get display value string
+                    my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        Value              => $TicketRaw{$Attribute}
+                    );
+
+                    if (!IsHashRefWithData($DisplayValue)) {
+                        my $Separator = ', ';
+                        if (
+                            IsHashRefWithData($DynamicFieldConfig) &&
+                            IsHashRefWithData($DynamicFieldConfig->{Config}) &&
+                            defined $DynamicFieldConfig->{Config}->{ItemSeparator}
+                        ) {
+                            $Separator = $DynamicFieldConfig->{Config}->{ItemSeparator};
+                        }
+
+                        my @Values;
+                        if ( ref $DFPreparedValue eq 'ARRAY' ) {
+                            @Values = @{ $DFPreparedValue };
+                        }
+                        else {
+                            @Values = ($DFPreparedValue);
+                        }
+
+                        $DisplayValue = {
+                            Value => join($Separator, @Values)
+                        };
+                    }
+
+                    # get html display value string
+                    my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        Value              => $TicketRaw{$Attribute},
+                    );
+
+                    # get short display value string
+                    my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        Value              => $TicketRaw{$Attribute}
+                    );
+
+                    push @DynamicFields, {
+                        ID                => $DynamicFieldConfig->{ID},
+                        Name              => $DynamicFieldConfig->{Name},
+                        Label             => $DynamicFieldConfig->{Label},
+                        Value             => $TicketRaw{$Attribute},
+                        DisplayValue      => $DisplayValue->{Value},
+                        DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
+                        DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
+                        PreparedValue     => $DFPreparedValue
+                    };
+                }
+            }
+            next ATTRIBUTE;
+        }
+    }
+
+    # add dynamic fields array into 'DynamicFields' hash key if any
+    if (@DynamicFields) {
+        $TicketData{DynamicFields} = \@DynamicFields;
+    }
+    else {
+        $TicketData{DynamicFields} = [];
+    }
+    
+    # include AccountedTime if requested
+    if ( $Param{Data}->{include}->{AccountedTime} && !defined $TicketData{AccountedTime} ) {
+        $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
+            TicketID => $TicketID,
+        );
+    }
+
+    #FIXME: workaround KIX2018-3308
+    $TicketData{ContactID}      = "" . $TicketData{ContactID};
+    $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
+
+    return \%TicketData;
 }
 
 1;

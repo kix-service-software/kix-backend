@@ -689,6 +689,14 @@ Get the value of all (valid) SysConfig option
 sub ValueGetAll {
     my ( $Self, %Param ) = @_;
 
+    # check cache
+    my $CacheKey = 'ValueGetAll::'.($Param{Valid} || '');
+    my $CacheResult = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey
+    );
+    return %{$CacheResult} if (IsArrayRefWithData($CacheResult));
+
     my $Where = '';
     if ( $Param{Valid} ) {
         $Where = 'WHERE valid_id = 1'
@@ -721,6 +729,14 @@ sub ValueGetAll {
         }
         $_->{Name} => $Value
     } @{$FetchResult};
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%Result,
+    );
 
     return %Result;
 }

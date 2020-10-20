@@ -126,176 +126,24 @@ sub Run {
 
     my @ContactList;
   
-    # start loop
-    foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
-
-        # get the Contact data
-        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-            ID => $ContactID,
+    if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) { 
+        @ContactList = $Self->_RunParallel(
+            \&_GetContactData,
+            Items => $Param{Data}->{ContactID},
+            %Param,
         );
-
-        if ( !IsHashRefWithData( \%ContactData ) ) {
-
-            return $Self->_Error(
-                Code => 'Object.NotFound',
+    }
+    else {
+        # start loop
+        foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
+            my $ContactData = $Self->_GetContactData(
+                ContactID => $ContactID,
+                Data      => $Param{Data}
             );
-        }
-
-        # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
-            foreach my $Attr (sort keys %ContactData) {
-                delete $ContactData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+            if ( IsHashRefWithData($ContactData) ) {
+                push @ContactList, $ContactData;
             }
         }
-
-        # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
-            foreach my $Attr (sort keys %ContactData) {
-                delete $ContactData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
-            }
-        }
-
-        # include TicketStats if requested
-        if ( $Param{Data}->{include}->{TicketStats} ) {
-            # execute ticket searches
-            my %TicketStats;
-            # new tickets
-            $TicketStats{NewCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
-                    AND => [
-                        {
-                            Field    => 'ContactID',
-                            Operator => 'EQ',
-                            Value    => $ContactID,
-                        },
-                        {
-                            Field    => 'StateType',
-                            Operator => 'EQ',
-                            Value    => 'new',
-                        },
-                    ]
-                },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
-            );
-            # open tickets
-            $TicketStats{OpenCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
-                    AND => [
-                        {
-                            Field    => 'ContactID',
-                            Operator => 'EQ',
-                            Value    => $ContactID,
-                        },
-                        {
-                            Field    => 'StateType',
-                            Operator => 'EQ',
-                            Value    => 'open',
-                        },
-                    ]
-                },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
-            );
-            # pending tickets
-            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
-                    AND => [
-                        {
-                            Field    => 'ContactID',
-                            Operator => 'EQ',
-                            Value    => $ContactID,
-                        },
-                        {
-                            Field    => 'StateType',
-                            Operator => 'EQ',
-                            Value    => 'pending reminder',
-                        },
-                    ]
-                },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
-            );
-
-            $ContactData{TicketStats} = \%TicketStats;
-
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'Ticket');
-            $Self->AddCacheDependency(Type => 'User');
-        }
-
-        # include assigned user if requested (and existing)
-
-        #FIXME: workaround KIX2018-3308####################
-        $Self->AddCacheDependency(Type => 'User');
-        my $UserData;
-        if ($ContactData{AssignedUserID}) {
-            $UserData = $Self->ExecOperation(
-                OperationType => 'V1::User::UserGet',
-                Data          => {
-                    UserID => $ContactData{AssignedUserID},
-                }
-            );
-        }
-        $ContactData{Login} = ($UserData && $UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
-        #######################
-
-        #comment back in when 3308 is resolved properly
-        if ($Param{Data}->{include}->{User}) {
-            # $Self->AddCacheDependency( Type => 'User' );
-            # $ContactData{User} = undef;
-            # if ($ContactData{AssignedUserID}) {
-            #     my $UserData = $Self->ExecOperation(
-            #         OperationType => 'V1::User::UserGet',
-            #         Data          => {
-            #             UserID => $ContactData{AssignedUserID},
-            #         }
-            #     );
-                $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
-            # }
-        }
-
-        # include assigned config items if requested
-        if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
-
-            # add user data for
-            my %CIContact = %ContactData;
-            if (!$CIContact{User} && $CIContact{AssignedUserID}) {
-                my $UserData = $Self->ExecOperation(
-                    OperationType => 'V1::User::UserGet',
-                    Data          => {
-                        UserID => $CIContact{AssignedUserID},
-                    }
-                );
-                $CIContact{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
-                $Self->AddCacheDependency(Type => 'User');
-            }
-
-            my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-                ObjectType => 'Contact',
-                Object     => \%CIContact
-            );
-
-            # filter for customer assigned config items if necessary
-            my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
-                ConfigItemIDList => $ItemIDs
-            );
-
-            $ContactData{AssignedConfigItems} = \@ConfigItemIDList;
-
-            $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
-        }
-
-        # delete the UserID in %ContactData, because it's some backwards compatibility fix (KIX2018-2515) masking the
-        # the contact ID as the user ID and should not be delivered through the API to the client.
-        delete($ContactData{UserID});
-
-        #always delete the User ID of the assigned User. If user information is requested, the assigned User Object is
-        # included.
-        #delete($ContactData{AssignedUserID});
-
-        # add
-        push(@ContactList, \%ContactData);
     }
 
     if ( scalar(@ContactList) == 1 ) {
@@ -307,6 +155,179 @@ sub Run {
     return $Self->_Success(
         Contact => \@ContactList,
     );
+}
+
+sub _GetContactData {
+    my ( $Self, %Param ) = @_;
+
+    my $ContactID = $Param{Item} || $Param{ContactID};
+
+    # get the Contact data
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+        ID => $ContactID,
+    );
+
+    if ( !IsHashRefWithData( \%ContactData ) ) {
+
+        return $Self->_Error(
+            Code => 'Object.NotFound',
+        );
+    }
+
+    # filter valid attributes
+    if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
+        foreach my $Attr (sort keys %ContactData) {
+            delete $ContactData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+        }
+    }
+
+    # filter valid attributes
+    if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
+        foreach my $Attr (sort keys %ContactData) {
+            delete $ContactData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
+        }
+    }
+
+    # include TicketStats if requested
+    if ( $Param{Data}->{include}->{TicketStats} ) {
+        # execute ticket searches
+        my %TicketStats;
+        # new tickets
+        $TicketStats{NewCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'ContactID',
+                        Operator => 'EQ',
+                        Value    => $ContactID,
+                    },
+                    {
+                        Field    => 'StateType',
+                        Operator => 'EQ',
+                        Value    => 'new',
+                    },
+                ]
+            },
+            UserID => $Self->{Authorization}->{UserID},
+            Result => 'COUNT',
+        );
+        # open tickets
+        $TicketStats{OpenCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'ContactID',
+                        Operator => 'EQ',
+                        Value    => $ContactID,
+                    },
+                    {
+                        Field    => 'StateType',
+                        Operator => 'EQ',
+                        Value    => 'open',
+                    },
+                ]
+            },
+            UserID => $Self->{Authorization}->{UserID},
+            Result => 'COUNT',
+        );
+        # pending tickets
+        $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'ContactID',
+                        Operator => 'EQ',
+                        Value    => $ContactID,
+                    },
+                    {
+                        Field    => 'StateType',
+                        Operator => 'EQ',
+                        Value    => 'pending reminder',
+                    },
+                ]
+            },
+            UserID => $Self->{Authorization}->{UserID},
+            Result => 'COUNT',
+        );
+
+        $ContactData{TicketStats} = \%TicketStats;
+
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'Ticket');
+        $Self->AddCacheDependency(Type => 'User');
+    }
+
+    # include assigned user if requested (and existing)
+
+    #FIXME: workaround KIX2018-3308####################
+    $Self->AddCacheDependency(Type => 'User');
+    my $UserData;
+    if ($ContactData{AssignedUserID}) {
+        $UserData = $Self->ExecOperation(
+            OperationType => 'V1::User::UserGet',
+            Data          => {
+                UserID => $ContactData{AssignedUserID},
+            }
+        );
+    }
+    $ContactData{Login} = ($UserData && $UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
+    #######################
+
+    #comment back in when 3308 is resolved properly
+    if ($Param{Data}->{include}->{User}) {
+        # $Self->AddCacheDependency( Type => 'User' );
+        # $ContactData{User} = undef;
+        # if ($ContactData{AssignedUserID}) {
+        #     my $UserData = $Self->ExecOperation(
+        #         OperationType => 'V1::User::UserGet',
+        #         Data          => {
+        #             UserID => $ContactData{AssignedUserID},
+        #         }
+        #     );
+            $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+        # }
+    }
+
+    # include assigned config items if requested
+    if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
+
+        # add user data for
+        my %CIContact = %ContactData;
+        if (!$CIContact{User} && $CIContact{AssignedUserID}) {
+            my $UserData = $Self->ExecOperation(
+                OperationType => 'V1::User::UserGet',
+                Data          => {
+                    UserID => $CIContact{AssignedUserID},
+                }
+            );
+            $CIContact{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+            $Self->AddCacheDependency(Type => 'User');
+        }
+
+        my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
+            ObjectType => 'Contact',
+            Object     => \%CIContact
+        );
+
+        # filter for customer assigned config items if necessary
+        my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
+            ConfigItemIDList => $ItemIDs
+        );
+
+        $ContactData{AssignedConfigItems} = \@ConfigItemIDList;
+
+        $Self->AddCacheDependency(Type => 'ITSMConfigurationManagement');
+    }
+
+    # delete the UserID in %ContactData, because it's some backwards compatibility fix (KIX2018-2515) masking the
+    # the contact ID as the user ID and should not be delivered through the API to the client.
+    delete($ContactData{UserID});
+
+    #always delete the User ID of the assigned User. If user information is requested, the assigned User Object is
+    # included.
+    #delete($ContactData{AssignedUserID});
+
+    return \%ContactData;
 }
 
 1;

@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use File::Basename;
+use Storable;
 
 use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(:all);
@@ -347,28 +348,100 @@ sub _CheckPermission {
     my ($Resource, $ResourceBase) = fileparse $Self->{RequestURI};
     my @Resources = split(/,/, $Resource);
 
-    # check if user has permission for this request
     my $Granted = 0;
     my $AllowedPermission;
     my @GrantedResources;
-    foreach my $Resource ( @Resources ) {
-        ($Granted, $AllowedPermission) = $Kernel::OM->Get('User')->CheckResourcePermission(
-            UserID              => $Param{Authorization}->{UserID},
-            UsageContext        => $Param{Authorization}->{UserType},
-            Target              => $ResourceBase.$Resource,
-            RequestedPermission => $RequestedPermission,
-        );
 
-        my $AllowedPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
-            Value  => $AllowedPermission || 0,
-            Format => 'Short'
-        );
+    # check permissions parallel
+    my $NumWorkers = $Kernel::OM->Get('Config')->Get('API::Parallelity') || 4;
+    my $MinChecksPerWorker = $Kernel::OM->Get('Config')->Get('API::MinTasksPerWorker') || 10;
 
-        $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $AllowedPermissionShort, ($AllowedPermission||0)));
+    my $CanRunParallel = (!$Kernel::OM->Get('Config')->Get('SecureMode') && $Param{Authorization}->{UserID} == 1) && $Kernel::OM->Get('Config')->Get('API::Parallelity');
 
-        if ( $Granted ) {
-            # build new list of allowed (item) resources
-            push(@GrantedResources, $Resource);
+    if ( $CanRunParallel && scalar(@Resources) >= $NumWorkers * $MinChecksPerWorker ) {
+
+        use threads;
+        use threads::shared;
+        use Thread::Queue;
+
+        my $WorkQueue : shared;
+        $WorkQueue = Thread::Queue->new();
+        my $ResultQueue : shared;
+        $ResultQueue = Thread::Queue->new();
+
+        $Self->_PermissionDebug("using parallel algorithm ($NumWorkers workers)");
+
+        # create parallel instances
+        my %Workers;
+        foreach my $WorkerID ( 1..$NumWorkers ) {
+            $Workers{$WorkerID}, threads->create(
+                sub {
+                    my ( $Self, %Param ) = @_;
+
+                    local $Kernel::OM = Kernel::System::ObjectManager->new(
+                        'Log' => {
+                            LogPrefix => 'worker#'.$Param{WorkerID},
+                        },
+                    );
+
+                    while ( (my $Resource = $Param{WorkQueue}->dequeue) ne "END_OF_QUEUE" ) {
+                        my ( $Granted, $AllowedPermission ) = $Self->_CheckPermissionWorker(
+                            %Param,
+                            Target => $Param{ResourceBase}.$Resource, 
+                        );
+
+                        if ( $Granted ) {
+                            # build new list of allowed (item) resources
+                            $ResultQueue->enqueue( Storable::freeze {    
+                                Resource          => $Resource, 
+                                Granted           => $Granted, 
+                                AllowedPermission => $AllowedPermission
+                            });
+                        }
+                    }
+                }, 
+                $Self, 
+                WorkQueue           => $WorkQueue,
+                ResultQueue         => $ResultQueue,
+                WorkerID            => $WorkerID, 
+                UserID              => $Param{Authorization}->{UserID},
+                UserType            => $Param{Authorization}->{UserType},
+                ResourceBase        => $ResourceBase,
+                RequestedPermission => $RequestedPermission
+            );
+        }
+
+        $WorkQueue->enqueue(@Resources);
+
+        foreach ( 1..$NumWorkers ) {
+            $WorkQueue->enqueue("END_OF_QUEUE");
+        }
+
+        foreach my $t ( threads->list() ) {
+            $t->join();
+        }
+
+        # sync thread output
+        while ( my $Result = Storable::thaw $ResultQueue->dequeue_nb() ) {
+            push @GrantedResources, $Result->{Resource};
+
+            $Granted           = $Result->{Granted},
+            $AllowedPermission = $Result->{AllowedPermission};
+        }
+    }
+    else {
+        foreach my $Resource ( @Resources ) {
+            ( $Granted, $AllowedPermission ) = $Self->_CheckPermissionWorker(
+                UserID              => $Param{Authorization}->{UserID}, 
+                UserType            => $Param{Authorization}->{UserType}, 
+                Target              => $ResourceBase.$Resource, 
+                RequestedPermission => $RequestedPermission
+            );
+
+            if ( $Granted ) {
+                # build new list of allowed (item) resources
+                push(@GrantedResources, $Resource);
+            }
         }
     }
 
@@ -399,6 +472,26 @@ sub _CheckPermission {
     $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
 
     return ($Granted, @AllowedMethods);
+}
+
+sub _CheckPermissionWorker {
+    my ( $Self, %Param ) = @_;
+
+    my ($Granted, $AllowedPermission) = $Kernel::OM->Get('User')->CheckResourcePermission(
+        UserID              => $Param{UserID},
+        UsageContext        => $Param{UserType},
+        Target              => $Param{Target},
+        RequestedPermission => $Param{RequestedPermission},
+    );
+
+    my $AllowedPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
+        Value  => $AllowedPermission || 0,
+        Format => 'Short'
+    );
+
+    $Self->_PermissionDebug(sprintf("RequestURI: %s, requested permission: $Param{RequestedPermission}, granted: %i, allowed permission: %s (0x%04x)", $Param{Target}, ($Granted || 0), $AllowedPermissionShort, ($AllowedPermission||0)));
+
+    return ($Granted, $AllowedPermission);
 }
 
 sub _Debug {

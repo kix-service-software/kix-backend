@@ -10,7 +10,7 @@ package Kernel::System::Token;
 
 use strict;
 use warnings;
-use JSON;
+use JSON::MaybeXS;
 use JSON::WebToken;
 
 use Kernel::Language qw(Translatable);

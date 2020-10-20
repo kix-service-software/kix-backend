@@ -18,6 +18,8 @@ use Time::HiRes qw(gettimeofday);
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
+use base qw(Kernel::System::AsynchronousExecutor);
+
 our @ObjectDependencies = (
     'Config',
     'CacheInternal',
@@ -100,7 +102,7 @@ sub ClientRegistrationGet {
     return %{$Cache} if $Cache;
     
     return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT client_id, notification_url, notification_interval, notification_authorization, additional_data, last_notification_timestamp FROM client_registration WHERE client_id = ?",
+        SQL   => "SELECT client_id, notification_url, notification_authorization, additional_data FROM client_registration WHERE client_id = ?",
         Bind => [ \$Param{ClientID} ],
     );
 
@@ -111,14 +113,12 @@ sub ClientRegistrationGet {
         %Data = (
             ClientID                  => $Row[0],
             NotificationURL           => $Row[1],
-            NotificationInterval      => $Row[2],
-            Authorization             => $Row[3],
-            LastNotificationTimestamp => $Row[5],
+            Authorization             => $Row[2],
         );
-        if ( $Row[4] ) {
+        if ( $Row[3] ) {
             # prepare additional data
             my $AdditionalData = $Kernel::OM->Get('JSON')->Decode(
-                Data => $Row[4]
+                Data => $Row[3]
             );
             if ( IsHashRefWithData($AdditionalData) ) {
                 $Data{Plugins}  = $AdditionalData->{Plugins};
@@ -157,7 +157,6 @@ Adds a new client registration
     my $Result = $ClientRegistrationObject->ClientRegistrationAdd(
         ClientID             => 'CLIENT1',
         NotificationURL      => '...',            # optional
-        NotificationInterval => 123,              # optional, in seconds
         Authorization        => '...',            # optional
         Translations         => '...',            # optional
         Plugins              => [],               # optional
@@ -177,9 +176,6 @@ sub ClientRegistrationAdd {
         }
     }
 
-    # init the last notification timestamp to define a base to start from
-    my $Now = ($Param{NotificationURL} && $Param{NotificationInterval}) ? gettimeofday() : undef;
-
     # prepare additional data
     my $AdditionalDataJSON = $Kernel::OM->Get('JSON')->Encode(
         Data => {
@@ -190,14 +186,12 @@ sub ClientRegistrationAdd {
 
     # do the db insert...
     my $Result = $Self->{DBObject}->Do(
-        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_interval, notification_authorization, additional_data, last_notification_timestamp) VALUES (?, ?, ?, ?, ?, ?)",
+        SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_authorization, additional_data) VALUES (?, ?, ?, ?)",
         Bind => [
             \$Param{ClientID},
             \$Param{NotificationURL},
-            \$Param{NotificationInterval},
             \$Param{Authorization},
             \$AdditionalDataJSON,
-            \$Now,
         ],
     );
 
@@ -216,27 +210,14 @@ sub ClientRegistrationAdd {
         Type => $Self->{CacheType}
     );
 
-    # schedule notification task if requested by client
-    if ( $Param{NotificationURL} && $Param{NotificationInterval} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'info',
-            Message  => "Scheduling periodic notification task for client \"$Param{ClientID}\" with an interval of $Param{NotificationInterval} seconds.",
-        );
-
-        my $Result = $Self->ScheduleNotificationTask(
-            ClientID => $Param{ClientID},
-        );
-        return if !$Result;
-    }
-
     return $Param{ClientID};
 }
 
 =item ClientRegistrationList()
 
-Returns a ArrayRef with all registered ClientIDs
+Returns an array with all registered ClientIDs
 
-    my $ClientIDs = $ClientRegistrationObject->ClientRegistrationList(
+    my @ClientIDs = $ClientRegistrationObject->ClientRegistrationList(
         Notifiable => 0|1           # optional, get only those client that requested to be notified
     );
 
@@ -252,12 +233,12 @@ sub ClientRegistrationList {
         Type => $Self->{CacheType},
         Key  => $CacheKey
     );
-    return $CacheResult if (IsArrayRefWithData($CacheResult));
+    return @{$CacheResult} if (IsArrayRefWithData($CacheResult));
   
     my $SQL = 'SELECT client_id FROM client_registration';
 
     if ( $Param{Notifiable} ) {
-        $SQL .= ' WHERE notification_url IS NOT NULL and notification_interval IS NOT NULL'
+        $SQL .= ' WHERE notification_url IS NOT NULL'
     }
 
     return if !$Self->{DBObject}->Prepare( 
@@ -277,7 +258,7 @@ sub ClientRegistrationList {
         TTL   => $CacheTTL,
     );
 
-    return \@Result;
+    return @Result;
 }
 
 =item ClientRegistrationDelete()
@@ -351,230 +332,78 @@ sub NotifyClients {
     my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
     my $RequestID = $Headers{HTTP_KIX_REQUEST_ID} || '';
 
-    # do the db insert...
-    my $Result = $Self->{DBObject}->Do(
-        SQL  => "INSERT INTO client_notification (timestamp, event, request_id, namespace, object_id) VALUES (?, ?, ?, ?, ?)",
-        Bind => [
-            \$Timestamp,
-            \$Param{Event},
-            \$RequestID,
-            \$Param{Namespace},
-            \$Param{ObjectID},
-        ],
+    $Kernel::OM->Get('Cache')->Set(
+        Type          => 'ClientNotification',
+        Key           => $$.'_'.$Timestamp.'_'.$RequestID,
+        Value         => $Param{Event}.'::'.$Param{Namespace}.'::'.$Param{ObjectID},
+        NoStatsUpdate => 1,
     );
-
-    # handle the insert result...
-    if ( !$Result ) {
-        $Self->{LogObject}->Log(
-            Priority => 'error',
-            Message  => "DB insert failed!",
-        );
-
-        return;
-    }
-
-    return 1;
-}
-
-=item NotificationCleanup()
-
-Cleans up old client notifications
-
-    my $Result = $ClientRegistrationObject->NotificationCleanup(
-        MaxAge => 123       # required, delete all entries older than minutes
-    );
-
-=cut
-
-sub NotificationCleanup {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(MaxAge)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my $Threshold = $Param{MaxAge} * 60;
-
-    # do the db delete...
-    my $Result = $Self->{DBObject}->Do(
-        SQL  => "DELETE FROM client_notification WHERE timestamp < timestamp - ?",
-        Bind => [
-            \$Threshold
-        ],
-    );
-
-    # handle the delete result...
-    if ( !$Result ) {
-        $Self->{LogObject}->Log(
-            Priority => 'error',
-            Message  => "DB delete failed!",
-        );
-
-        return;
-    }
 
     return 1;
 }
 
 =item NotificationSend()
 
-send notifications to client
+send notifications to all clients who want to receive notifications
 
-    my $Result = $ClientRegistrationObject->NotificationSend(
-        ClientID => 'CLIENT1',
-    );
+    my $Result = $ClientRegistrationObject->NotificationSend();
 
 =cut
 
 sub NotificationSend {
     my ( $Self, %Param ) = @_;
 
-    # get registration for client
-    my %ClientRegistration = $Self->ClientRegistrationGet(
-        ClientID => $Param{ClientID}
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    # get cached events
+    my @Keys = $CacheObject->GetKeysForType(
+        Type => 'ClientNotification',
     );
-    
-    # save current timestamp as new start point
-    my $Timestamp = gettimeofday();
+    return 1 if !@Keys;
 
-    return if !$Self->{DBObject}->Prepare( 
-        SQL   => "SELECT timestamp, event, request_id, namespace, object_type, object_id FROM client_notification WHERE timestamp > ?",
-        Bind  => [
-            \$ClientRegistration{LastNotificationTimestamp}
-        ]
+    my @EventList = $CacheObject->GetMulti(
+        Type          => 'ClientNotification',
+        Keys          => \@Keys,
+        UseRawKey     => 1,
+        NoStatsUpdate => 1,
     );
+    return 1 if !@EventList;
 
-    my @EventList;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        my %Event;
+    # get list of clients that requested to be notified
+    my @ClientIDs = $Self->ClientRegistrationList(
+        Notifiable => 1
+    );
+    return if !@ClientIDs;
 
-        $Event{Timestamp}  = $Row[0];
-        $Event{Event}      = $Row[1];
-        $Event{RequestID}  = $Row[2];
-        $Event{Namespace}  = $Row[3];
-        $Event{ObjectType} = $Row[4];
-        $Event{ObjectID}   = $Row[5];
-
-        push(@EventList, \%Event);
-    }
-
-    # only communication with client if we have something to tell
-    if ( @EventList ) {
-        my %Stats;
-        foreach my $Event ( @EventList ) {
-            $Stats{lc($Event->{Event})}++;        
-        }
-        my @StatsParts;
-        foreach my $Event ( sort keys %Stats ) {
-            push(@StatsParts, "$Stats{$Event} $Event".'s');
-        }
-
-        $Self->{LogObject}->Log( 
-            Priority => 'debug', 
-            Message  => "Sending ". @EventList . " notifications to client \"$Param{ClientID}\" (" . (join(', ', @StatsParts)) . ').' 
-        );
-
-        # don't use Crypt::SSLeay but Net::SSL instead
-        $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
-
-        my $UserAgent = LWP::UserAgent->new();
-
-        # set user agent
-        $UserAgent->agent(
-            $Kernel::OM->Get('Config')->Get('Product') . ' ' . $Kernel::OM->Get('Config')->Get('Version')
-        );
-    
-        # set timeout
-        $UserAgent->timeout( $Kernel::OM->Get('WebUserAgent')->{Timeout} );
-
-        # disable SSL host verification
-        if ( $Kernel::OM->Get('Config')->Get('WebUserAgent::DisableSSLVerification') ) {
-            $UserAgent->ssl_opts(
-                verify_hostname => 0,
-            );
-        }
-
-        # set proxy
-        if ( $Kernel::OM->Get('WebUserAgent')->{Proxy} ) {
-            $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Kernel::OM->Get('WebUserAgent')->{Proxy} );
-        }
-
-        my $Request = HTTP::Request->new('POST', $ClientRegistration{NotificationURL});
-        $Request->header('Content-Type' => 'application/json'); 
-        if ( $ClientRegistration{Authorization} ) {
-            $Request->header('Authorization' => $ClientRegistration{Authorization});
-        }
-        my $JSON = $Kernel::OM->Get('JSON')->Encode(
-            Data => \@EventList,
-        );
-        $Request->content($JSON);
-        my $Response = $UserAgent->request($Request);
-
-        if ( !$Response->is_success ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Client \"$Param{ClientID}\" responded with error ".$Response->status_line.".",
-            );
-            # don't return in case of an error, just re-schedule the job to try it again later
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'debug',
-                Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
-            );
-        }
-    }
-
-    # update client registration
-    my $Result = $Self->{DBObject}->Do(
-        SQL  => "UPDATE client_registration SET last_notification_timestamp = ? WHERE client_id = ?",
-        Bind => [
-            \$Timestamp,
-            \$Param{ClientID},
-        ],
+    # send outstanding notifications to clients
+    $Self->AsyncCall(
+        ObjectName               => $Kernel::OM->GetModuleFor('ClientRegistration'),
+        FunctionName             => 'NotificationSendWorker',
+        FunctionParams           => {
+            EventList => \@EventList,
+            ClientIDs => \@ClientIDs
+        },
+        MaximumParallelInstances => 1,
     );
 
-    # schedule new task if the scheduler executed this method
-    if ( $Param{IsScheduler} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'debug',
-            Message  => "Rescheduling notification task for client \"$Param{ClientID}\".",
-        );
-        my $Result = $Self->ScheduleNotificationTask(
-            ClientID => $Param{ClientID},
+    # delete the cached events we sent
+    foreach my $Key ( @Keys ) {
+        $CacheObject->Delete(
+            Type          => 'ClientNotification',
+            Key           => $Key,
+            UseRawKey     => 1,
+            NoStatsUpdate => 1,
         );
     }
-
-    # delete cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
 
     return 1;
 }
 
-=item ScheduleNotificationTask()
-
-Schedule a client notification task.
-
-    my $Result = $ClientRegistrationObject->ScheduleNotificationTask(
-        ClientID => 'CLIENT1',
-    );
-
-=cut
-
-sub ScheduleNotificationTask {
-    my ($Self, %Param) = @_;
+sub NotificationSendWorker {
+    my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ClientID)) {
+    for (qw(ClientIDs EventList)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -584,38 +413,110 @@ sub ScheduleNotificationTask {
         }
     }
 
+    my %Stats;
+    my @PreparedEventList;
+    foreach my $Item ( @{$Param{EventList}} ) {
+        my ( $Event, $Namespace, $ObjectID ) = split(/::/, $Item);
+        push @PreparedEventList, {
+            Event     => $Event,
+            Namespace => $Namespace,
+            ObjectID  => $ObjectID ? $ObjectID : '',
+        };
+        $Stats{lc($Event)}++;
+    }
+    my @StatsParts;
+    foreach my $Event ( sort keys %Stats ) {
+        push(@StatsParts, "$Stats{$Event} $Event".'s');
+    }
+
+    foreach my $ClientID ( @{$Param{ClientIDs}} ) {
+        $Self->{LogObject}->Log( 
+            Priority => 'debug', 
+            Message  => "Sending ". @PreparedEventList . " notifications to client \"$ClientID\" (" . (join(', ', @StatsParts)) . ').' 
+        );
+
+        $Self->_NotificationSendToClient(
+            ClientID  => $ClientID,
+            EventList => \@PreparedEventList,
+        );
+    }
+
+    return 1;
+}
+
+sub _NotificationSendToClient {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ClientID EventList)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get the registration of the client
     my %ClientRegistration = $Self->ClientRegistrationGet(
         ClientID => $Param{ClientID}
     );
 
-    # Calculate execution time in future.
-    my $ExecutionTime = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-        SystemTime => $Kernel::OM->Get('Time')->SystemTime() + $ClientRegistration{NotificationInterval},
-    );
+    # don't use Crypt::SSLeay but Net::SSL instead
+    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
 
-    # Create a new future task.
-    my $TaskID = $Kernel::OM->Get('Daemon::SchedulerDB')->FutureTaskAdd(
-        ExecutionTime => $ExecutionTime,
-        Type          => 'AsynchronousExecutor',
-        Name          => 'client notification for '.$Param{ClientID},
-        Attempts      => 1,
-        Data          => {
-            Object   => 'ClientRegistration',
-            Function => 'NotificationSend',
-            Params   => {
-                ClientID    => $Param{ClientID},
-                IsScheduler => 1
-            },
+    if ( !$Self->{UserAgent} ) {
+        my $ConfigObject       = $Kernel::OM->Get('Config');
+        my $WebUserAgentObject = $Kernel::OM->Get('WebUserAgent');
+        
+        $Self->{UserAgent} = LWP::UserAgent->new();
+
+        # set user agent
+        $Self->{UserAgent}->agent(
+            $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
+        );
+
+        # set timeout
+        $Self->{UserAgent}->timeout( $WebUserAgentObject->{Timeout} );
+
+        # disable SSL host verification
+        if ( $ConfigObject->Get('WebUserAgent::DisableSSLVerification') ) {
+            $Self->{UserAgent}->ssl_opts(
+                verify_hostname => 0,
+            );
         }
-    );
 
-    if ( !$TaskID ) {
+        # set proxy
+        if ( $WebUserAgentObject->{Proxy} ) {
+            $Self->{UserAgent}->proxy( [ 'http', 'https', 'ftp' ], $WebUserAgentObject->{Proxy} );
+        }
+    }
+
+    my $Request = HTTP::Request->new('POST', $ClientRegistration{NotificationURL});
+    $Request->header('Content-Type' => 'application/json'); 
+    if ( $ClientRegistration{Authorization} ) {
+        $Request->header('Authorization' => $ClientRegistration{Authorization});
+    }
+
+    my $JSON = $Kernel::OM->Get('JSON')->Encode(
+        Data => $Param{EventList},
+    );
+    $Request->content($JSON);
+    my $Response = $Self->{UserAgent}->request($Request);
+
+    if ( !$Response->is_success ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Could not schedule a task for periodic notification of client \"$Param{ClientID}\".",
+            Message  => "Client \"$Param{ClientID}\" responded with error ".$Response->status_line.".",
         );
-        return;
+        return 0;
     }
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'debug',
+        Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
+    );
 
     return 1;
 }
