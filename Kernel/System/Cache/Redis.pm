@@ -35,6 +35,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    $Kernel::OM->ObjectParamAdd(
+        'Config' => {
+            NoCache => 1
+        },
+    );
+
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
@@ -42,6 +48,8 @@ sub new {
     if ( $Self->{Config} ) {
         $Self->_InitRedis();
     }
+
+    $Kernel::OM->ObjectsDiscard( Objects => ['Config'] );
 
     return $Self;
 }

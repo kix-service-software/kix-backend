@@ -66,6 +66,7 @@ sub new {
     }
 
     $Self->{ReadOnlyOptions} = {};
+    $Self->{NoCache}         = $Param{NoCache};
 
     # load settings from Config.pm
     $Self->{Config} = $Self->LoadLocalConfig($Self->{Config}->{Home}.'/config');
@@ -125,16 +126,18 @@ sub LoadSysConfig {
 
     my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
-    # check cache
     my $CacheKey = 'Config';
-    my $CacheResult = $Kernel::OM->Get('Cache')->Get(
-        Type => $SysConfigObject->{CacheType},
-        Key  => $CacheKey
-    );
-    if ( IsHashRefWithData($CacheResult) ) {
-        $Self->{SysConfigLoaded} = 1;
-        $Self->{Config} = $CacheResult;
-        return 1;
+    if ( !$Self->{NoCache} ) {
+        # check cache
+        my $CacheResult = $Kernel::OM->Get('Cache')->Get(
+            Type => $SysConfigObject->{CacheType},
+            Key  => $CacheKey
+        );
+        if ( IsHashRefWithData($CacheResult) ) {
+            $Self->{SysConfigLoaded} = 1;
+            $Self->{Config} = $CacheResult;
+            return 1;
+        }
     }
 
     $Self->{SysConfigLoaded} = 1;
@@ -187,13 +190,15 @@ sub LoadSysConfig {
         die;
     }
 
-    # set cache
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $SysConfigObject->{CacheType},
-        TTL   => $SysConfigObject->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $Self->{Config},
-    );
+    if ( !$Self->{NoCache} ) {
+        # set cache
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $SysConfigObject->{CacheType},
+            TTL   => $SysConfigObject->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $Self->{Config},
+        );
+    }
 
     return 1;
 }
