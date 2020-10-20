@@ -400,6 +400,8 @@ sub _GetTicketData {
             }
             next ATTRIBUTE;
         }
+
+        $TicketData{$Attribute} = $TicketRaw{$Attribute};
     }
 
     # add dynamic fields array into 'DynamicFields' hash key if any
