@@ -241,6 +241,8 @@ sub Run {
         $Param{Data}->{$1} = (split(/\//, $Self->{AlteredRequestURI}))[-1];
     }
 
+    $Self->{BackendObject}->{PermissionCheckOnly} = $Param{PermissionCheckOnly};
+
     # start the backend
     my $Result = $Self->{BackendObject}->RunOperation(%Param);
 
