@@ -112,7 +112,7 @@ sub Describe {
     $Self->AddOption(
         Name        => 'Team',
         Label       => Kernel::Language::Translatable('Team'),
-        Description => Kernel::Language::Translatable('The name of the team of the new ticket.'),
+        Description => Kernel::Language::Translatable('The name of the team of the new ticket. If it is as sub-team, the full path-name has to be used (separated by two colons - e.g. "NameOfParentTeam::NameOfTeamToBeSet").'),
         Required    => 1,
     );
     $Self->AddOption(

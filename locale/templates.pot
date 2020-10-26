@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-10-12 11:21+0000\n"
+"POT-Creation-Date: 2020-10-26 13:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -959,7 +959,7 @@ msgid "Sets the team of a ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
-msgid "The name of the team to be set."
+msgid "The name of the team to be set. If it is as sub-team, the full path-name has to be used (separated by two colons - e.g. \"NameOfParentTeam::NameOfTeamToBeSet\")."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1039,7 +1039,7 @@ msgid "The name of the state of the new ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The name of the team of the new ticket."
+msgid "The name of the team of the new ticket. If it is as sub-team, the full path-name has to be used (separated by two colons - e.g. \"NameOfParentTeam::NameOfTeamToBeSet\")."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1211,7 +1211,7 @@ msgid "Defines how many tasks are needed per thread (see API::Parallelity) to us
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines how many threads should be used for parallel tasks."
+msgid "Defines how many threads should be used for parallel tasks. Enter 0 to deactivate."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1246,12 +1246,20 @@ msgstr ""
 msgid "Defines which attributes of the contact data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported"
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/API/Contact.xml
+msgid "Enable wildcard praefix for contact fulltext search."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API/Organisation.xml
 msgid "Defines which attributes of the organisation data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Organisation.xml
 msgid "Defines which attributes of the organisation data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Organisation.xml
+msgid "Enable wildcard praefix for organisation search."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -2047,10 +2055,6 @@ msgid "Defines which customer ID to use if no company defined - only relevant fo
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines which default password-suffix to use for import if not defined - strongly depends on backend configuration!!!"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines which email address to use if not defined - strongly depends on backend configuration!!!"
 msgstr ""
 
@@ -2068,10 +2072,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Delete expired cache from core modules."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Delete older callback events."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2143,10 +2143,6 @@ msgid "English"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Enter your shared secret to enable two factor authentication."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Event Based"
 msgstr ""
 
@@ -2196,10 +2192,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "German"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Google Authenticator"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2708,10 +2700,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Setup the separator used for splitting the structures handled in templategenerator."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Shared Secret"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3452,6 +3440,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the subject for rejected emails."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the template for notifications. The placeholders \"[% Data.Subject %]\" and \"[% Data.Body %]\" are used to insert the configured subject and text of the notification in these positions."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
