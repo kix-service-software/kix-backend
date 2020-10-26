@@ -625,10 +625,12 @@ sub ExecPlanCheck {
     );
     return if !$BackendObject;
 
+    # check the backend
+    # prevent the job execution if the job was created after the target time but on the day of desired execution
     my $BackendResult = $BackendObject->Run(
         %Param,
         Config            => $ExecPlan{Parameters},
-        LastExecutionTime => $Job{LastExecutionTime},
+        LastExecutionTime => $Job{LastExecutionTime} || $Job{CreateTime},
     );
 
     return $BackendResult;
