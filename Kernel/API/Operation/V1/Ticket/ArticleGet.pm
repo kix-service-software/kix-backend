@@ -248,6 +248,15 @@ sub Run {
 
             $ArticleData{To} = $ArticleData{To} . ' <' . $QueueSystemeMailAddress{Name} . '>';
         }
+
+        if ( $Param{Data}->{include}->{Plain} ) {
+            my $PlainMessage = $TicketObject->ArticlePlain(
+                ArticleID => $ArticleID,
+                UserID    => $Self->{Authorization}->{UserID},
+            ) || '';
+            $ArticleData{Plain} = $PlainMessage;
+        }
+
         # add
         push(@ArticleList, \%ArticleData);
     }

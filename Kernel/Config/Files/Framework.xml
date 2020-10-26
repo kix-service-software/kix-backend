@@ -506,14 +506,6 @@
             <String Regex="">dummy@localhost.com</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="UserImport::DefaultPassword" Required="1" Valid="1">
-        <Description Translatable="1">Defines which default password-suffix to use for import if not defined - strongly depends on backend configuration!!!</Description>
-        <Group>Framework</Group>
-        <SubGroup>UserImportExport</SubGroup>
-        <Setting>
-            <String Regex="">pass123</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="UserImport::ForceCSVMappingRecreation" Required="1" Valid="1">
         <Description Translatable="1">Defines if CSV-mappings are re-created on next package reinstallation or upgrade if already existent.</Description>
         <Group>Framework</Group>
@@ -630,26 +622,6 @@
                     <Array>
                         <Item>Expired</Item>
                         <Item>1</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###CallbackEventsCleanup" Required="0" Valid="1" ConfigLevel="100">
-        <Description Translatable="1">Delete older callback events.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">CallbackEventsCleanup</Item>
-                <Item Key="Schedule">0 */2 * * *</Item> <!-- default every 2 hours -->
-                <Item Key="Module">Kernel::System::ClientRegistration</Item>
-                <Item Key="Function">CallbackCleanup</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                        <Item>MaxAge</Item>
-                        <Item>120</Item>
                     </Array>
                 </Item>
             </Hash>
@@ -2384,7 +2356,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::HTTP::Password" Required="0" Valid="1">
+    <ConfigItem AccessLevel="confidential" Name="Tool::Acknowledge::HTTP::Password" Required="0" Valid="1">
         <Description Translatable="1">The http acknowledge password.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
@@ -7546,7 +7518,7 @@ You can log in via the following URL:
             <String Regex="">25</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Authentication###000-Default" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="confidential" Name="Authentication###000-Default" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the auth modules and their order of execution.</Description>
         <Group>Framework</Group>
         <Setting>
@@ -7658,7 +7630,7 @@ You can log in via the following URL:
             <Option Location="Kernel/System/Auth/TwoFactor/*.pm" SelectedID="Kernel::System::Auth::TwoFactor::GoogleAuthenticator"></Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthTwoFactorModule::SecretPreferencesKey" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="confidential" Name="AuthTwoFactorModule::SecretPreferencesKey" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the agent preferences key where the shared secret key is stored.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Agent::Auth::TwoFactor</SubGroup>
@@ -7739,24 +7711,6 @@ You can log in via the following URL:
                 <Item Key="PasswordNeedDigit">0</Item>
                 <Item Key="PasswordMaxLoginFailed">0</Item>
                 <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###GoogleAuthenticatorSecretKey" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Google Authenticator</Item>
-                <Item Key="Desc" Translatable="1">Enter your shared secret to enable two factor authentication.</Item>
-                <Item Key="Key" Translatable="1">Shared Secret</Item>
-                <Item Key="Block">Input</Item>
-                <Item Key="PrefKey">UserGoogleAuthenticatorSecretKey</Item>
-                <Item Key="Prio">0600</Item>
-                <Item Key="Active">0</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -7883,23 +7837,6 @@ You can log in via the following URL:
                         <Item Key="TableUserID">contact_id</Item>
                     </Hash>
                 </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###GoogleAuthenticatorSecretKey" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Google Authenticator</Item>
-                <Item Key="Key" Translatable="1">Shared Secret</Item>
-                <Item Key="Block">Input</Item>
-                <Item Key="PrefKey">UserGoogleAuthenticatorSecretKey</Item>
-                <Item Key="Prio">1100</Item>
-                <Item Key="Active">0</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8247,7 +8184,7 @@ You can log in via the following URL:
         <Group>Framework</Group>
         <SubGroup>Core::Cache</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/Cache/*.pm" SelectedID="Kernel::System::Cache::FileStorable">
+            <Option Location="Kernel/System/Cache/*.pm" SelectedID="Kernel::System::Cache::Redis">
             </Option>
         </Setting>
     </ConfigItem>

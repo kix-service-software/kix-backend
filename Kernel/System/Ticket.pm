@@ -1061,7 +1061,7 @@ sub TicketGet {
     my $CacheKeyDynamicFields
         = 'Cache::GetTicket' . $Param{TicketID} . '::' . $Param{Extended} . '::' . $FetchDynamicFields;
 
-    my $CachedDynamicFields = $Kernel::OM->Get('Cache')->Get(
+    my $CachedDynamicFields = $Self->_TicketCacheGet(
         Type           => $Self->{CacheType},
         Key            => $CacheKeyDynamicFields,
         CacheInMemory  => 1,
@@ -1075,7 +1075,7 @@ sub TicketGet {
 
     my %Ticket;
 
-    my $Cached = $Kernel::OM->Get('Cache')->Get(
+    my $Cached = $Self->_TicketCacheGet(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -1243,22 +1243,79 @@ sub TicketGet {
     }
 
     # cache user result
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKeyDynamicFields,
-        Value => \%Ticket,
+    $Self->_TicketCacheSet(
+        TicketID => $Param{TicketID},
+        Type    => $Self->{CacheType},
+        TTL     => $Self->{CacheTTL},
+        Key     => $CacheKeyDynamicFields,
+        Value    => \%Ticket,
     );
 
     return %Ticket;
 }
 
+sub _TicketCacheGet {
+    my ( $Self, %Param ) = @_;
+
+    # get cache
+    return $Kernel::OM->Get('Cache')->Get(
+        %Param
+    );
+}
+
+sub _TicketCacheSet {
+    my ( $Self, %Param ) = @_;
+
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    if ( $Param{TicketID} ) {
+        $CacheObject->Set(
+            Type          => "TicketCache".$Param{TicketID},
+            Key           => $Param{Key},
+            Value         => $Param{Type}.'::'.$Param{Key},
+            NoStatsUpdate => 1,
+        );
+    }
+
+    return if $Param{OnlyUpdateMeta};
+
+    # set cache
+    return $CacheObject->Set(
+        %Param
+    );
+}
+
 sub _TicketCacheClear {
     my ( $Self, %Param ) = @_;
 
-    # reset cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType},
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    my @Keys = $CacheObject->GetKeysForType(
+        Type => "TicketCache".$Param{TicketID},
+    );
+    return if !@Keys;
+
+    my @Values = $CacheObject->GetMulti(
+        Type          => "TicketCache".$Param{TicketID},
+        Keys          => \@Keys,
+        UseRawKey     => 1,
+        NoStatsUpdate => 1,
+    );
+
+    foreach my $Value ( @Values ) {
+        my ( $Type, $Key ) = split(/::/, $Value, 2);
+
+        # reset cache
+        $CacheObject->Delete(
+            Type => $Type,
+            Key  => $Key
+        );
+    }
+
+    # delete metadata
+    $CacheObject->CleanUp(
+        Type          => "TicketCache".$Param{TicketID},
+        NoStatsUpdate => 1,
     );
 
     return 1;
@@ -4093,7 +4150,7 @@ sub HistoryTicketGet {
     my $CacheKey = 'HistoryTicketGet::'
         . join( '::', map { ( $_ || 0 ) . "::$Param{$_}" } sort keys %Param );
 
-    my $Cached = $Kernel::OM->Get('Cache')->Get(
+    my $Cached = $Self->_TicketCacheGet(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -4280,11 +4337,12 @@ sub HistoryTicketGet {
 
     # if the request is for the last month or older, cache it
     if ( "$Year-$Month" gt "$Param{StopYear}-$Param{StopMonth}" ) {
-        $Kernel::OM->Get('Cache')->Set(
-            Type  => $Self->{CacheType},
-            TTL   => $Self->{CacheTTL},
-            Key   => $CacheKey,
-            Value => \%Ticket,
+        $Self->_TicketCacheSet(
+            TicketID  => $Param{TicketID},
+            Type      => $Self->{CacheType},
+            TTL       => $Self->{CacheTTL},
+            Key       => $CacheKey,
+            Value     => \%Ticket,
         );
     }
 
@@ -4316,7 +4374,7 @@ sub HistoryTypeLookup {
 
     # check if we ask the same request?
     my $CacheKey = 'Ticket::History::HistoryTypeLookup::' . ($Param{Type} || $Param{TypeID});
-    my $Cached   = $Kernel::OM->Get('Cache')->Get(
+    my $Cached   = $Self->_TicketCacheGet(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -4371,12 +4429,10 @@ sub HistoryTypeLookup {
 
     # set cache
     $Kernel::OM->Get('Cache')->Set(
-        Type           => $Self->{CacheType},
-        TTL            => $Self->{CacheTTL},
-        Key            => $CacheKey,
-        Value          => $Result,
-        CacheInMemory  => 1,
-        CacheInBackend => 0,
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Result,
     );
 
     return $Result;

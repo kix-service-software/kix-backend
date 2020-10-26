@@ -64,7 +64,7 @@ sub new {
 sub Set {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed (qw(Type Key Value TTL)) {
+    for my $Needed (qw(Type Key Value)) {
         if ( !defined $Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -76,7 +76,7 @@ sub Set {
 
     my $Dump = Storable::nfreeze(
         {
-            TTL   => time() + $Param{TTL},
+            TTL   => $Param{TTL} ? time() + $Param{TTL} : 0,
             Value => $Param{Value},
         }
     );
@@ -139,12 +139,30 @@ sub Get {
 
     # read data structure back from file dump, use block eval for safety reasons
     my $Storage = eval { Storable::thaw( ${$Content} ) };
-    if ( ref $Storage ne 'HASH' || $Storage->{TTL} < time() ) {
+    if ( ref $Storage ne 'HASH' || ( $Storage->{TTL} && $Storage->{TTL} < time() ) ) {
         $Self->Delete(%Param);
         return;
     }
 
     return $Storage->{Value};
+}
+
+sub GetMulti {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Type Keys)) {
+        if ( !defined $Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            return;
+        }
+    }
+
+    my @Values;
+    foreach my $Key ( @{$Param{Keys}} ) {
+        push @Values, $Self->Get(%Param, Key => $Key);
+    }
+    return @Values;
 }
 
 sub Delete {
@@ -215,7 +233,7 @@ sub CleanUp {
 
             if ( ref $Content eq 'SCALAR' ) {
                 my $Storage = eval { Storable::thaw( ${$Content} ); };
-                return if ( ref $Storage eq 'HASH' && $Storage->{TTL} > time() );
+                return if ( ref $Storage eq 'HASH' && ( !$Storage->{TTL} || $Storage->{TTL} > time() ) );
             }
         }
 
@@ -241,6 +259,29 @@ sub CleanUp {
     );
 
     return 1;
+}
+
+sub GetKeysForType {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Type)) {
+        if ( !defined $Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            return;
+        }
+    }
+
+    my $CacheDirectory = $Self->{CacheDirectory} . '/' . $Param{Type};
+
+    my @FileList = $Kernel::OM->Get('Main')->DirectoryRead(
+        Directory => $CacheDirectory,
+        Filter    => '*',
+        Recursive => 1,
+        Silent    => 1,
+    );
+
+    return @FileList;
 }
 
 sub _GetFilenameAndCacheDirectory {

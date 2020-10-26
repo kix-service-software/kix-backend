@@ -62,15 +62,12 @@ sub new {
     # 0=off; 1=set+get_cache; 2=+delete+get_request;
     $Self->{Debug} = $Param{Debug} || 0;
 
-    # cache backend
-    my $CacheModule = $Kernel::OM->Get('Config')->Get('Cache::Module')
-        || 'Kernel::System::Cache::FileStorable';
-
     # Store backend in $Self for fastest access.
-    $Self->{CacheObject}    = $Kernel::OM->Get($CacheModule);
-    $Self->{CacheInMemory}  = $Kernel::OM->Get('Config')->Get('Cache::InMemory') // 1;
-    $Self->{CacheInBackend} = $Kernel::OM->Get('Config')->Get('Cache::InBackend') // 1;
+    $Self->{CacheObject} = $Kernel::OM->Get($Param{Backend} || 'Kernel::System::Cache::Redis');
 
+    $Self->{CacheInBackend} = $Param{CacheInBackend} // 1;
+    $Self->{CacheInMemory}  = $Param{CacheInMemory} // 0;
+    
     return $Self;
 }
 
@@ -133,6 +130,7 @@ value:
         TTL            => 60 * 60 * 24 * 1,  # optional, default 20 days
         CacheInMemory  => 0,                 # optional, defaults to 1
         CacheInBackend => 1,                 # optional, defaults to 1
+        NoStatsUpdate  => 1,                 # optional, don't update cache stats (i.e. for internal cache keys)
     );
 
 =cut
@@ -218,10 +216,12 @@ sub Set {
     }
 
     # update stats
-    $Self->_UpdateCacheStats(
-        Operation => 'Set',
-        %Param,
-    );
+    if ( !$Param{NoStatsUpdate} ) {
+        $Self->_UpdateCacheStats(
+            Operation => 'Set',
+            %Param,
+        );
+    }
 
     # Set persistent cache.
     if ( $Self->{CacheInBackend} && ( $Param{CacheInBackend} // 1 ) ) {
@@ -255,8 +255,9 @@ value:
         Type => 'ObjectName',
         Key  => 'SomeKey',
 
-        CacheInMemory => 0,     # optional, defaults to 1
+        CacheInMemory  => 0,    # optional, defaults to 1
         CacheInBackend => 1,    # optional, defaults to 1
+        NoStatsUpdate  => 1,    # optional, don't update cache stats (i.e. for internal cache keys)
     );
 
 
@@ -278,21 +279,25 @@ sub Get {
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         if ( exists $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } ) {
-            $Self->_UpdateCacheStats(
-                Operation => 'Get',
-                Result    => 'HIT',
-                %Param,
-            );
+            if ( !$Param{NoStatsUpdate} ) {
+                $Self->_UpdateCacheStats(
+                    Operation => 'Get',
+                    Result    => 'HIT',
+                    %Param,
+                );
+            }
             return $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} };
         }
     }
 
     if ( !$Self->{CacheInBackend} || !( $Param{CacheInBackend} // 1 ) ) {
-        $Self->_UpdateCacheStats(
-            Operation => 'Get',
-            Result    => 'MISS',
-            %Param,
-        );
+        if ( !$Param{NoStatsUpdate} ) {
+            $Self->_UpdateCacheStats(
+                Operation => 'Get',
+                Result    => 'MISS',
+                %Param,
+            );
+        }
         return;
     }
 
@@ -301,24 +306,120 @@ sub Get {
 
     # set in-memory cache
     if ( defined $Value ) {
-        $Self->_UpdateCacheStats(
-            Operation => 'Get',
-            Result    => 'HIT',
-            %Param,
-        );
+        if ( !$Param{NoStatsUpdate} ) {
+            $Self->_UpdateCacheStats(
+                Operation => 'Get',
+                Result    => 'HIT',
+                %Param,
+            );
+        }
         if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
             $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } = $Value;
         }
     }
     else {
-        $Self->_UpdateCacheStats(
-            Operation => 'Get',
-            Result    => 'MISS',
-            %Param,
-        );
+        if ( !$Param{NoStatsUpdate} ) {
+            $Self->_UpdateCacheStats(
+                Operation => 'Get',
+                Result    => 'MISS',
+                %Param,
+            );
+        }
     }
 
     return $Value;
+}
+
+=item GetMulti()
+
+Fetches values for multiple keys from cache backend. Works like Get and returns an ArrayRef
+
+    my $Values = $CacheObject->GetMulti(
+        Type => 'ObjectName',       # only [a-zA-Z0-9_] chars usable
+        Keys => [ 'SomeKey1', 'SomeKey2' ]
+    );
+
+=cut
+
+sub GetMulti {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(Type Keys)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    # check in-memory cache
+    if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
+        my @Results;
+        foreach my $Key ( @{$Param{Keys}} ) { 
+            if ( exists $Self->{Cache}->{ $Param{Type} }->{$Key} ) {
+                if ( !$Param{NoStatsUpdate} ) {
+                    $Self->_UpdateCacheStats(
+                        Operation => 'Get',
+                        Result    => 'HIT',
+                        %Param,
+                    );
+                }
+                push(@Results, $Self->{Cache}->{ $Param{Type} }->{$Key});
+            }
+        }
+        return \@Results if IsArrayRefWithData(\@Results);
+    }
+
+    if ( !$Self->{CacheInBackend} || !( $Param{CacheInBackend} // 1 ) ) {
+        foreach my $Key ( @{$Param{Keys}} ) { 
+            next if $Param{NoStatsUpdate};
+
+            $Self->_UpdateCacheStats(
+                Operation => 'Get',
+                Result    => 'MISS',
+                %Param,
+                Key       => $Key,
+            );
+        }
+        return;
+    }
+
+    # check persistent cache
+    my  @Values = $Self->{CacheObject}->GetMulti(%Param);
+
+    # set in-memory cache
+    if ( @Values ) {
+        my $Index = 0;
+        foreach my $Key ( @{$Param{Keys}} ) { 
+            if ( !$Param{NoStatsUpdate} ) {
+                $Self->_UpdateCacheStats(
+                    Operation => 'Get',
+                    Result    => 'HIT',
+                    %Param,
+                    Key       => $Key,
+                );
+            }
+            if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
+                $Self->{Cache}->{ $Param{Type} }->{ $Key } = $Values[$Index++];
+            }
+        }
+    }
+    else {
+        foreach my $Key ( @{$Param{Keys}} ) { 
+            next if $Param{NoStatsUpdate};
+
+            $Self->_UpdateCacheStats(
+                Operation => 'Get',
+                Result    => 'MISS',
+                %Param,
+                Key       => $Key,
+            );
+        }
+    }
+
+    return @Values;
 }
 
 =item Delete()
@@ -326,8 +427,9 @@ sub Get {
 deletes a single value from the cache.
 
     $CacheObject->Delete(
-        Type => 'ObjectName',       # only [a-zA-Z0-9_] chars usable
-        Key  => 'SomeKey',
+        Type           => 'ObjectName',       # only [a-zA-Z0-9_] chars usable
+        Key            => 'SomeKey',
+        NoStatsUpdate  => 1,                  # optional, don't update cache stats (i.e. for internal cache keys)
     );
 
 Please note that despite the cache configuration, Delete and CleanUp will always
@@ -365,10 +467,12 @@ sub Delete {
         Indent => $Param{Indent}.'    '
     );
 
-    $Self->_UpdateCacheStats(
-        Operation => 'Delete',
-        %Param,
-    );
+    if ( !$Param{NoStatsUpdate} ) {
+        $Self->_UpdateCacheStats(
+            Operation => 'Delete',
+            %Param,
+        );
+    }
 
     return 1;
 }
@@ -427,10 +531,12 @@ sub CleanUp {
             Indent => $Param{Indent}.'    '
         );
 
-        $Self->_UpdateCacheStats(
-            Operation => 'CleanUp',
-            %Param,
-        );
+        if ( !$Param{NoStatsUpdate} ) {
+            $Self->_UpdateCacheStats(
+                Operation => 'CleanUp',
+                %Param,
+            );
+        }
     }
     elsif ( $Param{KeepTypes} ) {
         my %KeepTypeLookup;
@@ -447,10 +553,12 @@ sub CleanUp {
                 Indent => $Param{Indent}.'    '
             );
 
-            $Self->_UpdateCacheStats(
-                Operation => 'CleanUp',
-                Type      => $Type
-            );
+            if ( !$Param{NoStatsUpdate} ) {
+                $Self->_UpdateCacheStats(
+                    Operation => 'CleanUp',
+                    Type      => $Type
+                );
+            }
         }
     }
     else {
@@ -483,10 +591,12 @@ sub CleanUp {
             $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
         }
 
-        $Self->_UpdateCacheStats(
-            Operation => 'CleanUp',
-            %Param,
-        );        
+        if ( !$Param{NoStatsUpdate} ) {
+            $Self->_UpdateCacheStats(
+                Operation => 'CleanUp',
+                %Param,
+            );
+        }
     }
 
     # cleanup persistent cache
@@ -511,9 +621,9 @@ sub GetCacheStats {
 
     foreach my $Key (@Keys) {
         my $CacheStats = $Self->{CacheObject}->Get(
-            Type   => 'CacheStats',
-            Key    => $Key,
-            RawKey => 1,
+            Type      => 'CacheStats',
+            Key       => $Key,
+            UseRawKey => 1,
         );
         if ( $CacheStats ) {
             foreach my $Type (keys %{$CacheStats}) {
@@ -548,6 +658,34 @@ sub DeleteCacheStats {
 
     return $Self->{CacheObject}->CleanUp(
         Type => 'CacheStats'
+    );
+}
+
+=item GetKeysForType()
+
+get a list of keys for a given cache type
+
+    my @Keys = $CacheObject->GetKeysForType(
+        Type => '...'           # required
+    );
+
+=cut
+
+sub GetKeysForType {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(Type)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    return $Self->{CacheObject}->GetKeysForType(
+        Type => $Param{Type}
     );
 }
 
@@ -616,8 +754,9 @@ sub _UpdateCacheStats {
 
     # read stats
     my $CacheStats = $Self->{CacheObject}->Get(
-        Type => 'CacheStats',
-        Key  => $$,
+        Type          => 'CacheStats',
+        Key           => $$,
+        NoStatsUpdate => 1,
     ) || {};
 
     # add to stats
@@ -655,9 +794,10 @@ sub _UpdateCacheStats {
 
     # store updated stats
     $Self->{CacheObject}->Set(
-        Type  => 'CacheStats',
-        Key   => $$,
-        Value => $CacheStats,
+        Type          => 'CacheStats',
+        Key           => $$,
+        Value         => $CacheStats,
+        NoStatsUpdate => 1,
     );
 
     return 1;

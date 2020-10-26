@@ -8,7 +8,7 @@ use lib cwd() . '/scripts/test/api/Cucumber';
 
 use LWP::UserAgent;
 use HTTP::Request;
-use JSON::XS qw(encode_json decode_json);
+use JSON::MaybeXS qw(encode_json decode_json);
 use JSON::Validator;
 
 use Test::More;

@@ -11,7 +11,9 @@ package Kernel::API::Operation::V1::Common;
 use strict;
 use warnings;
 use Hash::Flatten;
+use File::Basename;
 use Data::Sorting qw(:arrays);
+use Storable;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -70,26 +72,34 @@ sub RunOperation {
     # also ignore all this if we have been told to ignore permissions
     if ( !$Self->{IgnorePermissions} && $Self->{Authorization}->{UserID} && ( $Kernel::OM->Get('Config')->Get('SecureMode') || $Self->{Authorization}->{UserID} != 1 ) ) {
 
-        # check the necessary permission of the parent object if needed
-        if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) ) {
+        # determine which method to use
+        my $RequestMethodOrigin = $Param{RequestMethodOrigin};
+        my $ParentCheckMethod = ($Param{RequestMethodOrigin} || $Self->{RequestMethod}) eq 'GET' ? 'GET' : 'PATCH';
 
-            # determine which method to use
-            my $Method = $Self->{RequestMethod} eq 'GET' ? 'GET' : 'PATCH';
+        # if we don't have a 
+        if ( !$Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} && $Self->{ParentMethodOperationMapping}->{GET} ) {
+            $RequestMethodOrigin = $ParentCheckMethod if !$RequestMethodOrigin;
+            $ParentCheckMethod = 'GET';
+        }
+
+        # check the necessary permission of the parent object if needed
+        if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) && $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} ) {
 
             # get the config of the parent operation to determine the primary object ID attribute
-            my $OperationConfig = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Self->{ParentMethodOperationMapping}->{$Method}};
+            my $OperationConfig = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Self->{ParentMethodOperationMapping}->{$ParentCheckMethod}};
 
             my $Data = $OperationConfig->{ObjectID} ? {
                     $OperationConfig->{ObjectID} => $Param{Data}->{$OperationConfig->{ObjectID}},
                 } : $Param{Data};
 
             my $ExecResult = $Self->ExecOperation(
-                RequestMethod       => $Method,
-                OperationType       => $Self->{ParentMethodOperationMapping}->{$Method},
-                Data                => $Data,
-                IgnoreInclude       => 1,       # we don't need any includes
-                IgnoreExpand        => 1,       # we don't need any expands
-                PermissionCheckOnly => 1,       # do not change any data
+                RequestMethod         => $ParentCheckMethod,
+                RequestMethodOrigin   => $RequestMethodOrigin,
+                OperationType         => $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod},
+                Data                  => $Data,
+                IgnoreInclude         => 1,       # we don't need any includes
+                IgnoreExpand          => 1,       # we don't need any expands
+                PermissionCheckOnly   => 1,       # do not change any data
             );
 
             if ( !IsHashRefWithData($ExecResult) || !$ExecResult->{Success} ) {
@@ -119,7 +129,7 @@ sub RunOperation {
         }
     }
 
-    if ( $Param{PermissionCheckOnly} ) {
+    if ( $Self->{PermissionCheckOnly} && $Self->{RequestMethod} ne 'GET' ) {
         return $Self->_Success();
     }
 
@@ -877,28 +887,30 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", $TimeDiff));
         }
 
-        # honor a generic include, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
-            my $StartTime = Time::HiRes::time();
+        if ( !$Self->{PermissionCheckOnly} ) {
+            # honor a generic include, if we have one
+            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
+                my $StartTime = Time::HiRes::time();
 
-            $Self->_ApplyInclude(
-                Data => \%Param,
-            );
+                $Self->_ApplyInclude(
+                    Data => \%Param,
+                );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", $TimeDiff));
-        }
+                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", $TimeDiff));
+            }
 
-        # honor an expander, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
-            my $StartTime = Time::HiRes::time();
+            # honor an expander, if we have one
+            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
+                my $StartTime = Time::HiRes::time();
 
-            $Self->_ApplyExpand(
-                Data => \%Param,
-            );
+                $Self->_ApplyExpand(
+                    Data => \%Param,
+                );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
+                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
+            }
         }
 
         # cache request without offset and limit if CacheType is set for this operation
@@ -964,7 +976,7 @@ helper function to execute another operation to work with its result.
 
     my $Return = $CommonObject->ExecOperation(
         OperationType            => '...',                              # required
-        Data                     => {},                                 # required
+        Data                     => {},                                 # optional
         IgnorePermissions        => 1,                                  # optional
         SuppressPermissionErrors => 1,                                  # optional
         IgnoreInclude            => 1,                                  # optional
@@ -978,7 +990,7 @@ sub ExecOperation {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(OperationType Data)) {
+    for my $Needed (qw(OperationType)) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'ExecOperation.MissingParameter',
@@ -1091,6 +1103,7 @@ sub ExecOperation {
         OperationType            => $Param{OperationType},
         WebserviceID             => $Self->{WebserviceID},
         RequestMethod            => $Param{RequestMethod} || $Self->{RequestMethod},
+        RequestMethodOrigin      => $Param{RequestMethodOrigin},
         AvailableMethods         => \%AvailableMethods,
         RequestURI               => $RequestURI,
         CurrentRoute             => $CurrentRoute,
@@ -1129,7 +1142,7 @@ sub ExecOperation {
 
     my $Result = $OperationObject->Run(
         Data    => {
-            %{$Param{Data}},
+            %{$Param{Data} || {}},
             %AdditionalData,
         },
         IgnorePermissions   => $Param{IgnorePermissions},
@@ -2311,7 +2324,7 @@ sub _CheckObjectPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/\w+/g;
+        $Target =~ s/\*/\\w+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2555,7 +2568,7 @@ sub _CheckPropertyPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/\w+/g;
+        $Target =~ s/\*/\\w+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2825,6 +2838,120 @@ sub _ReplaceVariablesInPermission {
     }
 
     return $Result;
+}
+
+sub _RunParallel {
+    my ( $Self, $Sub, %Param ) = @_;
+
+    # check needed stuff
+    if ( !ref $Sub eq 'CODE' ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Sub as a function ref!",
+        );
+        return;
+    }
+
+    for my $Needed (qw(Items)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    use threads;
+    use threads::shared;
+    use Thread::Queue;
+
+    my $NumWorkers = $Kernel::OM->Get('Config')->Get('API::Parallelity') || 4;
+
+    my $WorkQueue : shared;
+    $WorkQueue = Thread::Queue->new();
+    my $ResultQueue : shared;
+    $ResultQueue = Thread::Queue->new();
+
+    $Self->_Debug("executing with parallel algorithm ($NumWorkers workers)");
+
+    # create parallel instances
+    my %Workers;
+    foreach my $WorkerID ( 1..$NumWorkers ) {
+        $Workers{$WorkerID}, threads->create(
+            sub {
+                my ( $Self, %Param ) = @_;
+
+                local $Kernel::OM = Kernel::System::ObjectManager->new(
+                    'Log' => {
+                        LogPrefix => 'runworker#'.$Param{WorkerID},
+                    },
+                );
+
+                while ( (my $Item = $Param{WorkQueue}->dequeue) ne "END_OF_QUEUE" ) {
+                    my $Result = $Sub->($Self, Item => $Item, %Param);
+
+                    $ResultQueue->enqueue(Storable::freeze {
+                        Item   => $Item,
+                        Result => $Result, 
+                    });
+                }
+            }, 
+            $Self, 
+            %Param,
+            WorkQueue   => $WorkQueue,
+            ResultQueue => $ResultQueue,
+            WorkerID    => $WorkerID,
+        );
+    }
+
+    $WorkQueue->enqueue(@{$Param{Items}});
+
+    foreach ( 1..$NumWorkers ) {
+        $WorkQueue->enqueue("END_OF_QUEUE");
+    }
+
+    foreach my $t ( threads->list() ) {
+        $t->join();
+    }
+
+    # sync thread output
+    my %ResultHash;
+    while ( my $Result = Storable::thaw $ResultQueue->dequeue_nb() ) {
+        $ResultHash{$Result->{Item}} = $Result->{Result};
+    }
+
+    my @Result;
+    foreach my $Item ( @{$Param{Items}} ) {
+        next if !$ResultHash{$Item};
+        push @Result, $ResultHash{$Item};
+    }
+
+    return @Result;
+}
+
+sub _CanRunParallel {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Items)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    # check if deactivated
+    return 0 if !$Kernel::OM->Get('Config')->Get('API::Parallelity');
+
+    my $NumWorkers = $Kernel::OM->Get('Config')->Get('API::Parallelity') || 4;
+    my $MinChecksPerWorker = $Kernel::OM->Get('Config')->Get('API::MinTasksPerWorker') || 10;
+
+    return 1 if ( scalar(@{$Param{Items}}) >= $NumWorkers * $MinChecksPerWorker );
+    return 0;
 }
 
 sub _Debug {

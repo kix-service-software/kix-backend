@@ -30,8 +30,76 @@ my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
+_DeleteObseleteSysConfigKeys();
+_UpdateAccessLevels();
+
 # updates permissions for role Customer
 _UpdatePermissionsForRoleSystemAdmin();
+
+
+sub _DeleteObseleteSysConfigKeys {
+
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+
+    my @Items = qw{
+        ContactPreferencesGroups###GoogleAuthenticatorSecretKey
+        PreferencesGroups###GoogleAuthenticatorSecretKey
+        UserImport::DefaultPassword
+    };
+
+    foreach my $key (@Items) {
+        if (!$SysConfigObject->OptionDelete(Name => $key)) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to delete obsolete item $key from sysconfig!"
+            );
+            return;
+        }
+    }
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
+
+    return 1;
+}
+
+sub _UpdateAccessLevels {
+
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+
+    my @Items = qw{
+        AuthTwoFactorModule::SecretPreferencesKey
+        Tool::Acknowledge::HTTP::Password
+    };
+
+    foreach my $key (@Items) {
+
+        if (!$SysConfigObject->OptionUpdate(Name => $key, AccessLevel => 'confidential')) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update item $key from sysconfig!"
+            );
+            return;
+        }
+    }
+
+    #update Authentication###**** - Keys
+    my $Result = $Kernel::OM->Get('DB')->Do(
+        SQL => "UPDATE sysconfig SET access_level = 'confidential', change_by = 1, change_time = current_timestamp
+                 WHERE name LIKE ('Authentication###%')"
+    );
+    if (!$Result) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Unable to update "Authentication###***"-Keys in sysconfig!'
+        );
+        return;
+    }
+
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
+
+    return 1;
+}
 
 sub _UpdatePermissionsForRoleSystemAdmin {
     # get database object

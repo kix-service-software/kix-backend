@@ -4523,6 +4523,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -5976,6 +5981,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -7041,6 +7051,11 @@ pre code {
                "readOnly" : true
             },
             "MimeType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
                "readOnly" : true
             },
@@ -10784,6 +10799,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -12070,6 +12090,11 @@ pre code {
                "readOnly" : true
             },
             "MimeType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
                "readOnly" : true
             },
@@ -13546,6 +13571,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -14388,6 +14418,11 @@ pre code {
                "readOnly" : true
             },
             "MimeType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
                "readOnly" : true
             },
@@ -15579,6 +15614,11 @@ pre code {
                "readOnly" : true
             },
             "MimeType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
                "readOnly" : true
             },
@@ -17057,6 +17097,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -18213,6 +18258,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -18966,7 +19016,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="tickets__ticketid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets__ticketid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_tickets__ticketid__articles" class="panel"><div class="resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Attachments</code></td><td>Adds an ID list of the attachments on an article - if expanded the list will be objects with the meta-data (without content)</td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/tickets/{ticketId}</span><span class="uri">/articles</span> <span class="methods"><a href="#tickets__ticketid__articles_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets__ticketid__articles_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets__ticketid__articles_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/tickets/{ticketId}</span><span class="uri">/articles</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets__ticketid__articles_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets__ticketid__articles_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets__ticketid__articles_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets__ticketid__articles_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">ticketId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets__ticketid__articles_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets__ticketid__articles_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketArticleCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="tickets__ticketid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets__ticketid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_tickets__ticketid__articles" class="panel"><div class="resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Attachments</code></td><td>Adds an ID list of the attachments on an article - if expanded the list will be objects with the meta-data (without content)</td></tr><tr><td><code>Plain</code></td><td>Adds the plain source string of a message of an email article (channel)</td></tr></tbody></table></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/tickets/{ticketId}</span><span class="uri">/articles</span> <span class="methods"><a href="#tickets__ticketid__articles_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets__ticketid__articles_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets__ticketid__articles_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/tickets/{ticketId}</span><span class="uri">/articles</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets__ticketid__articles_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets__ticketid__articles_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets__ticketid__articles_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets__ticketid__articles_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">ticketId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets__ticketid__articles_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets__ticketid__articles_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketArticleCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "TicketArticleCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of ticket articles.",
@@ -19241,6 +19291,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -19340,6 +19395,7 @@ pre code {
             "IncomingTime": 1586413516,
             "MessageID": "",
             "MimeType": "text/plain",
+            "Plain": "MIME-Version: 1.0\nX-Mailer: ...\n",
             "References": "",
             "ReplyTo": "",
             "SenderType": "external",
@@ -19373,6 +19429,7 @@ pre code {
             "IncomingTime": 1586413516,
             "MessageID": "",
             "MimeType": "text/plain",
+            "Plain": "MIME-Version: 1.0\nX-Mailer: ...\n",
             "References": "",
             "ReplyTo": "",
             "SenderType": "agent",
@@ -19609,7 +19666,7 @@ pre code {
         "MimeType": "text/html",
         "SenderTypeID": 3,
         "Subject": "The printer does not work!",
-        "TimeUnits": 12345,
+        "TimeUnit": 12345,
         "To": "someoneelse@somecorp.com,\"another one\" &lt;anotherone@anothercorp.com&gt;"
     }
 }</code></pre></div></div><div class="tab-pane" id="tickets__ticketid__articles_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets__ticketid__articles_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The TicketArticle has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketArticlePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -19946,6 +20003,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -20181,7 +20243,7 @@ pre code {
     "Article": {
         "CustomerVisible": 2,
         "TicketID": 42,
-        "TimeUnits": 6789
+        "TimeUnit": 6789
     }
 }</code></pre></div></div><div class="tab-pane" id="tickets__ticketid__articles__articleid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets__ticketid__articles__articleid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketArticlePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "TicketArticlePostPatchResponse.json",
@@ -41367,6 +41429,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
             "References" : {
                "type" : "string",
                "readOnly" : true
@@ -42660,6 +42727,11 @@ pre code {
                "readOnly" : true
             },
             "MimeType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
                "readOnly" : true
             },

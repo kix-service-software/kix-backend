@@ -39,30 +39,29 @@ sub Run {
 
     my $ClientID = $Self->GetOption('client-id') || '';
 
-    my $ClientList = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
-    if ( !$ClientList ) {
-        $Self->PrintError("Unable to determine client registrations.\n");
-        return $Self->ExitCodeError();
-    }
-    my %Clients = map { $_ => 1 } @{$ClientList};
-
     my @ClientIDs;
     if ( $ClientID ) {
-        push(@ClientIDs, $ClientID);
+        @ClientIDs = ( $ClientID );
     }
     else {
-        if ( ref $ClientList eq 'ARRAY' ) {
-            @ClientIDs = @{$ClientList};
+        @ClientIDs = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
+        if ( !@ClientIDs ) {
+            $Self->PrintError("Unable to determine client registrations.\n");
+            return $Self->ExitCodeError();
         }
     }
 
     foreach my $ClientID ( sort @ClientIDs ) {
-        $Self->Print("removing client $ClientID\n");
-
-        if ( !$Clients{$ClientID} ) {
+        my %ClientRegistration = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList(
+            ClientID => $ClientID,
+            Silent   => 1,
+        );
+        if ( !%ClientRegistration ) {
             $Self->PrintError("No registration for this client exists.\n");
             return $Self->ExitCodeError();
         }
+
+        $Self->Print("removing client $ClientID\n");
 
         my $Result = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationDelete(
             ClientID => $ClientID

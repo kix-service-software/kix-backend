@@ -35,6 +35,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    $Kernel::OM->ObjectParamAdd(
+        'Config' => {
+            NoCache => 1
+        },
+    );
+
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
@@ -42,6 +48,8 @@ sub new {
     if ( $Self->{Config} ) {
         $Self->_InitRedis();
     }
+
+    $Kernel::OM->ObjectsDiscard( Objects => ['Config'] );
 
     return $Self;
 }
@@ -75,7 +83,7 @@ sub Set {
     # prepare value for Redis
     my $Value = $Param{Value};
     if ( ref $Value ) {
-        $Value = '__base64::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );     
+        $Value = '__base64::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );
     }
 
     my $Result;
@@ -113,7 +121,7 @@ sub Get {
 
     return if !$Self->{RedisObject};
 
-    my $PreparedKey = $Param{RawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
+    my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
 
     my $Value = $Self->{RedisObject}->get(
         $PreparedKey,
@@ -130,6 +138,41 @@ sub Get {
     return eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
 }
 
+sub GetMulti {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Type Keys)) {
+        if ( !defined $Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            return;
+        }
+    }
+
+    return if !$Self->{RedisObject};
+
+    my @PreparedKeys = map { $Param{UseRawKey} ? $_ : $Self->_PrepareRedisKey($_) } @{$Param{Keys}};
+
+    my @Values = $Self->{RedisObject}->mget(
+        @PreparedKeys,
+    );
+
+    if ( @Values && $Self->{Config}->{Debug} ) {
+        $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: get() for keys \"".(Data::Dumper::Dumper(\@PreparedKeys))."\" returned value");
+    }
+
+    return @Values if !@Values;
+    
+    foreach my $Value ( @Values ) {
+        next if !substr($Value, 0, 10) ne '__base64::';
+        # restore Value
+        $Value = substr($Value, 10);
+        $Value = eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
+    }
+
+    return @Values;
+}
+
 sub Delete {
     my ( $Self, %Param ) = @_;
 
@@ -143,8 +186,10 @@ sub Delete {
 
     return if ( !$Self->{RedisObject} );
 
+    my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
+
     return $Self->{RedisObject}->del(
-        $Self->_PrepareRedisKey(%Param)
+        $PreparedKey
     );
 }
 

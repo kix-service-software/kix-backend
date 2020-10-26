@@ -126,59 +126,30 @@ sub Run {
 
     my @UserList;
 
-    # start loop
-    foreach my $UserID ( @{$Param{Data}->{UserID}} ) {
-
-        # get the user data
-        my %UserData = $Kernel::OM->Get('User')->GetUserData(
-            UserID        => $UserID,
-            NoPreferences => 1
+    if ( $Self->_CanRunParallel(Items => $Param{Data}->{UserID}) ) { 
+        @UserList = $Self->_RunParallel(
+            \&_GetUserData,
+            Items => $Param{Data}->{UserID},
+            %Param,
         );
+    }
+    else {
+        # start loop
+        foreach my $UserID ( @{$Param{Data}->{UserID}} ) {
 
-        if ( !IsHashRefWithData( \%UserData ) ) {
-
-            return $Self->_Error(
-                Code => 'Object.NotFound',
+            my $UserData = $Self->_GetUserData(
+                UserID => $UserID,
+                Data   => $Param{Data}
             );
-        }
-
-        # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+            if ( IsHashRefWithData($UserData) ) {
+                push @UserList, $UserData;
+            }
+            else {
+                return $Self->_Error(
+                    Code => 'Object.NotFound',
+                );
             }
         }
-
-        # filter valid attributes
-        if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
-            foreach my $Attr (sort keys %UserData) {
-                delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
-            }
-        }
-
-        #FIXME: workaoround KIX2018-3308###########
-        $Self->AddCacheDependency(Type => 'Contact');
-        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-            UserID => $UserID,
-        );
-        $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
-        $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
-        $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;
-        $UserData{UserEmail} = %ContactData ? $ContactData{Email} : undef;
-        ##################################
-
-        #FIXME: comment back in when 3308 is resolved properly
-        if ($Param{Data}->{include}->{Contact}) {
-            # $Self->AddCacheDependency( Type => 'Contact' );
-            $UserData{Contact} = undef;
-            # my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-            #         UserID => $UserID,
-            # );
-            $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
-        }
-                
-        # add
-        push(@UserList, \%UserData);
     }
 
     if ( scalar(@UserList) == 1 ) {
@@ -190,6 +161,59 @@ sub Run {
     return $Self->_Success(
         User => \@UserList,
     );
+}
+
+sub _GetUserData {
+    my ( $Self, %Param ) = @_;
+
+    my $UserID = $Param{Item} || $Param{UserID};
+
+    # get the user data
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
+        UserID        => $UserID,
+        NoPreferences => 1
+    );
+
+    if ( !IsHashRefWithData( \%UserData ) ) {
+        return;
+    }
+
+    # filter valid attributes
+    if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
+        foreach my $Attr (sort keys %UserData) {
+            delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
+        }
+    }
+
+    # filter valid attributes
+    if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
+        foreach my $Attr (sort keys %UserData) {
+            delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
+        }
+    }
+
+    #FIXME: workaoround KIX2018-3308###########
+    $Self->AddCacheDependency(Type => 'Contact');
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+        UserID => $UserID,
+    );
+    $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
+    $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
+    $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;
+    $UserData{UserEmail} = %ContactData ? $ContactData{Email} : undef;
+    ##################################
+
+    #FIXME: comment back in when 3308 is resolved properly
+    if ($Param{Data}->{include}->{Contact}) {
+        # $Self->AddCacheDependency( Type => 'Contact' );
+        $UserData{Contact} = undef;
+        # my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+        #         UserID => $UserID,
+        # );
+        $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
+    }
+
+    return \%UserData;
 }
 
 1;
