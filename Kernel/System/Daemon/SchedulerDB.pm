@@ -1592,16 +1592,25 @@ sub AutomationTaskToExecute {
     my $AutomationObject = $Kernel::OM->Get('Automation');
     my $TimeObject       = $Kernel::OM->Get('Time');
 
-    # get a list of automation jobs
-    my %JobList = $AutomationObject->JobList();
+    # get a list of valid automation jobs
+    my %JobList = $AutomationObject->JobList(
+        Valid => 1
+    );
 
     # do noting if there are no automation jobs
     return 1 if !%JobList;
+
+    # get the list of scheduled jobs
+    my %TaskList = map { $_->{Name} => $_->{TaskID} } $Self->TaskList(
+        Type => 'AsynchronousExecutor'
+    );
 
     my $CurrentTimestamp = $TimeObject->CurrentTimestamp();
 
     JOBNAME:
     for my $JobID ( sort keys %JobList ) {
+        # skip job if it has already been scheduled
+        next JOBNAME if $TaskList{'Job-'.$JobList{$JobID}};
 
         # check if job can be executed now
         my $CanExecute = $AutomationObject->JobIsExecutable(
@@ -1609,24 +1618,13 @@ sub AutomationTaskToExecute {
             Time   => $CurrentTimestamp,
             UserID => 1,
         );
-
         # skip if job can't be executed
         next JOBNAME if !$CanExecute;
 
-        my %Job = $AutomationObject->JobGet(
-            ID => $JobID
-        );
-
-        # skip if job is not valid
-        next JOBNAME if $Job{ValidID} != 1;
-
         # execute recurrent tasks
-        $Self->RecurrentTaskExecute(
-            NodeID                   => $Param{NodeID},
-            PID                      => $Param{PID},
-            TaskName                 => $JobList{$JobID},
-            TaskType                 => 'AsynchronousExecutor',
-            PreviousEventTimestamp   => $TimeObject->SystemTime(),
+        $Self->TaskAdd(
+            Name                     => 'Job-'.$JobList{$JobID},
+            Type                     => 'AsynchronousExecutor',
             MaximumParallelInstances => 1,
             Data                     => {
                 Object   => 'Automation',
