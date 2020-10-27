@@ -98,11 +98,11 @@ sub Run {
         my $Type   = $Line->[1];
         my $Target = $Line->[2];
         my $Value  = 0
-            + ( $Line->[3] ? Kernel::System::Role::Permission->PERMISSION->{CREATE} : 0 )
-            + ( $Line->[4] ? Kernel::System::Role::Permission->PERMISSION->{READ}   : 0 )
-            + ( $Line->[5] ? Kernel::System::Role::Permission->PERMISSION->{UPDATE} : 0 )
-            + ( $Line->[6] ? Kernel::System::Role::Permission->PERMISSION->{DELETE} : 0 )
-            + ( $Line->[7] ? Kernel::System::Role::Permission->PERMISSION->{DENY}   : 0 );
+            + ( $Line->[3] ? Kernel::System::Role::Permission::PERMISSION->{CREATE} : 0 )
+            + ( $Line->[4] ? Kernel::System::Role::Permission::PERMISSION->{READ}   : 0 )
+            + ( $Line->[5] ? Kernel::System::Role::Permission::PERMISSION->{UPDATE} : 0 )
+            + ( $Line->[6] ? Kernel::System::Role::Permission::PERMISSION->{DELETE} : 0 )
+            + ( $Line->[7] ? Kernel::System::Role::Permission::PERMISSION->{DENY}   : 0 );
 
         my $PermissionStr = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
             Value  => $Value,
