@@ -11,7 +11,7 @@ Feature: GET request to the /system/dynamicfields resource
 
   Scenario: get the list of existing dynamicfields
     When I query the collection of dynamicfields
-    Then the response code is 200
+    Then the response code is 200    
     Then the response contains 7 items of type "DynamicField"
     And the response contains the following items of type DynamicField
       | Name                         | Label                  | FieldType               | ObjectType |
