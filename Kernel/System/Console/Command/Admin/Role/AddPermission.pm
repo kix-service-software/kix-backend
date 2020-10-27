@@ -87,8 +87,8 @@ sub Run {
 
     $Self->Print("<yellow>Adding a new permission to role $Self->{RoleName}...</yellow>\n");
 
-    my %PossiblePermissions = %{Kernel::System::Role::Permission->PERMISSION};
-    $PossiblePermissions{CRUD} = Kernel::System::Role::Permission->PERMISSION_CRUD;
+    my %PossiblePermissions = %{Kernel::System::Role::Permission::PERMISSION};
+    $PossiblePermissions{CRUD} = Kernel::System::Role::Permission::PERMISSION_CRUD;
 
     my $Value = 0;
     foreach my $Permission ( split(/\s*\,\s*/, $Self->GetOption('value')) ) {

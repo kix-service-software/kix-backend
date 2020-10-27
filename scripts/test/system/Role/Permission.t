@@ -67,7 +67,7 @@ my @PermissionTests = (
             {
                 TypeID => 1,
                 Target => '/users',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{CREATE} + Kernel::System::Role::Permission->PERMISSION->{READ},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{CREATE} + Kernel::System::Role::Permission::PERMISSION->{READ},
             }
         ]
     },
@@ -82,7 +82,7 @@ my @PermissionTests = (
             {
                 TypeID => 1,
                 Target => '/tickets/1',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
         ]
     },
@@ -98,13 +98,13 @@ my @PermissionTests = (
                 TypeID  => 1,
                 Target  => '/queues',
                 Comment => 'full permission on queues',
-                Value   => Kernel::System::Role::Permission->PERMISSION_CRUD,
+                Value   => Kernel::System::Role::Permission::PERMISSION_CRUD,
             },
             {
                 TypeID  => 2,
                 Target  => '/queues/1',
                 Comment => 'read permission on queue 1',
-                Value   => Kernel::System::Role::Permission->PERMISSION->{READ},
+                Value   => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
         ]
     },
@@ -119,7 +119,7 @@ my @PermissionTests = (
             {
                 TypeID => 1,
                 Target => '/tickets',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{READ} + Kernel::System::Role::Permission->PERMISSION->{UPDATE},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ} + Kernel::System::Role::Permission::PERMISSION->{UPDATE},
             }
         ]
     },

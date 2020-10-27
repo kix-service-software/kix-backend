@@ -103,7 +103,7 @@ my $RoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
         Resource => [
             {
                 Target => '/tickets',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
         ]
     }
@@ -116,7 +116,7 @@ my $TicketDenyRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
         Resource => [
             {
                 Target => '/tickets',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{DENY},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{DENY},
             }
         ]
     }
@@ -129,7 +129,7 @@ my $TicketReadRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
         Resource => [
             {
                 Target => '/tickets',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
         ]
     }
@@ -142,7 +142,7 @@ my $TicketWriteRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
         Resource => [
             {
                 Target => '/tickets',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{UPDATE},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{UPDATE},
             }
         ]
     }

@@ -123,6 +123,8 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+print STDERR "GET: ".Data::Dumper::Dumper($Param{Data});
+
     my @SysConfigList;
 
     my $SysConfigObject = $Kernel::OM->Get('SysConfig');
@@ -136,6 +138,8 @@ sub Run {
         );
 
         if ( !IsHashRefWithData(\%Config) ) {
+            use CGI::Carp qw(cluck);
+            cluck;
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );

@@ -82,7 +82,7 @@ my $RoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
         Resource => [
             {
                 Target => '/tickets',
-                Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
         ]
     }
