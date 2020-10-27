@@ -475,7 +475,29 @@ sub Run {
             Name => $GetParam{'X-KIX-FollowUp-Channel'},
         );
         if ( !$ChannelID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message =>
+                    "Channel ".$GetParam{'X-KIX-FollowUp-Channel'}." does not exist, falling back to 'email'."
+            );
             $GetParam{'X-KIX-FollowUp-Channel'} = undef;
+        }
+    }
+
+    # check sender type
+    if ( $GetParam{'X-KIX-FollowUp-SenderType'} ) {
+
+        # check if it's an existing SenderType
+        my $SenderTypeID = $TicketObject->ArticleSenderTypeLookup(
+            SenderType => $GetParam{'X-KIX-FollowUp-SenderType'},
+        );
+        if ( !$SenderTypeID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message =>
+                    "SenderType ".$GetParam{'X-KIX-FollowUp-SenderType'}." does not exist, falling back to 'external'."
+            );
+            $GetParam{'X-KIX-FollowUp-SenderType'} = 'external';
         }
     }
 
@@ -484,7 +506,7 @@ sub Run {
         TicketID         => $Param{TicketID},
         Channel          => $GetParam{'X-KIX-FollowUp-Channel'} || 'email',
         CustomerVisible  => $GetParam{CustomerVisible},
-        SenderType       => $GetParam{'X-KIX-FollowUp-SenderType'},
+        SenderType       => $GetParam{'X-KIX-FollowUp-SenderType'} || 'external',
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
