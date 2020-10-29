@@ -47,11 +47,11 @@ sub _DeleteObseleteSysConfigKeys {
         UserImport::DefaultPassword
     };
 
-    foreach my $key (@Items) {
-        if (!$SysConfigObject->OptionDelete(Name => $key)) {
+    foreach my $Key (@Items) {
+        if (!$SysConfigObject->OptionDelete(Name => $Key)) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to delete obsolete item $key from sysconfig!"
+                Message  => "Unable to delete obsolete item $Key from sysconfig!"
             );
             return;
         }
@@ -71,12 +71,12 @@ sub _UpdateAccessLevels {
         Tool::Acknowledge::HTTP::Password
     };
 
-    foreach my $key (@Items) {
+    foreach my $Key (@Items) {
 
-        if (!$SysConfigObject->OptionUpdate(Name => $key, AccessLevel => 'confidential')) {
+        if (!$SysConfigObject->OptionUpdate(Name => $Key, AccessLevel => 'confidential', UserID => 1)) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to update item $key from sysconfig!"
+                Message  => "Unable to update item $Key from sysconfig!"
             );
             return;
         }
