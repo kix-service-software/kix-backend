@@ -119,7 +119,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="public" Name="OrganisationSearch::UseWildcardPraefix" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="public" Name="OrganisationSearch::UseWildcardPrefix" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Enable wildcard praefix for organisation search.</Description>
         <Group>API</Group>
         <Setting>
