@@ -2,17 +2,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-10 10:24+0000\n"
-"PO-Revision-Date: 2020-09-21 10:53+0000\n"
+"POT-Creation-Date: 2020-10-12 11:21+0000\n"
+"PO-Revision-Date: 2020-10-23 11:33+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
-"Language-Team: German <http://translate.kix18.docker.vm.devel.cape-it.de/"
-"projects/kix18/backend-app/de/>\n"
+"Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
+"backend-app/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.3\n"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
@@ -164,7 +164,7 @@ msgstr "Gleichzeitige Nutzer"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer"
-msgstr ""
+msgstr "Kunde"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer - New Ticket Receipt"
@@ -523,10 +523,6 @@ msgid "Ticket Agent"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Ticket Creator"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
 msgstr ""
 
@@ -580,6 +576,10 @@ msgid "Warning"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Webform Ticket Creator"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Workplace"
 msgstr ""
 
@@ -602,6 +602,12 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
+"allows to create new tickets by using the \"Customer Portal Light\" webform "
+"mechanism"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid ""
 "allows to login in both frontend- and backend application but does not grant "
 "any further permissions"
 msgstr ""
@@ -615,12 +621,6 @@ msgstr ""
 msgid ""
 "allows to read any asset information in any asset class and allows to READ "
 "links"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid ""
-"allows to read any information required to create a ticket (queues, types, "
-"priorities, etc.), allows to create new tickets and allows to CREATE links"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -692,7 +692,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "pending auto close"
-msgstr "warten auf erfolgreich schließen"
+msgstr "warten auf automatisch schließen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "pending reminder"
@@ -948,12 +948,12 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "The value for the dynamic field to be set."
 msgstr ""
-"Der \"value\" des dynamischen Feldes, welches gesetzt werden soll. Feldtyp \""
-"Selection\" erwartet den \"key\" des zu setzenden Wertes, Feldtyp \""
-"AssetReference\" erwartet die Asset ID, Feldtyp \"TicketReference\" erwartet "
-"die Ticket ID, Feldtyp \"Checklist\" erwartet das entsprechende JSON-Format, "
-"Feldtyp \"Date\" erwartet das Format <YYYY-MM-DD 00:00:00>, Feldtyp \""
-"DateTime\" das Format <YYYY-MM-DD hh:mm:ss>."
+"Der \"value\" des dynamischen Feldes, welches gesetzt werden soll. Feldtyp "
+"\"Selection\" erwartet den \"key\" des zu setzenden Wertes, Feldtyp "
+"\"AssetReference\" erwartet die Asset ID, Feldtyp \"TicketReference\" "
+"erwartet die Ticket ID, Feldtyp \"Checklist\" erwartet das entsprechende "
+"JSON-Format, Feldtyp \"Date\" erwartet das Format <YYYY-MM-DD 00:00:00>, "
+"Feldtyp \"DateTime\" das Format <YYYY-MM-DD hh:mm:ss>."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Asset Reference Dynamic Field"
@@ -1059,8 +1059,8 @@ msgid ""
 "when the macro action is executed. Used for pending states only."
 msgstr ""
 "(Optional) Warten-Zeit in Sekunden. Wird zum jeweiligen Zeitpunkt addiert, "
-"zu dem die Macro Action ausgeführt wird. Wird nur für Status vom Statustyp \""
-"Warten\" genutzt."
+"zu dem die Macro Action ausgeführt wird. Wird nur für Status vom Statustyp "
+"\"Warten\" genutzt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Creates an ticket."
@@ -1318,6 +1318,16 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Cache time in seconds for the web service config backend."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid ""
+"Defines how many tasks are needed per thread (see API::Parallelity) to use "
+"the parallel alogorithm."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Defines how many threads should be used for parallel tasks."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1764,7 +1774,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Company name which will be included in outgoing emails as an X-Header."
-msgstr ""
+msgstr "Der Name Ihres Unternehmens für die Verwendung im KIX-Mail-Header."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2217,6 +2227,11 @@ msgid ""
 "specified (external) mailserver. \"DoNotSendEmail\" doesn't send emails and "
 "it is useful for test systems."
 msgstr ""
+"Definiert das Modul, über das E-Mails versendet werden. \"Sendmail\" nutzt "
+"das sendmail-binary Ihres laufenden Systems. Alle \"SMTP\" Mechanismen "
+"nutzen einen externen Mailserver. Die Auswahl von \"DoNotSendEmail\" führt "
+"dazu, dass keine E-Mails versendet werden, was z.B. für Testsysteme genutzt "
+"werden kann."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2538,7 +2553,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Extended organization description."
-msgstr ""
+msgstr "Weitere Informationen über Ihr Unternehmen (vgl. auch Platzhaltertext)."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Fetch emails via fetchmail (using SSL)."
@@ -2670,18 +2685,24 @@ msgid ""
 "If any of the \"SMTP\" mechanisms was selected as SendmailModule, and "
 "authentication to the mail server is needed, a password must be specified."
 msgstr ""
+"Wenn unter Typ ein SMTP Mechanismus gewählt wurde, muss hier das Passwort "
+"für die Authentifizierung eingegeben werden."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "If any of the \"SMTP\" mechanisms was selected as SendmailModule, and "
 "authentication to the mail server is needed, an username must be specified."
 msgstr ""
+"Wenn als Typ ein \"SMTP\" Mechanismus gewählt wurde, muss hier der "
+"Nutzername für die Authentifizierung eingegeben werden."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "If any of the \"SMTP\" mechanisms was selected as SendmailModule, the "
 "mailhost that sends out the mails must be specified."
 msgstr ""
+"Wenn als Typ ein \"SMTP\" Mechanismen ausgewählt wurde, muss hier der "
+"Mailhost angegeben werden, der die E-Mails versendet."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2689,6 +2710,8 @@ msgid ""
 "where your mailserver is listening for incoming connections must be "
 "specified."
 msgstr ""
+"Wenn als Typ ein \"SMTP\" Mechanismus ausgewählt wurde, muss hier der Port "
+"für eingehende Verbindungen Ihres E-Mail-Servers angegeben werden."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2712,6 +2735,9 @@ msgid ""
 "possible to use the email's from address instead of an empty envelope sender "
 "(required in certain mail server configurations)."
 msgstr ""
+"Wenn kein \"SendmailNotificationEnvelopeFrom\" angegeben ist, können Sie mit "
+"dieser Einstellung die Absenderadresse anstelle eines leeren Umschlagsenders "
+"verwenden (in bestimmten Mailserverkonfigurationen erforderlich)."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2719,6 +2745,9 @@ msgid ""
 "notifications. If no address is specified, the envelope sender header is "
 "empty."
 msgstr ""
+"Wenn gesetzt, wird diese Adresse als \"Umschlags\"-Absender-Header in "
+"ausgehenden Benachrichtigungen verwendet. Wenn keine Adresse angegeben wird, "
+"ist der Absender-Header des \"Umschlags\" leer."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2726,6 +2755,10 @@ msgid ""
 "notifications - see below). If no address is specified, the envelope sender "
 "is equal to queue e-mail address."
 msgstr ""
+"Wenn gesetzt, wird diese Adresse als \"Umschlags\"-Absender-Adresse für "
+"ausgehene Nachrichten verwendet (Nicht für Benachrichtigungen - siehe unten)"
+". Wird keine Adresse angegeben, ist die \"Umschlags\"-Adresse gleich der "
+"Absende-Adresse des Teams."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3380,6 +3413,8 @@ msgid ""
 "The director/s mentioned in your organizations legal registration for use in "
 "placeholder."
 msgstr ""
+"Der/die eingetragene(n) Geschäftsführer Ihres Unternehmens, zur Verwendung "
+"in Platzhaltern."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The directory to use for temporary files."
@@ -3582,23 +3617,29 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Your organizations name for use in placeholder."
-msgstr ""
+msgstr "Der Name Ihres Unternehmens für die Verwendung in Platzhaltern."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Your organizations registration location according to legal requirements (if "
 "applicable) for use in placeholder."
 msgstr ""
+"Der Ort, an dem Ihr Unternehmen gemäß den gesetzlichen Bestimmungen "
+"registriert ist (wenn zutreffend), zur Verwendung in Platzhaltern."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Your organizations registration number according to legal requirements (if "
 "applicable) for use in placeholder."
 msgstr ""
+"Die Registrationsnummer Ihres Unternehmens gemäß den gesetzlichen "
+"Bestimmungen (wenn zutreffend), z. B. Handelsregisternummer, zur Verwendung "
+"in Platzhaltern."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Your organizations street for use in placeholder."
 msgstr ""
+"Straße und Hausnummer Ihres Unternehmens zur Verwendung in Platzhaltern."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "attachment"
@@ -4514,10 +4555,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module to filter encrypted bodies of incoming messages."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module to generate accounted time ticket statistics."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

@@ -1212,12 +1212,9 @@ sub ArticleLastArticle {
 returns an array with article IDs
 
     my @ArticleIDs = $TicketObject->ArticleIndex(
-        TicketID => 123,
-    );
-
-    my @ArticleIDs = $TicketObject->ArticleIndex(
-        SenderType => 'external',                   # optional, to limit to a certain sender type
-        TicketID   => 123,
+        TicketID        => 123,
+        SenderType      => 'external',                  # optional, to limit to a certain sender type
+        CustomerVisible => 1|0                          # optional, to limit to only customer visible
     );
 
 =cut
@@ -1245,7 +1242,7 @@ sub ArticleIndex {
 
     my $UseCache = $CacheableSenderTypes{ $Param{SenderType} || 'ALL' };
 
-    my $CacheKey = 'ArticleIndex::' . $Param{TicketID} . '::' . ( $Param{SenderType} || 'ALL' );
+    my $CacheKey = 'ArticleIndex::' . $Param{TicketID} . '::' . ( $Param{SenderType} || 'ALL' ) . ($Param{CustomerVisible} ? '::CustomerVisible' : '');
 
     if ($UseCache) {
         my $Cached = $Kernel::OM->Get('Cache')->Get(
@@ -1263,36 +1260,25 @@ sub ArticleIndex {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # db query
-    if ( $Param{SenderType} && $Param{CustomerVisible} ) {
+    if ( $Param{SenderType} ) {
         return if !$DBObject->Prepare(
             SQL => '
                     SELECT art.id FROM article art, article_sender_type ast
                     WHERE art.ticket_id = ?
                         AND art.article_sender_type_id = ast.id
-                        AND ast.name = ?
-                        AND art.customer_visible = 1
-                    ORDER BY art.id',
+                        AND ast.name = ?'
+                    . ($Param{CustomerVisible} ? ' AND art.customer_visible = 1' : '') .
+                    ' ORDER BY art.id',
             Bind => [ \$Param{TicketID}, \$Param{SenderType} ],
         );
-    }
-    elsif ( $Param{SenderType} ) {
-        return if !$DBObject->Prepare(
-            SQL => '
-                SELECT art.id FROM article art, article_sender_type ast
-                WHERE art.ticket_id = ?
-                    AND art.article_sender_type_id = ast.id
-                    AND ast.name = ?
-                ORDER BY art.id',
-            Bind => [ \$Param{TicketID}, \$Param{SenderType} ],
-        );
-    }
-    else {
+    } else {
         return if !$DBObject->Prepare(
             SQL => '
                 SELECT id
                 FROM article
-                WHERE ticket_id = ?
-                ORDER BY id',
+                WHERE ticket_id = ?'
+                . ($Param{CustomerVisible} ? ' AND customer_visible = 1' : '') .
+                ' ORDER BY id',
             Bind => [ \$Param{TicketID} ],
         );
     }

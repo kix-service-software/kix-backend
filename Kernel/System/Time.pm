@@ -63,8 +63,11 @@ sub new {
         || $Kernel::OM->Get('Config')->Get('TimeZone')
         || 'Etc/UTC';   # fallback
 
-	my $TimeZoneObject   = DateTime::TimeZone->new(name => $Self->{TimeZone});
-    $Self->{TimeSecDiff} = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
+    $Self->{TimeSecDiff} = 0;
+    if ( lc $Self->{TimeZone} ne 'local' ) {
+        my $TimeZoneObject   = DateTime::TimeZone->new(name => $Self->{TimeZone});
+        $Self->{TimeSecDiff} = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
+    }
 
     $Self->{CacheObject} = $Kernel::OM->Get('Cache');
     $Self->{CacheType}   = 'Time';

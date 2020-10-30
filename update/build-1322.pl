@@ -47,11 +47,11 @@ sub _DeleteObseleteSysConfigKeys {
         UserImport::DefaultPassword
     };
 
-    foreach my $key (@Items) {
-        if (!$SysConfigObject->OptionDelete(Name => $key)) {
+    foreach my $Key (@Items) {
+        if (!$SysConfigObject->OptionDelete(Name => $Key)) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to delete obsolete item $key from sysconfig!"
+                Message  => "Unable to delete obsolete item $Key from sysconfig!"
             );
             return;
         }
@@ -69,35 +69,36 @@ sub _UpdateAccessLevels {
     my @Items = qw{
         AuthTwoFactorModule::SecretPreferencesKey
         Tool::Acknowledge::HTTP::Password
+        Authentication###000-Default
     };
 
-    foreach my $key (@Items) {
-
-        if (!$SysConfigObject->OptionUpdate(Name => $key, AccessLevel => 'confidential')) {
+    foreach my $Key (@Items) {
+        my %Option = $SysConfigObject->OptionGet(
+            Name => $Key
+        );
+        if (!%Option) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to update item $key from sysconfig!"
+                Message  => "Unable to get option $Key from sysconfig!"
+            );
+            return;
+        }
+
+        my $Result = $SysConfigObject->OptionUpdate(
+            %Option,
+            AccessLevel => 'confidential', 
+            UserID      => 1
+        );
+
+        if (!$Result) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update item $Key from sysconfig!"
             );
             return;
         }
     }
-
-    #update Authentication###**** - Keys
-    my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL => "UPDATE sysconfig SET access_level = 'confidential', change_by = 1, change_time = current_timestamp
-                 WHERE name LIKE ('Authentication###%')"
-    );
-    if (!$Result) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Unable to update "Authentication###***"-Keys in sysconfig!'
-        );
-        return;
-    }
-
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
-
+    
     return 1;
 }
 

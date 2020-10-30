@@ -107,7 +107,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="public" Name="ContactSearch::UseWildcardPraefix" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="public" Name="ContactSearch::UseWildcardPrefix" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Enable wildcard praefix for contact fulltext search.</Description>
         <Group>API</Group>
         <Setting>

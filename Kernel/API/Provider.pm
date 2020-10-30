@@ -242,8 +242,7 @@ sub Run {
             DebuggerObject => $Self->{DebuggerObject},
             Operation      => $Operation,
             OperationType  => $ProviderConfig->{Operation}->{$Operation}->{Type},
-            MappingConfig =>
-                $ProviderConfig->{Operation}->{$Operation}->{MappingInbound},
+            MappingConfig  => $ProviderConfig->{Operation}->{$Operation}->{MappingInbound},
         );
 
         # if mapping init failed, bail out
@@ -322,26 +321,28 @@ sub Run {
                 }
             }
             else {
-
-                my $OperationResult = $OperationObject->Run(
-                    Data                => $FunctionResult->{Data},
-                    PermissionCheckOnly => 1
-                );
-
-                if ( $OperationResult->{Success} ) {
-                    # get options from operation
-                    my $OptionsResult = $OperationObject->Options();
-                    my %OptionsData = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
-
-                    $Data->{Methods}->{$Method} = {
-                        %OptionsData,
-                        Route               => $ProcessRequestResult{AvailableMethods}->{$Method}->{Route},
-                        AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
-                    }
-                } else {
-                    return $Self->_GenerateErrorResponse(
-                        %{$OperationResult},
+                # don't execute GET operation on collections 
+                # (atm we simply check if the OperationType ends with 'Search', that will cover all critical collections so far)
+                if ( $ProviderConfig->{Operation}->{$Operation}->{Type} !~ /Search$/ || $Method ne 'GET' ) {
+                    my $OperationResult = $OperationObject->Run(
+                        Data                => $FunctionResult->{Data},
+                        PermissionCheckOnly => 1
                     );
+                    if ( !$OperationResult->{Success} ) {
+                        return $Self->_GenerateErrorResponse(
+                            %{$OperationResult},
+                        );
+                    }
+                }
+
+                # get options from operation
+                my $OptionsResult = $OperationObject->Options();
+                my %OptionsData   = IsHashRefWithData($OptionsResult->{Data}) ? %{$OptionsResult->{Data}} : ();
+
+                $Data->{Methods}->{$Method} = {
+                    %OptionsData,
+                    Route               => $ProcessRequestResult{AvailableMethods}->{$Method}->{Route},
+                    AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
                 }
             }
         }

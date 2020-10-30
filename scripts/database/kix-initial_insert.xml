@@ -9970,7 +9970,6 @@ vielen Dank für Ihre Nachricht.
         <Data Key="label" Type="Quote" Translatable="1">Mobile Processing</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">Multiselect</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
-        <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 ---
 CountMin: '1'
@@ -10004,7 +10003,6 @@ TranslatableValues: '1'
         <Data Key="label" Type="Quote" Translatable="1">Risk Assumption Remark</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
-        <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 ---
 CountMin: '0'
@@ -10025,7 +10023,6 @@ DefaultValue: ''
         <Data Key="label" Type="Quote" Translatable="1">Checklist 01</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">CheckList</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
-        <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 ---
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\",\r\n
@@ -10060,7 +10057,6 @@ DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\
         <Data Key="label" Type="Quote" Translatable="1">Checklist 02</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">CheckList</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
-        <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \"description\":
   \"\",\r\n    \"input\": \"ChecklistState\",\r\n    \"value\": \"-\"\r\n  },\r\n
@@ -10084,7 +10080,6 @@ DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"task 1\",\r\n    \
         <Data Key="label" Type="Quote" Translatable="1">Affected Asset</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">ITSMConfigItemReference</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
-        <Data Key="displaygroup_id">0</Data>
         <Data Key="config" Type="Quote"><![CDATA[
 CountMin: 0
 CountMax: 15

@@ -114,6 +114,7 @@ sub RunOperation {
 
         # check if we have permission for this object
         my $Result =  $Self->_CheckObjectPermission(
+            %Param,
             Data => $Param{Data},
         );
         if ( !$Result->{Success} ) {
@@ -122,8 +123,10 @@ sub RunOperation {
 
         # check if we have permission for specific properties of this object
         $Result =  $Self->_CheckPropertyPermission(
+            %Param,
             Data => $Param{Data},
         );
+
         if ( !$Result->{Success} ) {
             return $Result;
         }
@@ -1139,7 +1142,7 @@ sub ExecOperation {
     if ( !$Param{IgnoreExpand} ) {
         $AdditionalData{expand} = $Self->{RequestData}->{expand};
     }
-
+    
     my $Result = $OperationObject->Run(
         Data    => {
             %{$Param{Data} || {}},
@@ -2439,10 +2442,10 @@ sub _CheckObjectPermission {
                 }
 
                 # add a NOT filter if we should have no permission (including DENY)
-                if ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) {
+                if ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
                     $Not = 1;
                 }
-                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                     $Not = 1;
                     # also clear all existing permission filters
                     $Self->_ClearPermissionFilters();
@@ -2497,7 +2500,7 @@ sub _CheckObjectPermission {
                         $Self->_PermissionDebug($Self->{LevelIndent}, "resulting Object permission: $ResultingPermissionShort");
 
                         # check if we have a DENY already
-                        if ( ($Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY}) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                        if ( ($Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY}) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                             $Self->_PermissionDebug($Self->{LevelIndent}, "DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
                             last PERMISSION;
                         }
@@ -2506,9 +2509,9 @@ sub _CheckObjectPermission {
 
                 if ( $ResultingPermission != -1 ) {
                     # check if we have the desired permission
-                    my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission->PERMISSION->{$PermissionName};
+                    my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission::PERMISSION->{$PermissionName};
 
-                    if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+                    if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                         $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
 
                         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -2521,7 +2524,7 @@ sub _CheckObjectPermission {
                     }
                 }
             }
-            elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} ) {
+            elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                 # if we have a GET request and a DENY permission we can stop here and just use the DENY filter
                 last PERMISSION;
             }
@@ -2646,8 +2649,8 @@ sub _CheckPropertyPermission {
                 $Self->{PermissionFieldSelector}->{$Object} = [ $Self->{OperationConfig}->{ObjectID} || 'ID' ] if !exists $Self->{PermissionFieldSelector}->{$Object};
 
                 my $Ignore = '';
-                if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
-                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY}
+                if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName}
+                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY}
                 ) {
                     # access is denied, so we have to add an ignore selector for this attribute
                     $Ignore = '!'
@@ -2670,8 +2673,8 @@ sub _CheckPropertyPermission {
                 my $AttributeExists = grep /^$LookupAttribute$/, keys %{$FlatData};
 
                 # if the attribute exists in the data hash we have to check whether the needed permission is granted
-                if ( $AttributeExists && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission->PERMISSION->{$PermissionName}
-                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission->PERMISSION->{DENY} ) == Kernel::System::Role::Permission->PERMISSION->{DENY} )
+                if ( $AttributeExists && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName}
+                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} )
                 ) {
                     $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("request data doesn't match the required criteria - denying request") );
 

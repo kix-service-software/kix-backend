@@ -37,7 +37,7 @@ sub new {
     $Self->{Die}                    = $Param{Config}->{Die} || 1;
     $Self->{Host}                   = $Param{Config}->{Host} || '';
     $Self->{BaseDN}                 = $Param{Config}->{BaseDN} || '';
-    $Self->{UID}                    = $Param{Config}->{UID} || '';
+    $Self->{UID}                    = $Param{Config}->{UID} || 'uid';
     $Self->{SearchUserDN}           = $Param{Config}->{SearchUserDN} || '';
     $Self->{SearchUserPw}           = $Param{Config}->{SearchUserPw} || '';
     $Self->{GroupDN}                = $Param{Config}->{GroupDN} || '';
@@ -184,6 +184,7 @@ sub Sync {
                 for my $AttributeName (@{$AttributeNames}) {
                     if ($AttributeName =~ /^SET:/i) {
                         $SyncUser{$Key} = substr($AttributeName, 4);
+                        $SyncUser{$Key} =~ s/^\s+|\s+$//g;
                         last ATTRIBUTE_NAME;
                     }
                     elsif ($Entry->get_value($AttributeName)) {
@@ -226,7 +227,7 @@ sub Sync {
                     );
                     if ($ContactData{AssignedUserID} && $ContactData{AssignedUserID} != $UserID) {
                         $Kernel::OM->Get('Log')->Log(
-                            LogPrefix => 'LDAP2Contact',
+                            LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
                             Priority  => 'error',
                             Message   => "Can't assign user '$Param{User}' ($UserDN) to contact ($ContactData{ID}) in RDBMS! Contact already is already assigned.",
                         );
@@ -244,7 +245,7 @@ sub Sync {
                     );
                 }
                 $Kernel::OM->Get('Log')->Log(
-                    LogPrefix => 'LDAP2Contact',
+                    LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
                     Priority  => 'notice',
                     Message   => "Initial data for '$Param{User}' ($UserDN) created in RDBMS.",
                 );

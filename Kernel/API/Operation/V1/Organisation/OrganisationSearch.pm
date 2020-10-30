@@ -121,7 +121,7 @@ sub Run {
                     $Value = '*' . $Value;
                 } elsif ( $SearchItem->{Operator} eq 'LIKE' ) {
                     $Value = $Value . '*';
-                    if( $Kernel::OM->Get('Config')->Get('OrganisationSearch::UseWildcardPraefix') ) {
+                    if( $Kernel::OM->Get('Config')->Get('OrganisationSearch::UseWildcardPrefix') ) {
                         $Value = '*' . $Value;
                     }
                 }

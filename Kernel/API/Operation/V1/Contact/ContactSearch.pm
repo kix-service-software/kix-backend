@@ -236,7 +236,7 @@ sub _DoFulltextSearch {
             for my $AndSearchString (@AndCombinedGroups) {
 
                 $AndSearchString = $AndSearchString . '*';
-                if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPraefix') ) {
+                if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPrefix') ) {
                     $AndSearchString = '*' . $AndSearchString;
                 }
 

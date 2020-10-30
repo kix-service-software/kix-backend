@@ -2,17 +2,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 10:53+0000\n"
-"PO-Revision-Date: 2020-09-21 10:53+0000\n"
+"POT-Creation-Date: 2020-10-12 11:21+0000\n"
+"PO-Revision-Date: 2020-10-23 11:33+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
-"Language-Team: English <http://translate.kix18.docker.vm.devel.cape-it.de/"
-"projects/kix18/backend-app/en/>\n"
+"Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
+"backend-app/en/>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 3.9.1\n"
+"X-Generator: Weblate 4.3\n"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
@@ -523,10 +523,6 @@ msgid "Ticket Agent"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Ticket Creator"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
 msgstr ""
 
@@ -579,6 +575,10 @@ msgid "Warning"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Webform Ticket Creator"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Workplace"
 msgstr ""
 
@@ -601,6 +601,12 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
+"allows to create new tickets by using the \"Customer Portal Light\" webform "
+"mechanism"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid ""
 "allows to login in both frontend- and backend application but does not grant "
 "any further permissions"
 msgstr ""
@@ -614,12 +620,6 @@ msgstr ""
 msgid ""
 "allows to read any asset information in any asset class and allows to READ "
 "links"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid ""
-"allows to read any information required to create a ticket (queues, types, "
-"priorities, etc.), allows to create new tickets and allows to CREATE links"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -935,8 +935,8 @@ msgstr ""
 "The \"value\" for the dynamic field to be set. Field type \"Selection\" "
 "expects the key of the value to be set, field type \"AssetReference\" "
 "expects the Asset ID, field type TicketReference expects the Ticket ID, "
-"field type \"Checklist\" expects the appropriate JSON-format, field type \""
-"Date\" expects the format <YYYY-MM-DD 00:00:00>, field type \"DateTime\" "
+"field type \"Checklist\" expects the appropriate JSON-format, field type "
+"\"Date\" expects the format <YYYY-MM-DD 00:00:00>, field type \"DateTime\" "
 "expects the format <YYYY-MM-DD hh:mm:ss>."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
@@ -1282,6 +1282,16 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Cache time in seconds for the web service config backend."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid ""
+"Defines how many tasks are needed per thread (see API::Parallelity) to use "
+"the parallel alogorithm."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Defines how many threads should be used for parallel tasks."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -2502,7 +2512,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Extended organization description."
-msgstr ""
+msgstr "Extended organization description (also see placeholder)."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Fetch emails via fetchmail (using SSL)."
@@ -2690,6 +2700,9 @@ msgid ""
 "notifications - see below). If no address is specified, the envelope sender "
 "is equal to queue e-mail address."
 msgstr ""
+"If set, this address is used as envelope sender in outgoing messages (not "
+"notifications - see below). If no address is specified, the envelope sender "
+"is equal to team e-mail address."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4474,10 +4487,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module to filter encrypted bodies of incoming messages."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module to generate accounted time ticket statistics."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
