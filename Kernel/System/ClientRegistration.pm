@@ -335,7 +335,9 @@ sub NotifyClients {
     $Kernel::OM->Get('Cache')->Set(
         Type          => 'ClientNotification',
         Key           => $$.'_'.$Timestamp.'_'.$RequestID,
-        Value         => $Param{Event}.'::'.$Param{Namespace}.'::'.$Param{ObjectID},
+        Value         => {
+            Data => $Param{Event}.'::'.$Param{Namespace}.'::'.$Param{ObjectID}
+        },
         NoStatsUpdate => 1,
     );
 
@@ -416,7 +418,7 @@ sub NotificationSendWorker {
     my %Stats;
     my @PreparedEventList;
     foreach my $Item ( @{$Param{EventList}} ) {
-        my ( $Event, $Namespace, $ObjectID ) = split(/::/, $Item);
+        my ( $Event, $Namespace, $ObjectID ) = split(/::/, $Item->{Data});
         push @PreparedEventList, {
             Event     => $Event,
             Namespace => $Namespace,
