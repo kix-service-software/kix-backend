@@ -164,7 +164,7 @@ sub GetMulti {
     return @Values if !@Values;
     
     foreach my $Value ( @Values ) {
-        next if !substr($Value, 0, 10) ne '__base64::';
+        next if substr($Value, 0, 10) ne '__base64::';
         # restore Value
         $Value = substr($Value, 10);
         $Value = eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
