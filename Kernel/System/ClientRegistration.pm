@@ -425,7 +425,7 @@ sub NotificationSendWorker {
             Namespace => $Item->{Namespace},
             ObjectID  => $Item->{ObjectID} || '',
         };
-        $Stats{lc($Event)}++;
+        $Stats{lc($Item->{Event})}++;
     }
     my @StatsParts;
     foreach my $Event ( sort keys %Stats ) {
