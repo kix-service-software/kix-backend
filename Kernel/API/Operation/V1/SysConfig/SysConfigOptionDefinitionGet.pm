@@ -136,6 +136,8 @@ sub Run {
         );
 
         if ( !IsHashRefWithData(\%Config) ) {
+            use CGI::Carp qw(cluck);
+            cluck;
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );

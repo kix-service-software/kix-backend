@@ -125,8 +125,8 @@ sub Run {
             $Value = $Self->{Permission}->{Value};
         }
 
-        my %PossiblePermissions = %{Kernel::System::Role::Permission->PERMISSION};
-        $PossiblePermissions{CRUD} = Kernel::System::Role::Permission->PERMISSION_CRUD;
+        my %PossiblePermissions = %{Kernel::System::Role::Permission::PERMISSION};
+        $PossiblePermissions{CRUD} = Kernel::System::Role::Permission::PERMISSION_CRUD;
 
         foreach my $Permission ( split(/\s*\,\s*/, $Self->GetOption('value') ) ) {
             my $Mode = 'add';

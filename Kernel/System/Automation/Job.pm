@@ -889,6 +889,12 @@ sub JobExecute {
     # add JobID for log reference
     $Self->{JobID} = $Param{ID};
 
+    # update execution time of job
+    my $Success = $Self->_JobLastExecutionTimeSet(
+        ID         => $Param{ID},
+        UserID     => $Param{UserID},
+    );
+
     # get Job data
     my %Job = $Self->JobGet(
         ID => $Param{ID}
@@ -1021,12 +1027,6 @@ sub JobExecute {
             }
         }
     }
-
-    # update execution time of job
-    my $Success = $Self->_JobLastExecutionTimeSet(
-        ID         => $Param{ID},
-        UserID     => $Param{UserID},
-    );
 
     # update job run
     my $StateID = 2;        # finished 

@@ -266,6 +266,23 @@ sub Run {
         $GetParam{'X-KIX-OwnerID'} = $TmpOwnerID;
     }
 
+    # check lock
+    if ( $GetParam{'X-KIX-Lock'} ) {
+
+        # check if it's an existing Lock state
+        my $LockID = $Kernel::OM->Get('Lock')->LockLookup(
+            Lock => $GetParam{'X-KIX-Lock'},
+        );
+        if ( !$LockID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message =>
+                    "Lock ".$GetParam{'X-KIX-Lock'}." does not exist, falling back to 'unlock'."
+            );
+            $GetParam{'X-KIX-Lock'} = 'unlock';
+        }
+    }
+
     # handle optional things
     my %Opts;
 
@@ -288,17 +305,6 @@ sub Run {
         $Opts{ResponsibleID} = $TmpResponsibleID || $Opts{ResponsibleID};
     }
 
-    # check channel
-    if ( $GetParam{'X-KIX-Channel'} ) {
-        # check if it's an existing Channel
-        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup(
-            Name => $GetParam{'X-KIX-Channel'},
-        );
-        if ( !$ChannelID ) {
-            $GetParam{'X-KIX-Channel'} = undef;
-        }
-    }
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
@@ -311,7 +317,7 @@ sub Run {
         Lock            => $GetParam{'X-KIX-Lock'} || 'unlock',
         Priority        => $Priority,
         State           => $State,
-        Type            => $GetParam{'X-KIX-Type'}    || '',
+        TypeID          => $TypeID,
         OrganisationID  => $GetParam{'X-KIX-Organisation'},
         ContactID       => $GetParam{'X-KIX-Contact'},
         OwnerID         => $GetParam{'X-KIX-OwnerID'} || $Param{InmailUserID},
@@ -503,12 +509,46 @@ sub Run {
         }
     }
 
+    # check channel
+    if ( $GetParam{'X-KIX-Channel'} ) {
+
+        # check if it's an existing Channel
+        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup(
+            Name => $GetParam{'X-KIX-Channel'},
+        );
+        if ( !$ChannelID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message =>
+                    "Channel ".$GetParam{'X-KIX-Channel'}." does not exist, falling back to 'email'."
+            );
+            $GetParam{'X-KIX-Channel'} = undef;
+        }
+    }
+
+    # check sender type
+    if ( $GetParam{'X-KIX-SenderType'} ) {
+
+        # check if it's an existing SenderType
+        my $SenderTypeID = $TicketObject->ArticleSenderTypeLookup(
+            SenderType => $GetParam{'X-KIX-SenderType'},
+        );
+        if ( !$SenderTypeID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message =>
+                    "SenderType ".$GetParam{'X-KIX-SenderType'}." does not exist, falling back to 'external'."
+            );
+            $GetParam{'X-KIX-SenderType'} = 'external';
+        }
+    }
+
     # do article db insert
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $TicketID,
         Channel          => $GetParam{'X-KIX-Channel'} || 'email',
         CustomerVisible  => 1,
-        SenderType       => $GetParam{'X-KIX-SenderType'},
+        SenderType       => $GetParam{'X-KIX-SenderType'} || 'external',
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},

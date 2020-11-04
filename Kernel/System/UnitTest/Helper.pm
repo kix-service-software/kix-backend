@@ -350,7 +350,7 @@ Returns the ID and Name of the new role
             Resource => [
                 { 
                     Target => '/tickets', 
-                    Value  => Kernel::System::Role::Permission->PERMISSION->{READ},
+                    Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
                 }
             ]
         }
