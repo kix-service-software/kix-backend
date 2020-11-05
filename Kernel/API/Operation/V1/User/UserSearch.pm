@@ -185,6 +185,7 @@ sub Run {
         # perform User search without any search params
         %UserList = $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
+            Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
             Valid => 0
         );
     }

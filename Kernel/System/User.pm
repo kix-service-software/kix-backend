@@ -1042,7 +1042,10 @@ sub UserList {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    return if !$DBObject->Prepare( SQL => $SQL );
+    return if !$DBObject->Prepare(
+        SQL   => $SQL,
+        Limit => $Param{Limit},
+    );
 
     # fetch the result
     my %UsersRaw;
@@ -1182,7 +1185,7 @@ sub PermissionList {
     );
 
     return () if !@RoleIDs;
-    
+
     # get all permissions from every valid role the user is assigned to
     my @Bind;
 
@@ -1370,7 +1373,7 @@ sub CheckResourcePermission {
             Valid        => 1,
         );
         $Self->{PermissionCheckUserRoleList} = \@UserRoleList;
-     
+
         if ( $Self->{PermissionDebug} ) {
             $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}}));
         }
@@ -1514,7 +1517,7 @@ sub _CheckResourcePermissionForRole {
     }
 
     if ( exists $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
-        
+
         if ( IsArrayRefWithData($Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
             my $Granted = $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'denied';
             if ( $Self->{PermissionDebug} ) {
@@ -1567,7 +1570,7 @@ sub _CheckResourcePermissionForRole {
             == Kernel::System::Role::Permission::PERMISSION->{DENY} )
         {
             if ( $Self->{PermissionDebug} ) {
-                $Self->_PermissionDebug($Self->{LevelIndent}, 
+                $Self->_PermissionDebug($Self->{LevelIndent},
                     "DENY in permission ID $Permission->{ID} for role $Param{RoleID} on target \"$Permission->{Target}\""
                         . ( $Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '' ) );
             }
