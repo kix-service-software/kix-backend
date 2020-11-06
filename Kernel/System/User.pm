@@ -1365,25 +1365,37 @@ sub CheckResourcePermission {
         }
     }
 
-    # get all roles the user is assigned to
-    my @UserRoleList = $Self->RoleList(
-        UserID       => $Param{UserID},
-        UsageContext => $Param{UsageContext},
-        Valid        => 1,
-    );
-    $Self->{PermissionCheckUserRoleList} = \@UserRoleList;
-
-    if ( $Self->{PermissionDebug} ) {
-        $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}}));
+    if(!$Self->{PermissionCheckUserRoleList}) {
+        $Self->{PermissionCheckUserRoleList}->{$Param{UserID}} = ();
     }
 
-    my %PermissionList = $Self->PermissionList(
-        UserID   => $Param{UserID},
-        Types    => ['Resource'],
-        UserType => $Param{UserType}
-    );
-    foreach my $Permission ( values %PermissionList ) {
-        $Self->{PermissionCheckUserRolePermissionList}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
+    if ( !IsArrayRefWithData($Self->{PermissionCheckUserRoleList}->{$Param{UserID}} ) ) {
+        # get all roles the user is assigned to
+        my @UserRoleList = $Self->RoleList(
+            UserID       => $Param{UserID},
+            UsageContext => $Param{UsageContext},
+            Valid        => 1,
+        );
+        $Self->{PermissionCheckUserRoleList}->{$Param{UserID}} = \@UserRoleList;
+
+        if ( $Self->{PermissionDebug} ) {
+            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}}));
+        }
+    }
+
+    if(!$Self->{PermissionCheckUserRolePermissionList}) {
+        $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}
+    }
+
+    if ( !IsHashRefWithData($Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) ) {
+        my %PermissionList = $Self->PermissionList(
+            UserID   => $Param{UserID},
+            Types    => ['Resource'],
+            UserType => $Param{UserType}
+        );
+        foreach my $Permission ( values %PermissionList ) {
+            $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
+        }
     }
 
     # check the permission for each target level (from top to bottom) and role
@@ -1400,7 +1412,7 @@ sub CheckResourcePermission {
 
         my $TargetPermission;
         ROLEID:
-        foreach my $RoleID ( sort @{$Self->{PermissionCheckUserRoleList}} ) {
+        foreach my $RoleID ( sort @{ $Self->{PermissionCheckUserRoleList}->{$Param{UserID}} } ) {
             my ( $RoleGranted, $RolePermission ) = $Self->_CheckResourcePermissionForRole(
                 %Param,
                 Target   => $Target,
@@ -1527,8 +1539,8 @@ sub _CheckResourcePermissionForRole {
 
     my $Result = 0;
     my %RelevantPermissions;
-    foreach my $ID ( sort keys %{$Self->{PermissionCheckUserRolePermissionList}->{$Param{RoleID}}} ) {
-        my $Permission = $Self->{PermissionCheckUserRolePermissionList}->{$Param{RoleID}}->{$ID};
+    foreach my $ID ( sort keys %{$Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}} ) {
+        my $Permission = $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}->{$ID};
 
         # prepare target
         my $Target = $Permission->{Target};
