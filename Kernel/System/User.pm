@@ -1365,29 +1365,25 @@ sub CheckResourcePermission {
         }
     }
 
-    if ( !IsArrayRefWithData($Self->{PermissionCheckUserRoleList}) ) {
-        # get all roles the user is assigned to
-        my @UserRoleList = $Self->RoleList(
-            UserID       => $Param{UserID},
-            UsageContext => $Param{UsageContext},
-            Valid        => 1,
-        );
-        $Self->{PermissionCheckUserRoleList} = \@UserRoleList;
+    # get all roles the user is assigned to
+    my @UserRoleList = $Self->RoleList(
+        UserID       => $Param{UserID},
+        UsageContext => $Param{UsageContext},
+        Valid        => 1,
+    );
+    $Self->{PermissionCheckUserRoleList} = \@UserRoleList;
 
-        if ( $Self->{PermissionDebug} ) {
-            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}}));
-        }
+    if ( $Self->{PermissionDebug} ) {
+        $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}}));
     }
 
-    if ( !IsHashRefWithData($Self->{PermissionCheckUserRolePermissionList}) ) {
-        my %PermissionList = $Self->PermissionList(
-            UserID   => $Param{UserID},
-            Types    => ['Resource'],
-            UserType => $Param{UserType}
-        );
-        foreach my $Permission ( values %PermissionList ) {
-            $Self->{PermissionCheckUserRolePermissionList}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
-        }
+    my %PermissionList = $Self->PermissionList(
+        UserID   => $Param{UserID},
+        Types    => ['Resource'],
+        UserType => $Param{UserType}
+    );
+    foreach my $Permission ( values %PermissionList ) {
+        $Self->{PermissionCheckUserRolePermissionList}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
     }
 
     # check the permission for each target level (from top to bottom) and role
