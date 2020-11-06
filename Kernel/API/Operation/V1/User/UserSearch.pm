@@ -203,9 +203,6 @@ sub Run {
                         RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission},
                         UsageContext        => $Self->{Authorization}->{UserType}
                     );
-                    # print STDERR Data::Dumper::Dumper($Self->{RequiredPermission}->{$Permission});
-                    # print STDERR Data::Dumper::Dumper($Granted);
-                    # print STDERR Data::Dumper::Dumper(($Granted));
                     last if !$Granted;
                 }
 
