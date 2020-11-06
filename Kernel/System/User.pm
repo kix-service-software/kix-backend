@@ -1384,7 +1384,7 @@ sub CheckResourcePermission {
     }
 
     if(!$Self->{PermissionCheckUserRolePermissionList}) {
-        $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}
+        $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} = ();
     }
 
     if ( !IsHashRefWithData($Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) ) {
