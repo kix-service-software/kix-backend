@@ -15,6 +15,8 @@ use Redis;
 use Storable qw();
 use MIME::Base64;
 use Digest::MD5 qw();
+use utf8;
+
 umask 002;
 
 use Kernel::System::VariableCheck qw(:all);
@@ -83,29 +85,30 @@ sub Set {
     # prepare value for Redis
     my $Value = $Param{Value};
     if ( ref $Value ) {
-        $Value = '__base64::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );
+        $Value = '__b64+nf::'.MIME::Base64::encode_base64( Storable::nfreeze( $Param{Value} ) );
+    }
+    elsif ( !utf8::downgrade($Value, 1) ) {
+        utf8::encode($Value);
+        $Value = '__b64raw::'.MIME::Base64::encode_base64( $Value );
     }
 
-    my $Result;
     if ( $TTL > 0 ) {
-        $Result = $Self->{RedisObject}->setex(
-            $PreparedKey, 
-            $TTL, 
+        $Self->{RedisObject}->hset(
+            $Param{Type},
+            $PreparedKey,
             $Value,
         );
+        $Self->{RedisObject}->expire($Param{Type}, $TTL);
     }
     else {
-        $Result = $Self->{RedisObject}->set(
+        $Self->{RedisObject}->hset(
+            $Param{Type},
             $PreparedKey, 
             $Value,
         );
     }
 
-    if ( $Self->{Config}->{Debug} ) {
-        $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: executed setex() for key \"$PreparedKey\" (Result=$Result)");
-    }
-
-    return $Result;
+    return 1;
 }
 
 sub Get {
@@ -123,19 +126,26 @@ sub Get {
 
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
 
-    my $Value = $Self->{RedisObject}->get(
+    my $Value = $Self->{RedisObject}->hget(
+        $Param{Type},
         $PreparedKey,
     );
 
-    if ($Value && $Self->{Config}->{Debug} ) {
-        $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: get() for key \"$PreparedKey\" returned value");
-    }
-
-    return $Value if !$Value || substr($Value, 0, 10) ne '__base64::';
+    return $Value if !$Value || index($Value, '__b64') != 0;
 
     # restore Value
-    $Value = substr($Value, 10);
-    return eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
+    my $Result;
+    if ( index($Value, '__b64+nf') == 0 ) {
+        $Value = substr($Value, 10);
+        $Result = eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
+    }
+    else {
+        $Value = substr($Value, 10);
+        $Result = MIME::Base64::decode_base64($Value);
+        utf8::decode($Result);
+    }
+
+    return $Result;
 }
 
 sub GetMulti {
@@ -153,21 +163,27 @@ sub GetMulti {
 
     my @PreparedKeys = map { $Param{UseRawKey} ? $_ : $Self->_PrepareRedisKey($_) } @{$Param{Keys}};
 
-    my @Values = $Self->{RedisObject}->mget(
+    my @Values = $Self->{RedisObject}->hmget(
+        $Param{Type},
         @PreparedKeys,
     );
-
-    if ( @Values && $Self->{Config}->{Debug} ) {
-        $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: get() for keys \"".(Data::Dumper::Dumper(\@PreparedKeys))."\" returned value");
-    }
 
     return @Values if !@Values;
     
     foreach my $Value ( @Values ) {
-        next if substr($Value, 0, 10) ne '__base64::';
+        next if !$Value;
+        next if index($Value, '__b64') != 0;
+
         # restore Value
-        $Value = substr($Value, 10);
-        $Value = eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
+        if ( index($Value, '__b64+nf') == 0 ) {
+            $Value = substr($Value, 10);
+            $Value = eval { Storable::thaw( MIME::Base64::decode_base64($Value) ) };
+        }
+        else {
+            $Value = substr($Value, 10);
+            $Value = MIME::Base64::decode_base64($Value);
+            utf8::decode($Value);
+        }
     }
 
     return @Values;
@@ -188,7 +204,8 @@ sub Delete {
 
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
 
-    return $Self->{RedisObject}->del(
+    return $Self->{RedisObject}->hdel(
+        $Param{Type},
         $PreparedKey
     );
 }
@@ -199,46 +216,25 @@ sub CleanUp {
     return if ( !$Self->{RedisObject} );
 
     if ( $Param{Type} ) {
-        # get keys for type 
-        my @Keys = $Self->{RedisObject}->keys($Param{Type}.'::*');
-        my $KeyCount = @Keys;
-        return 1 if !$KeyCount;
-
-        if ( $Self->{Config}->{Debug} ) {
-            use Data::Dumper;
-            $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: deleting keys of type \"$Param{Type}\": ".Dumper(\@Keys));
-        }
-
-        # delete keys
-        my $OK = $Self->{RedisObject}->del(@Keys);
-
-        if ( $Self->{Config}->{Debug} ) {
-            $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: executed del() for $KeyCount keys of type \"$Param{Type}\" (deleted $OK/$KeyCount)");
-            $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: cleaned up type \"$Param{Type}\"");
-        }
-        return 1;
+        # delete type
+        return $Self->{RedisObject}->del($Param{Type});
     }
     else {
         if ( $Param{KeepTypes} ) {
             my %KeepTypeLookup;
             @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
 
-            # get all keys
-            my @Keys = $Self->{RedisObject}->keys('*');
+            # get all types
+            my @Types = $Self->GetKeysForType(Type => '*');
 
-            for my $Key ( @Keys ) {                
-                $Key =~ /^(.+?)::/;
-                my $Type = $1;
+            for my $Type ( @Types ) {
                 next if $KeepTypeLookup{$Type};
                 $Self->CleanUp( Type => $Type );
-            }        
+            }
         } 
         else {
-            if ( $Self->{Config}->{Debug} ) {
-                $Kernel::OM->Get('Cache')->_Debug(0, "    Redis: executing flushall()");
-            }
             return $Self->{RedisObject}->flushall();
-        }        
+        }
     }
 }
 
@@ -253,7 +249,20 @@ sub GetKeysForType {
         }
     }
 
-    return $Self->{RedisObject}->keys($Param{Type}.'::*');
+    my @Result;
+    my $Keys;
+    my $Cursor = 0;
+    do {
+        if ( $Param{Type} ne '*' ) {
+            ($Cursor, $Keys) = $Self->{RedisObject}->hscan($Param{Type}, $Cursor);
+        }
+        else {
+            ($Cursor, $Keys) = $Self->{RedisObject}->scan($Cursor);
+        }
+        push @Result, @{$Keys};
+    } while ( $Cursor );
+
+    return @Result;
 }
 
 =item _InitRedis()
@@ -294,20 +303,16 @@ sub _PrepareRedisKey {
     my ( $Self, %Param ) = @_;
 
     if ($Param{Raw}) {
-        return $Param{Type}.'::'.$Param{Key};
+        return $Param{Key};
     }
 
     my $Key = $Param{Key};
     $Kernel::OM->Get('Encode')->EncodeOutput( \$Key );
     $Key = Digest::MD5::md5_hex($Key);
-    $Key = $Param{Type} . '::' . $Key;
     return $Key;
 }
 
 1;
-
-
-
 
 =back
 

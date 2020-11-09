@@ -547,7 +547,7 @@ sub TicketCreate {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear( TicketID => $TicketID );
 
     # trigger event
     $Self->EventHandler(
@@ -1303,7 +1303,10 @@ sub _TicketCacheClear {
     );
 
     foreach my $Value ( @Values ) {
+        next if !$Value;
         my ( $Type, $Key ) = split(/::/, $Value, 2);
+
+        next if !$Type || !$Key;
 
         # reset cache
         $CacheObject->Delete(
