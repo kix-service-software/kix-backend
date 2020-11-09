@@ -202,7 +202,10 @@ sub ArticleDeletePlain {
     );
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
+    my $ContentPath = $Self->ArticleGetContentPath( 
+        TicketID  => $Article{TicketID},
+        ArticleID => $Param{ArticleID} 
+    );
     my $File = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt";
     if ( -f $File ) {
         if ( !unlink $File ) {
@@ -262,7 +265,10 @@ sub ArticleDeleteAttachment {
     );
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
+    my $ContentPath = $Self->ArticleGetContentPath( 
+        TicketID  => $Article{TicketID},
+        ArticleID => $Param{ArticleID} 
+    );
     my $Path = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}";
 
     if ( -e $Path ) {
@@ -391,7 +397,10 @@ sub ArticleWriteAttachment {
     # prepare/filter ArticleID
     $Param{ArticleID} = quotemeta( $Param{ArticleID} );
     $Param{ArticleID} =~ s/\0//g;
-    my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
+    my $ContentPath = $Self->ArticleGetContentPath( 
+        TicketID  => $Article{TicketID},
+        ArticleID => $Param{ArticleID} 
+    );
 
     # define path
     $Param{Path} = $Self->{ArticleDataDir} . '/' . $ContentPath . '/' . $Param{ArticleID};
