@@ -336,8 +336,9 @@ sub NotifyClients {
         Type          => 'ClientNotification',
         Key           => $$.'_'.$Timestamp.'_'.$RequestID,
         Value         => {
+            ID        => $$.'_'.$Timestamp.'_'.$RequestID,
             Event     => $Param{Event},
-            Namespace =>  $Param{Namespace},
+            Namespace => $Param{Namespace},
             ObjectID  => $Param{ObjectID},
         },
         NoStatsUpdate => 1,
@@ -420,11 +421,7 @@ sub NotificationSendWorker {
     my %Stats;
     my @PreparedEventList;
     foreach my $Item ( @{$Param{EventList}} ) {
-        push @PreparedEventList, {
-            Event     => $Item->{Event},
-            Namespace => $Item->{Namespace},
-            ObjectID  => $Item->{ObjectID} || '',
-        };
+        push @PreparedEventList, $Item;
         $Stats{lc($Item->{Event})}++;
     }
     my @StatsParts;
