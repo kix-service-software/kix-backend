@@ -221,8 +221,7 @@ sub CleanUp {
     }
     else {
         if ( $Param{KeepTypes} ) {
-            my %KeepTypeLookup;
-            @KeepTypeLookup{ ( @{ $Param{KeepTypes} || [] } ) } = undef;
+            my %KeepTypeLookup = map { $_ => 1 } @{ $Param{KeepTypes} || [] };
 
             # get all types
             my @Types = $Self->GetKeysForType(Type => '*');
