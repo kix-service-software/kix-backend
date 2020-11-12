@@ -1379,7 +1379,7 @@ sub CheckResourcePermission {
         $Self->{PermissionCheckUserRoleList}->{$Param{UserID}} = \@UserRoleList;
 
         if ( $Self->{PermissionDebug} ) {
-            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}}));
+            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to UserID $Param{UserID}: " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}->{$Param{UserID}}}));
         }
     }
 
