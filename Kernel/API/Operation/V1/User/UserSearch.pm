@@ -189,30 +189,31 @@ sub Run {
 
         # check requested permissions (AND combined)
         my @GetUserIDs = sort keys %UserList;
-        my @AllowedUserIDs;
         if( $Param{Data} && $Param{Data}->{requiredPermission} ) {
             my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission});
 
-            for my $UserID (@GetUserIDs) {
-                my $Granted = 1;
-                for my $Permission (@Permissions) {
-                    next if (!$Self->{RequiredPermission} || !$Self->{RequiredPermission}->{$Permission});
-                    $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
+            for my $Permission (@Permissions) {
+                next if (!$Self->{RequiredPermission} || !$Self->{RequiredPermission}->{$Permission});
+
+                my @AllowedUserIDs;
+                for my $UserID (@GetUserIDs) {
+
+                    my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                         UserID              => $UserID,
                         Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
                         RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission},
                         UsageContext        => $Self->{Authorization}->{UserType}
                     );
-                    last if !$Granted;
+
+                    if ($Granted) {
+                        push(@AllowedUserIDs, $UserID);
+                    }
                 }
 
-                if( $Granted ) {
-                    push(@AllowedUserIDs, $UserID);
-                }
+                # set allowed ids for next permission
+                @GetUserIDs = @AllowedUserIDs;
             }
         }
-
-        @GetUserIDs = @AllowedUserIDs;
 
         # get already prepared user data from UserGet operation
         my $UserGetResult = $Self->ExecOperation(
