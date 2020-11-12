@@ -1422,8 +1422,8 @@ sub CheckResourcePermission {
 
             # use parent permission if no permissions have been found
             if ( !defined $RolePermission && $ParentTarget ) {
-                $RolePermission = $Self->{PermissionCache}->{$ParentTarget}->{$RoleID};
-                $Self->{PermissionCache}->{$Target}->{$RoleID} = $RolePermission;
+                $RolePermission = $Self->{PermissionCache}->{$Param{UserID}}->{$ParentTarget}->{$RoleID};
+                $Self->{PermissionCache}->{$Param{UserID}}->{$Target}->{$RoleID} = $RolePermission;
                 $Self->_PermissionDebug($Self->{LevelIndent}, "no permissions found for role $RoleID on target $Target, using parent permission");
             }
 
@@ -1524,10 +1524,10 @@ sub _CheckResourcePermissionForRole {
         $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for role $Param{RoleID} on target $Param{Target}");
     }
 
-    if ( exists $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
+    if ( exists $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
 
-        if ( IsArrayRefWithData($Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
-            my $Granted = $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'denied';
+        if ( IsArrayRefWithData($Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
+            my $Granted = $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'denied';
             if ( $Self->{PermissionDebug} ) {
                 $Self->_PermissionDebug($Self->{LevelIndent}, "using cache for role $Param{RoleID} on target $Param{Target}: $Param{RequestedPermission} = $Granted");
             }
@@ -1603,7 +1603,7 @@ sub _CheckResourcePermissionForRole {
 
     # check if we have a DENY
     if ( ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
-        $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = 0;
+        $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = 0;
         return 0;
     }
 
@@ -1612,8 +1612,8 @@ sub _CheckResourcePermissionForRole {
             & Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} } )
         == Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} };
 
-    $Self->{PermissionCache}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ $Granted, $ResultingPermission ];
-    $Self->{PermissionCache}->{$Param{Target}}->{$Param{RoleID}} = $ResultingPermission;
+    $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ $Granted, $ResultingPermission ];
+    $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RoleID}} = $ResultingPermission;
 
     return ( $Granted, $ResultingPermission );
 }
