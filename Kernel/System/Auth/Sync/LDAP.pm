@@ -220,30 +220,38 @@ sub Sync {
                 return;
             }
             else {
+                my %ContactData;
                 if ($SyncUser{Email}) {
-                    my %ContactData = $ContactObject->ContactSearch(
+                    %ContactData = $ContactObject->ContactSearch(
                         PostMasterSearch => $SyncUser{Email},
                         Silent           => 1,
                     );
-                    if ($ContactData{AssignedUserID} && $ContactData{AssignedUserID} != $UserID) {
-                        $Kernel::OM->Get('Log')->Log(
-                            LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
-                            Priority  => 'error',
-                            Message   => "Can't assign user '$Param{User}' ($UserDN) to contact ($ContactData{ID}) in RDBMS! Contact already is already assigned.",
-                        );
-
-                        # take down session
-                        $LDAP->unbind();
-                        return;
-                    }
-                    $ContactID = $ContactObject->ContactAdd(
-                        %SyncUser,
-                        AssignedUserID        => $UserID,
-                        PrimaryOrganisationID => 1,
-                        ValidID               => 1,
-                        UserID                => 1,
+                }
+                elsif ($SyncUser{UserLogin}) {
+                    %ContactData = $ContactObject->ContactSearch(
+                        Login  => $SyncUser{UserLogin},
+                        Silent => 1,
                     );
                 }
+                if ($ContactData{AssignedUserID} && $ContactData{AssignedUserID} != $UserID) {
+                    $Kernel::OM->Get('Log')->Log(
+                        LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
+                        Priority  => 'error',
+                        Message   => "Can't assign user '$Param{User}' ($UserDN) to contact ($ContactData{ID}) in RDBMS! Contact already is already assigned to userid ($ContactData{AssignedUserID}).",
+                    );
+
+                    # take down session
+                    $LDAP->unbind();
+                    return;
+                }
+                $ContactID = $ContactObject->ContactAdd(
+                    %SyncUser,
+                    AssignedUserID        => $UserID,
+                    PrimaryOrganisationID => 1,
+                    ValidID               => 1,
+                    UserID                => 1,
+                );
+
                 $Kernel::OM->Get('Log')->Log(
                     LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
                     Priority  => 'notice',
@@ -265,7 +273,7 @@ sub Sync {
             my $AttributeChange;
             ATTRIBUTE:
             for my $Attribute (sort keys %SyncUser) {
-                next ATTRIBUTE if $SyncUser{$Attribute} eq $UserData{$Attribute};
+                next ATTRIBUTE if ($SyncUser{$Attribute} && $UserData{$Attribute} && $SyncUser{$Attribute} eq $UserData{$Attribute});
                 $AttributeChange = 1;
                 last ATTRIBUTE;
             }
@@ -286,7 +294,7 @@ sub Sync {
             $AttributeChange = 0;
             ATTRIBUTE:
             for my $Attribute (sort keys %SyncUser) {
-                next ATTRIBUTE if $SyncUser{$Attribute} eq $ContactData{$Attribute};
+                next ATTRIBUTE if ($SyncUser{$Attribute} && $ContactData{$Attribute} && $SyncUser{$Attribute} eq $ContactData{$Attribute});
                 $AttributeChange = 1;
                 last ATTRIBUTE;
             }
