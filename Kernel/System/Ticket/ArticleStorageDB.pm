@@ -182,7 +182,10 @@ sub ArticleDeletePlain {
     return 1 if $Param{OnlyMyBackend};
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
+    my $ContentPath = $Self->ArticleGetContentPath( 
+        TicketID  => $Article{TicketID},
+        ArticleID => $Param{ArticleID} 
+    );
     my $File = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt";
     if ( -f $File ) {
         if ( !unlink $File ) {
@@ -236,7 +239,10 @@ sub ArticleDeleteAttachment {
     return 1 if $Param{OnlyMyBackend};
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
+    my $ContentPath = $Self->ArticleGetContentPath( 
+        TicketID  => $Article{TicketID},
+        ArticleID => $Param{ArticleID} 
+    );
     my $Path = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}";
 
     if ( -e $Path ) {

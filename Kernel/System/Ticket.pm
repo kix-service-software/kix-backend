@@ -547,7 +547,7 @@ sub TicketCreate {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear( TicketID => $TicketID );
 
     # trigger event
     $Self->EventHandler(
