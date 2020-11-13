@@ -120,7 +120,7 @@ perform MailFilterUpdate Operation. This will return the updated TypeID.
                         Value  => 'email@example.com',
                         Not    => 0                     # optional
                     },
-                    { 
+                    {
                         Key    => 'Subject',
                         Value  => 'Test',
                         Not    => 1                     # optional
@@ -141,10 +141,10 @@ perform MailFilterUpdate Operation. This will return the updated TypeID.
         Code              => '',                      # in case of error
         Message           => '',                      # in case of error
         Data              => {                        # result data payload after Operation
-            MailFilterID  => 123,                     # ID of the updated MailFilter 
+            MailFilterID  => 123,                     # ID of the updated MailFilter
         },
     };
-   
+
 =cut
 
 sub Run {
@@ -154,22 +154,24 @@ sub Run {
     my $MailFilter = $Self->_Trim( Data => $Param{Data}->{MailFilter} );
 
     # check if another filter with name already exists
-    my $Exists = $Kernel::OM->Get('PostMaster::Filter')->NameExistsCheck(
-        Name => $MailFilter->{Name},
-        ID   => $Param{Data}->{MailFilterID}
-    );
-    if ($Exists) {
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Another MailFilter with the same name already exists."
+    if (exists $MailFilter->{Name}) {
+        my $Exists = $Kernel::OM->Get('PostMaster::Filter')->NameExistsCheck(
+            Name => $MailFilter->{Name},
+            ID   => $Param{Data}->{MailFilterID}
         );
+        if ($Exists) {
+            return $Self->_Error(
+                Code    => 'Object.AlreadyExists',
+                Message => "Another MailFilter with the same name already exists."
+            );
+        }
     }
 
     # validate MailFilter
     my $Check = $Self->_CheckMailFilter(
         MailFilter => $MailFilter
     );
-    if ( !$Check->{Success} )  {
+    if ( !$Check->{Success} ) {
         return $Check;
     }
 

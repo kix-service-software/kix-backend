@@ -114,7 +114,9 @@ sub new {
         for my $DynamicField ( values %$DynamicFields ) {
             for my $Header (
                 'X-KIX-DynamicField-' . $DynamicField,
+                'X-KIX-DynamicField_' . $DynamicField,   # except also underline
                 'X-KIX-FollowUp-DynamicField-' . $DynamicField,
+                'X-KIX-FollowUp-DynamicField_' . $DynamicField,   # except also underline
                 )
             {
 

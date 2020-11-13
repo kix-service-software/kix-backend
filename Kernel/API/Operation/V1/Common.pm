@@ -2327,7 +2327,7 @@ sub _CheckObjectPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/\\w+/g;
+        $Target =~ s/\*/[^\/]+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2571,7 +2571,7 @@ sub _CheckPropertyPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/\\w+/g;
+        $Target =~ s/\*/[^\/]+/g;
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
