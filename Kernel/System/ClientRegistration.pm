@@ -421,6 +421,7 @@ sub NotificationSendWorker {
     my %Stats;
     my @PreparedEventList;
     foreach my $Item ( @{$Param{EventList}} ) {
+        next if !$Item->{Event};
         push @PreparedEventList, $Item;
         $Stats{lc($Item->{Event})}++;
     }
@@ -508,14 +509,14 @@ sub _NotificationSendToClient {
     if ( !$Response->is_success ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Client \"$Param{ClientID}\" responded with error ".$Response->status_line.".",
+            Message  => "Client \"$Param{ClientID}\" ($ClientRegistration{NotificationURL}) responded with error ".$Response->status_line.".",
         );
         return 0;
     }
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'debug',
-        Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
+        Message  => "Client \"$Param{ClientID}\" ($ClientRegistration{NotificationURL}) responded with success ".$Response->status_line.".",
     );
 
     return 1;

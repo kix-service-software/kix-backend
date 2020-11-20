@@ -546,8 +546,8 @@ sub TicketCreate {
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
 
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $TicketID );
+    # clear whole ticket cache
+    $Self->_TicketCacheClear();
 
     # trigger event
     $Self->EventHandler(
@@ -1289,6 +1289,14 @@ sub _TicketCacheClear {
     my ( $Self, %Param ) = @_;
 
     my $CacheObject = $Kernel::OM->Get('Cache');
+
+    if ( !$Param{TicketID} ) {
+        # delete whole ticket cache, without ticket specific cache types
+        $CacheObject->CleanUp(
+            Type => $Self->{CacheType},
+        );
+        return 1;
+    }
 
     my @Keys = $CacheObject->GetKeysForType(
         Type => "TicketCache".$Param{TicketID},
