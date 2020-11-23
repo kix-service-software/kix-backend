@@ -135,7 +135,7 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 To                              => 'some to string',           # optional
                 Cc                              => 'some Cc string',           # optional
                 Bcc                             => 'some Bcc string',          # optional
-                ReplyTo                         => 'some ReplyTo string',      # optional
+                InReplyTo                       => 'some InReplyTo string',    # optional
                 HistoryType                     => 'some history type',        # optional
                 HistoryComment                  => 'Some  history comment',    # optional
                 TimeUnit                        => 123,                        # optional
@@ -165,7 +165,7 @@ perform ArticleCreate Operation. This will return the created ArticleID.
     $Result = {
         Success         => 1,                       # 0 or 1
         Code            => '',                      #
-        Message    => '',                      # in case of error
+        Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             ArticleID   => 123,                     # ID of created article
         },
@@ -394,10 +394,10 @@ sub _ArticleCreate {
             To      => $To,
             Subject => $Article->{Subject},
             Body    => $Article->{Body},
-
         },
         Attachment     => $Article->{Attachments},
-        TimeUnits      => $Article->{TimeUnit}
+        TimeUnits      => $Article->{TimeUnit},
+        InReplyTo      => $Article->{InReplyTo} || ''
     );
 
     if ( !$ArticleID ) {
