@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem AccessLevel="internal" Name="Ticket::Hook" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="Ticket::Hook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a ticket, e.g. Ticket#, Call#, MyTicket#. The default is Ticket#.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
@@ -8,7 +8,7 @@
             <String Regex="">Ticket#</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::HookDivider" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="Ticket::HookDivider" Required="1" Valid="1">
         <Description Translatable="1">The divider between TicketHook and ticket number. E.g ': '.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
