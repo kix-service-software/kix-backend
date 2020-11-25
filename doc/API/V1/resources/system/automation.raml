@@ -12,7 +12,7 @@
         jobId:
           displayName: JobID
           type: integer
-      /execPlanIds:
+      /execplanids:
         description: !include ../../descriptions/resources/system/automation/jobs/execplanids.md
         type: { collection-nopatch: { typeName: JobExecPlanID } }
         /{execPlanId}:
@@ -21,7 +21,7 @@
             execPlanId:
               displayName: ExecPlanID
               type: integer
-      /macroIds:
+      /macroids:
         description: !include ../../descriptions/resources/system/automation/jobs/macroids.md
         type: { collection-nopatch: { typeName: JobMacroID } }
         /{macroId}:
