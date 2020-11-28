@@ -71,6 +71,9 @@ sub Set {
 
     return if !$Self->{RedisObject};
 
+    # make sure we have an active connection
+    $Self->{RedisObject}->connect() if !$Self->{RedisObject}->ping();
+
     my $PreparedKey = $Self->_PrepareRedisKey(%Param);
     my $TTL = $Param{TTL} // 0;
     if ( IsHashRefWithData($Self->{Config}->{OverrideTTL}) ) {
@@ -124,6 +127,9 @@ sub Get {
 
     return if !$Self->{RedisObject};
 
+    # make sure we have an active connection
+    $Self->{RedisObject}->connect() if !$Self->{RedisObject}->ping();
+
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
 
     my $Value = $Self->{RedisObject}->hget(
@@ -160,6 +166,9 @@ sub GetMulti {
     }
 
     return if !$Self->{RedisObject};
+
+    # make sure we have an active connection
+    $Self->{RedisObject}->connect() if !$Self->{RedisObject}->ping();
 
     my @PreparedKeys = map { $Param{UseRawKey} ? $_ : $Self->_PrepareRedisKey($_) } @{$Param{Keys}};
 
@@ -200,7 +209,10 @@ sub Delete {
         }
     }
 
-    return if ( !$Self->{RedisObject} );
+    return if !$Self->{RedisObject};
+
+    # make sure we have an active connection
+    $Self->{RedisObject}->connect() if !$Self->{RedisObject}->ping();
 
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
 
@@ -213,7 +225,10 @@ sub Delete {
 sub CleanUp {
     my ( $Self, %Param ) = @_;
 
-    return if ( !$Self->{RedisObject} );
+    return if !$Self->{RedisObject};
+
+    # make sure we have an active connection
+    $Self->{RedisObject}->connect() if !$Self->{RedisObject}->ping();
 
     if ( $Param{Type} ) {
         # delete type
@@ -247,6 +262,11 @@ sub GetKeysForType {
             return;
         }
     }
+
+    return if !$Self->{RedisObject};
+
+    # make sure we have an active connection
+    $Self->{RedisObject}->connect() if !$Self->{RedisObject}->ping();
 
     my @Result;
     my $Keys;

@@ -22,7 +22,7 @@ use base qw(Kernel::System::AsynchronousExecutor);
 
 our @ObjectDependencies = (
     'Config',
-    'CacheInternal',
+    'Cache',
     'DB',
     'Log',
 );
