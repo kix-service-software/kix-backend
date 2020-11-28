@@ -355,7 +355,7 @@ sub PriorityUpdate {
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'CREATE',
+        Event     => 'UPDATE',
         Namespace => 'Priority',
         ObjectID  => $Param{PriorityID},
     );
