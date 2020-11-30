@@ -171,6 +171,13 @@ sub Run {
             UserID             => $Self->{Authorization}->{UserID},
         );
 
+        # check if article attachment exists
+        if ( !%Attachment ) {
+            return $Self->_Error(
+                Code => 'Object.NotFound',
+            );
+        }
+
         # add ID to result
         $Attachment{ID} = $AttachmentID;
 
