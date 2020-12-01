@@ -265,8 +265,10 @@ sub MacroActionAdd {
         $ID = $Row[0]
     }
 
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -383,8 +385,10 @@ sub MacroActionUpdate {
         ],
     );
 
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -513,8 +517,10 @@ sub MacroActionDelete {
         Bind => [ \$Param{ID} ],
     );
    
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
