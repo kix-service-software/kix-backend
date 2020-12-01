@@ -1318,6 +1318,11 @@ sub _TicketCacheClear {
         NoStatsUpdate => 1,
     );
 
+    # cleanup search cache
+    $CacheObject->CleanUp(
+        Type => "TicketSearch",
+    );
+
     return 1;
 }
 

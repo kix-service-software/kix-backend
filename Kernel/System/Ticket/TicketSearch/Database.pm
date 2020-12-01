@@ -291,7 +291,7 @@ sub TicketSearch {
 
     my $CacheKey = $SQL . $Result . ($Param{Limit} || '');
     my $CacheData = $CacheObject->Get(
-        Type => 'Ticket',
+        Type => 'TicketSearch',
         Key  => $CacheKey,
     );
 
@@ -331,24 +331,11 @@ sub TicketSearch {
         $Tickets{ $Row[0] } = $Row[1];
     }
 
-    # set ticket cache
-    if ( $CacheObject ) {
-        my $TicketObject = $Kernel::OM->Get('Ticket');
-        foreach my $TicketID ( @TicketIDs ) {
-            $TicketObject->_TicketCacheSet(
-                TicketID       => $TicketID,
-                Type           => 'Ticket',
-                Key            => $CacheKey,
-                OnlyUpdateMeta => 1,
-            );
-        }
-    }
-
     # return COUNT
     if ( $Result eq 'COUNT' ) {
         if ($CacheObject) {
             $CacheObject->Set(
-                Type  => 'Ticket',
+                Type  => 'TicketSearch',
                 Key   => $CacheKey,
                 Value => $Count,
                 TTL   => $Param{CacheTTL} || 60 * 4,
@@ -361,7 +348,7 @@ sub TicketSearch {
     elsif ( $Result eq 'HASH' ) {
         if ($CacheObject) {
             $CacheObject->Set(
-                Type  => 'Ticket',
+                Type  => 'TicketSearch',
                 Key   => $CacheKey,
                 Value => \%Tickets,
                 TTL   => $Param{CacheTTL} || 60 * 4,
@@ -374,7 +361,7 @@ sub TicketSearch {
     else {
         if ($CacheObject) {
             $CacheObject->Set(
-                Type  => 'Ticket',
+                Type  => 'TicketSearch',
                 Key   => $CacheKey,
                 Value => \@TicketIDs,
                 TTL   => $Param{CacheTTL} || 60 * 4,
