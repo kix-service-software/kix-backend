@@ -166,7 +166,7 @@ sub _LookupValue {
         my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class => $Param{Parent},
         );
-        my %ItemListReverse = reverse %{$ItemList};
+        my %ItemListReverse = reverse %{$ItemList || {}};
         $Value = $ItemListReverse{$Param{RawValue}};
     }
     elsif ( $Param{Object} eq 'FAQCategory' ) {

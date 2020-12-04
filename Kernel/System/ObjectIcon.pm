@@ -16,7 +16,7 @@ use vars qw(@ISA);
 
 our @ObjectDependencies = (
     'Config',
-    'CacheInternal',
+    'Cache',
     'DB',
     'Log',
 );

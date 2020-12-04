@@ -22,7 +22,7 @@ use base qw(Kernel::System::AsynchronousExecutor);
 
 our @ObjectDependencies = (
     'Config',
-    'CacheInternal',
+    'Cache',
     'DB',
     'Log',
 );
@@ -335,7 +335,12 @@ sub NotifyClients {
     $Kernel::OM->Get('Cache')->Set(
         Type          => 'ClientNotification',
         Key           => $$.'_'.$Timestamp.'_'.$RequestID,
-        Value         => $Param{Event}.'::'.$Param{Namespace}.'::'.$Param{ObjectID},
+        Value         => {
+            ID        => $$.'_'.$Timestamp.'_'.$RequestID,
+            Event     => $Param{Event},
+            Namespace => $Param{Namespace},
+            ObjectID  => $Param{ObjectID},
+        },
         NoStatsUpdate => 1,
     );
 
@@ -416,13 +421,9 @@ sub NotificationSendWorker {
     my %Stats;
     my @PreparedEventList;
     foreach my $Item ( @{$Param{EventList}} ) {
-        my ( $Event, $Namespace, $ObjectID ) = split(/::/, $Item);
-        push @PreparedEventList, {
-            Event     => $Event,
-            Namespace => $Namespace,
-            ObjectID  => $ObjectID ? $ObjectID : '',
-        };
-        $Stats{lc($Event)}++;
+        next if !$Item->{Event};
+        push @PreparedEventList, $Item;
+        $Stats{lc($Item->{Event})}++;
     }
     my @StatsParts;
     foreach my $Event ( sort keys %Stats ) {
@@ -508,14 +509,14 @@ sub _NotificationSendToClient {
     if ( !$Response->is_success ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Client \"$Param{ClientID}\" responded with error ".$Response->status_line.".",
+            Message  => "Client \"$Param{ClientID}\" ($ClientRegistration{NotificationURL}) responded with error ".$Response->status_line.".",
         );
         return 0;
     }
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'debug',
-        Message  => "Client \"$Param{ClientID}\" responded with success ".$Response->status_line.".",
+        Message  => "Client \"$Param{ClientID}\" ($ClientRegistration{NotificationURL}) responded with success ".$Response->status_line.".",
     );
 
     return 1;

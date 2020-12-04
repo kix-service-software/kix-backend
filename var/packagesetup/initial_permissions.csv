@@ -121,6 +121,8 @@
 "Customer";"Resource";"/system/communication/notifications";;"x";;;
 "Customer";"Resource";"/system/communication/sendertypes";;"x";;;
 "Customer";"Resource";"/system/communication/systemaddresses";;"x";;;
+"Customer";"Resource";"/system/objectactions";;"x";;;
+"Customer";"Object";"/system/objectactions/*{ObjectAction.UsageContext EQ 1}";;;;;
 "Customer";"Resource";"/system/objecticons";;"x";;;
 "Customer";"Resource";"/system/faq";;"x";;;
 "Customer";"Resource";"/system/faq/*";;;;;
