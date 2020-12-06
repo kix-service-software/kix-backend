@@ -350,6 +350,7 @@ sub Run {
                         GetParam         => $GetParam,
                         QueueID          => $QueueID,
                         AutoResponseType => 'auto reply',
+                        SkipTicketIDs    => \%SkipTicketIDHash
                     );
 
                     if ( !$TicketID ) {
@@ -390,6 +391,7 @@ sub Run {
                 GetParam         => $GetParam,
                 QueueID          => $Param{QueueID},
                 AutoResponseType => 'auto reply',
+                SkipTicketIDs    => \%SkipTicketIDHash
             );
 
             return if !$TicketID;
@@ -446,6 +448,7 @@ sub Run {
                     GetParam         => $GetParam,
                     QueueID          => $Param{QueueID},
                     AutoResponseType => 'auto reply',
+                    SkipTicketIDs    => \%SkipTicketIDHash
                 );
                 return if !$TicketID;
 

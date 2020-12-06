@@ -383,10 +383,12 @@ sub ArticleCreate {
         );
 
         # create MessageID
-        my $Time      = $Kernel::OM->Get('Time')->SystemTime();
-        my $Random    = rand 999999;
-        my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
-        $Param{MessageID} = "<$Time.$Random\@$FQDN>";
+        if (!$Param{MessageID}) {
+            my $Time      = $Kernel::OM->Get('Time')->SystemTime();
+            my $Random    = rand 999999;
+            my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
+            $Param{MessageID} = "<$Time.$Random\@$FQDN>";
+        }
     } else {
         $Param{CustomerVisible} = (defined $Param{CustomerVisible} && $Param{CustomerVisible} ne '') ? $Param{CustomerVisible} : 0;
     }
