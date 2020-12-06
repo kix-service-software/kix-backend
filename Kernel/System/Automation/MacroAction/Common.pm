@@ -132,6 +132,8 @@ sub AddOption {
         return;
     }
 
+    $Self->{Definition}->{Options} //= {};
+    $Param{Order} = scalar(keys %{$Self->{Definition}->{Options}}) + 1;
     $Self->{Definition}->{Options}->{$Param{Name}} = \%Param;
 
     return 1;
