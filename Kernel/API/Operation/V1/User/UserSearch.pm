@@ -62,11 +62,6 @@ sub new {
         TicketCreate => {
             Target => '/tickets',
             Permission => 'CREATE'
-        },
-        # FIXME: currently with placeholder, until specific object permission are implemented
-        TicketUpdate => {
-            Target => '/tickets/placeholder',
-            Permission => 'UPDATE'
         }
     };
 
@@ -185,6 +180,7 @@ sub Run {
         # perform User search without any search params
         %UserList = $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
+            Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
             Valid => 0
         );
     }

@@ -114,7 +114,9 @@ sub new {
         for my $DynamicField ( values %$DynamicFields ) {
             for my $Header (
                 'X-KIX-DynamicField-' . $DynamicField,
+                'X-KIX-DynamicField_' . $DynamicField,   # except also underline
                 'X-KIX-FollowUp-DynamicField-' . $DynamicField,
+                'X-KIX-FollowUp-DynamicField_' . $DynamicField,   # except also underline
                 )
             {
 
@@ -348,6 +350,7 @@ sub Run {
                         GetParam         => $GetParam,
                         QueueID          => $QueueID,
                         AutoResponseType => 'auto reply',
+                        SkipTicketIDs    => \%SkipTicketIDHash
                     );
 
                     if ( !$TicketID ) {
@@ -388,6 +391,7 @@ sub Run {
                 GetParam         => $GetParam,
                 QueueID          => $Param{QueueID},
                 AutoResponseType => 'auto reply',
+                SkipTicketIDs    => \%SkipTicketIDHash
             );
 
             return if !$TicketID;
@@ -444,6 +448,7 @@ sub Run {
                     GetParam         => $GetParam,
                     QueueID          => $Param{QueueID},
                     AutoResponseType => 'auto reply',
+                    SkipTicketIDs    => \%SkipTicketIDHash
                 );
                 return if !$TicketID;
 

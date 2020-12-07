@@ -23,86 +23,23 @@ use Kernel::System::VariableCheck qw(:all);
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-1322',
+        LogPrefix => 'framework_update-to-build-1337',
     },
 );
 my $LogObject = $Kernel::OM->Get('Log');
 
 use vars qw(%INC);
 
-_DeleteObseleteSysConfigKeys();
-_UpdateAccessLevels();
 
-# updates permissions for role Customer
-_UpdatePermissionsForRoleSystemAdmin();
+_UpdatePermissions();
+_UpdateSysConfigKeys();
 
+# delete whole cache
+$Kernel::OM->Get('Cache')->CleanUp();
 
-sub _DeleteObseleteSysConfigKeys {
+exit 0;
 
-    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
-
-    my @Items = qw{
-        ContactPreferencesGroups###GoogleAuthenticatorSecretKey
-        PreferencesGroups###GoogleAuthenticatorSecretKey
-        UserImport::DefaultPassword
-    };
-
-    foreach my $Key (@Items) {
-        if (!$SysConfigObject->OptionDelete(Name => $Key)) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to delete obsolete item $Key from sysconfig!"
-            );
-            return;
-        }
-    }
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
-
-    return 1;
-}
-
-sub _UpdateAccessLevels {
-
-    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
-
-    my @Items = qw{
-        AuthTwoFactorModule::SecretPreferencesKey
-        Tool::Acknowledge::HTTP::Password
-        Authentication###000-Default
-    };
-
-    foreach my $Key (@Items) {
-        my %Option = $SysConfigObject->OptionGet(
-            Name => $Key
-        );
-        if (!%Option) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to get option $Key from sysconfig!"
-            );
-            return;
-        }
-
-        my $Result = $SysConfigObject->OptionUpdate(
-            %Option,
-            AccessLevel => 'confidential', 
-            UserID      => 1
-        );
-
-        if (!$Result) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to update item $Key from sysconfig!"
-            );
-            return;
-        }
-    }
-    
-    return 1;
-}
-
-sub _UpdatePermissionsForRoleSystemAdmin {
+sub _UpdatePermissions {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
     my $RoleObject = $Kernel::OM->Get('Role');
@@ -113,12 +50,12 @@ sub _UpdatePermissionsForRoleSystemAdmin {
     my @PermissionUpdates = (
         {
             Permission => {
-                Role   => 'System Admin',
-                Type   => 'Resource',
-                Target => '/organisations'
+                Role   => 'Customer',
+                Type   => 'Property',
+                Target => '/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID]}'
             },
             Change => {
-                Value => 6,
+                Target => '/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber]}',
             }
         }
     );
@@ -149,6 +86,7 @@ sub _UpdatePermissionsForRoleSystemAdmin {
 
         # Update existing permission
         if($PermissionID) {
+
             my $Success = $RoleObject->PermissionUpdate(
                 ID     => $PermissionID,
                 UserID => 1,
@@ -167,29 +105,59 @@ sub _UpdatePermissionsForRoleSystemAdmin {
                     Message  => "Updated permission ID $PermissionID!"
                 );
             }
-        } else {
-            # create permission
-            my $Success = $RoleObject->PermissionAdd(
-                RoleID     => $RoleID,
-                TypeID     => $PermissionTypeID,
-                Target     => $Update->{Permission}->{Target},
-                Value      => $Update->{Change}->{Value},
-                UserID => 1
-            );
-
-            if (!$Success) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to create permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
-                );
-            }
         }
+
     }
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
 
     return 1;
+}
+
+sub _UpdateSysConfigKeys {
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+
+    my @Items = qw{
+        Ticket::Hook
+        Ticket::HookDivider
+        DefaultLanguage
+    };
+
+    foreach my $Key (@Items) {
+        my %Option = $SysConfigObject->OptionGet(
+            Name => $Key
+        );
+        if (!%Option) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to get option $Key from sysconfig!"
+            );
+            return;
+        }
+
+        my $Result = $SysConfigObject->OptionUpdate(
+            %Option,
+            AccessLevel => 'external',
+            UserID      => 1
+        );
+
+        if (!$Result) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update item $Key from sysconfig!"
+            );
+            return;
+        }
+    }
+
+    return 1;
+
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
 }
 
 exit 0;

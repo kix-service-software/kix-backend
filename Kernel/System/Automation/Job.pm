@@ -254,8 +254,10 @@ sub JobAdd {
         $ID = $Row[0];
     }
 
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -351,8 +353,10 @@ sub JobUpdate {
         ],
     );
 
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -484,8 +488,10 @@ sub JobDelete {
         Bind => [ \$Param{ID} ],
     );
    
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -599,8 +605,10 @@ sub JobMacroAdd {
             ],
         );
 
-        # delete whole cache
-        $Kernel::OM->Get('Cache')->CleanUp();
+        # delete cache
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Self->{CacheType},
+        );
 
         # push client callback event
         $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -644,8 +652,10 @@ sub JobMacroDelete {
         Bind => [ \$Param{JobID}, \$Param{MacroID} ],
     );
    
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -759,8 +769,10 @@ sub JobExecPlanAdd {
             ],
         );
 
-        # delete whole cache
-        $Kernel::OM->Get('Cache')->CleanUp();
+        # delete cache
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Self->{CacheType},
+        );
 
         # push client callback event
         $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -804,8 +816,10 @@ sub JobExecPlanDelete {
         Bind => [ \$Param{JobID}, \$Param{ExecPlanID} ],
     );
 
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -1042,8 +1056,10 @@ sub JobExecute {
     delete $Self->{JobID};
     delete $Self->{RunID};
 
-    # delete whole cache
-    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp();
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
@@ -1362,9 +1378,11 @@ sub _JobLastExecutionTimeSet {
         );
     }
 
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
-
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+    
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',

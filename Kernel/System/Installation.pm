@@ -353,7 +353,7 @@ sub Update {
             my $Result = $Kernel::OM->Get('Main')->FileWrite(
                 Directory => $Home.'/config/installation',
                 Filename  => $UpdateItem->{Name},
-                Content   => \($LastBuild || $PluginList{$UpdateItem->{Name}}->{BuildNumber})
+                Content   => \($UpdateItem->{Name} eq 'framework' ? $Param{TargetBuild} : $PluginList{$UpdateItem->{Name}}->{BuildNumber}),
             );
         }
     }

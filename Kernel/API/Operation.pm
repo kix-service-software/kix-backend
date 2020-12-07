@@ -22,7 +22,6 @@ use Kernel::System::ObjectManager;
 
 use base qw(
     Kernel::API::Common
-    Kernel::System::PerfLog
 );
 
 our $ObjectManagerDisabled = 1;
@@ -354,8 +353,6 @@ sub _CheckPermission {
     my @GrantedResources;
     my $PermissionDebug = $Kernel::OM->Get('Config')->Get('Permission::Debug');
 
-$Self->{PerfLogFile} = '/tmp/perflog.txt';
-$Self->PerfLogStart('_CheckPermission');
     foreach my $Resource ( @Resources ) {
         ($Granted, $AllowedPermission) = $Kernel::OM->Get('User')->CheckResourcePermission(
                 UserID              => $Param{Authorization}->{UserID}, 
@@ -404,9 +401,6 @@ $Self->PerfLogStart('_CheckPermission');
 
     my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
     $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
-
-$Self->PerfLogStop('_CheckPermission');
-$Self->PerfLogOutput();
 
     # OPTIONS requests are always possible
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );

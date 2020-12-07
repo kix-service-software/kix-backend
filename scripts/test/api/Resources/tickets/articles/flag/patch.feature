@@ -1,4 +1,4 @@
-Feature: the /tickets/:TicketID/articles/:ArticleID/flags/:FlagName resource
+Feature: PATCH request to the /tickets/:TicketID/articles/:ArticleID/flags/:FlagName resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
