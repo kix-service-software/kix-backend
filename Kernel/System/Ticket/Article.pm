@@ -908,13 +908,22 @@ sub ArticleGetContentPath {
         return;
     }
 
+    if ( !$Param{TicketID} ) {
+        # get Article
+        my %Article = $Self->ArticleGet(
+            ArticleID => $Param{ArticleID}
+        );
+        $Param{TicketID} = $Article{TicketID};
+    }
+
     # check key
     my $CacheKey = 'ArticleGetContentPath::' . $Param{ArticleID};
 
     # check cache
-    my $Cache = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+    my $Cache = $Self->_TicketCacheGet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        Key      => $CacheKey,
     );
     return $Cache if $Cache;
 
@@ -933,11 +942,12 @@ sub ArticleGetContentPath {
     }
 
     # set cache
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $Result,
+    $Self->_TicketCacheSet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        TTL      => $Self->{CacheTTL},
+        Key      => $CacheKey,
+        Value    => $Result,
     );
 
     # return
@@ -1245,9 +1255,10 @@ sub ArticleIndex {
     my $CacheKey = 'ArticleIndex::' . $Param{TicketID} . '::' . ( $Param{SenderType} || 'ALL' ) . ($Param{CustomerVisible} ? '::CustomerVisible' : '');
 
     if ($UseCache) {
-        my $Cached = $Kernel::OM->Get('Cache')->Get(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
+        my $Cached = $Self->_TicketCacheGet(
+            TicketID => $Param{TicketID},
+            Type     => $Self->{CacheType},
+            Key      => $CacheKey,
         );
 
         if ( ref $Cached eq 'ARRAY' ) {
@@ -1290,6 +1301,7 @@ sub ArticleIndex {
 
     if ($UseCache) {
         $Self->_TicketCacheSet(
+            TicketID => $Param{TicketID},
             Type     => $Self->{CacheType},
             TTL      => $Self->{CacheTTL},
             Key      => $CacheKey,

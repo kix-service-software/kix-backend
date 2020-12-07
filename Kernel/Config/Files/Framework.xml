@@ -8257,6 +8257,8 @@ You can log in via the following URL:
         <Setting>
             <Hash>
                 <Item Key="Cache">1</Item>
+                <Item Key="SysConfig">1</Item>
+                <Item Key="API_sysconfig">1</Item>
                 <Item Key="Translation">1</Item>
                 <Item Key="API_i18n_translations">1</Item>
             </Hash>
