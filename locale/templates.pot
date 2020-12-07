@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-10-26 13:59+0000\n"
+"POT-Creation-Date: 2020-12-03 23:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -203,6 +203,10 @@ msgid "Enterprise Licence"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Event based Execution Plan for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
 msgstr ""
 
@@ -259,6 +263,10 @@ msgid "Incoming monitoring messages."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "KIX Field Agent - Mobile Processing Rejected"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Keyboard"
 msgstr ""
 
@@ -268,6 +276,14 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Laptop"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -500,6 +516,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The last job run has been finished."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "This job resets owner and lock state of a ticket, when its mobile processing state is set to \"rejected\"."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -3208,10 +3228,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "%s time unit(s) accounted. Now total %s time unit(s)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "A list of dynamic fields that are merged into the main ticket during a merge operation. Only dynamic fields that are empty in the main ticket will be set."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
