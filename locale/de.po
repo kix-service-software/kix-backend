@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-12 11:21+0000\n"
-"PO-Revision-Date: 2020-10-23 11:33+0000\n"
+"PO-Revision-Date: 2020-12-08 13:33+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1047,7 +1047,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
 msgid "Sets the team of a ticket."
-msgstr ""
+msgstr "Setzt das Team an einem Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
 msgid "The name of the team to be set."
