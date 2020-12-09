@@ -121,6 +121,11 @@ tr:hover {
     background-color: lightgray;
     color: gray;
 }
+a {
+    text-decoration: none;
+    color: inherit;
+    cursor: hand; 
+}
 </style>
 </head></body><div><h1>$Date</h1></div><table><tbody>\n";
 
