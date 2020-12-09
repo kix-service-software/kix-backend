@@ -409,22 +409,6 @@ sub ValidateConfig {
 sub _CheckTicketParams {
     my ( $Self, %Param ) = @_;
 
-    # if ($Param{Contact}) {
-    #     my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-    #         Login  => $Param{Contact},
-    #         Silent => 1
-    #     );
-
-    #     if ( !$ContactID ) {
-    #         $Kernel::OM->Get('Automation')->LogError(
-    #             Referrer => $Self,
-    #             Message  => "Couldn't create new ticket - can't find contact with login \"$Param{Contact}\"!",
-    #             UserID   => $Param{UserID}
-    #         );
-    #         return;
-    #     }
-    # }
-
     if ($Param{Lock}) {
         my $LockID = $Kernel::OM->Get('Lock')->LockLookup(
             Lock => $Param{Lock},
@@ -536,6 +520,21 @@ sub _CheckTicketParams {
             $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - can't find ticket type \"$Param{Type}\"!",
+                UserID   => $Param{UserID}
+            );
+            return;
+        }
+    }
+
+    if ($Param{ContactEmailOrID} && $Param{ContactEmailOrID} =~ /^\d+$/) {
+        my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+            ID     => $Param{ContactEmailOrID},
+            Silent => 1,
+        );
+        if (!$ContactID) {
+            $Kernel::OM->Get('Automation')->LogError(
+                Referrer => $Self,
+                Message  => "Couldn't create new ticket - can't find contact for contact id \"$Param{ContactEmailOrID}\"!",
                 UserID   => $Param{UserID}
             );
             return;
