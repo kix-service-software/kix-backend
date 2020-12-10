@@ -19,6 +19,7 @@ use Data::Dumper;
 my %Options;
 GetOptions(
     'source-directory=s' => \$Options{SourceDirectory},
+    'allure-url=s'       => \$Options{AllureURL},
     'help'               => \$Options{Help},
 );
 
@@ -35,6 +36,7 @@ if ( $Options{Help} || %Missing ) {
     print "\n";
     print "Required Options:\n";
     print "  --source-directory - The directory where the pherkin allure output files are located.\n";
+    print "  --allure-url - The URL to the detailed latest test results in allure. (optional)\n";
     exit -1;
 }
 
@@ -65,7 +67,14 @@ foreach my $File ( glob("*-result.json") ) {
             }
             last;
         } 
+        my $uuid = $AllureResult->{uuid};
+        $uuid =~ s/-//g;
+        $Results{$Resource}->{$Method}->{UUID}   = $uuid;
         $Results{$Resource}->{$Method}->{Status} = $AllureResult->{status};
+
+        if ( $Options{AllureURL} ) {
+            $Results{$Resource}->{$Method}->{AllureLink} = $Options{AllureURL}.'/'.$Results{$Resource}->{$Method}->{UUID};
+        }
     }
 }
 
@@ -112,6 +121,11 @@ tr:hover {
     background-color: lightgray;
     color: gray;
 }
+a {
+    text-decoration: none;
+    color: inherit;
+    cursor: hand; 
+}
 </style>
 </head></body><div><h1>$Date</h1></div><table><tbody>\n";
 
@@ -120,7 +134,12 @@ foreach my $Resource ( sort keys %Results ) {
     my $Row = '<tr><td class="count">'.++$Count.'</td><td class="resource">'.$Resource.'</td>';
     foreach my $Method ( qw(GET POST PATCH DELETE) ) {
         if ( exists $Results{$Resource}->{$Method} ) {
-            $Row .= '<td class="method '.$Results{$Resource}->{$Method}->{Status}.'">'.$Method.'</td>';
+            if ( $Results{$Resource}->{$Method}->{AllureLink} ) {
+                $Row .= '<td class="method '.$Results{$Resource}->{$Method}->{Status}.'"><a href="'.$Results{$Resource}->{$Method}->{AllureLink}.'">'.$Method.'</a></td>';
+            }
+            else {
+                $Row .= '<td class="method '.$Results{$Resource}->{$Method}->{Status}.'">'.$Method.'</td>';
+            }
         }
         else {
             $Row .= '<td class="method nil">'.$Method.'</td>';
