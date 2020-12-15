@@ -57,7 +57,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => 'something for label',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Article',
             ValidID    => 1,
@@ -75,7 +74,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => 'something for label',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Article',
             ValidID    => 1,
@@ -92,7 +90,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => '!"§$%&/()=?Ü*ÄÖL:L@,.-',
-            FieldOrder => 10000,
             FieldType  => 'Date',
             ObjectType => 'Ticket',
             ValidID    => 1,
@@ -109,7 +106,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => 'alabel',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Ticket',
             ValidID    => 2,
@@ -123,7 +119,6 @@ my @Tests = (
         Add           => {
             Config     => {},
             Label      => 'nothing interesting',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Article',
             ValidID    => 2,
@@ -137,7 +132,6 @@ my @Tests = (
         Add           => {
             Config     => undef,
             Label      => 'label',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Article',
             ValidID    => 2,
@@ -154,7 +148,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => '',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Ticket',
             ValidID    => 2,
@@ -171,7 +164,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => 'Other label',
-            FieldOrder => 10000,
             FieldType  => '',
             ObjectType => 'Article',
             ValidID    => 1,
@@ -188,7 +180,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => 'Complex label',
-            FieldOrder => 10000,
             FieldType  => 'Int',
             ObjectType => '',
             ValidID    => 1,
@@ -206,7 +197,6 @@ my @Tests = (
             },
             Label      => 'Simple Label',
             FieldType  => 'Text',
-            FieldOrder => 10000,
             ObjectType => 'Ticket',
             ValidID    => '',
             UserID     => $UserID,
@@ -222,7 +212,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => 'Other label',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Ticket',
             ValidID    => 1,
@@ -239,7 +228,6 @@ my @Tests = (
                 Description => 'Description for Dynamic Field.',
             },
             Label      => 'Other label',
-            FieldOrder => 10000,
             FieldType  => 'Text',
             ObjectType => 'Ticket',
             ValidID    => 1,
@@ -653,488 +641,6 @@ for my $DynamicFieldID (@DynamicFieldIDs) {
     );
 }
 
-# FieldOrder tests
-@Tests = (
-    {
-        Name => 'testorder1',
-        Add  => {
-            Config     => {},
-            Label      => 'nothing interesting',
-            FieldOrder => 9001,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-    },
-    {
-        Name => 'testorder2',
-        Add  => {
-            Config     => {},
-            Label      => 'nothing interesting',
-            FieldOrder => 9002,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-    },
-    {
-        Name => 'testorder3',
-        Add  => {
-            Config     => {},
-            Label      => 'nothing interesting',
-            FieldOrder => 9003,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-    },
-    {
-        Name => 'testorder4',
-        Add  => {
-            Config     => {},
-            Label      => 'nothing interesting',
-            FieldOrder => 9004,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-    },
-    {
-        Name => 'testorder5',
-        Add  => {
-            Config     => {},
-            Label      => 'nothing interesting',
-            FieldOrder => 9005,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-    },
-    {
-        Name => 'testorder6',
-        Add  => {
-            Config     => {},
-            Label      => 'nothing interesting',
-            FieldOrder => 9006,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-    },
-);
-
-my @AddedFieldIDs;
-my %OrderLookup;
-for my $Test (@Tests) {
-
-    # add dynamic field
-    my $DynamicFieldID = $DynamicFieldObject->DynamicFieldAdd(
-        Name => $Test->{Name} . $RandomID,
-        %{ $Test->{Add} }
-    );
-
-    # sanity check
-    $Self->True(
-        $DynamicFieldID,
-        "DynamicFieldAdd() FieldOrderTests for FieldID $DynamicFieldID"
-    );
-
-    if ($DynamicFieldID) {
-        push @AddedFieldIDs, $DynamicFieldID;
-
-        $OrderLookup{ $Test->{Name} . $RandomID } = $Test->{Add}->{FieldOrder};
-    }
-
-}
-
-# sanity checks
-$Self->Is(
-    scalar @AddedFieldIDs,
-    scalar @Tests,
-    'Added DynamicField numbers match the number of defined fields in this part of the test'
-);
-
-$Self->IsNotDeeply(
-    \%OrderLookup,
-    {},
-    'OrderLookup table elements is not empty',
-);
-
-$Self->Is(
-    scalar keys %OrderLookup,
-    scalar @Tests,
-    'OrderLookup table elements match the number of defined fields in this part of the test'
-);
-
-# backup original order lookup table
-my %OrigOrderLookup = %OrderLookup;
-
-# backup original fields configuration
-my @OrigFieldsConfig;
-for my $DynamicFieldID (@AddedFieldIDs) {
-
-    my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-        ID => $DynamicFieldID,
-    );
-    push @OrigFieldsConfig, $DynamicField;
-}
-
-# check that the initial order is as expected
-for my $DynamicFieldID (@AddedFieldIDs) {
-
-    my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-        ID => $DynamicFieldID,
-    );
-
-    $Self->Is(
-        $DynamicField->{FieldOrder},
-        $OrderLookup{ $DynamicField->{Name} },
-        "Order (Initial) Test for field ID $DynamicFieldID",
-    );
-}
-
-# prepare tests
-my @UpdateTests = (
-    {
-        Name          => 'Moved a field to the beginning',
-        MovedField    => 'testorder4',
-        NewFieldOrder => 9001,
-        OrderLoockup  => {
-            'testorder4' . $RandomID => 9001,
-            'testorder1' . $RandomID => 9002,
-            'testorder2' . $RandomID => 9003,
-            'testorder3' . $RandomID => 9004,
-            'testorder5' . $RandomID => 9005,
-            'testorder6' . $RandomID => 9006,
-        },
-    },
-    {
-        Name          => 'Moved a field to the end',
-        MovedField    => 'testorder4',
-        NewFieldOrder => 9006,
-        OrderLoockup  => {
-            'testorder1' . $RandomID => 9001,
-            'testorder2' . $RandomID => 9002,
-            'testorder3' . $RandomID => 9003,
-            'testorder5' . $RandomID => 9004,
-            'testorder6' . $RandomID => 9005,
-            'testorder4' . $RandomID => 9006,
-        },
-    },
-    {
-        Name          => 'Moved a field to lower order',
-        MovedField    => 'testorder4',
-        NewFieldOrder => 9003,
-        OrderLoockup  => {
-            'testorder1' . $RandomID => 9001,
-            'testorder2' . $RandomID => 9002,
-            'testorder4' . $RandomID => 9003,
-            'testorder3' . $RandomID => 9004,
-            'testorder5' . $RandomID => 9005,
-            'testorder6' . $RandomID => 9006,
-        },
-    },
-    {
-        Name          => 'Moved a field to upper order',
-        MovedField    => 'testorder4',
-        NewFieldOrder => 9005,
-        OrderLoockup  => {
-            'testorder1' . $RandomID => 9001,
-            'testorder2' . $RandomID => 9002,
-            'testorder3' . $RandomID => 9003,
-            'testorder5' . $RandomID => 9004,
-            'testorder4' . $RandomID => 9005,
-            'testorder6' . $RandomID => 9006,
-        },
-    },
-    {
-        Name          => 'Moved a field from first to end',
-        MovedField    => 'testorder1',
-        NewFieldOrder => 9006,
-        OrderLoockup  => {
-            'testorder2' . $RandomID => 9001,
-            'testorder3' . $RandomID => 9002,
-            'testorder4' . $RandomID => 9003,
-            'testorder5' . $RandomID => 9004,
-            'testorder6' . $RandomID => 9005,
-            'testorder1' . $RandomID => 9006,
-        },
-    },
-    {
-        Name          => 'Moved a field from end to beginning',
-        MovedField    => 'testorder6',
-        NewFieldOrder => 9001,
-        OrderLoockup  => {
-            'testorder6' . $RandomID => 9001,
-            'testorder1' . $RandomID => 9002,
-            'testorder2' . $RandomID => 9003,
-            'testorder3' . $RandomID => 9004,
-            'testorder4' . $RandomID => 9005,
-            'testorder5' . $RandomID => 9006,
-        },
-    },
-    {
-        Name          => 'Moved a field from first to middle',
-        MovedField    => 'testorder1',
-        NewFieldOrder => 9004,
-        OrderLoockup  => {
-            'testorder2' . $RandomID => 9001,
-            'testorder3' . $RandomID => 9002,
-            'testorder4' . $RandomID => 9003,
-            'testorder1' . $RandomID => 9004,
-            'testorder5' . $RandomID => 9005,
-            'testorder6' . $RandomID => 9006,
-        },
-    },
-    {
-        Name          => 'Moved a field from end to middle',
-        MovedField    => 'testorder6',
-        NewFieldOrder => 9004,
-        OrderLoockup  => {
-            'testorder1' . $RandomID => 9001,
-            'testorder2' . $RandomID => 9002,
-            'testorder3' . $RandomID => 9003,
-            'testorder6' . $RandomID => 9004,
-            'testorder4' . $RandomID => 9005,
-            'testorder5' . $RandomID => 9006,
-        },
-    },
-);
-
-# perform move tests
-for my $Test (@UpdateTests) {
-    my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-        Name => $Test->{MovedField} . $RandomID,
-    );
-    $DynamicField->{FieldOrder} = $Test->{NewFieldOrder};
-
-    # update the field
-    my $Success = $DynamicFieldObject->DynamicFieldUpdate(
-        %{$DynamicField},
-        UserID => $UserID,
-    );
-
-    # sanity check
-    $Self->True(
-        $Success,
-        "DynamicFieldUpdate() Move Order $Test->{Name} Test",
-    );
-
-    # reorder the OrderLookup Table
-    my %NewOrderLoockup = %{ $Test->{OrderLoockup} };
-    %OrderLookup = %NewOrderLoockup;
-
-    # check that the order is as expected
-    for my $DynamicFieldID (@AddedFieldIDs) {
-
-        my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-            ID => $DynamicFieldID,
-        );
-
-        $Self->Is(
-            $DynamicField->{FieldOrder},
-            $OrderLookup{ $DynamicField->{Name} },
-            "Move Order $Test->{Name} Test for field ID $DynamicFieldID",
-        );
-    }
-
-    # revert all changes
-    for my $DynamicField (@OrigFieldsConfig) {
-
-        # update dynamic fields without reordering
-        my $Success = $DynamicFieldObject->DynamicFieldUpdate(
-            %{$DynamicField},
-            Reorder => 0,
-            UserID  => $UserID,
-        );
-
-        # sanity check
-        $Self->True(
-            $Success,
-            "DynamicFielUpdate() revert changes (without reorder) for FieldID $DynamicField->{ID}"
-        );
-    }
-
-    # revert OrderLookup table
-    %OrderLookup = %OrigOrderLookup;
-
-    # sanity check
-    for my $DynamicFieldID (@AddedFieldIDs) {
-
-        my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-            ID => $DynamicFieldID,
-        );
-
-        $Self->Is(
-            $DynamicField->{FieldOrder},
-            $OrderLookup{ $DynamicField->{Name} },
-            "Move Order (Reverted) Test for field ID $DynamicFieldID",
-        );
-    }
-}
-
-# test for add and delete
-my @AddDeleteTests = (
-    {
-        Name     => 'Add a field to the beginning',
-        AddField => {
-            Name       => 'testorder7' . $RandomID,
-            Label      => 'nothing interesting',
-            FieldOrder => 9001,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            Config     => {},
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-        OrderLoockup => {
-            'testorder7' . $RandomID => 9001,
-            'testorder1' . $RandomID => 9002,
-            'testorder2' . $RandomID => 9003,
-            'testorder3' . $RandomID => 9004,
-            'testorder4' . $RandomID => 9005,
-            'testorder5' . $RandomID => 9006,
-            'testorder6' . $RandomID => 9007,
-        },
-    },
-    {
-        Name     => 'Add a field at the end',
-        AddField => {
-            Name       => 'testorder7' . $RandomID,
-            Label      => 'nothing interesting',
-            FieldOrder => 9007,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            Config     => {},
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-        OrderLoockup => {
-            'testorder1' . $RandomID => 9001,
-            'testorder2' . $RandomID => 9002,
-            'testorder3' . $RandomID => 9003,
-            'testorder4' . $RandomID => 9004,
-            'testorder5' . $RandomID => 9005,
-            'testorder6' . $RandomID => 9006,
-            'testorder7' . $RandomID => 9007,
-        },
-    },
-    {
-        Name     => 'Add a field at the middle',
-        AddField => {
-            Name       => 'testorder7' . $RandomID,
-            Label      => 'nothing interesting',
-            FieldOrder => 9004,
-            FieldType  => 'Text',
-            ObjectType => 'Article',
-            Config     => {},
-            ValidID    => 2,
-            UserID     => $UserID,
-        },
-        OrderLoockup => {
-            'testorder1' . $RandomID => 9001,
-            'testorder2' . $RandomID => 9002,
-            'testorder3' . $RandomID => 9003,
-            'testorder7' . $RandomID => 9004,
-            'testorder4' . $RandomID => 9005,
-            'testorder5' . $RandomID => 9006,
-            'testorder6' . $RandomID => 9007,
-        },
-    },
-);
-
-# perform Add Delete tests
-for my $Test (@AddDeleteTests) {
-
-    my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
-        %{ $Test->{AddField} },
-    );
-
-    # sanity check
-    $Self->True(
-        $FieldID,
-        "DynamicFieldAdd() Add Order - Test ($Test->{Name}) - for field ID $FieldID"
-    );
-
-    push @AddedFieldIDs, $FieldID;
-
-    # reorder the OrderLookup Table
-    my %NewOrderLoockup = %{ $Test->{OrderLoockup} };
-    %OrderLookup = %NewOrderLoockup;
-
-    # check that the order is as expected
-    for my $DynamicFieldID (@AddedFieldIDs) {
-
-        my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-            ID => $DynamicFieldID,
-        );
-
-        $Self->Is(
-            $DynamicField->{FieldOrder},
-            $OrderLookup{ $DynamicField->{Name} },
-            "Add Order - Test ($Test->{Name}) - for field ID $DynamicFieldID",
-        );
-    }
-
-    my $Success = $DynamicFieldObject->DynamicFieldDelete(
-        ID     => $FieldID,
-        UserID => 1,
-    );
-
-    # sanity check
-    $Self->True(
-        $Success,
-        "DynamicFieldDelete() Delete Order - Test ($Test->{Name}) - for Field ID $FieldID"
-    );
-
-    # revert OrderLookup
-    %OrderLookup = %OrigOrderLookup;
-
-    # remove the FieldID from @AddedFieldIDs
-    my $RemovedFieldID = pop @AddedFieldIDs;
-
-    # sanity check
-    $Self->Is(
-        $RemovedFieldID,
-        $FieldID,
-        "Field removed from the compare list for FieldID $FieldID",
-    );
-
-    # check that the order is reverted
-    for my $DynamicFieldID (@AddedFieldIDs) {
-
-        my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-            ID => $DynamicFieldID,
-        );
-
-        $Self->Is(
-            $DynamicField->{FieldOrder},
-            $OrderLookup{ $DynamicField->{Name} },
-            "Delete Order $Test->{Name} Test for field ID $DynamicFieldID",
-        );
-    }
-}
-
-# remove DynamicFields
-for my $DynamicFieldID (@AddedFieldIDs) {
-    my $Success = $DynamicFieldObject->DynamicFieldDelete(
-        ID     => $DynamicFieldID,
-        UserID => $UserID,
-    );
-
-    # sanity check
-    $Self->True(
-        $Success,
-        "DynamicFieldDelete() Field Order Tests for Field ID $DynamicFieldID"
-    );
-}
-
 # restore original fields order
 for my $DynamicField ( @{$OriginalDynamicFields} ) {
 
@@ -1157,7 +663,7 @@ my $RestoredDynamicFields = $DynamicFieldObject->DynamicFieldListGet( Valid => 0
 # check if fields were restored OK
 for my $DynamicField ( @{$OriginalDynamicFields} ) {
     my $RestoredDynamicField = $DynamicFieldObject->DynamicFieldGet( ID => $DynamicField->{ID} );
-    for my $Parameter (qw(Name Label FieldOrder FieldType ObjectType ValidID)) {
+    for my $Parameter (qw(Name Label FieldType ObjectType ValidID)) {
         $Self->Is(
             $RestoredDynamicField->{$Parameter},
             $DynamicField->{$Parameter},
@@ -1171,9 +677,6 @@ for my $DynamicField ( @{$OriginalDynamicFields} ) {
     );
 }
 
-#clean AddedFieldIDs
-@AddedFieldIDs = ();
-
 # List and ListGet specific tests
 my @ListFields = (
     {
@@ -1182,7 +685,6 @@ my @ListFields = (
         Config => {
             DefautValue => '',
         },
-        FieldOrder => 1101,
         FieldType  => 'Text',
         ObjectType => 'ListTest_Ticket',
         ValidID    => 1,
@@ -1195,7 +697,6 @@ my @ListFields = (
         Config => {
             DefautValue => '',
         },
-        FieldOrder => 1102,
         FieldType  => 'Text',
         ObjectType => 'ListTest_Ticket',
         ValidID    => 1,
@@ -1208,7 +709,6 @@ my @ListFields = (
         Config => {
             DefautValue => '',
         },
-        FieldOrder => 1103,
         FieldType  => 'Text',
         ObjectType => 'ListTest_Ticket',
         ValidID    => 1,
@@ -1221,7 +721,6 @@ my @ListFields = (
         Config => {
             DefautValue => '',
         },
-        FieldOrder => 1104,
         FieldType  => 'Text',
         ObjectType => 'ListTest_Article',
         ValidID    => 1,
@@ -1234,7 +733,6 @@ my @ListFields = (
         Config => {
             DefautValue => '',
         },
-        FieldOrder => 1105,
         FieldType  => 'Text',
         ObjectType => 'ListTest_Article',
         ValidID    => 1,
@@ -1247,7 +745,6 @@ my @ListFields = (
         Config => {
             DefautValue => '',
         },
-        FieldOrder => 1106,
         FieldType  => 'Text',
         ObjectType => 'ListTest_Other',
         ValidID    => 1,
@@ -1284,9 +781,6 @@ for my $FieldConfig (@ListFields) {
         $FieldID,
         "DynamicFieldAdd() for ListField $FieldConfig->{Name}",
     );
-
-    # add to the list to be deleted at the end of the tests
-    push @AddedFieldIDs, $FieldID;
 
     if ( $FieldConfig->{ObjectType} eq 'ListTest_Ticket' ) {
 
@@ -1562,139 +1056,6 @@ for my $ObjectType (qw(Ticket Article)) {
         $GotListFilteredFields,
         \@ListFilteredFields,
         "DynamicFieldListGet() for combined object types"
-    );
-}
-
-# begin order check and reset tests
-
-# reset fields order
-my $OrderResetSuccess = $DynamicFieldObject->DynamicFieldOrderReset();
-
-# sanity check (should be success)
-$Self->True(
-    $OrderResetSuccess,
-    'DynamicFieldOrderReset() for initial state, with True',
-);
-
-my $OrderCheckSuccess = $DynamicFieldObject->DynamicFieldOrderCheck();
-
-# sanity check (should be success)
-$Self->True(
-    $OrderCheckSuccess,
-    'DynamicFieldOrderCheck() for initial state, with True',
-);
-
-# create some duplicated orders
-DYNAMICFIELD:
-for my $DynamicFieldID (@AddedFieldIDs) {
-
-    next DYNAMICFIELD if $DynamicFieldID == $AddedFieldIDs[0];
-
-    my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-        ID     => $DynamicFieldID,
-        UserID => 1,
-    );
-
-    # substract 1 to the field order to get duplicates at the first added field
-    my $FieldOrder = $DynamicField->{FieldOrder} - 1;
-
-    if ( $DynamicFieldID == $AddedFieldIDs[-1] ) {
-
-        # substract an extra one in the last field to also have a duplicate at the last field
-        $FieldOrder--;
-    }
-
-    my $Success = $DynamicFieldObject->DynamicFieldUpdate(
-        ID => $DynamicFieldID,
-        %{$DynamicField},
-        FieldOrder => $FieldOrder,
-        UserID     => 1,
-        Reorder    => 0,
-    );
-}
-
-# check that the order list has duplicates
-$OrderCheckSuccess = $DynamicFieldObject->DynamicFieldOrderCheck();
-
-$Self->False(
-    $OrderCheckSuccess,
-    'DynamicFieldOrderCheck() for duplicates, with False',
-);
-
-# reset fields order
-$OrderResetSuccess = $DynamicFieldObject->DynamicFieldOrderReset();
-
-$Self->True(
-    $OrderResetSuccess,
-    'DynamicFieldOrderReset() remove duplicates, with True',
-);
-
-$OrderCheckSuccess = $DynamicFieldObject->DynamicFieldOrderCheck();
-
-$Self->True(
-    $OrderCheckSuccess,
-    'DynamicFieldOrderCheck() after remove duplicates, with True',
-);
-
-# create some gaps in the order
-DYNAMICFIELD:
-for my $DynamicFieldID (@AddedFieldIDs) {
-
-    # create a get at the first and the last added fields
-    next DYNAMICFIELD if $DynamicFieldID ne $AddedFieldIDs[0]
-        && $DynamicFieldID ne $AddedFieldIDs[-2];
-
-    my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-        ID     => $DynamicFieldID,
-        UserID => 1,
-    );
-
-    # create a gap in the numbering
-    my $FieldOrder = $DynamicField->{FieldOrder} + scalar @AddedFieldIDs + 1;
-
-    my $Success = $DynamicFieldObject->DynamicFieldUpdate(
-        ID => $DynamicFieldID,
-        %{$DynamicField},
-        FieldOrder => $FieldOrder,
-        UserID     => 1,
-        Reorder    => 0,
-    );
-}
-
-# check that the order list has duplicates
-$OrderCheckSuccess = $DynamicFieldObject->DynamicFieldOrderCheck();
-
-$Self->False(
-    $OrderCheckSuccess,
-    'DynamicFieldOrderCheck() for gaps, with False',
-);
-
-# reset fields order
-$OrderResetSuccess = $DynamicFieldObject->DynamicFieldOrderReset();
-
-$Self->True(
-    $OrderResetSuccess,
-    'DynamicFieldOrderReset() remove remove gaps, with True',
-);
-
-$OrderCheckSuccess = $DynamicFieldObject->DynamicFieldOrderCheck();
-
-$Self->True(
-    $OrderCheckSuccess,
-    'DynamicFieldOrderCheck() after remove gaps, with True',
-);
-
-# remove DynamicFields
-for my $DynamicFieldID (@AddedFieldIDs) {
-    my $Success = $DynamicFieldObject->DynamicFieldDelete(
-        ID     => $DynamicFieldID,
-        UserID => $UserID,
-    );
-
-    # sanity check
-    $Self->True(
-        $Success,
-        "DynamicFieldDelete() Field List() and ListGet() for Field ID $DynamicFieldID"
     );
 }
 

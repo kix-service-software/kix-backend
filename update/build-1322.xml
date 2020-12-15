@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="dynamic_field">
+        <ColumnAdd Name="comments" Required="false" Size="200" Type="VARCHAR" />
+        <ColumnDrop Name="displaygroup_id" />
+    </TableAlter>
+
+</database>

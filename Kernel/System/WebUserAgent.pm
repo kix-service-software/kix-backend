@@ -101,6 +101,7 @@ alternatively, you can use an arrayref like this:
 returns
 
     %Response = (
+        Success => 1,           # 1 or 0
         Status  => '200 OK',    # http status
         Content => $ContentRef, # content of requested URL
     );
@@ -225,7 +226,8 @@ sub Request {
             Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
         );
         return (
-            Status => $Response->status_line(),
+            Success => 0,
+            Status  => $Response->status_line(),
         );
     }
 
@@ -235,6 +237,7 @@ sub Request {
 
     if ( $Param{Return} && $Param{Return} eq 'REQUEST' ) {
         return (
+            Success => 1,
             Status  => $Response->status_line(),
             Content => \$Response->request()->as_string(),
         );
@@ -242,6 +245,7 @@ sub Request {
 
     # return request
     return (
+        Success => 1,
         Status  => $Response->status_line(),
         Content => \$ResponseContent,
     );

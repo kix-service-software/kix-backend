@@ -943,7 +943,7 @@ sub ValueGet {
     if ( !$Self->{$DynamicFieldBackend} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+            Message  => "Backend \"$Param{DynamicFieldConfig}->{FieldType}\" is invalid!"
         );
         return;
     }

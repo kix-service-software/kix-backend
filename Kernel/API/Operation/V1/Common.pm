@@ -15,6 +15,8 @@ use File::Basename;
 use Data::Sorting qw(:arrays);
 use Storable;
 
+BEGIN { $SIG{ __WARN__} = sub { return if $_[0] =~ /in cleanup/ }; }
+
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -2885,11 +2887,16 @@ sub _RunParallel {
             sub {
                 my ( $Self, %Param ) = @_;
 
+                my $DBDPg_VERSION = $DBD::Pg::{VERSION};
+
                 local $Kernel::OM = Kernel::System::ObjectManager->new(
                     'Log' => {
                         LogPrefix => 'runworker#'.$Param{WorkerID},
                     },
                 );
+
+                $Kernel::OM->Get('DB')->Disconnect();
+                $DBD::Pg::VERSION = $DBDPg_VERSION;
 
                 while ( (my $Item = $Param{WorkQueue}->dequeue) ne "END_OF_QUEUE" ) {
                     my $Result = $Sub->($Self, Item => $Item, %Param);

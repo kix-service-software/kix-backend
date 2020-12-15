@@ -234,7 +234,6 @@ sub Get {
         $Self->LoadSysConfig();
     }
 
-
     # debug
     if ( $Self->{Debug} > 1 ) {
         my $Value = defined $Self->{Config}->{$What} ? $Self->{Config}->{$What} : '<undef>';
