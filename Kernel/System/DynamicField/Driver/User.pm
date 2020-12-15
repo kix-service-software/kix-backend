@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::DynamicField::Driver::ObjectReference::Contact;
+package Kernel::System::DynamicField::Driver::User;
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseSelect);
 
 our @ObjectDependencies = (
-    'Contact',
+    'User',
     'DynamicFieldValue',
     'Ticket::ColumnFilter',
 );
@@ -51,7 +51,7 @@ sub new {
     bless( $Self, $Type );
 
     # KIX4OTRS-capeIT
-    $Self->{ContactObject}      = $Kernel::OM->Get('Contact');
+    $Self->{UserObject}              = $Kernel::OM->Get('User');
     $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('DynamicFieldValue');
 
     # EO KIX4OTRS-capeIT
@@ -67,7 +67,7 @@ sub new {
 
     # get the Dynamic Field Driver custmom extensions
     my $DynamicFieldDriverExtensions
-        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::Contact');
+        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::User');
 
     EXTENSION:
     for my $ExtensionKey ( sort keys %{$DynamicFieldDriverExtensions} ) {
@@ -142,18 +142,18 @@ sub ValueSet {
     }
 
     # KIX4OTRS-capeIT
-    # check for valid ContactLogin
+    # check for valid UserLogin
     for my $Object (@Values) {
 
         next if !$Object;
 
         my %UserListCustomer =
-            $Self->{ContactObject}
-            ->CustomerSearch( UserLogin => $Object, );
+            $Self->{UserObject}
+            ->UserSearch( UserLogin => $Object, );
         if ( !%UserListCustomer ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "The value for the field Contact is invalid!\n"
+                Message  => "The value for the field User is invalid!\n"
                     . "No Customer with login "
                     . $Object
                     . " found in configured backend(s).",
@@ -211,15 +211,15 @@ sub ValueValidate {
     }
 
     # KIX4OTRS-capeIT
-    # check for valid ContactLogin
+    # check for valid UserLogin
     for my $Object (@Values) {
         my %UserListCustomer =
-            $Self->{ContactObject}
-            ->CustomerSearch( UserLogin => $Object, );
+            $Self->{UserObject}
+            ->UserSearch( UserLogin => $Object, );
         if ( !%UserListCustomer ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "The value for the field Contact is invalid!\n"
+                Message  => "The value for the field User is invalid!\n"
                     . "No Customer with login "
                     . $Object
                     . " found in configured backend(s).",
@@ -347,18 +347,23 @@ sub EditFieldRender {
         }
 
         # set field as autocomplete
-        $FieldClass .= ' ContactAutoComplete ';
+        $FieldClass .= ' UserAutoComplete ';
         my $FieldNameKey = $FieldName . '_Key';
 
         # get user data to display value
         my $UserDataString = '';
         if ($Value) {
-            my %ContactData = $Self->{ContactObject}->ContactGet(
-                ID => $Value,
+            my $UserID = $Self->{UserObject}->UserLookup(
+                UserLogin => $Value
             );
-            $UserDataString
-                = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
-                . $ContactData{Email} . ">";
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                $UserDataString
+                    = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
+                    . $ContactData{Email} . ">";
+            }
         }
 
         $HTMLString = <<"EOF";
@@ -367,7 +372,7 @@ sub EditFieldRender {
 EOF
 
         # add JS for AutoComplete
-        my $FieldSelector = '.ContactAutoComplete';
+        my $FieldSelector = '.UserAutoComplete';
 
         $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"EOF");
                 \$('$FieldSelector').each(function () {
@@ -385,18 +390,28 @@ EOF
     elsif ( $DisplayFieldType eq 'Multiselect' || $DisplayFieldType eq 'Dropdown' ) {
 
         # get data
-        my %ObjectList = $Self->{ContactObject}->ContactSearch(
+        my %ObjectList = $Self->{UserObject}->UserList(
             Valid => 1,
         );
 
         # create user hash
         my %UserHash = ();
-        for my $User ( keys %ObjectList ) {
-            my %ContactList = $Self->{ContactObject}->CustomerSearch(
+        for my $User (keys %ObjectList) {
+            my $UserID = $Self->{UserObject}->UserLookup(
                 UserLogin => $User,
             );
-
-            $UserHash{$User} = $ContactList{$User};
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                if (defined $ContactData{Firstname}) {
+                    $UserHash{$ObjectList{$User}}
+                        = $ContactData{Firstname} . " "
+                        . $ContactData{Lastname} . " <"
+                        . $ContactData{Email} . "> ("
+                        . $ObjectList{$User} . ")";
+                }
+            }
         }
 
         # multiselect or dropdown
@@ -528,8 +543,8 @@ sub EditFieldValueValidate {
         for my $Object ( @{$Values} ) {
             next if !$Object;
             my %UserListCustomer =
-                $Self->{ContactObject}
-                ->CustomerSearch( UserLogin => $Object, );
+                $Self->{UserObject}
+                ->UserSearch( UserLogin => $Object, );
             if ( !%UserListCustomer ) {
                 $ServerError  = 1;
                 $ErrorMessage = 'The field content is invalid';
@@ -592,24 +607,18 @@ sub DisplayValueRender {
         # EO KIX4OTRS-capeIT
 
         # KIX4OTRS-capeIT
-        my %Contacts = $Self->{ContactObject}->ContactSearch(
-            Login => $ReadableValue,
-            Limit => 1,
-            Valid => 0
+        my $UserID = $Self->{UserObject}->UserLookup(
+            UserLogin => $ReadableValue,
         );
         my %ContactData;
-        if ( IsHashRefWithData(\%Contacts)) {
-            for my $ContactID ( keys %Contacts) {
-                %ContactData = $Self->{ContactObject}->ContactGet(
-                    ID => $ContactID,
-                );
-            }
+        if ($UserID) {
+            my %ContactData = $Self->{ContactObject}->ContactGet(
+                UserID => $UserID,
+            );
+            $ReadableValue = $ContactData{Firstname} . " "
+                . $ContactData{Lastname} . " <"
+                . $ContactData{Email} . ">";
         }
-        $ReadableValue
-            = $ContactData{Firstname} . " "
-            . $ContactData{Lastname} . " <"
-            . $ContactData{Email} . ">";
-
         # alternative display string defined ?
         if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
             $ReadableValue = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
@@ -771,21 +780,20 @@ sub SearchFieldRender {
     if ( $DisplayFieldType eq 'AutoComplete' ) {
 
         # set field as autocomplete
-        $FieldClass .= ' ContactAutoComplete ';
+        $FieldClass .= ' UserAutoComplete ';
         my $FieldNameKey = $FieldName . '_Key';
 
         # get user data to display value
         my $UserDataString = '';
         if ($Value) {
             my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $Value
+                UserLogin => $Value,
             );
             if ($UserID) {
                 my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserIDID => $UserID,
+                    UserID => $UserID,
                 );
-                $UserDataString
-                    = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
+                $UserDataString = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
                     . $ContactData{Email} . ">";
             }
         }
@@ -796,7 +804,7 @@ sub SearchFieldRender {
 EOF
 
         # add JS for AutoComplete
-        my $FieldSelector = '.ContactAutoComplete';
+        my $FieldSelector = '.UserAutoComplete';
 
         $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"EOF");
                 \$('$FieldSelector').each(function () {
@@ -814,18 +822,28 @@ EOF
     elsif ( $DisplayFieldType eq 'Multiselect' || $DisplayFieldType eq 'Dropdown' ) {
 
         # get data
-        my %ObjectList = $Self->{ContactObject}->ContactSearch(
+        my %ObjectList = $Self->{UserObject}->UserList(
             Valid => 1,
         );
 
         # create user hash
         my %UserHash = ();
-        for my $User ( keys %ObjectList ) {
-            my %ContactList = $Self->{ContactObject}->CustomerSearch(
+        for my $User (keys %ObjectList) {
+            my $UserID = $Self->{UserObject}->UserLookup(
                 UserLogin => $User,
             );
-
-            $UserHash{$User} = $ContactList{$User};
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                if (defined $ContactData{Firstname}) {
+                    $UserHash{$ObjectList{$User}}
+                        = $ContactData{Firstname} . " "
+                        . $ContactData{Lastname} . " <"
+                        . $ContactData{Email} . "> ("
+                        . $ObjectList{$User} . ")";
+                }
+            }
         }
 
         # create HTML string
@@ -1067,24 +1085,34 @@ sub PossibleValuesGet {
         # get data
         my %ObjectList;
         if ($Param{Search}) {
-            %ObjectList = $Self->{ContactObject}->CustomerSearch(
+            %ObjectList = $Self->{UserObject}->UserSearch(
                 Search => $Param{Search},
             );
         }
         else {
-            %ObjectList = $Self->{ContactObject}->ContactSearch(
+            %ObjectList = $Self->{UserObject}->UserList(
                 Valid => 1,
             );
         }
 
         # create user hash
         my %UserHash = ();
-        for my $User ( keys %ObjectList ) {
-            my %ContactList = $Self->{ContactObject}->CustomerSearch(
+        for my $User (keys %ObjectList) {
+            my $UserID = $Self->{UserObject}->UserLookup(
                 UserLogin => $User,
             );
-
-            $UserHash{$User} = $ContactList{$User};
+            if ($UserID) {
+                my %ContactData = $Self->{ContactObject}->ContactGet(
+                    UserID => $UserID,
+                );
+                if (defined $ContactData{Firstname}) {
+                    $UserHash{$ObjectList{$User}}
+                        = $ContactData{Firstname} . " "
+                        . $ContactData{Lastname} . " <"
+                        . $ContactData{Email} . "> ("
+                        . $ObjectList{$User} . ")";
+                }
+            }
         }
 
         # set PossibleValues
@@ -1158,42 +1186,48 @@ sub ValueLookup {
         # set the value as the key by default
         my $Value = $Item;
 
-# KIX4OTRS-capeIT
-#        # try to convert key to real value
-#        if ( $PossibleValues->{$Item} ) {
-#            $Value = $PossibleValues->{$Item};
-#
-#            # check if translation is possible
-#            if (
-#                defined $Param{LanguageObject}
-#                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-#                )
-#            {
-#
-#                # translate value
-#                $Value = $Param{LanguageObject}->Translate($Value);
-#            }
-#        }
-        my %ContactData = $Self->{ContactObject}->ContactGet(
-            ID => $Value,
+        # KIX4OTRS-capeIT
+        #        # try to convert key to real value
+        #        if ( $PossibleValues->{$Item} ) {
+        #            $Value = $PossibleValues->{$Item};
+        #
+        #            # check if translation is possible
+        #            if (
+        #                defined $Param{LanguageObject}
+        #                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
+        #                )
+        #            {
+        #
+        #                # translate value
+        #                $Value = $Param{LanguageObject}->Translate($Value);
+        #            }
+        #        }
+        my $UserID = $Self->{UserObject}->UserLookup(
+            UserLogin => $Value,
         );
-        $Value = $ContactData{Firstname}
-               . " "
-               . $ContactData{Lastname}
-               . " <"
-               . $ContactData{Email}
-               . ">";
+        if ($UserID) {
+            my %ContactData = $Self->{ContactObject}->ContactGet(
+                UserID => $UserID,
+            );
+            $Value = $ContactData{Firstname}
+                . " "
+                . $ContactData{Lastname}
+                . " <"
+                . $ContactData{Email}
+                . ">";
 
-        # alternative display string defined ?
-        if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
-            $Value = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-            $Value =~ s{<(.+?)>}{$ContactData{$1}}egx;
+            # alternative display string defined ?
+            if ($Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay}) {
+                $Value = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
+                $Value =~ s{<(.+?)>}{$ContactData{$1} }egx;
+            }
+            # EO KIX4OTRS-capeIT
+            push @Values, $Value;
         }
-# EO KIX4OTRS-capeIT
-        push @Values, $Value;
-    }
 
-    return \@Values;
+        return \@Values;
+    }
+    return;
 }
 
 1;

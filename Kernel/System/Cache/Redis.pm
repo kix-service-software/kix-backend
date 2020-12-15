@@ -71,7 +71,8 @@ sub Set {
 
     return if !$Self->{RedisObject};
 
-    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+    my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
+
     my $TTL = $Param{TTL} // 0;
     if ( IsHashRefWithData($Self->{Config}->{OverrideTTL}) ) {
         foreach my $TypePattern (keys %{$Self->{Config}->{OverrideTTL}}) {

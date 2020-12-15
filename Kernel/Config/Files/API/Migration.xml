@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Migration::MigrationGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MigrationGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Migration::MigrationGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">MigrationID</Item>
+                <Item Key="ResponseSchema">MigrationResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Migration::MigrationSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MigrationSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Migration::MigrationSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">MigrationCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Migration::MigrationCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MigrationCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Migration::MigrationCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">MigrationPostRequest</Item>
+                <Item Key="ResponseSchema">MigrationPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Migration::MigrationDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">MigrationDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Migration::MigrationDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>
