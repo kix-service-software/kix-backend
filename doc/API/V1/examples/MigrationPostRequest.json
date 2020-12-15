@@ -1,0 +1,7 @@
+{
+    "Migration": {
+        "Source": "KIX17",
+        "SourceID": "mykix17",
+        "Options": "URL=http://localhost:9999/kix/migration.pl,AutoDeps=1"
+    }
+}

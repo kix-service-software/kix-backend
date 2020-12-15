@@ -67,6 +67,8 @@ sub new {
 
     $Self->{CacheInBackend} = $Param{CacheInBackend} // 1;
     $Self->{CacheInMemory}  = $Param{CacheInMemory} // 0;
+
+    $Self->{IgnoreTypes} = {};
     
     return $Self;
 }
@@ -147,6 +149,8 @@ sub Set {
             return;
         }
     }
+
+    return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     # set default TTL to 20 days
     $Param{TTL} //= 60 * 60 * 24 * 20;
@@ -276,6 +280,8 @@ sub Get {
         }
     }
 
+    return if $Self->{IgnoreTypes}->{$Param{Type}};
+
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         if ( exists $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } ) {
@@ -353,6 +359,8 @@ sub GetMulti {
             return;
         }
     }
+
+    return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
@@ -449,6 +457,8 @@ sub Delete {
             return;
         }
     }
+
+    return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     $Param{Indent} = $Param{Indent} || '';
 
@@ -683,6 +693,8 @@ sub GetKeysForType {
             return;
         }
     }
+
+    return () if $Self->{IgnoreTypes}->{$Param{Type}};
 
     return $Self->{CacheObject}->GetKeysForType(
         Type => $Param{Type}

@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "MigrationPostRequest.json",
+    "type": "object",
+    "description": "The migration request object for creation.",
+    "properties": {
+        "Migration": {
+            "type": "object",
+            "properties": {
+                "Source": {
+                    "type": "string"
+                },
+                "SourceID": {
+                    "type": "string"
+                },
+                "Options": {
+                    "type": "string",
+                    "description": "The Options depend on the source of the migration."
+                }
+            },
+            "required": [
+                "Source",
+                "SourceID"
+            ]
+        }
+    },
+    "required": [
+        "Migration"
+    ]
+}

@@ -8261,6 +8261,7 @@ You can log in via the following URL:
                 <Item Key="API_sysconfig">1</Item>
                 <Item Key="Translation">1</Item>
                 <Item Key="API_i18n_translations">1</Item>
+                <Item Key="Migration">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8584,27 +8585,14 @@ You can log in via the following URL:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###ObjectReference" Required="0" Valid="1">
-        <Description Translatable="1">DynamicField backend registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">ObjectReference</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldObjectReference</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###Contact" Required="0" Valid="1">
         <Description Translatable="1">DynamicField backend registration.</Description>
         <Group>Framework</Group>
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">ObjectReference</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::Contact</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldObjectReference</Item>
+                <Item Key="DisplayName" Translatable="1">Contact</Item>
+                <Item Key="Module">Kernel::System::DynamicField::Driver::Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8614,9 +8602,8 @@ You can log in via the following URL:
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">ObjectReference</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::Organisation</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldObjectReference</Item>
+                <Item Key="DisplayName" Translatable="1">Organisation</Item>
+                <Item Key="Module">Kernel::System::DynamicField::Driver::Organisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8626,22 +8613,9 @@ You can log in via the following URL:
         <SubGroup>DynamicFields::Driver::Registration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">ObjectReference</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::ObjectReference::User</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldObjectReference</Item>
+                <Item Key="DisplayName" Translatable="1">User</Item>
+                <Item Key="Module">Kernel::System::DynamicField::Driver::User</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::ObjectReferences###FieldTypes" Required="0" Valid="1">
-        <Description Translatable="1"></Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Admin::DynamicField</SubGroup>
-        <Setting>
-            <Array>
-                <Item>AutoComplete</Item>
-                <Item>Multiselect</Item>
-                <Item>Dropdown</Item>
-            </Array>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###888-ExtendedFollowUp" Required="0" Valid="1">
