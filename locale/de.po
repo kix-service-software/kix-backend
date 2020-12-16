@@ -670,10 +670,6 @@ msgid "external"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "finished"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "full permissions on everything (CRUD on resource /*)"
 msgstr ""
 
@@ -1080,8 +1076,8 @@ msgid ""
 "NameOfTeamToBeSet\")."
 msgstr ""
 "Der Name des Teams, das gesetzt werden soll. Handelt es sich um ein "
-"untergeordnetes Team, muss der vollständige Pfad-Name angegeben werden ("
-"Namen getrennt durch doppelte Doppelpunkte, z.B. \"NameÜbergeordnetesTeam::"
+"untergeordnetes Team, muss der vollständige Pfad-Name angegeben werden "
+"(Namen getrennt durch doppelte Doppelpunkte, z.B. \"NameÜbergeordnetesTeam::"
 "NameZuSetzendesTeam\")."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1322,6 +1318,34 @@ msgstr ""
 
 #. Perl Module: Kernel/System/ITSMConfigItem/History.pm
 msgid "CIHistory::"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation.pm
+msgid "aborting"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "aborted"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "finished"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "in progress"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "loading data from source"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "pending"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
+msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Ticket.pm
@@ -3938,6 +3962,10 @@ msgstr ""
 msgid ""
 "Event module to add or change the CSV-mapping if config item class defintion "
 "is changed."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Migration/KIX17.xml
+msgid "Object handler registration for data migration."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
