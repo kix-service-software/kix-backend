@@ -13,6 +13,7 @@ package Kernel::System::Automation::MacroAction::Ticket::TicketCreate;
 use strict;
 use warnings;
 use utf8;
+use List::MoreUtils qw(uniq);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -551,7 +552,7 @@ sub _SetDynamicFields {
     if ( $Param{NewTicketID} && IsArrayRefWithData( $Param{Config}->{DynamicFieldList} ) ) {
 
         my $TemplateGeneratorObject   = $Kernel::OM->Get('TemplateGenerator');
-        my $DynamicFieldBakcendObject = $Kernel::OM->Get('DynamicField::Backend');
+        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
         # get the dynamic fields
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
@@ -568,29 +569,54 @@ sub _SetDynamicFields {
             $DynamicFieldLookup{ $DynamicField->{Name} } = $DynamicField;
         }
 
+        my %Values;
         DYNAMICFIELD:
-        foreach my $DynamicField ( @{ $Param{Config}->{DynamicFieldList} } ) {
+        foreach my $DynamicField (@{$Param{Config}->{DynamicFieldList}}) {
             next if (
                 !IsArrayRefWithData($DynamicField)
-                || !$DynamicField->[0]
-                || !IsHashRefWithData( $DynamicFieldLookup{$DynamicField->[0]} )
+                    || !$DynamicField->[0]
+                    || !IsHashRefWithData($DynamicFieldLookup{$DynamicField->[0]})
             );
 
-            my $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
-                RichText => 0,
-                Text     => $DynamicField->[1],
-                TicketID => $Param{TicketID}, # id of start ticket
-                Data     => {},
-                UserID   => $Param{UserID},
-            );
+            my $ReplacedValue;
 
-            # check value structure
-            next if ( !IsString( $Value ) && ref $Value ne 'ARRAY' && defined($Value) );
+            if ($DynamicField->[1] =~ m/^<KIX_TICKET_DynamicField_\w+?>$/) {
+                $ReplacedValue = $DynamicFieldBackendObject->ValueGet(
+                    DynamicFieldConfig => $DynamicFieldLookup{$DynamicField->[0]},
+                    ObjectID           => $Param{TicketID},
+                );
+            }
+            else {
+                $ReplacedValue = $TemplateGeneratorObject->ReplacePlaceHolder(
+                    RichText => 0,
+                    Text     => $DynamicField->[1],
+                    TicketID => $Param{TicketID}, # id of start ticket
+                    Data     => {},
+                    UserID   => $Param{UserID},
+                );
+            }
 
-            my $Success = $DynamicFieldBakcendObject->ValueSet(
-                DynamicFieldConfig => $DynamicFieldLookup{$DynamicField->[0]},
+            next if (!$ReplacedValue);
+
+            my @ExistingValuesForGivenDF = $Values{$DynamicField->[0]} ? @{$Values{$DynamicField->[0]}} : ();
+
+            if (IsArrayRefWithData($ReplacedValue)) {
+                push(@ExistingValuesForGivenDF, @{$ReplacedValue});
+            }
+            else {
+                push(@ExistingValuesForGivenDF, ($ReplacedValue));
+            }
+
+            @ExistingValuesForGivenDF = uniq(@ExistingValuesForGivenDF);
+
+            $Values{$DynamicField->[0]} = \@ExistingValuesForGivenDF;
+        }
+
+        for my $v (keys %Values) {
+            $DynamicFieldBackendObject->ValueSet(
+                DynamicFieldConfig => $DynamicFieldLookup{$v},
                 ObjectID           => $Param{NewTicketID},
-                Value              => $Value,
+                Value              => $Values{$v},
                 UserID             => $Param{UserID},
             );
         }
