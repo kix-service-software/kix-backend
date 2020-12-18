@@ -409,22 +409,6 @@ sub ValidateConfig {
 sub _CheckTicketParams {
     my ( $Self, %Param ) = @_;
 
-    # if ($Param{Contact}) {
-    #     my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-    #         Login  => $Param{Contact},
-    #         Silent => 1
-    #     );
-
-    #     if ( !$ContactID ) {
-    #         $Kernel::OM->Get('Automation')->LogError(
-    #             Referrer => $Self,
-    #             Message  => "Couldn't create new ticket - can't find contact with login \"$Param{Contact}\"!",
-    #             UserID   => $Param{UserID}
-    #         );
-    #         return;
-    #     }
-    # }
-
     if ($Param{Lock}) {
         my $LockID = $Kernel::OM->Get('Lock')->LockLookup(
             Lock => $Param{Lock},
@@ -542,6 +526,21 @@ sub _CheckTicketParams {
         }
     }
 
+    if ($Param{ContactEmailOrID} && $Param{ContactEmailOrID} =~ /^\d+$/) {
+        my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+            ID     => $Param{ContactEmailOrID},
+            Silent => 1,
+        );
+        if (!$ContactID) {
+            $Kernel::OM->Get('Automation')->LogError(
+                Referrer => $Self,
+                Message  => "Couldn't create new ticket - can't find contact for contact id \"$Param{ContactEmailOrID}\"!",
+                UserID   => $Param{UserID}
+            );
+            return;
+        }
+    }
+
     return 1;
 }
 
@@ -552,7 +551,7 @@ sub _SetDynamicFields {
     if ( $Param{NewTicketID} && IsArrayRefWithData( $Param{Config}->{DynamicFieldList} ) ) {
 
         my $TemplateGeneratorObject   = $Kernel::OM->Get('TemplateGenerator');
-        my $DynamicFieldBakcendObject = $Kernel::OM->Get('DynamicField::Backend');
+        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
         # get the dynamic fields
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
@@ -569,33 +568,63 @@ sub _SetDynamicFields {
             $DynamicFieldLookup{ $DynamicField->{Name} } = $DynamicField;
         }
 
+        my %Values;
         DYNAMICFIELD:
-        foreach my $DynamicField ( @{ $Param{Config}->{DynamicFieldList} } ) {
+        foreach my $DynamicField (@{$Param{Config}->{DynamicFieldList}}) {
             next if (
                 !IsArrayRefWithData($DynamicField)
-                || !$DynamicField->[0]
-                || !IsHashRefWithData( $DynamicFieldLookup{$DynamicField->[0]} )
+                    || !$DynamicField->[0]
+                    || !IsHashRefWithData($DynamicFieldLookup{$DynamicField->[0]})
             );
 
-            my $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
-                RichText => 0,
-                Text     => $DynamicField->[1],
-                TicketID => $Param{TicketID}, # id of start ticket
-                Data     => {},
-                UserID   => $Param{UserID},
-            );
+            my $ReplacedValue;
 
-            # check value structure
-            next if ( !IsString( $Value ) && ref $Value ne 'ARRAY' && defined($Value) );
+            if ($DynamicField->[1] =~ m/^<KIX_TICKET_DynamicField_\w+?>$/) {
+                $ReplacedValue = $DynamicFieldBackendObject->ValueGet(
+                    DynamicFieldConfig => $DynamicFieldLookup{$DynamicField->[0]},
+                    ObjectID           => $Param{TicketID},
+                );
+            }
+            else {
+                $ReplacedValue = $TemplateGeneratorObject->ReplacePlaceHolder(
+                    RichText => 0,
+                    Text     => $DynamicField->[1],
+                    TicketID => $Param{TicketID}, # id of start ticket
+                    Data     => {},
+                    UserID   => $Param{UserID},
+                );
+            }
 
-            my $Success = $DynamicFieldBakcendObject->ValueSet(
-                DynamicFieldConfig => $DynamicFieldLookup{$DynamicField->[0]},
+            next if (!$ReplacedValue);
+
+            my @ExistingValuesForGivenDF = $Values{$DynamicField->[0]} ? @{$Values{$DynamicField->[0]}} : ();
+
+            if (IsArrayRefWithData($ReplacedValue)) {
+                push(@ExistingValuesForGivenDF, @{$ReplacedValue});
+            }
+            else {
+                push(@ExistingValuesForGivenDF, ($ReplacedValue));
+            }
+
+            @ExistingValuesForGivenDF = _GetUnique(@ExistingValuesForGivenDF);
+
+            $Values{$DynamicField->[0]} = \@ExistingValuesForGivenDF;
+        }
+
+        for my $v (keys %Values) {
+            $DynamicFieldBackendObject->ValueSet(
+                DynamicFieldConfig => $DynamicFieldLookup{$v},
                 ObjectID           => $Param{NewTicketID},
-                Value              => $Value,
+                Value              => $Values{$v},
                 UserID             => $Param{UserID},
             );
         }
     }
+}
+
+sub _GetUnique {
+    my %seen;
+    return grep {!$seen{$_}++} @_;
 }
 
 1;

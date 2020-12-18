@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-12 11:21+0000\n"
-"PO-Revision-Date: 2020-10-23 11:33+0000\n"
+"POT-Creation-Date: 2020-12-03 23:19+0000\n"
+"PO-Revision-Date: 2020-12-10 10:43+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -207,8 +207,14 @@ msgid "Enterprise Licence"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Expired"
+msgid ""
+"Event based Execution Plan for Job \"KIX Field Agent - Mobile Processing "
+"Rejected\""
 msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Expired"
+msgstr "Abgelaufen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQ Editor"
@@ -256,7 +262,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Inactive"
-msgstr ""
+msgstr "Außer Dienst"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Incident"
@@ -264,6 +270,10 @@ msgstr "Störung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Incoming monitoring messages."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "KIX Field Agent - Mobile Processing Rejected"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -279,8 +289,16 @@ msgid "Laptop"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Maintenance"
+msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Maintenance"
+msgstr "In Wartung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Middleware"
@@ -328,7 +346,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Operational"
-msgstr ""
+msgstr "Betriebsbereit"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Other"
@@ -376,11 +394,11 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Pilot"
-msgstr ""
+msgstr "Pilotbetrieb"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Planned"
-msgstr ""
+msgstr "Geplant"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Printer"
@@ -388,7 +406,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Production"
-msgstr ""
+msgstr "Produktiv"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Property"
@@ -400,7 +418,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Repair"
-msgstr ""
+msgstr "In Reparatur"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Resource"
@@ -408,11 +426,11 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Retired"
-msgstr ""
+msgstr "Außer Dienst"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Review"
-msgstr ""
+msgstr "Unter Review"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Risk Assumption Remark"
@@ -488,7 +506,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Test/QA"
-msgstr ""
+msgstr "Test/QS"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "TextArea"
@@ -512,6 +530,12 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The last job run has been finished."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"This job resets owner and lock state of a ticket, when its mobile processing "
+"state is set to \"rejected\"."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -573,7 +597,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Warning"
-msgstr ""
+msgstr "Warnung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Webform Ticket Creator"
@@ -643,10 +667,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "external"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "finished"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -755,7 +775,7 @@ msgstr "gültig"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
-msgstr ""
+msgstr "Warnung"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "d"
@@ -1047,11 +1067,18 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
 msgid "Sets the team of a ticket."
-msgstr ""
+msgstr "Setzt das Team an einem Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
-msgid "The name of the team to be set."
-msgstr "Der Name des Teams, das gesetzt werden soll."
+msgid ""
+"The name of the team to be set. If it is as sub-team, the full path-name has "
+"to be used (separated by two colons - e.g. \"NameOfParentTeam::"
+"NameOfTeamToBeSet\")."
+msgstr ""
+"Der Name des Teams, das gesetzt werden soll. Handelt es sich um ein "
+"untergeordnetes Team, muss der vollständige Pfad-Name angegeben werden "
+"(Namen getrennt durch doppelte Doppelpunkte, z.B. \"NameÜbergeordnetesTeam::"
+"NameZuSetzendesTeam\")."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1147,8 +1174,11 @@ msgid "The name of the state of the new ticket."
 msgstr "Der Name des Status für das neue Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The name of the team of the new ticket."
-msgstr "Der Name des Teams für das neue Ticket."
+msgid ""
+"The name of the team of the new ticket. If it is as sub-team, the full path-"
+"name has to be used (separated by two colons - e.g. \"NameOfParentTeam::"
+"NameOfTeamToBeSet\")."
+msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1290,6 +1320,34 @@ msgstr ""
 msgid "CIHistory::"
 msgstr ""
 
+#. Perl Module: Kernel/System/Installation.pm
+msgid "aborting"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "aborted"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "finished"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "in progress"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "loading data from source"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "pending"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
+msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+msgstr ""
+
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
 msgstr ""
@@ -1327,7 +1385,9 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines how many threads should be used for parallel tasks."
+msgid ""
+"Defines how many threads should be used for parallel tasks. Enter 0 to "
+"deactivate."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1372,6 +1432,10 @@ msgid ""
 "every attribute will be exported"
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/API/Contact.xml
+msgid "Enable wildcard praefix for contact fulltext search."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API/Organisation.xml
 msgid ""
 "Defines which attributes of the organisation data hash should NOT be "
@@ -1384,6 +1448,10 @@ msgid ""
 "Defines which attributes of the organisation data hash should be exported. "
 "Key = Attribute, Value = 1 if attribute should be exported. If nothing is "
 "defined, every attribute will be exported"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Organisation.xml
+msgid "Enable wildcard praefix for organisation search."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -2417,12 +2485,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Defines which default password-suffix to use for import if not defined - "
-"strongly depends on backend configuration!!!"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
 "Defines which email address to use if not defined - strongly depends on "
 "backend configuration!!!"
 msgstr ""
@@ -2443,10 +2505,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Delete expired cache from core modules."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Delete older callback events."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2534,10 +2592,6 @@ msgid "English"
 msgstr "Englisch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Enter your shared secret to enable two factor authentication."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Event Based"
 msgstr ""
 
@@ -2553,7 +2607,8 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Extended organization description."
-msgstr "Weitere Informationen über Ihr Unternehmen (vgl. auch Platzhaltertext)."
+msgstr ""
+"Weitere Informationen über Ihr Unternehmen (vgl. auch Platzhaltertext)."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Fetch emails via fetchmail (using SSL)."
@@ -2590,10 +2645,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "German"
 msgstr "Deutsch"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Google Authenticator"
-msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Graph: Bar Chart"
@@ -2756,9 +2807,9 @@ msgid ""
 "is equal to queue e-mail address."
 msgstr ""
 "Wenn gesetzt, wird diese Adresse als \"Umschlags\"-Absender-Adresse für "
-"ausgehene Nachrichten verwendet (Nicht für Benachrichtigungen - siehe unten)"
-". Wird keine Adresse angegeben, ist die \"Umschlags\"-Adresse gleich der "
-"Absende-Adresse des Teams."
+"ausgehene Nachrichten verwendet (Nicht für Benachrichtigungen - siehe "
+"unten). Wird keine Adresse angegeben, ist die \"Umschlags\"-Adresse gleich "
+"der Absende-Adresse des Teams."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3259,10 +3310,6 @@ msgstr ""
 msgid ""
 "Setup the separator used for splitting the structures handled in "
 "templategenerator."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Shared Secret"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3917,6 +3964,10 @@ msgid ""
 "is changed."
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/Migration/KIX17.xml
+msgid "Object handler registration for data migration."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "\"%s\" notification was sent to \"%s\" by \"%s\"."
 msgstr ""
@@ -3927,12 +3978,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "%s time unit(s) accounted. Now total %s time unit(s)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"A list of dynamic fields that are merged into the main ticket during a merge "
-"operation. Only dynamic fields that are empty in the main ticket will be set."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4220,6 +4265,17 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the subject for rejected emails."
 msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Defines the template for notifications. The placeholders \"[% Data.Subject "
+"%]\" and \"[% Data.Body %]\" are used to insert the configured subject and "
+"text of the notification in these positions."
+msgstr ""
+"Definiert die Layout-Vorlage für Benachrichtigungen. Die Platzhalter \"[% "
+"Data.Subject %]\" und \"[% Data.Body %]\" werden verwendet, um den in der "
+"Benachrichtigung konfigurierten Betreff und Text an diesen Positionen "
+"anzuzeigen."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -5339,6 +5395,12 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid "The name of the team to be set."
+#~ msgstr "Der Name des Teams, das gesetzt werden soll."
+
+#~ msgid "The name of the team of the new ticket."
+#~ msgstr "Der Name des Teams für das neue Ticket."
 
 #~ msgid "TimeUnits"
 #~ msgstr "Zeiteinheiten"

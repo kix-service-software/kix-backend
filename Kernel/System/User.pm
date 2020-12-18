@@ -664,7 +664,7 @@ sub UserSearch {
     return if !$DBObject->Prepare(
         SQL   => $SQL,
         Bind  => \@Bind,
-        Limit => $Self->{UserSearchListLimit} || $Param{Limit},
+        Limit => $Param{Limit} || $Self->{UserSearchListLimit},
     );
 
     # fetch the result

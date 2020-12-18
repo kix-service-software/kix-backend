@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::DynamicField::Driver::ObjectReference::User;
+package Kernel::System::DynamicField::Driver::Organisation;
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::DynamicField::Driver::BaseSelect);
 
 our @ObjectDependencies = (
-    'User',
+    'Organisation',
     'DynamicFieldValue',
     'Ticket::ColumnFilter',
 );
@@ -51,7 +51,7 @@ sub new {
     bless( $Self, $Type );
 
     # KIX4OTRS-capeIT
-    $Self->{UserObject}              = $Kernel::OM->Get('User');
+    $Self->{OrganisationObject}   = $Kernel::OM->Get('Organisation');
     $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('DynamicFieldValue');
 
     # EO KIX4OTRS-capeIT
@@ -67,7 +67,8 @@ sub new {
 
     # get the Dynamic Field Driver custmom extensions
     my $DynamicFieldDriverExtensions
-        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::User');
+        = $Kernel::OM->Get('Config')
+        ->Get('DynamicFields::Extension::Driver::Organisation');
 
     EXTENSION:
     for my $ExtensionKey ( sort keys %{$DynamicFieldDriverExtensions} ) {
@@ -128,10 +129,6 @@ sub ValueGet {
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
-    # KIX4OTRS-capeIT
-    # content removed
-    # EO KIX4OTRS-capeIT
-
     # check value
     my @Values;
     if ( ref $Param{Value} eq 'ARRAY' ) {
@@ -141,28 +138,29 @@ sub ValueSet {
         @Values = ( $Param{Value} );
     }
 
-    # KIX4OTRS-capeIT
-    # check for valid UserLogin
+    # check for valid organisation
     for my $Object (@Values) {
 
         next if !$Object;
 
-        my %UserListCustomer =
-            $Self->{UserObject}
-            ->UserSearch( UserLogin => $Object, );
-        if ( !%UserListCustomer ) {
+        my %OrganisationSearch = $Self->{OrganisationObject}->OrganisationSearch();
+
+        my $Match = 0;
+        for my $OrgID ( keys %OrganisationSearch ) {
+            next if $OrgID ne $Object;
+            $Match = 1;
+            last;
+        }
+
+        if ( !$Match ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "The value for the field User is invalid!\n"
-                    . "No Customer with login "
-                    . $Object
-                    . " found in configured backend(s).",
+                Message  => "The value for the field type Organisation is invalid!\n"
+                    . "No Organisation with ID " . $Object . " found.",
             );
             return 0;
         }
     }
-
-    # EO KIX4OTRS-capeIT
 
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
@@ -210,25 +208,27 @@ sub ValueValidate {
         @Values = ( $Param{Value} );
     }
 
-    # KIX4OTRS-capeIT
-    # check for valid UserLogin
+    # check for valid organisation
     for my $Object (@Values) {
-        my %UserListCustomer =
-            $Self->{UserObject}
-            ->UserSearch( UserLogin => $Object, );
-        if ( !%UserListCustomer ) {
+
+        my %OrganisationSearch =$Self->{OrganisationObject}->OrganisationSearch();
+
+        my $Match = 0;
+        for my $OrgID ( keys %OrganisationSearch ) {
+            next if $OrgID ne $Object;
+            $Match = 1;
+            last;
+        }
+
+        if ( !$Match ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "The value for the field User is invalid!\n"
-                    . "No Customer with login "
-                    . $Object
-                    . " found in configured backend(s).",
+                Message  => "The value for the field type Organisation is invalid!\n"
+                    . "No organisation with ID " . $Object . " found.",
             );
             return 0;
         }
     }
-
-    # EO KIX4OTRS-capeIT
 
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
@@ -347,32 +347,25 @@ sub EditFieldRender {
         }
 
         # set field as autocomplete
-        $FieldClass .= ' UserAutoComplete ';
+        $FieldClass .= ' OrganisationAutoComplete ';
         my $FieldNameKey = $FieldName . '_Key';
 
-        # get user data to display value
-        my $UserDataString = '';
+        # get organisation data to display value
+        my $OrgDataString = '';
         if ($Value) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $Value
+            my %OrganisationData = $Self->{OrganisationObject}->OrganisationGet(
+                ID => $Value,
             );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                $UserDataString
-                    = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
-                    . $ContactData{Email} . ">";
-            }
+            $OrgDataString = $OrganisationData{Name};
         }
 
         $HTMLString = <<"EOF";
 <input type="text" class="Hidden" id="$FieldName" name="$FieldName" title="$FieldLabel" value="$Value" />
-<input type="text" class="$FieldClass" id="$FieldNameKey" name="$FieldNameKey" title="$FieldLabel" value="$UserDataString" />
+<input type="text" class="$FieldClass" id="$FieldNameKey" name="$FieldNameKey" title="$FieldLabel" value="$OrgDataString" />
 EOF
 
         # add JS for AutoComplete
-        my $FieldSelector = '.UserAutoComplete';
+        my $FieldSelector = '.OrganisationAutoComplete';
 
         $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"EOF");
                 \$('$FieldSelector').each(function () {
@@ -390,28 +383,13 @@ EOF
     elsif ( $DisplayFieldType eq 'Multiselect' || $DisplayFieldType eq 'Dropdown' ) {
 
         # get data
-        my %ObjectList = $Self->{UserObject}->UserList(
+        my %ObjectList;
+        my %OrgList = $Self->{OrganisationObject}->OrganisationSearch(
             Valid => 1,
         );
 
-        # create user hash
-        my %UserHash = ();
-        for my $User (keys %ObjectList) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $User,
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                if (defined $ContactData{Firstname}) {
-                    $UserHash{$ObjectList{$User}}
-                        = $ContactData{Firstname} . " "
-                        . $ContactData{Lastname} . " <"
-                        . $ContactData{Email} . "> ("
-                        . $ObjectList{$User} . ")";
-                }
-            }
+        for my $OrgID ( keys %OrgList ) {
+            $ObjectList{$OrgID} = $OrgID;
         }
 
         # multiselect or dropdown
@@ -422,7 +400,7 @@ EOF
 
         # create HTML string
         $HTMLString = $Param{LayoutObject}->BuildSelection(
-            Data => \%UserHash || {},
+            Data         => \%ObjectList || {},
             SelectedID   => $Value,
             Name         => $FieldName,
             Class        => $FieldClass,
@@ -539,13 +517,20 @@ sub EditFieldValueValidate {
     else {
 
         # KIX4OTRS-capeIT
-        # check if valid CustomerLogin
+        # check if valid organisation
         for my $Object ( @{$Values} ) {
             next if !$Object;
-            my %UserListCustomer =
-                $Self->{UserObject}
-                ->UserSearch( UserLogin => $Object, );
-            if ( !%UserListCustomer ) {
+
+            my %OrganisationSearch = $Self->{OrganisationObject}->OrganisationSearch();
+
+            my $Match = 0;
+            for my $OrgID ( keys %OrganisationSearch ) {
+                next if $OrgID ne $Object;
+                $Match = 1;
+                last;
+            }
+
+            if ( !$Match ) {
                 $ServerError  = 1;
                 $ErrorMessage = 'The field content is invalid';
             }
@@ -607,22 +592,15 @@ sub DisplayValueRender {
         # EO KIX4OTRS-capeIT
 
         # KIX4OTRS-capeIT
-        my $UserID = $Self->{UserObject}->UserLookup(
-            UserLogin => $ReadableValue,
+        my %OrganisationData = $Self->{OrganisationObject}->OrganisationGet(
+            ID => $ReadableValue,
         );
-        my %ContactData;
-        if ($UserID) {
-            my %ContactData = $Self->{ContactObject}->ContactGet(
-                UserID => $UserID,
-            );
-            $ReadableValue = $ContactData{Firstname} . " "
-                . $ContactData{Lastname} . " <"
-                . $ContactData{Email} . ">";
-        }
+        $ReadableValue = $OrganisationData{Name};
+
         # alternative display string defined ?
         if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
             $ReadableValue = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-            $ReadableValue =~ s{<(.+?)>}{$ContactData{$1}}egx;
+            $ReadableValue =~ s{<(.+?)>}{$OrganisationData{$1}}egx;
         }
 
         # EO KIX4OTRS-capeIT
@@ -780,31 +758,25 @@ sub SearchFieldRender {
     if ( $DisplayFieldType eq 'AutoComplete' ) {
 
         # set field as autocomplete
-        $FieldClass .= ' UserAutoComplete ';
+        $FieldClass .= ' OrganisationAutoComplete ';
         my $FieldNameKey = $FieldName . '_Key';
 
-        # get user data to display value
-        my $UserDataString = '';
+        # get organisation data to display value
+        my $OrgDataString = '';
         if ($Value) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $Value,
+            my %OrganisationData = $Self->{OrganisationObject}->OrganisationGet(
+                ID => $Value,
             );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                $UserDataString = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
-                    . $ContactData{Email} . ">";
-            }
+            $OrgDataString = $OrganisationData{Name};
         }
 
         $HTMLString = <<"EOF";
 <input type="text" class="Hidden" id="$FieldName" name="$FieldName" title="$FieldLabel" value="$Value" />
-<input type="text" class="$FieldClass" id="$FieldNameKey" name="$FieldNameKey" title="$FieldLabel" value="$UserDataString" />
+<input type="text" class="$FieldClass" id="$FieldNameKey" name="$FieldNameKey" title="$FieldLabel" value="$OrgDataString" />
 EOF
 
         # add JS for AutoComplete
-        my $FieldSelector = '.UserAutoComplete';
+        my $FieldSelector = '.OrganisationAutoComplete';
 
         $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"EOF");
                 \$('$FieldSelector').each(function () {
@@ -822,33 +794,18 @@ EOF
     elsif ( $DisplayFieldType eq 'Multiselect' || $DisplayFieldType eq 'Dropdown' ) {
 
         # get data
-        my %ObjectList = $Self->{UserObject}->UserList(
+        my %ObjectList;
+        my %OrgList = $Self->{OrganisationObject}->OrganisationSearch(
             Valid => 1,
         );
 
-        # create user hash
-        my %UserHash = ();
-        for my $User (keys %ObjectList) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $User,
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                if (defined $ContactData{Firstname}) {
-                    $UserHash{$ObjectList{$User}}
-                        = $ContactData{Firstname} . " "
-                        . $ContactData{Lastname} . " <"
-                        . $ContactData{Email} . "> ("
-                        . $ObjectList{$User} . ")";
-                }
-            }
+        for my $OrgID ( keys %OrgList ) {
+            $ObjectList{$OrgID} = $OrgID;
         }
 
         # create HTML string
         $HTMLString = $Param{LayoutObject}->BuildSelection(
-            Data => \%UserHash || {},
+            Data => \%ObjectList || {},
             SelectedID   => $Value,
             Name         => $FieldName,
             Class        => $FieldClass,
@@ -1085,38 +1042,18 @@ sub PossibleValuesGet {
         # get data
         my %ObjectList;
         if ($Param{Search}) {
-            %ObjectList = $Self->{UserObject}->UserSearch(
+            %ObjectList = $Self->{OrganisationObject}->OrganisationSearch(
                 Search => $Param{Search},
             );
         }
         else {
-            %ObjectList = $Self->{UserObject}->UserList(
+            %ObjectList = $Self->{OrganisationObject}->OrganisationSearch(
                 Valid => 1,
             );
         }
 
-        # create user hash
-        my %UserHash = ();
-        for my $User (keys %ObjectList) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $User,
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                if (defined $ContactData{Firstname}) {
-                    $UserHash{$ObjectList{$User}}
-                        = $ContactData{Firstname} . " "
-                        . $ContactData{Lastname} . " <"
-                        . $ContactData{Email} . "> ("
-                        . $ObjectList{$User} . ")";
-                }
-            }
-        }
-
         # set PossibleValues
-        my $DefinedPossibleValues = \%UserHash;
+        my $DefinedPossibleValues = \%ObjectList;
 
         # EO KIX4OTRS-capeIT
 
@@ -1186,48 +1123,37 @@ sub ValueLookup {
         # set the value as the key by default
         my $Value = $Item;
 
-        # KIX4OTRS-capeIT
-        #        # try to convert key to real value
-        #        if ( $PossibleValues->{$Item} ) {
-        #            $Value = $PossibleValues->{$Item};
-        #
-        #            # check if translation is possible
-        #            if (
-        #                defined $Param{LanguageObject}
-        #                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-        #                )
-        #            {
-        #
-        #                # translate value
-        #                $Value = $Param{LanguageObject}->Translate($Value);
-        #            }
-        #        }
-        my $UserID = $Self->{UserObject}->UserLookup(
-            UserLogin => $Value,
+# KIX4OTRS-capeIT
+#        # try to convert key to real value
+#        if ( $PossibleValues->{$Item} ) {
+#            $Value = $PossibleValues->{$Item};
+#
+#            # check if translation is possible
+#            if (
+#                defined $Param{LanguageObject}
+#                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
+#                )
+#            {
+#
+#                # translate value
+#                $Value = $Param{LanguageObject}->Translate($Value);
+#            }
+#        }
+        my %OrganisationData = $Self->{OrganisationObject}->OrganisationGet(
+            ID => $Value,
         );
-        if ($UserID) {
-            my %ContactData = $Self->{ContactObject}->ContactGet(
-                UserID => $UserID,
-            );
-            $Value = $ContactData{Firstname}
-                . " "
-                . $ContactData{Lastname}
-                . " <"
-                . $ContactData{Email}
-                . ">";
+        $Value = $OrganisationData{Name};
 
-            # alternative display string defined ?
-            if ($Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay}) {
-                $Value = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-                $Value =~ s{<(.+?)>}{$ContactData{$1} }egx;
-            }
-            # EO KIX4OTRS-capeIT
-            push @Values, $Value;
+        # alternative display string defined ?
+        if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
+            $Value = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
+            $Value =~ s{<(.+?)>}{$OrganisationData{$1}}egx;
         }
-
-        return \@Values;
+# EO KIX4OTRS-capeIT
+        push @Values, $Value;
     }
-    return;
+
+    return \@Values;
 }
 
 1;

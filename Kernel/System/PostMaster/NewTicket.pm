@@ -64,6 +64,27 @@ sub Run {
 
     # get queue id and name
     my $QueueID = $Param{QueueID} || die "need QueueID!";
+
+    # skip new ticket if queue already has message
+    if (
+        $Param{SkipTicketIDs}
+        && ref( $Param{SkipTicketIDs} ) eq 'HASH'
+    ) {
+        for my $TicketID ( keys( %{ $Param{SkipTicketIDs} } ) ) {
+            my %Ticket = $Kernel::OM->Get('Kernel::System::Ticket')->TicketGet(
+                TicketID      => $TicketID,
+                DynamicFields => 0,
+                UserID        => 1,
+            );
+            if (
+                %Ticket
+                && $Ticket{QueueID} eq $QueueID
+            ) {
+                return ( 6, $TicketID );
+            }
+        }
+    }
+
     my $Queue = $Kernel::OM->Get('Queue')->QueueLookup(
         QueueID => $QueueID,
     );
@@ -410,9 +431,18 @@ sub Run {
     for my $DynamicFieldID ( sort keys %{$DynamicFieldList} ) {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
-        my $Key = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
 
-        if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
+        my $Key;
+        my $CheckKey = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
+        my $CheckKey2 = 'X-KIX-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
+
+        if ( defined $GetParam{$CheckKey} && length $GetParam{$CheckKey} ) {
+            $Key = $CheckKey;
+        } elsif ( defined $GetParam{$CheckKey2} && length $GetParam{$CheckKey2} ) {
+            $Key = $CheckKey2;
+        }
+
+        if ($Key) {
 
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(

@@ -84,10 +84,10 @@ returns id of new Dynamic field if successful or undef otherwise
         InternalField => 0,             # optional, 0 or 1, internal fields are protected
         Name            => 'NameForField',  # mandatory
         Label           => 'a description', # mandatory, label to show
+        Comment         => 'a comment'    , #optional
         FieldType       => 'Text',          # mandatory, selects the DF backend to use for this field
         ObjectType      => 'Article',       # this controls which object the dynamic field links to
                                         # allow only lowercase letters
-        DisplayGroupID  => 123,          # optional
         Config          => $ConfigHashRef,  # it is stored on YAML format
                                         # to individual articles, otherwise to tickets
         Reorder         => 1,               # or 0, to trigger reorder function, default 1
@@ -162,11 +162,11 @@ sub DynamicFieldAdd {
     # sql
     return if !$DBObject->Do(
         SQL =>
-            'INSERT INTO dynamic_field (internal_field, name, label, field_type, displaygroup_id, object_type,' .
+            'INSERT INTO dynamic_field (internal_field, name, label, field_type, comments, object_type,' .
             ' config, customer_visible, valid_id, create_time, create_by, change_time, change_by)' .
             ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$InternalField, \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{DisplayGroupID},
+            \$InternalField, \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{Comment},
             \$Param{ObjectType}, \$Config, \$Param{CustomerVisible}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -226,7 +226,7 @@ Returns:
         FieldType       => 'Text',
         ObjectType      => 'Article',
         Config          => $ConfigHashRef,
-        DisplayGroupID  => 123,
+        Comment         => '...',
         CustomerVisible => 0,
         ValidID         => 1,
         CreateBy        => 1,
@@ -274,7 +274,7 @@ sub DynamicFieldGet {
     if ( $Param{ID} ) {
         return if !$DBObject->Prepare(
             SQL =>
-                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config, customer_visible,'
+                'SELECT id, internal_field, name, label, field_type, comments, object_type, config, customer_visible,'
                 .
                 ' valid_id, create_by, create_time, change_by, change_time ' .
                 'FROM dynamic_field WHERE id = ?',
@@ -284,7 +284,7 @@ sub DynamicFieldGet {
     else {
         return if !$DBObject->Prepare(
             SQL =>
-                'SELECT id, internal_field, name, label, field_type, displaygroup_id, object_type, config, customer_visible,'
+                'SELECT id, internal_field, name, label, field_type, comments, object_type, config, customer_visible,'
                 .
                 ' valid_id, create_by, create_time, change_by, change_time ' .
                 'FROM dynamic_field WHERE name = ?',
@@ -307,7 +307,7 @@ sub DynamicFieldGet {
             Name            => $Data[2],
             Label           => $Data[3],
             FieldType       => $Data[4],
-            DisplayGroupID  => $Data[5],
+            Comment         => $Data[5],
             ObjectType      => $Data[6],
             Config          => $Config,
             CustomerVisible => $CustomerVisible,
@@ -366,7 +366,7 @@ returns 1 on success or undef on error
         Name            => 'NameForField',  # mandatory
         Label           => 'a description', # mandatory, label to show
         FieldType       => 'Text',          # mandatory, selects the DF backend to use for this field
-        DisplayGroupID  => 123,          # optional
+        Comment         => 'a comment',     # optional
         ObjectType      => 'Article',       # this controls which object the dynamic field links to
                                         # allow only lowercase letters
         Config          => $ConfigHashRef,  # it is stored on YAML format
@@ -448,11 +448,11 @@ sub DynamicFieldUpdate {
 
     # sql
     return if !$DBObject->Do(
-        SQL => 'UPDATE dynamic_field SET name = ?, label = ?, field_type = ?, displaygroup_id = ?,'
+        SQL => 'UPDATE dynamic_field SET name = ?, label = ?, field_type = ?, comments = ?,'
             . 'object_type = ?, config = ?, customer_visible = ?, valid_id = ?, change_time = current_timestamp, '
             . ' change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{DisplayGroupID},
+            \$Param{Name}, \$Param{Label}, \$Param{FieldType}, \$Param{Comment},
             \$Param{ObjectType}, \$Config, \$Param{CustomerVisible}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID},
         ],
     );

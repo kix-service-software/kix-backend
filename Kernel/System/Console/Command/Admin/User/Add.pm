@@ -32,27 +32,6 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'first-name',
-        Description => "First name of the new user.",
-        Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'last-name',
-        Description => "Last name of the new user.",
-        Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
-        Name        => 'email-address',
-        Description => "Email address of the new user.",
-        Required    => 1,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
-    $Self->AddOption(
         Name        => 'password',
         Description => "Password for the new user. If left empty, a password will be created automatically.",
         Required    => 0,
