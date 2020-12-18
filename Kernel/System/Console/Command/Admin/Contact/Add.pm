@@ -98,7 +98,7 @@ sub Run {
         };
     }
 
-    if ( !$OrganisationList{$Self->GetOption('primary-organisation')} ) {
+    if ( $Self->GetOption('primary-organisation') && !$OrganisationList{$Self->GetOption('primary-organisation')} ) {
         $Self->PrintError("Can't find organisation \"".$Self->GetOption('primary-organisation'). "\".");
         return $Self->ExitCodeError();
     }
@@ -107,7 +107,7 @@ sub Run {
         !$Kernel::OM->Get('Contact')->ContactAdd(
             Firstname             => $Self->GetOption('first-name'),
             Lastname              => $Self->GetOption('last-name'),
-            PrimaryOrganisationID => $OrganisationList{$Self->GetOption('primary-organisation')},
+            PrimaryOrganisationID => $Self->GetOption('primary-organisation') ? $OrganisationList{$Self->GetOption('primary-organisation')} : undef,
             OrganisationIDs       => \@OrgIDs,
             Email                 => $Self->GetOption('email-address'),
             AssignedUserID        => $AssignedUserID,
