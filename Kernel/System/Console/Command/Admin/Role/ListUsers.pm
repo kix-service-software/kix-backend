@@ -45,11 +45,7 @@ sub PreRun {
 
     $Self->{RoleName} = $Self->GetOption('role-name');
     $Self->{ListAll} =  $Self->GetOption('all');
-    #deleteme
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => '$Self' . Data::Dumper::Dumper(\$Self),
-    );
+
 
     if (!$Self->{ListAll} && !$Self->{RoleName}) {
         print $Self->GetUsageHelp();

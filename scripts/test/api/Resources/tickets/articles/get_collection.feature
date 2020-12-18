@@ -1,4 +1,4 @@
-Feature: the /tickets/:TicketID/articles resource
+Feature: GET request to the /tickets/:TicketID/articles resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__

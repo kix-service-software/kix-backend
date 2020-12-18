@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <Table Name="migration">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+        <Column Name="source" Required="true" Size="255" Type="VARCHAR"/>
+        <Column Name="source_id" Required="true" Size="255" Type="VARCHAR"/>
+        <Column Name="object_type" Required="false" Size="255" Type="VARCHAR"/>
+        <Column Name="object_id" Required="false" Size="255" Type="VARCHAR"/>
+        <Column Name="source_object_id" Required="false" Size="255" Type="VARCHAR"/>
+        <Index Name="migration_source">
+            <IndexColumn Name="source"/>
+        </Index>
+        <Index Name="migration_source_id">
+            <IndexColumn Name="source_id"/>
+        </Index>
+        <Index Name="migration_object_type">
+            <IndexColumn Name="object_type"/>
+        </Index>
+        <Index Name="migration_oid">
+            <IndexColumn Name="object_id"/>
+        </Index>
+        <Index Name="migration_soid">
+            <IndexColumn Name="source_object_id"/>
+        </Index>
+    </Table>
+
+    <TableAlter Name="dynamic_field">
+        <ColumnAdd Name="comments" Required="false" Size="200" Type="VARCHAR" />
+        <ColumnDrop Name="displaygroup_id" />
+    </TableAlter>
+    
+    <TableAlter Name="article_flag">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+    </TableAlter>
+
+    <TableAlter Name="ticket_flag">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+    </TableAlter>
+
+</database>

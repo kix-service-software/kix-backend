@@ -1,0 +1,2 @@
+# rebuild the ticket index in the background
+Maint::Ticket::IndexRebuild --allow-root

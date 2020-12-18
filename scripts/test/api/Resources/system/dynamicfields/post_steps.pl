@@ -39,10 +39,8 @@ Given qr/a dynamicfield$/, sub {
             FieldType      => "DateTime", 
             ObjectType     => "Ticket", 
             InternalField  => 0, 
-#            DisplayGroupID => 99, 
             ValidID => 1, 
             Config => {
-                YearsPeriod   => "1", 
                 YearsInFuture => "1", 
                 DefaultValue  => "259200", 
                 YearsInPast   => "9", 
@@ -64,10 +62,8 @@ When qr/I create a dynamicfield$/, sub {
             FieldType      => "DateTime", 
             ObjectType     => "Ticket", 
             InternalField  => 0, 
-#            DisplayGroupID => 99, 
             ValidID => 1, 
             Config => {
-                YearsPeriod   => "1", 
                 YearsInFuture => "1", 
                 DefaultValue  => "259200", 
                 YearsInPast   => "9", 

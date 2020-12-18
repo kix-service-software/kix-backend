@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-12 11:21+0000\n"
+"POT-Creation-Date: 2020-12-03 23:19+0000\n"
 "PO-Revision-Date: 2020-10-23 11:33+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -207,6 +207,12 @@ msgid "Enterprise Licence"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"Event based Execution Plan for Job \"KIX Field Agent - Mobile Processing "
+"Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
 msgstr ""
 
@@ -267,6 +273,10 @@ msgid "Incoming monitoring messages."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "KIX Field Agent - Mobile Processing Rejected"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Keyboard"
 msgstr ""
 
@@ -276,6 +286,14 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Laptop"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -515,6 +533,12 @@ msgid "The last job run has been finished."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"This job resets owner and lock state of a ticket, when its mobile processing "
+"state is set to \"rejected\"."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket"
 msgstr ""
 
@@ -642,10 +666,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "external"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "finished"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1023,7 +1043,10 @@ msgid "Sets the team of a ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
-msgid "The name of the team to be set."
+msgid ""
+"The name of the team to be set. If it is as sub-team, the full path-name has "
+"to be used (separated by two colons - e.g. \"NameOfParentTeam::"
+"NameOfTeamToBeSet\")."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1113,7 +1136,10 @@ msgid "The name of the state of the new ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The name of the team of the new ticket."
+msgid ""
+"The name of the team of the new ticket. If it is as sub-team, the full path-"
+"name has to be used (separated by two colons - e.g. \"NameOfParentTeam::"
+"NameOfTeamToBeSet\")."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1254,6 +1280,34 @@ msgstr ""
 msgid "CIHistory::"
 msgstr ""
 
+#. Perl Module: Kernel/System/Installation.pm
+msgid "aborting"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "aborted"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "finished"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "in progress"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "loading data from source"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "pending"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
+msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+msgstr ""
+
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
 msgstr ""
@@ -1291,7 +1345,9 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines how many threads should be used for parallel tasks."
+msgid ""
+"Defines how many threads should be used for parallel tasks. Enter 0 to "
+"deactivate."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1336,6 +1392,10 @@ msgid ""
 "every attribute will be exported"
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/API/Contact.xml
+msgid "Enable wildcard praefix for contact fulltext search."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API/Organisation.xml
 msgid ""
 "Defines which attributes of the organisation data hash should NOT be "
@@ -1348,6 +1408,10 @@ msgid ""
 "Defines which attributes of the organisation data hash should be exported. "
 "Key = Attribute, Value = 1 if attribute should be exported. If nothing is "
 "defined, every attribute will be exported"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Organisation.xml
+msgid "Enable wildcard praefix for organisation search."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -2376,12 +2440,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Defines which default password-suffix to use for import if not defined - "
-"strongly depends on backend configuration!!!"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
 "Defines which email address to use if not defined - strongly depends on "
 "backend configuration!!!"
 msgstr ""
@@ -2402,10 +2460,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Delete expired cache from core modules."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Delete older callback events."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2493,10 +2547,6 @@ msgid "English"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Enter your shared secret to enable two factor authentication."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Event Based"
 msgstr ""
 
@@ -2548,10 +2598,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "German"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Google Authenticator"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3206,10 +3252,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Shared Secret"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Should the cache data be held in memory?"
 msgstr ""
 
@@ -3853,6 +3895,10 @@ msgid ""
 "is changed."
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/Migration/KIX17.xml
+msgid "Object handler registration for data migration."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "\"%s\" notification was sent to \"%s\" by \"%s\"."
 msgstr ""
@@ -3863,12 +3909,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "%s time unit(s) accounted. Now total %s time unit(s)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"A list of dynamic fields that are merged into the main ticket during a merge "
-"operation. Only dynamic fields that are empty in the main ticket will be set."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4155,6 +4195,13 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the subject for rejected emails."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Defines the template for notifications. The placeholders \"[% Data.Subject "
+"%]\" and \"[% Data.Body %]\" are used to insert the configured subject and "
+"text of the notification in these positions."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

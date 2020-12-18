@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="ticket_index">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+        <Column Name="ticket_id" Required="true" Type="BIGINT"/>
+        <ColumnDrop Name="queue"/>
+        <ColumnDrop Name="s_state"/>
+        <ColumnDrop Name="s_lock"/>
+        <ColumnAdd Name="lock_id" Required="true" Size="200" Type="VARCHAR"/>
+        <ColumnAdd Name="state_id" Required="true" Size="200" Type="VARCHAR"/>
+        <IndexAdd Name="ticket_index_lock_id">
+            <IndexColumn Name="lock_id"/>
+        </IndexAdd>
+        <IndexAdd Name="ticket_index_state_id">
+            <IndexColumn Name="state_id"/>
+        </IndexAdd>
+        <ForeignKey ForeignTable="ticket_state">
+            <Reference Local="state_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="lock">
+            <Reference Local="lock_id" Foreign="id"/>
+        </ForeignKey>
+    </TableAlter>
+
+    <TableDrop Name="ticket_lock_index"/>
+
+</database>

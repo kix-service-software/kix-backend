@@ -1,4 +1,4 @@
-Feature: the /tickets/:TicketID/articles/:ArticleID/flags resource
+Feature: POST request to the /tickets/:TicketID/articles/:ArticleID/flags resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__

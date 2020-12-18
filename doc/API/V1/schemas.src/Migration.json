@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "MigrationState.json",
+  "type": "object",
+  "description": "The migration state object.",
+  "properties": {
+    "ID": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Status": {
+      "type": "string",
+      "readOnly": true
+    },
+    "State": {
+      "type": "object",
+      "readOnly": true,
+      "description": "The content depends on the source of the migration.",
+      "patternProperties": {
+        "^[a-zA-Z]+$": {
+          "type": "object",
+          "items": {
+            "anyOf": [
+              {"type": "string"},
+              {"type": "integer"}
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "ID",
+    "Status"
+  ]
+}

@@ -39,10 +39,10 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'primary-organisation-id',
+        Name        => 'primary-organisation',
         # rkaiser - T#2017020290001194 - changed customer user to contact
-        Description => "The primary organisation ID for the new contact.",
-        Required    => 1,
+        Description => "The number of the primary organisation for the new contact.",
+        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -55,8 +55,8 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'organisation-ids',
-        Description => "All organisation IDs for the new contact. Separate multiple values by comma (primary organisation id must be included).",
+        Name        => 'organisations',
+        Description => "All organisation number for the new contact. Separate multiple values by comma (primary organisation must be included).",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -77,6 +77,8 @@ sub Run {
 
     $Self->Print("<yellow>Adding a new contact...</yellow>\n");
 
+    my %OrganisationList = reverse $Kernel::OM->Get('Organisation')->OrganisationSearch(Valid => 0);
+
     my $AssignedUserID;
     if ($Self->GetOption('user-login')) {
         $AssignedUserID = $Kernel::OM->Get('User')->UserLookup(
@@ -86,15 +88,26 @@ sub Run {
     }
 
     my @OrgIDs;
-    if ($Self->GetOption('organisation-ids')) {
-        @OrgIDs = split(/,\s*/, $Self->GetOption('organisation-ids'));
+    if ($Self->GetOption('organisations')) {
+        foreach my $OrgNumber ( split(/,\s*/, $Self->GetOption('organisations')) ) {
+            if ( !$OrganisationList{$OrgNumber} ) {
+                $Self->PrintError("Can't find organisation \"$OrgNumber\".");
+                return $Self->ExitCodeError();
+            }
+            push @OrgIDs, $OrganisationList{$OrgNumber}
+        };
+    }
+
+    if ( $Self->GetOption('primary-organisation') && !$OrganisationList{$Self->GetOption('primary-organisation')} ) {
+        $Self->PrintError("Can't find organisation \"".$Self->GetOption('primary-organisation'). "\".");
+        return $Self->ExitCodeError();
     }
 
     if (
         !$Kernel::OM->Get('Contact')->ContactAdd(
             Firstname             => $Self->GetOption('first-name'),
             Lastname              => $Self->GetOption('last-name'),
-            PrimaryOrganisationID => $Self->GetOption('primary-organisation-id'),
+            PrimaryOrganisationID => $Self->GetOption('primary-organisation') ? $OrganisationList{$Self->GetOption('primary-organisation')} : undef,
             OrganisationIDs       => \@OrgIDs,
             Email                 => $Self->GetOption('email-address'),
             AssignedUserID        => $AssignedUserID,

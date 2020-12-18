@@ -119,6 +119,10 @@
 /system/importexport/templates/:TemplateID/runs                                |   POST            | V1::ImportExport::TemplateRunCreate
 /system/logs                                                                   |   GET             | V1::Log::LogFileSearch
 /system/logs/:LogFileID                                                        |   GET             | V1::Log::LogFileGet
+/system/migration                                                              |   GET             | V1::Migration::MigrationSearch
+/system/migration                                                              |   POST            | V1::Migration::MigrationCreate
+/system/migration/:MigrationID                                                 |   DELETE          | V1::Migration::MigrationDelete
+/system/migration/:MigrationID                                                 |   GET             | V1::Migration::MigrationGet
 /system/objecticons                                                            |   GET             | V1::ObjectIcon::ObjectIconSearch
 /system/objecticons                                                            |   POST            | V1::ObjectIcon::ObjectIconCreate
 /system/objecticons/:ObjectIconID                                              |   DELETE          | V1::ObjectIcon::ObjectIconDelete

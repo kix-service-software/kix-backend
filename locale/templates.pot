@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-10-26 13:59+0000\n"
+"POT-Creation-Date: 2020-12-03 23:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -203,6 +203,10 @@ msgid "Enterprise Licence"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Event based Execution Plan for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
 msgstr ""
 
@@ -259,6 +263,10 @@ msgid "Incoming monitoring messages."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "KIX Field Agent - Mobile Processing Rejected"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Keyboard"
 msgstr ""
 
@@ -268,6 +276,14 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Laptop"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -503,6 +519,10 @@ msgid "The last job run has been finished."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "This job resets owner and lock state of a ticket, when its mobile processing state is set to \"rejected\"."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket"
 msgstr ""
 
@@ -616,10 +636,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "external"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "finished"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1176,6 +1192,34 @@ msgstr ""
 
 #. Perl Module: Kernel/System/ITSMConfigItem/History.pm
 msgid "CIHistory::"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation.pm
+msgid "aborting"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "aborted"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "finished"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "in progress"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "loading data from source"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "pending"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
+msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Ticket.pm
@@ -3198,6 +3242,10 @@ msgstr ""
 msgid "Event module to add or change the CSV-mapping if config item class defintion is changed."
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/Migration/KIX17.xml
+msgid "Object handler registration for data migration."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "\"%s\" notification was sent to \"%s\" by \"%s\"."
 msgstr ""
@@ -3208,10 +3256,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "%s time unit(s) accounted. Now total %s time unit(s)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "A list of dynamic fields that are merged into the main ticket during a merge operation. Only dynamic fields that are empty in the main ticket will be set."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

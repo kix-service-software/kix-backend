@@ -20,6 +20,7 @@ use Encode ();
 use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
+use Kernel::System::Ticket::TicketIndex;
 use Kernel::System::Ticket::TicketSearch;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
@@ -89,6 +90,7 @@ sub new {
 
     @ISA = qw(
         Kernel::System::Ticket::Article
+        Kernel::System::Ticket::TicketIndex
         Kernel::System::Ticket::TicketSearch
         Kernel::System::EventHandler
         Kernel::System::PerfLog
@@ -546,6 +548,9 @@ sub TicketCreate {
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
 
+    # update ticket index
+    $Self->TicketIndexAdd(TicketID => $TicketID);
+
     # clear whole ticket cache
     $Self->_TicketCacheClear();
 
@@ -634,6 +639,9 @@ sub TicketDelete {
 
     # update full text index
     return if !$Self->ArticleIndexDeleteTicket(%Param);
+
+    # update ticket index
+    return if !$Self->TicketIndexDelete(%Param);
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -1327,6 +1335,11 @@ sub _TicketCacheClear {
     $CacheObject->CleanUp(
         Type          => "TicketCache".$Param{TicketID},
         NoStatsUpdate => 1,
+    );
+
+    # cleanup search cache
+    $CacheObject->CleanUp(
+        Type => "TicketSearch",
     );
 
     return 1;
@@ -4830,328 +4843,6 @@ sub TicketAccountTime {
     return 1;
 }
 
-=item TicketMerge()
-
-merge two tickets
-
-    my $Success = $TicketObject->TicketMerge(
-        MainTicketID  => 412,
-        MergeTicketID => 123,
-        UserID        => 123,
-    );
-
-Events:
-    TicketMerge
-
-=cut
-
-sub TicketMerge {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(MainTicketID MergeTicketID UserID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # change ticket id of merge ticket to main ticket
-    return if !$DBObject->Do(
-        SQL => 'UPDATE article SET ticket_id = ?, change_time = current_timestamp, '
-            . ' change_by = ? WHERE ticket_id = ?',
-        Bind => [ \$Param{MainTicketID}, \$Param{UserID}, \$Param{MergeTicketID} ],
-    );
-
-    # bug 9635
-    # do the same with article_search (harmless if not used)
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE article_search SET ticket_id = ? WHERE ticket_id = ?',
-        Bind => [ \$Param{MainTicketID}, \$Param{MergeTicketID} ],
-    );
-
-    # reassign article history
-    return if !$DBObject->Do(
-        SQL => 'UPDATE ticket_history SET ticket_id = ?, change_time = current_timestamp, '
-            . ' change_by = ? WHERE ticket_id = ?
-            AND (article_id IS NOT NULL OR article_id != 0)',
-        Bind => [ \$Param{MainTicketID}, \$Param{UserID}, \$Param{MergeTicketID} ],
-    );
-
-    # update the accounted time of the main ticket
-    return if !$DBObject->Do(
-        SQL => 'UPDATE time_accounting SET ticket_id = ?, change_time = current_timestamp, '
-            . ' change_by = ? WHERE ticket_id = ?',
-        Bind => [ \$Param{MainTicketID}, \$Param{UserID}, \$Param{MergeTicketID} ],
-    );
-
-    my %MainTicket = $Self->TicketGet(
-        TicketID      => $Param{MainTicketID},
-        DynamicFields => 0,
-    );
-    my %MergeTicket = $Self->TicketGet(
-        TicketID      => $Param{MergeTicketID},
-        DynamicFields => 0,
-    );
-
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    my $Body = $ConfigObject->Get('Ticket::Frontend::AutomaticMergeText');
-    $Body =~ s{<KIX_TICKET>}{$MergeTicket{TicketNumber}}xms;
-
-    # KIX4OTRS-capeIT
-    # $Body =~ s{<KIX_MERGE_TO_TICKET>}{$MainTicket{TicketNumber}}xms;
-    $Body =~
-        s{<KIX_MERGE_TO_TICKET>}{<!-- KIX MergeTargetLinkStart ::$Param{MainTicketID}:: -->$MainTicket{TicketNumber}<!-- KIX MergeTargetLinkEnd -->}xms;
-
-    # EO KIX4OTRS-capeIT
-
-    # add merge article to merge ticket
-    $Self->ArticleCreate(
-        TicketID       => $Param{MergeTicketID},
-        SenderType     => 'agent',
-        Channel        => 'note',
-        ContentType    => "text/plain; charset=ascii",
-        UserID         => $Param{UserID},
-        HistoryType    => 'AddNote',
-        HistoryComment => '%%Note',
-        Subject        => $ConfigObject->Get('Ticket::Frontend::AutomaticMergeSubject')
-            || 'Ticket Merged',
-        Body          => $Body,
-        NoAgentNotify => 1,
-    );
-
-    # add merge history to merge ticket
-    $Self->HistoryAdd(
-        TicketID    => $Param{MergeTicketID},
-        HistoryType => 'Merged',
-        Name =>
-            "Merged Ticket ($MergeTicket{TicketNumber}/$Param{MergeTicketID}) to ($MainTicket{TicketNumber}/$Param{MainTicketID})",
-        CreateUserID => $Param{UserID},
-    );
-
-    # add merge history to main ticket
-    $Self->HistoryAdd(
-        TicketID    => $Param{MainTicketID},
-        HistoryType => 'Merged',
-        Name =>
-            "Merged Ticket ($MergeTicket{TicketNumber}/$Param{MergeTicketID}) to ($MainTicket{TicketNumber}/$Param{MainTicketID})",
-        CreateUserID => $Param{UserID},
-    );
-
-    # tranfer watchers - only those that were not already watching the main ticket
-    # delete all watchers from the merge ticket that are already watching the main ticket
-    my $MergeSuccess = $Kernel::OM->Get('Watcher')->WatcherTransfer(
-        Object         => 'Ticket',
-        SourceObjectID => $Param{MergeTicketID},
-        TargetObjectID => $Param{MainTicketID},
-    );
-
-    # link tickets
-    $Kernel::OM->Get('LinkObject')->LinkAdd(
-        SourceObject => 'Ticket',
-        SourceKey    => $Param{MainTicketID},
-        TargetObject => 'Ticket',
-        TargetKey    => $Param{MergeTicketID},
-        Type         => 'ParentChild',
-        UserID       => $Param{UserID},
-    );
-
-    # get the list of all merged states
-    my @MergeStateList = $Kernel::OM->Get('State')->StateGetStatesByType(
-        StateType => ['merged'],
-        Result    => 'Name',
-    );
-
-    # error handling
-    if ( !@MergeStateList ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No merge state found! Please add a valid merge state.",
-        );
-        return;
-    }
-
-    # set new state of merge ticket
-    $Self->TicketStateSet(
-        State    => $MergeStateList[0],
-        TicketID => $Param{MergeTicketID},
-        UserID   => $Param{UserID},
-    );
-
-    # unlock ticket
-    $Self->LockSet(
-        Lock     => 'unlock',
-        TicketID => $Param{MergeTicketID},
-        UserID   => $Param{UserID},
-    );
-
-    # remove seen flag for all users on the main ticket
-    my $Success = $Self->TicketFlagDelete(
-        TicketID => $Param{MainTicketID},
-        Key      => 'Seen',
-        AllUsers => 1,
-    );
-
-    $Self->TicketMergeDynamicFields(
-        MergeTicketID => $Param{MergeTicketID},
-        MainTicketID  => $Param{MainTicketID},
-        UserID        => $Param{UserID},
-    );
-
-    $Self->_TicketCacheClear( TicketID => $Param{MergeTicketID} );
-    $Self->_TicketCacheClear( TicketID => $Param{MainTicketID} );
-
-    # trigger event
-    $Self->EventHandler(
-        Event => 'TicketMerge',
-        Data  => {
-            TicketID     => $Param{MergeTicketID},
-            MainTicketID => $Param{MainTicketID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    # KIX4OTRS-capeIT
-    $Self->EventHandler(
-        Event => 'TicketMergeTarget',
-        Data  => {
-            TicketID       => $Param{MainTicketID},
-            MergedTicketID => $Param{MergeTicketID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    # EO KIX4OTRS-capeIT
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{MainTicketID},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{MergeTicketID},
-    );
-
-    return 1;
-}
-
-=item TicketMergeDynamicFields()
-
-merge dynamic fields from one ticket into another, that is, copy
-them from the merge ticket to the main ticket if the value is empty
-in the main ticket.
-
-    my $Success = $TicketObject->TicketMergeDynamicFields(
-        MainTicketID  => 123,
-        MergeTicketID => 42,
-        UserID        => 1,
-        DynamicFields => ['DynamicField_TicketFreeText1'], # optional
-    );
-
-If DynamicFields is not present, it is taken from the Ticket::MergeDynamicFields
-configuration.
-
-=cut
-
-sub TicketMergeDynamicFields {
-    my ( $Self, %Param ) = @_;
-
-    for my $Needed (qw(MainTicketID MergeTicketID UserID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    my $DynamicFields = $Param{DynamicFields};
-
-    if ( !$DynamicFields ) {
-        $DynamicFields = $Kernel::OM->Get('Config')->Get('Ticket::MergeDynamicFields');
-    }
-
-    return 1 if !IsArrayRefWithData($DynamicFields);
-
-    my %MainTicket = $Self->TicketGet(
-        TicketID      => $Param{MainTicketID},
-        UserID        => $Param{UserID},
-        DynamicFields => 1,
-    );
-    my %MergeTicket = $Self->TicketGet(
-        TicketID      => $Param{MergeTicketID},
-        UserID        => $Param{UserID},
-        DynamicFields => 1,
-    );
-
-    # get dynamic field objects
-    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
-    FIELDS:
-    for my $DynamicFieldName ( @{$DynamicFields} ) {
-
-        my $Key = "DynamicField_$DynamicFieldName";
-
-        if (
-            defined $MergeTicket{$Key}
-            && length $MergeTicket{$Key}
-            && !( defined $MainTicket{$Key} && length $MainTicket{$Key} )
-            )
-        {
-
-            my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
-                Name => $DynamicFieldName,
-            );
-
-            if ( !$DynamicFieldConfig ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'Error',
-                    Message  => qq[No such dynamic field "$DynamicFieldName"],
-                );
-                return;
-            }
-
-            $DynamicFieldBackendObject->ValueSet(
-                DynamicFieldConfig => $DynamicFieldConfig,
-                ObjectID           => $Param{MainTicketID},
-                UserID             => $Param{UserID},
-                Value              => $MergeTicket{$Key},
-            );
-        }
-    }
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{MainTicketID},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{MergeTicketID},
-    );
-
-    return 1;
-}
-
 =item TicketFlagSet()
 
 set ticket flags
@@ -6874,6 +6565,54 @@ sub GetLinkedTickets {
         push @TicketIDs, $Row[0];
     }
     return @TicketIDs;
+}
+
+sub TicketFulltextIndexRebuild {
+    my ( $Self, %Param ) = @_;
+
+    # get all tickets
+    my @TicketIDs = $Self->TicketSearch(
+        ArchiveFlags => [ 'y', 'n' ],
+        OrderBy      => 'Down',
+        SortBy       => 'Age',
+        Result       => 'ARRAY',
+        Limit        => 100_000_000,
+        Permission   => 'ro',
+        UserID       => 1,
+    );
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => "Rebuilding ticket fulltext index for ".@TicketIDs." tickets."
+    );
+
+    my $Count      = 0;
+    my $PercentOld = 0;
+    for my $TicketID ( @TicketIDs ) {
+
+        # get articles
+        my @ArticleIndex = $Self->ArticleIndex(
+            TicketID => $TicketID,
+            UserID   => 1,
+        );
+
+        for my $ArticleID (@ArticleIndex) {
+            $Self->ArticleIndexBuild(
+                ArticleID => $ArticleID,
+                UserID    => 1,
+            );
+        }
+
+        my $Percent = int( $Count++ / ( $#TicketIDs / 100 ) );
+
+        if ( $Percent > $PercentOld ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "Rebuilding ticket fulltext index...". $Percent . "% done."
+            );
+            $PercentOld = $Percent;
+        }
+    }
 }
 
 # Levenshtein algorithm taken from

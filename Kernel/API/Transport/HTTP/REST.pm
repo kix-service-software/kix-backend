@@ -314,7 +314,7 @@ sub ProviderProcessRequest {
     my $Length = $ENV{'CONTENT_LENGTH'};
 
     # no length provided, return the information we have
-    if ( !$Length || $RequestMethod eq 'OPTIONS' ) {
+    if ( !$Length ) {
         return $Self->_Success(
             Route          => $CurrentRoute,
             RequestURI     => $RequestURI,

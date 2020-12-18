@@ -128,11 +128,11 @@ perform DynamicFieldCreate Operation. This will return the created DynamicFieldI
         Data => {
             DynamicFieldID => 123,
             DynamicField   => {
-	            Name            => '...',            
-	            Label           => '...',            
-                FieldType       => '...',            
-                DisplayGroupID  => 123,              
-                ObjectType      => '...',            
+	            Name            => '...',
+	            Label           => '...',
+                Comment         => '...'
+                FieldType       => '...',
+                ObjectType      => '...',
                 Config          => { },
                 CustomerVisible => 0,
 	            InternalField   => 0|1,              # optional
@@ -197,7 +197,6 @@ sub Run {
         Label           => $DynamicField->{Label},
         InternalField   => $DynamicField->{InternalField} || 0,
         FieldType       => $DynamicField->{FieldType},
-        DisplayGroupID  => $DynamicField->{DisplayGroupID},
         ObjectType      => $DynamicField->{ObjectType},
         Config          => $DynamicField->{Config},
         CustomerVisible => $DynamicField->{CustomerVisible},

@@ -20,6 +20,7 @@ our %EXPORT_TAGS = (    ## no critic
     all => [
         'IsArrayRef',
         'IsArrayRefWithData',
+        'IsCodeRef',
         'IsHashRef',
         'IsHashRefWithData',
         'IsInteger',
@@ -188,6 +189,24 @@ sub IsArrayRefWithData {
     return if !@{$TestData};
 
     return 1;
+}
+
+=item IsCodeRef()
+
+test supplied data to determine if it is a code reference
+
+returns 1 if data matches criteria or undef otherwise
+
+    my $Result = IsCodeRef(
+        ...
+    );
+
+=cut
+
+sub IsCodeRef {
+    my $TestData = $_[0];
+
+    return ref $TestData eq 'CODE';
 }
 
 =item IsHashRef()

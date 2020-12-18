@@ -322,6 +322,11 @@ sub ArticleCreate {
         $Param{$Attribute} = substr( $Param{$Attribute}, 0, 3800 );
     }
 
+    # second check after conversion to plain text (i.e. empty <body> tag in HTML mail)
+    if ( !length $Param{Body} ) {
+        $Param{Body} = 'No body';
+    }
+
     # handle some special things for channel "email"
     if ( $Param{Channel} eq 'email' ) {
         # check needed stuff
@@ -383,10 +388,12 @@ sub ArticleCreate {
         );
 
         # create MessageID
-        my $Time      = $Kernel::OM->Get('Time')->SystemTime();
-        my $Random    = rand 999999;
-        my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
-        $Param{MessageID} = "<$Time.$Random\@$FQDN>";
+        if (!$Param{MessageID}) {
+            my $Time      = $Kernel::OM->Get('Time')->SystemTime();
+            my $Random    = rand 999999;
+            my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
+            $Param{MessageID} = "<$Time.$Random\@$FQDN>";
+        }
     } else {
         $Param{CustomerVisible} = (defined $Param{CustomerVisible} && $Param{CustomerVisible} ne '') ? $Param{CustomerVisible} : 0;
     }

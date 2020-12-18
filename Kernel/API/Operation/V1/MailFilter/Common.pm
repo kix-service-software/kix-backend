@@ -74,56 +74,55 @@ sub _CheckMailFilter {
         }
     }
 
-    if ( !IsArrayRefWithData( $MailFilter->{Match} ) ) {
-    }
-
-    my $Index = 1;
-    for my $Match ( @{ $MailFilter->{Match} } ) {
-        for my $KeyValue (qw(Key Value)) {
-            if ( !defined $Match->{$KeyValue} ) {
+    if ( IsArrayRefWithData( $MailFilter->{Match} ) ) {
+        my $Index = 1;
+        for my $Match ( @{ $MailFilter->{Match} } ) {
+            for my $KeyValue (qw(Key Value)) {
+                if ( !defined $Match->{$KeyValue} ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Element $Index of Match has no $KeyValue!"
+                    );
+                }
+            }
+            if ( !$MatchHeaders{ $Match->{Key} } ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
-                    Message => "Element $Index of Match has no $KeyValue!"
+                    Message => "Email header '$Match->{Key}' is not supported!"
                 );
             }
-        }
-        if ( !$MatchHeaders{ $Match->{Key} } ) {
-            return $Self->_Error(
-                Code    => 'BadRequest',
-                Message => "Email header '$Match->{Key}' is not supported!"
-            );
-        }
 
-        my $regex = eval { qr/$Match->{Value}/ };
-        if ( $@ ) {
-            return $Self->_Error(
-                Code    => 'BadRequest',
-                Message => "Element $Match->{Key} of Match has not a valid Regex value ($Match->{Value})!"
-            );
-        }
-
-        $Index++;
-    }
-
-    if ( !IsArrayRefWithData( $MailFilter->{Set} ) ) {
-    }
-    my $Index = 1;
-    for my $Set ( @{ $MailFilter->{Set} } ) {
-        for my $KeyValue (qw(Key Value)) {
-            if ( !defined $Set->{$KeyValue} ) {
+            my $regex = eval { qr/$Match->{Value}/ };
+            if ( $@ ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
-                    Message => "Element $Index of Set has no $KeyValue!"
+                    Message => "Element $Match->{Key} of Match has not a valid Regex value ($Match->{Value})!"
                 );
             }
+
+            $Index++;
         }
-        if ( !$SetHeaders{ $Set->{Key} } ) {
-            return $Self->_Error(
-                Code    => 'BadRequest',
-                Message => "Email header '$Set->{Key}' is not supported!"
-            );
+    }
+
+    if ( IsArrayRefWithData( $MailFilter->{Set} ) ) {
+        my $Index = 1;
+        for my $Set ( @{ $MailFilter->{Set} } ) {
+            for my $KeyValue (qw(Key Value)) {
+                if ( !defined $Set->{$KeyValue} ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Element $Index of Set has no $KeyValue!"
+                    );
+                }
+            }
+            if ( !$SetHeaders{ $Set->{Key} } ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Email header '$Set->{Key}' is not supported!"
+                );
+            }
+            $Index++;
         }
-        $Index++;
     }
 
     # if everything is OK then return Success

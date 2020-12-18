@@ -144,7 +144,7 @@ sub Run {
                 OperationType => 'V1::CMDB::ClassDefinitionSearch',
                 Data          => {
                     ClassID => $ClassID,
-                    sort    => 'ConfigItemClassDefinition.-DefinitionID:numeric',
+                    sort    => 'ConfigItemClassDefinition.-Version:numeric',
                     limit   => 1,
                 }
             );
