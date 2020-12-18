@@ -102,7 +102,7 @@ foreach my $Table ( @{$XMLRef->{Table}} ) {
         my $IndexCount = scalar @{$Table->{Index}};
         $Self->True(
             $IndexCount < $ColumnCount,
-            'Table "'.$Table->{Name}.'" has many indexes ('.$IndexCount.') in relation to columns ('.$ColumnCount.')',
+            'Table "'.$Table->{Name}.'" has less indexes ('.$IndexCount.') in relation to columns ('.$ColumnCount.')',
         );
     }
 }
