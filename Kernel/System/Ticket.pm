@@ -20,6 +20,7 @@ use Encode ();
 use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
+use Kernel::System::Ticket::TicketIndex;
 use Kernel::System::Ticket::TicketSearch;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
@@ -89,6 +90,7 @@ sub new {
 
     @ISA = qw(
         Kernel::System::Ticket::Article
+        Kernel::System::Ticket::TicketIndex
         Kernel::System::Ticket::TicketSearch
         Kernel::System::EventHandler
         Kernel::System::PerfLog
@@ -546,6 +548,9 @@ sub TicketCreate {
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
 
+    # update ticket index
+    $Self->TicketIndexAdd(TicketID => $TicketID);
+
     # clear whole ticket cache
     $Self->_TicketCacheClear();
 
@@ -634,6 +639,9 @@ sub TicketDelete {
 
     # update full text index
     return if !$Self->ArticleIndexDeleteTicket(%Param);
+
+    # update ticket index
+    return if !$Self->TicketIndexDelete(%Param);
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
