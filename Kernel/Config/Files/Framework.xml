@@ -719,6 +719,24 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###TicketIndexRebuild" Required="0" Valid="1" ConfigLevel="100">
+        <Description Translatable="1">Rebuild the ticket index queue stats.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">TicketIndexRebuild</Item>
+                <Item Key="Schedule">01 01 * * *</Item> <!-- default each day at 01:01 AM -->
+                <Item Key="Module">Kernel::System::Ticket</Item>
+                <Item Key="Function">TicketIndexRebuild</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###TicketUnlockTimeout" Required="0" Valid="1" ConfigLevel="100">
         <Description Translatable="1">Unlock tickets that are past their unlock timeout.</Description>
         <Group>Framework</Group>

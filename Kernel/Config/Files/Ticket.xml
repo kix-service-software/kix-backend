@@ -233,6 +233,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###110-TicketIndexUpdate" Required="0" Valid="1">
+        <Description Translatable="1">Updates the ticket index.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::TicketIndexUpdate</Item>
+                <Item Key="Event">TicketStateUpdate|TicketQueueUpdate|TicketLockUpdate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###120-ForceOwnerResetOnMove" Required="0" Valid="0">
         <Description Translatable="1">Resets and unlocks the owner of a ticket if it was moved to another queue.</Description>
         <Group>Ticket</Group>
