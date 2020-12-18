@@ -5,5 +5,5 @@ In addition to its sub-resources (as far as they exist), this resource supports 
 |Include|Description|
 |-|-|
 |```SubQueues```|Adds the die tree of sub-queues to the response.|
-|```TicketStats```|Adds some statistics to the response, about the tickets in this queue. It will contain the total number of tickets, the number of locked tickets and the number of escalated tickets, based on the given URL parameter ```TicketStats.StateType``` or ```TicketStats.StateID```. Both can contain multiple values separated by a comma.|
+|```TicketStats```|Adds some statistics to the response, about the tickets in this queue. It will contain the total number of tickets and the number of locked tickets, based on the given URL parameter ```TicketStats.StateType``` or ```TicketStats.StateID```. Both can contain multiple values separated by a comma. The two virtual StateTypes ```Open``` and ```Viewable``` represent only the viewable state types (see SysConfig option ```Ticket::ViewableStateType```).|
 |```Tickets```|Adds the list of tickets to the response.|
