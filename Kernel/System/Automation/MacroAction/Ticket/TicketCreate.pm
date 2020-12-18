@@ -13,7 +13,6 @@ package Kernel::System::Automation::MacroAction::Ticket::TicketCreate;
 use strict;
 use warnings;
 use utf8;
-use List::MoreUtils qw(uniq);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -607,7 +606,7 @@ sub _SetDynamicFields {
                 push(@ExistingValuesForGivenDF, ($ReplacedValue));
             }
 
-            @ExistingValuesForGivenDF = uniq(@ExistingValuesForGivenDF);
+            @ExistingValuesForGivenDF = _GetUnique(@ExistingValuesForGivenDF);
 
             $Values{$DynamicField->[0]} = \@ExistingValuesForGivenDF;
         }
@@ -621,6 +620,11 @@ sub _SetDynamicFields {
             );
         }
     }
+}
+
+sub _GetUnique {
+    my %seen;
+    return grep {!$seen{$_}++} @_;
 }
 
 1;
