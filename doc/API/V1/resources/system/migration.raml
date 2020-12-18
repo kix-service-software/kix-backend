@@ -1,0 +1,9 @@
+  displayName: "[System] Migration"
+  description: !include ../../descriptions/resources/system/migration.md
+  type: { collection-nopatch: { typeName: Migration } }
+  /{migrationId}:
+    type: { item-nopatch: { typeName: Migration } }
+    uriParameters:
+      migrationId:
+        displayName:MigrationID
+        type: string

@@ -64,6 +64,8 @@ sub new {
     $Self->{LogObject}    = $Kernel::OM->Get('Log');
 
     $Self->{CacheType} = 'ClientRegistration';
+
+    $Self->{DisableClientNotifications} = $Param{DisableClientNotifications};
     
     return $Self;
 }
@@ -325,6 +327,8 @@ sub NotifyClients {
         }
     }
 
+    return if $Self->{DisableClientNotifications};
+
     my $Timestamp = gettimeofday();
 
     # get RequestID
@@ -336,10 +340,8 @@ sub NotifyClients {
         Type          => 'ClientNotification',
         Key           => $$.'_'.$Timestamp.'_'.$RequestID,
         Value         => {
-            ID        => $$.'_'.$Timestamp.'_'.$RequestID,
-            Event     => $Param{Event},
-            Namespace => $Param{Namespace},
-            ObjectID  => $Param{ObjectID},
+            ID => $$.'_'.$Timestamp.'_'.$RequestID,
+            %Param,
         },
         NoStatsUpdate => 1,
     );
@@ -357,6 +359,8 @@ send notifications to all clients who want to receive notifications
 
 sub NotificationSend {
     my ( $Self, %Param ) = @_;
+
+    return if $Self->{DisableClientNotifications};
 
     my $CacheObject = $Kernel::OM->Get('Cache');
 

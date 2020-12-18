@@ -126,7 +126,6 @@ my %DynamicFieldConfigs = (
         Config        => {
             DefaultValue  => '',
             Link          => '',
-            YearsPeriod   => '',
             YearsInFuture => '',
             YearsInPast   => '',
         },
@@ -145,7 +144,6 @@ my %DynamicFieldConfigs = (
         Config        => {
             DefaultValue  => '',
             Link          => '',
-            YearsPeriod   => '',
             YearsInFuture => '',
             YearsInPast   => '',
         },

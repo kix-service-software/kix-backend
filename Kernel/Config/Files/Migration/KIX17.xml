@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+    <ConfigItem AccessLevel="internal" Name="Migration::Sources###KIX17" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17</Item>
+                <Item Key="Options"><![CDATA[URL=<URL to the migration.pl>[,PSK=<PSK>][,AutoDeps=1][,Limit=<Limit>]]></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###FAQ::Category" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::FAQ::Category</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###FAQ::Item" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::FAQ::Item</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###User" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::User</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###CustomerUser" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::CustomerUser</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Ticket::Priority" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Ticket::Priority</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Ticket::State" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Ticket::State</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Ticket::Type" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Ticket::Type</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Ticket::HistoryType" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Ticket::HistoryType</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Ticket::Ticket" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Ticket::Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###GeneralCatalog::Item" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::GeneralCatalog::Item</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###GeneralCatalog::Preferences" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::GeneralCatalog::Preferences</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###SystemAddress" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::SystemAddress</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Queue" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###CustomerCompany" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::CustomerCompany</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Asset::Definition" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Asset::Definition</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Asset::Item" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Asset::Item</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Asset::HistoryType" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Asset::HistoryType</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###DynamicField::Config" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::DynamicField::Config</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###DynamicField::Value" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::DynamicField::Value</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Link::Object" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Link::Object</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Link::Type" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Link::Type</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Link::Relation" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Link::Relation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>

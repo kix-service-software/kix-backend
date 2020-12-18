@@ -23,15 +23,18 @@ my $Helper       = $Kernel::OM->Get('UnitTest::Helper');
 my $HomeDir = $ConfigObject->Get('Home');
 
 # get all available backend modules
-my @BackendModuleFiles = $MainObject->DirectoryRead(
-    Directory => $HomeDir . '/Kernel/System/Cache/',
-    Filter    => '*.pm',
-    Silent    => 1,
-);
+# my @BackendModuleFiles = $MainObject->DirectoryRead(
+#     Directory => $HomeDir . '/Kernel/System/Cache/',
+#     Filter    => '*.pm',
+#     Silent    => 1,
+# );
+
+# atm we are only testing Redis
+my @BackendModuleFiles = ( 'Kernel/System/Cache/Redis.pm' );
 
 # define fixed time compatible backends
 my %FixedTimeCompatibleBackends = (
-    FileStorable => 1,
+    FileStorable => 0,
 );
 
 MODULEFILE:
@@ -44,12 +47,13 @@ for my $ModuleFile (@BackendModuleFiles) {
 
     next MODULEFILE if !$Module;
 
-    $ConfigObject->Set(
-        Key   => 'Cache::Module',
-        Value => "Kernel::System::Cache::$Module",
-    );
-
     for my $SubdirLevels ( 0 .. 3 ) {
+
+        $Kernel::OM->ObjectParamAdd(
+            Cache => {
+                Backend => "Kernel::System::Cache::$Module"
+            }
+        );
 
         # make sure that the CacheObject gets recreated for each loop.
         $Kernel::OM->ObjectsDiscard( Objects => ['Cache'] );
@@ -60,27 +64,14 @@ for my $ModuleFile (@BackendModuleFiles) {
         );
 
         # get a new cache object
-        my $CacheObject;
+        my $CacheObject = $Kernel::OM->Get('Cache');
 
-        # initiate redis mock server
-        if ( $Module eq 'Redis' ) {
-            # set the filestorable so that the redis cache BE doesn't bail out becuase of no connection to a live redis server
-            $ConfigObject->Set(
-                Key   => 'Cache::Module',
-                Value => "Kernel::System::Cache::FileStorable",
-            );
-            $CacheObject = $Kernel::OM->Get('Cache');
-                    $ConfigObject->Set(
-                Key   => 'Cache::Module',
-                Value => "Kernel::System::Cache::$Module",
-            );
-            # replace the redis object
-            my $MockObject = $Kernel::OM->Get('Kernel::System::UnitTest::RedisMock');
-            $CacheObject->{CacheObject}->{RedisObject} = $MockObject;
-        }
-        else {
-            $CacheObject = $Kernel::OM->Get('Cache');
-        }
+        # initiate redis mock server - we can't use the mock server because it doesn't support some commands
+        # if ( $Module eq 'Redis' ) {
+        #     # replace the redis object
+        #     my $MockObject = $Kernel::OM->Get('Kernel::System::UnitTest::RedisMock');
+        #     $CacheObject->{CacheObject}->{RedisObject} = $MockObject;
+        # }
 
         next MODULEFILE if !$CacheObject;
 

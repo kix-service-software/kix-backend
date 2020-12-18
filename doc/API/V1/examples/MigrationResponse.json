@@ -1,0 +1,114 @@
+{
+    "Migration": {
+        "Filter": null,
+        "ID": "413_1605301650.21101",
+        "MappingFile": null,
+        "ObjectType": null,
+        "Options": "URL=http://localhost:9999/kix/migration.pl,AutoDeps=1",
+        "Source": "KIX17",
+        "SourceID": "mykix17",
+        "State": {
+            "Progress": {
+                "configitem_history_type": {
+                    "EndTime": "1605301651.69365",
+                    "Ignored": 13,
+                    "ItemCount": 13,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301651.64625"
+                },
+                "general_catalog": {
+                    "EndTime": "1605301652.02603",
+                    "Ignored": 100,
+                    "ItemCount": 100,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301651.90287"
+                },
+                "link_object": {
+                    "EndTime": "1605301650.80109",
+                    "Ignored": 3,
+                    "ItemCount": 3,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301650.79521"
+                },
+                "link_type": {
+                    "Current": 0,
+                    "ElapsedTime": 0,
+                    "Ignored": 0,
+                    "ItemCount": 6,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301652.35836"
+                },
+                "ticket_history_type": {
+                    "EndTime": "1605301651.08027",
+                    "Ignored": 51,
+                    "ItemCount": 51,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301651.01938"
+                },
+                "ticket_priority": {
+                    "EndTime": "1605301652.26046",
+                    "Ignored": 5,
+                    "ItemCount": 5,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301652.25111"
+                },
+                "ticket_state": {
+                    "EndTime": "1605301651.28296",
+                    "Ignored": 11,
+                    "ItemCount": 11,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301651.2683"
+                },
+                "ticket_type": {
+                    "EndTime": "1605301651.44278",
+                    "Ignored": 7,
+                    "ItemCount": 7,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301651.43564"
+                },
+                "users": {
+                    "EndTime": "1605301650.62366",
+                    "Ignored": 9,
+                    "ItemCount": 9,
+                    "NotOK": 0,
+                    "OK": 0,
+                    "StartTime": "1605301650.61109"
+                }
+            },
+            "Types": [
+                "users",
+                "link_object",
+                "ticket_history_type",
+                "ticket_state",
+                "ticket_type",
+                "configitem_history_type",
+                "general_catalog",
+                "ticket_priority",
+                "link_type",
+                "customer_company",
+                "faq_category",
+                "dynamic_field",
+                "system_address",
+                "queue",
+                "faq_item",
+                "general_catalog_preferences",
+                "configitem_definition",
+                "customer_user",
+                "configitem",
+                "ticket",
+                "dynamic_field_value",
+                "link_relation"
+            ]
+        },
+        "Status": "in progress",
+        "Workers": null
+    }
+}

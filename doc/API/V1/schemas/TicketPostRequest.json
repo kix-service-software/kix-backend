@@ -71,7 +71,7 @@
          "type" : "object",
          "properties" : {
             "Name" : {
-               "description" : "the name of the relevant dynami field",
+               "description" : "the name of the relevant dynamic field",
                "type" : "string"
             },
             "Value" : {
@@ -111,7 +111,7 @@
          "type" : "object",
          "properties" : {
             "Name" : {
-               "description" : "the name of the relevant dynami field",
+               "description" : "the name of the relevant dynamic field",
                "type" : "string"
             },
             "Value" : {

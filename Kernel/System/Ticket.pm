@@ -6559,6 +6559,54 @@ sub GetLinkedTickets {
     return @TicketIDs;
 }
 
+sub TicketFulltextIndexRebuild {
+    my ( $Self, %Param ) = @_;
+
+    # get all tickets
+    my @TicketIDs = $Self->TicketSearch(
+        ArchiveFlags => [ 'y', 'n' ],
+        OrderBy      => 'Down',
+        SortBy       => 'Age',
+        Result       => 'ARRAY',
+        Limit        => 100_000_000,
+        Permission   => 'ro',
+        UserID       => 1,
+    );
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => "Rebuilding ticket fulltext index for ".@TicketIDs." tickets."
+    );
+
+    my $Count      = 0;
+    my $PercentOld = 0;
+    for my $TicketID ( @TicketIDs ) {
+
+        # get articles
+        my @ArticleIndex = $Self->ArticleIndex(
+            TicketID => $TicketID,
+            UserID   => 1,
+        );
+
+        for my $ArticleID (@ArticleIndex) {
+            $Self->ArticleIndexBuild(
+                ArticleID => $ArticleID,
+                UserID    => 1,
+            );
+        }
+
+        my $Percent = int( $Count++ / ( $#TicketIDs / 100 ) );
+
+        if ( $Percent > $PercentOld ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "Rebuilding ticket fulltext index...". $Percent . "% done."
+            );
+            $PercentOld = $Percent;
+        }
+    }
+}
+
 # Levenshtein algorithm taken from
 # http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Levenshtein_distance#Perl
 sub _CalcStringDistance {
