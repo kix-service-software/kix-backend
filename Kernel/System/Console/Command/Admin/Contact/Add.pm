@@ -42,7 +42,7 @@ sub Configure {
         Name        => 'primary-organisation',
         # rkaiser - T#2017020290001194 - changed customer user to contact
         Description => "The number of the primary organisation for the new contact.",
-        Required    => 1,
+        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
