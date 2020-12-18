@@ -55,19 +55,19 @@ When qr/added a textmodule$/, sub {
       URL     => S->{API_URL}.'/system/textmodules',
       Token   => S->{Token},
       Content => {
-    TextModule => {
-        Name => "textmodul_".rand(4), 
-        Text => "this is a also a test", 
-        Keywords => "", 
-        Comment => "", 
-        Subject => "testsubject", 
-        Language => "en", 
-        Category => "Testing", 
-        AgentFrontend => 1, 
-        CustomerFrontend => 0, 
-        PublicFrontend => 0, 
-        ValidID => 1
+	    TextModule => {
+	        Name => "textmodul_".rand(4), 
+	        Text => "this is a also a test", 
+	        Keywords => "", 
+	        Comment => "", 
+	        Subject => "testsubject", 
+	        Language => "en", 
+	        Category => "Testing", 
+	        AgentFrontend => 1, 
+	        CustomerFrontend => 0, 
+	        PublicFrontend => 0, 
+	        ValidID => 1
+	    } 
     } 
-} 
    );
 };

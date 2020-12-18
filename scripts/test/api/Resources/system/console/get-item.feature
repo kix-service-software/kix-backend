@@ -10,3 +10,18 @@
     Then the response code is 200
 #    And the response object is ConsoleCommandResponse
 
+  Scenario: get an existing console command as root
+    When I get this console command "Maint::Cache::Delete"
+    Then the response code is 200
+#    And the response object is ConsoleCommandResponse
+    And the response contains the following items of type ConsoleCommand
+      | ExitCode | Output                                                                                                                                                                                                                                                       |
+      | 1        | Maint::Cache::Delete   :$VAR1 = {\n  'Command' => 'Maint::Cache::Delete'\n};\nError: You cannot run kix.Console.pl as root. Please run it as the apache user or with the help of su:\n  su -c \"bin/kix.Console.pl MyCommand\" -s /bin/bash <apache user> \n |
+
+   Scenario: get an existing console command --allow-root
+     When I get this console command "Maint::Cache::Delete"
+     Then the response code is 200
+#    And the response object is ConsoleCommandResponse
+     And the response contains the following items of type ConsoleCommand
+      | Command              | Description                         |
+      | Maint::Cache::Delete | Deletes cache items created by KIX. |
