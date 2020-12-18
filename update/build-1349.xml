@@ -3,7 +3,7 @@
 
     <TableAlter Name="ticket_index">
         <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
-        <Column Name="ticket_id" Required="true" Type="BIGINT"/>
+        <ColumnAdd Name="ticket_id" Required="true" Type="BIGINT"/>
         <ColumnDrop Name="queue"/>
         <ColumnDrop Name="s_state"/>
         <ColumnDrop Name="s_lock"/>
