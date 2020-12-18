@@ -707,6 +707,7 @@
 
 <!-- ticket_index -->
 <Table Name="ticket_index">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="ticket_id" Required="true" Type="BIGINT"/>
     <Column Name="queue_id" Required="true" Type="INTEGER"/>
     <Column Name="lock_id" Required="true" Type="INTEGER"/>
