@@ -25,6 +25,11 @@
         </Index>
     </Table>
 
+    <TableAlter Name="dynamic_field">
+        <ColumnAdd Name="comments" Required="false" Size="200" Type="VARCHAR" />
+        <ColumnDrop Name="displaygroup_id" />
+    </TableAlter>
+    
     <TableAlter Name="article_flag">
         <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     </TableAlter>

@@ -322,6 +322,11 @@ sub ArticleCreate {
         $Param{$Attribute} = substr( $Param{$Attribute}, 0, 3800 );
     }
 
+    # second check after conversion to plain text (i.e. empty <body> tag in HTML mail)
+    if ( !length $Param{Body} ) {
+        $Param{Body} = 'No body';
+    }
+
     # handle some special things for channel "email"
     if ( $Param{Channel} eq 'email' ) {
         # check needed stuff
