@@ -2634,6 +2634,7 @@ sub _CheckPropertyPermission {
             $AttributePermissions{$Attribute} |= $AttributePermissions{'*.*'} || 0;
         }
 
+        my %SeenAttributes;
         foreach my $Attribute ( sort keys %AttributePermissions ) {
 
             my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
@@ -2641,7 +2642,7 @@ sub _CheckPropertyPermission {
                 Format => 'Short'
             );
 
-            $Self->_PermissionDebug($Self->{LevelIndent}, "resulting Property permission for property \"$Attribute\": $ResultingPermissionShort");
+            $Self->_PermissionDebug($Self->{LevelIndent}, "resulting configured Property permission for property \"$Attribute\": $ResultingPermissionShort");
 
             if ( $Self->{RequestMethod} eq 'GET' ) {
                 # add attribute to field selector
@@ -2671,22 +2672,41 @@ sub _CheckPropertyPermission {
 
                 # check if the attribute exists in the Data hash
                 my $LookupAttribute = $Attribute;
+                my $Not = 0;
+                if ( $LookupAttribute =~ /^(.*?)\.!(.*?)$/ ) {
+                    $Not = 1;
+                    $LookupAttribute = "$1.$2";
+                }
+                $LookupAttribute =~ s/\./\\./g;
                 $LookupAttribute =~ s/\*/.*?/g;
-                my $AttributeExists = grep /^$LookupAttribute$/, keys %{$FlatData};
+                my @MatchingAttributes = grep /^$LookupAttribute$/, keys %{$FlatData};
 
-                # if the attribute exists in the data hash we have to check whether the needed permission is granted
-                if ( $AttributeExists && ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName}
-                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} )
-                ) {
-                    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("request data doesn't match the required criteria - denying request") );
+                foreach my $MatchingAttribute ( @MatchingAttributes ) {
+                    # ignore everything we have already handled so far
+                    next if $SeenAttributes{$MatchingAttribute};
 
-                    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
+                    my $IsPermissionMatch = ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission::PERMISSION->{$PermissionName} || 0;
+                    my $IsDeny            = ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{DENY} )            == Kernel::System::Role::Permission::PERMISSION->{DENY} || 0;
 
-                    # return 403, because we don't have permission to execute this
-                    return $Self->_Error(
-                        Code => 'Forbidden',
-                    );
+                    $Self->_PermissionDebug($Self->{LevelIndent}.'    ', "found property \"$MatchingAttribute\" (Not: $Not, $PermissionName permission: $IsPermissionMatch, DENY: $IsDeny)");
+
+                    if ( !$Not && !$IsPermissionMatch || $Not && $IsPermissionMatch || $IsDeny ) {
+                        $Self->_PermissionDebug($Self->{LevelIndent}, "request data doesn't match the required criteria - denying request" );
+
+                        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+                        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
+
+                        # return 403, because we don't have permission to execute this
+                        return $Self->_Error(
+                            Code => 'Forbidden',
+                        );
+                    }
+                    else {
+                        $Self->_PermissionDebug($Self->{LevelIndent}.'        ', "$PermissionName permission granted");
+                    }
+
+                    # for later lookup
+                    $SeenAttributes{$MatchingAttribute} = 1;
                 }
             }
         }
