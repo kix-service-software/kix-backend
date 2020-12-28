@@ -686,6 +686,7 @@ deletes a dynamic field value.
         ObjectID           => $ObjectID,                # ID of the current object that the field
                                                         # must be linked to, e. g. TicketID
         UserID             => 123,
+        NoPostHandling     => 1,                        # optional, will be called to suppress the post handling (i.e. when a ticket gets deleted)
     );
 
 =cut
@@ -751,16 +752,18 @@ sub ValueDelete {
         return;
     }
 
-    # set the dyanamic field object handler
-    my $DynamicFieldObjectHandler =
-        'DynamicField' . $Param{DynamicFieldConfig}->{ObjectType} . 'HandlerObject';
+    if ( !$Param{NoPostHandling} ) {
+        # set the dyanamic field object handler
+        my $DynamicFieldObjectHandler =
+            'DynamicField' . $Param{DynamicFieldConfig}->{ObjectType} . 'HandlerObject';
 
-    # If an ObjectType handler is registered, use it.
-    if ( ref $Self->{$DynamicFieldObjectHandler} ) {
-        return $Self->{$DynamicFieldObjectHandler}->PostValueSet(
-            OldValue => $OldValue,
-            %Param,
-        );
+        # If an ObjectType handler is registered, use it.
+        if ( ref $Self->{$DynamicFieldObjectHandler} ) {
+            return $Self->{$DynamicFieldObjectHandler}->PostValueSet(
+                OldValue => $OldValue,
+                %Param,
+            );
+        }
     }
 
     return 1;

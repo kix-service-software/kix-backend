@@ -624,6 +624,7 @@ sub TicketDelete {
             DynamicFieldConfig => $DynamicFieldConfig,
             ObjectID           => $Param{TicketID},
             UserID             => $Param{UserID},
+            NoPostHandling     => 1,                # we will delete the ticket, so no additional handling needed when deleting the DF values
         );
     }
 
