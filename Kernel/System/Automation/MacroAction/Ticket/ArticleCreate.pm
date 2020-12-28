@@ -198,17 +198,23 @@ sub Run {
             return;
         }
     }
+
+    # replace placeholders in non-richtext attributes
+    for my $Attribute ( qw(Channel SenderType Subject To From Cc Bcc AccountTime) ) {
+        next if !defined $Param{Config}->{$Attribute};
+
+        $Param{Config}->{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText => 0,
+            Text     => $Param{Config}->{$Attribute},
+            TicketID => $Param{TicketID},
+            Data     => {},
+            UserID   => $Param{UserID},
+        );
+    }
+
     $Param{Config}->{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 1,
         Text     => $Param{Config}->{Body},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
-    );
-
-    $Param{Config}->{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Subject},
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},

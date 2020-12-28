@@ -352,6 +352,20 @@ sub Run {
         UserID   => $Param{UserID},
     );
 
+
+    # replace placeholders in non-richtext attributes
+    for my $Attribute ( qw(Channel SenderType Subject To From Cc Bcc AccountTime) ) {
+        next if !defined $ArticleParam{$Attribute};
+
+        $ArticleParam{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText => 0,
+            Text     => $ArticleParam{$Attribute},
+            TicketID => $Param{TicketID},
+            Data     => {},
+            UserID   => $Param{UserID},
+        );
+    }
+
     # create article
     my $ArticleBackendResult = $Self->SUPER::Run(
         Config   => \%ArticleParam,
