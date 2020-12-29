@@ -157,7 +157,6 @@ Then qr/the response content is$/, sub {
 
 Then qr/the response content history is$/, sub {
     S->{HistoryEntryID} = S->{ResponseContent}->{ConfigItemHistoryItem}->[0]->{HistoryEntryID};
-#	print STDERR "HistoryEntryID".Dumper(S->{ResponseContent}->{ConfigItemHistoryItem}->[0]->{HistoryEntryID});
 #    print STDERR "HistoryEntryIDxxx".Dumper(S->{HistoryEntryID});
 };
 

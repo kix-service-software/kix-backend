@@ -204,7 +204,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 13
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 42 items of type "Permission"
+    And the response contains 44 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                    | Value | TypeID |
       | /auth                                                                                                                                     | 1     | 1      |
@@ -229,6 +229,8 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/communication/notifications                                                                                                       | 2     | 1      |
       | /system/communication/sendertypes                                                                                                         | 2     | 1      |
       | /system/communication/systemaddresses                                                                                                     | 2     | 1      |
+      | /system/objectactions                                                                                                                     | 2     | 1      |
+      | /system/objectactions/*{ObjectAction.UsageContext EQ 1}                                                                                   | 0     | 1      |
       | /system/objecticons                                                                                                                       | 2     | 1      |
       | /system/faq                                                                                                                               | 2     | 1      |
       | /system/faq/*                                                                                                                             | 0     | 1      |
