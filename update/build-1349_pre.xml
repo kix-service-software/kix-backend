@@ -32,7 +32,7 @@
         <ForeignKey ForeignTable="ticket_state">
             <Reference Local="state_id" Foreign="id"/>
         </ForeignKey>
-        <ForeignKey ForeignTable="lock">
+        <ForeignKey ForeignTable="ticket_lock_type">
             <Reference Local="lock_id" Foreign="id"/>
         </ForeignKey>
     </TableCreate>
