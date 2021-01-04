@@ -56,8 +56,8 @@ sub new {
     }
     if ( $Rotation eq 'weekly' ) {
         my ( $s, $m, $h, $D, $M, $Y, $WD, $YD, $DST ) = localtime( time() );    ## no critic
-        my ($Week, $year) = Week_of_Year($Y, $M, $D);
         $Y = $Y + 1900;
+        my ($Week, $Year) = Week_of_Year($Y, $M+1, $D);
         $Week = sprintf '%02d', $Week;
         $Self->{LogFile} .= ".$Y-cw$Week";
     }
