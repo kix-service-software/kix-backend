@@ -91,10 +91,10 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ClassGet Operation. 
+perform ClassGet Operation.
 
     my $Result = $OperationObject->Run(
-        ClassID  => 1                                              # required 
+        ClassID  => 1                                              # required
     );
 
     $Result = {
@@ -220,6 +220,9 @@ sub Run {
 
         push( @ClassList, \%Class );
     }
+
+    # inform API caching about a new dependency
+    $Self->AddCacheDependency( Type => 'GeneralCatalog' );
 
     if ( scalar(@ClassList) == 0 ) {
         return $Self->_Error(
