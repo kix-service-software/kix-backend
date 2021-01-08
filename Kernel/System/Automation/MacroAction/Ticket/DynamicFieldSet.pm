@@ -61,6 +61,12 @@ sub Describe {
         Description => Kernel::Language::Translatable('The value for the dynamic field to be set.'),
         Required    => 1,
     );
+    $Self->AddOption(
+        Name        => 'DynamicFieldAppend',
+        Label       => Kernel::Language::Translatable('Append'),
+        Description => Kernel::Language::Translatable('Specifies whether the new value should be appended or set.'),
+        Required    => 0,
+    );
 
     return;
 }
@@ -113,27 +119,17 @@ sub Run {
         return;
     }
 
-    my $DFValue = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{DynamicFieldValue},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
-    );
+    my @NewValue = $Self->_PrepareValue(
+        %Param,
+        Ticket => \%Ticket,
 
-    # do nothing if the desired value is already set
-    if ( 
-        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } &&
-        $Ticket{ "DynamicField_". $Param{Config}->{DynamicFieldName} } eq $DFValue
-    ) {
-        return 1;
-    }
+    );
 
     # set the new value
     my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
         DynamicFieldConfig => $DynamicFieldConfig,
         ObjectID           => $Param{TicketID},
-        Value              => $DFValue,
+        Value              => \@NewValue,
         UserID             => $Param{UserID},
     );
 
@@ -147,6 +143,61 @@ sub Run {
     }
 
     return 1;
+}
+
+
+sub _PrepareValue {
+    my ( $Self, %Param ) = @_;
+
+    my @NewValue;
+    if ($Param{Config}->{DynamicFieldValue} =~ m/^<KIX_TICKET_DynamicField_(\w+?)>$/) {
+        my $DFName = $1;
+        $DFName =~ s/(\w+?)_.+/$1/;
+
+        if ($DFName) {
+            my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                Name => $DFName,
+            );
+
+            if ( IsHashRefWithData( $DynamicFieldConfig ) ) {
+                my $ReplaceValue = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
+                    DynamicFieldConfig => $DynamicFieldConfig,
+                    ObjectID           => $Param{TicketID},
+                );
+                if ($ReplaceValue) {
+                    if (IsArrayRefWithData($ReplaceValue)) {
+                        @NewValue = @{ $ReplaceValue };
+                    } else {
+                        @NewValue = ( $ReplaceValue );
+                    }
+                }
+            }
+        }
+    } else {
+        my $Value = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText => 0,
+            Text     => $Param{Config}->{DynamicFieldValue},
+            TicketID => $Param{TicketID},
+            Data     => {},
+            UserID   => $Param{UserID},
+        );
+        @NewValue = ($Value);
+    }
+
+    if ($Param{Config}->{DynamicFieldAppend} && $Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} }) {
+        if (IsArrayRefWithData($Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} })) {
+            unshift(@NewValue, @{ $Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} } });
+        } else {
+            unshift(@NewValue, $Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} });
+        }
+    }
+
+    return _GetUnique(@NewValue);
+}
+
+sub _GetUnique {
+  my %Known;
+  return grep { !$Known{$_}++ } @_;
 }
 
 1;
