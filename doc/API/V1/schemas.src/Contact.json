@@ -156,9 +156,8 @@
     },
     "User": {
       "type": "object",
-      "description": "added via include \"User\"",
-      "readOnly": true,
-      "$ref": "User.json"
+      "description": "added via include \"User\". See /system/users resource for details.",
+      "readOnly": true
     },
     "ValidID": {
       "type": "integer",

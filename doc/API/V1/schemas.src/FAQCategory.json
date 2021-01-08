@@ -69,7 +69,8 @@
             "description": "added via include and expand \"SubCategories\" (only IDs without expand)",
             "items": [
                 {
-                    "$ref": "FAQCategory.json"
+                    "type": "object",
+                    "description": "same schema like this one"
                 },
                 {
                     "type": "integer"
