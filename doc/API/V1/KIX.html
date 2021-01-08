@@ -21929,6 +21929,10 @@ pre code {
                "description" : "",
                "type" : "object"
             },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
             "Type" : {
                "type" : "string",
                "readOnly" : true
@@ -22437,6 +22441,10 @@ pre code {
             },
             "Parameters" : {
                "description" : "",
+               "type" : "object"
+            },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
                "type" : "object"
             },
             "Type" : {
@@ -24298,6 +24306,10 @@ pre code {
                "description" : "",
                "type" : "object"
             },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
             "Type" : {
                "type" : "string",
                "readOnly" : true
@@ -24523,6 +24535,10 @@ pre code {
             },
             "Parameters" : {
                "description" : "",
+               "type" : "object"
+            },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
                "type" : "object"
             },
             "Type" : {
@@ -24769,6 +24785,15 @@ pre code {
                      ]
                   }
                }
+            },
+            "Results" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               }
             }
          },
          "required" : [
@@ -24904,6 +24929,15 @@ pre code {
                      ]
                   }
                }
+            },
+            "Results" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               }
             }
          },
          "required" : [
@@ -25008,6 +25042,10 @@ pre code {
             },
             "Parameters" : {
                "description" : "",
+               "type" : "object"
+            },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
                "type" : "object"
             },
             "Type" : {
@@ -25395,6 +25433,10 @@ pre code {
                "description" : "",
                "type" : "object"
             },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
             "Type" : {
                "type" : "string",
                "readOnly" : true
@@ -25489,6 +25531,10 @@ pre code {
                "description" : "",
                "type" : "object"
             },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
             "Type" : {
                "description" : "",
                "type" : "string"
@@ -25513,6 +25559,9 @@ pre code {
         "MacroID": 1,
         "Name": "new macro",
         "Parameters": {},
+        "ResultVariables": {
+            "TicketID": "MyVariableName"
+        },
         "Type": "Ticket",
         "ValidID": 1
     }
@@ -25630,6 +25679,10 @@ pre code {
                "description" : "",
                "type" : "object"
             },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
             "Type" : {
                "type" : "string",
                "readOnly" : true
@@ -25703,6 +25756,10 @@ pre code {
             },
             "Parameters" : {
                "description" : "",
+               "type" : "object"
+            },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
                "type" : "object"
             },
             "Type" : {
