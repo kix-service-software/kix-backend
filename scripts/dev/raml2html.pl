@@ -71,8 +71,9 @@ if ( $? ) {
 }
 chomp $TmpDir;
 
-print "merging source directoris into $TmpDir\n";
+print "merging source directories into $TmpDir\n";
 foreach my $Directory ( @{$Options{SourceDirectory}} ) {
+    print "executing rsync --archive --copy-links --recursive $Directory/* $TmpDir\n";
     my $ExecResult = `rsync --archive --copy-links --recursive $Directory/* $TmpDir`;
     if ( $? ) {
         print STDERR "ERROR: unable to merge source directory $Directory (Code: $?, Message: $ExecResult).";
