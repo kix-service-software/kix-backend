@@ -11,6 +11,7 @@ use strict;
 use warnings;
 
 use Cwd;
+use Encode;
 use Getopt::Long;
 use File::Basename;
 use File::Copy;
