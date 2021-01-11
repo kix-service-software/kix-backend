@@ -129,6 +129,11 @@ sub Describe {
     );
     delete $Self->{Definition}->{Options}->{Subject};
 
+    $Self->AddResult(
+        Name        => 'NewTicketID',
+        Description => Kernel::Language::Translatable('The ID of the new ticket.'),
+    );
+
     return;
 }
 
@@ -383,6 +388,8 @@ sub Run {
         );
         return;
     }
+
+    $Self->SetResult(Name => 'NewTicketID', Value => $TicketID);
 
     return 1;
 }
