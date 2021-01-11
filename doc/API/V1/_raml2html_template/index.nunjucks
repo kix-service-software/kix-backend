@@ -39,15 +39,17 @@
               </div>
             {% endif %}
 
-            <div class="chapter">
-              <h2 id="base_uri"><a href="#base_uri">Base URI</a></h2>
-              <pre class="base-uri">{{ baseUri | replace(r/\$version/, version) }}</pre>
-              {% if baseUriParameters %}
-                {% set parameterList = baseUriParameters %}
-                {% set suppressExamples = true %}
-                {% include "./paramtable.nunjucks" %}
-              {% endif %}
-            </div>
+            {% if baseUri %}
+              <div class="chapter">
+                <h2 id="base_uri"><a href="#base_uri">Base URI</a></h2>
+                <pre class="base-uri">{{ baseUri | replace(r/\$version/, version) }}</pre>
+                {% if baseUriParameters %}
+                  {% set parameterList = baseUriParameters %}
+                  {% set suppressExamples = true %}
+                  {% include "./paramtable.nunjucks" %}
+                {% endif %}
+              </div>
+            {% endif %}
 
             {% for chapter in documentation %}
               <div class="chapter">

@@ -54,6 +54,10 @@
                "description" : "",
                "type" : "object"
             },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
             "Type" : {
                "description" : "",
                "type" : "string"

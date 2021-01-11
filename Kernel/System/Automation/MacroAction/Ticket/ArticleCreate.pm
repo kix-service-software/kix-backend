@@ -118,6 +118,11 @@ sub Describe {
     # ExcludeNotificationToUserID
     # ExcludeMuteNotificationToUserID
 
+    $Self->AddResult(
+        Name        => 'NewArticleID',
+        Description => Kernel::Language::Translatable('The ID of the new article.'),
+    );
+
     return;
 }
 
@@ -249,6 +254,8 @@ sub Run {
         );
         return;
     }
+
+    $Self->SetResult(Name => 'NewArticleID', Value => $ArticleID);
 
     return 1;
 }

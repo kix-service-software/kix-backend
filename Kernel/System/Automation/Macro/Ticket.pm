@@ -67,7 +67,6 @@ sub Run {
         }
     }
 
-    
     # execute all macro action given in the execution order attribute
     foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
         my $Result = $Kernel::OM->Get('Automation')->MacroActionExecute(

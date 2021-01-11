@@ -66,6 +66,15 @@
                      ]
                   }
                }
+            },
+            "Results" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               }
             }
          },
          "required" : [

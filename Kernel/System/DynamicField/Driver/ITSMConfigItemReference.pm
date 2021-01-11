@@ -147,6 +147,47 @@ sub ValueLookup {
     return \@Values;
 }
 
+sub ValueValidate {
+    my ( $Self, %Param ) = @_;
+
+    # check value
+    my @Values;
+    if ( IsArrayRefWithData( $Param{Value} ) ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    for my $Item (@Values) {
+
+        # check if value is an integer (an ID)
+        my $Success = $Self->{DynamicFieldValueObject}->ValueValidate(
+            Value => {
+                ValueInt => $Item,
+            },
+            UserID => $Param{UserID}
+        );
+
+        return if (!$Success);
+
+        # check if ticket exists
+        my $Number = $Self->{ITSMConfigItemObject}->ConfigItemLookup(
+            ConfigItemID => $Item,
+        );
+
+        if (!$Number) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No config item with id $Item exists"
+            );
+            return;
+        }
+    }
+
+    return 1;
+}
+
 sub PossibleValuesGet {
     my ( $Self, %Param ) = @_;
 

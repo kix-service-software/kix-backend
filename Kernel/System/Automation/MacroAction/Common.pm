@@ -139,6 +139,93 @@ sub AddOption {
     return 1;
 }
 
+=item AddResult()
+
+Add a new result definition for this macro action module.
+
+Example:
+    $Self->AddResult(
+        Name        => 'TicketID',
+        Description => 'This is the ID of the created ticket.',
+    );
+
+=cut
+
+sub AddResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{Definition}->{Results} //= {};
+    $Self->{Definition}->{Results}->{$Param{Name}} = \%Param;
+
+    return 1;
+}
+
+=item GetResult()
+
+Get the value of a result variable.
+
+Example:
+    my $Value = $Self->GetResult(
+        Name => 'TicketID',
+    );
+
+=cut
+
+sub GetResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{Results} //= {};
+    
+    return $Self->{Results}->{$Param{Name}};
+}
+
+=item SetResult()
+
+Assign a value for a result variable.
+
+Example:
+    $Self->SetResult(
+        Name  => 'TicketID',
+        Value => 123,
+    );
+
+=cut
+
+sub SetResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{Results}->{$Param{Name}} = $Param{Value};
+
+    return 1;
+}
+
 =item ValidateConfig()
 
 Validates the required parameters of the config.
