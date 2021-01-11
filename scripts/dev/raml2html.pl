@@ -80,7 +80,7 @@ foreach my $Directory ( @{$Options{SourceDirectory}} ) {
         exit 1;
     }
 }
-`ls -la $TmpDir`;
+print `ls -la $TmpDir`."\n";
 
 # change working directory
 my $Cwd = cwd();
