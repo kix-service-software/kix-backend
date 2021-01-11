@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2020-12-03 23:19+0000\n"
+"POT-Creation-Date: 2021-1-11 13:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -739,11 +739,23 @@ msgid "d"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "day(s)"
+msgstr ""
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "h"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "hour(s)"
+msgstr ""
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "m"
+msgstr ""
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "minute(s)"
 msgstr ""
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
@@ -859,6 +871,10 @@ msgid "Subject"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "The ID of the new article."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The subject of the new article."
 msgstr ""
 
@@ -879,6 +895,10 @@ msgid "The ID or email of the contact to be set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
+msgid "Append"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Dynamic Field Name"
 msgstr ""
 
@@ -888,6 +908,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Sets a dynamic field value of a ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
+msgid "Specifies whether the new value should be appended or set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
@@ -927,11 +951,19 @@ msgid "The name of the dynamic field which contains the relevant asset ID."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
+msgid "Lock"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "Sets the lock state of a ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "The lock state to be set."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
+msgid "Organisation"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
@@ -943,7 +975,15 @@ msgid "The ID or number of the organisation to be set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
+msgid "Owner"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
 msgid "Sets the owner of a ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/PrioritySet.pm
+msgid "Priority"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/PrioritySet.pm
@@ -955,6 +995,10 @@ msgid "The name of the priority to be set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
+msgid "Responsible"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
 msgid "Sets the responsible of a ticket."
 msgstr ""
 
@@ -963,7 +1007,19 @@ msgid "The ID or login of the agent to be set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
+msgid "(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
+msgid "Pending Time Difference"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "Sets the state of a ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
+msgid "State"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
@@ -975,11 +1031,11 @@ msgid "Sets the team of a ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
-msgid "The name of the team to be set. If it is as sub-team, the full path-name has to be used (separated by two colons - e.g. \"NameOfParentTeam::NameOfTeamToBeSet\")."
+msgid "Team"
 msgstr ""
 
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only."
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
+msgid "The name of the team to be set. If it is as sub-team, the full path-name has to be used (separated by two colons - e.g. \"NameOfParentTeam::NameOfTeamToBeSet\")."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -991,35 +1047,7 @@ msgid "Dynamic Fields"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Lock"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Organisation"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Owner"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Pending Time Difference"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Priority"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Responsible"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "State"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Team"
+msgid "The ID of the new ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1123,19 +1151,7 @@ msgid "day"
 msgstr ""
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "day(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "hour(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "in more than ..."
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "minute(s)"
 msgstr ""
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
@@ -1162,16 +1178,16 @@ msgstr ""
 msgid "year(s)"
 msgstr ""
 
-#. Perl Module: Kernel/System/DynamicField/Driver/MultiselectGeneralCatalog.pm
-msgid "Show Tree Selection"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
+#. Perl Module: Kernel/System/DynamicField/Driver/ITSMConfigItemReference.pm
 msgid "Remove selection"
 msgstr ""
 
-#. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
+#. Perl Module: Kernel/System/DynamicField/Driver/ITSMConfigItemReference.pm
 msgid "This field is required."
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Multiselect.pm
+msgid "Show Tree Selection"
 msgstr ""
 
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
@@ -1195,11 +1211,11 @@ msgid "CIHistory::"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation.pm
-msgid "aborting"
+msgid "aborted"
 msgstr ""
 
-#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
-msgid "aborted"
+#. Perl Module: Kernel/System/Installation.pm
+msgid "aborting"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
@@ -1216,6 +1232,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "pending"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
+msgid "DF Type not yet supported!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
@@ -1236,6 +1256,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the mapping layer."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "API module registration for the operation layer."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1294,6 +1318,14 @@ msgstr ""
 msgid "Enable wildcard praefix for contact fulltext search."
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/API/Link.xml
+msgid "Defines a generic expand available for all GET (including SEARCH) operations."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Link.xml
+msgid "Defines a generic include available for all GET (including SEARCH) operations."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API/Organisation.xml
 msgid "Defines which attributes of the organisation data hash should NOT be exported. Key = Attribute, Value = 1 if attribute should not be exported. If nothing is defined, every attribute will be exported"
 msgstr ""
@@ -1308,10 +1340,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Age"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Ticket.xml
-msgid "Defines a generic expand available for all GET (including SEARCH) operations."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -1362,16 +1390,8 @@ msgstr ""
 msgid "Defines which attributes of the user data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported"
 msgstr ""
 
-#. SysConfig: Kernel/Config/Files/API/Valid.xml
-msgid "API module registration for the operation layer."
-msgstr ""
-
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "API module registration for the validator layer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Watcher.xml
-msgid "Defines a generic include available for all GET (including SEARCH) operations."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
@@ -2519,10 +2539,6 @@ msgid "Object backend module registration for the import/export module."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "ObjectReference"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Option"
 msgstr ""
 
@@ -2571,6 +2587,10 @@ msgid "Process pending tickets."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Rebuild the ticket index queue stats."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registers an identifier for the email filters. Value is used in the following config options. The keys will use for sorting."
 msgstr ""
 
@@ -2580,6 +2600,14 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a execution plan type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a job type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a macro type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2988,6 +3016,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Used ticket state, if \"_PREVIOUS_\" ticket state could not be determined. As key you have to define the ticket type + \":::\" + current state OR the ticket type."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "User"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3823,15 +3855,7 @@ msgid "Recognize if a ticket is a follow-up to an existing ticket using an exter
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a job type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Registration of a macro action type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a macro type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4044,6 +4068,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Updated: %s=%s;%s=%s;%s=%s;"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Updates the ticket index."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
