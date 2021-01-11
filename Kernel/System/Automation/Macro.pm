@@ -11,6 +11,8 @@ package Kernel::System::Automation::Macro;
 use strict;
 use warnings;
 
+use Digest::MD5;
+
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -602,17 +604,27 @@ sub MacroExecute {
     $BackendObject->{MacroID}  = $Param{ID};
     $BackendObject->{ObjectID} = $Param{ObjectID};
 
-    my $BackendResult = $BackendObject->Run(
+    # clear result variable cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => Digest::MD5::md5_hex($Self->{JobID}.'::'.$Self->{RunID}.'::'.$Self->{MacroID})
+    );
+
+    my $Success = $BackendObject->Run(
         ObjectID  => $Param{ObjectID},
         ExecOrder => $Macro{ExecOrder},
         UserID    => $Param{UserID}
+    );
+
+    # remove result variable cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => Digest::MD5::md5_hex($Self->{JobID}.'::'.$Self->{RunID}.'::'.$Self->{MacroID})
     );
 
     # remove IDs from log reference
     delete $Self->{MacroID};
     delete $Self->{ObjectID};
 
-    return $BackendResult;
+    return $Success;
 }
 
 sub _LoadMacroTypeBackend {

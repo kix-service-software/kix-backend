@@ -98,7 +98,7 @@ perform MacroActionDelete Operation. This will return {}.
         Data => {
             MacroID => 123,
             MacroActionID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -109,7 +109,7 @@ perform MacroActionDelete Operation. This will return {}.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # check if macro exists
     my %Macro = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
@@ -129,7 +129,7 @@ sub Run {
             ID      => $MacroActionID,
             UserID  => $Self->{Authorization}->{UserID},
         );
-        if ( $MacroAction{MacroID} != $Param{Data}->{MacroID} ) {
+        if ( !IsHashRefWithData(\%MacroAction) || $MacroAction{MacroID} != $Param{Data}->{MacroID} ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
@@ -140,10 +140,10 @@ sub Run {
             ID      => $MacroActionID,
             UserID  => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
-                Code    => 'Object.UnableToDelete',
+                Code => 'Object.UnableToDelete',
             );
         }
     }

@@ -90,7 +90,7 @@ sub ParameterDefinition {
         'MacroAction' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -103,24 +103,25 @@ perform MacroActionUpdate Operation. This will return the updated MacroActionID.
             MacroID => 123,
             MacroActionID => 123,
             MacroAction  => {
-                Type          => '...',                     # (optional)
-                Parameters    => {},                        # (optional)
-                Comment       => 'Comment',                 # (optional)
-                ValidID       => 1,                         # (optional)
+                Type            => '...',                     # (optional)
+                Parameters      => {},                        # (optional)
+                ResultVariables => {},                        # (optional)
+                Comment         => 'Comment',                 # (optional)
+                ValidID         => 1,                         # (optional)
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            MacroActionID  => 123,       # ID of the updated MacroAction 
+            MacroActionID  => 123,       # ID of the updated MacroAction
         },
     };
-   
+
 =cut
 
 
@@ -143,7 +144,7 @@ sub Run {
         );
     }
 
-    # check if MacroAction exists 
+    # check if MacroAction exists
     my %MacroActionData = $Kernel::OM->Get('Automation')->MacroActionGet(
         ID => $Param{Data}->{MacroActionID},
     );
@@ -156,13 +157,14 @@ sub Run {
 
     # update MacroAction
     my $Success = $Kernel::OM->Get('Automation')->MacroActionUpdate(
-        ID          => $Param{Data}->{MacroActionID},    
-        Type        => $MacroAction->{Type} || $MacroActionData{Type},
-        Name        => $MacroAction->{Name} || $MacroActionData{Name},
-        Parameters  => exists $MacroAction->{Parameters} ? $MacroAction->{Parameters} : $MacroActionData{Parameters},
-        Comment     => exists $MacroAction->{Comment} ? $MacroAction->{Comment} : $MacroActionData{Comment},
-        ValidID     => exists $MacroAction->{ValidID} ? $MacroAction->{ValidID} : $MacroActionData{ValidID},
-        UserID      => $Self->{Authorization}->{UserID},                        
+        ID              => $Param{Data}->{MacroActionID},
+        Type            => $MacroAction->{Type} || $MacroActionData{Type},
+        Name            => $MacroAction->{Name} || $MacroActionData{Name},
+        Parameters      => exists $MacroAction->{Parameters} ? $MacroAction->{Parameters} : $MacroActionData{Parameters},
+        ResultVariables => exists $MacroAction->{ResultVariables} ? $MacroAction->{ResultVariables} : $MacroActionData{ResultVariables},
+        Comment         => exists $MacroAction->{Comment} ? $MacroAction->{Comment} : $MacroActionData{Comment},
+        ValidID         => exists $MacroAction->{ValidID} ? $MacroAction->{ValidID} : $MacroActionData{ValidID},
+        UserID          => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -171,10 +173,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         MacroActionID => 0 + $Param{Data}->{MacroActionID},
-    );    
+    );
 }
 
 1;
