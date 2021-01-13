@@ -14,6 +14,7 @@ use Cwd;
 use Getopt::Long;
 use File::Basename;
 use File::Path;
+use File::Copy;
 use JSON::MaybeXS;
 use JSON::Validator;
 
@@ -43,7 +44,7 @@ if ( $Options{Help} || %Missing ) {
     print "Copyright (c) 2006-2021 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
     print "\n";
     print "Required Options:\n";
-    print "  --source-directory  - The directories where the documentation sources are located. All directories will be \"merged\" in the given order.\n";
+    print "  --source-directory  - The directories where the documentation sources are located. All directories will be \"merged\" in the given order. The bundled schema files will also be created in these directories, depending on their schema sources.\n";
     print "  --raml-file         - The main RAML file.\n";
     print "  --output-file       - The output HTML file.\n";
     print "  --template          - The output template to be used.\n";
@@ -80,7 +81,6 @@ foreach my $Directory ( @{$Options{SourceDirectory}} ) {
         exit 1;
     }
 }
-print `ls -la $TmpDir`."\n";
 
 # change working directory
 my $Cwd = cwd();
@@ -88,14 +88,13 @@ chdir $TmpDir;
 
 # expand $ref in schema files
 if ( -d "$Options{SchemaDirectory}" ) {
-    print "expanding JSON schema refs\n";
+    print "\nexpanding JSON schema refs\n";
 
     if ( ! -d "$TmpDir/schemas" ) {
         mkpath("$TmpDir/schemas");
     }
 
     # change working directory
-    my $Cwd = cwd();
     chdir "$Options{SchemaDirectory}";
 
     foreach my $File ( glob("*.json") ) {
@@ -191,12 +190,38 @@ if ( -d "$Options{SchemaDirectory}" ) {
         }
     }
 
+    # copy all bundled schema files that exist in the schema source directory to the relevant directory
+    print "\ncopying bundled schema files to corresponding directories\n";
+    foreach my $Directory ( @{$Options{SourceDirectory}} ) {
+        chdir "$Cwd/$Directory/$Options{SchemaDirectory}";
+
+        my $TargetDirectory = "$Cwd/$Directory/schemas";
+        if ( -d "$TargetDirectory" && !rmtree("$TargetDirectory") ) {
+            print STDERR "ERROR: Unable to remove directory $TargetDirectory.\n";
+            next;
+        }
+        if ( ! -d "$TargetDirectory" && !mkpath("$TargetDirectory") ) {
+            print STDERR "ERROR: Unable to create directory $TargetDirectory.\n";
+            next;
+        }
+        my $Count = 0;
+        my $Total = 0;
+        foreach my $File ( glob("*.json") ) {
+            $Total++;
+            if ( !copy($File, "$TargetDirectory/$File") ) {
+                print STDERR "ERROR: Unable to copy bundled schema $File to $TargetDirectory.\n";
+            }
+            $Count++;
+        }
+        printf "    target $TargetDirectory...%i/%i files\n", $Count, $Total;
+    }
+
     chdir $Cwd;
 }
 
 # validating example files against schema
 if ( -d "$Options{ExampleDirectory}" && -d "$TmpDir/schemas") {
-    print "validating examples\n";
+    print "\nvalidating examples\n";
 
     # change working directory
     my $Cwd = cwd();
@@ -263,7 +288,7 @@ if ( @ErrorFiles ) {
 
 # replace variables (create a copy of the source directory)
 if ( ref $Options{Variables} eq 'ARRAY' && @{$Options{Variables}} ) {
-    print "replacing variables\n";
+    print "\nreplacing variables\n";
     chdir $Cwd;
     foreach my $Variable ( @{$Options{Variables}} ) {
         my ($Name, $Value) = split(/=/, $Variable);
@@ -277,7 +302,7 @@ if ( ref $Options{Variables} eq 'ARRAY' && @{$Options{Variables}} ) {
 }
 
 # execute raml2html 
-print "executing raml2html -i $TmpDir/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}\n";
+print "\nexecuting raml2html -i $TmpDir/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}\n";
 my $ExecResult = `raml2html -i $TmpDir/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}`;
 print STDERR "$ExecResult\n";
 if ( $? ) {
