@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SystemAddressCollectionResponse.json",
+  "type": "object",
+  "description": "A list of system addresses.",
+  "properties": {
+    "SystemAddress": {
+      "type": "array",
+      "items": {
+        "$ref": "SystemAddress.json"
+      }
+    }
+  },
+  "required": [
+    "SystemAddress"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "MailAccountTypeCollectionResponse.json",
+  "type": "object",
+  "description": "A list of mail account types.",
+  "properties": {
+    "MailAccountType": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "readOnly": true
+      }
+    }
+  },
+  "required": [
+    "MailAccountType"
+  ]  
+}

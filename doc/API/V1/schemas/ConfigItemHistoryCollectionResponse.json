@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ConfigItemHistoryCollectionResponse.json",
+  "type": "object",
+  "description": "A list of config item history objects.",
+  "properties": {
+    "ConfigItemHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "ConfigItemHistory.json"
+      }
+    }
+  },
+  "required": [
+    "ConfigItemHistory"
+  ]
+}

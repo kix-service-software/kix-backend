@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "Role.json",
+  "type": "object",
+  "description": "The role object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Comment": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Permissions": {
+      "type": "array",
+      "description": "added via include \"Permissions\"",
+      "readOnly": true,
+      "items": {
+        "$ref": "Permission.json"
+      }
+    },
+    "UserIDs": {
+      "type": "array",
+      "description": "added via include \"UserIDs\"",
+      "readOnly": true,
+      "items": {
+        "type": "integer"
+      }
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "ID",
+    "Name",
+    "ValidID"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "TicketArticleFlag.json",
+  "type": "object",
+  "description": "The ticket article flag object.",
+  "properties": {
+    "ArticleID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Value": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ArticleID",
+    "Name",
+    "Value"
+  ]
+}

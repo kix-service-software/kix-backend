@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "User.json",
+  "type": "object",
+  "description": "The user object.",
+  "properties": {
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Contact": {
+      "type": "object",
+      "description": "added via include \"Contact\"",
+      "readOnly": true,
+      "$ref": "Contact.json"
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "IsAgent": {
+      "description": "Defines if user can use the agent portal.",
+      "type": "integer",
+      "readOnly": true
+    },
+    "IsCustomer": {
+      "description": "Defines if user can use the self service portal (customer portal).",
+      "type": "integer",
+      "readOnly": true
+    },
+    "Preferences": {
+      "type": "array",
+      "description": "added via include \"Preferences\"",
+      "item": {
+        "$ref": "UserPreference.json"
+      },
+      "readOnly": true
+    },
+    "RoleIDs": {
+      "type": "array",
+      "description": "added via include \"RoleIDs\"",
+      "item": {
+        "type": "integer"
+      },
+      "readOnly": true
+    },
+    "UsageContext": {
+      "description": "Shows for which context the user is enabled (1 = agent portal; 2 = self service portal; 3 = both).",
+      "type": "integer",
+      "readOnly": true
+    },
+    "UserComment": {
+      "anyOf": [
+        {"type": "string"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    },
+    "UserID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "UserLogin": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ChangeBy",
+    "ChangeTime",
+    "CreateBy",
+    "CreateTime",
+    "IsAgent",
+    "IsCustomer",
+    "UsageContext",
+    "UserComment",
+    "UserID",
+    "UserLogin",
+    "ValidID"
+  ]
+}

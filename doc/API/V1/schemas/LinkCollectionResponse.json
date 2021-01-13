@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "LinkCollectionResponse.json",
+  "type": "object",
+  "description": "A list of links.",
+  "properties": {
+    "Link": {
+      "type": "array",
+      "items": {
+        "$ref": "Link.json"
+      }
+    }
+  },
+  "required": [
+    "Link"
+  ]
+}

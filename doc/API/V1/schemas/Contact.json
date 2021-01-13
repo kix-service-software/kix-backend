@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "Contact.json",
+  "type": "object",
+  "description": "The contact object.",
+  "properties": {
+    "AssignedConfigItems": {
+      "type": "array",
+      "description": "A list of asset IDs, added via include \"AssignedConfigItems\"",
+      "readOnly": true,
+      "items": {
+        "type": "number"
+      }
+    },
+    "AssignedUserID": {
+      "anyOf": [
+        { "type": "integer" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "ChangeBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ChangeTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "City": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "Comment": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "Country": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Email": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Fax": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "Firstname": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Fullname": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Lastname": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Login": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Mobile": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "OrganisationIDs": {
+      "type": "array",
+      "readOnly": true,
+      "items": {
+        "type": "integer"
+      }
+    },
+    "Phone": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "PrimaryOrganisationID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Street": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    },
+    "Tickets": {
+      "type": "array",
+      "description": "added via include \"Tickets\"",
+      "readOnly": true,
+      "items": {
+        "$ref": "Ticket.json"
+      }
+    },
+    "TicketStats": {
+      "type": "object",
+      "description": "An object with numbers for new, open, pending and escalated tickets of this contact.",
+      "readOnly": true,
+      "properties": {
+        "EscalatedCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "NewCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "OpenCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "PendingReminderCount": {
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "Title": {
+      "type": "string",
+      "readOnly": true
+    },
+    "User": {
+      "type": "object",
+      "description": "added via include \"User\". See /system/users resource for details.",
+      "readOnly": true
+    },
+    "ValidID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Zip": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "readOnly": true
+    }
+  },
+  "required": [
+    "AssignedUserID",
+    "ChangeBy",
+    "ChangeTime",
+    "City",
+    "Comment",
+    "Country",
+    "CreateBy",
+    "CreateTime",
+    "Email",
+    "Fax",
+    "Firstname",
+    "Fullname",
+    "ID",
+    "Lastname",
+    "Mobile",
+    "OrganisationIDs",
+    "Phone",
+    "PrimaryOrganisationID",
+    "Street",
+    "Title",
+    "ValidID",
+    "Zip"
+  ]
+}

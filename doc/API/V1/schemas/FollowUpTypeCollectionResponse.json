@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "FollowUpTypeCollectionResponse.json",
+  "type": "object",
+  "description": "A list of followup types.",
+  "properties": {
+    "FollowUpType": {
+      "type": "array",
+      "items": {
+        "$ref": "FollowUpType.json"
+      }
+    }
+  },
+  "required": [
+    "FollowUpType"
+  ]  
+}
