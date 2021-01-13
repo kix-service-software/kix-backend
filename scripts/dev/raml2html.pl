@@ -193,9 +193,16 @@ if ( -d "$Options{SchemaDirectory}" ) {
     # copy all bundled schema files that exist in the schema source directory to the relevant directory
     print "\ncopying bundled schema files to corresponding directories\n";
     foreach my $Directory ( @{$Options{SourceDirectory}} ) {
-        chdir "$Cwd/$Directory/$Options{SchemaDirectory}";
+        my $TargetDirectory;
+        if ( $Directory !~ /^\// ) { 
+            chdir "$Cwd/$Directory/$Options{SchemaDirectory}";
+            $TargetDirectory = "$Cwd/$Directory/schemas";
+        }
+        else {
+            chdir "$Directory/$Options{SchemaDirectory}";
+            $TargetDirectory = "$Directory/schemas";
+        }
 
-        my $TargetDirectory = "$Cwd/$Directory/schemas";
         if ( -d "$TargetDirectory" && !rmtree("$TargetDirectory") ) {
             print STDERR "ERROR: Unable to remove directory $TargetDirectory.\n";
             next;
