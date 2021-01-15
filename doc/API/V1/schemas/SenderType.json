@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SenderType.json",
+  "type": "object",
+  "description": "The sender type object.",
+  "properties": {
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "ID",
+    "Name"
+  ]
+}

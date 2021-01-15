@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "UserCollectionResponse.json",
+  "type": "object",
+  "description": "A list of users.",
+  "properties": {
+    "User": {
+      "type": "array",
+      "items": {
+        "$ref": "User.json"
+      }
+    }
+  },
+  "required": [
+    "User"
+  ]
+}

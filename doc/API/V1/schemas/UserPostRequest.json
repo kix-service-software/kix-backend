@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "UserPostRequest.json",
+  "type": "object",
+  "description": "The user request object for creation.",
+  "properties": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "IsAgent": {
+          "type": "integer"
+        },
+        "IsCustomer": {
+          "type": "integer"
+        },
+        "Preferences": {
+          "type": "array",
+          "item": {
+            "$ref": "UserPreferencePostItem.json"
+          }
+        },
+        "UserComment": {
+          "type": "string"
+        },
+        "UserLogin": {
+          "type": "string"
+        },
+        "UserPw": {
+          "description": "A random password will be generated if not given.",
+          "type": "string"
+        },
+        "RoleIDs": {
+          "type": "array",
+          "item": {
+            "type": "integer"
+          }
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "UserLogin"
+      ]
+    }
+  },
+  "required": [
+    "User"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ChannelCollectionResponse.json",
+  "type": "object",
+  "description": "A list of channels.",
+  "properties": {
+    "Channel": {
+      "type": "array",
+      "items": {
+        "$ref": "Channel.json"
+      }
+    }
+  },
+  "required": [
+    "Channel"
+  ]
+}
