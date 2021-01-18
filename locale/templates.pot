@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-1-13 12:53+0000\n"
+"POT-Creation-Date: 2021-1-18 09:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -216,6 +216,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQ Reader"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "FAQArticle"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1248,6 +1252,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Ticket/Event/CreateFAQEntry.pm
 msgid "FAQ Item suggested in source ticket:"
+msgstr ""
+
+#. Perl Module: update/build-1373.pl
+msgid "Related Assets"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
