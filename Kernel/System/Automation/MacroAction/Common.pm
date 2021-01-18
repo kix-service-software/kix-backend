@@ -266,6 +266,45 @@ sub ValidateConfig {
     return 1;
 }
 
+sub _CheckParams {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Config UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }
+
+    if (ref $Param{Config} ne 'HASH') {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Config is no object!",
+        );
+        return;
+    }
+
+    my %Definition = $Self->DefinitionGet();
+
+    if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
+        for my $Option ( values %{$Definition{Options}}) {
+            if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Option->{Name} in Config!",
+                );
+                return;
+            }
+        }
+    }
+
+    return 1;
+}
+
 1;
 
 =back
