@@ -46,9 +46,9 @@ Run this macro module.
 
 Example:
     my $Result = $Object->Run(
-        ObjectID     => 123,
-        ExecOrder    => [],
-        UserID       => 123,
+        ObjectID  => 123,
+        ExecOrder => [],
+        UserID    => 123,
     );
 
 =cut
@@ -71,9 +71,9 @@ sub Run {
     # execute all macro action given in the execution order attribute
     foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
         my $Result = $Kernel::OM->Get('Automation')->MacroActionExecute(
-            ID        => $MacroActionID,
-            ObjectID  => $Param{ObjectID},
-            UserID    => $Param{UserID},
+            ID       => $MacroActionID,
+            ObjectID => $Param{ObjectID},
+            UserID   => $Param{UserID},
         );
         # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here
     }

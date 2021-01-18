@@ -110,11 +110,20 @@ perform MacroActionTypeSearch Operation. This will return a list macro types.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # get common MacroAction types which are available for all macro types
+    my $MacroActionTypesCommon = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::Common');
+
     # get MacroAction types for given macro type
     my $MacroActionTypes = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{Data}->{MacroType});
 
+    # merge common types
+    $MacroActionTypes = {
+        %{$MacroActionTypesCommon},
+        %{$MacroActionTypes}
+    };
+
 	# get already prepared MacroActionType data from MacroActionTypeGet operation
-    if ( IsHashRefWithData($MacroActionTypes) ) {  	
+    if ( IsHashRefWithData($MacroActionTypes) ) {
         my $MacroActionTypeGetResult = $Self->ExecOperation(
             OperationType => 'V1::Automation::MacroActionTypeGet',
             Data      => {
