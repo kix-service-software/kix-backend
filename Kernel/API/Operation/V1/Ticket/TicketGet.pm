@@ -257,7 +257,7 @@ sub Run {
 
     my @TicketList;
 
-    if ( $Self->_CanRunParallel(Items => $Param{Data}->{TicketID}) ) { 
+    if ( $Self->_CanRunParallel(Items => $Param{Data}->{TicketID}) ) {
         @TicketList = $Self->_RunParallel(
             \&_GetTicketData,
             Items => $Param{Data}->{TicketID},
@@ -339,63 +339,15 @@ sub _GetTicketData {
                     # ignore DFs which are not visible for the customer, if the user session is a Customer session
                     next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
 
-                    # get prepared value
-                    my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Key                => $TicketRaw{$Attribute},
+                    my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                        Config => $DynamicFieldConfig,
+                        Value  => $TicketRaw{$Attribute}
                     );
 
-                    # get display value string
-                    my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Value              => $TicketRaw{$Attribute}
-                    );
-
-                    if (!IsHashRefWithData($DisplayValue)) {
-                        my $Separator = ', ';
-                        if (
-                            IsHashRefWithData($DynamicFieldConfig) &&
-                            IsHashRefWithData($DynamicFieldConfig->{Config}) &&
-                            defined $DynamicFieldConfig->{Config}->{ItemSeparator}
-                        ) {
-                            $Separator = $DynamicFieldConfig->{Config}->{ItemSeparator};
-                        }
-
-                        my @Values;
-                        if ( ref $DFPreparedValue eq 'ARRAY' ) {
-                            @Values = @{ $DFPreparedValue };
-                        }
-                        else {
-                            @Values = ($DFPreparedValue);
-                        }
-
-                        $DisplayValue = {
-                            Value => join($Separator, @Values)
-                        };
+                    if (IsHashRefWithData($PreparedValue)) {
+                        push(@DynamicFields, $PreparedValue);
                     }
 
-                    # get html display value string
-                    my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Value              => $TicketRaw{$Attribute},
-                    );
-
-                    # get short display value string
-                    my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        Value              => $TicketRaw{$Attribute}
-                    );
-
-                    push @DynamicFields, {
-                        ID                => $DynamicFieldConfig->{ID},
-                        Name              => $DynamicFieldConfig->{Name},
-                        Label             => $DynamicFieldConfig->{Label},
-                        Value             => $TicketRaw{$Attribute},
-                        DisplayValue      => $DisplayValue->{Value},
-                        DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
-                        DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
-                        PreparedValue     => $DFPreparedValue
-                    };
                 }
             }
             next ATTRIBUTE;
@@ -411,7 +363,7 @@ sub _GetTicketData {
     else {
         $TicketData{DynamicFields} = [];
     }
-    
+
     # include AccountedTime if requested
     if ( $Param{Data}->{include}->{AccountedTime} && !defined $TicketData{AccountedTime} ) {
         $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
