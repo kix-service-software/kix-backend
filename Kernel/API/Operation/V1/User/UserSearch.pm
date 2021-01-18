@@ -117,6 +117,7 @@ sub Run {
             my %SearchTypeResult;
             foreach my $SearchItem ( @{ $UserSearch{$SearchType} } ) {
 
+                my %SearchResult;
                 my $Value = $SearchItem->{Value};
                 my %SearchParam;
 
@@ -135,14 +136,49 @@ sub Run {
                     $SearchParam{UserLogin} = $Value;
                 } else {
                     $SearchParam{Search} = $Value;
+
+                    # execute contact search to honor contact attributes
+                    my %ContactSearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
+                        Search => $Value,
+                        Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                        Valid  => 0
+                    );
+
+                    my %ContactLoginResult = $Kernel::OM->Get('Contact')->ContactSearch(
+                        Login => $Value,
+                        Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                        Valid  => 0
+                    );
+
+                    my %ContactsResult = (
+                        %ContactSearchResult,
+                        %ContactLoginResult
+                    );
+
+                    # add AssignedUserIds to SearchResult
+                    foreach my $Key ( keys %ContactsResult ) {
+                        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+                            ID      => $Key,
+                            Silent  => 1
+                        );
+
+                        if ( $Contact{AssignedUserID} ) {
+                            %SearchResult = (
+                                %SearchResult,
+                                $Contact{AssignedUserID} => $Contact{Email}
+                            );
+                        }
+                    }
                 }
 
-                # perform User search
-                my %SearchResult = $Kernel::OM->Get('User')->UserSearch(
-                    %SearchParam,
-                    Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
-                    Valid => 0
-                );
+                if ( !%SearchResult ) {
+                    # perform User search
+                    %SearchResult = $Kernel::OM->Get('User')->UserSearch(
+                        %SearchParam,
+                        Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                        Valid => 0
+                    );
+                }
 
                 # merge results
                 if ( $SearchType eq 'AND' ) {
