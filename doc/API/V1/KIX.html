@@ -6875,6 +6875,67 @@ pre code {
       "FAQArticle"
    ],
    "definitions" : {
+      "_DynamicFieldValue_json" : {
+         "$id" : "DynamicFieldValue.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object.",
+         "type" : "object",
+         "properties" : {
+            "DisplayValue" : {
+               "description" : "prepared values ",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueHTML" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueShort" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "description" : "ID of the dynamic field",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "description" : "label of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "description" : "name of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedValue" : {
+               "description" : "prepared values - e.g. display values of a selection field instead of the keys",
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "DisplayValue",
+            "DisplayValueHTML",
+            "DisplayValueShort",
+            "ID",
+            "Label",
+            "Name",
+            "PreparedValue",
+            "Value"
+         ]
+      },
       "_FAQArticle_json" : {
          "$id" : "FAQArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -6919,6 +6980,14 @@ pre code {
             },
             "CustomerVisible" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Field1" : {
@@ -7189,6 +7258,7 @@ pre code {
             "Created": "2019-08-09 08:13:38",
             "CreatedBy": 1,
             "CustomerVisible": 1,
+            "DynamicFields": [],
             "Field1": "",
             "Field2": "&lt;p&gt;&lt;span style=\"font-size:small\"&gt;Es wird ein erster &amp;Uuml;berblick ben&amp;ouml;tigt, wie mit KIX Cloud gearbeitet werden kann.&lt;/span&gt;&lt;/p&gt;\n",
             "Field3": "&lt;p&gt;&lt;span style=\"font-size:small\"&gt;&lt;b&gt;Hinweise zum Aufbau&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;\n\n&lt;p&gt;&lt;span style=\"font-size:small\"&gt;Die Anwendung ist aufgebaut aus Modul [...] Wie suche ich mit KIX &lt;/span&gt;&lt;span style=\"font-size:small\"&gt;Cloud&lt;/span&gt;&lt;span style=\"font-size:small\"&gt;&amp;quot;.&lt;/span&gt;&lt;/p&gt;\n",
@@ -7212,6 +7282,24 @@ pre code {
             "Created": "2019-08-09 08:13:38",
             "CreatedBy": 1,
             "CustomerVisible": 1,
+            "DynamicFields": [
+                {
+                    "DisplayValue": "Prometheus, Zeus",
+                    "DisplayValueHTML": "Prometheus, Zeus",
+                    "DisplayValueShort": "Prometheus, Zeus",
+                    "ID": 34,
+                    "Label": "Related Assets",
+                    "Name": "RelatedAssets",
+                    "PreparedValue": [
+                        "Prometheus",
+                        "Zeus"
+                    ],
+                    "Value": [
+                        "2",
+                        "4"
+                    ]
+                }
+            ],
             "Field1": "",
             "Field2": "&lt;p&gt;&lt;span style=\"font-size:small\"&gt;It is necessary to get a first overview on how to work with KIX Cloud.&lt;/span&gt;&lt;/p&gt;\n",
             "Field3": "&lt;p&gt;&lt;span style=\"font-size:small\"&gt;&lt;b&gt;Structure&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;\n\n&lt;p&gt;&lt;span style=\"font-size:small\"&gt;The application consists in a Modul [...] How to search in KIX 18&amp;ldquo;.&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;\n",
@@ -7281,6 +7369,13 @@ pre code {
             "CustomerVisible" : {
                "type" : "integer"
             },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
             "Field1" : {
                "description" : "symptom",
                "type" : "string"
@@ -7332,6 +7427,46 @@ pre code {
       "FAQArticle"
    ],
    "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      },
       "_FAQAttachmentPostItem_json" : {
          "$id" : "FAQAttachmentPostItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -7367,21 +7502,6 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "FAQArticle": {
         "Approved": 1,
-        "CategoryID": 2,
-        "ContentType": "text/html",
-        "CustomerVisible": 1,
-        "Field1": "some symptom",
-        "Field2": "problem",
-        "Field3": "solution",
-        "Field4": "",
-        "Field5": "",
-        "Field6": "comment",
-        "ID": 2,
-        "Keywords": ["some", "keyword"],
-        "Language": "en",
-        "Number": "17002",
-        "Title": "Some title",
-        "ValidID": 1,
         "Attachments": [
             {
                 "Content": "base64 coded file content",
@@ -7389,7 +7509,33 @@ pre code {
                 "Filename": "somename.xml",
                 "Inline": 0
             }
-        ]
+        ],
+        "CategoryID": 2,
+        "ContentType": "text/html",
+        "CustomerVisible": 1,
+        "DynamicFields": [
+            {
+                "Name": "RelatedAssets",
+                "Value": [
+                    2
+                ]
+            }
+        ],
+        "Field1": "some symptom",
+        "Field2": "problem",
+        "Field3": "solution",
+        "Field4": "",
+        "Field5": "",
+        "Field6": "comment",
+        "ID": 2,
+        "Keywords": [
+            "some",
+            "keyword"
+        ],
+        "Language": "en",
+        "Number": "17002",
+        "Title": "Some title",
+        "ValidID": 1
     }
 }</code></pre></div></div><div class="tab-pane" id="faq_articles_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="faq_articles_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The FAQArticle has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: FAQArticlePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "FAQArticlePostPatchResponse.json",
@@ -7467,6 +7613,67 @@ pre code {
       "FAQArticle"
    ],
    "definitions" : {
+      "_DynamicFieldValue_json" : {
+         "$id" : "DynamicFieldValue.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object.",
+         "type" : "object",
+         "properties" : {
+            "DisplayValue" : {
+               "description" : "prepared values ",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueHTML" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueShort" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "description" : "ID of the dynamic field",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "description" : "label of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "description" : "name of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedValue" : {
+               "description" : "prepared values - e.g. display values of a selection field instead of the keys",
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "DisplayValue",
+            "DisplayValueHTML",
+            "DisplayValueShort",
+            "ID",
+            "Label",
+            "Name",
+            "PreparedValue",
+            "Value"
+         ]
+      },
       "_FAQArticle_json" : {
          "$id" : "FAQArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -7511,6 +7718,14 @@ pre code {
             },
             "CustomerVisible" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Field1" : {
@@ -7780,6 +7995,24 @@ pre code {
         "Created": "2019-08-09 08:13:38",
         "CreatedBy": 1,
         "CustomerVisible": 1,
+        "DynamicFields": [
+            {
+                "DisplayValue": "Prometheus, Zeus",
+                "DisplayValueHTML": "Prometheus, Zeus",
+                "DisplayValueShort": "Prometheus, Zeus",
+                "ID": 34,
+                "Label": "Related Assets",
+                "Name": "RelatedAssets",
+                "PreparedValue": [
+                    "Prometheus",
+                    "Zeus"
+                ],
+                "Value": [
+                    "2",
+                    "4"
+                ]
+            }
+        ],
         "Field1": "",
         "Field2": "&lt;p&gt;&lt;span style=\"font-size:small\"&gt;It is necessary to get a first overview on how to work with KIX Cloud.&lt;/span&gt;&lt;/p&gt;\n",
         "Field3": "&lt;p&gt;&lt;span style=\"font-size:small\"&gt;&lt;b&gt;Structure&lt;/b&gt;&lt;/span&gt;&lt;/p&gt;\n\n&lt;p&gt;&lt;span style=\"font-size:small\"&gt;The application consists in a Modul [...] How to search in KIX 18&amp;ldquo;.&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;\n",
@@ -7842,6 +8075,13 @@ pre code {
             "CustomerVisible" : {
                "type" : "integer"
             },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
             "Field1" : {
                "description" : "symptom",
                "type" : "string"
@@ -7887,7 +8127,49 @@ pre code {
    },
    "required" : [
       "FAQArticle"
-   ]
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "FAQArticle": {
@@ -7895,8 +8177,18 @@ pre code {
         "CategoryID": 2,
         "ContentType": "text/html",
         "CustomerVisible": 2,
+        "DynamicFields": [
+            {
+                "Name": "RelatedAssets",
+                "Value": [
+                    4
+                ]
+            }
+        ],
         "Field3": "changed text",
-        "Keywords": ["new keyword"],
+        "Keywords": [
+            "new keyword"
+        ],
         "Title": "New title",
         "ValidID": 2
     }
@@ -30560,6 +30852,67 @@ pre code {
       "FAQCategory"
    ],
    "definitions" : {
+      "_DynamicFieldValue_json" : {
+         "$id" : "DynamicFieldValue.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object.",
+         "type" : "object",
+         "properties" : {
+            "DisplayValue" : {
+               "description" : "prepared values ",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueHTML" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueShort" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "description" : "ID of the dynamic field",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "description" : "label of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "description" : "name of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedValue" : {
+               "description" : "prepared values - e.g. display values of a selection field instead of the keys",
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "DisplayValue",
+            "DisplayValueHTML",
+            "DisplayValueShort",
+            "ID",
+            "Label",
+            "Name",
+            "PreparedValue",
+            "Value"
+         ]
+      },
       "_FAQArticle_json" : {
          "$id" : "FAQArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -30604,6 +30957,14 @@ pre code {
             },
             "CustomerVisible" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Field1" : {
@@ -31123,6 +31484,67 @@ pre code {
       "FAQCategory"
    ],
    "definitions" : {
+      "_DynamicFieldValue_json" : {
+         "$id" : "DynamicFieldValue.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object.",
+         "type" : "object",
+         "properties" : {
+            "DisplayValue" : {
+               "description" : "prepared values ",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueHTML" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueShort" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "description" : "ID of the dynamic field",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "description" : "label of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "description" : "name of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedValue" : {
+               "description" : "prepared values - e.g. display values of a selection field instead of the keys",
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "DisplayValue",
+            "DisplayValueHTML",
+            "DisplayValueShort",
+            "ID",
+            "Label",
+            "Name",
+            "PreparedValue",
+            "Value"
+         ]
+      },
       "_FAQArticle_json" : {
          "$id" : "FAQArticle.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -31167,6 +31589,14 @@ pre code {
             },
             "CustomerVisible" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Field1" : {
