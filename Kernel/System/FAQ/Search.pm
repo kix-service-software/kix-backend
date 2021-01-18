@@ -264,7 +264,7 @@ sub FAQSearch {
 
         # Check all configured FAQ dynamic fields
         $FAQDynamicFields = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-            ObjectType => 'FAQ',
+            ObjectType => 'FAQArticle',
         );
 
         for my $DynamicField ( @{$FAQDynamicFields} ) {

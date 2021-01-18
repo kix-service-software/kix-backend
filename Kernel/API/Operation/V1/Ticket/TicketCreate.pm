@@ -463,10 +463,11 @@ sub _TicketCreate {
 
         DYNAMICFIELD:
         foreach my $DynamicField ( @{ $Ticket->{DynamicFields} } ) {
-            my $Result = $Self->SetDynamicFieldValue(
+            my $Result = $Self->_SetDynamicFieldValue(
                 %{$DynamicField},
-                TicketID => $TicketID,
-                UserID   => $Param{UserID},
+                ObjectID   => $TicketID,
+                ObjectType => 'Ticket',
+                UserID     => $Param{UserID},
             );
 
             if ( !$Result->{Success} ) {
