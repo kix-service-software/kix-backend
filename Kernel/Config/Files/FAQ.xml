@@ -301,7 +301,7 @@ Your KIX Notification Master
             <String Regex="">172800</String> <!-- default 172,800 (60 * 60 * 24 * 2) -->
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::ObjectType###FAQ" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="DynamicFields::ObjectType###FAQArticle" Required="0" Valid="1">
         <Description Translatable="1">DynamicField object registration.</Description>
         <Group>FAQ</Group>
         <SubGroup>DynamicFields::ObjectType::Registration</SubGroup>
@@ -314,4 +314,3 @@ Your KIX Notification Master
         </Setting>
     </ConfigItem>
 </kix_config>
-    

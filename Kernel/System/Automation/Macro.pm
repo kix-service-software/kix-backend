@@ -543,9 +543,9 @@ sub MacroIsExecutable {
 executes a macro
 
     my $Success = $AutomationObject->MacroExecute(
-        ID       => 123,        # the ID of the macro
-        ObjectID => 123,        # the ID of the object to execute the macro onto
-        UserID    => 1
+        ID            => 123,        # the ID of the macro
+        ObjectID      => 123,        # the ID of the object to execute the macro onto
+        UserID        => 1
     );
 
 =cut
@@ -564,7 +564,17 @@ sub MacroExecute {
         }
     }
 
-    # add MacroID for log reference
+    # init call stack
+    $Self->{ParentMacroID} //= [];
+
+    # add IDs for log reference
+    if ( $Self->{MacroID} ) {
+        push @{$Self->{ParentMacroID}}, $Self->{MacroID};
+    }
+    else {
+        $Self->{MacroResults} = {};
+    }
+
     $Self->{MacroID}  = $Param{ID};
     $Self->{ObjectID} = $Param{ObjectID};
 
@@ -621,7 +631,7 @@ sub MacroExecute {
     );
 
     # remove IDs from log reference
-    delete $Self->{MacroID};
+    $Self->{MacroID} = pop @{$Self->{ParentMacroID}};
     delete $Self->{ObjectID};
 
     return $Success;

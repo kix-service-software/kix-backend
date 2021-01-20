@@ -87,7 +87,7 @@ sub ParameterDefinition {
         'FAQArticleID' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -125,6 +125,9 @@ sub Run {
 
     my @FAQArticleData;
 
+    # inform API caching about a new dependency
+    $Self->AddCacheDependency(Type => 'DynamicField');
+
     # start loop
     foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
 
@@ -149,10 +152,16 @@ sub Run {
         my @Keywords = split(/\s+/, $FAQArticle{Keywords} || '');
         $FAQArticle{Keywords} = \@Keywords;
 
-        $FAQArticle{CustomerVisible} = $FAQArticle{Visibility} 
+        $FAQArticle{CustomerVisible} = $FAQArticle{Visibility}
             && ($FAQArticle{Visibility} eq 'external' || $FAQArticle{Visibility} eq 'public' )
             ? 1 : 0;
         delete $FAQArticle{Visibility};
+
+        if ($Param{Data}->{include}->{DynamicFields}) {
+            $FAQArticle{DynamicFields} = $Self->_GetDynamicFields(
+                FAQArticleID => $FAQArticle{ID}
+            );
+        }
 
         # add
         push(@FAQArticleData, \%FAQArticle);
@@ -161,13 +170,60 @@ sub Run {
     if ( scalar(@FAQArticleData) == 1 ) {
         return $Self->_Success(
             FAQArticle => $FAQArticleData[0],
-        );    
+        );
     }
 
     # return result
     return $Self->_Success(
         FAQArticle => \@FAQArticleData,
     );
+}
+
+
+sub _GetDynamicFields {
+    my ( $Self, %Param ) = @_;
+
+    my @DynamicFields;
+
+    # get dynamic field objects
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+    # get all dynamic fields for the object type Ticket
+    my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+        ObjectType => 'FAQArticle'
+    );
+
+    DYNAMICFIELD:
+    for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
+
+        # validate each dynamic field
+        next DYNAMICFIELD if !$DynamicFieldConfig;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+        next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
+
+        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+        next DYNAMICFIELD if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+        # get the current value for each dynamic field
+        my $Value = $DynamicFieldBackendObject->ValueGet(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            ObjectID           => $Param{FAQArticleID},
+        );
+
+        if ($Value) {
+            my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                Config => $DynamicFieldConfig,
+                Value  => $Value
+            );
+
+            if (IsHashRefWithData($PreparedValue)) {
+                push(@DynamicFields, $PreparedValue);
+            }
+        }
+    }
+
+    return \@DynamicFields;
 }
 
 1;

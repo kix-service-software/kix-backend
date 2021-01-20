@@ -147,7 +147,7 @@ sub PluginList {
     my $PluginDirectory = $Home.'/plugins';
 
     # get all directories in the plugins folder
-    # don't do that using the Main object, since we are called by the OM constructor 
+    # don't do that using the Main object, since we are called by the OM constructor
     opendir(HANDLE, $PluginDirectory) || die "Can't open $PluginDirectory: $!";
     while (readdir HANDLE) {
         next if $_ =~ /^\./;
@@ -155,7 +155,7 @@ sub PluginList {
 
         push @DirectoryList, $PluginDirectory.'/'.$_;
     }
-    closedir(HANDLE); 
+    closedir(HANDLE);
 
     # get RELEASE information of each plugin
     DIRECTORY:
@@ -176,19 +176,19 @@ sub PluginList {
                 chomp;
                 $_ =~ s/^\s*(.*?)\s*$/$1/g;
 
-                my ($Object, $Module) = split(/\s+=\s+/, $_);                
+                my ($Object, $Module) = split(/\s+=\s+/, $_);
 
                 next if !$Object && !$Module;
 
                 $Plugin{Exports}->{$Object} = $Module;
             }
             close(HANDLE);
-        }        
+        }
 
         # add to list of plugins
         push @Plugins, \%Plugin;
     }
-    
+
     if ( IsArrayRefWithData(\@Plugins) ) {
         my %PluginList = map { $_->{Product} => $_ } @Plugins;
 
@@ -265,13 +265,13 @@ sub Update {
     }
     elsif ( $Param{Plugin} && $Param{Plugin} ne 'ALL' ) {
         my $Directory = $PluginList{$Param{Plugin}}->{Directory};
-    
+
         if ( ! -d $Directory ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Plugin $Param{Plugin} doesn't exist!"
             );
-            return;        
+            return;
         }
         # add plugin
         push @UpdateItems, { Name => $Param{Plugin}, Directory => $Directory };
@@ -320,7 +320,7 @@ sub Update {
             $Param{SourceBuild} = 0;
             if ( $Content ) {
                 $Param{SourceBuild} = $$Content;
-            }            
+            }
         }
         if ( !defined $Param{TargetBuild} ) {
             $Param{TargetBuild} = $PluginList{$UpdateItem->{Name}}->{BuildNumber};
@@ -366,7 +366,7 @@ sub Update {
 
 =item MigrationSupportedTypeList()
 
-get the list of supported object types for the given source 
+get the list of supported object types for the given source
 
     my @Result = $InstallationObject->MigrationSupportedTypeList(
         Source      => 'KIX17'          # the source
@@ -487,7 +487,7 @@ migrate the data from another source
         Filter      => '...'            # optional, source specific
         ObjectType  => 'Ticket,FAQ'     # optional, if not given all supported objects will be migrated
         MappingFile => 'mappings.json'  # optional
-        Workers     => 4,               # optional, number of workers to used if something can be parallelly executed 
+        Workers     => 4,               # optional, number of workers to used if something can be parallelly executed
         Async       => 1,               # optional, start migration as a background process
     );
 
@@ -572,7 +572,6 @@ sub MigrationStart {
             },
             MaximumParallelInstances => 1,
         );
-        print STDERR "TaskID: $TaskID\n";
 
         return $MigrationID;
     }
@@ -587,7 +586,7 @@ sub MigrationStart {
 
 sub _MigrationStart {
     my ($Self, %Param) = @_;
-    
+
     $Kernel::OM->ObjectParamAdd(
         $Param{BackendModule} => {
             %Param,
@@ -726,7 +725,7 @@ sub _ExecUpdateScript {
     else {
         $Type = '';
     }
- 
+
     my $ScriptFile = $Param{Directory}.'/update/'.$Param{Build}.$Type.'.pl';
 
     if ( ! -f $ScriptFile ) {
@@ -738,7 +737,7 @@ sub _ExecUpdateScript {
         Message  => "    executing $OrgType update script",
     );
 
-    my $ExitCode = system($ScriptFile);    
+    my $ExitCode = system($ScriptFile);
     if ($ExitCode) {
         $Kernel::OM->Get('Log')->Log(
             Priority => "error",
@@ -755,7 +754,7 @@ sub _ExecUpdateSQL {
 
     # check if xml file exists, if it doesn't, exit gracefully
     my $XMLFile = $Param{Directory}.'/update/'.$Param{Build}.'_'.$Param{Type}.'.xml';
-    
+
     if ( ! -f "$XMLFile" ) {
         return 1;
     }
@@ -799,8 +798,8 @@ sub _ExecUpdateSQL {
     }
 
     for my $SQL (@SQL) {
-        my $Result = $Kernel::OM->Get('DB')->Do( 
-            SQL => $SQL 
+        my $Result = $Kernel::OM->Get('DB')->Do(
+            SQL => $SQL
         );
         if (!$Result) {
             $Kernel::OM->Get('Log')->Log(
@@ -813,8 +812,8 @@ sub _ExecUpdateSQL {
     # execute post SQL statements (indexes, constraints)
     my @SQLPost = $Kernel::OM->Get('DB')->SQLProcessorPost();
     for my $SQL (@SQLPost) {
-        my $Result = $Kernel::OM->Get('DB')->Do( 
-            SQL => $SQL 
+        my $Result = $Kernel::OM->Get('DB')->Do(
+            SQL => $SQL
         );
         if (!$Result) {
             $Kernel::OM->Get('Log')->Log(
@@ -849,7 +848,7 @@ sub _ReadReleaseFile {
     while (<HANDLE>) {
         chomp;
         my $Line = $_;
-   
+
         # ignore comment lines
         next if ( $Line =~ /^#/ );
 
@@ -859,7 +858,7 @@ sub _ReadReleaseFile {
             if ( $Line =~ /^$Var\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
                 $Release{$Key} = $1;
             }
-        }                
+        }
     }
     close(HANDLE);
 

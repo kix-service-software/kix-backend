@@ -566,8 +566,8 @@ sub MacroActionDelete {
 executes a macro action
 
     my $Success = $AutomationObject->MacroActionExecute(
-        ID        => 123,       # the ID of the macro action
-        UserID    => 1
+        ID     => 123,       # the ID of the macro action
+        UserID => 1
         ....
     );
 
@@ -639,18 +639,11 @@ sub MacroActionExecute {
 
     my %Parameters = %{$MacroAction{Parameters} || {}};
 
-    my $CacheType = Digest::MD5::md5_hex($Self->{JobID}.'::'.$Self->{RunID}.'::'.$Self->{MacroID});
-    my $Results = $Kernel::OM->Get('Cache')->Get(
-        Type => $CacheType,
-        Key  => 'ResultVariables'
-    );
-    $Results //= {};
-
     # replace result variables
-    if (IsHashRefWithData($Results)) {
+    if (IsHashRefWithData($Self->{MacroResults})) {
         foreach my $Parameter ( sort keys %Parameters ) {
-            foreach my $Variable ( keys %{$Results} ) {
-                $Parameters{$Parameter} =~ s/\$\{$Variable\}/$Results->{$Variable}/gmx;
+            foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
+                $Parameters{$Parameter} =~ s/\$\{$Variable\}/$Self->{MacroResults}->{$Variable}/gmx;
             }
         }
     }
@@ -674,14 +667,8 @@ sub MacroActionExecute {
     else {
         # map results to variables if given
         foreach my $Result ( keys %{$MacroAction{ResultVariables}} ) {
-            $Results->{$MacroAction{ResultVariables}->{$Result} || $Result} = $BackendObject->GetResult(Name => $Result);
+            $Self->{MacroResults}->{$MacroAction{ResultVariables}->{$Result} || $Result} = $BackendObject->GetResult(Name => $Result);
         }
-
-        my $Results = $Kernel::OM->Get('Cache')->Set(
-            Type  => $CacheType,
-            Key   => 'ResultVariables',
-            Value => $Results,
-        );
     }
 
     # remove MacroActionID from log reference
@@ -710,12 +697,17 @@ sub _LoadMacroActionTypeBackend {
         # load backend modules
         my $Backends = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{MacroType});
 
-        if ( !IsHashRefWithData($Backends) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No macro action backend modules for macro type \"$Param{MacroType}\" found!",
-            );
-            return;
+        # fallback to Common
+        if ( !IsHashRefWithData($Backends) || !IsHashRefWithData($Backends->{$Param{Name}}) ) {
+            $Backends = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::Common');
+
+            if ( !IsHashRefWithData($Backends) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No macro action backend modules for macro type \"$Param{MacroType}\" found!",
+                );
+                return;
+            }
         }
 
         my $Backend = $Backends->{$Param{Name}}->{Module};

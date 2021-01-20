@@ -112,9 +112,6 @@ sub PostValueSet {
         UserID => $Param{UserID},
     );
 
-    # clear FAQ cache
-    $FAQObject->_DeleteFromFAQCache( ItemID => $Param{ObjectID} );
-
     # Trigger event.
     $FAQObject->EventHandler(
         Event => 'FAQDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},

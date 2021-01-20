@@ -31,7 +31,6 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-print STDERR "TicketIndexUpdate: ".Data::Dumper::Dumper(\%Param); 
     # check needed stuff
     for (qw(Data Event Config)) {
         if ( !$Param{$_} ) {
