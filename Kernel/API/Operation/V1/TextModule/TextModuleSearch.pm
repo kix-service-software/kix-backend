@@ -103,23 +103,25 @@ sub Run {
 
 	# get already prepared TextModule data from TextModuleGet operation
     if ( IsArrayRefWithData($TextModuleList) ) {  	
-        my $TextModuleGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::TextModule::TextModuleGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 TextModuleID => join(',', @{$TextModuleList}),
             }
-        );    
-
-        if ( !IsHashRefWithData($TextModuleGetResult) || !$TextModuleGetResult->{Success} ) {
-            return $TextModuleGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @TextModuleDataList = IsArrayRef($TextModuleGetResult->{Data}->{TextModule}) ? @{$TextModuleGetResult->{Data}->{TextModule}} : ( $TextModuleGetResult->{Data}->{TextModule} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{TextModule} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{TextModule}) ? @{$GetResult->{Data}->{TextModule}} : ( $GetResult->{Data}->{TextModule} );
+        }
 
-        if ( IsArrayRefWithData(\@TextModuleDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                TextModule => \@TextModuleDataList,
+                TextModule => \@ResultList,
             )
         }
     }

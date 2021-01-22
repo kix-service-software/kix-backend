@@ -87,19 +87,21 @@ sub Run {
 
     # get already prepared tickettype data from TicketTypeGet operation
     if ( IsHashRefWithData(\%TicketTypeList) ) {
-        my $TicketTypeGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::TicketType::TicketTypeGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 TypeID => join(',', sort keys %TicketTypeList),
             }
         );
- 
-        if ( !IsHashRefWithData($TicketTypeGetResult) || !$TicketTypeGetResult->{Success} ) {
-            return $TicketTypeGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($TicketTypeGetResult->{Data}->{TicketType}) ? @{$TicketTypeGetResult->{Data}->{TicketType}} : ( $TicketTypeGetResult->{Data}->{TicketType} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{TicketType} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{TicketType}) ? @{$GetResult->{Data}->{TicketType}} : ( $GetResult->{Data}->{TicketType} );
+        }
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

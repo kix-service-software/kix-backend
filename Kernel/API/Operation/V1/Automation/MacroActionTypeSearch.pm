@@ -124,23 +124,25 @@ sub Run {
 
 	# get already prepared MacroActionType data from MacroActionTypeGet operation
     if ( IsHashRefWithData($MacroActionTypes) ) {
-        my $MacroActionTypeGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::Automation::MacroActionTypeGet',
             Data      => {
                 MacroType       => $Param{Data}->{MacroType},
                 MacroActionType => join(',', sort keys %{$MacroActionTypes}),
             }
-        );    
-
-        if ( !IsHashRefWithData($MacroActionTypeGetResult) || !$MacroActionTypeGetResult->{Success} ) {
-            return $MacroActionTypeGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @MacroActionTypeDataList = IsArrayRef($MacroActionTypeGetResult->{Data}->{MacroActionType}) ? @{$MacroActionTypeGetResult->{Data}->{MacroActionType}} : ( $MacroActionTypeGetResult->{Data}->{MacroActionType} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{MacroActionType} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{MacroActionType}) ? @{$GetResult->{Data}->{MacroActionType}} : ( $GetResult->{Data}->{MacroActionType} );
+        }
 
-        if ( IsArrayRefWithData(\@MacroActionTypeDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                MacroActionType => \@MacroActionTypeDataList,
+                MacroActionType => \@ResultList,
             )
         }
     }

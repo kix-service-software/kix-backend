@@ -97,17 +97,19 @@ sub Run {
             Data      => {
                 ClassID => join(',', sort keys %{$ItemList}),
             }
-        );    
-
+        );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
         }
 
-        my @ClassDataList = IsArrayRef($GetResult->{Data}->{ConfigItemClass}) ? @{$GetResult->{Data}->{ConfigItemClass}} : ( $GetResult->{Data}->{ConfigItemClass} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ConfigItemClass} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItemClass}) ? @{$GetResult->{Data}->{ConfigItemClass}} : ( $GetResult->{Data}->{ConfigItemClass} );
+        }
 
-        if ( IsArrayRefWithData(\@ClassDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConfigItemClass => \@ClassDataList,
+                ConfigItemClass => \@ResultList,
             )
         }
     }

@@ -88,23 +88,25 @@ sub Run {
     my @MigrationList = $Kernel::OM->Get('Installation')->MigrationList();
     
     if (IsArrayRefWithData(\@MigrationList)) {
-        my $MigrationGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Migration::MigrationGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 MigrationID => join(',', map { $_->{ID} } @MigrationList),
             }
         );
- 
-        if ( !IsHashRefWithData($MigrationGetResult) || !$MigrationGetResult->{Success} ) {
-            return $MigrationGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @MigrationDataList = IsArrayRef($MigrationGetResult->{Data}->{Migration}) ? @{$MigrationGetResult->{Data}->{Migration}} : ( $MigrationGetResult->{Data}->{Migration} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Migration} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Migration}) ? @{$GetResult->{Data}->{Migration}} : ( $GetResult->{Data}->{Migration} );
+        }
 
-        if ( IsArrayRefWithData(\@MigrationDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Migration => \@MigrationDataList,
+                Migration => \@ResultList,
             )
         }
     }

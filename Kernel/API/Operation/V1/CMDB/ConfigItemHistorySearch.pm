@@ -154,17 +154,19 @@ sub Run {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 HistoryID    => join(',', sort @HistoryIDs),
             }
-        );    
-
+        );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRef($GetResult->{Data}->{ConfigItemHistory}) ? @{$GetResult->{Data}->{ConfigItemHistory}} : ( $GetResult->{Data}->{ConfigItemHistory} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ConfigItemHistoryItem} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItemHistoryItem}) ? @{$GetResult->{Data}->{ConfigItemHistoryItem}} : ( $GetResult->{Data}->{ConfigItemHistoryItem} );
+        }
 
-        if ( IsArrayRefWithData(\@DataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConfigItemHistoryItem => \@DataList,
+                ConfigItemHistoryItem => \@ResultList,
             )
         }
     }

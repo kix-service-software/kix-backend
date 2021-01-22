@@ -91,26 +91,29 @@ sub Run {
    
     # get already prepared Job data from JobGet operation
     if ( IsHashRefWithData(\%JobList) ) {   
-        my $JobGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::JobGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 JobID => join(',', sort keys %JobList),
             }
-        );    
-
-        if ( !IsHashRefWithData($JobGetResult) || !$JobGetResult->{Success} ) {
-            return $JobGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
-        push @JobDataList,IsArrayRefWithData($JobGetResult->{Data}->{Job}) ? @{$JobGetResult->{Data}->{Job}} : ( $JobGetResult->{Data}->{Job} );
-    }	            	
 
-    if ( IsArrayRefWithData(\@JobDataList) ) {
-        return $Self->_Success(
-            Job => \@JobDataList,
-        )
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Job} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Job}) ? @{$GetResult->{Data}->{Job}} : ( $GetResult->{Data}->{Job} );
+        }
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                Job => \@ResultList,
+            )
+        }
     }
-    
+
     # return result
     return $Self->_Success(
         Job => [],
