@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<database Name="kix">
-
-    <TableAlter Name="macro_action">
-        <ColumnAdd Name="result_variables" Required="false" Size="10000" Type="VARCHAR"/>
-    </TableAlter>
-
-</database>
