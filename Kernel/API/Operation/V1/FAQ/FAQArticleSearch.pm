@@ -198,24 +198,26 @@ sub Run {
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
 
-        my $FAQArticleGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::FAQ::FAQArticleGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 FAQArticleID => join( ',', sort @ArticleIDs ),
             }
         );
-
-        if ( !IsHashRefWithData($FAQArticleGetResult) || !$FAQArticleGetResult->{Success} ) {
-            return $FAQArticleGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @FAQArticleDataList = IsArrayRef( $FAQArticleGetResult->{Data}->{FAQArticle} ) ? @{ $FAQArticleGetResult->{Data}->{FAQArticle} } : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{FAQArticle} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{FAQArticle}) ? @{$GetResult->{Data}->{FAQArticle}} : ( $GetResult->{Data}->{FAQArticle} );
+        }
 
-        if ( IsArrayRefWithData( \@FAQArticleDataList ) ) {
+        if ( IsArrayRefWithData( \@ResultList ) ) {
             return $Self->_Success(
-                FAQArticle => \@FAQArticleDataList,
-                )
+                FAQArticle => \@ResultList,
+            )
         }
     }
 

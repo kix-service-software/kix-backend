@@ -252,18 +252,21 @@ sub Run {
         }
 
         # get already prepared user data from UserGet operation
-        my $UserGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::User::UserGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 UserID => join(',', @GetUserIDs),
             }
         );
-        if ( !IsHashRefWithData($UserGetResult) || !$UserGetResult->{Success} ) {
-            return $UserGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($UserGetResult->{Data}->{User}) ? @{$UserGetResult->{Data}->{User}} : ( $UserGetResult->{Data}->{User} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{User} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{User}) ? @{$GetResult->{Data}->{User}} : ( $GetResult->{Data}->{User} );
+        }
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

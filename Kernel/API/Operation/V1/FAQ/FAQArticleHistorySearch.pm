@@ -122,7 +122,7 @@ sub Run {
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
 
-        my $FAQArticleHistoryGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::FAQ::FAQArticleHistoryGet',
             SuppressPermissionErrors => 1,
             Data      => {
@@ -130,16 +130,18 @@ sub Run {
                 FAQHistoryID => join(',', sort @{$HistoryIDs}),
             }
         );
-
-        if ( !IsHashRefWithData($FAQArticleHistoryGetResult) || !$FAQArticleHistoryGetResult->{Success} ) {
-            return $FAQArticleHistoryGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @FAQArticleHistoryDataList = IsArrayRef($FAQArticleHistoryGetResult->{Data}->{FAQHistory}) ? @{$FAQArticleHistoryGetResult->{Data}->{FAQHistory}} : ( $FAQArticleHistoryGetResult->{Data}->{FAQHistory} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{FAQHistory} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{FAQHistory}) ? @{$GetResult->{Data}->{FAQHistory}} : ( $GetResult->{Data}->{FAQHistory} );
+        }
 
-        if ( IsArrayRefWithData(\@FAQArticleHistoryDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                FAQHistory => \@FAQArticleHistoryDataList,
+                FAQHistory => \@ResultList,
             )
         }
     }

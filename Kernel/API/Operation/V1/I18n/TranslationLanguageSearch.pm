@@ -123,7 +123,7 @@ sub Run {
     if ( IsArrayRefWithData($PatternData{AvailableLanguages}) ) {
 
         # get already prepared Translation data from TranslationLanguageGet operation
-        my $TranslationLanguageGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::I18n::TranslationLanguageGet',
             SuppressPermissionErrors => 1,
             Data          => {
@@ -131,11 +131,14 @@ sub Run {
                 Language      => join(',', @{$PatternData{AvailableLanguages}}),
             }
         );
-        if ( !IsHashRefWithData($TranslationLanguageGetResult) || !$TranslationLanguageGetResult->{Success} ) {
-            return $TranslationLanguageGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($TranslationLanguageGetResult->{Data}->{TranslationLanguage}) ? @{$TranslationLanguageGetResult->{Data}->{TranslationLanguage}} : ( $TranslationLanguageGetResult->{Data}->{TranslationLanguage} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{TranslationLanguage} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{TranslationLanguage}) ? @{$GetResult->{Data}->{TranslationLanguage}} : ( $GetResult->{Data}->{TranslationLanguage} );
+        }
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
