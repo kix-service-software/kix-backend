@@ -186,20 +186,21 @@ sub Run {
     if (IsHashRefWithData(\%OrgList)) {
 
         # get already prepared Organisation data from OrganisationGet operation
-        my $OrganisationGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Organisation::OrganisationGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 OrganisationID => join(',', sort keys %OrgList),
             }
         );
-        if ( !IsHashRefWithData($OrganisationGetResult) || !$OrganisationGetResult->{Success} ) {
-            return $OrganisationGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($OrganisationGetResult->{Data}->{Organisation}) ?
-            @{$OrganisationGetResult->{Data}->{Organisation}} :
-            ( $OrganisationGetResult->{Data}->{Organisation} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Organisation} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Organisation}) ? @{$GetResult->{Data}->{Organisation}} : ( $GetResult->{Data}->{Organisation} );
+        }
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

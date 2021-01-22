@@ -119,27 +119,30 @@ sub Run {
 
     # get already prepared Run data from JobRunGet operation
     if ( IsHashRefWithData(\%JobRunList) ) {   
-        my $JobRunGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::JobRunGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 JobID => $Param{Data}->{JobID},
                 RunID => join(',', sort keys %JobRunList),
             }
-        );    
-
-        if ( !IsHashRefWithData($JobRunGetResult) || !$JobRunGetResult->{Success} ) {
-            return $JobRunGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
-        push @JobRunDataList, IsArrayRefWithData($JobRunGetResult->{Data}->{JobRun}) ? @{$JobRunGetResult->{Data}->{JobRun}} : ( $JobRunGetResult->{Data}->{JobRun} );
-    }	            	
-    
-    if ( IsArrayRefWithData(\@JobRunDataList) ) {
-        return $Self->_Success(
-            JobRun => \@JobRunDataList,
-        )
-    }
 
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{JobRun} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{JobRun}) ? @{$GetResult->{Data}->{JobRun}} : ( $GetResult->{Data}->{JobRun} );
+        }
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                JobRun => \@ResultList,
+            )
+        }
+    }
+    
     # return result
     return $Self->_Success(
         JobRun => [],

@@ -1316,11 +1316,21 @@ sub _ApplyFilter {
     my $Filter = $Param{Filter} || $Self->{Filter};
 
     OBJECT:
-    foreach my $FilterObject ( keys %{$Filter} ) {
+    foreach my $FilterObject ( sort keys %{$Filter} ) {
         my $Object = $FilterObject;
         if ( $Object eq '*' ) {
             # wildcard
             $Object = (sort keys %{$Param{Data}})[0];
+            # merge that filter with a specific one (if we have)
+            if ( IsHashRefWithData($Filter->{$Object}) ) {
+                foreach my $Key ( keys %{$Filter->{$Object}} ) {
+                    next if !exists $Filter->{$FilterObject}->{$Key};
+                    $Filter->{$Object}->{$Key} = [
+                        @{$Filter->{$Object}->{$Key}},
+                        @{$Filter->{$FilterObject}->{$Key}}
+                    ];
+                }
+            }
         }
         my $ObjectData = $Param{Data}->{$Object};
 
@@ -1340,7 +1350,7 @@ sub _ApplyFilter {
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             if ( $Param{IsPermissionFilter} ) {
-                $Self->_PermissionDebug($Self->{LevelIndent}, "using permission filter: " . Dumper( $Param{Filter} ) );
+                $Self->_PermissionDebug($Self->{LevelIndent}, "using permission filter: " . Dumper( $Filter ) );
             }
 
             # filter each contained hash
@@ -1355,7 +1365,7 @@ sub _ApplyFilter {
                     foreach my $BoolOperator ( keys %{ $Filter->{$FilterObject} } ) {
                         my $BoolOperatorMatch = 1;
 
-                        FILTER:
+                        FILTERITEM:
                         foreach my $FilterItem ( @{ $Filter->{$FilterObject}->{$BoolOperator} } ) {
                             my $FilterMatch = 1;
 
@@ -1578,17 +1588,19 @@ sub _ApplyFilter {
 
                                 # signal the operator that it didn't match
                                 $BoolOperatorMatch = 0;
-                                last FILTER;
+                                last FILTERITEM;
                             }
                             elsif ( $BoolOperator eq 'OR' && $FilterMatch ) {
 
                                 # we don't need to check more filters in this case
                                 $BoolOperatorMatch = 1;
-                                last FILTER;
+                                last FILTERITEM;
                             }
                             elsif ( $BoolOperator eq 'OR' && !$FilterMatch ) {
                                 $BoolOperatorMatch = 0;
                             }
+
+                            last FILTERITEM if $FilterItem->{StopAfterMatch};
                         }
 
                         # abort filters for this object, if we have a non-match in the operator filters
@@ -2325,11 +2337,19 @@ sub _CheckObjectPermission {
 
     # get all relevant permissions
     my @RelevantPermissions;
-    foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
+    foreach my $Permission ( sort { length($b->{Target}) <=> length($a->{Target}) } values %Permissions ) {
+
+        # check for "Wildcard" target (empty restriction)
+        $Permission->{IsWildcard} = 1 if $Permission->{Target} =~ /^.*?\{\}$/;
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/[^\/]+/g;
+        if ( !$Permission->{IsWildcard} ) {
+            $Target =~ s/\*/[^\/]+/g;
+        }
+        else {
+            $Target =~ s/\*/.*?/g;
+        }
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2382,9 +2402,6 @@ sub _CheckObjectPermission {
             # extract property value permission
             next if $Permission->{Target} !~ /^.*?\{(.*?)\}$/;
 
-            # check for "Wildcard" target (empty restriction)
-            my $WildcardTarget = 1 if $1 =~ /^\s*$/;
-
             # every permission will be a part of a logical OR
             my $UseAnd = 0;
 
@@ -2407,7 +2424,7 @@ sub _CheckObjectPermission {
 
                 my ( $Object, $Attribute, $Operator, $Value );
 
-                if ( !$WildcardTarget ) {
+                if ( !$Permission->{IsWildcard} ) {
                     next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
 
                     ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
@@ -2443,26 +2460,32 @@ sub _CheckObjectPermission {
                     $Object = '*';
                 }
 
-                # add a NOT filter if we should have no permission (including DENY)
-                if ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
+                my $StopAfterMatch = 0;
+
+                # add a NOT filter if we should have no permission
+                if ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
+                    $Self->_PermissionDebug($Self->{LevelIndent}, "found a DENY, clearing all existing permission filters");
                     $Not = 1;
-                }
-                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
-                    $Not = 1;
+                    $StopAfterMatch = 1;
+
                     # also clear all existing permission filters
                     $Self->_ClearPermissionFilters();
+                }
+                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
+                    $Not = 1;
                 }
 
                 # add a filter accordingly
                 my %Result = $Self->_AddPermissionFilterForObject(
-                    Filter     => \%Filter,
-                    Object     => $Object,
-                    Field      => $Attribute,
-                    Operator   => $Operator,
-                    Value      => $Value,
-                    Not        => $Not,
-                    UseAnd     => $UseAnd,
-                    AlwaysTrue => $WildcardTarget,
+                    Filter         => \%Filter,
+                    Object         => $Object,
+                    Field          => $Attribute,
+                    Operator       => $Operator,
+                    Value          => $Value,
+                    Not            => $Not,
+                    UseAnd         => $UseAnd,
+                    StopAfterMatch => $StopAfterMatch,
+                    AlwaysTrue     => $Permission->{IsWildcard},
                 );
                 if ( !%Result ) {
 
@@ -2571,9 +2594,17 @@ sub _CheckPropertyPermission {
     my @RelevantPermissions;
     foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
 
+        # check for "Wildcard" target (empty restriction)
+        $Permission->{IsWildcard} = 1 if $Permission->{Target} =~ /^.*?\{\}$/;
+
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/[^\/]+/g;
+        if ( !$Permission->{IsWildcard} ) {
+            $Target =~ s/\*/[^\/]+/g;
+        }
+        else {
+            $Target =~ s/\*/.*?/g;
+        }
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2602,12 +2633,9 @@ sub _CheckPropertyPermission {
         PERMISSION:
         foreach my $Permission ( @RelevantPermissions ) {
 
-            # check for "Wildcard" target (empty restriction)
-            my $WildcardTarget = 1 if $Permission->{Target} =~ /^.*?\{\}$/;
-
             my ( $Object, $Attributes, @AttributeList);
 
-            if ( !$WildcardTarget ) {
+            if ( !$Permission->{IsWildcard} ) {
                 # extract property value permission
                 next if $Permission->{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/;
 
@@ -2723,14 +2751,15 @@ sub _CheckPropertyPermission {
 adds a permission filter
 
     my $Return = $CommonObject->_AddPermissionFilterForObject(
-        Filter     => {},            # optional, if given the method adds the new filter the the existing one
-        Object     => 'Ticket',
-        Field      => 'QueueID',
-        Operator   => 'EQ',
-        Value      => 12,
-        Not        => 0|1,
-        UseAnd     => 0|1,
-        AlwaysTrue => 1              # optional, used for Wildcards
+        Filter         => {},            # optional, if given the method adds the new filter the the existing one
+        Object         => 'Ticket',
+        Field          => 'QueueID',
+        Operator       => 'EQ',
+        Value          => 12,
+        Not            => 0|1,           # optional, default 0
+        UseAnd         => 0|1,           # optional, default 0
+        StopAfterMatch => 0|1,           # optional, default 0
+        AlwaysTrue     => 1              # optional, used for Wildcards
     );
 
     $Return = %Filter
@@ -2787,11 +2816,12 @@ sub _GetPermissionFilter {
 
         # prepare filter definition
         my %FilterDef = (
-            Field      => $Filter->{Field},
-            Operator   => $Filter->{Operator},
-            Value      => $Filter->{Value},
-            Not        => $Filter->{Not},
-            AlwaysTrue => $Filter->{AlwaysTrue}
+            Field          => $Filter->{Field},
+            Operator       => $Filter->{Operator},
+            Value          => $Filter->{Value},
+            Not            => $Filter->{Not} || 0,
+            AlwaysTrue     => $Filter->{AlwaysTrue} || 0,
+            StopAfterMatch => $Filter->{StopAfterMatch} || 0,
         );
 
         my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';

@@ -99,23 +99,25 @@ sub Run {
             }
         }
 
-        my $FAQCategoryGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::FAQ::FAQCategoryGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 FAQCategoryID => join(',', sort keys %{$FAQCategories}),
             }
         );
-  
-        if ( !IsHashRefWithData($FAQCategoryGetResult) || !$FAQCategoryGetResult->{Success} ) {
-            return $FAQCategoryGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @FAQCategoryDataList = IsArrayRef($FAQCategoryGetResult->{Data}->{FAQCategory}) ? @{$FAQCategoryGetResult->{Data}->{FAQCategory}} : ( $FAQCategoryGetResult->{Data}->{FAQCategory} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{FAQCategory} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{FAQCategory}) ? @{$GetResult->{Data}->{FAQCategory}} : ( $GetResult->{Data}->{FAQCategory} );
+        }
 
-        if ( IsArrayRefWithData(\@FAQCategoryDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                FAQCategory => \@FAQCategoryDataList,
+                FAQCategory => \@ResultList,
             )
         }
     }

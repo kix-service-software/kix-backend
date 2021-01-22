@@ -105,23 +105,25 @@ sub Run {
 
 	# get already prepared Link data from LinkGet operation
     if ( IsArrayRefWithData($LinkList) ) {  	
-        my $LinkGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Link::LinkGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 LinkID => join(',', sort @{$LinkList}),
             }
-        );    
-
-        if ( !IsHashRefWithData($LinkGetResult) || !$LinkGetResult->{Success} ) {
-            return $LinkGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @LinkDataList = IsArrayRef($LinkGetResult->{Data}->{Link}) ? @{$LinkGetResult->{Data}->{Link}} : ( $LinkGetResult->{Data}->{Link} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Link} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Link}) ? @{$GetResult->{Data}->{Link}} : ( $GetResult->{Data}->{Link} );
+        }
 
-        if ( IsArrayRefWithData(\@LinkDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Link => \@LinkDataList,
+                Link => \@ResultList,
             )
         }
     }

@@ -91,23 +91,25 @@ sub Run {
 
 	# get already prepared Lock data from LockGet operation
     if ( IsHashRefWithData(\%LockList) ) {  	
-        my $LockGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Lock::LockGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 LockID => join(',', sort keys %LockList),
             }
-        );    
-
-        if ( !IsHashRefWithData($LockGetResult) || !$LockGetResult->{Success} ) {
-            return $LockGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @LockDataList = IsArrayRef($LockGetResult->{Data}->{Lock}) ? @{$LockGetResult->{Data}->{Lock}} : ( $LockGetResult->{Data}->{Lock} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Lock} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Lock}) ? @{$GetResult->{Data}->{Lock}} : ( $GetResult->{Data}->{Lock} );
+        }
 
-        if ( IsArrayRefWithData(\@LockDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Lock => \@LockDataList,
+                Lock => \@ResultList,
             )
         }
     }

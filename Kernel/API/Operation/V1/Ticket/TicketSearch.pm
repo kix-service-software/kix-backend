@@ -102,7 +102,7 @@ sub Run {
     if ( @TicketIndex ) {
 
         # get already prepared Ticket data from TicketGet operation
-        my $TicketGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::TicketGet',
             SuppressPermissionErrors => 1,
             Data          => {
@@ -111,11 +111,14 @@ sub Run {
                 expand    => $Param{Data}->{expand},
             }
         );
-        if ( !IsHashRefWithData($TicketGetResult) || !$TicketGetResult->{Success} ) {
-            return $TicketGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Ticket} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Ticket}) ? @{$GetResult->{Data}->{Ticket}} : ( $GetResult->{Data}->{Ticket} );
+        }
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

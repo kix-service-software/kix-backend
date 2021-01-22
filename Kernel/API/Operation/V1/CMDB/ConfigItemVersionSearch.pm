@@ -148,17 +148,19 @@ sub Run {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 VersionID    => join(',', sort @{$VersionList}),
             }
-        );    
-
+        );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRef($GetResult->{Data}->{ConfigItemVersion}) ? @{$GetResult->{Data}->{ConfigItemVersion}} : ( $GetResult->{Data}->{ConfigItemVersion} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ConfigItemVersion} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItemVersion}) ? @{$GetResult->{Data}->{ConfigItemVersion}} : ( $GetResult->{Data}->{ConfigItemVersion} );
+        }
 
-        if ( IsArrayRefWithData(\@DataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConfigItemVersion => \@DataList,
+                ConfigItemVersion => \@ResultList,
             )
         }
     }

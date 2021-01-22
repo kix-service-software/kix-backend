@@ -208,11 +208,14 @@ sub Run {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRef($GetResult->{Data}->{ConfigItem}) ? @{$GetResult->{Data}->{ConfigItem}} : ( $GetResult->{Data}->{ConfigItem} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ConfigItem} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItem}) ? @{$GetResult->{Data}->{ConfigItem}} : ( $GetResult->{Data}->{ConfigItem} );
+        }
 
-        if ( IsArrayRefWithData(\@DataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConfigItem => \@DataList,
+                ConfigItem => \@ResultList,
             )
         }
     }

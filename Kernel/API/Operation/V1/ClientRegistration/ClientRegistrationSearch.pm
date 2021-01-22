@@ -89,23 +89,25 @@ sub Run {
 
 	# get already prepared ClientRegistration data from ClientRegistrationGet operation
     if ( IsArrayRefWithData(\@ClientList) ) {  	
-        my $ClientRegistrationGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::ClientRegistration::ClientRegistrationGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 ClientID => join(',', @ClientList),
             }
-        );    
-
-        if ( !IsHashRefWithData($ClientRegistrationGetResult) || !$ClientRegistrationGetResult->{Success} ) {
-            return $ClientRegistrationGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ClientRegistrationDataList = IsArrayRef($ClientRegistrationGetResult->{Data}->{ClientRegistration}) ? @{$ClientRegistrationGetResult->{Data}->{ClientRegistration}} : ( $ClientRegistrationGetResult->{Data}->{ClientRegistration} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ClientRegistration} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ClientRegistration}) ? @{$GetResult->{Data}->{ClientRegistration}} : ( $GetResult->{Data}->{ClientRegistration} );
+        }
 
-        if ( IsArrayRefWithData(\@ClientRegistrationDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ClientRegistration => \@ClientRegistrationDataList,
+                ClientRegistration => \@ResultList,
             )
         }
     }

@@ -111,13 +111,16 @@ sub Run {
                 Option  => join(',', sort keys %AllOptions),
                 include => $Param{Data}->{include},
             }
-        );    
+        );
 
         if ( !IsHashRefWithData($SysConfigGetResult) || !$SysConfigGetResult->{Success} ) {
             return $SysConfigGetResult;
         }
         
-        my @SysConfigDataList = ref $SysConfigGetResult->{Data}->{SysConfigOption} eq 'ARRAY' ? @{$SysConfigGetResult->{Data}->{SysConfigOption}} : ( $SysConfigGetResult->{Data}->{SysConfigOption} );
+        my @SysConfigDataList;
+        if ( defined $SysConfigGetResult->{Data}->{SysConfigOption} ) {
+            @SysConfigDataList = IsArrayRef($SysConfigGetResult->{Data}->{SysConfigOption}) ? @{$SysConfigGetResult->{Data}->{SysConfigOption}} : ( $SysConfigGetResult->{Data}->{SysConfigOption} );
+        }
 
         if ( IsArrayRefWithData(\@SysConfigDataList) ) {
             return $Self->_Success(

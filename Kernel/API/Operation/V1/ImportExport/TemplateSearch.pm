@@ -91,23 +91,24 @@ sub Run {
 
     # get already prepared Template data from TemplateGet operation
     if ( IsArrayRefWithData($TemplateListRef) ) {
-        my $TemplateGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::ImportExport::TemplateGet',
             Data      => {
                 TemplateID => join(',', @{$TemplateListRef}),
             }
         );
-
-        if ( !IsHashRefWithData($TemplateGetResult) || !$TemplateGetResult->{Success} ) {
-            return $TemplateGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @TemplateDataList = IsArrayRef($TemplateGetResult->{Data}->{ImportExportTemplate})
-            ? @{$TemplateGetResult->{Data}->{ImportExportTemplate}} : ( $TemplateGetResult->{Data}->{ImportExportTemplate} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ImportExportTemplate} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ImportExportTemplate}) ? @{$GetResult->{Data}->{ImportExportTemplate}} : ( $GetResult->{Data}->{ImportExportTemplate} );
+        }
 
-        if ( IsArrayRefWithData(\@TemplateDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ImportExportTemplate => \@TemplateDataList,
+                ImportExportTemplate => \@ResultList,
             );
         }
     }
