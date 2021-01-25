@@ -88,23 +88,25 @@ sub Run {
 
 	# get already prepared ticketstate data from TicketStateGet operation
     if ( IsHashRefWithData(\%TicketStateList) ) {  	
-        my $TicketStateGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::TicketState::TicketStateGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 StateID => join(',', sort keys %TicketStateList),
             }
-        );    
-
-        if ( !IsHashRefWithData($TicketStateGetResult) || !$TicketStateGetResult->{Success} ) {
-            return $TicketStateGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @TicketStateDataList = IsArrayRef($TicketStateGetResult->{Data}->{TicketState}) ? @{$TicketStateGetResult->{Data}->{TicketState}} : ( $TicketStateGetResult->{Data}->{TicketState} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{TicketState} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{TicketState}) ? @{$GetResult->{Data}->{TicketState}} : ( $GetResult->{Data}->{TicketState} );
+        }
 
-        if ( IsArrayRefWithData(\@TicketStateDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                TicketState => \@TicketStateDataList,
+                TicketState => \@ResultList,
             )
         }
     }

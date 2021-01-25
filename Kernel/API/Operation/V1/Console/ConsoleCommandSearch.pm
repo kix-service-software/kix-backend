@@ -88,23 +88,25 @@ sub Run {
 
 	# get already prepared Command data from CommandGet operation
     if ( IsArrayRefWithData(\@CommandList) ) {  	
-        my $CommandGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Console::ConsoleCommandGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 Command => join(',', sort @CommandList),
             }
-        );    
-
-        if ( !IsHashRefWithData($CommandGetResult) || !$CommandGetResult->{Success} ) {
-            return $CommandGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @CommandDataList = IsArrayRef($CommandGetResult->{Data}->{ConsoleCommand}) ? @{$CommandGetResult->{Data}->{ConsoleCommand}} : ( $CommandGetResult->{Data}->{ConsoleCommand} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ConsoleCommand} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConsoleCommand}) ? @{$GetResult->{Data}->{ConsoleCommand}} : ( $GetResult->{Data}->{ConsoleCommand} );
+        }
 
-        if ( IsArrayRefWithData(\@CommandDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConsoleCommand => \@CommandDataList,
+                ConsoleCommand => \@ResultList,
             )
         }
     }

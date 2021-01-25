@@ -148,17 +148,19 @@ sub Run {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 ImageID    => join(',', @{$ImageList}),
             }
-        );    
-
+        );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRef($GetResult->{Data}->{Image}) ? @{$GetResult->{Data}->{Image}} : ( $GetResult->{Data}->{Image} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Image} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Image}) ? @{$GetResult->{Data}->{Image}} : ( $GetResult->{Data}->{Image} );
+        }
 
-        if ( IsArrayRefWithData(\@DataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Image => \@DataList,
+                Image => \@ResultList,
             )
         }
     }

@@ -117,7 +117,10 @@ sub Run {
             return $SysConfigGetResult;
         }
 
-        my @SysConfigDataList = IsArrayRef($SysConfigGetResult->{Data}->{SysConfigOptionDefinition}) ? @{$SysConfigGetResult->{Data}->{SysConfigOptionDefinition}} : ( $SysConfigGetResult->{Data}->{SysConfigOptionDefinition} );
+        my @SysConfigDataList;
+        if ( defined $SysConfigGetResult->{Data}->{SysConfigOptionDefinition} ) {
+            @SysConfigDataList = IsArrayRef($SysConfigGetResult->{Data}->{SysConfigOptionDefinition}) ? @{$SysConfigGetResult->{Data}->{SysConfigOptionDefinition}} : ( $SysConfigGetResult->{Data}->{SysConfigOptionDefinition} );
+        }
 
         if ( IsArrayRefWithData(\@SysConfigDataList) ) {
             return $Self->_Success(

@@ -89,25 +89,25 @@ sub Run {
 
     # get already prepared MailAccount data from MailAccountGet operation
     if ( IsHashRefWithData( \%MailAccountList ) ) {
-        my $MailAccountGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::MailAccount::MailAccountGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 MailAccountID => join( ',', sort keys %MailAccountList ),
                 }
         );
-
-        if ( !IsHashRefWithData($MailAccountGetResult) || !$MailAccountGetResult->{Success} ) {
-            return $MailAccountGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @MailAccountDataList = IsArrayRef( $MailAccountGetResult->{Data}->{MailAccount} )
-            ? @{ $MailAccountGetResult->{Data}->{MailAccount} }
-            : ( $MailAccountGetResult->{Data}->{MailAccount} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{MailAccount} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{MailAccount}) ? @{$GetResult->{Data}->{MailAccount}} : ( $GetResult->{Data}->{MailAccount} );
+        }
 
-        if ( IsArrayRefWithData( \@MailAccountDataList ) ) {
+        if ( IsArrayRefWithData( \@ResultList ) ) {
             return $Self->_Success(
-                MailAccount => \@MailAccountDataList,
+                MailAccount => \@ResultList,
             );
         }
     }

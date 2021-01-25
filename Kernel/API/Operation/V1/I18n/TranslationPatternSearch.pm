@@ -92,18 +92,21 @@ sub Run {
     if (IsHashRefWithData(\%PatternList)) {
 
         # get already prepared Pattern data from TranslationPatternGet operation
-        my $PatternGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::I18n::TranslationPatternGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 PatternID => join(',', sort keys %PatternList),
             }
         );
-        if ( !IsHashRefWithData($PatternGetResult) || !$PatternGetResult->{Success} ) {
-            return $PatternGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($PatternGetResult->{Data}->{TranslationPattern}) ? @{$PatternGetResult->{Data}->{TranslationPattern}} : ( $PatternGetResult->{Data}->{TranslationPattern} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{TranslationPattern} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{TranslationPattern}) ? @{$GetResult->{Data}->{TranslationPattern}} : ( $GetResult->{Data}->{TranslationPattern} );
+        }
         
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(

@@ -89,32 +89,33 @@ sub Run {
 
     # get already prepared Notification data from NotificationGet operation
     if ( IsHashRefWithData( \%NotificationList ) ) {
-        my $NotificationGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Notification::NotificationGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 NotificationID => join( ',', sort keys %NotificationList )
             }
         );
-
-        if (
-            !IsHashRefWithData($NotificationGetResult)
-            || !$NotificationGetResult->{Success}
-            ) {
-            return $NotificationGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @NotificationDataList = IsArrayRef( $NotificationGetResult->{Data}->{Notification} )
-            ? @{ $NotificationGetResult->{Data}->{Notification} }
-            : ( $NotificationGetResult->{Data}->{Notification} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Notification} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Notification}) ? @{$GetResult->{Data}->{Notification}} : ( $GetResult->{Data}->{Notification} );
+        }
 
-        if ( IsArrayRefWithData( \@NotificationDataList ) ) {
-            return $Self->_Success( Notification => \@NotificationDataList, );
+        if ( IsArrayRefWithData( \@ResultList ) ) {
+            return $Self->_Success( 
+                Notification => \@ResultList,
+            );
         }
     }
 
     # return result
-    return $Self->_Success( Notification => [], );
+    return $Self->_Success( 
+        Notification => [],
+    );
 }
 
 1;

@@ -91,23 +91,25 @@ sub Run {
 
 	# get already prepared AddressBook data from AddressGet operation
     if ( IsHashRefWithData(\%AddressList) ) {  	
-        my $AddressBookGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::AddressBook::AddressGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 AddressID => join(',', sort keys %AddressList),
             }
-        );    
-
-        if ( !IsHashRefWithData($AddressBookGetResult) || !$AddressBookGetResult->{Success} ) {
-            return $AddressBookGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @AddressDataList = IsArrayRef($AddressBookGetResult->{Data}->{Address}) ? @{$AddressBookGetResult->{Data}->{Address}} : ( $AddressBookGetResult->{Data}->{Address} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Address} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Address}) ? @{$GetResult->{Data}->{Address}} : ( $GetResult->{Data}->{Address} );
+        }
 
-        if ( IsArrayRefWithData(\@AddressDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Address => \@AddressDataList,
+                Address => \@ResultList,
             )
         }
     }
