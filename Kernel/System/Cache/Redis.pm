@@ -257,6 +257,9 @@ sub GetKeysForType {
     do {
         if ( $Param{Type} ne '*' ) {
             ($Cursor, $Keys) = $Self->{RedisObject}->hscan($Param{Type}, $Cursor);
+            # remove the values in this case
+            my $Index=0; 
+            $Keys = [ grep { $Index++ % 2 == 0 } @{$Keys} ];
         }
         else {
             ($Cursor, $Keys) = $Self->{RedisObject}->scan($Cursor);
