@@ -668,7 +668,7 @@ sub MigrationStop {
     );
     return if !IsHashRefWithData($Migration);
 
-    $Migration->{Status} = $Migration->{Status} ne 'pending' ? Kernel::Language::Translatable('aborting') : Kernel::Language::Translatable('aborted');
+    $Migration->{Status} = $Migration->{Status} !~ /^(pending|finished)$/ ? Kernel::Language::Translatable('aborting') : Kernel::Language::Translatable('aborted');
 
     return $Kernel::OM->Get('Cache')->Set(
         Type  => 'Migration',
