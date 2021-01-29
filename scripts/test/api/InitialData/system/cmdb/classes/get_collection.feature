@@ -8,7 +8,7 @@ Feature: GET request to the /system/cmdb/classes resource
   Scenario: check is the existing classes are consistent with the delivery defaults
     When I query the cmdb collection of classes
     Then the response code is 200
-    And the response object is ConfigItemClassCollectionResponse
+#    And the response object is ConfigItemClassCollectionResponse
     And the response contains 7 items of type "ConfigItemClass"
     And the response contains the following items of type ConfigItemClass
       | Name     |
