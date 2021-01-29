@@ -7570,6 +7570,15 @@ You can log in via the following URL:
                             "Enabled": 0,
                             "Module": "Kernel::System::Auth::Sync::LDAP",
                             "Config": {
+                                "GroupDNBasedUsageContextSync": {
+                                    "SomeDN": {
+                                        "IsAgent": 1,
+                                        "IsCustomer": 0
+                                    },
+                                    "SomeOtherDN": {
+                                        "IsCustomer": 1
+                                    }
+                                },
                                 "GroupDNBasedRoleSync": {
                                     "SomeDN": {
                                         "Role1": 1,
