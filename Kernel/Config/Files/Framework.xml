@@ -41,7 +41,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::ObjectType###Article" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="DynamicFields::ObjectType###Article" Required="0" Valid="0">
         <Description Translatable="1">DynamicField object registration.</Description>
         <Group>Framework</Group>
         <SubGroup>DynamicFields::ObjectType::Registration</SubGroup>
@@ -3301,7 +3301,7 @@ Notes:
         <Setting>
             <String Regex="">Calendar Name 1</String>
         </Setting>
-    </ConfigItem>  
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeZone::Calendar1" Required="1" Valid="1">
         <Description Translatable="1">Defines name of timezone to use for calendar. Used to calculate offset for timezones with DST. Require a system with UTC as system time.</Description>
         <Group>Framework</Group>
@@ -8263,7 +8263,7 @@ You can log in via the following URL:
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
         </Setting>
-    </ConfigItem>    
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Cache::SubdirLevels" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Specify how many sub directory levels to use when creating cache files. This should prevent too many cache files being in one directory.</Description>
         <Group>Framework</Group>
