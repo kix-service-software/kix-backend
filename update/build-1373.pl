@@ -104,6 +104,9 @@ sub _AddDynamicFields {
         }
     }
 
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
+
     return 1;
 }
 
