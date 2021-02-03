@@ -171,6 +171,8 @@ sub _ReplaceArticlePlaceholders {
         if ( $Param{Text} =~ /$Tag\_(.+?)$Self->{End}/g ) {
             my $CharLength = $1;
             my $AttributeValue = $Param{Article}->{$Attribute};
+            next if !defined $AttributeValue;
+            
             $AttributeValue =~ s/^(.{$CharLength}).*$/$1 [...]/;
 
             $Param{Text}    =~ s/$Tag\_.+?$Self->{End}/$AttributeValue/g;

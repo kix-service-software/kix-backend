@@ -112,8 +112,10 @@ sub ExecuteJobsForEvent {
         );
 
         if ( $CanExecute ) {
-            # execute the job
-            my $Result = $Self->JobExecute(
+            # execute the job in a new Automation instance
+            my $AutomationObject = $Kernel::OM->GetModuleFor('Automation')->new(%{$Self});
+
+            my $Result = $AutomationObject->JobExecute(
                 ID => $JobID,
                 %Param,
             );

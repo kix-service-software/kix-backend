@@ -13,10 +13,6 @@ package Kernel::System::Automation::Event::Handler;
 use strict;
 use warnings;
 
-use List::Util qw(first);
-
-use Kernel::System::VariableCheck qw(:all);
-
 our @ObjectDependencies = (
     'Config',
     'Log',

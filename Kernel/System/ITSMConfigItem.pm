@@ -609,7 +609,7 @@ sub ConfigItemUpdate {
         Event => 'ConfigItemUpdate',
         Data  => {
             ConfigItemID => $Param{ConfigItemID},
-            Comment      => $Param{ConfigItemID} . '%%' . $Param{Number},
+            Comment      => $Param{ConfigItemID},
         },
         UserID => $Param{UserID},
     );
