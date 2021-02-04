@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-2-2 16:49+0000\n"
+"POT-Creation-Date: 2021-2-4 09:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -496,6 +496,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Test/QA"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Text"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1278,6 +1282,10 @@ msgstr ""
 msgid "Related Assets"
 msgstr ""
 
+#. Perl Module: update/build-1391.pl
+msgid "Source"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
 msgstr ""
@@ -1608,10 +1616,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Alternative to"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Article"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2888,10 +2892,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Synchronisation"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Text"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
