@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -10,6 +10,8 @@ package Kernel::System::Organisation;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::EventHandler);
 
@@ -180,6 +182,7 @@ get organisation attributes
 
     my %Organisation = $OrganisationObject->OrganisationGet(
         ID => 123,
+        DynamicFields => 0|1,         # Optional, default 0. To include the dynamic field values for this contact to the return structure.
     );
 
 Returns:
@@ -215,8 +218,10 @@ sub OrganisationGet {
         return;
     }
 
+    my $FetchDynamicFields = $Param{DynamicFields} ? 1 : 0;
+
     # check cache
-    my $CacheKey = "OrganisationGet::$Param{ID}";
+    my $CacheKey = "OrganisationGet::$Param{ID}::$FetchDynamicFields";
     my $Data = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -257,6 +262,33 @@ sub OrganisationGet {
             Message  => "Organisation with ID $Param{ID} not found in database!",
         );
         return;
+    }
+
+    # check if need to return DynamicFields
+    if ($FetchDynamicFields) {
+        
+        # get all dynamic fields for the object type Ticket
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+            ObjectType => 'Organisation'
+        );
+
+        DYNAMICFIELD:
+        for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
+
+            # validate each dynamic field
+            next DYNAMICFIELD if !$DynamicFieldConfig;
+            next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+            next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
+
+            # get the current value for each dynamic field
+            my $Value = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                ObjectID           => $Param{ID},
+            );
+
+            # set the dynamic field name and value into the ticket hash
+            $Organisation{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
+        }
     }
 
     $Kernel::OM->Get('Cache')->Set(
@@ -669,6 +701,29 @@ sub OrganisationDelete {
             );
             return;
         }
+    }
+
+    # get all dynamic fields this object type
+    my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+        ObjectType => 'Organisation',
+        Valid      => 0,
+    );
+
+    # delete dynamicfield values for this organisation
+    DYNAMICFIELD:
+    for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
+
+        next DYNAMICFIELD if !$DynamicFieldConfig;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+        next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
+        next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
+
+        $Kernel::OM->Get('DynamicFieldBackend')->ValueDelete(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            ObjectID           => $Param{ID},
+            UserID             => $Param{UserID},
+            NoPostHandling     => 1,                # we will delete the contact, so no additional handling needed when deleting the DF values
+        );
     }
 
     # get database object

@@ -1,156 +1,17 @@
 {
-   "$id" : "ConfigItemClassCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of config item class objects.",
-   "type" : "object",
-   "properties" : {
-      "ConfigItemClass" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ConfigItemClass_json-70bafa8537"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ConfigItemClassCollectionResponse.json",
+  "type": "object",
+  "description": "A list of config item class objects.",
+  "properties": {
+    "ConfigItemClass": {
+      "type": "array",
+      "items": {
+        "$ref": "ConfigItemClass.json"
       }
-   },
-   "required" : [
-      "ConfigItemClass"
-   ],
-   "definitions" : {
-      "ConfigItemClassDefinition_json-3965c4d329" : {
-         "$id" : "ConfigItemClassDefinition.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item class definition object.",
-         "type" : "object",
-         "properties" : {
-            "Class" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ClassID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Definition" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object"
-               },
-               "readOnly" : true
-            },
-            "DefinitionID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "DefinitionString" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Version" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "Class",
-            "ClassID",
-            "CreateBy",
-            "CreateTime",
-            "Definition",
-            "DefinitionID",
-            "DefinitionString",
-            "Version"
-         ]
-      },
-      "ConfigItemClass_json-70bafa8537" : {
-         "$id" : "ConfigItemClass.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item class object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "ConfigItemStats" : {
-               "description" : "result of include \"ConfigItemStats\"",
-               "type" : "object",
-               "properties" : {
-                  "PostProductiveCount" : {
-                     "type" : "integer",
-                     "readOnly" : true
-                  },
-                  "ProductiveCount" : {
-                     "type" : "integer",
-                     "readOnly" : true
-                  }
-               },
-               "required" : [
-                  "PostProductiveCount",
-                  "ProductiveCount"
-               ]
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CurrentDefinition" : {
-               "$ref" : "#/definitions/ConfigItemClassDefinition_json-3965c4d329"
-            },
-            "Definitions" : {
-               "description" : "added via include \"Definitions\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/ConfigItemClassDefinition_json-3965c4d329"
-               }
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "ConfigItemClass"
+  ]
 }

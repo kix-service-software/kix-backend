@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,24 +91,27 @@ sub Run {
    
     # get already prepared ExecPlan data from ExecPlanGet operation
     if ( IsHashRefWithData(\%ExecPlanList) ) {   
-        my $ExecPlanGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::ExecPlanGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 ExecPlanID => join(',', sort keys %ExecPlanList),
             }
-        );    
-
-        if ( !IsHashRefWithData($ExecPlanGetResult) || !$ExecPlanGetResult->{Success} ) {
-            return $ExecPlanGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
-        push @ExecPlanDataList,IsArrayRefWithData($ExecPlanGetResult->{Data}->{ExecPlan}) ? @{$ExecPlanGetResult->{Data}->{ExecPlan}} : ( $ExecPlanGetResult->{Data}->{ExecPlan} );
-    }	            	
 
-    if ( IsArrayRefWithData(\@ExecPlanDataList) ) {
-        return $Self->_Success(
-            ExecPlan => \@ExecPlanDataList,
-        )
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ExecPlan} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ExecPlan}) ? @{$GetResult->{Data}->{ExecPlan}} : ( $GetResult->{Data}->{ExecPlan} );
+        }
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                ExecPlan => \@ResultList,
+            )
+        }
     }
     
     # return result

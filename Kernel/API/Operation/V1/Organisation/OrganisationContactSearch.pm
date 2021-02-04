@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -119,18 +119,21 @@ sub Run {
     if (IsHashRefWithData(\%ContactList)) {
         
         # get already prepared Contact data from ContactGet operation
-        my $ContactGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::Contact::ContactGet',
             Data          => {
                 ContactID => join(',', sort keys %ContactList),
             }
         );
-        if ( !IsHashRefWithData($ContactGetResult) || !$ContactGetResult->{Success} ) {
-            return $ContactGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($ContactGetResult->{Data}->{Contact}) ? @{$ContactGetResult->{Data}->{Contact}} : ( $ContactGetResult->{Data}->{Contact} );
-        
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Contact} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Contact}) ? @{$GetResult->{Data}->{Contact}} : ( $GetResult->{Data}->{Contact} );
+        }
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Contact => \@ResultList,

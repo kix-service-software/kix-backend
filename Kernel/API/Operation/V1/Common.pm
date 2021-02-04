@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ initialize and run the current operation
 
 sub RunOperation {
     my ( $Self, %Param ) = @_;
-    
+
     # init webservice
     my $Result = $Self->Init(
         WebserviceID => $Self->{WebserviceID},
@@ -78,7 +78,7 @@ sub RunOperation {
         my $RequestMethodOrigin = $Param{RequestMethodOrigin};
         my $ParentCheckMethod = ($Param{RequestMethodOrigin} || $Self->{RequestMethod}) eq 'GET' ? 'GET' : 'PATCH';
 
-        # if we don't have a 
+        # if we don't have a
         if ( !$Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} && $Self->{ParentMethodOperationMapping}->{GET} ) {
             $RequestMethodOrigin = $ParentCheckMethod if !$RequestMethodOrigin;
             $ParentCheckMethod = 'GET';
@@ -1144,7 +1144,7 @@ sub ExecOperation {
     if ( !$Param{IgnoreExpand} ) {
         $AdditionalData{expand} = $Self->{RequestData}->{expand};
     }
-    
+
     my $Result = $OperationObject->Run(
         Data    => {
             %{$Param{Data} || {}},
@@ -1316,11 +1316,21 @@ sub _ApplyFilter {
     my $Filter = $Param{Filter} || $Self->{Filter};
 
     OBJECT:
-    foreach my $FilterObject ( keys %{$Filter} ) {
+    foreach my $FilterObject ( sort keys %{$Filter} ) {
         my $Object = $FilterObject;
         if ( $Object eq '*' ) {
             # wildcard
             $Object = (sort keys %{$Param{Data}})[0];
+            # merge that filter with a specific one (if we have)
+            if ( IsHashRefWithData($Filter->{$Object}) ) {
+                foreach my $Key ( keys %{$Filter->{$Object}} ) {
+                    next if !exists $Filter->{$FilterObject}->{$Key};
+                    $Filter->{$Object}->{$Key} = [
+                        @{$Filter->{$Object}->{$Key}},
+                        @{$Filter->{$FilterObject}->{$Key}}
+                    ];
+                }
+            }
         }
         my $ObjectData = $Param{Data}->{$Object};
 
@@ -1340,7 +1350,7 @@ sub _ApplyFilter {
             $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
 
             if ( $Param{IsPermissionFilter} ) {
-                $Self->_PermissionDebug($Self->{LevelIndent}, "using permission filter: " . Dumper( $Param{Filter} ) );
+                $Self->_PermissionDebug($Self->{LevelIndent}, "using permission filter: " . Dumper( $Filter ) );
             }
 
             # filter each contained hash
@@ -1355,8 +1365,8 @@ sub _ApplyFilter {
                     foreach my $BoolOperator ( keys %{ $Filter->{$FilterObject} } ) {
                         my $BoolOperatorMatch = 1;
 
-                        FILTER:
-                        foreach my $FilterItem ( @{ $Filter->{$FilterObject}->{$BoolOperator} } ) {                           
+                        FILTERITEM:
+                        foreach my $FilterItem ( @{ $Filter->{$FilterObject}->{$BoolOperator} } ) {
                             my $FilterMatch = 1;
 
                             if ( !$FilterItem->{AlwaysTrue} ) {
@@ -1578,17 +1588,19 @@ sub _ApplyFilter {
 
                                 # signal the operator that it didn't match
                                 $BoolOperatorMatch = 0;
-                                last FILTER;
+                                last FILTERITEM;
                             }
                             elsif ( $BoolOperator eq 'OR' && $FilterMatch ) {
 
                                 # we don't need to check more filters in this case
                                 $BoolOperatorMatch = 1;
-                                last FILTER;
+                                last FILTERITEM;
                             }
                             elsif ( $BoolOperator eq 'OR' && !$FilterMatch ) {
                                 $BoolOperatorMatch = 0;
                             }
+
+                            last FILTERITEM if $FilterItem->{StopAfterMatch};
                         }
 
                         # abort filters for this object, if we have a non-match in the operator filters
@@ -2325,11 +2337,19 @@ sub _CheckObjectPermission {
 
     # get all relevant permissions
     my @RelevantPermissions;
-    foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
+    foreach my $Permission ( sort { length($b->{Target}) <=> length($a->{Target}) } values %Permissions ) {
+
+        # check for "Wildcard" target (empty restriction)
+        $Permission->{IsWildcard} = 1 if $Permission->{Target} =~ /^.*?\{\}$/;
 
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/[^\/]+/g;
+        if ( !$Permission->{IsWildcard} ) {
+            $Target =~ s/\*/[^\/]+/g;
+        }
+        else {
+            $Target =~ s/\*/.*?/g;
+        }
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2382,9 +2402,6 @@ sub _CheckObjectPermission {
             # extract property value permission
             next if $Permission->{Target} !~ /^.*?\{(.*?)\}$/;
 
-            # check for "Wildcard" target (empty restriction)
-            my $WildcardTarget = 1 if $1 =~ /^\s*$/;
-
             # every permission will be a part of a logical OR
             my $UseAnd = 0;
 
@@ -2407,7 +2424,7 @@ sub _CheckObjectPermission {
 
                 my ( $Object, $Attribute, $Operator, $Value );
 
-                if ( !$WildcardTarget ) {
+                if ( !$Permission->{IsWildcard} ) {
                     next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
 
                     ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
@@ -2443,26 +2460,32 @@ sub _CheckObjectPermission {
                     $Object = '*';
                 }
 
-                # add a NOT filter if we should have no permission (including DENY)
-                if ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
+                my $StopAfterMatch = 0;
+
+                # add a NOT filter if we should have no permission
+                if ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
+                    $Self->_PermissionDebug($Self->{LevelIndent}, "found a DENY, clearing all existing permission filters");
                     $Not = 1;
-                }
-                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
-                    $Not = 1;
+                    $StopAfterMatch = 1;
+
                     # also clear all existing permission filters
                     $Self->_ClearPermissionFilters();
+                }
+                elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
+                    $Not = 1;
                 }
 
                 # add a filter accordingly
                 my %Result = $Self->_AddPermissionFilterForObject(
-                    Filter     => \%Filter,
-                    Object     => $Object,
-                    Field      => $Attribute,
-                    Operator   => $Operator,
-                    Value      => $Value,
-                    Not        => $Not,
-                    UseAnd     => $UseAnd,
-                    AlwaysTrue => $WildcardTarget,
+                    Filter         => \%Filter,
+                    Object         => $Object,
+                    Field          => $Attribute,
+                    Operator       => $Operator,
+                    Value          => $Value,
+                    Not            => $Not,
+                    UseAnd         => $UseAnd,
+                    StopAfterMatch => $StopAfterMatch,
+                    AlwaysTrue     => $Permission->{IsWildcard},
                 );
                 if ( !%Result ) {
 
@@ -2571,9 +2594,17 @@ sub _CheckPropertyPermission {
     my @RelevantPermissions;
     foreach my $Permission ( sort { length($b) <=> length($a) } values %Permissions ) {
 
+        # check for "Wildcard" target (empty restriction)
+        $Permission->{IsWildcard} = 1 if $Permission->{Target} =~ /^.*?\{\}$/;
+
         # prepare target
         my $Target = $Permission->{Target};
-        $Target =~ s/\*/[^\/]+/g;
+        if ( !$Permission->{IsWildcard} ) {
+            $Target =~ s/\*/[^\/]+/g;
+        }
+        else {
+            $Target =~ s/\*/.*?/g;
+        }
         $Target =~ s/\//\\\//g;
         $Target =~ s/\{.*?\}$//g;
 
@@ -2602,12 +2633,9 @@ sub _CheckPropertyPermission {
         PERMISSION:
         foreach my $Permission ( @RelevantPermissions ) {
 
-            # check for "Wildcard" target (empty restriction)
-            my $WildcardTarget = 1 if $Permission->{Target} =~ /^.*?\{\}$/;
-
             my ( $Object, $Attributes, @AttributeList);
 
-            if ( !$WildcardTarget ) {
+            if ( !$Permission->{IsWildcard} ) {
                 # extract property value permission
                 next if $Permission->{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/;
 
@@ -2616,7 +2644,7 @@ sub _CheckPropertyPermission {
             }
             else {
                 $Object = '*';
-                @AttributeList = ( '*' ); 
+                @AttributeList = ( '*' );
             }
 
             $Self->_PermissionDebug($Self->{LevelIndent},  sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
@@ -2723,14 +2751,15 @@ sub _CheckPropertyPermission {
 adds a permission filter
 
     my $Return = $CommonObject->_AddPermissionFilterForObject(
-        Filter     => {},            # optional, if given the method adds the new filter the the existing one
-        Object     => 'Ticket',
-        Field      => 'QueueID',
-        Operator   => 'EQ',
-        Value      => 12,
-        Not        => 0|1,
-        UseAnd     => 0|1,
-        AlwaysTrue => 1              # optional, used for Wildcards
+        Filter         => {},            # optional, if given the method adds the new filter the the existing one
+        Object         => 'Ticket',
+        Field          => 'QueueID',
+        Operator       => 'EQ',
+        Value          => 12,
+        Not            => 0|1,           # optional, default 0
+        UseAnd         => 0|1,           # optional, default 0
+        StopAfterMatch => 0|1,           # optional, default 0
+        AlwaysTrue     => 1              # optional, used for Wildcards
     );
 
     $Return = %Filter
@@ -2787,11 +2816,12 @@ sub _GetPermissionFilter {
 
         # prepare filter definition
         my %FilterDef = (
-            Field      => $Filter->{Field},
-            Operator   => $Filter->{Operator},
-            Value      => $Filter->{Value},
-            Not        => $Filter->{Not},
-            AlwaysTrue => $Filter->{AlwaysTrue}
+            Field          => $Filter->{Field},
+            Operator       => $Filter->{Operator},
+            Value          => $Filter->{Value},
+            Not            => $Filter->{Not} || 0,
+            AlwaysTrue     => $Filter->{AlwaysTrue} || 0,
+            StopAfterMatch => $Filter->{StopAfterMatch} || 0,
         );
 
         my $Logical = $Filter->{UseAnd} ? 'AND' : 'OR';
@@ -2923,11 +2953,11 @@ sub _RunParallel {
 
                     $ResultQueue->enqueue(Storable::freeze {
                         Item   => $Item,
-                        Result => $Result, 
+                        Result => $Result,
                     });
                 }
-            }, 
-            $Self, 
+            },
+            $Self,
             %Param,
             WorkQueue   => $WorkQueue,
             ResultQueue => $ResultQueue,
@@ -3060,6 +3090,413 @@ sub _FilterCustomerUserVisibleConfigItems {
     }
 
     return @ConfigItemIDList;
+}
+
+=item _CheckDynamicField()
+
+checks if the given dynamic field parameter is valid.
+
+    my $DynamicFieldCheck = $OperationObject->_CheckDynamicField(
+        DynamicField => $DynamicField,              # all dynamic field parameters
+        ObjectType   => 'Ticket'
+    );
+
+    returns:
+
+    $DynamicFieldCheck = {
+        Success => 1,                               # if everything is OK
+    }
+
+    $DynamicFieldCheck = {
+        Code    => 'Function.Error',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub _CheckDynamicField {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(DynamicField ObjectType)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "_CheckDynamicField() No $Needed given!"
+            );
+        }
+    }
+
+    # get the dynamic fields
+    my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+        Valid      => 1,
+        ObjectType => [ $Param{ObjectType} ],
+    );
+
+    # create a Dynamic Fields lookup table (by name)
+    DYNAMICFIELD:
+    for my $DynamicField ( @{$DynamicFieldList} ) {
+        next DYNAMICFIELD if !$DynamicField;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
+        next DYNAMICFIELD if !$DynamicField->{Name};
+        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
+    }
+
+    my $DynamicField = $Param{DynamicField};
+
+    # check DynamicField item internally
+    for my $Needed (qw(Name Value)) {
+        if (
+            !defined $DynamicField->{$Needed}
+            || ( !IsString( $DynamicField->{$Needed} ) && ref $DynamicField->{$Needed} ne 'ARRAY' )
+            )
+        {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter DynamicField::$Needed is missing!",
+            );
+        }
+    }
+
+    # check DF access
+    if ( $Self->{Authorization}->{UserType} eq 'Customer' && !$Self->{DynamicFieldLookup}->{ $DynamicField->{Name} }->{CustomerVisible} ) {
+        return $Self->_Error(
+            Code    => 'Forbidden',
+            Message => "DynamicField \"$Param{Name}\" cannot be set!",
+        );
+    }
+
+    # check DynamicField->Name
+    if ( !$Self->_ValidateDynamicFieldName( %{$DynamicField} ) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter DynamicField::Name is invalid!",
+        );
+    }
+
+    # check DynamicField->Value
+    if ( !$Self->_ValidateDynamicFieldObjectType( %{$DynamicField}, ObjectType => $Param{ObjectType} ) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter DynamicField is invalid for object type \"$Param{ObjectType}\"!",
+        );
+    }
+
+    # check DynamicField->Value
+    if ( !$Self->_ValidateDynamicFieldValue( %{$DynamicField} ) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter DynamicField::Value is invalid!",
+        );
+    }
+
+    # if everything is OK then return Success
+    return $Self->_Success();
+}
+
+=item _ValidateDynamicFieldName()
+
+checks if the given dynamic field name is valid.
+
+    my $Success = $CommonObject->_ValidateDynamicFieldName(
+        Name => 'some name',
+    );
+
+    returns
+    $Success = 1            # or 0
+
+=cut
+
+sub _ValidateDynamicFieldName {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    return if !IsHashRefWithData( $Self->{DynamicFieldLookup} );
+    return if !$Param{Name};
+
+    return if !$Self->{DynamicFieldLookup}->{ $Param{Name} };
+    return if !IsHashRefWithData( $Self->{DynamicFieldLookup}->{ $Param{Name} } );
+
+    return 1;
+}
+
+=item _ValidateDynamicFieldValue()
+
+checks if the given dynamic field value is valid.
+
+    my $Success = $CommonObject->_ValidateDynamicFieldValue(
+        Name  => 'some name',
+        Value => 'some value',          # String or Integer or DateTime format
+    );
+
+    my $Success = $CommonObject->_ValidateDynamicFieldValue(
+        Value => [                      # Only for fields that can handle multiple values like
+            'some value',               #   Multiselect
+            'some other value',
+        ],
+    );
+
+    returns
+    $Success = 1                        # or 0
+
+=cut
+
+sub _ValidateDynamicFieldValue {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    return if !IsHashRefWithData( $Self->{DynamicFieldLookup} );
+
+    # possible structures are string and array, no data inside is needed
+    if ( !IsString( $Param{Value} ) && ref $Param{Value} ne 'ARRAY' ) {
+        return;
+    }
+
+    # get dynamic field config
+    my $DynamicFieldConfig = $Self->{DynamicFieldLookup}->{ $Param{Name} };
+
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    for my $Value (@Values) {
+        my $ValueTypeResult = $Kernel::OM->Get('DynamicField::Backend')->ValueValidate(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $Value,
+            UserID             => 1,
+        );
+        return if (!$ValueTypeResult);
+    }
+
+    return 1;
+}
+
+=item _ValidateDynamicFieldObjectType()
+
+checks if the given dynamic field object type is valid.
+
+    my $Success = $CommonObject->_ValidateDynamicFieldObjectType(
+        Name       => 'some name',
+        ObjectType => 'Ticket'
+    );
+
+    returns
+    $Success = 1            # or 0
+
+=cut
+
+sub _ValidateDynamicFieldObjectType {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    return if !IsHashRefWithData( $Self->{DynamicFieldLookup} );
+    return if !$Param{Name};
+
+    return if !$Self->{DynamicFieldLookup}->{ $Param{Name} };
+    return if !IsHashRefWithData( $Self->{DynamicFieldLookup}->{ $Param{Name} } );
+
+    my $DynamicFieldConfg = $Self->{DynamicFieldLookup}->{ $Param{Name} };
+    return if $DynamicFieldConfg->{ObjectType} ne $Param{ObjectType};
+
+    return 1;
+}
+
+=item _SetDynamicFieldValue()
+
+sets the value of a dynamic field.
+
+    my $Result = $CommonObject->_SetDynamicFieldValue(
+        Name       => 'some name',           # the name of the dynamic field
+        Value      => 'some value',          # String or Integer or DateTime format
+        ObjectID   => 123
+        ObjectType => 123
+        UserID     => 123,
+    );
+
+    returns
+
+    $Result = {
+        Success => 1,                        # if everything is ok
+    }
+
+    $Result = {
+        Success      => 0,
+        ErrorMessage => 'Error description'
+    }
+
+=cut
+
+sub _SetDynamicFieldValue {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(UserID ObjectID)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "_SetDynamicFieldValue() No $Needed given!"
+            );
+        }
+    }
+
+    # check needed stuff
+    for my $Needed (qw(Name ObjectType)) {
+        if ( !IsString( $Param{$Needed} ) ) {
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "_SetDynamicFieldValue() Invalid value for $Needed, just string is allowed!"
+            );
+        }
+    }
+
+    # get the dynamic fields
+    my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+        Valid      => 1,
+        ObjectType => [ $Param{ObjectType} ],
+    );
+
+    # create a Dynamic Fields lookup table (by name)
+    DYNAMICFIELD:
+    for my $DynamicField ( @{$DynamicFieldList} ) {
+        next DYNAMICFIELD if !$DynamicField;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicField);
+        next DYNAMICFIELD if !$DynamicField->{Name};
+        $Self->{DynamicFieldLookup}->{ $DynamicField->{Name} } = $DynamicField;
+    }
+
+    # check value structure
+    if ( !IsString( $Param{Value} ) && ref $Param{Value} ne 'ARRAY' && defined($Param{Value}) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "_SetDynamicFieldValue() Invalid value for Value, just string, array and undef is allowed!"
+        );
+    }
+
+    if ( !IsHashRefWithData( $Self->{DynamicFieldLookup} ) ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "_SetDynamicFieldValue() No DynamicFieldLookup!"
+        );
+    }
+
+    # get dynamic field config
+    my $Config = $Self->{DynamicFieldLookup}->{ $Param{Name} };
+
+    if ( !$Config ) {
+        return $Self->_Error(
+            Code    => 'Operation.InternalError',
+            Message => "_SetDynamicFieldValue() no matching dynamic field found for \"$Param{Name}\"!"
+        );
+    }
+
+    my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+        DynamicFieldConfig => $Config,
+        ObjectID           => $Param{ObjectID},
+        Value              => $Param{Value},
+        UserID             => $Param{UserID},
+    );
+
+    return $Self->_Success();
+}
+
+=item _GetPrepareDynamicFieldValue()
+
+prepares the value of a dynamic field
+
+    my $Result = $CommonObject->_GetPrepareDynamicFieldValue(
+        Config     => $Param{Config}HashRef,
+        Value      => 'some value',          # String or Integer or DateTime format
+    );
+
+    returns
+
+    $Result = {
+        ID                => 123,
+        Name              => 'someDFName',
+        Label             => 'Some label',
+        Value             => [5, 10]
+        DisplayValue      => 'Value1, Value2'        # configured separator is used, else ', '
+        DisplayValueHTML  => 'Value1, Value2'        # if special html value is possible (e.g. for checklists), else DisplayValue
+        DisplayValueShort => 'Value1, Value2'        # if special short value is possible (e.g. for checklists), else DisplayValue
+        PreparedValue     => ['Value1', 'Value2']
+    }
+
+=cut
+
+sub _GetPrepareDynamicFieldValue {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Config Value)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "_PrepareDynamicFieldValue() No $Needed given!" );
+            return;
+        }
+    }
+
+    # get prepared value
+    my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
+        DynamicFieldConfig => $Param{Config},
+        Key                => $Param{Value}
+    );
+
+    # get display value string
+    my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
+        DynamicFieldConfig => $Param{Config},
+        Value              => $Param{Value}
+    );
+
+    if (!IsHashRefWithData($DisplayValue)) {
+        my $Separator = ', ';
+        if (
+            IsHashRefWithData($Param{Config}) &&
+            IsHashRefWithData($Param{Config}->{Config}) &&
+            defined $Param{Config}->{Config}->{ItemSeparator}
+        ) {
+            $Separator = $Param{Config}->{Config}->{ItemSeparator};
+        }
+
+        my @Values;
+        if ( ref $DFPreparedValue eq 'ARRAY' ) {
+            @Values = @{ $DFPreparedValue };
+        }
+        else {
+            @Values = ($DFPreparedValue);
+        }
+
+        $DisplayValue = {
+            Value => join($Separator, @Values)
+        };
+    }
+
+    # get html display value string
+    my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
+        DynamicFieldConfig => $Param{Config},
+        Value              => $Param{Value}
+    );
+
+    # get short display value string
+    my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
+        DynamicFieldConfig => $Param{Config},
+        Value              => $Param{Value}
+    );
+
+    return {
+        ID                => $Param{Config}->{ID},
+        Name              => $Param{Config}->{Name},
+        Label             => $Param{Config}->{Label},
+        Value             => $Param{Value},
+        DisplayValue      => $DisplayValue->{Value},
+        DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
+        DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
+        PreparedValue     => $DFPreparedValue
+    };
 }
 
 1;

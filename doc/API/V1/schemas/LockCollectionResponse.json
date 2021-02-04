@@ -1,62 +1,17 @@
 {
-   "$id" : "LockCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of ticket locks.",
-   "type" : "object",
-   "properties" : {
-      "Lock" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Lock_json-e5e85df3b3"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "LockCollectionResponse.json",
+  "type": "object",
+  "description": "A list of ticket locks.",
+  "properties": {
+    "Lock": {
+      "type": "array",
+      "items": {
+        "$ref": "Lock.json"
       }
-   },
-   "required" : [
-      "Lock"
-   ],
-   "definitions" : {
-      "Lock_json-e5e85df3b3" : {
-         "$id" : "Lock.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The ticket lock object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string"
-            },
-            "ValidID" : {
-               "type" : "integer"
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "Lock"
+  ]
 }

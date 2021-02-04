@@ -1,72 +1,72 @@
 {
-   "$id" : "ExecPlan.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The execution plan object.",
-   "type" : "object",
-   "properties" : {
-      "ChangeBy" : {
-         "type" : "integer",
-         "readOnly" : true
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "ExecPlan.json",
+   "type": "object",
+   "description": "The execution plan object.",
+   "properties": {
+      "ChangeBy": {
+         "type": "integer",
+         "readOnly": true
       },
-      "ChangeTime" : {
-         "type" : "string",
-         "readOnly" : true
+      "ChangeTime": {
+         "type": "string",
+         "readOnly": true
       },
-      "Comment" : {
-         "type" : "string",
-         "readOnly" : true
+      "Comment": {
+         "type": "string",
+         "readOnly": true
       },
-      "CreateBy" : {
-         "type" : "integer",
-         "readOnly" : true
+      "CreateBy": {
+         "type": "integer",
+         "readOnly": true
       },
-      "CreateTime" : {
-         "type" : "string",
-         "readOnly" : true
+      "CreateTime": {
+         "type": "string",
+         "readOnly": true
       },
-      "ID" : {
-         "type" : "integer",
-         "readOnly" : true
+      "ID": {
+         "type": "integer",
+         "readOnly": true
       },
-      "Name" : {
-         "type" : "string",
-         "readOnly" : true
+      "Name": {
+         "type": "string",
+         "readOnly": true
       },
-      "Parameters" : {
-         "description" : "Parameters of the execution plan, when and/or by what the corresponding job of this execution plan will be triggert",
-         "type" : "object",
-         "properties" : {
-            "Event" : {
-               "description" : "list of events, e.g. \"TicketCreate\"",
-               "type" : "array",
-               "item" : {
-                  "type" : "string"
-               },
-               "readOnly" : true
+      "Parameters": {
+         "type": "object",
+         "readOnly": true,
+         "properties": {
+            "Weekday": {
+              "type": "array",
+              "readOnly": true,
+              "item": {
+                "type": "integer"
+              },
+              "description": "List of weekday: 0 = sunday, 1 = monday, ..."
             },
-            "Time" : {
-               "description" : "time for the weekdays as \"hh:mm:ss\"",
-               "type" : "string",
-               "readOnly" : true
+            "Time": {
+               "type": "string",
+               "readOnly": true,
+               "description": "time for the weekdays as \"hh:mm:ss\""
             },
-            "Weekday" : {
-               "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
-               "type" : "array",
-               "item" : {
-                  "type" : "integer"
+            "Event": {
+               "type": "array",
+               "readOnly": true,
+               "item": {
+                  "type": "string"
                },
-               "readOnly" : true
+               "description": "list of events, e.g. \"TicketCreate\""
             }
          },
-         "readOnly" : true
+         "description": "Parameters of the execution plan, when and/or by what the corresponding job of this execution plan will be triggert"
       },
-      "Type" : {
-         "type" : "string",
-         "readOnly" : true
+      "Type": {
+         "type": "string",
+         "readOnly": true
       },
-      "ValidID" : {
-         "type" : "integer",
-         "readOnly" : true
+      "ValidID": {
+         "type": "integer",
+         "readOnly": true
       }
    },
    "required" : [

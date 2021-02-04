@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -110,28 +110,39 @@ perform MacroActionTypeSearch Operation. This will return a list macro types.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # get common MacroAction types which are available for all macro types
+    my $MacroActionTypesCommon = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::Common');
+
     # get MacroAction types for given macro type
     my $MacroActionTypes = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{Data}->{MacroType});
 
+    # merge common types
+    $MacroActionTypes = {
+        %{$MacroActionTypesCommon},
+        %{$MacroActionTypes}
+    };
+
 	# get already prepared MacroActionType data from MacroActionTypeGet operation
-    if ( IsHashRefWithData($MacroActionTypes) ) {  	
-        my $MacroActionTypeGetResult = $Self->ExecOperation(
+    if ( IsHashRefWithData($MacroActionTypes) ) {
+        my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::Automation::MacroActionTypeGet',
             Data      => {
                 MacroType       => $Param{Data}->{MacroType},
                 MacroActionType => join(',', sort keys %{$MacroActionTypes}),
             }
-        );    
-
-        if ( !IsHashRefWithData($MacroActionTypeGetResult) || !$MacroActionTypeGetResult->{Success} ) {
-            return $MacroActionTypeGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @MacroActionTypeDataList = IsArrayRef($MacroActionTypeGetResult->{Data}->{MacroActionType}) ? @{$MacroActionTypeGetResult->{Data}->{MacroActionType}} : ( $MacroActionTypeGetResult->{Data}->{MacroActionType} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{MacroActionType} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{MacroActionType}) ? @{$GetResult->{Data}->{MacroActionType}} : ( $GetResult->{Data}->{MacroActionType} );
+        }
 
-        if ( IsArrayRefWithData(\@MacroActionTypeDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                MacroActionType => \@MacroActionTypeDataList,
+                MacroActionType => \@ResultList,
             )
         }
     }

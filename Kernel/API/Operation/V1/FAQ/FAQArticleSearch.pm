@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -86,12 +86,111 @@ sub Run {
 
     my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
     my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
+    my @ArticleIDs;
 
-    # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
-    my @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
-        UserID   => $Self->{Authorization}->{UserID},
-        ValidIDs => \@ValidIDs
-    );
+    # prepare search (dynamic fields are possible)
+    my %FAQDFSearch;
+    if ( IsHashRefWithData( $Self->{Search}->{FAQArticle} ) ) {
+        foreach my $SearchType ( keys %{ $Self->{Search}->{FAQArticle} } ) {
+            my @FilteredList;
+            foreach my $SearchItem ( @{ $Self->{Search}->{FAQArticle}->{$SearchType} } ) {
+
+                # removed them from search-param (is used as filter, see below)
+                if ($SearchItem->{Field} =~ m/DynamicField_/) {
+                    if (!$FAQDFSearch{$SearchType}) {
+                        $FAQDFSearch{$SearchType} = [];
+                    }
+                    push(@{$FAQDFSearch{$SearchType}}, $SearchItem);
+                } else {
+                    push(@FilteredList, $SearchItem);
+                }
+            }
+            $Self->{Search}->{FAQArticle}->{$SearchType} = \@FilteredList;
+        }
+    }
+
+    # do search if given (only with dfs and valid)
+    if ( IsHashRefWithData( \%FAQDFSearch ) ) {
+        foreach my $SearchType ( keys %FAQDFSearch ) {
+            my @SearchTypeResult;
+            foreach my $SearchItem ( @{ $FAQDFSearch{$SearchType} } ) {
+
+                my $Value = $SearchItem->{Value};
+                my $Operator = 'Like';
+
+                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
+                    $Value = '*' . $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
+                    $Value = '' . $Value . '*';
+                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
+                    $Value = '*' . $Value;
+                } elsif ( $SearchItem->{Operator} eq 'IN' ) {
+                    $Operator = 'Equals';
+                } elsif ( $SearchItem->{Operator} eq 'EQ' ) {
+                    $Operator = 'Equals';
+                    $Value = "$Value";
+                } elsif ( $SearchItem->{Operator} eq 'LT' ) {
+                    $Operator = 'SmallerThan';
+                } elsif ( $SearchItem->{Operator} eq 'LTE' ) {
+                    $Operator = 'SmallerThanEquals';
+                } elsif ( $SearchItem->{Operator} eq 'GT' ) {
+                    $Operator = 'GreaterThan';
+                } elsif ( $SearchItem->{Operator} eq 'GTE' ) {
+                    $Operator = 'GreaterThanEquals';
+                }
+
+                # perform faq search
+                my @SearchResult = $Kernel::OM->Get('FAQ')->FAQSearch(
+                    UserID   => $Self->{Authorization}->{UserID},
+                    Limit    => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                    ValidIDs => \@ValidIDs,
+                    $SearchItem->{Field} => {
+                        $Operator => $Value
+                    }
+                );
+
+                # merge results
+                if ( $SearchType eq 'AND' ) {
+                    if ( !@SearchTypeResult ) {
+                        @SearchTypeResult = @SearchResult;
+                    } else {
+
+                        # remove all IDs from type result that we don't have in this search
+                        @SearchTypeResult = $Self->_GetCombinedList(
+                            ListA => \@SearchTypeResult,
+                            ListB => \@SearchResult
+                        );
+                    }
+                } elsif ( $SearchType eq 'OR' ) {
+                    @SearchTypeResult = $Self->_GetCombinedList(
+                        ListA => \@SearchTypeResult,
+                        ListB => \@SearchResult,
+                        Union => 1
+                    );
+                }
+            }
+
+            if ( !@ArticleIDs ) {
+                @ArticleIDs = @SearchTypeResult;
+            } else {
+
+                # combine both results by AND
+                # remove all IDs from type result that we don't have in this search
+                @ArticleIDs = $Self->_GetCombinedList(
+                    ListA => \@SearchTypeResult,
+                    ListB => \@ArticleIDs
+                );
+            }
+        }
+    } else {
+
+        # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
+        @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
+            UserID   => $Self->{Authorization}->{UserID},
+            Limit    => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+            ValidIDs => \@ValidIDs
+        );
+    }
 
     # get already prepared FAQ data from FAQArticleGet operation
     if (@ArticleIDs) {
@@ -99,24 +198,26 @@ sub Run {
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
 
-        my $FAQArticleGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::FAQ::FAQArticleGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 FAQArticleID => join( ',', sort @ArticleIDs ),
             }
         );
-
-        if ( !IsHashRefWithData($FAQArticleGetResult) || !$FAQArticleGetResult->{Success} ) {
-            return $FAQArticleGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @FAQArticleDataList = IsArrayRef( $FAQArticleGetResult->{Data}->{FAQArticle} ) ? @{ $FAQArticleGetResult->{Data}->{FAQArticle} } : ( $FAQArticleGetResult->{Data}->{FAQArticle} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{FAQArticle} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{FAQArticle}) ? @{$GetResult->{Data}->{FAQArticle}} : ( $GetResult->{Data}->{FAQArticle} );
+        }
 
-        if ( IsArrayRefWithData( \@FAQArticleDataList ) ) {
+        if ( IsArrayRefWithData( \@ResultList ) ) {
             return $Self->_Success(
-                FAQArticle => \@FAQArticleDataList,
-                )
+                FAQArticle => \@ResultList,
+            )
         }
     }
 
@@ -124,6 +225,18 @@ sub Run {
     return $Self->_Success(
         FAQArticle => [],
     );
+}
+
+sub _GetCombinedList {
+    my ( $Self, %Param ) = @_;
+
+    my %Union;
+    my %Isect;
+    for my $E ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
+        $Union{$E}++ && $Isect{$E}++
+    }
+
+    return $Param{Union} ? keys %Union : keys %Isect;
 }
 
 1;

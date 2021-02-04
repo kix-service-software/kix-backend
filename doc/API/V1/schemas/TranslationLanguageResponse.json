@@ -1,41 +1,14 @@
 {
-   "$id" : "TranslationLanguageResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A response for translation language GET request.",
-   "type" : "object",
-   "properties" : {
-      "TranslationLanguage" : {
-         "$ref" : "#/definitions/TranslationLanguage_json-119d3b9694"
-      }
-   },
-   "required" : [
-      "TranslationLanguage"
-   ],
-   "definitions" : {
-      "TranslationLanguage_json-119d3b9694" : {
-         "$id" : "TranslationLanguage.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The translation language object.",
-         "type" : "object",
-         "properties" : {
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "PatternID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "PatternID",
-            "Language",
-            "Value"
-         ]
-      }
-   }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "TranslationLanguageResponse.json",
+  "type": "object",
+  "description": "A response for translation language GET request.",
+  "properties": {
+    "TranslationLanguage": {
+      "$ref": "TranslationLanguage.json"
+    }
+  },
+  "required": [
+    "TranslationLanguage"
+  ]
 }

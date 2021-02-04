@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -158,6 +158,27 @@ sub Run {
         );
     }
     
+    # set dynamic fields
+    if ( IsArrayRefWithData( $Organisation->{DynamicFields} ) ) {
+
+        DYNAMICFIELD:
+        foreach my $DynamicField ( @{ $Organisation->{DynamicFields} } ) {
+            my $Result = $Self->_SetDynamicFieldValue(
+                %{$DynamicField},
+                ObjectID   => $OrganisationID,
+                ObjectType => 'Organisation',
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    Code    => 'Operation.InternalError',
+                    Message => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
+                );
+            }
+        }
+    }
+
     return $Self->_Success(
         Code   => 'Object.Created',
         OrganisationID => $OrganisationID,

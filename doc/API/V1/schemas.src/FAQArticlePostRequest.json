@@ -29,6 +29,13 @@
                 "CustomerVisible": {
                     "type": "integer"
                 },
+                "DynamicFields": {
+                  "type": "array",
+                  "description": "list of dynamic field values to be set",
+                  "items": {
+                    "$ref": "DynamicFieldValueSetItem.json"
+                  }
+                },
                 "Field1": {
                     "type": "string",
                     "description": "symptom"

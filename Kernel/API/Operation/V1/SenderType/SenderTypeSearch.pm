@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,23 +91,25 @@ sub Run {
 
 	# get already prepared SenderType data from SenderTypeGet operation
     if ( IsHashRefWithData(\%SenderTypeList) ) {  	
-        my $SenderTypeGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::SenderType::SenderTypeGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 SenderTypeID => join(',', sort keys %SenderTypeList),
             }
-        );    
-
-        if ( !IsHashRefWithData($SenderTypeGetResult) || !$SenderTypeGetResult->{Success} ) {
-            return $SenderTypeGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @SenderTypeDataList = IsArrayRef($SenderTypeGetResult->{Data}->{SenderType}) ? @{$SenderTypeGetResult->{Data}->{SenderType}} : ( $SenderTypeGetResult->{Data}->{SenderType} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{SenderType} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{SenderType}) ? @{$GetResult->{Data}->{SenderType}} : ( $GetResult->{Data}->{SenderType} );
+        }
 
-        if ( IsArrayRefWithData(\@SenderTypeDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                SenderType => \@SenderTypeDataList,
+                SenderType => \@ResultList,
             )
         }
     }

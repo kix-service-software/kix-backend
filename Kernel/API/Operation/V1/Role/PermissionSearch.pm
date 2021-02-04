@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -130,24 +130,26 @@ sub Run {
 
 	# get already prepared Permission data from PermissionGet operation
     if ( @PermissionList ) {  	
-        my $PermissionGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Role::PermissionGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 RoleID       => $Param{Data}->{RoleID},
                 PermissionID => join(',', sort @PermissionList),
             }
-        );    
-
-        if ( !IsHashRefWithData($PermissionGetResult) || !$PermissionGetResult->{Success} ) {
-            return $PermissionGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @PermissionDataList = IsArrayRef($PermissionGetResult->{Data}->{Permission}) ? @{$PermissionGetResult->{Data}->{Permission}} : ( $PermissionGetResult->{Data}->{Permission} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Permission} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Permission}) ? @{$GetResult->{Data}->{Permission}} : ( $GetResult->{Data}->{Permission} );
+        }
 
-        if ( IsArrayRefWithData(\@PermissionDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Permission => \@PermissionDataList,
+                Permission => \@ResultList,
             )
         }
     }

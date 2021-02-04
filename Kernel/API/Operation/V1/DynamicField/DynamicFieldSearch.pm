@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -89,24 +89,26 @@ sub Run {
 
 	# get already prepared DynamicField data from DynamicFieldGet operation
     if ( IsArrayRefWithData($DynamicFieldList) ) {  	
-        my $DynamicFieldGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::DynamicField::DynamicFieldGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 DynamicFieldID => join(',', sort @{$DynamicFieldList}),
                 include        => $Param{Data}->{include},
             }
-        );    
-
-        if ( !IsHashRefWithData($DynamicFieldGetResult) || !$DynamicFieldGetResult->{Success} ) {
-            return $DynamicFieldGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @DynamicFieldDataList = IsArrayRef($DynamicFieldGetResult->{Data}->{DynamicField}) ? @{$DynamicFieldGetResult->{Data}->{DynamicField}} : ( $DynamicFieldGetResult->{Data}->{DynamicField} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{DynamicField} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{DynamicField}) ? @{$GetResult->{Data}->{DynamicField}} : ( $GetResult->{Data}->{DynamicField} );
+        }
 
-        if ( IsArrayRefWithData(\@DynamicFieldDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                DynamicField => \@DynamicFieldDataList,
+                DynamicField => \@ResultList,
             )
         }
     }

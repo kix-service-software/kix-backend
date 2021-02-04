@@ -1,62 +1,14 @@
 {
-   "$id" : "ConfigItemImageResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A response for config item image GET request.",
-   "type" : "object",
-   "properties" : {
-      "Image" : {
-         "$ref" : "#/definitions/ConfigItemImage_json-c9452e1cd4"
-      }
-   },
-   "required" : [
-      "Image"
-   ],
-   "definitions" : {
-      "ConfigItemImage_json-c9452e1cd4" : {
-         "$id" : "ConfigItemImage.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item image object.",
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "ConfigItemID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Content" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ContentType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Filename" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "Comment",
-            "ConfigItemID",
-            "ContentType",
-            "Filename",
-            "ID"
-         ]
-      }
-   }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ConfigItemImageResponse.json",
+  "type": "object",
+  "description": "A response for config item image GET request.",
+  "properties": {
+    "Image": {
+      "$ref": "ConfigItemImage.json"
+    }
+  },
+  "required": [
+    "Image"
+  ]
 }

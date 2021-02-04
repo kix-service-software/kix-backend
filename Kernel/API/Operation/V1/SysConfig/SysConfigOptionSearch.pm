@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -111,13 +111,16 @@ sub Run {
                 Option  => join(',', sort keys %AllOptions),
                 include => $Param{Data}->{include},
             }
-        );    
+        );
 
         if ( !IsHashRefWithData($SysConfigGetResult) || !$SysConfigGetResult->{Success} ) {
             return $SysConfigGetResult;
         }
         
-        my @SysConfigDataList = ref $SysConfigGetResult->{Data}->{SysConfigOption} eq 'ARRAY' ? @{$SysConfigGetResult->{Data}->{SysConfigOption}} : ( $SysConfigGetResult->{Data}->{SysConfigOption} );
+        my @SysConfigDataList;
+        if ( defined $SysConfigGetResult->{Data}->{SysConfigOption} ) {
+            @SysConfigDataList = IsArrayRef($SysConfigGetResult->{Data}->{SysConfigOption}) ? @{$SysConfigGetResult->{Data}->{SysConfigOption}} : ( $SysConfigGetResult->{Data}->{SysConfigOption} );
+        }
 
         if ( IsArrayRefWithData(\@SysConfigDataList) ) {
             return $Self->_Success(

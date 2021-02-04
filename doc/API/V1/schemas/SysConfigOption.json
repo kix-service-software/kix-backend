@@ -1,59 +1,45 @@
 {
-   "$id" : "SysConfigOption.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The SysConfig option object.",
-   "type" : "object",
-   "properties" : {
-      "AccessLevel" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Context" : {
-         "anyOf" : [
-            {
-               "type" : "string"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "ContextMetadata" : {
-         "anyOf" : [
-            {
-               "type" : "string"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "Name" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "ReadOnly" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "Value" : {
-         "anyOf" : [
-            {
-               "type" : "object"
-            },
-            {
-               "type" : "string"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Name"
-   ]
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SysConfigOption.json",
+  "type": "object",
+  "description": "The SysConfig option object.",
+  "properties": {
+    "AccessLevel": {
+        "type": "string",
+        "readOnly": true
+    },
+    "Context": {
+        "anyOf": [
+            {"type": "string"},
+            {"type": "null"}
+        ],
+        "readOnly": true
+    },
+    "ContextMetadata": {
+        "anyOf": [
+            {"type": "string"},
+            {"type": "null"}
+        ],
+        "readOnly": true
+    },
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    },
+    "ReadOnly": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Value": {
+      "anyOf": [
+        {"type": "object"},
+        {"type": "string"},
+        {"type": "null"}
+      ],
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Name"
+  ]
 }

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -105,15 +105,17 @@ sub PostValueSet {
     # get FAQ object
     my $FAQObject = $Kernel::OM->Get('FAQ');
 
+    # clear cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'FAQ',
+    );
+
     # history insert
     $FAQObject->FAQHistoryAdd(
         Name   => "DynamicField $Param{DynamicFieldConfig}->{Name} Updated",
         ItemID => $Param{ObjectID},
         UserID => $Param{UserID},
     );
-
-    # clear FAQ cache
-    $FAQObject->_DeleteFromFAQCache( ItemID => $Param{ObjectID} );
 
     # Trigger event.
     $FAQObject->EventHandler(
@@ -126,6 +128,13 @@ sub PostValueSet {
             UserID    => $Param{UserID},
         },
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'FAQ.Article',
+        ObjectID  => $Param{ObjectID},
     );
 
     return 1;

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -231,6 +231,27 @@ sub Run {
             Code    => 'Object.UnableToUpdate',
             Message => 'Could not update contact, please contact the system administrator',
         );
+    }
+
+    # set dynamic fields
+    if ( IsArrayRefWithData($Contact->{DynamicFields}) ) {
+
+        DYNAMICFIELD:
+        foreach my $DynamicField ( @{$Contact->{DynamicFields}} ) {
+            my $Result = $Self->_SetDynamicFieldValue(
+                %{$DynamicField},
+                ObjectID   => $Param{Data}->{ContactID},
+                ObjectType => 'Contact',
+                UserID     => $Param{UserID},
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    Code         => 'Object.UnableToUpdate',
+                    Message      => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
+                );
+            }
+        }
     }
 
     return $Self->_Success(

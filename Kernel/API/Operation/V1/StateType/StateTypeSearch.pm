@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -92,23 +92,25 @@ sub Run {
 
 	# get already prepared StateType data from StateTypeGet operation
     if ( IsHashRefWithData(\%StateTypeList) ) {  	
-        my $StateTypeGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::StateType::StateTypeGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 StateTypeID => join(',', sort keys %StateTypeList),
             }
-        );    
-
-        if ( !IsHashRefWithData($StateTypeGetResult) || !$StateTypeGetResult->{Success} ) {
-            return $StateTypeGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @StateTypeDataList = IsArrayRef($StateTypeGetResult->{Data}->{StateType}) ? @{$StateTypeGetResult->{Data}->{StateType}} : ( $StateTypeGetResult->{Data}->{StateType} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{StateType} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{StateType}) ? @{$GetResult->{Data}->{StateType}} : ( $GetResult->{Data}->{StateType} );
+        }
 
-        if ( IsArrayRefWithData(\@StateTypeDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                StateType => \@StateTypeDataList,
+                StateType => \@ResultList,
             )
         }
     }

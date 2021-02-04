@@ -1,72 +1,79 @@
 {
-   "$id" : "FAQArticlePatchRequest.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The FAQ article request object for update.",
-   "type" : "object",
-   "properties" : {
-      "FAQArticle" : {
-         "type" : "object",
-         "properties" : {
-            "ApprovalOff" : {
-               "description" : "if set to 1 approval is ignored",
-               "type" : "integer"
-            },
-            "Approved" : {
-               "type" : "integer"
-            },
-            "CategoryID" : {
-               "type" : "integer"
-            },
-            "ContentType" : {
-               "type" : "string"
-            },
-            "CustomerVisible" : {
-               "type" : "integer"
-            },
-            "Field1" : {
-               "description" : "symptom",
-               "type" : "string"
-            },
-            "Field2" : {
-               "description" : "problem",
-               "type" : "string"
-            },
-            "Field3" : {
-               "description" : "solution",
-               "type" : "string"
-            },
-            "Field4" : {
-               "type" : "string"
-            },
-            "Field5" : {
-               "type" : "string"
-            },
-            "Field6" : {
-               "description" : "comment",
-               "type" : "string"
-            },
-            "Keywords" : {
-               "type" : "array",
-               "item" : {
-                  "type" : "string"
-               }
-            },
-            "Language" : {
-               "type" : "string"
-            },
-            "Number" : {
-               "type" : "string"
-            },
-            "Title" : {
-               "type" : "string"
-            },
-            "ValidID" : {
-               "type" : "integer"
-            }
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "FAQArticlePatchRequest.json",
+  "type": "object",
+  "description": "The FAQ article request object for update.",
+  "properties": {
+    "FAQArticle": {
+      "type": "object",
+      "properties": {
+        "Approved": {
+          "type": "integer"
+        },
+        "ApprovalOff": {
+          "type": "integer",
+          "description": "if set to 1 approval is ignored"
+        },
+        "CategoryID": {
+          "type": "integer"
+        },
+        "ContentType": {
+          "type": "string"
+        },
+        "CustomerVisible": {
+          "type": "integer"
+        },
+        "DynamicFields": {
+          "type": "array",
+          "description": "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+          "items": {
+            "$ref": "DynamicFieldValueSetItem.json"
+          }
+        },
+        "Field1": {
+          "type": "string",
+          "description": "symptom"
+        },
+        "Field2": {
+          "type": "string",
+          "description": "problem"
+        },
+        "Field3": {
+          "type": "string",
+          "description": "solution"
+        },
+        "Field4": {
+          "type": "string"
+        },
+        "Field5": {
+          "type": "string"
+        },
+        "Field6": {
+          "type": "string",
+          "description": "comment"
+        },
+        "Keywords": {
+          "type": "array",
+          "item": {
+            "type": "string"
+          }
+        },
+        "Language": {
+          "type": "string"
+        },
+        "Number": {
+          "type": "string"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
       }
-   },
-   "required" : [
-      "FAQArticle"
-   ]
+    }
+  },
+  "required": [
+    "FAQArticle"
+  ]
 }

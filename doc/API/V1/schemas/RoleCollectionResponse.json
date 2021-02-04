@@ -1,156 +1,17 @@
 {
-   "$id" : "RoleCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of roles.",
-   "type" : "object",
-   "properties" : {
-      "Role" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Role_json-03191ce16b"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "RoleCollectionResponse.json",
+  "type": "object",
+  "description": "A list of roles.",
+  "properties": {
+    "Role": {
+      "type": "array",
+      "items": {
+        "$ref": "Role.json"
       }
-   },
-   "required" : [
-      "Role"
-   ],
-   "definitions" : {
-      "Permission_json-db3c2f18ea" : {
-         "$id" : "Permission.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The permission object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "IsRequired" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Target" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "TypeID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "description" : "bitmask, please see documentation for bit descriptions",
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Target",
-            "Value"
-         ]
-      },
-      "Role_json-03191ce16b" : {
-         "$id" : "Role.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The role object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Permissions" : {
-               "description" : "added via include \"Permissions\"",
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/Permission_json-db3c2f18ea"
-               },
-               "readOnly" : true
-            },
-            "UserIDs" : {
-               "description" : "added via include \"UserIDs\"",
-               "type" : "array",
-               "items" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "Role"
+  ]  
 }

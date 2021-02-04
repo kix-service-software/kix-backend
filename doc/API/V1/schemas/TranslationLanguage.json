@@ -1,25 +1,25 @@
 {
-   "$id" : "TranslationLanguage.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The translation language object.",
-   "type" : "object",
-   "properties" : {
-      "Language" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "PatternID" : {
-         "type" : "integer",
-         "readOnly" : true
-      },
-      "Value" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "PatternID",
-      "Language",
-      "Value"
-   ]
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "TranslationLanguage.json",
+  "type": "object",
+  "description": "The translation language object.",
+  "properties": {
+    "PatternID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Language": {
+      "type": "string",
+      "readOnly": true
+    },
+    "Value": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "PatternID",
+    "Language",
+    "Value"
+  ]
 }

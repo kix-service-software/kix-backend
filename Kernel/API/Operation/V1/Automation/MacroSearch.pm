@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,24 +91,27 @@ sub Run {
 
     # get already prepared Macro data from MacroGet operation
     if ( IsHashRefWithData(\%MacroList) ) {
-        my $MacroGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::MacroGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 MacroID => join(',', sort keys %MacroList),
             }
         );
-
-        if ( !IsHashRefWithData($MacroGetResult) || !$MacroGetResult->{Success} ) {
-            return $MacroGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
-        push @MacroDataList,IsArrayRefWithData($MacroGetResult->{Data}->{Macro}) ? @{$MacroGetResult->{Data}->{Macro}} : ( $MacroGetResult->{Data}->{Macro} );
-    }
 
-    if ( IsArrayRefWithData(\@MacroDataList) ) {
-        return $Self->_Success(
-            Macro => \@MacroDataList,
-        )
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Macro} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Macro}) ? @{$GetResult->{Data}->{Macro}} : ( $GetResult->{Data}->{Macro} );
+        }
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                Macro => \@ResultList,
+            )
+        }
     }
 
     # return result

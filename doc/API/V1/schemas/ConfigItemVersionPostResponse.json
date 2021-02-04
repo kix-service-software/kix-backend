@@ -1,14 +1,14 @@
 {
-   "$id" : "ConfigItemVersionPostResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The ID of the created config item version.",
-   "type" : "object",
-   "properties" : {
-      "VersionID" : {
-         "type" : "integer"
-      }
-   },
-   "required" : [
-      "VersionID"
-   ]
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ConfigItemVersionPostResponse.json",
+    "type": "object",
+    "description": "The ID of the created config item version.",
+    "properties": {
+        "VersionID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "VersionID"
+    ]
 }

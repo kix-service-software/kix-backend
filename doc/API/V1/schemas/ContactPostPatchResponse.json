@@ -1,14 +1,14 @@
 {
-   "$id" : "ContactPostPatchResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The ID of the created or updated contact.",
-   "type" : "object",
-   "properties" : {
-      "ContactID" : {
-         "type" : "integer"
-      }
-   },
-   "required" : [
-      "ContactID"
-   ]
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ContactPostPatchResponse.json",
+    "type": "object",
+    "description": "The ID of the created or updated contact.",
+    "properties": {
+        "ContactID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "ContactID"
+    ]
 }

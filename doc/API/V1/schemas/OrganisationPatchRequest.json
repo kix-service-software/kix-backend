@@ -1,43 +1,50 @@
 {
-   "$id" : "OrganisationPatchRequest.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The organisation request object for update.",
-   "type" : "object",
-   "properties" : {
-      "Organisation" : {
-         "type" : "object",
-         "properties" : {
-            "City" : {
-               "type" : "string"
-            },
-            "Comment" : {
-               "type" : "string"
-            },
-            "Country" : {
-               "type" : "string"
-            },
-            "Name" : {
-               "type" : "string"
-            },
-            "Number" : {
-               "type" : "string"
-            },
-            "Street" : {
-               "type" : "string"
-            },
-            "Url" : {
-               "type" : "string"
-            },
-            "ValidID" : {
-               "type" : "integer"
-            },
-            "Zip" : {
-               "type" : "string"
-            }
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "OrganisationPatchRequest.json",
+  "type": "object",
+  "description": "The organisation request object for update.",
+  "properties": {
+    "Organisation": {
+      "type": "object",
+      "properties": {
+        "City": {
+          "type": "string"
+        },
+        "Comment": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "DynamicFields": {
+          "type": "array",
+          "description": "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+          "items": {
+              "$ref": "DynamicFieldValueSetItem.json"
+          }
+        },
+        "Number": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Street": {
+          "type": "string"
+        },
+        "Url": {
+          "type": "string"
+        },
+        "ValidID": {
+          "type": "integer"
+        },
+        "Zip": {
+          "type": "string"
+        }
       }
-   },
-   "required" : [
-      "Organisation"
-   ]
+    }
+  },
+  "required": [
+    "Organisation"
+  ]
 }

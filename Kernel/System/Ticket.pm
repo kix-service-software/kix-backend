@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -624,6 +624,7 @@ sub TicketDelete {
             DynamicFieldConfig => $DynamicFieldConfig,
             ObjectID           => $Param{TicketID},
             UserID             => $Param{UserID},
+            NoPostHandling     => 1,                # we will delete the ticket, so no additional handling needed when deleting the DF values
         );
     }
 

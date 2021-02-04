@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -118,6 +118,11 @@ sub Describe {
     # ExcludeNotificationToUserID
     # ExcludeMuteNotificationToUserID
 
+    $Self->AddResult(
+        Name        => 'NewArticleID',
+        Description => Kernel::Language::Translatable('The ID of the new article.'),
+    );
+
     return;
 }
 
@@ -198,17 +203,23 @@ sub Run {
             return;
         }
     }
+
+    # replace placeholders in non-richtext attributes
+    for my $Attribute ( qw(Channel SenderType Subject To From Cc Bcc AccountTime) ) {
+        next if !defined $Param{Config}->{$Attribute};
+
+        $Param{Config}->{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText => 0,
+            Text     => $Param{Config}->{$Attribute},
+            TicketID => $Param{TicketID},
+            Data     => {},
+            UserID   => $Param{UserID},
+        );
+    }
+
     $Param{Config}->{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 1,
         Text     => $Param{Config}->{Body},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
-    );
-
-    $Param{Config}->{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Subject},
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
@@ -243,6 +254,8 @@ sub Run {
         );
         return;
     }
+
+    $Self->SetResult(Name => 'NewArticleID', Value => $ArticleID);
 
     return 1;
 }

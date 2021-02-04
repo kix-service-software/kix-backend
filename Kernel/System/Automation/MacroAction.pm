@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -10,6 +10,8 @@ package Kernel::System::Automation::MacroAction;
 
 use strict;
 use warnings;
+
+use Digest::MD5;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -84,6 +86,7 @@ This returns something like:
         'ID'         => 2,
         'Type'       => '...'
         'Parameters' => {},
+        'ResultVariables' => {},
         'Comment'    => '...',
         'ValidID'    => '1',
         'CreateTime' => '2010-04-07 15:41:15',
@@ -115,27 +118,28 @@ sub MacroActionGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Kernel::OM->Get('DB')->Prepare( 
-        SQL   => "SELECT id, macro_id, type, parameters, comments, valid_id, create_time, create_by, change_time, change_by FROM macro_action WHERE id = ?",
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT id, macro_id, type, parameters, result_variables, comments, valid_id, create_time, create_by, change_time, change_by FROM macro_action WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
     my %Result;
-    
+
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
-            ID         => $Row[0],
-            MacroID    => $Row[1],
-            Type       => $Row[2],
-            Parameters => $Row[3],
-            Comment    => $Row[4],
-            ValidID    => $Row[5],
-            CreateTime => $Row[6],
-            CreateBy   => $Row[7],
-            ChangeTime => $Row[8],
-            ChangeBy   => $Row[9],
+            ID              => $Row[0],
+            MacroID         => $Row[1],
+            Type            => $Row[2],
+            Parameters      => $Row[3],
+            ResultVariables => $Row[4],
+            Comment         => $Row[5],
+            ValidID         => $Row[6],
+            CreateTime      => $Row[7],
+            CreateBy        => $Row[8],
+            ChangeTime      => $Row[9],
+            ChangeBy        => $Row[10],
         );
 
         if ( $Result{Parameters} ) {
@@ -144,8 +148,15 @@ sub MacroActionGet {
                 Data => $Result{Parameters}
             );
         }
+
+        if ( $Result{ResultVariables} ) {
+            # decode JSON
+            $Result{ResultVariables} = $Kernel::OM->Get('JSON')->Decode(
+                Data => $Result{ResultVariables}
+            );
+        }
     }
-    
+
     # no data found...
     if ( !%Result ) {
         $Kernel::OM->Get('Log')->Log(
@@ -154,14 +165,14 @@ sub MacroActionGet {
         );
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Result,
-    ); 
+    );
 
     return %Result;
 }
@@ -171,12 +182,13 @@ sub MacroActionGet {
 adds a new MacroAction
 
     my $ID = $AutomationObject->MacroActionAdd(
-        MacroID    => 123
-        Type       => 'test',
-        Parameters => HashRef,                                  # optional
-        Comment    => '...',                                    # optional
-        ValidID    => 1,                                        # optional
-        UserID     => 123,
+        MacroID         => 123
+        Type            => 'test',
+        Parameters      => HashRef,                                  # optional
+        ResultVariables => HashRef,                                  # optional
+        Comment         => '...',                                    # optional
+        ValidID         => 1,                                        # optional
+        UserID          => 123,
     );
 
 =cut
@@ -238,25 +250,32 @@ sub MacroActionAdd {
             Data => $Param{Parameters}
         );
     }
+    # prepare ResultVariables as JSON
+    my $ResultVariables;
+    if ( $Param{ResultVariables} ) {
+        $ResultVariables = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{ResultVariables}
+        );
+    }
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO macro_action (macro_id, type, parameters, comments, valid_id, create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO macro_action (macro_id, type, parameters, result_variables, comments, valid_id, create_time, create_by, change_time, change_by) '
+             . 'VALUES (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{MacroID}, \$Param{Type}, \$Parameters, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{MacroID}, \$Param{Type}, \$Parameters, \$ResultVariables, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
     # get new id
     return if !$DBObject->Prepare(
-        SQL  => 'SELECT id FROM macro_action WHERE macro_id = ? and type = ?',
-        Bind => [ 
-            \$Param{MacroID}, \$Param{Type}, 
-        ],
+        SQL  => 'SELECT id FROM macro_action WHERE macro_id = ? and type = ? ORDER BY id',
+        Bind => [
+            \$Param{MacroID}, \$Param{Type},
+        ]
     );
 
     # fetch the result
@@ -285,13 +304,14 @@ sub MacroActionAdd {
 updates an MacroAction
 
     my $Success = $AutomationObject->MacroActionUpdate(
-        ID         => 123,        
-        MacroID    => 123,                                      # optional
-        Type       => 'test',                                   # optional
-        Parameters => HashRef,                                  # optional
-        Comment    => '...',                                    # optional
-        ValidID    => 1,                                        # optional
-        UserID     => 123,
+        ID              => 123,
+        MacroID         => 123,                                      # optional
+        Type            => 'test',                                   # optional
+        Parameters      => HashRef,                                  # optional
+        ResultVariables => HashRef,                                  # optional
+        Comment         => '...',                                    # optional
+        ValidID         => 1,                                        # optional
+        UserID          => 123,
     );
 
 =cut
@@ -355,7 +375,7 @@ sub MacroActionUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key ( qw(MacroID Type Parameters Comment ValidID) ) {
+    for my $Key ( qw(MacroID Type Parameters ResultVariables Comment ValidID) ) {
 
         next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
 
@@ -377,11 +397,19 @@ sub MacroActionUpdate {
         );
     }
 
+    # prepare ResultVariables as JSON
+    my $ResultVariables;
+    if ( $Param{ResultVariables} ) {
+        $ResultVariables = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{ResultVariables}
+        );
+    }
+
     # update MacroAction in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE macro_action SET macro_id = ?, type = ?, parameters = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE macro_action SET macro_id = ?, type = ?, parameters = ?, result_variables = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{MacroID}, \$Param{Type}, \$Parameters, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{MacroID}, \$Param{Type}, \$Parameters, \$ResultVariables, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -452,7 +480,7 @@ sub MacroActionList {
         $SQL .= ' AND valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => [
             \$Param{MacroID}
@@ -500,7 +528,7 @@ sub MacroActionDelete {
     }
 
     # check if this macro_action exists
-    my $Data = $Self->MacroActionGet( 
+    my $Data = $Self->MacroActionGet(
         ID => $Param{ID},
     );
     if ( !$Data ) {
@@ -516,7 +544,7 @@ sub MacroActionDelete {
         SQL  => 'DELETE FROM macro_action WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-   
+
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
@@ -538,8 +566,8 @@ sub MacroActionDelete {
 executes a macro action
 
     my $Success = $AutomationObject->MacroActionExecute(
-        ID        => 123,       # the ID of the macro action
-        UserID    => 1
+        ID     => 123,       # the ID of the macro action
+        UserID => 1
         ....
     );
 
@@ -572,7 +600,7 @@ sub MacroActionExecute {
             Priority => 'error',
             Message  => "No such macro action with ID $Param{ID}!"
         );
-        return;        
+        return;
     }
 
     # return success if action has been marked to be skipped
@@ -594,7 +622,7 @@ sub MacroActionExecute {
             Priority => 'error',
             Message  => "No such macro with ID $MacroAction{MacroID}!"
         );
-        return;        
+        return;
     }
 
     # load type backend module
@@ -609,27 +637,44 @@ sub MacroActionExecute {
         $BackendObject->{$_} = $Self->{$_};
     }
 
-    my $BackendResult = $BackendObject->Run(
+    my %Parameters = %{$MacroAction{Parameters} || {}};
+
+    # replace result variables
+    if (IsHashRefWithData($Self->{MacroResults})) {
+        foreach my $Parameter ( sort keys %Parameters ) {
+            foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
+                $Parameters{$Parameter} =~ s/\$\{$Variable\}/$Self->{MacroResults}->{$Variable}/gmx;
+            }
+        }
+    }
+
+    my $Success = $BackendObject->Run(
         %Param,
-        Config => $MacroAction{Parameters}
+        Config => \%Parameters
     );
 
-    if ( !$BackendResult ) {
+    if ( !$Success ) {
         # get last error message from system log
         my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'error',
             What => 'Message',
-        );            
+        );
         $Self->LogError(
             Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
             UserID   => $Param{UserID},
         );
     }
+    else {
+        # map results to variables if given
+        foreach my $Result ( keys %{$MacroAction{ResultVariables}} ) {
+            $Self->{MacroResults}->{$MacroAction{ResultVariables}->{$Result} || $Result} = $BackendObject->GetResult(Name => $Result);
+        }
+    }
 
     # remove MacroActionID from log reference
     delete $Self->{MacroActionID};
 
-    return $BackendResult;
+    return 1;
 }
 
 sub _LoadMacroActionTypeBackend {
@@ -652,22 +697,27 @@ sub _LoadMacroActionTypeBackend {
         # load backend modules
         my $Backends = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{MacroType});
 
-        if ( !IsHashRefWithData($Backends) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No macro action backend modules for macro type \"$Param{MacroType}\" found!",
-            );
-            return;
-        }        
+        # fallback to Common
+        if ( !IsHashRefWithData($Backends) || !IsHashRefWithData($Backends->{$Param{Name}}) ) {
+            $Backends = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::Common');
 
-        my $Backend = $Backends->{$Param{Name}}->{Module}; 
+            if ( !IsHashRefWithData($Backends) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No macro action backend modules for macro type \"$Param{MacroType}\" found!",
+                );
+                return;
+            }
+        }
+
+        my $Backend = $Backends->{$Param{Name}}->{Module};
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
-            );     
-            return;   
+            );
+            return;
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
@@ -675,7 +725,7 @@ sub _LoadMacroActionTypeBackend {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
             return;
         }
 
