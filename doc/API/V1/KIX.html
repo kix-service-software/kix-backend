@@ -3872,6 +3872,14 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
+               "readOnly" : true
+            },
             "Email" : {
                "type" : "string",
                "readOnly" : true
@@ -4768,6 +4776,13 @@ pre code {
             "Country" : {
                "type" : "string"
             },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
             "Email" : {
                "type" : "string"
             },
@@ -4818,7 +4833,49 @@ pre code {
    },
    "required" : [
       "Contact"
-   ]
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
   "Contact": {
@@ -4979,6 +5036,14 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Email" : {
@@ -5897,6 +5962,13 @@ pre code {
             "Country" : {
                "type" : "string"
             },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
             "Email" : {
                "type" : "string"
             },
@@ -5941,7 +6013,49 @@ pre code {
    },
    "required" : [
       "Contact"
-   ]
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
   "Contact": {
@@ -9877,6 +9991,14 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
+               "readOnly" : true
+            },
             "Email" : {
                "type" : "string",
                "readOnly" : true
@@ -10145,6 +10267,14 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "ID" : {
@@ -10870,6 +11000,13 @@ pre code {
             "Country" : {
                "type" : "string"
             },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
             "Name" : {
                "type" : "string"
             },
@@ -10897,7 +11034,49 @@ pre code {
    },
    "required" : [
       "Organisation"
-   ]
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
   "Organisation": {
@@ -11052,6 +11231,14 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Email" : {
@@ -11322,6 +11509,14 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "ID" : {
@@ -12029,6 +12224,13 @@ pre code {
             "Country" : {
                "type" : "string"
             },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
             "Name" : {
                "type" : "string"
             },
@@ -12052,7 +12254,49 @@ pre code {
    },
    "required" : [
       "Organisation"
-   ]
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
   "Organisation": {
@@ -12278,6 +12522,14 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Email" : {
@@ -14207,6 +14459,14 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Email" : {
@@ -39896,6 +40156,14 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
+               "readOnly" : true
+            },
             "Email" : {
                "type" : "string",
                "readOnly" : true
@@ -41103,6 +41371,14 @@ pre code {
             },
             "CreateTime" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
                "readOnly" : true
             },
             "Email" : {
