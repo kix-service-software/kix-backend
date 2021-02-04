@@ -177,6 +177,27 @@ sub Run {
         );
     }
     
+    # set dynamic fields
+    if ( IsArrayRefWithData($Organisation->{DynamicFields}) ) {
+
+        DYNAMICFIELD:
+        foreach my $DynamicField ( @{$Organisation->{DynamicFields}} ) {
+            my $Result = $Self->_SetDynamicFieldValue(
+                %{$DynamicField},
+                ObjectID   => $Param{Data}->{OrganisationID},
+                ObjectType => 'Organisation',
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    Code         => 'Object.UnableToUpdate',
+                    Message      => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
+                );
+            }
+        }
+    }
+
     return $Self->_Success(
         OrganisationID => 0 + $Param{Data}->{OrganisationID},
     );   

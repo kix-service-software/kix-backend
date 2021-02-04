@@ -28,6 +28,7 @@ my %ObjectTypeReferenceMapping = (
     'Ticket'         => 'ticket',
     'ITSMConfigItem' => 'configitem',
     'FAQ'            => 'faq_item',
+    'Contact'        => 'contact',
 );
 
 my %FieldTypeReferenceMapping = (

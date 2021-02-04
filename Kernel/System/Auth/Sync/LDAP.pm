@@ -431,6 +431,40 @@ sub Sync {
                 Message   => "No such user \"$Param{User}\"!",
             );
         }
+
+        if ( $ContactID ) {
+            # get dynamic field list
+            my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+                Valid      => 1,
+                ObjectType => ['Contact'],
+            );
+            my %DynamicFieldConfig = map { $_->{Name} => $_ } @{$DynamicFieldList};
+
+            # set Dynamic Fields
+            ATTRIBUTE:
+            foreach my $Attribute ( sort keys %SyncUser ) {
+                next ATTRIBUTE if $Attribute !~ /^DynamicField_(.*?)$/g;
+                my $DynamicFieldName = $1;
+
+                next ATTRIBUTE if !IsHashRefWithData($DynamicFieldConfig{$DynamicFieldName});
+                next ATTRIBUTE if $DynamicFieldConfig{$DynamicFieldName}->{InternalField};
+
+                # set value
+                my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+                    DynamicFieldConfig => $DynamicFieldConfig{$DynamicFieldName},
+                    ObjectID           => $ContactID,
+                    UserID             => 1,
+                );
+
+                if ( !$Success ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
+                        Priority  => 'error',
+                        Message   => "Unable to update value for dynamic field \"$DynamicFieldName\" (contact $ContactID).",
+                    );
+                }
+            }
+        }
     }
 
     if ( IsHashRefWithData($Self->{GroupDNBasedRoleSync}) ) {

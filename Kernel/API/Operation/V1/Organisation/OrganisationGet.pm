@@ -131,7 +131,8 @@ sub Run {
 
         # get the Organisation data
         my %OrganisationData = $Kernel::OM->Get('Organisation')->OrganisationGet(
-            ID => $ID,
+            ID            => $ID,
+            DynamicFields => $Param{Data}->{include}->{DynamicFields},
         );
 
         if ( !IsHashRefWithData( \%OrganisationData ) ) {
@@ -139,6 +140,50 @@ sub Run {
             return $Self->_Error(
                 Code => 'Object.NotFound'
             );
+        }
+
+        if ( $Param{Data}->{include}->{DynamicFields} ) {
+            my @DynamicFields;
+
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency(Type => 'DynamicField');
+
+            # remove all dynamic fields from organisation hash and set them into an array.
+            ATTRIBUTE:
+            for my $Attribute ( sort keys %OrganisationData ) {
+
+                if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
+                    if ( $OrganisationData{$Attribute} ) {
+                        my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                            Name => $1,
+                        );
+                        if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                            # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                            next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+                            my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                                Config => $DynamicFieldConfig,
+                                Value  => $OrganisationData{$Attribute}
+                            );
+
+                            if (IsHashRefWithData($PreparedValue)) {
+                                push(@DynamicFields, $PreparedValue);
+                            }
+                        }
+                        delete $OrganisationData{$Attribute};
+                    }
+                    next ATTRIBUTE;
+                }
+            }
+
+            # add dynamic fields array into 'DynamicFields' hash key if any
+            if (@DynamicFields) {
+                $OrganisationData{DynamicFields} = \@DynamicFields;
+            }
+            else {
+                $OrganisationData{DynamicFields} = [];
+            }
         }
 
         # filter valid attributes

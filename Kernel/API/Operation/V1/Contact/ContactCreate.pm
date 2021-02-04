@@ -215,6 +215,27 @@ sub Run {
         );
     }
 
+    # set dynamic fields
+    if ( IsArrayRefWithData( $Contact->{DynamicFields} ) ) {
+
+        DYNAMICFIELD:
+        foreach my $DynamicField ( @{ $Contact->{DynamicFields} } ) {
+            my $Result = $Self->_SetDynamicFieldValue(
+                %{$DynamicField},
+                ObjectID   => $ContactID,
+                ObjectType => 'Contact',
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    Code    => 'Operation.InternalError',
+                    Message => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
+                );
+            }
+        }
+    }
+
     return $Self->_Success(
         Code   => 'Object.Created',
         ContactID => 0 + $ContactID,

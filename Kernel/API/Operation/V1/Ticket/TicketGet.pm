@@ -323,7 +323,7 @@ sub _GetTicketData {
     my @DynamicFields;
 
     # inform API caching about a new dependency
-    $Self->AddCacheDependency(Type => 'DynamicField');
+    $Self->AddCacheDependency(Type => 'DynamicField') if $Param{Data}->{include}->{DynamicFields};
 
     # remove all dynamic fields from main ticket hash and set them into an array.
     ATTRIBUTE:
