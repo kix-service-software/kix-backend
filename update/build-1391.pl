@@ -86,7 +86,6 @@ sub _AddDynamicFields {
                 %{$DynamicField},
                 ID         => $DynamicFieldLookup{ $DynamicField->{Name} }->{ID},
                 ValidID    => $DynamicFieldLookup{ $DynamicField->{Name} }->{ValidID},
-                Reorder    => 0,
                 UserID     => 1,
             );
         }
@@ -126,6 +125,7 @@ sub _GetDynamicFieldsDefinition {
             FieldType     => 'Text',
             ObjectType    => 'Contact',
             InternalField => 0,
+            Config        => {},
         },
         {
             Name          => 'Type',
