@@ -49,106 +49,139 @@ sub _Replace {
         }
     }
 
-    my $Tag = $Self->{Start} . 'KIX_TICKET_DynamicField_';
+    # get all supported object types
+    my $ObjectTypes = $Kernel::OM->Get('Config')->Get('DynamicFields::ObjectType') || {};
 
-    if ( IsHashRefWithData($Param{Ticket}) ) {
+    foreach my $ObjectType ( sort keys %{$ObjectTypes} ) {
 
-        # Dropdown, Checkbox and MultipleSelect DynamicFields, can store values (keys) that are
-        # different from the the values to display
-        # <KIX_TICKET_DynamicField_NameX> returns the display value
-        # <KIX_TICKET_DynamicField_NameX_Value> also returns the display value
-        # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for select fields (multiselect, reference)
-        # <KIX_TICKET_DynamicField_NameX_HTML> returns a special HTML display value (e.g. checklist) or default display value
-        # <KIX_TICKET_DynamicField_NameX_Short> returns a short display value (e.g. checklist) or default display value
+        my $Tag = $Self->{Start} . 'KIX_'.uc($ObjectType).'_DynamicField_';
 
-        my %DynamicFields;
+        # get objects
+        my $Object;
+        if ( $ObjectType eq 'Ticket' && (IsHashRefWithData($Param{Ticket}) || $Param{TicketID}) ) {
+            $Object = $Param{Ticket};
+            if ( !IsHashRefWithData($Object) && $Param{TicketID} ) {
+                my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet( 
+                    TicketID      => $Param{TicketID},
+                    DynamicFields => 1,
+                );
+                $Object = \%Ticket;
+            } 
+        }
+        elsif ( $ObjectType eq 'Contact' && ($Param{Data}->{ContactID} || $Param{Ticket}->{ContactID}) ) {
+            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+                ID            => $Param{Data}->{ContactID} || $Param{Ticket}->{ContactID},
+                DynamicFields => 1,
+            );
+            $Object = \%Contact;
+        }
+        elsif ( $ObjectType eq 'Organisation' && ($Param{Data}->{OrganisationID} || $Param{Ticket}->{OrganisationID}) ) {
+            my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                ID            => $Param{Data}->{OrganisationID} || $Param{Ticket}->{OrganisationID},
+                DynamicFields => 1,
+            );
+            $Object = \%Organisation;
+        }
+        
+        if ( IsHashRefWithData($Object) ) {
 
-        # For systems with many Dynamic fields we do not want to load them all unless needed
-        # Find what Dynamic Field Values are requested
-        while ( $Param{Text} =~ m/$Tag(\S+?)(_Value|_Key|_HTML|_Short)? $Self->{End}/gixms ) {
-            $DynamicFields{$1} = 1;
+            # Dropdown, Checkbox and MultipleSelect DynamicFields, can store values (keys) that are
+            # different from the the values to display, i.e.
+            # <KIX_TICKET_DynamicField_NameX> returns the display value
+            # <KIX_TICKET_DynamicField_NameX_Value> also returns the display value
+            # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for select fields (multiselect, reference)
+            # <KIX_TICKET_DynamicField_NameX_HTML> returns a special HTML display value (e.g. checklist) or default display value
+            # <KIX_TICKET_DynamicField_NameX_Short> returns a short display value (e.g. checklist) or default display value
+
+            my %DynamicFields;
+
+            # For systems with many Dynamic fields we do not want to load them all unless needed
+            # Find what Dynamic Field Values are requested
+            while ( $Param{Text} =~ m/$Tag(\S+?)(_Value|_Key|_HTML|_Short)? $Self->{End}/gixms ) {
+                $DynamicFields{$1} = 1;
+            }
+
+            # to store all the required DynamicField display values
+            my %DynamicFieldDisplayValues;
+
+            # get dynamic field objects
+            my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+            my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+            # get the dynamic fields for ticket object
+            my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+                Valid      => 1,
+                ObjectType => [ $ObjectType ],
+            ) || [];
+
+            DYNAMICFIELD:
+            for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
+                next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+
+                # only prepare values of the requested ones
+                next DYNAMICFIELD if !$DynamicFields{ $DynamicFieldConfig->{Name} };
+
+                # get the display values for each dynamic field
+                my $DisplayValueStrg = $DynamicFieldBackendObject->DisplayValueRender(
+                    DynamicFieldConfig => $DynamicFieldConfig,
+                    Value              => $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                    HTMLOutput         => $Param{RichText}
+                );
+                if ( IsHashRefWithData($DisplayValueStrg) ) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Value' }
+                        = $DisplayValueStrg->{Value};
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} }
+                        = $DisplayValueStrg->{Value};
+                }
+
+                # get the display keys for each dynamic field
+                my $DisplayKeyStrg = $DynamicFieldBackendObject->DisplayKeyRender(
+                    DynamicFieldConfig => $DynamicFieldConfig,
+                    Value              => $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                );
+
+                if (IsHashRefWithData($DisplayKeyStrg) && $DisplayKeyStrg->{Value}) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key' }
+                        = $DisplayKeyStrg->{Value} ;
+                } elsif (IsHashRefWithData($DisplayValueStrg)) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key' }
+                        = $DisplayValueStrg->{Value};
+                }
+
+                # get the html display values for each dynamic field
+                my $HTMLDisplayValueStrg = $DynamicFieldBackendObject->HTMLDisplayValueRender(
+                    DynamicFieldConfig => $DynamicFieldConfig,
+                    Value              => $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                );
+                if ( IsHashRefWithData($HTMLDisplayValueStrg) && $HTMLDisplayValueStrg->{Value} ) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_HTML' }
+                        = $HTMLDisplayValueStrg->{Value};
+                } elsif (IsHashRefWithData($DisplayValueStrg)) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_HTML' }
+                        = $DisplayValueStrg->{Value};
+                }
+
+                # get the short display values for each dynamic field
+                my $ShortDisplayValueStrg = $DynamicFieldBackendObject->ShortDisplayValueRender(
+                    DynamicFieldConfig => $DynamicFieldConfig,
+                    Value              => $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                );
+                if ( IsHashRefWithData($ShortDisplayValueStrg) && $ShortDisplayValueStrg->{Value} ) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' }
+                        = $ShortDisplayValueStrg->{Value};
+                } elsif (IsHashRefWithData($DisplayValueStrg)) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' }
+                        = $DisplayValueStrg->{Value};
+                }
+            }
+
+            # replace it
+            $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %DynamicFieldDisplayValues );
         }
 
-        # to store all the required DynamicField display values
-        my %DynamicFieldDisplayValues;
-
-        # get dynamic field objects
-        my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
-        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
-        # get the dynamic fields for ticket object
-        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
-            Valid      => 1,
-            ObjectType => ['Ticket'],
-        ) || [];
-
-        DYNAMICFIELD:
-        for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
-            next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
-
-            # only prepare values of the requested ones
-            next DYNAMICFIELD if !$DynamicFields{ $DynamicFieldConfig->{Name} };
-
-            # get the display values for each dynamic field
-            my $DisplayValueStrg = $DynamicFieldBackendObject->DisplayValueRender(
-                DynamicFieldConfig => $DynamicFieldConfig,
-                Value              => $Param{Ticket}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
-                HTMLOutput         => $Param{RichText}
-            );
-            if ( IsHashRefWithData($DisplayValueStrg) ) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Value' }
-                    = $DisplayValueStrg->{Value};
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} }
-                    = $DisplayValueStrg->{Value};
-            }
-
-            # get the display keys for each dynamic field
-            my $DisplayKeyStrg = $DynamicFieldBackendObject->DisplayKeyRender(
-                DynamicFieldConfig => $DynamicFieldConfig,
-                Value              => $Param{Ticket}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
-            );
-
-            if (IsHashRefWithData($DisplayKeyStrg) && $DisplayKeyStrg->{Value}) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key' }
-                    = $DisplayKeyStrg->{Value} ;
-            } elsif (IsHashRefWithData($DisplayValueStrg)) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key' }
-                    = $DisplayValueStrg->{Value};
-            }
-
-            # get the html display values for each dynamic field
-            my $HTMLDisplayValueStrg = $DynamicFieldBackendObject->HTMLDisplayValueRender(
-                DynamicFieldConfig => $DynamicFieldConfig,
-                Value              => $Param{Ticket}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
-            );
-            if ( IsHashRefWithData($HTMLDisplayValueStrg) && $HTMLDisplayValueStrg->{Value} ) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_HTML' }
-                    = $HTMLDisplayValueStrg->{Value};
-            } elsif (IsHashRefWithData($DisplayValueStrg)) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_HTML' }
-                    = $DisplayValueStrg->{Value};
-            }
-
-            # get the short display values for each dynamic field
-            my $ShortDisplayValueStrg = $DynamicFieldBackendObject->ShortDisplayValueRender(
-                DynamicFieldConfig => $DynamicFieldConfig,
-                Value              => $Param{Ticket}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
-            );
-            if ( IsHashRefWithData($ShortDisplayValueStrg) && $ShortDisplayValueStrg->{Value} ) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' }
-                    = $ShortDisplayValueStrg->{Value};
-            } elsif (IsHashRefWithData($DisplayValueStrg)) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' }
-                    = $DisplayValueStrg->{Value};
-            }
-        }
-
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %DynamicFieldDisplayValues );
+        # cleanup
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
     }
-
-    # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
 
     return $Param{Text};
 }

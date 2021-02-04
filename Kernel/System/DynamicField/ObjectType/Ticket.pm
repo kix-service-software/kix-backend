@@ -231,6 +231,13 @@ sub PostValueSet {
         UserID => $Param{UserID},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket',
+        ObjectID  => $Param{ObjectID},
+    );
+
     return 1;
 }
 
