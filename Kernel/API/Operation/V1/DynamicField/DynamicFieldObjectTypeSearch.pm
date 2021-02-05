@@ -101,12 +101,6 @@ sub Run {
         });
     }
 
-    if ( scalar(@ObjectTypes) == 1 ) {
-        return $Self->_Success(
-            DynamicFieldObject => $ObjectTypes[0],
-        );
-    }
-
     # return result
     return $Self->_Success(
         DynamicFieldObject => \@ObjectTypes,

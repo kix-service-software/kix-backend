@@ -164,7 +164,8 @@ sub _GetContactData {
 
     # get the Contact data
     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        ID => $ContactID,
+        ID            => $ContactID,
+        DynamicFields => $Param{Data}->{include}->{DynamicFields},
     );
 
     if ( !IsHashRefWithData( \%ContactData ) ) {
@@ -172,6 +173,50 @@ sub _GetContactData {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
+    }
+
+    if ( $Param{Data}->{include}->{DynamicFields} ) {
+        my @DynamicFields;
+
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'DynamicField');
+
+        # remove all dynamic fields from contact hash and set them into an array.
+        ATTRIBUTE:
+        for my $Attribute ( sort keys %ContactData ) {
+
+            if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
+                if ( $ContactData{$Attribute} ) {
+                    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                        Name => $1,
+                    );
+                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+                        my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                            Config => $DynamicFieldConfig,
+                            Value  => $ContactData{$Attribute}
+                        );
+
+                        if (IsHashRefWithData($PreparedValue)) {
+                            push(@DynamicFields, $PreparedValue);
+                        }
+                    }
+                    delete $ContactData{$Attribute};
+                }
+                next ATTRIBUTE;
+            }
+        }
+
+        # add dynamic fields array into 'DynamicFields' hash key if any
+        if (@DynamicFields) {
+            $ContactData{DynamicFields} = \@DynamicFields;
+        }
+        else {
+            $ContactData{DynamicFields} = [];
+        }
     }
 
     # filter valid attributes

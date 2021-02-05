@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::DynamicField::ObjectType::Article;
+package Kernel::System::DynamicField::ObjectType::Contact;
 
 use strict;
 use warnings;
@@ -18,18 +18,17 @@ use Scalar::Util;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'DB',
+    'FAQ',
     'Log',
-    'Ticket',
 );
 
 =head1 NAME
 
-Kernel::System::DynamicField::Backend::Article
+Kernel::System::DynamicField::ObjectType::Contact
 
 =head1 SYNOPSIS
 
-Article object handler for DynamicFields
+Contact object handler for DynamicFields
 
 =head1 PUBLIC INTERFACE
 
@@ -38,13 +37,14 @@ Article object handler for DynamicFields
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::System::DynamicField::Backend->new();
+by using Kernel::System::DynamicField::ObjectType::Contact->new();
 
 =cut
 
 sub new {
     my ( $Type, %Param ) = @_;
 
+    # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
 
@@ -55,10 +55,10 @@ sub new {
 
 perform specific functions after the Value set for this object type.
 
-    my $Success = $DynamicFieldTicketHandlerObject->PostValueSet(
+    my $Success = $DynamicFieldFAQHandlerObject->PostValueSet(
         DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
         ObjectID           => $ObjectID,                # ID of the current object that the field
-                                                        # must be linked to, e. g. TicketID
+                                                        # must be linked to, e. g. FAQID
         Value              => $Value,                   # Value to store, depends on backend type
         UserID             => 123,
     );
@@ -73,8 +73,9 @@ sub PostValueSet {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!",
+                Message  => "Need $Needed!"
             );
+
             return;
         }
     }
@@ -85,6 +86,7 @@ sub PostValueSet {
             Priority => 'error',
             Message  => "The field configuration is invalid",
         );
+
         return;
     }
 
@@ -93,44 +95,26 @@ sub PostValueSet {
         if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed in DynamicFieldConfig!",
+                Message  => "Need $Needed in DynamicFieldConfig!"
             );
+
             return;
         }
     }
 
-    # Don't hold a permanent reference to the TicketObject.
-    #   This is because the TicketObject has a Kernel::DynamicField::Backend object, which has this
-    #   object, which has a TicketObject again. Without weaken() we'd have a cyclic reference.
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Article = $TicketObject->ArticleGet(
-        ArticleID     => $Param{ObjectID},
-        DynamicFields => 0,
+    # clear cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'Contact',
     );
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # update change time
-    return if !$DBObject->Do(
-        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
-            . ' change_by = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$Article{TicketID} ],
-    );
-
-    # clear ticket cache
-    $TicketObject->_TicketCacheClear( TicketID => $Article{TicketID} );
-
-    # trigger event
-    $TicketObject->EventHandler(
-        Event => 'ArticleDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
+    # Trigger event.
+    $Kernel::OM->Get('Contact')->EventHandler(
+        Event => 'ContactDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
             FieldName => $Param{DynamicFieldConfig}->{Name},
             Value     => $Param{Value},
             OldValue  => $Param{OldValue},
-            TicketID  => $Article{TicketID},
-            ArticleID => $Param{ObjectID},
+            ItemID    => $Param{ObjectID},
             UserID    => $Param{UserID},
         },
         UserID => $Param{UserID},
@@ -139,11 +123,11 @@ sub PostValueSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket.Article',
-        ObjectID  => $Article{TicketID}.'::'.$Param{ObjectID},
+        Namespace => 'Contact',
+        ObjectID  => $Param{ObjectID},
     );
 
-    return 1
+    return 1;
 }
 
 1;
