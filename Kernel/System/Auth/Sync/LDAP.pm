@@ -159,6 +159,8 @@ sub Sync {
     my $ConfigObject = $Kernel::OM->Get('Config');
     my $ContactObject = $Kernel::OM->Get('Contact');
 
+    my $ContactID;
+    
     # get current user id
     my $UserID = $UserObject->UserLookup(
         UserLogin => $Param{User},
@@ -254,7 +256,7 @@ sub Sync {
             }
             if ( !IsHashRefWithData(\%ContactData) ) {
                 # create new contact
-                my $ContactID = $ContactObject->ContactAdd(
+                $ContactID = $ContactObject->ContactAdd(
                     %SyncContact,
                     AssignedUserID        => $UserID,
                     PrimaryOrganisationID => 1,
@@ -283,6 +285,7 @@ sub Sync {
                 my %ContactData = $ContactObject->ContactGet(
                     UserID => $UserID,
                 );
+                $ContactID = $ContactData{ID};
 
                 # check for changes on contact
                 my $AttributeChange = 0;
@@ -312,6 +315,39 @@ sub Sync {
                             LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
                             Priority  => 'notice',
                             Message   => "Updated contact for user \"$Param{User}\" ($UserDN) in RDBMS.",
+                        );
+                    }
+                }
+            }
+            if ( $ContactID ) {
+                # get dynamic field list
+                my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+                    Valid      => 1,
+                    ObjectType => ['Contact'],
+                );
+                my %DynamicFieldConfig = map { $_->{Name} => $_ } @{$DynamicFieldList};
+    
+                # set Dynamic Fields
+                ATTRIBUTE:
+                foreach my $Attribute ( sort keys %SyncContact ) {
+                    next ATTRIBUTE if $Attribute !~ /^DynamicField_(.*?)$/g;
+                    my $DynamicFieldName = $1;
+    
+                    next ATTRIBUTE if !IsHashRefWithData($DynamicFieldConfig{$DynamicFieldName});
+                    next ATTRIBUTE if $DynamicFieldConfig{$DynamicFieldName}->{InternalField};
+    
+                    # set value
+                    my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+                        DynamicFieldConfig => $DynamicFieldConfig{$DynamicFieldName},
+                        ObjectID           => $ContactID,
+                        UserID             => 1,
+                    );
+    
+                    if ( !$Success ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
+                            Priority  => 'error',
+                            Message   => "Unable to update value for dynamic field \"$DynamicFieldName\" (contact $ContactID).",
                         );
                     }
                 }
@@ -430,40 +466,6 @@ sub Sync {
                 Priority  => 'error',
                 Message   => "No such user \"$Param{User}\"!",
             );
-        }
-
-        if ( $ContactID ) {
-            # get dynamic field list
-            my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-                Valid      => 1,
-                ObjectType => ['Contact'],
-            );
-            my %DynamicFieldConfig = map { $_->{Name} => $_ } @{$DynamicFieldList};
-
-            # set Dynamic Fields
-            ATTRIBUTE:
-            foreach my $Attribute ( sort keys %SyncUser ) {
-                next ATTRIBUTE if $Attribute !~ /^DynamicField_(.*?)$/g;
-                my $DynamicFieldName = $1;
-
-                next ATTRIBUTE if !IsHashRefWithData($DynamicFieldConfig{$DynamicFieldName});
-                next ATTRIBUTE if $DynamicFieldConfig{$DynamicFieldName}->{InternalField};
-
-                # set value
-                my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
-                    DynamicFieldConfig => $DynamicFieldConfig{$DynamicFieldName},
-                    ObjectID           => $ContactID,
-                    UserID             => 1,
-                );
-
-                if ( !$Success ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
-                        Priority  => 'error',
-                        Message   => "Unable to update value for dynamic field \"$DynamicFieldName\" (contact $ContactID).",
-                    );
-                }
-            }
         }
     }
 
