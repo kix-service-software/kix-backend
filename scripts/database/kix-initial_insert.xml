@@ -2769,11 +2769,6 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">6</Data>
-        <Data Key="event_key" Type="Quote">Events</Data>
-        <Data Key="event_value" Type="Quote">TicketResponsibleUpdate</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">6</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentResponsible</Data>
     </Insert>
