@@ -340,6 +340,7 @@ sub Sync {
                     my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
                         DynamicFieldConfig => $DynamicFieldConfig{$DynamicFieldName},
                         ObjectID           => $ContactID,
+                        Value              => $SyncContact{$Attribute},
                         UserID             => 1,
                     );
     
