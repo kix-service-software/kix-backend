@@ -718,7 +718,7 @@ sub OrganisationDelete {
         next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
         next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
 
-        $Kernel::OM->Get('DynamicFieldBackend')->ValueDelete(
+        $Kernel::OM->Get('DynamicField::Backend')->ValueDelete(
             DynamicFieldConfig => $DynamicFieldConfig,
             ObjectID           => $Param{ID},
             UserID             => $Param{UserID},
