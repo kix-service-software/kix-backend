@@ -242,7 +242,7 @@ sub Run {
                 %{$DynamicField},
                 ObjectID   => $Param{Data}->{ContactID},
                 ObjectType => 'Contact',
-                UserID     => $Param{UserID},
+                UserID     => $Self->{Authorization}->{UserID},
             );
 
             if ( !$Result->{Success} ) {
