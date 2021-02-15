@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-2-4 09:25+0000\n"
-"PO-Revision-Date: 2021-02-08 17:46+0000\n"
+"PO-Revision-Date: 2021-02-15 11:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -124,7 +124,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Backup Device"
-msgstr ""
+msgstr "Backup Gerät"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Beamer"
@@ -132,7 +132,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Camera"
-msgstr ""
+msgstr "Kamera"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "CheckList"
@@ -322,7 +322,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Mouse"
-msgstr ""
+msgstr "Maus"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Multiselect"
@@ -406,7 +406,7 @@ msgstr "Geplant"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Printer"
-msgstr ""
+msgstr "Drucker"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Production"
@@ -450,7 +450,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Security Device"
-msgstr ""
+msgstr "Sicherheitsgerät"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Server"
@@ -576,7 +576,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "USB Device"
-msgstr ""
+msgstr "USB Gerät"
 
 # ticket types
 #. Database: scripts/database/kix-initial_insert.xml
@@ -601,7 +601,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "WLAN Access Point"
-msgstr ""
+msgstr "WLAN-Zugangspunkt"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Warning"
