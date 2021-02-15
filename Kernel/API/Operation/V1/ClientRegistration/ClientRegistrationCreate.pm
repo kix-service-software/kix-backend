@@ -247,6 +247,9 @@ sub Run {
     # import translations if given
     if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
         foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
+            # inform API caching about a new dependency
+            $Self->AddCacheDependency( Type => 'Translation' );
+    
             my $Content = MIME::Base64::decode_base64($Item->{Content});
                         
             # fire & forget, not result handling at the moment
@@ -260,6 +263,9 @@ sub Run {
 
     # import SysConfig definitions if given
     if ( IsArrayRefWithData($ClientRegistration->{SysConfigOptionDefinitions}) ) {
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency( Type => 'SysConfig' );
+
         my %SysConfigOptions = $Kernel::OM->Get('SysConfig')->OptionGetAll();
 
         foreach my $Item ( @{$ClientRegistration->{SysConfigOptionDefinitions}} ) {
