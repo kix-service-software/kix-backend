@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-2-4 09:25+0000\n"
-"PO-Revision-Date: 2021-02-15 11:46+0000\n"
+"PO-Revision-Date: 2021-02-16 14:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -988,7 +988,7 @@ msgstr "Die ID oder E-Mail Adresse des Kontakes, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Append"
-msgstr ""
+msgstr "Hinzufügen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Dynamic Field Name"
@@ -1005,6 +1005,9 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Specifies whether the new value should be appended or set."
 msgstr ""
+"Wenn diese Checkbox aktiv ist, wird der neue Wert ggf. vorhandenen Werten im "
+"dynamischen Feld hinzugefügt. Ansonsten werden ggf. vorhandene Werte "
+"vollständig durch den neuen Wert ersetzt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "The name of the dynamic field."
