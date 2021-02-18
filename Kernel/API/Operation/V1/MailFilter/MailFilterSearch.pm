@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -86,32 +86,33 @@ sub Run {
 
     # get already prepared MailFilter data from MailFilterGet operation
     if ( IsHashRefWithData( \%MailFilterList ) ) {
-        my $MailFilterGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::MailFilter::MailFilterGet',
             SuppressPermissionErrors => 1,
             Data          => {
                 MailFilterID => join( ',', sort keys %MailFilterList )
                 }
         );
-
-        if (
-            !IsHashRefWithData($MailFilterGetResult)
-            || !$MailFilterGetResult->{Success}
-            ) {
-            return $MailFilterGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @MailFilterDataList = IsArrayRef( $MailFilterGetResult->{Data}->{MailFilter} )
-            ? @{ $MailFilterGetResult->{Data}->{MailFilter} }
-            : ( $MailFilterGetResult->{Data}->{MailFilter} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{MailFilter} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{MailFilter}) ? @{$GetResult->{Data}->{MailFilter}} : ( $GetResult->{Data}->{MailFilter} );
+        }
 
-        if ( IsArrayRefWithData( \@MailFilterDataList ) ) {
-            return $Self->_Success( MailFilter => \@MailFilterDataList, );
+        if ( IsArrayRefWithData( \@ResultList ) ) {
+            return $Self->_Success( 
+                MailFilter => \@ResultList, 
+            );
         }
     }
 
     # return result
-    return $Self->_Success( MailFilter => [], );
+    return $Self->_Success( 
+        MailFilter => [], 
+    );
 }
 
 1;

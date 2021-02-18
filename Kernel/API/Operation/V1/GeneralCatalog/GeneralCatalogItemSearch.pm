@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -97,19 +97,24 @@ sub Run {
    
 	    # get already prepared GeneralCatalog data from GeneralCatalogGet operation
 	    if ( IsHashRefWithData($GeneralCatalogItemList) ) {   
-	        my $GeneralCatalogGetResult = $Self->ExecOperation(
+	        my $GetResult = $Self->ExecOperation(
 	            OperationType            => 'V1::GeneralCatalog::GeneralCatalogItemGet',
                 SuppressPermissionErrors => 1,
 	            Data      => {
 	                GeneralCatalogItemID => join(',', sort keys %$GeneralCatalogItemList),
 	            }
-	        );    
-	
-	        if ( !IsHashRefWithData($GeneralCatalogGetResult) || !$GeneralCatalogGetResult->{Success} ) {
-	            return $GeneralCatalogGetResult;
-	        }
-	        push @GeneralCatalogDataList,IsArrayRefWithData($GeneralCatalogGetResult->{Data}->{GeneralCatalogItem}) ? @{$GeneralCatalogGetResult->{Data}->{GeneralCatalogItem}} : ( $GeneralCatalogGetResult->{Data}->{GeneralCatalogItem} );
-	    }	            	
+	        );
+            if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+                return $GetResult;
+            }
+
+            my @ResultList;
+            if ( defined $GetResult->{Data}->{GeneralCatalogItem} ) {
+                @ResultList = IsArrayRef($GetResult->{Data}->{GeneralCatalogItem}) ? @{$GetResult->{Data}->{GeneralCatalogItem}} : ( $GetResult->{Data}->{GeneralCatalogItem} );
+            }
+
+	        push @GeneralCatalogDataList, @ResultList;
+	    }
     }
 
     if ( IsArrayRefWithData(\@GeneralCatalogDataList) ) {

@@ -1,14 +1,14 @@
 {
-   "$id" : "RoleUserIDPostResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The UserID of the created role user.",
-   "type" : "object",
-   "properties" : {
-      "UserID" : {
-         "type" : "integer"
-      }
-   },
-   "required" : [
-      "UserID"
-   ]
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "RoleUserIDPostResponse.json",
+    "type": "object",
+    "description": "The UserID of the created role user.",
+    "properties": {
+        "UserID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "UserID"
+    ]
 }

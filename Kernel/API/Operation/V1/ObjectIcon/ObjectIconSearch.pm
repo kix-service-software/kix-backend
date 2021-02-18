@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -89,23 +89,25 @@ sub Run {
 
 	# get already prepared ObjectIcon data from ObjectIconGet operation
     if ( IsArrayRefWithData($ObjectIconList) ) {  	
-        my $ObjectIconGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::ObjectIcon::ObjectIconGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 ObjectIconID => join(',', sort @{$ObjectIconList}),
             }
-        );    
-
-        if ( !IsHashRefWithData($ObjectIconGetResult) || !$ObjectIconGetResult->{Success} ) {
-            return $ObjectIconGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ObjectIconDataList = IsArrayRef($ObjectIconGetResult->{Data}->{ObjectIcon}) ? @{$ObjectIconGetResult->{Data}->{ObjectIcon}} : ( $ObjectIconGetResult->{Data}->{ObjectIcon} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ObjectIcon} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ObjectIcon}) ? @{$GetResult->{Data}->{ObjectIcon}} : ( $GetResult->{Data}->{ObjectIcon} );
+        }
 
-        if ( IsArrayRefWithData(\@ObjectIconDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ObjectIcon => \@ObjectIconDataList,
+                ObjectIcon => \@ResultList,
             )
         }
     }

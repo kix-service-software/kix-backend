@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,23 +91,25 @@ sub Run {
 
 	# get already prepared SystemAddress data from SystemAddressGet operation
     if ( IsHashRefWithData(\%SystemAddressList) ) {  	
-        my $SystemAddressGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::SystemAddress::SystemAddressGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 SystemAddressID => join(',', sort keys %SystemAddressList),
             }
-        );    
-
-        if ( !IsHashRefWithData($SystemAddressGetResult) || !$SystemAddressGetResult->{Success} ) {
-            return $SystemAddressGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @SystemAddressDataList = IsArrayRef($SystemAddressGetResult->{Data}->{SystemAddress}) ? @{$SystemAddressGetResult->{Data}->{SystemAddress}} : ( $SystemAddressGetResult->{Data}->{SystemAddress} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{SystemAddress} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{SystemAddress}) ? @{$GetResult->{Data}->{SystemAddress}} : ( $GetResult->{Data}->{SystemAddress} );
+        }
 
-        if ( IsArrayRefWithData(\@SystemAddressDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                SystemAddress => \@SystemAddressDataList,
+                SystemAddress => \@ResultList,
             )
         }
     }

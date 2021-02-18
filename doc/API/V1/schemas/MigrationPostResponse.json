@@ -1,14 +1,14 @@
 {
-   "$id" : "MigrationPostResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The ID of the created migration process.",
-   "type" : "object",
-   "properties" : {
-      "MigrationID" : {
-         "type" : "string"
-      }
-   },
-   "required" : [
-      "MigrationID"
-   ]
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "MigrationPostResponse.json",
+  "type": "object",
+  "description": "The ID of the created migration process.",
+  "properties": {
+    "MigrationID": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "MigrationID"
+  ]
 }

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::PID;
 
 use strict;
 use warnings;
+
+use Sys::Hostname;
 
 our @ObjectDependencies = (
     'Config',
@@ -50,8 +52,8 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get fqdn
-    $Self->{Host} = $Kernel::OM->Get('Config')->Get('FQDN');
+    # get hostname from system
+    $Self->{Host} = hostname;
 
     return $Self;
 }
@@ -61,7 +63,7 @@ sub new {
 create a new process id lock
 
     $PIDObject->PIDCreate(
-        Name => 'PostMasterPOP3',
+        Name     => 'PostMasterPOP3',
     );
 
     or to create a new PID forced, without check if already exists (this will delete any process

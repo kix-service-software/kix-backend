@@ -1,14 +1,14 @@
 {
-   "$id" : "ObjectIconPostPatchResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The ID of the created or updated object icon.",
-   "type" : "object",
-   "properties" : {
-      "ObjectIconID" : {
-         "type" : "integer"
-      }
-   },
-   "required" : [
-      "ObjectIconID"
-   ]
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ObjectIconPostPatchResponse.json",
+    "type": "object",
+    "description": "The ID of the created or updated object icon.",
+    "properties": {
+        "ObjectIconID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "ObjectIconID"
+    ]
 }

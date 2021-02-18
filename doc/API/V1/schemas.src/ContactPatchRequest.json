@@ -20,6 +20,13 @@
         "Country": {
           "type": "string"
         },
+        "DynamicFields": {
+          "type": "array",
+          "description": "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+          "items": {
+            "$ref": "DynamicFieldValueSetItem.json"
+          }
+        },
         "Email": {
           "type": "string"
         },

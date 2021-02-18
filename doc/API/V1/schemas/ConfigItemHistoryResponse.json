@@ -1,86 +1,14 @@
 {
-   "$id" : "ConfigItemHistoryCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A response for config item history GET request.",
-   "type" : "object",
-   "properties" : {
-      "ConfigItemHistory" : {
-         "$ref" : "#/definitions/ConfigItemHistory_json-666c1c3cf3"
-      }
-   },
-   "required" : [
-      "ConfigItemHistory"
-   ],
-   "definitions" : {
-      "ConfigItemHistory_json-666c1c3cf3" : {
-         "$id" : "ConfigItemHistory.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The config item history object.",
-         "type" : "object",
-         "properties" : {
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "ConfigItemID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "HistoryEntryID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "HistoryType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "HistoryTypeID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "UserFirstname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "UserLastname" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "UserLogin" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "CreateBy",
-            "CreateTime",
-            "HistoryEntryID",
-            "HistoryType",
-            "HistoryTypeID",
-            "UserID",
-            "UserFirstname",
-            "UserLastname",
-            "UserLogin"
-         ]
-      }
-   }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ConfigItemHistoryCollectionResponse.json",
+  "type": "object",
+  "description": "A response for config item history GET request.",
+  "properties": {
+    "ConfigItemHistory": {
+      "$ref": "ConfigItemHistory.json"
+    }
+  },
+  "required": [
+    "ConfigItemHistory"
+  ]
 }

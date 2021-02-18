@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -119,27 +119,30 @@ sub Run {
 
     # get already prepared Run data from JobRunGet operation
     if ( IsHashRefWithData(\%JobRunList) ) {   
-        my $JobRunGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::JobRunGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 JobID => $Param{Data}->{JobID},
                 RunID => join(',', sort keys %JobRunList),
             }
-        );    
-
-        if ( !IsHashRefWithData($JobRunGetResult) || !$JobRunGetResult->{Success} ) {
-            return $JobRunGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
-        push @JobRunDataList, IsArrayRefWithData($JobRunGetResult->{Data}->{JobRun}) ? @{$JobRunGetResult->{Data}->{JobRun}} : ( $JobRunGetResult->{Data}->{JobRun} );
-    }	            	
-    
-    if ( IsArrayRefWithData(\@JobRunDataList) ) {
-        return $Self->_Success(
-            JobRun => \@JobRunDataList,
-        )
-    }
 
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{JobRun} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{JobRun}) ? @{$GetResult->{Data}->{JobRun}} : ( $GetResult->{Data}->{JobRun} );
+        }
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                JobRun => \@ResultList,
+            )
+        }
+    }
+    
     # return result
     return $Self->_Success(
         JobRun => [],

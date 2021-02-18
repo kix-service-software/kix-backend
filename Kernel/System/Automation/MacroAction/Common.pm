@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -139,6 +139,93 @@ sub AddOption {
     return 1;
 }
 
+=item AddResult()
+
+Add a new result definition for this macro action module.
+
+Example:
+    $Self->AddResult(
+        Name        => 'TicketID',
+        Description => 'This is the ID of the created ticket.',
+    );
+
+=cut
+
+sub AddResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{Definition}->{Results} //= {};
+    $Self->{Definition}->{Results}->{$Param{Name}} = \%Param;
+
+    return 1;
+}
+
+=item GetResult()
+
+Get the value of a result variable.
+
+Example:
+    my $Value = $Self->GetResult(
+        Name => 'TicketID',
+    );
+
+=cut
+
+sub GetResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{Results} //= {};
+    
+    return $Self->{Results}->{$Param{Name}};
+}
+
+=item SetResult()
+
+Assign a value for a result variable.
+
+Example:
+    $Self->SetResult(
+        Name  => 'TicketID',
+        Value => 123,
+    );
+
+=cut
+
+sub SetResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{Results}->{$Param{Name}} = $Param{Value};
+
+    return 1;
+}
+
 =item ValidateConfig()
 
 Validates the required parameters of the config.
@@ -173,6 +260,45 @@ sub ValidateConfig {
                 Message  => "Required parameter \"$Option\" missing!",
             );
             return;
+        }
+    }
+
+    return 1;
+}
+
+sub _CheckParams {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Config UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }
+
+    if (ref $Param{Config} ne 'HASH') {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Config is no object!",
+        );
+        return;
+    }
+
+    my %Definition = $Self->DefinitionGet();
+
+    if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
+        for my $Option ( values %{$Definition{Options}}) {
+            if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Option->{Name} in Config!",
+                );
+                return;
+            }
         }
     }
 

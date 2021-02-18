@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableDrop Name="ticket_lock_index"/>
+    <TableDrop Name="ticket_index"/>
+
+    <TableCreate Name="ticket_index">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+        <Column Name="ticket_id" Required="true" Type="BIGINT"/>
+        <Column Name="queue_id" Required="true" Type="INTEGER"/>
+        <Column Name="lock_id" Required="true" Type="INTEGER"/>
+        <Column Name="state_id" Required="true" Type="INTEGER"/>
+        <Column Name="create_time_unix" Required="true" Type="BIGINT"/>
+        <Index Name="ticket_index_ticket_id">
+            <IndexColumn Name="ticket_id"/>
+        </Index>
+        <Index Name="ticket_index_queue_id">
+            <IndexColumn Name="queue_id"/>
+        </Index>
+        <Index Name="ticket_index_lock_id">
+            <IndexColumn Name="lock_id"/>
+        </Index>
+        <Index Name="ticket_index_state_id">
+            <IndexColumn Name="state_id"/>
+        </Index>
+        <ForeignKey ForeignTable="ticket">
+            <Reference Local="ticket_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="queue">
+            <Reference Local="queue_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="ticket_state">
+            <Reference Local="state_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="ticket_lock_type">
+            <Reference Local="lock_id" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+
+
+</database>

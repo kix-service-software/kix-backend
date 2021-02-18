@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -129,25 +129,28 @@ sub Run {
    
     # get already prepared MacroAction data from MacroActionGet operation
     if ( IsHashRefWithData(\%MacroActionList) ) {   
-        my $MacroActionGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::MacroActionGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 MacroID       => $Param{Data}->{MacroID},
                 MacroActionID => join(',', sort keys %MacroActionList),
             }
-        );    
-
-        if ( !IsHashRefWithData($MacroActionGetResult) || !$MacroActionGetResult->{Success} ) {
-            return $MacroActionGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
-        push @MacroActionDataList,IsArrayRefWithData($MacroActionGetResult->{Data}->{MacroAction}) ? @{$MacroActionGetResult->{Data}->{MacroAction}} : ( $MacroActionGetResult->{Data}->{MacroAction} );
-    }	            	
 
-    if ( IsArrayRefWithData(\@MacroActionDataList) ) {
-        return $Self->_Success(
-            MacroAction => \@MacroActionDataList,
-        )
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{MacroAction} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{MacroAction}) ? @{$GetResult->{Data}->{MacroAction}} : ( $GetResult->{Data}->{MacroAction} );
+        }
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                MacroAction => \@ResultList,
+            )
+        }
     }
     
     # return result

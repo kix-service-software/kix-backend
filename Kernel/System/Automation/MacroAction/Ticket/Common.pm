@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -55,6 +55,8 @@ sub _CheckParams {
         }
     }
 
+    return if !$Self->SUPER::_CheckParams(%Param);
+    
     my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
@@ -74,20 +76,6 @@ sub _CheckParams {
             Message  => "Config is no object!",
         );
         return;
-    }
-
-    my %Definition = $Self->DefinitionGet();
-
-    if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
-        for my $Option ( values %{$Definition{Options}}) {
-            if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $Option->{Name} in Config!",
-                );
-                return;
-            }
-        }
     }
 
     return 1;

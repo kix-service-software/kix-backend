@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -92,23 +92,25 @@ sub Run {
     );
 
     if (IsHashRefWithData(\%PriorityList)) {
-        my $PriorityGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Priority::PriorityGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 PriorityID => join(',', sort keys %PriorityList),
             }
         );
- 
-        if ( !IsHashRefWithData($PriorityGetResult) || !$PriorityGetResult->{Success} ) {
-            return $PriorityGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @PriorityDataList = IsArrayRef($PriorityGetResult->{Data}->{Priority}) ? @{$PriorityGetResult->{Data}->{Priority}} : ( $PriorityGetResult->{Data}->{Priority} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Priority} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Priority}) ? @{$GetResult->{Data}->{Priority}} : ( $GetResult->{Data}->{Priority} );
+        }
 
-        if ( IsArrayRefWithData(\@PriorityDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Priority => \@PriorityDataList,
+                Priority => \@ResultList,
             )
         }
     }

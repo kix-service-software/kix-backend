@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -88,23 +88,25 @@ sub Run {
 
 	# get already prepared LogFile data from LogFileGet operation
     if ( IsHashRefWithData(\%LogFileList) ) {  	
-        my $LogFileGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Log::LogFileGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 LogFileID => join(',', sort keys %LogFileList),
             }
-        );    
-
-        if ( !IsHashRefWithData($LogFileGetResult) || !$LogFileGetResult->{Success} ) {
-            return $LogFileGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @LogFileDataList = IsArrayRef($LogFileGetResult->{Data}->{LogFile}) ? @{$LogFileGetResult->{Data}->{LogFile}} : ( $LogFileGetResult->{Data}->{LogFile} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{LogFile} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{LogFile}) ? @{$GetResult->{Data}->{LogFile}} : ( $GetResult->{Data}->{LogFile} );
+        }
 
-        if ( IsArrayRefWithData(\@LogFileDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                LogFile => \@LogFileDataList,
+                LogFile => \@ResultList,
             )
         }
     }

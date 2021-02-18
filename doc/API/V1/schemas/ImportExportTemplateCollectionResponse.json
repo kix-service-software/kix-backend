@@ -1,83 +1,17 @@
 {
-   "$id" : "ImportExportTemplateCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of import export templates.",
-   "type" : "object",
-   "properties" : {
-      "ImportExportTemplate" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ImportExportTemplate_json-cf55d7d3e0"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ImportExportTemplateCollectionResponse.json",
+  "type": "object",
+  "description": "A list of import export templates.",
+  "properties": {
+    "ImportExportTemplate": {
+      "type": "array",
+      "items": {
+        "$ref": "ImportExportTemplate.json"
       }
-   },
-   "required" : [
-      "ImportExportTemplate"
-   ],
-   "definitions" : {
-      "ImportExportTemplate_json-cf55d7d3e0" : {
-         "$id" : "ImportExportTemplate.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The import export template object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Format" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Number" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Object" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "Format",
-            "ID",
-            "Name",
-            "Number",
-            "Object",
-            "ValidID"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "ImportExportTemplate"
+  ]
 }

@@ -56,6 +56,14 @@
       "type": "string",
       "readOnly": true
     },
+    "DynamicFields": {
+      "type": "array",
+      "description": "added via include \"DynamicFields\"",
+      "items": {
+        "$ref": "DynamicFieldValue.json"
+      },
+      "readOnly": true
+    },
     "Email": {
       "type": "string",
       "readOnly": true
@@ -156,9 +164,8 @@
     },
     "User": {
       "type": "object",
-      "description": "added via include \"User\"",
-      "readOnly": true,
-      "$ref": "User.json"
+      "description": "added via include \"User\". See /system/users resource for details.",
+      "readOnly": true
     },
     "ValidID": {
       "type": "integer",

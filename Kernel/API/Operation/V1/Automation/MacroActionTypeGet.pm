@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -129,6 +129,8 @@ sub Run {
 
     my @MacroActionTypeList;
 
+    my $MacroActionTypesCommon = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::Common');
+
     my $MacroActionTypes = $Kernel::OM->Get('Config')->Get('Automation::MacroActionType::'.$Param{Data}->{MacroType});
 
     # start loop
@@ -140,7 +142,7 @@ sub Run {
 	        Name      => $MacroActionType,
 	    );
 
-        if ( !%MacroActionTypeData ) {         
+        if ( !%MacroActionTypeData ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
@@ -148,7 +150,7 @@ sub Run {
 
         # add some more data 
         $MacroActionTypeData{Name}        = $MacroActionType;
-        $MacroActionTypeData{DisplayName} = $MacroActionTypes->{$MacroActionType}->{DisplayName};
+        $MacroActionTypeData{DisplayName} = $MacroActionTypes->{$MacroActionType}->{DisplayName} || $MacroActionTypesCommon->{$MacroActionType}->{DisplayName};
         $MacroActionTypeData{MacroType}   = $Param{Data}->{MacroType},
 
         # add

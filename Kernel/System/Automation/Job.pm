@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -985,10 +985,6 @@ sub JobExecute {
                 $Warning = 1;
             } else {
 
-                # add referrer data
-                $BackendObject->{JobID} = $Self->{JobID};
-                $BackendObject->{RunID} = $Self->{RunID};
-
                 # execute backend object for given type to get the (real) list of objects (search or filter)
                 @ObjectIDs = $BackendObject->Run(
                     Data      => $Param{Data},
@@ -1440,6 +1436,10 @@ sub _LoadJobTypeBackend {
             );
             return;
         }
+
+        # add referrer data
+        $BackendObject->{JobID} = $Self->{JobID};
+        $BackendObject->{RunID} = $Self->{RunID};
 
         $Self->{JobTypeModules}->{$Param{Name}} = $BackendObject;
     }

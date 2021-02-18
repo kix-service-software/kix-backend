@@ -1,14 +1,14 @@
 {
-   "$id" : "FAQCategoryPostPatchResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The ID of the created or updated FAQ category.",
-   "type" : "object",
-   "properties" : {
-      "FAQCategoryID" : {
-         "type" : "integer"
-      }
-   },
-   "required" : [
-      "FAQCategoryID"
-   ]
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "FAQCategoryPostPatchResponse.json",
+  "type": "object",
+  "description": "The ID of the created or updated FAQ category.",
+  "properties": {
+    "FAQCategoryID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "FAQCategoryID"
+  ]
 }

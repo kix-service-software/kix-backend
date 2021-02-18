@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,23 +91,25 @@ sub Run {
 
 	# get already prepared Queue data from QueueGet operation
     if ( IsHashRefWithData(\%QueueList) ) {  	
-        my $QueueGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Queue::QueueGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 QueueID => join(',', sort keys %QueueList),
             }
-        );    
-
-        if ( !IsHashRefWithData($QueueGetResult) || !$QueueGetResult->{Success} ) {
-            return $QueueGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @QueueDataList = IsArrayRef($QueueGetResult->{Data}->{Queue}) ? @{$QueueGetResult->{Data}->{Queue}} : ( $QueueGetResult->{Data}->{Queue} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Queue} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Queue}) ? @{$GetResult->{Data}->{Queue}} : ( $GetResult->{Data}->{Queue} );
+        }
 
-        if ( IsArrayRefWithData(\@QueueDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Queue => \@QueueDataList,
+                Queue => \@ResultList,
             )
         }
     }

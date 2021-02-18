@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -609,7 +609,7 @@ sub ConfigItemUpdate {
         Event => 'ConfigItemUpdate',
         Data  => {
             ConfigItemID => $Param{ConfigItemID},
-            Comment      => $Param{ConfigItemID} . '%%' . $Param{Number},
+            Comment      => $Param{ConfigItemID},
         },
         UserID => $Param{UserID},
     );
@@ -2403,15 +2403,15 @@ sub SetAttributeContentsByKey {
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
-            # no content then stop loop...
-            last COUNTER if !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
-
             # get the value...
             if ( $Item->{Key} eq $Param{KeyName} ) {
                 $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} = $Param{NewContent};
             }
 
             next COUNTER if !$Item->{Sub};
+
+            # make sure it's a hash ref
+            $Param{XMLData}->{ $Item->{Key} }->[$Counter] //= {};
 
             #recurse if subsection available...
             my $SubResult = $Self->SetAttributeContentsByKey(

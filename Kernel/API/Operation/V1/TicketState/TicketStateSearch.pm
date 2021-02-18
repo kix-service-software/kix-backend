@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -88,23 +88,25 @@ sub Run {
 
 	# get already prepared ticketstate data from TicketStateGet operation
     if ( IsHashRefWithData(\%TicketStateList) ) {  	
-        my $TicketStateGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::TicketState::TicketStateGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 StateID => join(',', sort keys %TicketStateList),
             }
-        );    
-
-        if ( !IsHashRefWithData($TicketStateGetResult) || !$TicketStateGetResult->{Success} ) {
-            return $TicketStateGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @TicketStateDataList = IsArrayRef($TicketStateGetResult->{Data}->{TicketState}) ? @{$TicketStateGetResult->{Data}->{TicketState}} : ( $TicketStateGetResult->{Data}->{TicketState} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{TicketState} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{TicketState}) ? @{$GetResult->{Data}->{TicketState}} : ( $GetResult->{Data}->{TicketState} );
+        }
 
-        if ( IsArrayRefWithData(\@TicketStateDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                TicketState => \@TicketStateDataList,
+                TicketState => \@ResultList,
             )
         }
     }

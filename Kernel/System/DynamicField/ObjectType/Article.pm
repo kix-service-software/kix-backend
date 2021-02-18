@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -124,7 +124,7 @@ sub PostValueSet {
 
     # trigger event
     $TicketObject->EventHandler(
-        Event => 'ArticleDynamicFieldUpdate',
+        Event => 'ArticleDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
             FieldName => $Param{DynamicFieldConfig}->{Name},
             Value     => $Param{Value},
@@ -134,6 +134,13 @@ sub PostValueSet {
             UserID    => $Param{UserID},
         },
         UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket.Article',
+        ObjectID  => $Article{TicketID}.'::'.$Param{ObjectID},
     );
 
     return 1

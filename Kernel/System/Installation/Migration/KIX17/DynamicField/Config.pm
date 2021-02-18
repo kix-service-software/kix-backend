@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -40,7 +40,7 @@ our %FieldTypeMigration = (
                 CountDefault => 1,
                 PossibleValues => {
                     ''  => '-',
-                    '1' => 'checked' 
+                    '1' => 'checked'
                 },
                 TranslatableValues => 1,
             }
@@ -186,7 +186,7 @@ our %FieldTypeMigration = (
 
 =item Describe()
 
-describe what is supported and what is required 
+describe what is supported and what is required
 
 =cut
 
@@ -222,6 +222,25 @@ sub Run {
     my $YAMLObject = $Kernel::OM->Get('YAML');
 
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
+
+    my %ActiveObjectTypes;
+    my $ObjectTypeConfigs = $Kernel::OM->Get('Config')->Get('DynamicFields::ObjectType');
+    if (IsHashRefWithData($ObjectTypeConfigs)) {
+        my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+        for my $Type ( keys %{$ObjectTypeConfigs} ) {
+            my %Config = $SysConfigObject->OptionGet(
+                Name => "DynamicFields::ObjectType###$Type",
+            );
+            if (IsHashRefWithData(\%Config) && $Config{ValidID} == 1) {
+                $ActiveObjectTypes{$Type} = 1;
+            }
+        }
+    } else {
+        %ActiveObjectTypes = (
+            Ticket       => 1,
+            FAQArticle   => 1
+        );
+    }
 
     foreach my $Item ( @{$SourceData} ) {
 
@@ -260,7 +279,7 @@ sub Run {
 
         # some special handling if the DF already exists
         if ( $ID ) {
-            $Item->{name} = 'Migration-'.$Item->{name}; 
+            $Item->{name} = 'Migration-'.$Item->{name};
             # do the lookup again
             goto LOOKUP;
         }
@@ -271,14 +290,17 @@ sub Run {
             # migrate field type if needed
             $Item->{field_type} = $Migration->{Type} ? $Migration->{Type} : $Item->{field_type};
 
+            # migrate object type if needed
+            $Item->{object_type} = $Item->{object_type} eq 'FAQ' ? 'FAQArticle' : $Item->{object_type};
+
             # deactivate field if needed
-            $Item->{valid_id} = ($Migration->{Deactivate} || $Item->{object_type} ne 'Ticket') ? 2 : $Item->{valid_id};
+            $Item->{valid_id} = ($Migration->{Deactivate} || !$ActiveObjectTypes{ $Item->{object_type} }) ? 2 : $Item->{valid_id};
 
             # add a warning comment if needed
             $Item->{label} = $Migration->{Warning} ? $Item->{label} . ' - ' . Kernel::Language::Translatable('DF Type not yet supported!') : $Item->{label};
 
             # add a warning comment if needed
-            $Item->{comments} = $Migration->{Deactivate} ? Kernel::Language::Translatable('DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!') : undef;
+            $Item->{comments} = ($Migration->{Deactivate} || !$ActiveObjectTypes{ $Item->{object_type} }) ? Kernel::Language::Translatable('DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!') : undef;
 
             if ( $Item->{config} ) {
                 my $Config = $YAMLObject->Load(Data => $Item->{config});

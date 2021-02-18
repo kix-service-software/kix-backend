@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -13,17 +13,22 @@ use warnings;
 use Cwd;
 use Getopt::Long;
 use File::Basename;
+use File::Path;
+use File::Copy;
 use JSON::MaybeXS;
 use JSON::Validator;
 
+STDOUT->autoflush(1);
+
 my %Options;
 GetOptions(
-    'source-directory=s'  => \$Options{SourceDirectory},
+    'source-directory=s@' => \$Options{SourceDirectory},
     'raml-file=s'         => \$Options{RamlFile},
     'output-file=s'       => \$Options{OutputFile},
     'template=s'          => \$Options{Template},
     'schema-directory=s'  => \$Options{SchemaDirectory},
     'example-directory=s' => \$Options{ExampleDirectory},
+    'variable=s@'         => \$Options{Variables},
     'help'                => \$Options{Help},
 );
 
@@ -36,15 +41,16 @@ foreach my $Option ( qw(SourceDirectory RamlFile OutputFile Template SchemaDirec
 # check if directory is given
 if ( $Options{Help} || %Missing ) {
     print "raml2html - Generates the HTML documentation from the RAML description.\n";
-    print "Copyright (c) 2006-2020 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
+    print "Copyright (c) 2006-2021 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
     print "\n";
     print "Required Options:\n";
-    print "  --source-directory  - The directory where the documentation source is located.\n";
+    print "  --source-directory  - The directories where the documentation sources are located. All directories will be \"merged\" in the given order. The bundled schema files will also be created in these directories, depending on their schema sources.\n";
     print "  --raml-file         - The main RAML file.\n";
     print "  --output-file       - The output HTML file.\n";
     print "  --template          - The output template to be used.\n";
-    print "  --schema-directory  - The directory where the source schema files are located (needed for transformation of the schema refs and validation).\n";
-    print "  --example-directory - The directory where the example files are located (needed for validation of the examples against the schema).\n";
+    print "  --schema-directory  - The directory relative to the source directory where the source schema files are located (needed for transformation of the schema refs and validation).\n";
+    print "  --example-directory - The directory relative to the source directory where the example files are located (needed for validation of the examples against the schema).\n";
+    print "  --variable          - A variable to replace. Format: <Variable>=<Value>. You can use multiple \"variable\" parameters.\n";
     exit -1;
 }
 
@@ -58,16 +64,37 @@ $JSONObject->allow_nonref( 1 );
 $JSONObject->canonical( [1] );
 $JSONObject->pretty( [1,1,1] );
 
+ # merge source directories
+my $TmpDir = `mktemp -d`;
+if ( $? ) {
+    print STDERR "ERROR: unable to create tmp directory (Code: $?, Message: $TmpDir).";
+    exit 1;
+}
+chomp $TmpDir;
+
+print "merging source directories into $TmpDir\n";
+foreach my $Directory ( @{$Options{SourceDirectory}} ) {
+    print "    executing rsync --archive --copy-links --recursive $Directory/* $TmpDir\n";
+    my $ExecResult = `rsync --archive --copy-links --recursive $Directory/* $TmpDir`;
+    if ( $? ) {
+        print STDERR "ERROR: unable to merge source directory $Directory (Code: $?, Message: $ExecResult).";
+        exit 1;
+    }
+}
+
+# change working directory
+my $Cwd = cwd();
+chdir $TmpDir;
+
 # expand $ref in schema files
 if ( -d "$Options{SchemaDirectory}" ) {
-    print "expanding JSON schema refs\n";
+    print "\nexpanding JSON schema refs\n";
 
-    if ( ! -d "$TargetDirectory/schemas" ) {
-        mkpath("$TargetDirectory/schemas");
+    if ( ! -d "$TmpDir/schemas" ) {
+        mkpath("$TmpDir/schemas");
     }
 
     # change working directory
-    my $Cwd = cwd();
     chdir "$Options{SchemaDirectory}";
 
     foreach my $File ( glob("*.json") ) {
@@ -153,19 +180,55 @@ if ( -d "$Options{SchemaDirectory}" ) {
         }
 
         my $Result = FileWrite(
-            Directory => "$TargetDirectory/schemas",
+            Directory => "$TmpDir/schemas",
             Filename  => $File,
             Content   => $BundledSchema
         );
+        if ( !$Result ) {
+            print STDERR "ERROR: Unable to save bundled schema $File.\n";
+            exit 1;
+        }
+    }
+
+    # copy all bundled schema files that exist in the schema source directory to the relevant directory
+    print "\ncopying bundled schema files to corresponding directories\n";
+    foreach my $Directory ( @{$Options{SourceDirectory}} ) {
+        my $TargetDirectory;
+        if ( $Directory !~ /^\// ) { 
+            chdir "$Cwd/$Directory/$Options{SchemaDirectory}";
+            $TargetDirectory = "$Cwd/$Directory/schemas";
+        }
+        else {
+            chdir "$Directory/$Options{SchemaDirectory}";
+            $TargetDirectory = "$Directory/schemas";
+        }
+
+        if ( -d "$TargetDirectory" && !rmtree("$TargetDirectory") ) {
+            print STDERR "ERROR: Unable to remove directory $TargetDirectory.\n";
+            next;
+        }
+        if ( ! -d "$TargetDirectory" && !mkpath("$TargetDirectory") ) {
+            print STDERR "ERROR: Unable to create directory $TargetDirectory.\n";
+            next;
+        }
+        my $Count = 0;
+        my $Total = 0;
+        foreach my $File ( glob("*.json") ) {
+            $Total++;
+            if ( !copy($File, "$TargetDirectory/$File") ) {
+                print STDERR "ERROR: Unable to copy bundled schema $File to $TargetDirectory.\n";
+            }
+            $Count++;
+        }
+        printf "    target $TargetDirectory...%i/%i files\n", $Count, $Total;
     }
 
     chdir $Cwd;
 }
 
-
 # validating example files against schema
-if ( -d "$Options{ExampleDirectory}" && -d "$TargetDirectory/schemas") {
-    print "validating examples\n";
+if ( -d "$Options{ExampleDirectory}" && -d "$TmpDir/schemas") {
+    print "\nvalidating examples\n";
 
     # change working directory
     my $Cwd = cwd();
@@ -178,8 +241,7 @@ if ( -d "$Options{ExampleDirectory}" && -d "$TargetDirectory/schemas") {
 
         # read example file
         my $ExampleContent = FileRead(
-            Directory => "$Options{ExampleDirectory}",
-            Filename  => $File
+            Location => $File
         );
         if ( !$ExampleContent ) {
             print STDERR "ERROR: Unable to read example file $File.\n";
@@ -188,7 +250,7 @@ if ( -d "$Options{ExampleDirectory}" && -d "$TargetDirectory/schemas") {
 
         # read schema file
         my $SchemaContent = FileRead(
-            Directory => "$TargetDirectory/schemas",
+            Directory => "$TmpDir/schemas",
             Filename  => $File
         );
         if ( !$SchemaContent ) {
@@ -231,9 +293,25 @@ if ( @ErrorFiles ) {
     print STDERR "\n";
 }
 
+# replace variables (create a copy of the source directory)
+if ( ref $Options{Variables} eq 'ARRAY' && @{$Options{Variables}} ) {
+    print "\nreplacing variables\n";
+    chdir $Cwd;
+    foreach my $Variable ( @{$Options{Variables}} ) {
+        my ($Name, $Value) = split(/=/, $Variable);
+        $Value =~ s/\//\\\//g;
+        my $ExecResult = `find $TmpDir -type f -exec sed -i 's/\${$Name}/$Value/g' {} +`;
+        if ( $? ) {
+            print STDERR "ERROR: unable to replace variable \"$Name\" (Code: $?, Message: $ExecResult).";
+            exit 1;
+        }
+    }
+}
+
 # execute raml2html 
-print "executing raml2html -i $Options{SourceDirectory}/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}\n";
-my $ExecResult = `raml2html -i $Options{SourceDirectory}/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}`;
+print "\nexecuting raml2html -i $TmpDir/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}\n";
+my $ExecResult = `raml2html -i $TmpDir/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}`;
+print STDERR "$ExecResult\n";
 if ( $? ) {
     print STDERR "ERROR: raml2html failed (Code: $?, Message: $ExecResult).";
     exit 1;

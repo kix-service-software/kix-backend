@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -208,11 +208,14 @@ sub Run {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRef($GetResult->{Data}->{ConfigItem}) ? @{$GetResult->{Data}->{ConfigItem}} : ( $GetResult->{Data}->{ConfigItem} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ConfigItem} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItem}) ? @{$GetResult->{Data}->{ConfigItem}} : ( $GetResult->{Data}->{ConfigItem} );
+        }
 
-        if ( IsArrayRefWithData(\@DataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConfigItem => \@DataList,
+                ConfigItem => \@ResultList,
             )
         }
     }

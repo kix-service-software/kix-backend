@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -89,23 +89,25 @@ sub Run {
 
 	# get already prepared Valid data from ValidGet operation
     if ( IsHashRefWithData(\%ValidList) ) {  	
-        my $ValidGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Valid::ValidGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 ValidID => join(',', sort keys %ValidList),
             }
         );    
-
-        if ( !IsHashRefWithData($ValidGetResult) || !$ValidGetResult->{Success} ) {
-            return $ValidGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ValidDataList = IsArrayRef($ValidGetResult->{Data}->{Valid}) ? @{$ValidGetResult->{Data}->{Valid}} : ( $ValidGetResult->{Data}->{Valid} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Valid} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Valid}) ? @{$GetResult->{Data}->{Valid}} : ( $GetResult->{Data}->{Valid} );
+        }
 
-        if ( IsArrayRefWithData(\@ValidDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Valid => \@ValidDataList,
+                Valid => \@ResultList,
             )
         }
     }

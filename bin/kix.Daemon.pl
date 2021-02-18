@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, http://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
@@ -15,6 +15,7 @@ use utf8;
 
 use Getopt::Long;
 use File::Basename;
+use Sys::Hostname;
 use FindBin qw($RealBin);
 use lib dirname($RealBin);
 use lib dirname($RealBin) . '/Kernel/cpan-lib';
@@ -25,6 +26,7 @@ use Time::HiRes qw(sleep);
 use Fcntl qw(:flock);
 
 use Kernel::System::ObjectManager;
+use Kernel::System::VariableCheck qw(:all);
 
 print STDOUT "kix.Daemon.pl - the KIX daemon\n";
 
@@ -49,8 +51,9 @@ GetOptions(
     'help'         => \$Options{Help},
 );
 
-# get config object
+# get required objects
 my $ConfigObject = $Kernel::OM->Get('Config');
+my $CacheObject  = $Kernel::OM->Get('Cache');
 
 # get pid directory
 my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
@@ -77,6 +80,12 @@ if ( !@ARGV || $Options{Help} ) {
 # to wait until all daemon stops (in seconds)
 my $DaemonStopWait = 30;
 my $ForceStop;
+
+# the child processes
+my %DaemonModules;
+
+# trigger a reload if needed
+my $ReloadRequired = 0;
 
 # check for debug mode
 my %DebugDaemons;
@@ -157,8 +166,26 @@ sub Start {
         exit 0 if $DaemonPID;
     }
 
-    # run Child
-    _Run();
+    # lock PID
+    my $LockSuccess = _PIDLock();
+
+    if ( !$LockSuccess ) {
+        print "Daemon already running!\n";
+        exit 0;
+    }
+
+    # run child and repeat if a reload is required
+    do {
+        _Run();
+    } while ( $ReloadRequired );
+
+    # cleanup
+    $CacheObject->Delete(
+        Type  => 'Daemon',
+        Key   => $$
+    );
+
+    return 1;
 }
 
 sub Stop {
@@ -178,6 +205,12 @@ sub Stop {
             kill 2, $RunningDaemonPID;
         }
     }
+
+    # cleanup
+    $CacheObject->Delete(
+        Type  => 'Daemon',
+        Key   => $$
+    );
 
     print STDOUT "Daemon stopped\n";
 
@@ -224,19 +257,24 @@ sub Status {
 }
 
 sub _Run {
-    # lock PID
-    my $LockSuccess = _PIDLock();
 
-    if ( !$LockSuccess ) {
-        print "Daemon already running!\n";
-        exit 0;
-    }
+    # no reload triggert atm
+    $ReloadRequired = 0;
+
+    # register the process - tell the system we are up and running
+    $CacheObject->Set(
+        Type  => 'Daemon',
+        Key   => $$,
+        Value => { 
+            PID  => $$,
+            Host => hostname,
+        }
+    );
 
     # get daemon modules from SysConfig
     my $DaemonModuleConfig = $Kernel::OM->Get('Config')->Get('DaemonModules') || {};
 
     # create daemon module hash
-    my %DaemonModules;
     MODULE:
     for my $Module ( sort keys %{$DaemonModuleConfig} ) {
 
@@ -262,6 +300,17 @@ sub _Run {
     }
 
     while ($DaemonChecker) {
+        my $Cache = $CacheObject->Get(
+            Type  => 'Daemon',
+            Key   => $$
+        );
+
+        # check for reload (either triggert externally or we've los our registration in cache)
+        if ( !IsHashRefWithData($Cache) || (IsHashRefWithData($Cache) && $Cache->{Reload}) ) {
+            print STDOUT "Reload triggered\n";
+            $ReloadRequired = 1;
+            last;
+        }
 
         MODULE:
         for my $Module ( sort keys %DaemonModules ) {
@@ -301,6 +350,89 @@ sub _Run {
         # module is damaged and produces hard errors
         sleep 0.1;
     }
+
+    # stop the child processes
+    _StopChildren();
+
+    # remove current log files without content
+    _LogFilesCleanup();
+
+    # unregister the process - tell the system we are no longer active
+    print STDOUT "Removing daemon registration...";
+    $CacheObject->Delete(
+        Type  => 'Daemon',
+        Key   => $$
+    );
+    print STDOUT "OK\n";
+
+    return 1;
+}
+
+sub _RunModule {
+    my (%Param) = @_;
+
+    my $ChildRun = 1;
+    local $SIG{INT}  = sub { $ChildRun = 0; };
+    local $SIG{TERM} = sub { $ChildRun = 0; };
+    local $SIG{CHLD} = "IGNORE";
+
+    local $Kernel::OM = Kernel::System::ObjectManager->new(
+        'Log' => {
+            LogPrefix => "kix.Daemon.pl - Daemon $Param{Module}",
+        },
+    );
+
+    # disable in memory cache because many processes run at the same time
+    $CacheObject->Configure(
+        CacheInMemory  => 0,
+        CacheInBackend => 1,
+    );
+
+    # set daemon log files
+    _LogFilesSet(
+        Module => $Param{ModuleName}
+    );
+    
+    my $DaemonObject;
+    LOOP:
+    while ($ChildRun) {
+
+        # create daemon object if not exists
+        eval {
+            if (
+                !$DaemonObject
+                && ( $DebugDaemons{All} || $DebugDaemons{ $Param{ModuleName} } )
+               )
+            {
+                $Kernel::OM->ObjectParamAdd(
+                    $Param{Module} => {
+                        Debug => 1,
+                    },
+                );
+            }
+
+            $DaemonObject ||= $Kernel::OM->Get($Param{Module});
+        };
+
+        # wait 10 seconds if creation of object is not possible
+        if ( !$DaemonObject ) {
+            sleep 10;
+            last LOOP;
+        }
+
+        METHOD:
+        for my $Method ( 'PreRun', 'Run', 'PostRun' ) {
+            last LOOP if !eval { $DaemonObject->$Method() };
+        }
+    }
+    
+    return 0;
+}
+
+sub _StopChildren {
+    my (%Param) = @_;
+
+    print STDOUT "Stopping child processes...";
 
     # send all daemon processes a stop signal
     MODULE:
@@ -350,7 +482,7 @@ sub _Run {
         sleep 1;
     }
 
-    # hard kill of all children witch are not stopped after 30 seconds
+    # hard kill of all children which are not stopped after 30 seconds
     MODULE:
     for my $Module ( sort keys %DaemonModules ) {
 
@@ -362,91 +494,9 @@ sub _Run {
         kill 9, $DaemonModules{$Module};
     }
 
-    # remove current log files without content
-    _LogFilesCleanup();
+    print STDOUT "OK\n";
 
-    return 0;
-}
-
-sub _RunModule {
-    my (%Param) = @_;
-
-    my $ChildRun = 1;
-    local $SIG{INT}  = sub { $ChildRun = 0; };
-    local $SIG{TERM} = sub { $ChildRun = 0; };
-    local $SIG{CHLD} = "IGNORE";
-
-    # define the ZZZ files
-    my @ZZZFiles = (
-        'ZZZAAuto.pm',
-        'ZZZAuto.pm',
-    );
-
-    # reload the ZZZ files (mod_perl workaround)
-    for my $ZZZFile (@ZZZFiles) {
-
-        PREFIX:
-        for my $Prefix (@INC) {
-            my $File = $Prefix . '/Kernel/Config/Files/' . $ZZZFile;
-            next PREFIX if !-f $File;
-            do $File;
-            last PREFIX;
-        }
-    }
-
-    local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'Log' => {
-            LogPrefix => "kix.Daemon.pl - Daemon $Param{Module}",
-        },
-    );
-
-    # disable in memory cache because many processes runs at the same time
-    $Kernel::OM->Get('Cache')->Configure(
-        CacheInMemory  => 0,
-        CacheInBackend => 1,
-    );
-
-    # set daemon log files
-    _LogFilesSet(
-        Module => $Param{ModuleName}
-    );
-    
-    my $DaemonObject;
-    LOOP:
-    while ($ChildRun) {
-
-        # create daemon object if not exists
-        eval {
-
-        
-            if (
-                !$DaemonObject
-                && ( $DebugDaemons{All} || $DebugDaemons{ $Param{ModuleName} } )
-               )
-            {
-                $Kernel::OM->ObjectParamAdd(
-                    $Param{Module} => {
-                        Debug => 1,
-                    },
-                );
-            }
-
-            $DaemonObject ||= $Kernel::OM->Get($Param{Module});
-        };
-
-        # wait 10 seconds if creation of object is not possible
-        if ( !$DaemonObject ) {
-            sleep 10;
-            last LOOP;
-        }
-
-        METHOD:
-        for my $Method ( 'PreRun', 'Run', 'PostRun' ) {
-            last LOOP if !eval { $DaemonObject->$Method() };
-        }
-    }
-    
-    return 0;
+    return 1;
 }
 
 sub _PIDLock {
@@ -595,6 +645,8 @@ sub _LogFilesSet {
 sub _LogFilesCleanup {
     my %Param = @_;
 
+    print STDOUT "Cleaning up empty logfiles...";
+
     my @LogFiles = glob "$LogDir/*.log";
 
     LOGFILE:
@@ -616,6 +668,8 @@ sub _LogFilesCleanup {
             );
         }
     }
+
+    print STDOUT "OK\n";
 
     return 1;
 }
