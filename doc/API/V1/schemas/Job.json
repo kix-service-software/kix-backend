@@ -1,80 +1,80 @@
 {
-   "$id" : "Job.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The job object.",
-   "type" : "object",
-   "properties" : {
-      "ChangeBy" : {
-         "type" : "integer",
-         "readOnly" : true
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "Job.json",
+   "type": "object",
+   "description": "The job object.",
+   "properties": {
+      "ChangeBy": {
+         "type": "integer",
+         "readOnly": true
       },
-      "ChangeTime" : {
-         "type" : "string",
-         "readOnly" : true
+      "ChangeTime": {
+         "type": "string",
+         "readOnly": true
       },
-      "Comment" : {
-         "type" : "string",
-         "readOnly" : true
+      "Comment": {
+         "type": "string",
+         "readOnly": true
       },
-      "CreateBy" : {
-         "type" : "integer",
-         "readOnly" : true
+      "CreateBy": {
+         "type": "integer",
+         "readOnly": true
       },
-      "CreateTime" : {
-         "type" : "string",
-         "readOnly" : true
+      "CreateTime": {
+         "type": "string",
+         "readOnly": true
       },
-      "ExecPlanIDs" : {
-         "description" : "IDs of assigned execution plans - added via include \"ExecPlanIDs\"",
-         "type" : "array",
-         "item" : {
-            "type" : "integer"
-         },
-         "readOnly" : true
+      "ExecPlanIDs": {
+        "type": "array",
+        "readOnly": true,
+        "item": {
+          "type": "integer"
+        },
+        "description": "IDs of assigned execution plans - added via include \"ExecPlanIDs\""
       },
-      "ExecPlans" : {
-         "description" : "assigned execution plans - added via include \"ExecPlans\"",
-         "type" : "array",
-         "item" : {
-            "$ref" : "#/definitions/ExecPlan_json-d9008c2c05"
-         },
-         "readOnly" : true
+      "ExecPlans": {
+        "type": "array",
+        "description": "assigned execution plans - added via include \"ExecPlans\"",
+        "readOnly": true,
+        "item": {
+          "$ref": "ExecPlan.json"
+        }
       },
-      "ID" : {
-         "type" : "integer",
-         "readOnly" : true
+      "ID": {
+         "type": "integer",
+         "readOnly": true
       },
-      "LastExecutionTime" : {
-         "type" : "string",
-         "readOnly" : true
+      "LastExecutionTime": {
+         "type": "string",
+         "readOnly": true
       },
-      "MacroIDs" : {
-         "description" : "IDs of assigned macros - added via include \"MacroIDs\"",
-         "type" : "array",
-         "item" : {
-            "type" : "integer"
-         },
-         "readOnly" : true
+      "MacroIDs": {
+        "type": "array",
+        "readOnly": true,
+        "item": {
+          "type": "integer"
+        },
+        "description": "IDs of assigned macros - added via include \"MacroIDs\""
       },
-      "Macros" : {
-         "description" : "assigned macros - added via include \"Macros\"",
-         "type" : "array",
-         "item" : {
-            "$ref" : "#/definitions/Macro_json-c1dec42b17"
-         },
-         "readOnly" : true
+      "Macros": {
+        "type": "array",
+        "description": "assigned macros - added via include \"Macros\"",
+        "readOnly": true,
+        "item": {
+          "$ref": "Macro.json"
+        }
       },
-      "Name" : {
-         "type" : "string",
-         "readOnly" : true
+      "Name": {
+         "type": "string",
+         "readOnly": true
       },
-      "Type" : {
-         "type" : "string",
-         "readOnly" : true
+      "Type": {
+         "type": "string",
+         "readOnly": true
       },
-      "ValidID" : {
-         "type" : "integer",
-         "readOnly" : true
+      "ValidID": {
+         "type": "integer",
+         "readOnly": true
       }
    },
    "required" : [
@@ -86,217 +86,5 @@
       "Name",
       "Type",
       "ValidID"
-   ],
-   "definitions" : {
-      "ExecPlan_json-d9008c2c05" : {
-         "$id" : "ExecPlan.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The execution plan object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Parameters" : {
-               "description" : "Parameters of the execution plan, when and/or by what the corresponding job of this execution plan will be triggert",
-               "type" : "object",
-               "properties" : {
-                  "Event" : {
-                     "description" : "list of events, e.g. \"TicketCreate\"",
-                     "type" : "array",
-                     "item" : {
-                        "type" : "string"
-                     },
-                     "readOnly" : true
-                  },
-                  "Time" : {
-                     "description" : "time for the weekdays as \"hh:mm:ss\"",
-                     "type" : "string",
-                     "readOnly" : true
-                  },
-                  "Weekday" : {
-                     "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
-                     "type" : "array",
-                     "item" : {
-                        "type" : "integer"
-                     },
-                     "readOnly" : true
-                  }
-               },
-               "readOnly" : true
-            },
-            "Type" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "Type",
-            "ValidID"
-         ]
-      },
-      "MacroAction_json-71b614e70e" : {
-         "$id" : "MacroAction.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The macro action object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "MacroID" : {
-               "description" : "ID of the corresponding macro.",
-               "type" : "integer"
-            },
-            "Parameters" : {
-               "description" : "",
-               "type" : "object"
-            },
-            "Type" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "MacroID",
-            "Type",
-            "ValidID"
-         ]
-      },
-      "Macro_json-c1dec42b17" : {
-         "$id" : "Macro.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The macro object.",
-         "type" : "object",
-         "properties" : {
-            "Actions" : {
-               "description" : "added via include \"Actions\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-71b614e70e"
-               },
-               "readOnly" : true
-            },
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ExecOrder" : {
-               "description" : "Order of corresponding macro actions as IDs.",
-               "type" : "array",
-               "item" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Type" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "Type",
-            "ValidID"
-         ]
-      }
-   }
+   ]
 }

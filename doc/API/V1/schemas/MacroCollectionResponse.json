@@ -1,147 +1,17 @@
 {
-   "$id" : "MacroCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of macros.",
-   "type" : "object",
-   "properties" : {
-      "Macro" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/Macro_json-c1dec42b17"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "MacroCollectionResponse.json",
+  "type": "object",
+  "description": "A list of macros.",
+  "properties": {
+    "Macro": {
+      "type": "array",
+      "items": {
+        "$ref": "Macro.json"
       }
-   },
-   "required" : [
-      "Macro"
-   ],
-   "definitions" : {
-      "MacroAction_json-71b614e70e" : {
-         "$id" : "MacroAction.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The macro action object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "MacroID" : {
-               "description" : "ID of the corresponding macro.",
-               "type" : "integer"
-            },
-            "Parameters" : {
-               "description" : "",
-               "type" : "object"
-            },
-            "Type" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "MacroID",
-            "Type",
-            "ValidID"
-         ]
-      },
-      "Macro_json-c1dec42b17" : {
-         "$id" : "Macro.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The macro object.",
-         "type" : "object",
-         "properties" : {
-            "Actions" : {
-               "description" : "added via include \"Actions\"",
-               "type" : "array",
-               "item" : {
-                  "$ref" : "#/definitions/MacroAction_json-71b614e70e"
-               },
-               "readOnly" : true
-            },
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ExecOrder" : {
-               "description" : "Order of corresponding macro actions as IDs.",
-               "type" : "array",
-               "item" : {
-                  "type" : "integer"
-               },
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Type" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "Type",
-            "ValidID"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "Macro"
+  ]
 }

@@ -2769,11 +2769,6 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">6</Data>
-        <Data Key="event_key" Type="Quote">Events</Data>
-        <Data Key="event_value" Type="Quote">TicketResponsibleUpdate</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">6</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentResponsible</Data>
     </Insert>
@@ -10111,6 +10106,71 @@ DeploymentStates: []
 ITSMConfigItemClasses: []
 ItemSeparator: ', '
     ]]></Data>
+        <Data Key="customer_visible">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">6</Data>
+        <Data Key="internal_field">0</Data>
+        <Data Key="name" Type="Quote" Translatable="0">RelatedAssets</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Related Assets</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">ITSMConfigItemReference</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">FAQArticle</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+CountMin: 0
+CountMax: 15
+CountDefault: 0
+DefaultValue: ''
+DeploymentStates: [11,13,14,15,16,17,19,20]
+ITSMConfigItemClasses: []
+ItemSeparator: ', '
+    ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">7</Data>
+        <Data Key="internal_field">0</Data>
+        <Data Key="name" Type="Quote" Translatable="0">Source</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Source</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Text</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Contact</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">8</Data>
+        <Data Key="internal_field">0</Data>
+        <Data Key="name" Type="Quote" Translatable="0">Type</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Type</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Multiselect</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Organisation</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+---
+CountMin: '1'
+CountMax: '2'
+CountDefault: '1'
+DefaultValue:
+PossibleNone: '1'
+PossibleValues:
+   customer: Customer
+   external supplier: External Supplier
+   internal supplier: Internal Supplier
+TranslatableValues: '1'
+        ]]></Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>

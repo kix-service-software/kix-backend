@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -128,6 +128,7 @@ Returns:
         Changed'          => '2011-01-05 21:53:50',
         ChangedBy         => '1',
         Created           => '2011-01-05 21:53:50',
+        DynamicFields     => 1 | 0                           # optional, default 0
     );
 
 =cut
@@ -262,7 +263,7 @@ sub FAQGet {
 
         # get all dynamic fields for the object type FAQ
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-            ObjectType => 'FAQ'
+            ObjectType => 'FAQArticle'
         );
 
         DYNAMICFIELD:
@@ -907,7 +908,7 @@ sub AttachmentAdd {
             ' created, created_by, changed, changed_by) VALUES ' .
             ' (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{ItemID},  \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize}, \$Param{ContentID}, 
+            \$Param{ItemID},  \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize}, \$Param{ContentID},
             \$Disposition, \$Param{Content}, \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -938,7 +939,7 @@ sub AttachmentAdd {
         Namespace => 'FAQ.Article.Attachment',
         ObjectID  => $Param{ItemID}.'::'.$AttachmentID,
     );
-    
+
     return $AttachmentID;
 }
 
@@ -1396,6 +1397,38 @@ sub FAQDelete {
 
         return if !$DeleteSuccess;
     }
+
+    # get dynamic field objects
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+    # get all dynamic fields for the object type FAQArticle
+    my $DynamicFieldListTicket = $DynamicFieldObject->DynamicFieldListGet(
+        ObjectType => 'FAQArticle',
+        Valid      => 0,
+    );
+
+    # delete dynamicfield values for this faq article
+    DYNAMICFIELD:
+    for my $DynamicFieldConfig ( @{$DynamicFieldListTicket} ) {
+
+        next DYNAMICFIELD if !$DynamicFieldConfig;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+        next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
+        next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
+
+        $DynamicFieldBackendObject->ValueDelete(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            ObjectID           => $Param{ItemID},
+            UserID             => $Param{UserID},
+            NoPostHandling     => 1,                # we will delete the faq article, so no additional handling needed when deleting the DF values
+        );
+    }
+
+    # clear cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # delete all FAQ links of this FAQ article
     $Kernel::OM->Get('LinkObject')->LinkDeleteAll(

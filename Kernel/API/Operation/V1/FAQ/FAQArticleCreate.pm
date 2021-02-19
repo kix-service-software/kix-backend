@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -93,7 +93,7 @@ sub ParameterDefinition {
         },
         'FAQArticle::CategoryID' => {
             Required => 1
-        },            
+        },
         'FAQArticle::Title' => {
             Required => 1
         },
@@ -133,7 +133,7 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
                 ContentType     => 'text/plain',     # optional, if not given set to 'text/plain'
                 Number          => '13402',          # optional
                 Keywords        => [                 # optional
-                    'some', 'keywords',  
+                    'some', 'keywords',
                 ]
                 Field1      => 'Symptom...',     # optional
                 Field2      => 'Problem...',     # optional
@@ -150,7 +150,14 @@ perform FAQArticleCreate Operation. This will return the created FAQArticleID.
                         Inline      => 1,   (0|1, default 0)
                     },
                     # ...
-                ],                    
+                ],
+                DynamicFields => [                  # optional
+                    {
+                        Name   => 'some name',
+                        Value  => $Value,           # value type depends on the dynamic field
+                    },
+                    # ...
+                ],
             }
         },
     );
@@ -173,7 +180,33 @@ sub Run {
     my $FAQArticle = $Self->_Trim(
         Data => $Param{Data}->{FAQArticle}
     );
-    
+
+    # check dynamic fields
+    if ( IsArrayRefWithData( $FAQArticle->{DynamicFields} ) ) {
+
+        # check DynamicField internal structure
+        foreach my $DynamicFieldItem (@{$FAQArticle->{DynamicFields}}) {
+            if ( !IsHashRefWithData($DynamicFieldItem) ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Parameter FAQArticle::DynamicFields is invalid!",
+                );
+            }
+
+            # check DynamicField attribute values
+            my $DynamicFieldCheck = $Self->_CheckDynamicField(
+                DynamicField => $DynamicFieldItem,
+                ObjectType   => 'FAQArticle'
+            );
+
+            if ( !$DynamicFieldCheck->{Success} ) {
+                return $Self->_Error(
+                    %{$DynamicFieldCheck}
+                );
+            }
+        }
+    }
+
     # everything is ok, let's create the FAQArticle
     my $FAQArticleID = $Kernel::OM->Get('FAQ')->FAQAdd(
         Title       => $FAQArticle->{Title},
@@ -216,6 +249,27 @@ sub Run {
                 return $Self->_Error(
                     %{$Result},
                 )
+            }
+        }
+    }
+
+    # set dynamic fields
+    if ( IsArrayRefWithData( $FAQArticle->{DynamicFields} ) ) {
+
+        DYNAMICFIELD:
+        foreach my $DynamicField ( @{ $FAQArticle->{DynamicFields} } ) {
+            my $Result = $Self->_SetDynamicFieldValue(
+                %{$DynamicField},
+                ObjectID   => $FAQArticleID,
+                ObjectType => 'FAQArticle',
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    Code    => 'Operation.InternalError',
+                    Message => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
+                );
             }
         }
     }

@@ -734,7 +734,7 @@
     <ForeignKey ForeignTable="ticket_state">
         <Reference Local="state_id" Foreign="id"/>
     </ForeignKey>
-    <ForeignKey ForeignTable="lock">
+    <ForeignKey ForeignTable="ticket_lock_type">
         <Reference Local="lock_id" Foreign="id"/>
     </ForeignKey>
 </Table>
@@ -2791,6 +2791,7 @@
     <Column Name="macro_id" Required="true" Type="INTEGER"/>
     <Column Name="type" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="parameters" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="result_variables" Required="false" Size="10000" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

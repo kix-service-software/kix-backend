@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -46,9 +46,9 @@ Run this macro module.
 
 Example:
     my $Result = $Object->Run(
-        ObjectID     => 123,
-        ExecOrder    => [],
-        UserID       => 123,
+        ObjectID  => 123,
+        ExecOrder => [],
+        UserID    => 123,
     );
 
 =cut
@@ -67,13 +67,13 @@ sub Run {
         }
     }
 
-    
     # execute all macro action given in the execution order attribute
     foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
         my $Result = $Kernel::OM->Get('Automation')->MacroActionExecute(
-            ID        => $MacroActionID,
-            TicketID  => $Param{ObjectID},
-            UserID    => $Param{UserID},
+            ID       => $MacroActionID,
+            ObjectID => $Param{ObjectID},      # give the anonymous ObjectID as well for "Common" macro actions
+            TicketID => $Param{ObjectID},
+            UserID   => $Param{UserID},
         );
         # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here
     }

@@ -1,130 +1,17 @@
 {
-   "$id" : "ClientRegistrationCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of client registrations.",
-   "type" : "object",
-   "properties" : {
-      "ClientRegistration" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/ClientRegistration_json-15d7494e99"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ClientRegistrationCollectionResponse.json",
+  "type": "object",
+  "description": "A list of client registrations.",
+  "properties": {
+    "ClientRegistration": {
+      "type": "array",
+      "items": {
+        "$ref": "ClientRegistration.json"
       }
-   },
-   "required" : [
-      "ClientRegistration"
-   ],
-   "definitions" : {
-      "ClientRegistration_json-15d7494e99" : {
-         "$id" : "ClientRegistration.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The client registration object.",
-         "type" : "object",
-         "properties" : {
-            "Authorization" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "ClientID" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "LastNotificationTimestamp" : {
-               "anyOf" : [
-                  {
-                     "type" : "number"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "NotificationInterval" : {
-               "anyOf" : [
-                  {
-                     "type" : "integer"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "NotificationURL" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "Plugins" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object",
-                  "properties" : {
-                     "BuildNumber" : {
-                        "type" : "integer"
-                     },
-                     "Description" : {
-                        "type" : "string"
-                     },
-                     "ExtendedData" : {
-                        "description" : "a key-value list of additional attributes",
-                        "type" : "object"
-                     },
-                     "Product" : {
-                        "type" : "string"
-                     },
-                     "Requires" : {
-                        "type" : "string"
-                     },
-                     "Version" : {
-                        "type" : "string"
-                     }
-                  },
-                  "required" : [
-                     "BuildNumber",
-                     "Product"
-                  ]
-               }
-            },
-            "Requires" : {
-               "type" : "array",
-               "items" : {
-                  "type" : "object",
-                  "properties" : {
-                     "BuildNumber" : {
-                        "type" : "integer"
-                     },
-                     "Operator" : {
-                        "description" : "supported operators: <, >, =, !",
-                        "type" : "string"
-                     },
-                     "Product" : {
-                        "type" : "string"
-                     }
-                  },
-                  "required" : [
-                     "Product"
-                  ]
-               }
-            }
-         },
-         "required" : [
-            "ClientID"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "ClientRegistration"
+  ]
 }

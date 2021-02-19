@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -121,7 +121,7 @@ sub Run {
     if ( @ArticleIndex ) {
 
         # get already prepared Article data from ArticleGet operation
-        my $ArticleGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleGet',
             SuppressPermissionErrors => 1,
             Data          => {
@@ -131,12 +131,15 @@ sub Run {
                 expand    => $Param{Data}->{expand},
             }
         );
-        if ( !IsHashRefWithData($ArticleGetResult) || !$ArticleGetResult->{Success} ) {
-            return $ArticleGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($ArticleGetResult->{Data}->{Article}) ? @{$ArticleGetResult->{Data}->{Article}} : ( $ArticleGetResult->{Data}->{Article} );
-        
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Article} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Article}) ? @{$GetResult->{Data}->{Article}} : ( $GetResult->{Data}->{Article} );
+        }
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Article => \@ResultList,

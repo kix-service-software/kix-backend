@@ -1,30 +1,30 @@
 {
-   "$id" : "MacroTypeCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of macro types.",
-   "type" : "object",
-   "properties" : {
-      "MacroType" : {
-         "type" : "array",
-         "items" : {
-            "type" : "object",
-            "properties" : {
-               "DisplayName" : {
-                  "type" : "string",
-                  "readOnly" : true
-               },
-               "Name" : {
-                  "type" : "string",
-                  "readOnly" : true
-               }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "MacroTypeCollectionResponse.json",
+  "type": "object",
+  "description": "A list of macro types.",
+  "properties": {
+    "MacroType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+            "DisplayName": {
+               "type": "string",
+               "readOnly": true
             },
-            "required" : [
-               "Name"
-            ]
-         }
+            "Name": {
+              "type": "string",
+              "readOnly": true
+            }
+        },
+        "required": [
+            "Name"
+        ]  
       }
-   },
-   "required" : [
-      "MacroType"
-   ]
+    }
+  },
+  "required": [
+    "MacroType"
+  ]  
 }

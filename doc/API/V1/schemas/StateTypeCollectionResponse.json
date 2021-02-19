@@ -1,39 +1,17 @@
 {
-   "$id" : "StateTypeCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of state types.",
-   "type" : "object",
-   "properties" : {
-      "StateType" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/StateType_json-53b95ce3af"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "StateTypeCollectionResponse.json",
+  "type": "object",
+  "description": "A list of state types.",
+  "properties": {
+    "StateType": {
+      "type": "array",
+      "items": {
+        "$ref": "StateType.json"
       }
-   },
-   "required" : [
-      "StateType"
-   ],
-   "definitions" : {
-      "StateType_json-53b95ce3af" : {
-         "$id" : "StateType.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The state type object.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ID",
-            "Name"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "StateType"
+  ]
 }

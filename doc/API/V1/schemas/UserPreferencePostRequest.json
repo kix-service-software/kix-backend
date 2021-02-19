@@ -1,34 +1,14 @@
 {
-   "$id" : "UserPreferencePostRequest.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The user preference request object for creation.",
-   "type" : "object",
-   "properties" : {
-      "UserPreference" : {
-         "$ref" : "#/definitions/UserPreferencePostItem_json-c4577df24d"
-      }
-   },
-   "required" : [
-      "UserPreference"
-   ],
-   "definitions" : {
-      "UserPreferencePostItem_json-c4577df24d" : {
-         "$id" : "UserPreferencePostItem.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The user preference request object for creation.",
-         "type" : "object",
-         "properties" : {
-            "ID" : {
-               "type" : "string"
-            },
-            "Value" : {
-               "type" : "string"
-            }
-         },
-         "required" : [
-            "ID",
-            "Value"
-         ]
-      }
-   }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "UserPreferencePostRequest.json",
+  "type": "object",
+  "description": "The user preference request object for creation.",
+  "properties": {
+    "UserPreference": {
+      "$ref": "UserPreferencePostItem.json"
+    }
+  },
+  "required": [
+    "UserPreference"
+  ]
 }

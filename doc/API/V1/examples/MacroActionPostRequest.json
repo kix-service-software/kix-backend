@@ -4,6 +4,9 @@
         "MacroID": 1,
         "Name": "new macro",
         "Parameters": {},
+        "ResultVariables": {
+            "TicketID": "MyVariableName"
+        },
         "Type": "Ticket",
         "ValidID": 1
     }

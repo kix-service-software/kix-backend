@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -122,7 +122,7 @@ sub Run {
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
 
-        my $FAQArticleVoteGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::FAQ::FAQArticleVoteGet',
             SuppressPermissionErrors => 1,
             Data      => {
@@ -130,16 +130,18 @@ sub Run {
                 FAQVoteID    => join(',', sort @{$VoteIDs}),
             }
         );
-
-        if ( !IsHashRefWithData($FAQArticleVoteGetResult) || !$FAQArticleVoteGetResult->{Success} ) {
-            return $FAQArticleVoteGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @FAQArticleVoteDataList = IsArrayRef($FAQArticleVoteGetResult->{Data}->{FAQVote}) ? @{$FAQArticleVoteGetResult->{Data}->{FAQVote}} : ( $FAQArticleVoteGetResult->{Data}->{FAQVote} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{FAQVote} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{FAQVote}) ? @{$GetResult->{Data}->{FAQVote}} : ( $GetResult->{Data}->{FAQVote} );
+        }
 
-        if ( IsArrayRefWithData(\@FAQArticleVoteDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                FAQVote => \@FAQArticleVoteDataList,
+                FAQVote => \@ResultList,
             )
         }
     }

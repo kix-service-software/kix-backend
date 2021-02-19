@@ -4,8 +4,18 @@
         "CategoryID": 2,
         "ContentType": "text/html",
         "CustomerVisible": 2,
+        "DynamicFields": [
+            {
+                "Name": "RelatedAssets",
+                "Value": [
+                    4
+                ]
+            }
+        ],
         "Field3": "changed text",
-        "Keywords": ["new keyword"],
+        "Keywords": [
+            "new keyword"
+        ],
         "Title": "New title",
         "ValidID": 2
     }

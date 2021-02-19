@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -88,7 +88,7 @@ sub ParameterDefinition {
             DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -125,13 +125,22 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my @ContactList;
-  
-    if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) { 
+
+    if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) {
         @ContactList = $Self->_RunParallel(
             \&_GetContactData,
             Items => $Param{Data}->{ContactID},
             %Param,
         );
+
+        foreach my $ContactData (@ContactList) {
+            if (defined $ContactData->{Success} && $ContactData->{Success} == 0) {
+                return $Self->_Error(
+                    Code => $ContactData->{Code} ? $ContactData->{Code} : 'Object.Invalid'
+                );
+            }
+        }
+
     }
     else {
         # start loop
@@ -140,7 +149,15 @@ sub Run {
                 ContactID => $ContactID,
                 Data      => $Param{Data}
             );
-            if ( IsHashRefWithData($ContactData) ) {
+
+            if (IsHashRefWithData($ContactData)) {
+
+                if (defined $ContactData->{Success} && $ContactData->{Success} == 0) {
+                    return $Self->_Error(
+                        Code => $ContactData->{Code} ? $ContactData->{Code} : 'Object.Invalid'
+                    );
+                }
+
                 push @ContactList, $ContactData;
             }
         }
@@ -149,7 +166,7 @@ sub Run {
     if ( scalar(@ContactList) == 1 ) {
         return $Self->_Success(
             Contact => $ContactList[0],
-        );    
+        );
     }
 
     return $Self->_Success(
@@ -164,7 +181,8 @@ sub _GetContactData {
 
     # get the Contact data
     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        ID => $ContactID,
+        ID            => $ContactID,
+        DynamicFields => $Param{Data}->{include}->{DynamicFields},
     );
 
     if ( !IsHashRefWithData( \%ContactData ) ) {
@@ -172,6 +190,50 @@ sub _GetContactData {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
+    }
+
+    if ( $Param{Data}->{include}->{DynamicFields} ) {
+        my @DynamicFields;
+
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'DynamicField');
+
+        # remove all dynamic fields from contact hash and set them into an array.
+        ATTRIBUTE:
+        for my $Attribute ( sort keys %ContactData ) {
+
+            if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
+                if ( $ContactData{$Attribute} ) {
+                    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                        Name => $1,
+                    );
+                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+                        my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                            Config => $DynamicFieldConfig,
+                            Value  => $ContactData{$Attribute}
+                        );
+
+                        if (IsHashRefWithData($PreparedValue)) {
+                            push(@DynamicFields, $PreparedValue);
+                        }
+                    }
+                    delete $ContactData{$Attribute};
+                }
+                next ATTRIBUTE;
+            }
+        }
+
+        # add dynamic fields array into 'DynamicFields' hash key if any
+        if (@DynamicFields) {
+            $ContactData{DynamicFields} = \@DynamicFields;
+        }
+        else {
+            $ContactData{DynamicFields} = [];
+        }
     }
 
     # filter valid attributes

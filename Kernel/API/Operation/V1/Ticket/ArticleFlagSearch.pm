@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -144,7 +144,7 @@ sub Run {
     if ( %ArticleFlags ) {
 
         # get already prepared ArticleFlag data from ArticleFlagGet operation
-        my $FlagGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleFlagGet',
             SuppressPermissionErrors => 1,
             Data          => {
@@ -153,12 +153,15 @@ sub Run {
                 FlagName  => join(',', keys %ArticleFlags),
             }
         );
-        if ( !IsHashRefWithData($FlagGetResult) || !$FlagGetResult->{Success} ) {
-            return $FlagGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($FlagGetResult->{Data}->{ArticleFlag}) ? @{$FlagGetResult->{Data}->{ArticleFlag}} : ( $FlagGetResult->{Data}->{ArticleFlag} );
-        
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ArticleFlag} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ArticleFlag}) ? @{$GetResult->{Data}->{ArticleFlag}} : ( $GetResult->{Data}->{ArticleFlag} );
+        }
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 ArticleFlag => \@ResultList,

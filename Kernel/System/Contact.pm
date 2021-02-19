@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -305,11 +305,13 @@ sub ContactAdd {
 get contact data (Firstname, Lastname, Email, ...) by contact id or for assigned user id
 
     my %Contact = $ContactObject->ContactGet(
-        ID => 123
+        ID => 123,
+        DynamicFields => 0|1,         # Optional, default 0. To include the dynamic field values for this contact to the return structure.
     );
 
     my %Contact = $ContactObject->ContactGet(
         UserID => 123
+        DynamicFields => 0|1,         # Optional, default 0. To include the dynamic field values for this contact to the return structure.
     );
 
 =cut
@@ -330,12 +332,15 @@ sub ContactGet {
     my @BindVars;
     my $CacheKey;
 
+    # check cache
+    my $FetchDynamicFields = $Param{DynamicFields} ? 1 : 0;
+
     if ($Param{ID}) {
         # ignore non-numeric IDs
         return if $Param{ID} !~ /^\d+$/;
 
         # check cache
-        $CacheKey = "ContactGet::ContactID::$Param{ID}";
+        $CacheKey = "ContactGet::ContactID::$Param{ID}::$FetchDynamicFields";
         my $Data = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -350,7 +355,7 @@ sub ContactGet {
     elsif ($Param{UserID}) {
         return if $Param{UserID} !~ /^\d+$/;
 
-        $CacheKey = "ContactGet::UserID::$Param{UserID}";
+        $CacheKey = "ContactGet::UserID::$Param{UserID}::$FetchDynamicFields";
         my $Data = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -435,6 +440,33 @@ sub ContactGet {
         ) : '',
         NameOrder => $Kernel::OM->Get('Config')->Get('FirstnameLastnameOrder') || 0,
     );
+
+    # check if need to return DynamicFields
+    if ($FetchDynamicFields) {
+        
+        # get all dynamic fields for the object type Ticket
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+            ObjectType => 'Contact'
+        );
+
+        DYNAMICFIELD:
+        for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
+
+            # validate each dynamic field
+            next DYNAMICFIELD if !$DynamicFieldConfig;
+            next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+            next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
+
+            # get the current value for each dynamic field
+            my $Value = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                ObjectID           => $Param{ID},
+            );
+
+            # set the dynamic field name and value into the ticket hash
+            $Contact{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
+        }
+    }
 
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
@@ -1136,7 +1168,34 @@ sub ContactDelete {
         ContactID => $Param{ID}
     );
 
-    #delete assignment to organinasations
+    # get dynamic field objects
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+    # get all dynamic fields for this object type
+    my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+        ObjectType => 'Contact',
+        Valid      => 0,
+    );
+
+    # delete dynamicfield values for this contact
+    DYNAMICFIELD:
+    for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
+
+        next DYNAMICFIELD if !$DynamicFieldConfig;
+        next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+        next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
+        next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
+
+        $DynamicFieldBackendObject->ValueDelete(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            ObjectID           => $Param{ID},
+            UserID             => $Param{UserID},
+            NoPostHandling     => 1,                # we will delete the contact, so no additional handling needed when deleting the DF values
+        );
+    }
+
+    # delete assignment to organisations
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM contact_organisation WHERE contact_id = ?',
         Bind => [ \$Param{ID} ],

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -265,8 +265,8 @@ creates a ticket with its article and sets dynamic fields and attachments if spe
 sub _ArticleCreate {
     my ( $Self, %Param ) = @_;
 
-    my $Ticket           = $Param{Ticket};
-    my $Article          = $Param{Article};
+    my $Ticket  = $Param{Ticket};
+    my $Article = $Param{Article};
 
     # get customer information
     # with information will be used to create the ticket if customer is not defined in the
@@ -275,42 +275,8 @@ sub _ArticleCreate {
         ID => $Ticket->{ContactID},
     );
 
-    # get user object
-    my $UserObject = $Kernel::OM->Get('User');
-
-    my $OwnerID;
-    if ( $Ticket->{Owner} && !$Ticket->{OwnerID} ) {
-        my %OwnerData = $UserObject->GetUserData(
-            User => $Ticket->{Owner},
-        );
-        $OwnerID = $OwnerData{UserID};
-    }
-    elsif ( defined $Ticket->{OwnerID} ) {
-        $OwnerID = $Ticket->{OwnerID};
-    }
-
-    my $ResponsibleID;
-    if ( $Ticket->{Responsible} && !$Ticket->{ResponsibleID} ) {
-        my %ResponsibleData = $UserObject->GetUserData(
-            User => $Ticket->{Responsible},
-        );
-        $ResponsibleID = $ResponsibleData{UserID};
-    }
-    elsif ( defined $Ticket->{ResponsibleID} ) {
-        $ResponsibleID = $Ticket->{ResponsibleID};
-    }
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    if ( !defined $Article->{NoAgentNotify} ) {
-
-        # check if new owner is given (then send no agent notify)
-        $Article->{NoAgentNotify} = 0;
-        if ($OwnerID) {
-            $Article->{NoAgentNotify} = 1;
-        }
-    }
 
     # set Article From
     my $From;

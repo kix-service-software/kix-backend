@@ -16,6 +16,13 @@
         "Country": {
           "type": "string"
         },
+        "DynamicFields": {
+          "type": "array",
+          "description": "list of dynamic field values to be set",
+          "items": {
+            "$ref": "DynamicFieldValueSetItem.json"
+          }
+        },
         "Number": {
           "type": "string"
         },

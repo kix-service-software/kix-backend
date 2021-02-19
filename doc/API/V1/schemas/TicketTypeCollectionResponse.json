@@ -1,75 +1,17 @@
 {
-   "$id" : "TicketTypeCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of ticket types.",
-   "type" : "object",
-   "properties" : {
-      "TicketType" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/TicketType_json-22bd3de3e3"
-         }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "TicketTypeCollectionResponse.json",
+  "type": "object",
+  "description": "A list of ticket types.",
+  "properties": {
+    "TicketType": {
+      "type": "array",
+      "items": {
+        "$ref": "TicketType.json"
       }
-   },
-   "required" : [
-      "TicketType"
-   ],
-   "definitions" : {
-      "TicketType_json-22bd3de3e3" : {
-         "$id" : "TicketType.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The ticket type object.",
-         "type" : "object",
-         "properties" : {
-            "ChangeBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "ChangeTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Comment" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
-               "readOnly" : true
-            },
-            "CreateBy" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "CreateTime" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Name" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ValidID" : {
-               "type" : "integer",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "ChangeBy",
-            "ChangeTime",
-            "CreateBy",
-            "CreateTime",
-            "ID",
-            "Name",
-            "ValidID"
-         ]
-      }
-   }
+    }
+  },
+  "required": [
+    "TicketType"
+  ]
 }

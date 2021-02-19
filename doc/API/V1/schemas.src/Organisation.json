@@ -43,6 +43,14 @@
       "type": "string",
       "readOnly": true
     },
+    "DynamicFields": {
+      "type": "array",
+      "description": "added via include \"DynamicFields\"",
+      "items": {
+        "$ref": "DynamicFieldValue.json"
+      },
+      "readOnly": true
+    },
     "ID": {
       "type": "integer",
       "readOnly": true

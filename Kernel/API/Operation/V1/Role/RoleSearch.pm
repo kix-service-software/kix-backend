@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,23 +91,25 @@ sub Run {
 
 	# get already prepared Role data from RoleGet operation
     if ( IsHashRefWithData(\%RoleList) ) {  	
-        my $RoleGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Role::RoleGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 RoleID => join(',', sort keys %RoleList),
             }
-        );    
-
-        if ( !IsHashRefWithData($RoleGetResult) || !$RoleGetResult->{Success} ) {
-            return $RoleGetResult;
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @RoleDataList = IsArrayRef($RoleGetResult->{Data}->{Role}) ? @{$RoleGetResult->{Data}->{Role}} : ( $RoleGetResult->{Data}->{Role} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Role} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Role}) ? @{$GetResult->{Data}->{Role}} : ( $GetResult->{Data}->{Role} );
+        }
 
-        if ( IsArrayRefWithData(\@RoleDataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                Role => \@RoleDataList,
+                Role => \@ResultList,
             )
         }
     }

@@ -1,55 +1,28 @@
 {
-   "$id" : "TranslationPatternPostRequest.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The translation pattern request object for creation.",
-   "type" : "object",
-   "properties" : {
-      "TranslationPattern" : {
-         "type" : "object",
-         "properties" : {
-            "Languages" : {
-               "type" : "array",
-               "items" : {
-                  "$ref" : "#/definitions/TranslationLanguage_json-119d3b9694"
-               }
-            },
-            "Value" : {
-               "type" : "string"
-            }
-         },
-         "required" : [
-            "Value"
-         ]
-      }
-   },
-   "required" : [
-      "TranslationPattern"
-   ],
-   "definitions" : {
-      "TranslationLanguage_json-119d3b9694" : {
-         "$id" : "TranslationLanguage.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The translation language object.",
-         "type" : "object",
-         "properties" : {
-            "Language" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "PatternID" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
-            "Value" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "PatternID",
-            "Language",
-            "Value"
-         ]
-      }
-   }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "TranslationPatternPostRequest.json",
+  "type": "object",
+  "description": "The translation pattern request object for creation.",
+  "properties": {
+    "TranslationPattern": {
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "string"
+        },
+        "Languages": {
+          "type": "array",
+          "items": {
+            "$ref": "TranslationLanguage.json"
+          }
+        }    
+      },
+      "required": [
+        "Value"
+      ]
+    }
+  },
+  "required": [
+    "TranslationPattern"
+  ]
 }

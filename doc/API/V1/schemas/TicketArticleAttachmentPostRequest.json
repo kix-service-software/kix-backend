@@ -1,39 +1,14 @@
 {
-   "$id" : "TicketArticleAttachmentPostRequest.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The ticket article attachment request object for creation.",
-   "type" : "object",
-   "properties" : {
-      "Attachment" : {
-         "$ref" : "#/definitions/TicketArticleAttachmentPostItem_json-3ba3c63ec2"
-      }
-   },
-   "required" : [
-      "Attachment"
-   ],
-   "definitions" : {
-      "TicketArticleAttachmentPostItem_json-3ba3c63ec2" : {
-         "$id" : "TicketArticleAttachmentPostItem.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "The ticket article attachment object for creation.",
-         "type" : "object",
-         "properties" : {
-            "Content" : {
-               "description" : "base63 encoded file content",
-               "type" : "string"
-            },
-            "ContentType" : {
-               "type" : "string"
-            },
-            "Filename" : {
-               "type" : "string"
-            }
-         },
-         "required" : [
-            "Content",
-            "ContentType",
-            "Filename"
-         ]
-      }
-   }
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "TicketArticleAttachmentPostRequest.json",
+  "type": "object",
+  "description": "The ticket article attachment request object for creation.",
+  "properties": {
+    "Attachment": {
+      "$ref": "TicketArticleAttachmentPostItem.json"
+    }
+  },
+  "required": [
+    "Attachment"
+  ]
 }

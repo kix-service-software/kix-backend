@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -128,6 +128,11 @@ sub Describe {
         Required    => 0,
     );
     delete $Self->{Definition}->{Options}->{Subject};
+
+    $Self->AddResult(
+        Name        => 'NewTicketID',
+        Description => Kernel::Language::Translatable('The ID of the new ticket.'),
+    );
 
     return;
 }
@@ -352,6 +357,20 @@ sub Run {
         UserID   => $Param{UserID},
     );
 
+
+    # replace placeholders in non-richtext attributes
+    for my $Attribute ( qw(Channel SenderType Subject To From Cc Bcc AccountTime) ) {
+        next if !defined $ArticleParam{$Attribute};
+
+        $ArticleParam{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText => 0,
+            Text     => $ArticleParam{$Attribute},
+            TicketID => $Param{TicketID},
+            Data     => {},
+            UserID   => $Param{UserID},
+        );
+    }
+
     # create article
     my $ArticleBackendResult = $Self->SUPER::Run(
         Config   => \%ArticleParam,
@@ -369,6 +388,8 @@ sub Run {
         );
         return;
     }
+
+    $Self->SetResult(Name => 'NewTicketID', Value => $TicketID);
 
     return 1;
 }

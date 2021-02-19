@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -120,7 +120,7 @@ sub Run {
     if ( @HistoryList ) {
 
         # get already prepared history data from HistoryGet operation
-        my $HistoryGetResult = $Self->ExecOperation(
+        my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::HistoryGet',
             SuppressPermissionErrors => 1,
             Data          => {
@@ -128,12 +128,15 @@ sub Run {
                 HistoryID => join(',', sort keys %HistoryHash),
             }
         );
-        if ( !IsHashRefWithData($HistoryGetResult) || !$HistoryGetResult->{Success} ) {
-            return $HistoryGetResult;
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
 
-        my @ResultList = IsArrayRef($HistoryGetResult->{Data}->{History}) ? @{$HistoryGetResult->{Data}->{History}} : ( $HistoryGetResult->{Data}->{History} );
-        
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{History} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{History}) ? @{$GetResult->{Data}->{History}} : ( $GetResult->{Data}->{History} );
+        }
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 History => \@ResultList,

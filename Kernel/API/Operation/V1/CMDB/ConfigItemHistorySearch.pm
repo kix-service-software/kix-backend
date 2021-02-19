@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -154,17 +154,19 @@ sub Run {
                 ConfigItemID => $Param{Data}->{ConfigItemID},
                 HistoryID    => join(',', sort @HistoryIDs),
             }
-        );    
-
+        );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
         }
 
-        my @DataList = IsArrayRef($GetResult->{Data}->{ConfigItemHistory}) ? @{$GetResult->{Data}->{ConfigItemHistory}} : ( $GetResult->{Data}->{ConfigItemHistory} );
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{ConfigItemHistoryItem} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItemHistoryItem}) ? @{$GetResult->{Data}->{ConfigItemHistoryItem}} : ( $GetResult->{Data}->{ConfigItemHistoryItem} );
+        }
 
-        if ( IsArrayRefWithData(\@DataList) ) {
+        if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConfigItemHistoryItem => \@DataList,
+                ConfigItemHistoryItem => \@ResultList,
             )
         }
     }

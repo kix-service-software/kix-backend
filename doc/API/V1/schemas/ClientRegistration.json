@@ -1,111 +1,111 @@
 {
-   "$id" : "ClientRegistration.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "The client registration object.",
-   "type" : "object",
-   "properties" : {
-      "Authorization" : {
-         "anyOf" : [
-            {
-               "type" : "string"
-            },
-            {
-               "type" : "null"
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ClientRegistration.json",
+    "type": "object",
+    "description": "The client registration object.",
+    "properties": {
+        "ClientID": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Authorization": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "readOnly": true
+        },
+        "NotificationURL": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "readOnly": true
+        },
+        "NotificationInterval": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "readOnly": true
+        },
+        "LastNotificationTimestamp": {
+            "anyOf": [
+                {
+                    "type": "number"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "readOnly": true
+        },
+        "Requires": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "BuildNumber": {
+                        "type": "integer"
+                    },
+                    "Operator": {
+                        "type": "string",
+                        "description": "supported operators: <, >, =, !"
+                    },
+                    "Product": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "Product"
+                ]
             }
-         ],
-         "readOnly" : true
-      },
-      "ClientID" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "LastNotificationTimestamp" : {
-         "anyOf" : [
-            {
-               "type" : "number"
-            },
-            {
-               "type" : "null"
+        },
+        "Plugins": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "BuildNumber": {
+                        "type": "integer"
+                    },
+                    "Description": {
+                        "type": "string"
+                    },
+                    "ExtendedData": {
+                        "type": "object",
+                        "description": "a key-value list of additional attributes"
+                    },
+                    "Product": {
+                        "type": "string"
+                    },
+                    "Requires": {
+                        "type": "string"
+                    },
+                    "Version": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "BuildNumber",
+                    "Product"
+                ]
             }
-         ],
-         "readOnly" : true
-      },
-      "NotificationInterval" : {
-         "anyOf" : [
-            {
-               "type" : "integer"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "NotificationURL" : {
-         "anyOf" : [
-            {
-               "type" : "string"
-            },
-            {
-               "type" : "null"
-            }
-         ],
-         "readOnly" : true
-      },
-      "Plugins" : {
-         "type" : "array",
-         "items" : {
-            "type" : "object",
-            "properties" : {
-               "BuildNumber" : {
-                  "type" : "integer"
-               },
-               "Description" : {
-                  "type" : "string"
-               },
-               "ExtendedData" : {
-                  "description" : "a key-value list of additional attributes",
-                  "type" : "object"
-               },
-               "Product" : {
-                  "type" : "string"
-               },
-               "Requires" : {
-                  "type" : "string"
-               },
-               "Version" : {
-                  "type" : "string"
-               }
-            },
-            "required" : [
-               "BuildNumber",
-               "Product"
-            ]
-         }
-      },
-      "Requires" : {
-         "type" : "array",
-         "items" : {
-            "type" : "object",
-            "properties" : {
-               "BuildNumber" : {
-                  "type" : "integer"
-               },
-               "Operator" : {
-                  "description" : "supported operators: <, >, =, !",
-                  "type" : "string"
-               },
-               "Product" : {
-                  "type" : "string"
-               }
-            },
-            "required" : [
-               "Product"
-            ]
-         }
-      }
-   },
-   "required" : [
-      "ClientID"
-   ]
+        }        
+    },
+    "required": [
+        "ClientID"
+    ]
 }

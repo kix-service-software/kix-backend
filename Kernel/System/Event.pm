@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -81,28 +81,17 @@ sub EventList {
         if ( !%ObjectTypes || $ObjectTypes{$ObjectType} ) {
             $Result{$ObjectType} = $EventConfig{$ObjectType};
         }
-    }
 
-    # get ticket df events
-    if ( !%ObjectTypes || $ObjectTypes{'Ticket'} ) {
-
-        # get dynamic field object
-        my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
-
-        my $DynamicFields = $DynamicFieldObject->DynamicFieldList(
+        # add DF events for this type
+        my $DynamicFields = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
             Valid      => 1,
-            ObjectType => ['Ticket'],
+            ObjectType => [ $ObjectType ],
             ResultType => 'HASH',
         );
-
-        my @DynamicFieldEvents = map {"TicketDynamicFieldUpdate_$_"} sort values %{$DynamicFields};
-
-        push @{ $Result{'Ticket'} || [] }, @DynamicFieldEvents;
-    }
-
-    # there is currently only one article df event
-    if ( !%ObjectTypes || $ObjectTypes{'Article'} ) {
-        push @{ $Result{'Article'} || [] }, 'ArticleDynamicFieldUpdate';
+        if ( IsHashRefWithData($DynamicFields) ) {
+            my @DynamicFieldEvents = map {$ObjectType."DynamicFieldUpdate_$_"} sort values %{$DynamicFields};
+            push @{ $Result{$ObjectType} || [] }, @DynamicFieldEvents;
+        }
     }
 
     return %Result;
