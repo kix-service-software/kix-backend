@@ -88,7 +88,7 @@ sub ParameterDefinition {
             DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -125,13 +125,22 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my @ContactList;
-  
-    if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) { 
+
+    if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) {
         @ContactList = $Self->_RunParallel(
             \&_GetContactData,
             Items => $Param{Data}->{ContactID},
             %Param,
         );
+
+        foreach my $ContactData (@ContactList) {
+            if (defined $ContactData->{Success} && $ContactData->{Success} == 0) {
+                return $Self->_Error(
+                    Code => $ContactData->{Code} ? $ContactData->{Code} : 'Object.Invalid'
+                );
+            }
+        }
+
     }
     else {
         # start loop
@@ -140,7 +149,15 @@ sub Run {
                 ContactID => $ContactID,
                 Data      => $Param{Data}
             );
-            if ( IsHashRefWithData($ContactData) ) {
+
+            if (IsHashRefWithData($ContactData)) {
+
+                if (defined $ContactData->{Success} && $ContactData->{Success} == 0) {
+                    return $Self->_Error(
+                        Code => $ContactData->{Code} ? $ContactData->{Code} : 'Object.Invalid'
+                    );
+                }
+
                 push @ContactList, $ContactData;
             }
         }
@@ -149,7 +166,7 @@ sub Run {
     if ( scalar(@ContactList) == 1 ) {
         return $Self->_Success(
             Contact => $ContactList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

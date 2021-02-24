@@ -2769,11 +2769,6 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">6</Data>
-        <Data Key="event_key" Type="Quote">Events</Data>
-        <Data Key="event_value" Type="Quote">TicketResponsibleUpdate</Data>
-    </Insert>
-    <Insert Table="notification_event_item">
-        <Data Key="notification_id">6</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentResponsible</Data>
     </Insert>
@@ -10111,6 +10106,7 @@ DeploymentStates: []
 ITSMConfigItemClasses: []
 ItemSeparator: ', '
     ]]></Data>
+        <Data Key="customer_visible">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -10119,7 +10115,7 @@ ItemSeparator: ', '
     </Insert>
 
     <Insert Table="dynamic_field">
-        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="id" Type="AutoIncrement">6</Data>
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">RelatedAssets</Data>
         <Data Key="label" Type="Quote" Translatable="1">Related Assets</Data>
@@ -10142,7 +10138,7 @@ ItemSeparator: ', '
     </Insert>
     
     <Insert Table="dynamic_field">
-        <Data Key="id" Type="AutoIncrement">6</Data>
+        <Data Key="id" Type="AutoIncrement">7</Data>
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">Source</Data>
         <Data Key="label" Type="Quote" Translatable="1">Source</Data>
@@ -10156,7 +10152,7 @@ ItemSeparator: ', '
     </Insert>
 
     <Insert Table="dynamic_field">
-        <Data Key="id" Type="AutoIncrement">7</Data>
+        <Data Key="id" Type="AutoIncrement">8</Data>
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">Type</Data>
         <Data Key="label" Type="Quote" Translatable="1">Type</Data>

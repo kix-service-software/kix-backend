@@ -29,8 +29,31 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 use vars qw(%INC);
 
+# update notifications
+_ReconfigureNotificationEvents();
+
 # add new contact dynamic field "Source"
 _AddDynamicFields();
+
+sub _ReconfigureNotificationEvents {
+
+    my %Notification = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
+        Name => 'Agent - Responsible Assignment',
+    );
+
+    # remove event "TicketResponsibleUpdate"
+    my %Events = map { $_ => 1 } @{$Notification{Data}->{Events}};
+    delete $Events{TicketResponsibleUpdate};
+    $Notification{Data}->{Events} = [ sort keys %Events ]; 
+
+    $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
+        ID => $Notification{ID},
+        %Notification,
+        UserID => 1
+    );
+
+    return 1;
+}
 
 sub _AddDynamicFields {
     my ( $Self, %Param ) = @_;
@@ -86,7 +109,6 @@ sub _AddDynamicFields {
                 %{$DynamicField},
                 ID         => $DynamicFieldLookup{ $DynamicField->{Name} }->{ID},
                 ValidID    => $DynamicFieldLookup{ $DynamicField->{Name} }->{ValidID},
-                Reorder    => 0,
                 UserID     => 1,
             );
         }
@@ -126,6 +148,7 @@ sub _GetDynamicFieldsDefinition {
             FieldType     => 'Text',
             ObjectType    => 'Contact',
             InternalField => 0,
+            Config        => {},
         },
         {
             Name          => 'Type',

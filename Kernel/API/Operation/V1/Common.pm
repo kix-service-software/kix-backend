@@ -3162,7 +3162,7 @@ sub _CheckDynamicField {
     if ( $Self->{Authorization}->{UserType} eq 'Customer' && !$Self->{DynamicFieldLookup}->{ $DynamicField->{Name} }->{CustomerVisible} ) {
         return $Self->_Error(
             Code    => 'Forbidden',
-            Message => "DynamicField \"$Param{Name}\" cannot be set!",
+            Message => "DynamicField \"$DynamicField->{Name}\" cannot be set!",
         );
     }
 
