@@ -17,6 +17,7 @@
       | ITSM::ConfigItem::Hardware::Type        |
       | ITSM::ConfigItem::Location::Type        |
       | ITSM::ConfigItem::Network::Type         |
+      | ITSM::ConfigItem::Service::Type         |
       | ITSM::ConfigItem::Software::LicenceType |
       | ITSM::ConfigItem::Software::Type        |
       | ITSM::ConfigItem::YesNo                 |

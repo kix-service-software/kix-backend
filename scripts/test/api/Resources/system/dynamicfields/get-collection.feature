@@ -7,7 +7,7 @@ Feature: GET request to the /system/dynamicfields resource
 
   Scenario: get the list of existing dynamicfields
     Given a dynamicfield
-    Then the response code is 200
+    Then the response code is 201
     When I query the collection of dynamicfields
     Then the response code is 200
     When I delete this dynamicfield

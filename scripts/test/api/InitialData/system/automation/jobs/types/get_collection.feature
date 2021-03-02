@@ -10,6 +10,6 @@ Feature: GET request to the /system/automation/jobs/types resource
     Then the response code is 200 
     And the response contains 2 items of type "JobType"
     And the response contains the following items of type JobType
-      | Name            |
-      | Synchronisation |
-      | Ticket          |
+      | Name            | DisplayName     |
+      | Synchronisation | Synchronisation |
+      | Ticket          | Ticket          |

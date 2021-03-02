@@ -12,18 +12,21 @@ Feature: GET request to the /system/dynamicfields resource
   Scenario: get the list of existing dynamicfields
     When I query the collection of dynamicfields
     Then the response code is 200    
-    Then the response contains 8 items of type "DynamicField"
+    Then the response contains 10 items of type "DynamicField"
     And the response contains the following items of type DynamicField
-      | Name                         | Label                  | FieldType               | ObjectType |
-      | AffectedAsset                | Affected Asset         | ITSMConfigItemReference | Ticket     |
-      | MobileProcessingChecklist010 | Checklist 01           | CheckList               | Ticket     |
-      | MobileProcessingChecklist020 | Checklist 02           | CheckList               | Ticket     |
-      | MobileProcessingState        | Mobile Processing      | Multiselect             | Ticket     |
-      | RelatedAssets                | Related Assets         | ITSMConfigItemReference | FAQArticle |
-      | PlanBegin                    | Plan Begin             | DateTime                | Ticket     |
-      | PlanEnd                      | Plan End               | DateTime                | Ticket     |
-      | RiskAssumptionRemark         | Risk Assumption Remark | TextArea                | Ticket     |
-    
+      | Name                         | Label                  | FieldType               | ObjectType   |
+      | AffectedAsset                | Affected Asset         | ITSMConfigItemReference | Ticket       |
+      | AnonymiseTicket              | Anonymise Ticket       | Multiselect             | Ticket       |
+      | ChildTickets                 | Child Tickets          | TicketReference         | Ticket       |
+      | MobileProcessingChecklist010 | Checklist 01           | CheckList               | Ticket       |
+      | MobileProcessingChecklist020 | Checklist 02           | CheckList               | Ticket       |
+      | MobileProcessingState        | Mobile Processing      | Multiselect             | Ticket       |
+      | PlanBegin                    | Plan Begin             | DateTime                | Ticket       |
+      | PlanEnd                      | Plan End               | DateTime                | Ticket       |
+      | RelatedAssets                | Related Assets         | ITSMConfigItemReference | FAQArticle   |
+      | RiskAssumptionRemark         | Risk Assumption Remark | TextArea                | Ticket       |
+      | Source                       | Source                 | Text                    | Contact      |
+      | Type                         | Type                   | Multiselect             | Organisation |
 
 
 

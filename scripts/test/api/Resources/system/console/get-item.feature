@@ -13,7 +13,6 @@
   Scenario: get an existing console command as root
     When I get this console command "Maint::Cache::Delete"
     Then the response code is 200
-Then the response content is
  #    And the response object is ConsoleCommandResponse
 #    And the response contains the following items of type ConsoleCommand
 #      | ExitCode | Output                                                                                                                                                                                                                                                       |

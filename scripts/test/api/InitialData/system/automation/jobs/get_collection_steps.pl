@@ -28,11 +28,11 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I get this configitem history$/, sub {
+When qr/I query the collection of automation jobs$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}.'/history/'.S->{HistoryEntryID}
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/system/automation/jobs',
+       Sort  => 'Job.Name:textual'
    );
 };
-
 

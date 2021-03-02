@@ -151,8 +151,13 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 #=======================work=================================
 Then qr/the response content is$/, sub {
 	print STDERR Dumper(S->{ResponseContent});
-};
+    #print STDERR Dumper(S->{Response});
 
+};
+Then qr/the response content$/, sub {
+	#print STDERR Dumper(S->{ResponseContent});
+    print STDERR Dumper(S->{Response});
+};
 #=============================================================
 
 Then qr/the response content history is$/, sub {

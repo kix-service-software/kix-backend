@@ -10,6 +10,7 @@ Feature: GET request to the /system/automation/macros/types resource
     Then the response code is 200 
     And the response contains 2 items of type "MacroType"
     And the response contains the following items of type MacroType
-      | Name            |
-      | Synchronisation |
-      | Ticket          |
+      | Name            | DisplayName     |
+      | Asset           | ITSMConfigItem  |
+      | Synchronisation | Synchronisation |
+      | Ticket          | Ticket          |

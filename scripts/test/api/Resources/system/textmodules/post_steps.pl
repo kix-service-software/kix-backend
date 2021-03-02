@@ -68,6 +68,6 @@ When qr/added a textmodule$/, sub {
 	        PublicFrontend => 0, 
 	        ValidID => 1
 	    } 
-    } 
+       } 
    );
 };
