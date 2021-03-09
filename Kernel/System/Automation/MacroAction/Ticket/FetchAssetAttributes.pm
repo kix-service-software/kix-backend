@@ -118,6 +118,7 @@ sub Run {
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
+        Language => 'en' # to not translate values
     );
 
     return if (!$AssetReferenceDFName);
@@ -172,6 +173,7 @@ sub Run {
             TicketID => $Param{TicketID},
             Data     => {},
             UserID   => $Param{UserID},
+            Language => 'en' # to not translate values
         );
 
         my $TargetDFName = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
@@ -180,6 +182,7 @@ sub Run {
             TicketID => $Param{TicketID},
             Data     => {},
             UserID   => $Param{UserID},
+            Language => 'en' # to not translate values
         );
 
         next if (!$SourceAttributeName || !$TargetDFName);
