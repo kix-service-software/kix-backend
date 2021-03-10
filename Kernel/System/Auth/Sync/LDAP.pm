@@ -367,48 +367,6 @@ sub Sync {
                 }
             }
 
-            $UserContextFromLDAP{IsAgent} = $SyncContact{IsAgent} ? 1 : 0;
-            $UserContextFromLDAP{IsCustomer} = $SyncContact{IsCustomer} ? 1 : 0;
-
-            # set user context in DB
-            my %User = $UserObject->GetUserData(
-                UserID => $UserID
-            );
-
-            if (%User) {
-                my $Result = $UserObject->UserUpdate(
-                    %User,
-                    %UserContextFromLDAP,
-                    ChangeUserID => 1,
-                );
-
-                if (!$Result) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Unable to update usage context of user \"$Param{User}\" (UserID: $UserID)!",
-                    );
-                }
-                else {
-                    $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
-                    $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 0;
-
-                    if ($UserContextFromLDAP{IsAgent}) {
-                        # add role "Agent User"
-                        $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 1;
-                    }
-
-                    if ($UserContextFromLDAP{IsCustomer}) {
-                        # add role "Customer"
-                        $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 1;
-                    }
-                }
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "No such user \"$Param{User}\"!",
-                );
-            }
         }
     }
 
@@ -603,6 +561,45 @@ sub Sync {
                 }
             }
         }
+    }
+
+    # set user context in DB
+    my %User = $UserObject->GetUserData(
+        UserID => $UserID
+    );
+    if (%User) {
+        my $Result = $UserObject->UserUpdate(
+            %User,
+            %UserContextFromLDAP,
+            ChangeUserID => 1,
+        );
+
+        if (!$Result) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update usage context of user \"$Param{User}\" (UserID: $UserID)!",
+            );
+        }
+        else {
+            $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
+            $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 0;
+
+            if ($UserContextFromLDAP{IsAgent}) {
+                # add role "Agent User"
+                $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 1;
+            }
+
+            if ($UserContextFromLDAP{IsCustomer}) {
+                # add role "Customer"
+                $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 1;
+            }
+        }
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No such user \"$Param{User}\"!",
+        );
     }
 
     # compare role permissions from ldap with current user role permissions and update if necessary
