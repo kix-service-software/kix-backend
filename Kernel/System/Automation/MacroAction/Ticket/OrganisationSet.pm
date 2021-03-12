@@ -95,6 +95,7 @@ sub Run {
         TicketID => $Param{TicketID},
         Data     => {},
         UserID   => $Param{UserID},
+        Language => 'en' # to not translate values
     );
 
     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
