@@ -26,4 +26,5 @@ Feature: GET request to the /system/roles resource
       | FAQ Reader             | allows to read any FAQ article in any FAQ category and allows to READ links                                                                                                  | 1       |
       | FAQ Editor             | same as FAQ Reader, but additionally allows to create new or edit any existing FAQ article and allows to CREATE, UPDATE, DELETE links                                        | 1       |
       | Asset Reader           | allows to read any asset information in any asset class and allows to READ links                                                                                             | 1       |
-
+      | Report User            |
+      | Report Manager         |
