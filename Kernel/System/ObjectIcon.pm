@@ -54,7 +54,7 @@ sub new {
 
     $Self->{CacheType} = 'ObjectIcon';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 30;   # 30 days
-    
+
     return $Self;
 }
 
@@ -70,18 +70,18 @@ Get an objecticon.
 
 sub ObjectIconGet {
     my ( $Self, %Param ) = @_;
-    
+
     my %Result;
 
     # check required params...
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log( 
-            Priority => 'error', 
-            Message  => 'Need ClientID!' 
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need ClientID!'
         );
         return;
     }
-   
+
     # check cache
     my $CacheKey = 'ObjectIconGet::' . $Param{ID};
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
@@ -89,17 +89,17 @@ sub ObjectIconGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
+
     my $DBObject = $Kernel::OM->Get('DB');
 
-    return if !$DBObject->Prepare( 
-        SQL   => "SELECT id, object, object_id, content_type, content, create_by, create_time, change_by, change_time 
+    return if !$DBObject->Prepare(
+        SQL   => "SELECT id, object, object_id, content_type, content, create_by, create_time, change_by, change_time
                   FROM object_icon WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
     my %Data;
-    
+
     # fetch the result
     while ( my @Data = $DBObject->FetchrowArray() ) {
         %Data = (
@@ -114,7 +114,7 @@ sub ObjectIconGet {
             ChangeTime  => $Data[8],
         );
     }
-    
+
     # no data found...
     if ( !%Data ) {
         $Kernel::OM->Get('Log')->Log(
@@ -123,16 +123,16 @@ sub ObjectIconGet {
         );
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Data,
-    ); 
-       
-    return %Data;   
+    );
+
+    return %Data;
 
 }
 
@@ -144,7 +144,7 @@ Adds a new objecticon
     my $Result = $ObjectIconObject->ObjectIconAdd(
         Object          => 'TicketState'
         ObjectID        => '12',
-        ContentType     => 'image/png',           
+        ContentType     => 'image/png',
         Content         => '...',
         UserID          => 1,
     );
@@ -166,7 +166,7 @@ sub ObjectIconAdd {
 
     # do the db insert...
     my $DBInsert = $DBObject->Do(
-        SQL  => "INSERT INTO object_icon (object, object_id, content_type, content, create_by, create_time, change_by, change_time) 
+        SQL  => "INSERT INTO object_icon (object, object_id, content_type, content, create_by, create_time, change_by, change_time)
                  VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp)",
         Bind => [
             \$Param{Object},
@@ -227,7 +227,7 @@ Update an objecticon
         ID              => 123
         Object          => 'TicketState'
         ObjectID        => '12',
-        ContentType     => 'image/png',           
+        ContentType     => 'image/png',
         Content         => '...',
         UserID          => 1,
     );
@@ -247,7 +247,7 @@ sub ObjectIconUpdate {
 
     # do the db insert...
     my $DBUpdate = $Kernel::OM->Get('DB')->Do(
-        SQL  => "UPDATE object_icon SET object = ?, object_id = ?, content_type = ?, content = ?, change_by = ? WHERE id = ?",
+        SQL  => "UPDATE object_icon SET object = ?, object_id = ?, content_type = ?, content = ?, change_by = ?, change_time = current_timestamp WHERE id = ?",
         Bind => [
             \$Param{Object},
             \$Param{ObjectID},
@@ -308,9 +308,9 @@ sub ObjectIconList {
         Type => $Self->{CacheType},
         Key  => $CacheKey
     );
-    
+
     return $CacheResult if (IsArrayRefWithData($CacheResult));
-  
+
     if ($Param{Object}) {
         push(@SQLWhere, 'object = ?');
         push(@BindVars, \$Param{Object});
@@ -326,10 +326,10 @@ sub ObjectIconList {
     if (@SQLWhere) {
         $SQL .= ' WHERE '.join(' AND ', @SQLWhere);
     }
-   
+
     my $DBObject = $Kernel::OM->Get('DB');
 
-    return if !$DBObject->Prepare( 
+    return if !$DBObject->Prepare(
         SQL   => $SQL,
         Bind  => \@BindVars,
     );
