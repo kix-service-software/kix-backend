@@ -30,17 +30,17 @@
       | Wie suche ich in KIX 18? |    
 
   Scenario: get the list of initial faq articles with offset
-    When I query the collection of faq articles with offset 4
+    When I query the collection of faq articles with offset 6
     Then the response code is 200
     And the response contains 8 items of type "FAQArticle"
     
   Scenario: get the list of initial faq articles with limit and offset
-    When I query the collection of faq articles with limit 2 and offset 4
+    When I query the collection of faq articles with limit 4 and offset 1
     Then the response code is 200
-    And the response contains 2 items of type "FAQArticle"
+    And the response contains 4 items of type "FAQArticle"
   
   Scenario: get the list of initial faq articles with sorted, limit and offset
-    When I query the collection of faq articles with sorted by "Address.-EmailAddress:textual" limit 2 and offset 4
+    When I query the collection of faq articles with sorted by "Address.-EmailAddress:textual" limit 4 and offset 2
     Then the response code is 200
     And the response contains 2 items of type "FAQArticle"
 

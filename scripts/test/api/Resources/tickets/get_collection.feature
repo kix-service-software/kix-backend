@@ -60,7 +60,9 @@ Feature: GET request to the /tickets resource
     
   Scenario: get the list of existing tickets with offset
     Given 8 of tickets
+Then the response code is 201
     When I query the collection of tickets with offset 4
+Then the response content
     Then the response code is 200
     And the response contains 4 items of type "Ticket"
     When delete all this tickets
