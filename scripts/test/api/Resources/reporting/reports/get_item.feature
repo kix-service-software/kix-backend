@@ -1,4 +1,4 @@
-Feature: GET request to the /reporting/reportdefinitions/:ReportDefinitionID/reports/:ReportID resource
+Feature: GET request to the /reporting/reports/:ReportID resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
@@ -7,8 +7,8 @@ Feature: GET request to the /reporting/reportdefinitions/:ReportDefinitionID/rep
       
   Scenario: get an existing reportdefinition report
     Given a reportdefinition
-    Given a reportdefinition report
-    When I get this reportdefinition report
+    Given a report
+    When I get this report
     Then the response code is 200
     When I delete this reportdefinition
     Then the response code is 204

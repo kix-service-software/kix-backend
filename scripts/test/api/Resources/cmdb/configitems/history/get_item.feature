@@ -10,8 +10,8 @@ Feature: GET request to the /cmdb/configitems/:ConfigItemID/history/:HistoryID r
     Then the response code is 201
 Then the response content is
     When I query the cmdb collection of configitem historys
-    Then the response content is
-    Then the response content history is
+Then the response content is
+Then the response content history is
     When I get this configitem history
     Then the response code is 200
     Then the response content is

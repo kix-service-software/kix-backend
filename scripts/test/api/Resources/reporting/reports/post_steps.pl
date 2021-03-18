@@ -28,12 +28,13 @@ require '_StepsLib.pl';
 
 # feature specific steps
 
-Given qr/a reportdefinition report$/, sub {
+Given qr/a report$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
-      URL     => S->{API_URL}.'/reporting/reportdefinitions/'.S->{ResponseContent}->{ReportDefinitionID}.'/reports',
+      URL     => S->{API_URL}.'/reporting/reports',
       Token   => S->{Token},
       Content => {
           Report => {
+              DefinitionID => S->{ReportDefinitionID},
               Config => {
                   Parameters    => {
                       Name_Pattern => "in"
@@ -47,12 +48,13 @@ Given qr/a reportdefinition report$/, sub {
    );
 };
 
-When qr/I create a reportdefinition report$/, sub {
+When qr/I create a report$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
-      URL     => S->{API_URL}.'/reporting/reportdefinitions/'.S->{ReportDefinitionID}.'/reports',
+      URL     => S->{API_URL}.'/reporting/reports',
       Token   => S->{Token},
       Content => {
           Report => {
+              DefinitionID => S->{ReportDefinitionID},
               Config => {
                   Parameters => {
                       Name_Pattern => "in"

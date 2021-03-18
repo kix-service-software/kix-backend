@@ -28,19 +28,18 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I delete this reportdefinition report result$/, sub {
+When qr/I delete this report result$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Delete(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/reporting/reportdefinitions/'.S->{ReportDefinitionID}.'/reports/'.S->{ReportID}.'/results/'.S->{ResponseContent}->{ReportResult}->[0]->{ID},
+      URL   => S->{API_URL}.'/reporting/reports/'.S->{ReportID}.'/results/'.S->{ResponseContent}->{ReportResult}->[0]->{ID},
    );
 };
 
-When qr/delete all this reportDefinitionIds$/, sub {
-
+When qr/delete all this reports$/, sub {
     for ($i=0;$i<@{S->{reportResultIdArray}};$i++){
         ( S->{Response}, S->{ResponseContent} ) = _Delete(
             Token => S->{Token},
-            URL   => S->{API_URL}.'/reporting/reportdefinitions/'.S->{reportDefinitionId}.'/reports/'.S->{reportId}.'/'.S->{ResponseContent}->{reportResultId}->[$i],
+            URL   => S->{API_URL}.'/reporting/reports/'.S->{reportId}.'/'.S->{ResponseContent}->{reportResultId}->[$i],
         );
     }
 

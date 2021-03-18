@@ -8,8 +8,8 @@ Feature: GET request to the /cmdb/configitems/:ConfigItemID/history resource
   Scenario: get the list of existing history
     Given a configitem
     When I query the cmdb collection of configitem historys
+Then the response content
     Then the response code is 200
-#    And the response object is ConfigItemHistoryCollectionResponse
     When I delete this configitem
     Then the response code is 204
     And the response has no content

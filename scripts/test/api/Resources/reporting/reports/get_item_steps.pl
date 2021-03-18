@@ -28,10 +28,11 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I get this reportdefinition report result\s*$/, sub {
+When qr/I get this report\s*$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/reporting/reportdefinitions/'.S->{ReportDefinitionID}.'/reports/'.S->{ReportID}.'/results',
+      URL   => S->{API_URL}.'/reporting/reports',
+       Filter => '{"Report": {"AND": [{"Field": "DefinitionID","Operator": "EQ","Value": "'.S->{ReportDefinitionID}.'"}]}}',
    );
 };
 

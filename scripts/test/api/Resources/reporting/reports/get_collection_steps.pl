@@ -28,10 +28,10 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I query the reportdefinitions reports collection$/, sub {
+When qr/I query the reports collection$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/reporting/reportdefinitions/'.S->{ReportDefinitionID}.'/reports',
+      URL   => S->{API_URL}.'/reporting/reports',
    );
 };
 
