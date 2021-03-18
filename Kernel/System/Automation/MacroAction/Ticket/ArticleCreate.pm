@@ -85,6 +85,12 @@ sub Describe {
         Required    => 0,
     );
     $Self->AddOption(
+        Name        => 'CustomerVisible',
+        Label       => Kernel::Language::Translatable('Show in Customer Portal'),
+        Description => Kernel::Language::Translatable('If the new article is visible for customers'),
+        Required    => 0,
+    );
+    $Self->AddOption(
         Name        => 'Subject',
         Label       => Kernel::Language::Translatable('Subject'),
         Description => Kernel::Language::Translatable('The subject of the new article.'),
@@ -103,12 +109,6 @@ sub Describe {
         Required    => 0,
     );
     # FIXME: add if necessary
-    # $Self->AddOption(
-    #     Name        => 'CustomerVisible',
-    #     Label       => 'For Customer Visible',
-    #     Description => '(Optional) If the new article is visible for customer. Possible are 0 or 1.',
-    #     Required    => 0,
-    # );
     # Charset          => 'utf-8',                                # 'ISO-8859-15'
     # MimeType         => 'text/plain',
     # HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
@@ -170,7 +170,7 @@ sub Run {
         }
     }
 
-    $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} || 0,
+    $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} // 0,
     $Param{Config}->{Channel} = $Param{Config}->{Channel} || 'note';
     $Param{Config}->{SenderType} = $Param{Config}->{SenderType} || 'agent';
     $Param{Config}->{Charset} = $Param{Config}->{Charset} || 'utf-8';
