@@ -94,7 +94,8 @@ sub Run {
         Text     => $Param{Config}->{ContactEmailOrID},
         TicketID => $Param{TicketID},
         Data     => {},
-        UserID   => $Param{UserID},
+        UserID   => $Param{UserID},,
+        Language => 'en' # to not translate value
     );
 
     my $ContactID;

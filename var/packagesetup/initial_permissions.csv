@@ -133,13 +133,14 @@
 "Customer";"Resource";"/tickets/*";;"x";"x";;
 "Customer";"Object";"/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
 "Customer";"Object";"/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
-"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber]}";;"x";;;
+"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;
 "Customer";"Object";"/tickets/*/articles/*{Article.CustomerVisible NE 1}";;;;;
-"Customer";"Property";"/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}";;"x";;;
+"Customer";"Property";"/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles/*/flags";"x";"x";;;
 "Customer";"Resource";"/system/config";;"x";;;
 "Customer";"Resource";"/system/config/*";;"x";;;
 "Customer";"Object";"/system/config{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Object";"/system/config/*{SysConfigOption.AccessLevel NE external}";;;;;
+"Customer";"Property";"/tickets/*/articles{Article.[!*,TimeUnit]}";;;;;"x"

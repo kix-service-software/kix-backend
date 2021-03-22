@@ -90,6 +90,7 @@ sub Run {
         TicketID => $Param{ObjectID},
         Data     => {},
         UserID   => $Param{UserID},
+        Language => 'en' # to not translate values
     );
 
     my @ValueList;
