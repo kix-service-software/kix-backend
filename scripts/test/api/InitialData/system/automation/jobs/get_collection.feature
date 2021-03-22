@@ -8,5 +8,7 @@ Feature: GET request to the /system/automation/jobs resource
   Scenario: get the list of automation jobs
     When I query the collection of automation jobs
     Then the response code is 200
-    Then the response contains 7 items of type "Job"
+    Then the response contains 1 items of type "Job"
     And the response contains the following items of type Job
+      | Name                                         | Comment                                                                                                    | Type   | ValidID |
+      | KIX Field Agent - Mobile Processing Rejected | This job resets owner and lock state of a ticket, when its mobile processing state is set to \"rejected\". | Ticket | 1       |

@@ -12,5 +12,5 @@ Feature: GET request to the /system/roles/permissiontypes resource
     And the response contains the following items of type PermissionType   
       | Name          | Comment                                                                                                        |
       | Resource      | Permission type that corresponds with a API resource.                                                          |
-      | Object | Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1). |
+      | Object        | Permission type that restricts access of objects based on their property values (i.e. tickets with QueueID=1). |
       | Property      | Permission type that restricts access on object properties (QueueID in tickets).                               |
