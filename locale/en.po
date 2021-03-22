@@ -1002,9 +1002,9 @@ msgid "The name of the dynamic field."
 msgstr "The name (=internal designation) of the dynamic field to be set."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
-msgid "The value for the dynamic field to be set."
+msgid "The value for the dynamic field to be set. Leave empty and uncheck \"Append\" to clear relevant dynamic field value of ticket."
 msgstr ""
-"The \"value\" for the dynamic field to be set. Field type \"Selection\" "
+"The \"value\" for the dynamic field to be set. Leave empty and uncheck \"Append\" to clear relevant dynamic field value of ticket. Field type \"Selection\" "
 "expects the key of the value to be set, field type \"AssetReference\" "
 "expects the Asset ID, field type TicketReference expects the Ticket ID, "
 "field type \"Checklist\" expects the appropriate JSON-format, field type "

@@ -70,7 +70,7 @@ sub ValueSet {
     }
     else {
         @Values = ( $Param{Value} );
-    }    
+    }
 
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
@@ -126,8 +126,7 @@ sub ValueValidate {
     my @Values;
     if ( IsArrayRefWithData( $Param{Value} ) ) {
         @Values = @{ $Param{Value} };
-    }
-    else {
+    } elsif ($Param{Value}) {
         @Values = ( $Param{Value} );
     }
 
@@ -163,10 +162,8 @@ sub ValueValidate {
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 
-    my $Success;
     for my $Item (@Values) {
-
-        $Success = $DynamicFieldValueObject->ValueValidate(
+        my $Success = $DynamicFieldValueObject->ValueValidate(
             Value => {
                 ValueText => $Item,
             },
@@ -176,7 +173,21 @@ sub ValueValidate {
         return if !$Success
     }
 
-    return $Success;
+    if (IsHashRefWithData($Param{DynamicFieldConfig}->{Config}->{PossibleValues})) {
+        for my $Item (@Values) {
+            my $Known = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Item};
+
+            if (!$Known) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown value ($Item)"
+                );
+                return;
+            }
+        }
+    }
+
+    return 1;
 }
 
 sub SearchSQLGet {
