@@ -139,7 +139,7 @@ sub Run {
     );
 
 	# get already prepared CI history data from ConfigItemHistoryGet operation
-    if ( IsArrayRefWithData($HistoryList) ) {  	
+    if ( IsArrayRefWithData($HistoryList) ) {
 
         # prepare ID list
         my @HistoryIDs;
@@ -160,20 +160,20 @@ sub Run {
         }
 
         my @ResultList;
-        if ( defined $GetResult->{Data}->{ConfigItemHistoryItem} ) {
-            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItemHistoryItem}) ? @{$GetResult->{Data}->{ConfigItemHistoryItem}} : ( $GetResult->{Data}->{ConfigItemHistoryItem} );
+        if ( defined $GetResult->{Data}->{ConfigItemHistory} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItemHistory}) ? @{$GetResult->{Data}->{ConfigItemHistory}} : ( $GetResult->{Data}->{ConfigItemHistory} );
         }
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
-                ConfigItemHistoryItem => \@ResultList,
+                ConfigItemHistory => \@ResultList,
             )
         }
     }
 
     # return result
     return $Self->_Success(
-        ConfigItemHistoryItem => [],
+        ConfigItemHistory => [],
     );
 }
 
