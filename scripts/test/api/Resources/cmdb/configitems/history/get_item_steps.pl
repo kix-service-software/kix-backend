@@ -31,11 +31,7 @@ require '_StepsLib.pl';
 When qr/I get this configitem history$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-<<<<<<< HEAD
-      URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}.'/history/'.S->{HistoryEntryID}
-=======
       URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}.'/history/'.S->{ResponseContent}->{ConfigItemHistory}->[0]->{HistoryEntryID}
->>>>>>> origin/rel-18_FEATURE
    );
 };
 
