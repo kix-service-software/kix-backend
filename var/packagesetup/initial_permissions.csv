@@ -137,9 +137,10 @@
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;
 "Customer";"Object";"/tickets/*/articles/*{Article.CustomerVisible NE 1}";;;;;
-"Customer";"Property";"/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}";;"x";;;
+"Customer";"Property";"/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles/*/flags";"x";"x";;;
 "Customer";"Resource";"/system/config";;"x";;;
 "Customer";"Resource";"/system/config/*";;"x";;;
 "Customer";"Object";"/system/config{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Object";"/system/config/*{SysConfigOption.AccessLevel NE external}";;;;;
+"Customer";"Property";"/tickets/*/articles{Article.[!*,TimeUnit]}";;;;;"x"
