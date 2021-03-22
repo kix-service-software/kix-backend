@@ -1024,9 +1024,9 @@ msgstr ""
 "werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
-msgid "The value for the dynamic field to be set."
+msgid "The value for the dynamic field to be set. Leave empty and uncheck \"Append\" to clear relevant dynamic field value of ticket."
 msgstr ""
-"Der \"value\" des dynamischen Feldes, welches gesetzt werden soll. Feldtyp "
+"Der \"value\" des dynamischen Feldes, welches gesetzt werden soll. Zum Entfernen des dynamischen Feldwertes am Ticket leer lassen und \"Hinzufügen\" nicht anhaken. Feldtyp "
 "\"Selection\" erwartet den \"key\" des zu setzenden Wertes, Feldtyp "
 "\"AssetReference\" erwartet die Asset ID, Feldtyp \"TicketReference\" "
 "erwartet die Ticket ID, Feldtyp \"Checklist\" erwartet das entsprechende "
