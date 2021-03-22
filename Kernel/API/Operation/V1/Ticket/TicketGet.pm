@@ -150,8 +150,8 @@ one or more ticket entries in one call.
 
                     FirstLock                       (timestamp of first lock)
 
-                    # if Include=TimeUnits was passed, the sum of all TimeUnits of all articles will be included
-                    TimeUnits
+                    # if Include=TimeUnit was passed, the sum of all TimeUnits of all articles will be included
+                    TimeUnit
 
                     # If Include=Articles was passed, you'll get an entry like this:
                     Articles => [

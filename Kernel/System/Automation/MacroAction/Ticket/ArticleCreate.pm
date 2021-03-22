@@ -241,7 +241,7 @@ sub Run {
 
     my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         %{ $Param{Config} },
-        TimeUnits => $Param{Config}->{AccountTime},
+        TimeUnit  => $Param{Config}->{AccountTime},
         TicketID  => $Param{TicketID},
         UserID    => $Param{UserID},
     );

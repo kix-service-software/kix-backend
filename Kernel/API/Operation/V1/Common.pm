@@ -1662,8 +1662,12 @@ sub _ApplyFieldSelector {
             # extract filtered fields from hash
             my %NewObject;
             my @FieldsToRemove;
-            foreach my $Field ( @Fields ) {
+            foreach my $Attribute ( @Fields ) {
                 my $Not = 0;
+
+                #localise Variable. see perdoc perlsyn
+                my $Field = $Attribute;
+
                 if ( $Field =~ /^!(.*?)$/ ) {
                     $Not   = 1;
                     $Field = $1;
@@ -1700,8 +1704,13 @@ sub _ApplyFieldSelector {
                     # extract filtered fields from hash
                     my %NewObjectItem;
                     my @FieldsToRemove;
-                    foreach my $Field ( @Fields ) {
+                    foreach my $Attribute ( @Fields ) {
                         my $Not = 0;
+
+                        #localise Variable. see perdoc perlsyn
+                        my $Field = $Attribute;
+
+
                         if ( $Field =~ /^!(.*?)$/ ) {
                             $Not   = 1;
                             $Field = $1;
@@ -2527,7 +2536,7 @@ sub _CheckObjectPermission {
                         # check if we have a DENY already
                         if ( ($Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY}) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                             $Self->_PermissionDebug($Self->{LevelIndent}, "DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
-                            last PERMISSION;
+                            last;
                         }
                     }
                 }
@@ -2551,7 +2560,7 @@ sub _CheckObjectPermission {
             }
             elsif ( ( $Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                 # if we have a GET request and a DENY permission we can stop here and just use the DENY filter
-                last PERMISSION;
+                last;
             }
         }
 
@@ -2575,6 +2584,8 @@ check property permissions
 =cut
 sub _CheckPropertyPermission {
     my ( $Self, %Param ) = @_;
+
+    $Self->{PermissionFieldSelector} = {};
 
     # get the relevant permission for the current request method
     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
@@ -2656,7 +2667,7 @@ sub _CheckPropertyPermission {
             }
         }
 
-        # if there is a wildcard permission we need to applay it to all non wildcard permissions
+        # if there is a wildcard permission we need to apply it to all non wildcard permissions
         foreach my $Attribute ( sort keys %AttributePermissions ) {
             next if $Attribute eq '*.*';
             $AttributePermissions{$Attribute} |= $AttributePermissions{'*.*'} || 0;
@@ -2686,7 +2697,12 @@ sub _CheckPropertyPermission {
                     # access is denied, so we have to add an ignore selector for this attribute
                     $Ignore = '!'
                 }
-                push @{$Self->{PermissionFieldSelector}->{$Object}}, "$Ignore$AttributeName";
+
+                # resolve double negations in case of NOT in DENY
+                my $ResultingFieldSelector = "$Ignore$AttributeName";
+                $ResultingFieldSelector =~ s/^!!//g;
+
+                push @{$Self->{PermissionFieldSelector}->{$Object}}, $ResultingFieldSelector;
             }
             else {
                 # we need a flat data structure to easily find the attributes
