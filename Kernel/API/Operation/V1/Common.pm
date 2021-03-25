@@ -263,41 +263,7 @@ sub Options {
         }
     }
 
-    # add the schema if available
-    my $SchemaLocation = $Kernel::OM->Get('Config')->Get('API::JSONSchema::Location');
-    if ( $SchemaLocation && -d $SchemaLocation ) {
-        foreach my $Type (qw(Request Response)) {
-            my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
-            if ($Object) {
-                my $Content = $Kernel::OM->Get('Main')->FileRead(
-                    Location => "$SchemaLocation/$Object.json",
-                );
-                if ($Content) {
-                    $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('JSON')->Decode(
-                        Data => $$Content
-                    );
-                }
-            }
-        }
-    }
-
-    # add the example if available
-    my $ExampleLocation = $Kernel::OM->Get('Config')->Get('API::Example::Location');
-    if ( $ExampleLocation && -d $ExampleLocation ) {
-        foreach my $Type (qw(Request Response)) {
-            my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
-            if ($Object) {
-                my $Content = $Kernel::OM->Get('Main')->FileRead(
-                    Location => "$ExampleLocation/$Object.json",
-                );
-                if ($Content) {
-                    $Data{$Type}->{Example} = $Kernel::OM->Get('JSON')->Decode(
-                        Data => $$Content
-                    );
-                }
-            }
-        }
-    }
+    $Self->_addSchemaAndExamples(Data => \%Data);
 
     return $Self->_Success(
         IsOptionsResponse => 1,
@@ -3513,6 +3479,89 @@ sub _GetPrepareDynamicFieldValue {
         DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
         PreparedValue     => $DFPreparedValue
     };
+}
+
+sub _addSchemaAndExamples {
+    my ( $Self, %Param ) = @_;
+
+    return if (!IsHashRefWithData($Param{Data}));
+
+    my @Directories;
+
+    # get plugin folders
+    my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
+        Valid     => 1,
+        InitOrder => 1
+    );
+    foreach my $Plugin ( @Plugins ) {
+        my $Directory = $Plugin->{Directory} . '/doc/API/V1';
+        next if ! -e $Directory;
+        push (@Directories, $Directory);
+    }
+
+    # get framework folder
+    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
+    if ( !$Home ) {
+        use FindBin qw($Bin);
+        $Home = $Bin.'/..';
+    }
+    push (@Directories, $Home . '/doc/API/V1');
+
+    foreach my $Type (qw(Request Response)) {
+        my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
+        if ($Object) {
+
+            # add the example if available
+            my $Example;
+            EXAMPLES:
+            for my $Location ( @Directories ) {
+                $Example = $Kernel::OM->Get('Main')->FileRead(
+                    Location        => "$Location/examples/$Object.json",
+                    DisableWarnings => 1
+                );
+                if ($Example) {
+                    last EXAMPLES;
+                }
+            }
+
+            if ($Example) {
+                $Param{Data}->{$Type}->{Example} = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $$Example
+                );
+            } else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "$Type Example for '$Object' not found!"
+                );
+            }
+
+            # add the schema if available
+            my $Schema;
+            SCHEMAS:
+            for my $Location ( @Directories ) {
+                $Schema = $Kernel::OM->Get('Main')->FileRead(
+                    Location        => "$Location/schemas/$Object.json",
+                    DisableWarnings => 1
+                );
+                if ($Schema) {
+                    last SCHEMAS;
+                }
+            }
+
+            if ($Schema) {
+                $Param{Data}->{$Type}->{JSONSchema} = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $$Schema
+                );
+            } else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "$Type Schema for '$Object' not found!"
+                );
+            }
+        }
+    }
+
+    return 1;
 }
 
 1;

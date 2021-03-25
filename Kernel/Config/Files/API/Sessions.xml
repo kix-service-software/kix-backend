@@ -21,7 +21,6 @@
                 <Item Key="Name">SessionCreate</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Sessions::SessionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseSchema">SessionCollectionResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -36,6 +35,4 @@
             </Hash>
         </Setting>
     </ConfigItem>
-
 </kix_config>
-    
