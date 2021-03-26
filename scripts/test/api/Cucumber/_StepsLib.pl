@@ -168,8 +168,6 @@ Then qr/the response content history is$/, sub {
 1;
 
 
-
-
 =back
 
 =head1 TERMS AND CONDITIONS
