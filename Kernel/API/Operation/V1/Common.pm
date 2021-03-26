@@ -840,18 +840,12 @@ sub _Success {
         }
 
         # honor a field selector, if we have one
-        if ( !$Self->{'_CachedResponse'} && (IsHashRefWithData( $Self->{Fields} ) || IsHashRefWithData( $Self->{PermissionFieldSelector} )) ) {
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Fields} ) ) {
             my $StartTime = Time::HiRes::time();
-
-            my $FieldSelector = $Self->{Fields};
-            if ( IsHashRefWithData( $Self->{PermissionFieldSelector} ) ) {
-                $Self->_Debug($Self->{LevelIndent}, "using permission field selector");
-                $FieldSelector = $Self->{PermissionFieldSelector};
-            }
 
             $Self->_ApplyFieldSelector(
                 Data   => \%Param,
-                Fields => $FieldSelector,
+                Fields => $Self->{Fields},
             );
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -882,6 +876,23 @@ sub _Success {
                 my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
                 $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
             }
+
+        }
+
+        # honor a permission field selector, if we have one - make sure nothing gets out what should not get out
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
+
+            $Self->_ApplyFieldSelector(
+                Data                       => \%Param,
+                Fields                     => $Self->{PermissionFieldSelector},
+                IsPermissionFieldSelection => 1
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", $TimeDiff));
         }
 
         # cache request without offset and limit if CacheType is set for this operation
@@ -1619,7 +1630,7 @@ sub _ApplyFieldSelector {
         my %Tmp = map { $_ => 1 } (
             @{ $Param{Fields}->{'*'} || [] },
             @{ $Param{Fields}->{$Object} || [] },
-            keys %{ $Self->{Include} } ,
+            $Param{IsPermissionFieldSelection} ? () : keys %{ $Self->{Include} },
         );
         my @Fields = sort keys %Tmp;
 
@@ -1646,7 +1657,7 @@ sub _ApplyFieldSelector {
                 else {
                     if ( !$Not ) {
                         # "select field"
-                        $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                        $NewObject{$Field} = $Param{Data}->{$Object}->{$Field} if exists $Param{Data}->{$Object}->{$Field};
                     }
                     else {
                         # remember field to be removed later
@@ -1689,7 +1700,7 @@ sub _ApplyFieldSelector {
                         else {
                             if ( !$Not ) {
                                 # "select field"
-                                $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                                $NewObjectItem{$Field} = $ObjectItem->{$Field} if exists $ObjectItem->{$Field};
                             }
                             else {
                                 # remember field to be removed later
