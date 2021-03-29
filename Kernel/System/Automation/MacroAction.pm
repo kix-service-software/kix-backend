@@ -637,6 +637,9 @@ sub MacroActionExecute {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
 
+    # add root object id
+    $BackendObject->{RootObjectID} = $Self->{RootObjectID};
+
     my %Parameters = %{$MacroAction{Parameters} || {}};
 
     # replace result variables

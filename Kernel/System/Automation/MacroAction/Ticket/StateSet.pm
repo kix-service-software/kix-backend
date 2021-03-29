@@ -97,13 +97,9 @@ sub Run {
         return;
     }
 
-    my $State = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{State},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
-        Language => 'en' # to not translate values
+    my $State = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{State}
     );
 
     # set the new state
@@ -142,26 +138,16 @@ sub Run {
 
     # set pending time if needed
     if ( $Success && $State{TypeName} =~ m{\A pending}msxi && IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
-
-        # get time object
-        my $TimeObject = $Kernel::OM->Get('Time');
-
-        # get current time
-        my $PendingTime = $TimeObject->SystemTime();
-
-        # add PendingTimeDiff
-        $PendingTime += $Param{Config}->{PendingTimeDiff};
-
-        # convert pending time to time stamp
-        my $PendingTimeString = $TimeObject->SystemTime2TimeStamp(
-            SystemTime => $PendingTime,
+        $Param{Config}->{PendingTimeDiff} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $Param{Config}->{PendingTimeDiff}
         );
 
         # set pending time
         my $Success = $TicketObject->TicketPendingTimeSet(
             UserID   => $Param{UserID},
             TicketID => $Param{TicketID},
-            String   => $PendingTimeString,
+            Diff     => $Param{Config}->{PendingTimeDiff},
         );
 
         if ( !$Success ) {

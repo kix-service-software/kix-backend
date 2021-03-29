@@ -803,7 +803,9 @@ sub ReplacePlaceHolder {
         }
     }
 
-    if ( !defined $Param{Language} || !$Param{Language}) {
+    $Param{Translate} = $Param{Translate} // 1;
+
+    if ( $Param{Translate} && (!defined $Param{Language} || !$Param{Language}) ) {
         $Param{Language}
             = $Self->{UserLanguage}
             || $Kernel::OM->Get('Config')->Get('DefaultLanguage')

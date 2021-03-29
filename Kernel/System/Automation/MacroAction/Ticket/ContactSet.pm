@@ -89,13 +89,9 @@ sub Run {
         return;
     }
 
-    my $Contact = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{ContactEmailOrID},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},,
-        Language => 'en' # to not translate value
+    my $Contact = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{ContactEmailOrID}
     );
 
     my $ContactID;
