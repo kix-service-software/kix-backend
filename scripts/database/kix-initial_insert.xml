@@ -10014,7 +10014,7 @@ PossibleValues:
    processing: processing
    suspended: suspended
    completed: completed
-   partiallyexecuted: partially executed
+   partially executed: partially executed
    cancelled: cancelled
 TranslatableValues: '1'
         ]]></Data>
