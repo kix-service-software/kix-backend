@@ -162,7 +162,7 @@ sub _PrepareValue {
                 if ( IsHashRefWithData( $DynamicFieldConfig ) ) {
                     my $ReplaceValue = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
                         DynamicFieldConfig => $DynamicFieldConfig,
-                        ObjectID           => $Param{TicketID},
+                        ObjectID           => $Self->{RootObjectID} || $Param{TicketID},
                     );
                     if ($ReplaceValue) {
                         if (IsArrayRefWithData($ReplaceValue)) {
@@ -174,13 +174,9 @@ sub _PrepareValue {
                 }
             }
         } else {
-            my $Value = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-                RichText => 0,
-                Text     => $Param{Config}->{DynamicFieldValue},
-                TicketID => $Param{TicketID},
-                Data     => {},
-                UserID   => $Param{UserID},
-                Language => 'en' # to not translate values
+            my $Value = $Self->_ReplaceValuePlaceholder(
+                %Param,
+                Value => $Param{Config}->{DynamicFieldValue}
             );
             @NewValue = ($Value);
         }

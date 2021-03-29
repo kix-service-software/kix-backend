@@ -56,7 +56,7 @@ sub _CheckParams {
     }
 
     return if !$Self->SUPER::_CheckParams(%Param);
-    
+
     my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
@@ -98,6 +98,36 @@ sub _ConvertScalar2ArrayRef {
     }
 
     return \@Data;
+}
+
+=item _ReplaceValuePlaceholder()
+
+replaces palceholders
+
+Example:
+    my $Value = $Self->_ReplaceValuePlaceholder(
+        Value     => $SomeValue,
+        Richtext  => 0             # optional: 0 will be used if omitted
+        Translate => 0             # optional: 0 will be used if omitted
+        UserID    => 1             # optional: 1 will be used if omitted
+        Data      => {}            # optional: {} will be used
+    );
+
+=cut
+
+sub _ReplaceValuePlaceholder {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Value} if (!$Param{Value} || $Param{Value} !~ m/<KIX_/);
+
+    return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+        Text      => $Param{Value},
+        RichText  => $Param{Richtext} || 0,
+        Translate => $Param{Translate} || 0,
+        UserID    => $Param{UserID} || 1,
+        Data      => $Param{Data} || {},
+        TicketID  => $Self->{RootObjectID} || $Param{TicketID}
+    );
 }
 
 1;
