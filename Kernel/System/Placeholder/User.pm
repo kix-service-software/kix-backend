@@ -129,6 +129,15 @@ sub _ReplaceUserPlaceholder {
         UserID => $Param{UseUserID},
     );
 
+    # FIXME: change/remove it (ID handling) with placeholder refactoring
+    if (IsHashRefWithData(\%User)) {
+        $User{ID} = $User{UserID};
+    }
+    if (IsHashRefWithData(\%ContactOfUser)) {
+        $ContactOfUser{ContactID} = $ContactOfUser{ID};
+        delete $ContactOfUser{ID};
+    }
+
     # html quoting of content
     if ( $Param{RichText} ) {
         for my $Attribute ( keys %ContactOfUser ) {
