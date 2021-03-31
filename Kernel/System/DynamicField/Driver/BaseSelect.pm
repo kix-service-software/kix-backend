@@ -126,7 +126,7 @@ sub ValueValidate {
     my @Values;
     if ( IsArrayRefWithData( $Param{Value} ) ) {
         @Values = @{ $Param{Value} };
-    } elsif ($Param{Value}) {
+    } elsif (defined $Param{Value}) {
         @Values = ( $Param{Value} );
     }
 
@@ -136,7 +136,7 @@ sub ValueValidate {
         if ($CountMin && scalar(@Values) < $CountMin) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message => "At least $CountMin values must be selected."
+                Message => "At least $CountMin value(s) must be selected."
             );
             return;
         }
