@@ -118,7 +118,7 @@ Example:
 sub _ReplaceValuePlaceholder {
     my ( $Self, %Param ) = @_;
 
-    return $Param{Value} if (!$Param{Value} || $Param{Value} !~ m/<KIX_/);
+    return $Param{Value} if (!$Param{Value} || $Param{Value} !~ m/(<|&lt;)KIX_/);
 
     return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         Text      => $Param{Value},
