@@ -4,7 +4,7 @@
     <TableCreate Name="report_definition">
         <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
         <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
-        <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
+        <Column Name="datasource" Required="true" Size="255" Type="VARCHAR"/>
         <Column Name="config" Required="false" Size="1800000" Type="VARCHAR"/>
         <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
         <Column Name="valid_id" Required="true" Type="SMALLINT"/>
