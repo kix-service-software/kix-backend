@@ -1,0 +1,39 @@
+{
+    "OutputFormat": {
+        "Description": "Converts the report data to CSV.",
+        "DisplayName": "CSV",
+        "Name": "CSV",
+        "Options": {
+            "Columns": {
+                "Description": "A list (Array) of the columns to be contained in the order in which they should occur in the output result.",
+                "Label": "Columns",
+                "Name": "Columns",
+                "Required": 1
+            },
+            "IncludeColumnHeader": {
+                "Description": "Determine if a header containing the column names should be contained. Default: 1 (true).",
+                "Label": "Include Column Headers",
+                "Name": "IncludeColumnHeader",
+                "Required": 0
+            },
+            "Quote": {
+                "Description": "The quote character to be used. Default: \" (Double Quote).",
+                "Label": "Quote",
+                "Name": "Quote",
+                "Required": 0
+            },
+            "Separator": {
+                "Description": "The value separator to be used. Default: , (Comma).",
+                "Label": "Separator",
+                "Name": "Separator",
+                "Required": 0
+            },
+            "Title": {
+                "Description": "A simple title, contained in the first row/cell of the output result.",
+                "Label": "Title",
+                "Name": "Title",
+                "Required": 0
+            }
+        }
+    }
+}

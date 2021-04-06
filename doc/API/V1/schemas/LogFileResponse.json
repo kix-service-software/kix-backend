@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "LogFileResponse.json",
   "type": "object",
-  "description": "A response for log file GET request.",
+  "description": "A response for a log file GET request.",
   "properties": {
     "LogFile": {
       "$ref": "LogFile.json"

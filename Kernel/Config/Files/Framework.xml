@@ -8845,4 +8845,70 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource###GenericSQL" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a report type for reporting.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Generic SQL</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource::GenericSQL::Function###if_plugin_available" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a function for reporting data source GenericSQL.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">if_plugin_available</Item>
+                <Item Key="Usage" Translatable="1">if_plugin_available(:Plugin,:Text)</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL::Function::IfPluginAvailable</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource::GenericSQL::OutputHandler###ResolveDynamicFieldValue" Required="0" Valid="1">
+        <Description Translatable="1">Registration of an output handler for reporting data source GenericSQL.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">ResolveDynamicFieldValue</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL::OutputHandler::ResolveDynamicFieldValue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource::GenericSQL::OutputHandler###Translate" Required="0" Valid="1">
+        <Description Translatable="1">Registration of an output handler for reporting data source GenericSQL.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Translate</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL::OutputHandler::Translate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Reporting::OutputFormat###CSV" Required="0" Valid="1">
+        <Description Translatable="1">Registration of an output format for reporting.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">CSV</Item>
+                <Item Key="Module">Kernel::System::Reporting::OutputFormat::CSV</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="ClientNotification::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable client notification debugging.</Description>
+        <Group>Framework</Group>
+        <SubGroup>ClientNotification</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>

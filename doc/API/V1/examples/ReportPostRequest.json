@@ -1,0 +1,13 @@
+{
+    "Report": {
+        "DefinitionID": 1,
+        "Config": {
+            "Parameters": {
+                "Name_Pattern": "in"
+            },
+            "OutputFormats": [
+                "CSV"
+            ]
+        }
+    }
+}

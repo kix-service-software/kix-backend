@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ConfigItemVersionResponse.json",
   "type": "object",
-  "description": "A response for config item version GET request.",
+  "description": "A response for a config item version GET request.",
   "properties": {
     "ConfigItemVersion": {
       "$ref": "ConfigItemVersion.json"

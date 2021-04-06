@@ -131,7 +131,6 @@ sub Validate {
                 $MimeType = $1;
                 $MimeType =~ s/"|'//g;
             }            
-        print STDERR "MimeType: $MimeType\n";
             my $Result = Kernel::API::Validator::MimeTypeValidator::Validate(
                 $Self, 
                 Attribute => 'MimeType',

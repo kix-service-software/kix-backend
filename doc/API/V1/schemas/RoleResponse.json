@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "RoleResponse.json",
   "type": "object",
-  "description": "A response for role GET request.",
+  "description": "A response for a role GET request.",
   "properties": {
     "Role": {
       "$ref": "Role.json"

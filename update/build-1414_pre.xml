@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableCreate Name="report_definition">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+        <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
+        <Column Name="config" Required="false" Size="1800000" Type="VARCHAR"/>
+        <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+        <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <Index Name="report_definition_name">
+            <IndexColumn Name="name"/>
+        </Index>
+        <ForeignKey ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+
+    <TableCreate Name="report">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <Column Name="definition_id" Required="true" Type="INTEGER"/>
+        <Column Name="config" Required="false" Size="1800000" Type="VARCHAR"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <ForeignKey ForeignTable="report_definition">
+            <Reference Local="definition_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+
+    <TableCreate Name="report_result">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+        <Column Name="report_id" Required="true" Type="INTEGER"/>
+        <Column Name="format" Required="true" Size="255" Type="VARCHAR"/>
+        <Column Name="content_type" Required="false" Size="255" Type="VARCHAR"/>
+        <Column Name="content_size" Required="false" Size="30" Type="VARCHAR"/>
+        <Column Name="content" Required="false" Type="LONGBLOB"/>
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <ForeignKey ForeignTable="report">
+            <Reference Local="report_id" Foreign="id"/>
+        </ForeignKey>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+        </ForeignKey>
+    </TableCreate>
+
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Tickets Created In Date Range</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists tickets created in a specific date range. Organization may be selected before report creation.</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIHR0Lm5hbWUgQVMgIlR5cGUiLCAKICAgICAgIHQudG4gQVMgIlROUiIsIAogICAgICAgdC50aXRsZSBBUyAiVGl0bGUiLCAKICAgICAgIHRzLm5hbWUgQVMgIlN0YXRlIiwKICAgICAgIG8ubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwgCiAgICAgICBjLmVtYWlsIEFTICJDb250YWN0IiwgCiAgICAgICB0LmFjY291bnRlZF90aW1lIEFTICJBY2NvdW50ZWQgVGltZSIKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnLAogICAgIGRmdi52YWx1ZV90ZXh0IEFTICJDbG9zZSBDb2RlIiwKICAgICBzbGFfcmVzcG9uc2UubmFtZSBBUyAiU0xBIFJlc3BvbnNlIE5hbWUiLAogICAgIHRzY19yZXNwb25zZS50YXJnZXRfdGltZSBBUyAiU0xBIFJlc3BvbnNlIFRhcmdldCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBSZXNwb25zZSBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgUmVzcG9uc2UgQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iLAogICAgIHNsYV9zb2x1dGlvbi5uYW1lIEFTICJTTEEgU29sdXRpb24gTmFtZSIsCiAgICAgdHNjX3NvbHV0aW9uLnRhcmdldF90aW1lIEFTICJTTEEgU29sdXRpb24gVGFyZ2V0IFRpbWUiLCAKICAgICB0c2Nfc29sdXRpb24uZnVsZmlsbG1lbnRfdGltZSBBUyAiU0xBIFNvbHV0aW9uIEZ1bGZpbGxtZW50IFRpbWUiLCAKICAgICB0c2Nfc29sdXRpb24udGltZV9kZXZpYXRpb25fYnVzaW5lc3MgQVMgIlNMQSBTb2x1dGlvbiBCdXNpbmVzcyBUaW1lIERldmlhdGlvbiIKJyl9CiAgRlJPTSBvcmdhbmlzYXRpb24gbywgCiAgICAgICBjb250YWN0IGMsIAogICAgICAgdGlja2V0X3N0YXRlIHRzLAogICAgICAgdGlja2V0X3R5cGUgdHQsIAogICAgICAgdGlja2V0IHQKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnCiAgTEVGVCBPVVRFUiBKT0lOIGR5bmFtaWNfZmllbGQgZGYgT04gKGRmLm5hbWUgPSAnQ2xvc2VDb2RlJykKICBMRUZUIE9VVEVSIEpPSU4gZHluYW1pY19maWVsZF92YWx1ZSBkZnYgT04gKGRmdi5vYmplY3RfaWQgPSB0LmlkIEFORCBkZnYuZmllbGRfaWQgPSBkZi5pZCkKICBMRUZUIE9VVEVSIEpPSU4gdGlja2V0X3NsYV9jcml0ZXJpb24gdHNjX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2UudGlja2V0X2lkID0gdC5pZCBBTkQgdHNjX3Jlc3BvbnNlLm5hbWUgPSAnUmVzcG9uc2UnKQogIExFRlQgT1VURVIgSk9JTiBzbGEgQVMgc2xhX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2Uuc2xhX2lkID0gc2xhX3Jlc3BvbnNlLmlkKQogIExFRlQgT1VURVIgSk9JTiB0aWNrZXRfc2xhX2NyaXRlcmlvbiB0c2Nfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi50aWNrZXRfaWQgPSB0LmlkIEFORCB0c2Nfc29sdXRpb24ubmFtZSA9ICdTb2x1dGlvbicpCiAgTEVGVCBPVVRFUiBKT0lOIHNsYSBBUyBzbGFfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi5zbGFfaWQgPSBzbGFfc29sdXRpb24uaWQpCicpfQogV0hFUkUgdC50eXBlX2lkID0gdHQuaWQKICAgQU5EIHQudGlja2V0X3N0YXRlX2lkID0gdHMuaWQKICAgQU5EIHQub3JnYW5pc2F0aW9uX2lkID0gby5pZAogICBBTkQgdC5jb250YWN0X2lkID0gYy5pZAogICBBTkQgby5pZCBJTiAoJHtQYXJhbWV0ZXJzLk9yZ2FuaXNhdGlvbklETGlzdH0pCiAgIEFORCB0LmNyZWF0ZV90aW1lIEJFVFdFRU4gJyR7UGFyYW1ldGVycy5TdGFydERhdGV9IDAwOjAwOjAwJyBBTkQgJyR7UGFyYW1ldGVycy5FbmREYXRlfSAyMzo1OTo1OScKIE9SREVSIEJZIHR0Lm5hbWUsIHQudG4=)"
+    },
+    "OutputHandler": [
+      {
+        "Name": "ResolveDynamicFieldValue",
+        "Columns": ["CloseCode"],
+        "FieldNames": ["CloseCode"]
+      },
+      {
+        "Name": "Translate",
+        "Columns": ["CloseCode","State","Type"]
+      }
+    ]
+  },
+  "Parameters": [
+    {
+      "Name": "StartDate",
+      "Label": "Start",
+      "DataType": "DATE",
+      "Required": 1
+    },
+    {
+      "Name": "EndDate",
+      "Label": "End",
+      "DataType": "DATE",
+      "Required": 1
+    },
+    {
+      "Name": "OrganisationIDList",
+      "Label": "Organisation",
+      "DataType": "NUMERIC",
+      "Multiple": 1,
+      "References": "Organisation.ID",
+      "Required": 1
+    }
+  ]
+}
+]]></Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Tickets Closed In Date Range</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists tickets closed in a specific date range. Organization may be selected before report creation.</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIHR0Lm5hbWUgQVMgIlR5cGUiLCAKICAgICAgIHQudG4gQVMgIlROUiIsIAogICAgICAgdC50aXRsZSBBUyAiVGl0bGUiLCAKICAgICAgIHRzLm5hbWUgQVMgIlN0YXRlIiwKICAgICAgIG8ubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwgCiAgICAgICBjLmVtYWlsIEFTICJDb250YWN0IiwgCiAgICAgICB0LmFjY291bnRlZF90aW1lIEFTICJBY2NvdW50ZWQgVGltZSIKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnLAogICAgIGRmdi52YWx1ZV90ZXh0IEFTICJDbG9zZSBDb2RlIiwKICAgICBzbGFfcmVzcG9uc2UubmFtZSBBUyAiU0xBIFJlc3BvbnNlIE5hbWUiLAogICAgIHRzY19yZXNwb25zZS50YXJnZXRfdGltZSBBUyAiU0xBIFJlc3BvbnNlIFRhcmdldCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBSZXNwb25zZSBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgUmVzcG9uc2UgQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iLAogICAgIHNsYV9zb2x1dGlvbi5uYW1lIEFTICJTTEEgU29sdXRpb24gTmFtZSIsCiAgICAgdHNjX3NvbHV0aW9uLnRhcmdldF90aW1lIEFTICJTTEEgU29sdXRpb24gVGFyZ2V0IFRpbWUiICwgCiAgICAgdHNjX3NvbHV0aW9uLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBTb2x1dGlvbiBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3NvbHV0aW9uLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgU29sdXRpb24gQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iCicpfQogIEZST00gb3JnYW5pc2F0aW9uIG8sIAogICAgICAgY29udGFjdCBjLCAKICAgICAgIHRpY2tldF90eXBlIHR0LAogICAgICAgdGlja2V0X3N0YXRlIHRzLAogICAgICAgdGlja2V0IHQKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnCiAgTEVGVCBPVVRFUiBKT0lOIGR5bmFtaWNfZmllbGQgZGYgT04gKGRmLm5hbWUgPSAnQ2xvc2VDb2RlJykKICBMRUZUIE9VVEVSIEpPSU4gZHluYW1pY19maWVsZF92YWx1ZSBkZnYgT04gKGRmdi5vYmplY3RfaWQgPSB0LmlkIEFORCBkZnYuZmllbGRfaWQgPSBkZi5pZCkKICBMRUZUIE9VVEVSIEpPSU4gdGlja2V0X3NsYV9jcml0ZXJpb24gdHNjX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2UudGlja2V0X2lkID0gdC5pZCBBTkQgdHNjX3Jlc3BvbnNlLm5hbWUgPSAnUmVzcG9uc2UnKQogIExFRlQgT1VURVIgSk9JTiBzbGEgQVMgc2xhX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2Uuc2xhX2lkID0gc2xhX3Jlc3BvbnNlLmlkKQogIExFRlQgT1VURVIgSk9JTiB0aWNrZXRfc2xhX2NyaXRlcmlvbiB0c2Nfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi50aWNrZXRfaWQgPSB0LmlkIEFORCB0c2Nfc29sdXRpb24ubmFtZSA9ICdTb2x1dGlvbicpCiAgTEVGVCBPVVRFUiBKT0lOIHNsYSBBUyBzbGFfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi5zbGFfaWQgPSBzbGFfc29sdXRpb24uaWQpCicpfQogV0hFUkUgdC50eXBlX2lkID0gdHQuaWQKICAgQU5EIHQudGlja2V0X3N0YXRlX2lkID0gdHMuaWQKICAgQU5EIHQub3JnYW5pc2F0aW9uX2lkID0gby5pZAogICBBTkQgdC5jb250YWN0X2lkID0gYy5pZAogICBBTkQgby5pZCBJTiAoJHtQYXJhbWV0ZXJzLk9yZ2FuaXNhdGlvbklETGlzdH0pCiAgIEFORCBFWElTVFMgKAogICAgIFNFTEVDVCB0aC5pZCAKICAgICAgIEZST00gdGlja2V0X3N0YXRlIHRzLAogICAgICAgICAgICB0aWNrZXRfaGlzdG9yeSB0aCwKICAgICAgICAgICAgdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQsCiAgICAgICAgICAgIHRpY2tldF9zdGF0ZV90eXBlIHRzdAogICAgICBXSEVSRSB0aC50aWNrZXRfaWQgPSB0LmlkCiAgICAgICAgQU5EIHRoLmhpc3RvcnlfdHlwZV9pZCA9IHRodC5pZAogICAgICAgIEFORCB0aHQubmFtZSA9ICdTdGF0ZVVwZGF0ZScKICAgICAgICBBTkQgdGguc3RhdGVfaWQgPSB0cy5pZAogICAgICAgIEFORCB0cy50eXBlX2lkID0gdHN0LmlkCiAgICAgICAgQU5EIHRzdC5uYW1lID0gJ2Nsb3NlZCcKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAnJHtQYXJhbWV0ZXJzLlN0YXJ0RGF0ZX0gMDA6MDA6MDAnIEFORCAnJHtQYXJhbWV0ZXJzLkVuZERhdGV9IDIzOjU5OjU5JwogICApCiBPUkRFUiBCWSB0dC5uYW1lLCB0LnRu)"
+    },
+    "OutputHandler": [
+      {
+        "Name": "ResolveDynamicFieldValue",
+        "Columns": ["CloseCode"],
+        "FieldNames": ["CloseCode"]
+      },
+      {
+        "Name": "Translate",
+        "Columns": ["CloseCode","State","Type"]
+      }
+    ]
+  },
+  "Parameters": [
+    {
+      "Name": "StartDate",
+      "Label": "Start",
+      "DataType": "DATE",
+      "Required": 1
+    },
+    {
+      "Name": "EndDate",
+      "Label": "End",
+      "DataType": "DATE",
+      "Required": 1
+    },
+    {
+      "Name": "OrganisationIDList",
+      "Label": "Organisation",
+      "DataType": "NUMERIC",
+      "Multiple": 1,
+      "References": "Organisation.ID",
+      "Required": 1
+    }
+  ]
+}
+]]></Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+</database>

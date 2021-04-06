@@ -340,6 +340,7 @@ prepare data, check given parameters and parse them according to type
                 RequiresValueIfUsed => 1                                # optional
                 Default             => ...                              # optional
                 OneOf               => [...]                            # optional
+                AnyOf               => [...]                            # optional
                 Format              => '...'                            # optional, RegEx that defines the format pattern
             }
         }
@@ -939,16 +940,26 @@ helper function to return an error message.
 sub _Error {
     my ( $Self, %Param ) = @_;
 
+    my $Message = $Param{Message};
+
+    if ( !$Message ) {
+        # get the last error log entry as the message if we don't have one
+        $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
+    }
+
     $Self->{DebuggerObject}->Error(
         Summary => $Param{Code},
-        Data    => $Param{Message},
+        Data    => $Message,
     );
 
     # return structure
     return {
         Success => 0,
         Code    => $Param{Code},
-        Message => $Param{Message},
+        Message => $Message,
     };
 }
 
@@ -1308,6 +1319,7 @@ sub _ApplyFilter {
                     ];
                 }
             }
+            next OBJECT;
         }
         my $ObjectData = $Param{Data}->{$Object};
 
@@ -1894,7 +1906,7 @@ sub _ApplyInclude {
             foreach my $Object ( keys %{ $Param{Data} } ) {
                 next if !$Param{Data}->{$Object};
 
-                if ( IsArrayRefWithData( $Param{Data}->{$Object} ) ) {
+                if ( IsArrayRef( $Param{Data}->{$Object} ) ) {
                     my $Index = 0;
                     foreach my $Item ( @{$Param{Data}->{$Object}} ) {
 
