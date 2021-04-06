@@ -22,7 +22,7 @@ Feature: POST request to the /system/automation/macros/:MacroID/actions resource
     Then the response code is 400
     And the response object is Error
     And the error code is "Object.UnableToCreate"
-    And the error message is "MacroAction config is invalid!"
+    And the error message is "Could not create item, please contact the system administrator."
     When I delete this automation macro
     Then the response code is 204
 
