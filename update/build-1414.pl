@@ -15,8 +15,6 @@ use FindBin qw($Bin);
 use lib dirname($Bin);
 use lib dirname($Bin) . '/Kernel/cpan-lib';
 
-use Getopt::Std;
-
 use Kernel::System::ObjectManager;
 use Kernel::System::VariableCheck qw(:all);
 
