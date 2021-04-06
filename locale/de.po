@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-3-22 10:22+0000\n"
+"POT-Creation-Date: 2021-4-6 07:49+0000\n"
 "PO-Revision-Date: 2021-03-24 10:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -293,6 +293,18 @@ msgid "Laptop"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"Lists tickets closed in a specific date range. Organization may be selected "
+"before report creation."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"Lists tickets created in a specific date range. Organization may be selected "
+"before report creation."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
@@ -425,6 +437,14 @@ msgid "Repair"
 msgstr "In Reparatur"
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Report Manager"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Report User"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Resource"
 msgstr ""
 
@@ -513,10 +533,6 @@ msgid "Test/QA"
 msgstr "Test/QS"
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Text"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "TextArea"
 msgstr ""
 
@@ -568,6 +584,14 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket is pending for automatic close."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Tickets Closed In Date Range"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Tickets Created In Date Range"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -633,6 +657,10 @@ msgid ""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to create and edit report definitions"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to create new tickets by using the \"Customer Portal Light\" webform "
 "mechanism"
@@ -663,6 +691,10 @@ msgstr ""
 msgid ""
 "allows to read information of any organization or contact and allows to READ "
 "links"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows to view report definitions and reports"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1257,10 +1289,6 @@ msgstr ""
 msgid "The title of the new ticket and subject of the first article."
 msgstr "Der Titel des neuen Tickets und Betreff des ersten Artikels."
 
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Title"
-msgstr ""
-
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "Sets the title of a ticket."
 msgstr ""
@@ -1415,6 +1443,145 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
 msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
+msgid ""
+"A list of output handler to be run on the data in the given order. The "
+"output of each handler will be used as the input of the following handler."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
+msgid "Allows to retrieve report data based on an SQL statement."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
+msgid "Output Handler"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
+msgid "SQL"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
+msgid ""
+"The SQL statement. You can also base64-encode the statement in the form "
+"\"base64(...)\"."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
+msgid "Plugin"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
+msgid ""
+"Returns the given text if the requested plugin is available in this system."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
+msgid "Text"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
+msgid "The name of the plugin to check for."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
+msgid "The text to return if the requested plugin is available."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
+msgid "Columns"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
+msgid "Field Names"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
+msgid "Resolves the actual display value of a dynamic field."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
+msgid ""
+"The columns in the raw data containing the Dynamic Field values to resolve."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
+msgid "The names of the Dynamic Fields corresponding with the column config."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
+msgid "Language"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
+msgid "The columns in the raw data to be translated."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
+msgid ""
+"The identifier of the language, i.e \"de\". If not given, the systems "
+"default language will be used."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
+msgid "Translate a value."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid ""
+"A list (Array) of the columns to be contained in the order in which they "
+"should occur in the output result. If omitted all columns will be used."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "Converts the report data to CSV."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid ""
+"Determine if a header containing the column names should be contained. "
+"Default: 1 (true)."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "Include Column Headers"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "Quote"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "Separator"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "The quote character to be used. Default: \" (Double Quote)."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "The value separator to be used. Default: , (Comma)."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "Translate Column Names"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid ""
+"Translate the column names. Default: 1 (true). If set to a language "
+"identifier, i.e. \"de\", this language will be used."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
+msgid ""
+"If given, this title overrides the one configured in the report definition."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
+msgid "Title"
 msgstr ""
 
 #. Perl Module: Kernel/System/Ticket.pm
@@ -2619,6 +2786,10 @@ msgid "Enable cache statistics."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable client notification debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enable keep-alive connection header for SOAP responses."
 msgstr ""
 
@@ -2713,6 +2884,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Format backend module registration for the import/export module."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Generic SQL"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2935,10 +3110,6 @@ msgid ""
 "Key has to be one of the identifier (see above). Values have to be dynamic "
 "field names in which the external reference numbers will be saved. this "
 "fields will be used for extended follow up."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Language"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3166,7 +3337,23 @@ msgid "Registration of a execution plan type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a function for reporting data source GenericSQL."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a report type for reporting."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a supported permission of type Object."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of an output format for reporting."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of an output handler for reporting data source GenericSQL."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3195,6 +3382,10 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Required for"
 msgstr "Benötigt für"
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "ResolveDynamicFieldValue"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3676,6 +3867,10 @@ msgid "Time Based"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Translate"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Turns off SSL certificate validation, for example if you use a transparent "
 "HTTPS proxy. Use at your own risk!"
@@ -3775,6 +3970,14 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "error"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "if_plugin_available"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "if_plugin_available(:Plugin,:Text)"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
