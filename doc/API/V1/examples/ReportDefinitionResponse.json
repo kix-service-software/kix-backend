@@ -1,0 +1,64 @@
+{
+    "ReportDefinition": {
+        "ChangeBy": 1,
+        "ChangeTime": "2021-03-01 16:16:32",
+        "Comment": "",
+        "Config": {
+            "OutputFormats": {
+                "CSV": {
+                    "Columns": [
+                        "id",
+                        "name",
+                        "CreatedByUser"
+                    ]
+                }
+            },
+            "Parameters": [
+                {
+                    "Name:": "Name_Pattern",
+                    "DataType": "STRING",
+                    "Label": "Name Pattern"
+                }
+            ],
+            "DataSource": {
+                "SQL": {
+                    "any": "SELECT id, name, create_by AS CreatedByUser FROM valid WHERE name LIKE '${Name_Pattern}%'"
+                }
+            }
+        },
+        "CreateBy": 1,
+        "CreateTime": "2021-03-01 16:16:32",
+        "DataSource": "GenericSQL",
+        "ID": 1,
+        "Name": "just a test",
+        "Reports": [
+            {
+                "Config": null,
+                "CreateBy": 1,
+                "CreateTime": "2021-03-01 16:16:37",
+                "DefinitionID": 1,
+                "ID": 1,
+                "Parameters": {
+                    "OutputFormats": [
+                        "CSV"
+                    ],
+                    "Parameters": {
+                        "Name_Pattern": "in"
+                    }
+                },
+                "Results": [
+                    {
+                        "ContentSize": "48",
+                        "ContentType": "text/csv",
+                        "CreateBy": 1,
+                        "CreateTime": "2021-03-01 16:16:37",
+                        "Format": "CSV",
+                        "ID": 1,
+                        "ReportID": 1
+                    }
+                ]
+            }
+        ],
+        "ValidID": 1
+    }
+}

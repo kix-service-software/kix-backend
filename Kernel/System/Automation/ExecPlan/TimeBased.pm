@@ -79,7 +79,7 @@ Example:
 
 =cut
 
-sub Validate {
+sub ValidateConfig {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -92,7 +92,7 @@ sub Validate {
     }
 
     # do some basic checks
-    return if !$Self->SUPER::Validate(%Param);
+    return if !$Self->SUPER::ValidateConfig(%Param);
 
     # check the weekdays
 

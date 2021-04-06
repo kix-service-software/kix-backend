@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "OutputFormatResponse.json",
+  "type": "object",
+  "description": "A response for a output format GET request.",
+  "properties": {
+    "OutputFormat": {
+      "$ref": "OutputFormat.json"
+    }
+  },
+  "required": [
+    "OutputFormat"
+  ]
+}

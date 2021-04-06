@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::DataSourceSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DataSourceSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::DataSourceSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">DataSourceCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::DataSourceGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">DataSourceGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::DataSourceGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">DataSourceResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::OutputFormatSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">OutputFormatSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::OutputFormatSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">OutputFormatCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::OutputFormatGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">OutputFormatGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::OutputFormatGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">OutputFormatResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportDefinitionGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportDefinitionGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportDefinitionGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">ReportDefinitionID</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">ReportDefinitionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportDefinitionSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportDefinitionSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportDefinitionSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">ReportDefinitionCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportDefinitionCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportDefinitionCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportDefinitionCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">ReportDefinitionPostRequest</Item>
+                <Item Key="ResponseSchema">ReportDefinitionPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportDefinitionUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportDefinitionUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportDefinitionUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">ReportDefinitionPatchRequest</Item>
+                <Item Key="ResponseSchema">ReportDefinitionPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportDefinitionDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportDefinitionDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportDefinitionDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">ReportID</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">ReportResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">ReportCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">ReportPostRequest</Item>
+                <Item Key="ResponseSchema">ReportPostPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportResultSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportResultSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportResultSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">ReportResultCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportResultGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportResultGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportResultGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">ResultID</Item>
+                <Item Key="CacheType">API_reporting</Item>
+                <Item Key="CacheTypeDependency">Reporting</Item>
+                <Item Key="ResponseSchema">ReportResultResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Reporting::ReportResultDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ReportResultDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportResultDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+</kix_config>

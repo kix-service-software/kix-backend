@@ -1,0 +1,139 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ReportDefinition.json",
+    "type": "object",
+    "description": "The report definition object.",
+    "properties": {
+        "ChangeBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "ChangeTime": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Comment": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Config": {
+            "type": "object",
+            "readOnly": true,
+            "properties": {
+                "Parameters": {
+                    "type": "array",
+                    "item": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z]+$": {
+                                "type": "object",
+                                "readOnly": true,
+                                "properties": {
+                                    "DataType": {
+                                        "type": "string",
+                                        "readOnly": true
+                                    },
+                                    "Default": {
+                                        "anyOf": [
+                                            {
+                                                "type": "object"
+                                            },
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ],
+                                        "readOnly": true
+                                    },
+                                    "Description": {
+                                        "type": "string",
+                                        "readOnly": true
+                                    },
+                                    "Label": {
+                                        "type": "string",
+                                        "readOnly": true
+                                    },
+                                    "Required": {
+                                        "type": "integer",
+                                        "readOnly": true
+                                    },
+                                    "Type": {
+                                        "type": "string",
+                                        "readOnly": true
+                                    }
+                                },
+                                "required": [
+                                    "Label",
+                                    "DataType"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "DataSource": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "OutputFormats": {
+                    "type": "object",
+                    "readOnly": true
+                },
+                "Title": {
+                    "type": "string",
+                    "readOnly": true
+                }
+            },
+            "required": [
+                "DataSource"
+            ]
+        },
+        "CreateBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "CreateTime": {
+            "type": "string",
+            "readOnly": true
+        },
+        "DataSource": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Name": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Reports": {
+            "type": "array",
+            "description": "added via include \"Reports\"",
+            "readOnly": true,
+            "item": {
+                "$ref": "Report.json"
+            }
+        },
+        "ValidID": {
+            "type": "integer",
+            "readOnly": true
+        }
+    },
+    "required": [
+        "ChangeBy",
+        "ChangeTime",
+        "CreateBy",
+        "CreateTime",
+        "ID",
+        "Name",
+        "DataSource",
+        "Config",
+        "ValidID"
+    ]
+}

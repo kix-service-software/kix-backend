@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ReportPostRequest.json",
+    "type": "object",
+    "description": "The report definition request object for creation.",
+    "properties": {
+        "Report": {
+            "type": "object",
+            "properties": {
+                "DefinitionID": {
+                    "type": "integer"
+                },
+                "Config": {
+                    "type": "object",
+                    "properties": {
+                        "Parameters": {
+                            "type": "object"
+                        },
+                        "OutputFormats": {
+                            "type": "array",
+                            "item": {
+                                "type:": "string"
+                            }
+                        }
+                    },
+                    "required": [
+                        "OutputFormats"
+                    ]
+                }
+            },
+            "required": [
+                "DefinitionID",
+                "Config"
+            ]
+        }
+    },
+    "required": [
+        "Report"
+    ]
+}

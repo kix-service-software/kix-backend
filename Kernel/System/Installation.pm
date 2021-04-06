@@ -208,6 +208,32 @@ sub PluginList {
     return @Plugins;
 }
 
+=item PluginAvailable()
+
+check if the given plugin is available
+
+    my $Result = $InstallationObject->PluginAvailable(
+        Plugin => 'KIXPro',
+    );
+
+=cut
+
+sub PluginAvailable {
+    my ( $Self, %Param ) = @_;
+
+    # check needed parameters
+    if ( !$Param{Plugin} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Plugin!"
+        );
+    }
+
+    my %Plugins = map {$_->{Product} => 1 } $Self->PluginList(Valid => 1);
+    
+    return $Plugins{$Param{Plugin}};
+}
+
 =item GetPluginExports()
 
 get the list of plugin exports (object map) in order of initialization

@@ -88,16 +88,7 @@ These font aliases are available in all methods:
 
 sub DocumentNew {
     my ( $Self, %Param ) = @_;
-
-    # check pdf object
-    if ( $Self->{PDF} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Cannot create new Document!',
-        );
-        return;
-    }
-
+    
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 

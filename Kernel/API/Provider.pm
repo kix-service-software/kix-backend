@@ -282,6 +282,7 @@ sub Run {
         my $Data;
 
         # add information about each available method
+        METHOD:
         foreach my $Method ( sort keys %{$ProcessRequestResult{AvailableMethods}} ) {
 
             # create an operation object for each allowed method and ask it for options
@@ -329,9 +330,13 @@ sub Run {
                         PermissionCheckOnly => 1
                     );
                     if ( !$OperationResult->{Success} ) {
-                        return $Self->_GenerateErrorResponse(
-                            %{$OperationResult},
-                        );
+                        # only bail out if it's not a 403
+                        if ( $OperationResult->{Code} ne 'Forbidden' ) {
+                            return $Self->_GenerateErrorResponse(
+                                %{$OperationResult},
+                            );
+                        }
+                        next METHOD;
                     }
                 }
 

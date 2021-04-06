@@ -206,6 +206,7 @@ PreEventHandler                                                               = 
 Priority                                                                      = Kernel::System::Priority
 Queue                                                                         = Kernel::System::Queue
 ReferenceData                                                                 = Kernel::System::ReferenceData
+Reporting                                                                     = Kernel::System::Reporting
 Role                                                                          = Kernel::System::Role
 Scheduler                                                                     = Kernel::System::Scheduler
 Spelling                                                                      = Kernel::System::Spelling

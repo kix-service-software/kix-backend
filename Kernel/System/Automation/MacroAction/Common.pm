@@ -85,7 +85,7 @@ Example:
 =cut
 
 sub DefinitionGet {
-    my ( $Self, $Description ) = @_;
+    my ( $Self ) = @_;
 
     return %{$Self->{Definition}};
 }

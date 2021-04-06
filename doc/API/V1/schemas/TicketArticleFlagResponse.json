@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "TicketArticleFlagResponse.json",
   "type": "object",
-  "description": "A response for ticket article flag GET request.",
+  "description": "A response for a ticket article flag GET request.",
   "properties": {
     "ArticleFlag": {
       "$ref": "TicketArticleFlag.json"

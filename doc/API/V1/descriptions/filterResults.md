@@ -77,9 +77,9 @@ If both lists are given (AND and OR) they will be combines using a logical AND o
 
 **Example**
 
-Return all users whose UserID isn't 1, 2 oder 3 and whose first name doesn't begin with their last name and whose email address doesn't end with "cape-it.de".
+Return all users whose UserID isn't 1, 2 oder 3 and whose first name doesn't begin with their last name and whose email address ends with "cape-it.de".
 
-``` js
+``` json
 {
     "User": {
         "AND": [
@@ -92,15 +92,16 @@ Return all users whose UserID isn't 1, 2 oder 3 and whose first name doesn't beg
                 "Field": "UserID",
                 "Operator": "IN",
                 "Value": [ 1, 2, 3 ],
-                "Type": "numeric"
+                "Type": "numeric",
+                "Not": true
             },
             {
                 "Field": "UserFirstname",
                 "Operator": "STARTSWITH",
-                "Value": "$UserComment",
+                "Value": "$UserLastname",
                 "Not": true
             }
         ]
-    ]
+    }
 }
 ```

@@ -144,3 +144,17 @@
 "Customer";"Object";"/system/config{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Object";"/system/config/*{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Property";"/tickets/*/articles{Article.[!*,TimeUnit]}";;;;;"x"
+"Report User";"Resource";"/reporting";"x";"x";;;
+"Report User";"Resource";"/reporting/*";;;;;
+"Report User";"Resource";"/reporting/outputformats";;"x";;;
+"Report User";"Resource";"/reporting/reports";"x";"x";;;
+"Report User";"Resource";"/reporting/reportdefinitions";;"x";;;
+"Report User";"Resource";"/reporting/reportdefinitions/*";;;;;
+"Report User";"Resource";"/reporting/reportdefinitions/1";;"x";;;
+"Report User";"Resource";"/reporting/reportdefinitions/2";;"x";;;
+"Report User";"Object";"/reporting/reports{}";;;;;
+"Report User";"Object";"/reporting/reports/*{}";;;;;
+"Report User";"Object";"/reporting/reports{Report.DefinitionID IN [1,2]}";"x";"x";;;
+"Report User";"Object";"/reporting/reports/*{Report.DefinitionID IN [1,2]}";;"x";;;
+"Report Manager";"Resource";"/reporting";"x";"x";"x";"x";
+"Report Manager";"Resource";"/system/roles";"";"x";"x";"";
