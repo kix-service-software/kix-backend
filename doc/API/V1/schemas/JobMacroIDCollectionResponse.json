@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "JobMacroIDCollectionResponse.json",
   "type": "object",
-  "description": "A response for job - macro IDs GET request.",
+  "description": "A response for a job - macro IDs GET request.",
   "properties": {
     "MacroID": {
       "type": "array",

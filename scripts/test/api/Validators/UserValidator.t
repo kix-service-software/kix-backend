@@ -75,7 +75,7 @@ foreach my $Attribute ( qw(Owner Responsible) ) {
     my $Result = $ValidatorObject->Validate(
         Attribute => $Attribute,
         Data      => {
-            $Attribute => 'root@localhost',
+            $Attribute => 'admin',
         }
     );
 

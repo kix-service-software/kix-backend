@@ -1,0 +1,97 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ReportDefinitionPostRequest.json",
+    "type": "object",
+    "description": "The report definition request object for creation.",
+    "properties": {
+        "ReportDefinition": {
+            "type": "object",
+            "properties": {
+                "Comment": {
+                    "type": "string"
+                },
+                "Config": {
+                    "type": "object",
+                    "properties": {
+                        "Parameters": {
+                            "type": "array",
+                            "item": {
+                                "type": "object",
+                                "patternProperties": {
+                                    "^[a-zA-Z]+$": {
+                                        "type": "object",
+                                        "properties": {
+                                            "DataType": {
+                                                "type": "string",
+                                                "readOnly": true
+                                            },
+                                            "Default": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "object"
+                                                    },
+                                                    {
+                                                        "type": "string"
+                                                    },
+                                                    {
+                                                        "type": "number"
+                                                    },
+                                                    {
+                                                        "type": "null"
+                                                    }
+                                                ],
+                                                "readOnly": true
+                                            },
+                                            "Description": {
+                                                "type": "string"
+                                            },
+                                            "Label": {
+                                                "type": "string"
+                                            },
+                                            "Required": {
+                                                "type": "integer"
+                                            },
+                                            "Type": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "Label",
+                                            "DataType"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "DataSource": {
+                            "type": "object"
+                        },
+                        "OutputFormats": {
+                            "type": "object"
+                        },
+                        "Title": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "DataSource"
+                    ]
+                },
+                "Name": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "DataSource": {
+                    "type": "string",
+                    "description": "The data source to use."
+                },
+                "ValidID": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "required": [
+        "ReportDefinition"
+    ]
+}

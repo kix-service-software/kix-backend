@@ -46,7 +46,10 @@ my $NameRandom  = $Helper->GetRandomID();
 # add exec plan
 my $ExecPlanID = $AutomationObject->ExecPlanAdd(
     Name    => 'execplan-'.$NameRandom,
-    Type    => 'TimeBased',
+    Type    => 'EventBased',
+    Parameters => {
+        Event => [ 'TicketCreate' ],
+    },
     ValidID => 1,
     UserID  => 1,
 );

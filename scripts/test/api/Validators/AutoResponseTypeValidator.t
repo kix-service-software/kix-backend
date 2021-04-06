@@ -43,7 +43,7 @@ my $ValidData = {
 };
 
 my $InvalidData = {
-    Channel => 'test'
+    AutoResponseType => 'test'
 };
 
 # validate valid AutoResponseType

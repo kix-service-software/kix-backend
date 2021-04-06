@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ConfigItemImageResponse.json",
   "type": "object",
-  "description": "A response for config item image GET request.",
+  "description": "A response for a config item image GET request.",
   "properties": {
     "Image": {
       "$ref": "ConfigItemImage.json"
