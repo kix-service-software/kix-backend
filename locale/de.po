@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-4-6 07:49+0000\n"
-"PO-Revision-Date: 2021-04-06 11:46+0000\n"
+"PO-Revision-Date: 2021-04-06 15:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1468,6 +1468,8 @@ msgid ""
 "The SQL statement. You can also base64-encode the statement in the form "
 "\"base64(...)\"."
 msgstr ""
+"Fügen Sie ein gültiges SQL-Statement ein. base64-Codierung in der Form "
+"\"base64(...)\" ist ebenfalls möglich."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "Plugin"
@@ -1534,6 +1536,9 @@ msgid ""
 "A list (Array) of the columns to be contained in the order in which they "
 "should occur in the output result. If omitted all columns will be used."
 msgstr ""
+"Eine Liste (Array) der Spalten, die im Bericht enthalten sind, Reihenfolge "
+"wie hier angegeben. Wird hier nichts eingetragen, werden alle Spalten "
+"angezeigt."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Converts the report data to CSV."
@@ -1544,6 +1549,10 @@ msgid ""
 "Determine if a header containing the column names should be contained. "
 "Default: 1 (true)."
 msgstr ""
+"Wenn ausgewählt, werden die Spaltentitel im Bericht mit ausgegeben, sofern "
+"dies das Ausgabeformat unterstützt und die Aliase der Spalten unter \"Spalten"
+"\" angegeben wurden. Ist dies nicht der Fall, werden keine Spaltentitel "
+"angezeigt, auch wenn diese Option aktiviert ist."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Include Column Headers"
@@ -1560,10 +1569,14 @@ msgstr "Trenner"
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "The quote character to be used. Default: \" (Double Quote)."
 msgstr ""
+"Zeichen, in welches die einzelnen Werte eingefasst werden (insbesondere für "
+"CSV). Standard: Hochkommas (\")."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "The value separator to be used. Default: , (Comma)."
 msgstr ""
+"Trennzeichen zwischen den einzelnen Werten (insbesondere für CSV). Standard: "
+"Komma (,)."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Translate Column Names"
@@ -1574,11 +1587,18 @@ msgid ""
 "Translate the column names. Default: 1 (true). If set to a language "
 "identifier, i.e. \"de\", this language will be used."
 msgstr ""
+"Für nicht-technische Ausgabeformate können Sie festlegen, in welcher Sprache "
+"die Spaltentitel angezeigt werden. Mögliche Werte sind Sprachkürzel der im "
+"System hinterlegten Sprachen (z.B. de, en) oder 0 (keine Übersetzung der "
+"Spaltentitel), 1 (Übersetzung der Spaltentitel in die Standardsprache des "
+"Systems)."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
 msgid ""
 "If given, this title overrides the one configured in the report definition."
 msgstr ""
+"Sie können für jedes Ausgabeformat einen anderen Titel angeben. Der hier "
+"hinterlegte Titel überschreibt den oben eingegebenen Titel."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
 msgid "Title"
