@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-4-6 07:49+0000\n"
-"PO-Revision-Date: 2021-03-24 10:46+0000\n"
+"PO-Revision-Date: 2021-04-06 11:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1492,7 +1492,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
 msgid "Columns"
-msgstr ""
+msgstr "Spalten"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
 msgid "Field Names"
@@ -1547,7 +1547,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Include Column Headers"
-msgstr ""
+msgstr "Spalten-Header beachten"
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Quote"
@@ -1555,7 +1555,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Separator"
-msgstr ""
+msgstr "Trenner"
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "The quote character to be used. Default: \" (Double Quote)."
@@ -1567,7 +1567,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Translate Column Names"
-msgstr ""
+msgstr "Spaltentitel übersetzen"
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid ""
