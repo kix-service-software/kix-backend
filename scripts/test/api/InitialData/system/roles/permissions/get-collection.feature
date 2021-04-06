@@ -203,8 +203,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer
     When I query the collection of permissions with roleid 13
     Then the response code is 200
-#    And the response object is PermissionCollectionResponse
-    And the response contains 44 items of type "Permission"
+    And the response contains 45 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                    | Value | TypeID |
       | /auth                                                                                                                                     | 1     | 1      |
@@ -245,41 +244,41 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /tickets/*/articles                                                                                                                       | 3     | 1      |
       | /tickets/*/articles/*                                                                                                                     | 2     | 1      |
       | /tickets/*/articles/*{Article.CustomerVisible NE 1}                                                                                       | 0     | 2      |
-      | /tickets/*/articles/*{Article.[*,!Bcc,!BccRealname]}                                                                                      | 2     | 3      |
+      | /tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit]}                                                                            | 2     | 3      |
       | /tickets/*/articles/*/flags                                                                                                               | 3     | 1      |
       | /system/config                                                                                                                            | 2     | 1      |
       | /system/config/*                                                                                                                          | 2     | 1      |
       | /system/config{SysConfigOption.AccessLevel NE external}                                                                                   | 0     | 2      |
       | /system/config/*{SysConfigOption.AccessLevel NE external}                                                                                 | 0     | 2      |
+      | /tickets/*/articles{Article.[!*,TimeUnit]}                                                                                                | 61440 | 3      |
 
   Scenario: get the list of existing permissions of Report User
     When I query the collection of permissions with roleid 14
     Then the response code is 200
-#    And the response object is PermissionCollectionResponse
-    And the response contains 11 items of type "Permission"
+    And the response contains 12 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target                                                                                                                                    | Value | TypeID |
-      | /reporting                                                                                                                                | 3     | 1      |
-      | /reporting/*                                                                                                                              | 0     | 1      |
-      | /reporting/outputformats                                                                                                                  | 2     | 1      |
-      | /faq                                                                                                                                      | 2     | 1      |
-      | /reporting/reports                                                                                                                        | 3     | 1      |
-      | /reporting/reportdefinitions                                                                                                              | 2     | 1      |
-      | /reporting/reportdefinitions/*                                                                                                            | 0     | 1      |
-      | /reporting/reportdefinitions/1                                                                                                            | 2     | 1      |
-      | /reporting/reports{}                                                                                                                      | 0     | 2      |
-      | /reporting/reports/*{}                                                                                                                    | 0     | 2      |
-      | /reporting/reports{Report.DefinitionID EQ 1}                                                                                              | 3     | 2      |
-      | /reporting/reports/*{Report.DefinitionID EQ 1}                                                                                            | 2     | 2      |
+      | Target                                             | Value | TypeID |
+      | /reporting                                         | 3     | 1      |
+      | /reporting/*                                       | 0     | 1      |
+      | /reporting/outputformats                           | 2     | 1      |
+      | /reporting/reports                                 | 3     | 1      |
+      | /reporting/reportdefinitions                       | 2     | 1      |
+      | /reporting/reportdefinitions/*                     | 0     | 1      |
+      | /reporting/reportdefinitions/1                     | 2     | 1      |
+      | /reporting/reportdefinitions/2                     | 2     | 1      |
+      | /reporting/reports{}                               | 0     | 2      |
+      | /reporting/reports/*{}                             | 0     | 2      |
+      | /reporting/reports{Report.DefinitionID IN [1,2]}   | 3     | 2      |
+      | /reporting/reports/*{Report.DefinitionID IN [1,2]} | 2     | 2      |
 
   Scenario: get the list of existing permissions of Report Manager
     When I query the collection of permissions with roleid 15
     Then the response code is 200
-#    And the response object is PermissionCollectionResponse
-    And the response contains 1 items of type "Permission"
+    And the response contains 2 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target                                                                                                                                    | Value | TypeID |
-      | /reporting                                                                                                                                | 15    | 1      |
+      | Target        | Value | TypeID |
+      | /reporting    | 15    | 1      |
+      | /system/roles | 6     | 1      |
 
 
 

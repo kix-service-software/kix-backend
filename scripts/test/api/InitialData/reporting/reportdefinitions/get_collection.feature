@@ -8,7 +8,8 @@ Feature: GET request to the /reporting/reportdefinitions resource
   Scenario: get the list of existing reportdefinitions
     When I query the reportdefinitions collection
     Then the response code is 200
-    And the response contains 1 items of type "ReportDefinition"
+    And the response contains 2 items of type "ReportDefinition"
     And the response contains the following items of type ReportDefinition
-      | Name                                                | Comment                                                                                 |
-      | Number Of Tickets Created Per Type and Organization | Provides overview of number of tickets created in given month by type and organization. |
+      | Name                                                | Comment                                                                        |
+      | Tickets Created In Date Range | Lists tickets created in a specific date range. Organization may be selected before report creation. |
+      | Tickets Closed In Date Range  | Lists tickets closed in a specific date range. Organization may be selected before report creation.  |
