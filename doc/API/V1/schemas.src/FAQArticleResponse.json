@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "FAQArticleResponse.json",
   "type": "object",
-  "description": "A response for execution FAQ article GET request.",
+  "description": "A response for a execution FAQ article GET request.",
   "properties": {
     "FAQArticle": {
       "$ref": "FAQArticle.json"

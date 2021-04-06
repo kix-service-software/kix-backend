@@ -87,12 +87,16 @@ sub Array2CSV {
     }
 
     my @Head;
+    my @Rows;
     my @Data = ( ['##No Data##'] );
+
     if ( $Param{Head} ) {
         @Head = @{ $Param{Head} };
+        push @Rows, \@Head;
     }
     if ( $Param{Data} ) {
         @Data = @{ $Param{Data} };
+        push @Rows, @Data;
     }
     my @WithHeader;
     if ( $Param{WithHeader} ) {
@@ -124,8 +128,6 @@ sub Array2CSV {
         # We will try to determine the appropriate length for each column.
         my @ColumnLengths;
         my $Row = 0;
-
-        my @Rows = ( \@Head, @Data );
 
         if ( scalar @WithHeader ) {
 

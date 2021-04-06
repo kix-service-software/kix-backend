@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "ImportExportTemplateResponse.json",
   "type": "object",
-  "description": "A response for import export template GET request.",
+  "description": "A response for a import export template GET request.",
   "properties": {
     "ImportExportTemplate": {
       "$ref": "ImportExportTemplate.json"

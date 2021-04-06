@@ -84,20 +84,20 @@ sub ParameterDefinition {
 
     return {        
         'RoleID' => {
-            Datatype => 'NUMERIC',
+            DataType => 'NUMERIC',
             Required => 1
         },
         'Permission' => {
-            Datatype => 'HASH',
+            DataType => 'HASH',
             Required => 1
         },        
         'Permission::TypeID' => {
-            Datatype => 'NUMERIC',
+            DataType => 'NUMERIC',
             Required => 1,
             OneOf    => \(keys %PermissionTypes),
         },
         'Permission::Target' => {
-            Datatype => 'STRING',
+            DataType => 'STRING',
             Required => 1
         },
     }

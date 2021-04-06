@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ReportCollectionResponse.json",
+  "type": "object",
+  "description": "A list of reports.",
+  "properties": {
+    "Report": {
+      "type": "array",
+      "items": {
+        "$ref": "Report.json"
+      }
+    }
+  },
+  "required": [
+    "Report"
+  ]
+}

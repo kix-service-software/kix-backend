@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "Report.json",
+  "type": "object",
+  "description": "The report object.",
+  "properties": {
+    "Config": {
+        "type": "object",
+        "properties": {
+            "Parameters": {
+                "type": "object",
+                "readOnly": true
+            },
+            "OutputFormats": {
+                "type": "array",
+                "readOnly": true,
+                "item": {
+                    "type:": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "required": [
+            "OutputFormats"
+        ]
+    },
+    "CreateBy": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "CreateTime": {
+      "type": "string",
+      "readOnly": true
+    },
+    "DefinitionID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "ID": {
+      "type": "integer",
+      "readOnly": true
+    },
+    "Results": {
+      "type": "array",
+      "description": "added via include \"Results\"",
+      "readOnly": true,
+      "item": {
+          "$ref": "ReportResult.json"
+      }
+    }
+  },
+  "required": [
+    "CreateBy",
+    "CreateTime",
+    "DefinitionID",
+    "ID",
+    "Config"
+  ]
+}

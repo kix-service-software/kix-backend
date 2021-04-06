@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "MigrationResponse.json",
   "type": "object",
-  "description": "A response for migration GET request.",
+  "description": "A response for a migration GET request.",
   "properties": {
     "Migration": {
       "$ref": "Migration.json"

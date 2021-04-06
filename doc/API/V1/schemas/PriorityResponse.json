@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "PriorityResponse.json",
   "type": "object",
-  "description": "A response for priority GET request.",
+  "description": "A response for a priority GET request.",
   "properties": {
     "Priority": {
       "$ref": "Priority.json"
