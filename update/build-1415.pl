@@ -27,6 +27,9 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 use vars qw(%INC);
 
+# delete whole cache to get the new roles
+$Kernel::OM->Get('Cache')->CleanUp();
+
 _AddReportingPermissions();
 _CreateReports();
 
@@ -147,9 +150,6 @@ sub _AddReportingPermissions {
             );
         }
     }
-
-    # delete whole cache
-    $Kernel::OM->Get('Cache')->CleanUp();
 
     return 1;
 }
