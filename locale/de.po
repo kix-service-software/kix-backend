@@ -5677,6 +5677,14 @@ msgid "downloaded"
 msgstr "Herungergeladen"
 
 #. manual entry from templates.pot.manual
+msgid "External Supplier"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Internal Supplier"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "no"
 msgstr "nein"
 
