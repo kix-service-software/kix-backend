@@ -239,7 +239,7 @@ sub _CreateReports {
                         {
                             'Name' => 'ResolveDynamicFieldValue',
                             'Columns' => ['Close Code'],
-                            'FieldNames' => ['Close Code']
+                            'FieldNames' => ['CloseCode']
                         },
                         {
                             'Name' => 'Translate',
@@ -284,7 +284,7 @@ sub _CreateReports {
                         {
                             'Name' => 'ResolveDynamicFieldValue',
                             'Columns' => ['Close Code'],
-                            'FieldNames' => ['Close Code']
+                            'FieldNames' => ['CloseCode']
                         },
                         {
                             'Name' => 'Translate',
