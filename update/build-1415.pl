@@ -27,55 +27,18 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 use vars qw(%INC);
 
-_AddReportingRoles();
+_AddReportingPermissions();
 _CreateReports();
 
 exit 0;
 
-sub _AddReportingRoles {
+sub _AddReportingPermissions {
     my ( $Self, %Param ) = @_;
 
     my $RoleObject = $Kernel::OM->Get('Role');
 
     my %RoleList = reverse $RoleObject->RoleList();
     my %PermissionTypeList = reverse $RoleObject->PermissionTypeList();
-
-    my @NewRoles = (
-        {
-            Name => 'Report User',
-            Comment => Kernel::Language::Translatable('allows to view report definitions and reports'),
-            UsageContext => 1
-        },
-        {
-            Name => 'Report Manager',
-            Comment => Kernel::Language::Translatable('allows to create and edit report definitions'),
-            UsageContext => 1
-        },
-    );
-
-    foreach my $Role ( @NewRoles ) {
-        my $RoleID = $RoleObject->RoleAdd(
-            %{$Role},
-            ValidID => 1,
-            UserID  => 1,
-        );
-        if ( !$RoleID ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create role \"$Role->{Name}\"!",
-            );
-            next;
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'info',
-                Message  => "Created role \"$Role->{Name}\"",
-            );
-        }
-    }
-
-    # reload role list
-    %RoleList = reverse $RoleObject->RoleList();
 
     my @NewPermissions = (
         {
