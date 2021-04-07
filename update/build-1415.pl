@@ -238,12 +238,12 @@ sub _CreateReports {
                     'OutputHandler' => [
                         {
                             'Name' => 'ResolveDynamicFieldValue',
-                            'Columns' => ['CloseCode'],
-                            'FieldNames' => ['CloseCode']
+                            'Columns' => ['Close Code'],
+                            'FieldNames' => ['Close Code']
                         },
                         {
                             'Name' => 'Translate',
-                            'Columns' => ['CloseCode','State','Type']
+                            'Columns' => ['Close Code','State','Type']
                         }
                     ]
                 },
@@ -283,12 +283,12 @@ sub _CreateReports {
                     'OutputHandler' => [
                         {
                             'Name' => 'ResolveDynamicFieldValue',
-                            'Columns' => ['CloseCode'],
-                            'FieldNames' => ['CloseCode']
+                            'Columns' => ['Close Code'],
+                            'FieldNames' => ['Close Code']
                         },
                         {
                             'Name' => 'Translate',
-                            'Columns' => ['CloseCode','State','Type']
+                            'Columns' => ['Close Code','State','Type']
                         }
                     ]
                 },
