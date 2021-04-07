@@ -2599,6 +2599,14 @@ sub _CheckPropertyPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
+
+        #on POST/PATCH and if DENY and has '!*', remove '!*' from target (only deny specified attributes)
+        if ($Self->{RequestMethod} =~ /^POST|PATCH$/ && $Target =~ /\!\*,?/g &&
+            ($Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY})
+                == Kernel::System::Role::Permission::PERMISSION->{DENY}) {
+            $Target =~ s/\!\*,?//g;
+            $Permission->{Target} = $Target;
+        }
         if ( !$Permission->{IsWildcard} ) {
             $Target =~ s/\*/[^\/]+/g;
         }
@@ -2612,6 +2620,10 @@ sub _CheckPropertyPermission {
         next if $Self->{RequestURI} !~ /^$Target$/;
 
         push @RelevantPermissions, $Permission;
+
+        # immediately break loop on DENY
+        last if (($Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY})
+            == Kernel::System::Role::Permission::PERMISSION->{DENY});
     }
 
     # do something if we have at least one permission
