@@ -166,14 +166,14 @@ sub _AddReportingRoles {
         # nothing to do if this permission already exists
         next if $PermissionID;
 
-        my $Success = $RoleObject->PermissionAdd(
+        $PermissionID = $RoleObject->PermissionAdd(
             UserID => 1,
             RoleID => $RoleID,
             TypeID => $PermissionTypeID,
             %{$Permission},
         );
 
-        if (!$Success) {
+        if (!$PermissionID) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target})!"
