@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-4-6 07:49+0000\n"
-"PO-Revision-Date: 2021-04-07 10:35+0000\n"
+"PO-Revision-Date: 2021-04-07 13:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -5678,11 +5678,11 @@ msgstr "Herungergeladen"
 
 #. manual entry from templates.pot.manual
 msgid "External Supplier"
-msgstr ""
+msgstr "Externer Lieferant"
 
 #. manual entry from templates.pot.manual
 msgid "Internal Supplier"
-msgstr ""
+msgstr "Interner Lieferant"
 
 #. manual entry from templates.pot.manual
 msgid "no"
