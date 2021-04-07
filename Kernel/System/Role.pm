@@ -233,7 +233,7 @@ sub RoleAdd {
     if ( defined $ExistingRoles{ $Param{Name} } ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "A Role with the name $Param{Name} already exists.",
+            Message  => "A Role with the name \"$Param{Name}\" already exists.",
         );
         return;
     }
@@ -312,7 +312,7 @@ sub RoleUpdate {
     if ( defined $ExistingRoles{ $Param{Name} } && $ExistingRoles{ $Param{Name} } != $Param{ID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "A Role with the name $Param{Name} already exists.",
+            Message  => "A Role with the name \"$Param{Name}\" already exists.",
         );
         return;
     }
