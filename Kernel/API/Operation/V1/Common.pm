@@ -263,41 +263,7 @@ sub Options {
         }
     }
 
-    # add the schema if available
-    my $SchemaLocation = $Kernel::OM->Get('Config')->Get('API::JSONSchema::Location');
-    if ( $SchemaLocation && -d $SchemaLocation ) {
-        foreach my $Type (qw(Request Response)) {
-            my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
-            if ($Object) {
-                my $Content = $Kernel::OM->Get('Main')->FileRead(
-                    Location => "$SchemaLocation/$Object.json",
-                );
-                if ($Content) {
-                    $Data{$Type}->{JSONSchema} = $Kernel::OM->Get('JSON')->Decode(
-                        Data => $$Content
-                    );
-                }
-            }
-        }
-    }
-
-    # add the example if available
-    my $ExampleLocation = $Kernel::OM->Get('Config')->Get('API::Example::Location');
-    if ( $ExampleLocation && -d $ExampleLocation ) {
-        foreach my $Type (qw(Request Response)) {
-            my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
-            if ($Object) {
-                my $Content = $Kernel::OM->Get('Main')->FileRead(
-                    Location => "$ExampleLocation/$Object.json",
-                );
-                if ($Content) {
-                    $Data{$Type}->{Example} = $Kernel::OM->Get('JSON')->Decode(
-                        Data => $$Content
-                    );
-                }
-            }
-        }
-    }
+    $Self->_AddSchemaAndExamples(Data => \%Data);
 
     return $Self->_Success(
         IsOptionsResponse => 1,
@@ -875,18 +841,12 @@ sub _Success {
         }
 
         # honor a field selector, if we have one
-        if ( !$Self->{'_CachedResponse'} && (IsHashRefWithData( $Self->{Fields} ) || IsHashRefWithData( $Self->{PermissionFieldSelector} )) ) {
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Fields} ) ) {
             my $StartTime = Time::HiRes::time();
-
-            my $FieldSelector = $Self->{Fields};
-            if ( IsHashRefWithData( $Self->{PermissionFieldSelector} ) ) {
-                $Self->_Debug($Self->{LevelIndent}, "using permission field selector");
-                $FieldSelector = $Self->{PermissionFieldSelector};
-            }
 
             $Self->_ApplyFieldSelector(
                 Data   => \%Param,
-                Fields => $FieldSelector,
+                Fields => $Self->{Fields},
             );
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -917,6 +877,23 @@ sub _Success {
                 my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
                 $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
             }
+
+        }
+
+        # honor a permission field selector, if we have one - make sure nothing gets out what should not get out
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
+
+            $Self->_ApplyFieldSelector(
+                Data                       => \%Param,
+                Fields                     => $Self->{PermissionFieldSelector},
+                IsPermissionFieldSelection => 1
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", $TimeDiff));
         }
 
         # cache request without offset and limit if CacheType is set for this operation
@@ -1665,7 +1642,7 @@ sub _ApplyFieldSelector {
         my %Tmp = map { $_ => 1 } (
             @{ $Param{Fields}->{'*'} || [] },
             @{ $Param{Fields}->{$Object} || [] },
-            keys %{ $Self->{Include} } ,
+            $Param{IsPermissionFieldSelection} ? () : keys %{ $Self->{Include} },
         );
         my @Fields = sort keys %Tmp;
 
@@ -1692,7 +1669,7 @@ sub _ApplyFieldSelector {
                 else {
                     if ( !$Not ) {
                         # "select field"
-                        $NewObject{$Field} = $Param{Data}->{$Object}->{$Field};
+                        $NewObject{$Field} = $Param{Data}->{$Object}->{$Field} if exists $Param{Data}->{$Object}->{$Field};
                     }
                     else {
                         # remember field to be removed later
@@ -1735,7 +1712,7 @@ sub _ApplyFieldSelector {
                         else {
                             if ( !$Not ) {
                                 # "select field"
-                                $NewObjectItem{$Field} = $ObjectItem->{$Field};
+                                $NewObjectItem{$Field} = $ObjectItem->{$Field} if exists $ObjectItem->{$Field};
                             }
                             else {
                                 # remember field to be removed later
@@ -2622,6 +2599,14 @@ sub _CheckPropertyPermission {
 
         # prepare target
         my $Target = $Permission->{Target};
+
+        #on POST/PATCH and if DENY and has '!*', remove '!*' from target (only deny specified attributes)
+        if ($Self->{RequestMethod} =~ /^POST|PATCH$/ && $Target =~ /\!\*,?/g &&
+            ($Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY})
+                == Kernel::System::Role::Permission::PERMISSION->{DENY}) {
+            $Target =~ s/\!\*,?//g;
+            $Permission->{Target} = $Target;
+        }
         if ( !$Permission->{IsWildcard} ) {
             $Target =~ s/\*/[^\/]+/g;
         }
@@ -2635,6 +2620,10 @@ sub _CheckPropertyPermission {
         next if $Self->{RequestURI} !~ /^$Target$/;
 
         push @RelevantPermissions, $Permission;
+
+        # immediately break loop on DENY
+        last if (($Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY})
+            == Kernel::System::Role::Permission::PERMISSION->{DENY});
     }
 
     # do something if we have at least one permission
@@ -3525,6 +3514,89 @@ sub _GetPrepareDynamicFieldValue {
         DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
         PreparedValue     => $DFPreparedValue
     };
+}
+
+sub _AddSchemaAndExamples {
+    my ( $Self, %Param ) = @_;
+
+    return if (!IsHashRefWithData($Param{Data}));
+
+    my @Directories;
+
+    # get plugin folders
+    my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
+        Valid     => 1,
+        InitOrder => 1
+    );
+    foreach my $Plugin ( @Plugins ) {
+        my $Directory = $Plugin->{Directory} . '/doc/API/V1';
+        next if ! -e $Directory;
+        push (@Directories, $Directory);
+    }
+
+    # get framework folder
+    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
+    if ( !$Home ) {
+        use FindBin qw($Bin);
+        $Home = $Bin.'/..';
+    }
+    push (@Directories, $Home . '/doc/API/V1');
+
+    foreach my $Type (qw(Request Response)) {
+        my $Object = $Self->{OperationConfig}->{ $Type . 'Schema' };
+        if ($Object) {
+
+            # add the example if available
+            my $Example;
+            EXAMPLES:
+            for my $Location ( @Directories ) {
+                $Example = $Kernel::OM->Get('Main')->FileRead(
+                    Location        => "$Location/examples/$Object.json",
+                    DisableWarnings => 1
+                );
+                if ($Example) {
+                    last EXAMPLES;
+                }
+            }
+
+            if ($Example) {
+                $Param{Data}->{$Type}->{Example} = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $$Example
+                );
+            } else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "$Type Example for '$Object' not found!"
+                );
+            }
+
+            # add the schema if available
+            my $Schema;
+            SCHEMAS:
+            for my $Location ( @Directories ) {
+                $Schema = $Kernel::OM->Get('Main')->FileRead(
+                    Location        => "$Location/schemas/$Object.json",
+                    DisableWarnings => 1
+                );
+                if ($Schema) {
+                    last SCHEMAS;
+                }
+            }
+
+            if ($Schema) {
+                $Param{Data}->{$Type}->{JSONSchema} = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $$Schema
+                );
+            } else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "$Type Schema for '$Object' not found!"
+                );
+            }
+        }
+    }
+
+    return 1;
 }
 
 1;

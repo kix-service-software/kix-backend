@@ -971,7 +971,7 @@ msgid "The name of the dynamic field."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
-msgid "The value for the dynamic field to be set."
+msgid "The value for the dynamic field to be set. Leave empty and uncheck \"Append\" to clear relevant dynamic field value of ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
@@ -4668,6 +4668,14 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "downloaded"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "External Supplier"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Internal Supplier"
 msgstr ""
 
 #. manual entry from templates.pot.manual

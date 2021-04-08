@@ -111,17 +111,17 @@ perform PermissionUpdate Operation. This will return the updated PermissionID.
             }
 	    },
 	);
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            PermissionID  => 123,               # ID of the updated permission 
+            PermissionID  => 123,               # ID of the updated permission
         },
     };
-   
+
 =cut
 
 
@@ -132,19 +132,19 @@ sub Run {
     my $Permission = $Self->_Trim(
         Data => $Param{Data}->{Permission}
     );
- 
-    # check if role exists 
+
+    # check if role exists
     my $Rolename = $Kernel::OM->Get('Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
     );
-  
+
     if ( !$Rolename ) {
         return $Self->_Error(
             Code => 'Object.ParentNotFound',
         );
     }
 
-    # check if permission exists and belongs to this role    
+    # check if permission exists and belongs to this role
     my %PermissionData = $Kernel::OM->Get('Role')->PermissionGet(
         ID => $Param{Data}->{PermissionID},
     );
@@ -162,9 +162,12 @@ sub Run {
         Value  => defined $Permission->{Value} ? $Permission->{Value} : $PermissionData{Value},
     );
     if ( !$ValidationResult ) {
+        my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList( Valid => 1 );
+        my $Type = $PermissionTypeList{$Permission->{TypeID}} || 'unknown';
+
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "Cannot create permission. The permission target doesn't match the possible ones for type Object.",
+            Message => "Cannot create permission. The permission target doesn't match the possible ones for type $Type.",
         );
     }
 
@@ -185,10 +188,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         PermissionID => $Param{Data}->{PermissionID},
-    );    
+    );
 }
 
 1;
