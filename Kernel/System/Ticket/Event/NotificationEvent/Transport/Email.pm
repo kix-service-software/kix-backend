@@ -383,6 +383,7 @@ sub SendNotification {
 
                 # KIX4OTRS-capeIT
                 # out of office-substitute notification
+                RecipientID   => $Recipient{UserID},
                 RecipientMail => $Recipient{Email},
                 Notification  => \%Notification,
                 Attachment    => $Param{Attachments},

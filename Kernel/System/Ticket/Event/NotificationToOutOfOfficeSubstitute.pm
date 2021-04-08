@@ -42,6 +42,7 @@ sub new {
     $Self->{SendmailObject}  = $Kernel::OM->Get('Email');
     $Self->{TimeObject}      = $Kernel::OM->Get('Time');
     $Self->{UserObject}      = $Kernel::OM->Get('User');
+    $Self->{ContactObject}   = $Kernel::OM->Get('Contact');
 
     return $Self;
 }
@@ -70,24 +71,28 @@ sub Run {
         );
         return;
     }
+
     my %User;
     if ( $Param{Data}->{RecipientID} ) {
         %User = $Self->{UserObject}->GetUserData(
             UserID => $Param{Data}->{RecipientID},
             Valid  => 1,
         );
-    }
-    else {
-        my %UserList = $Self->{UserObject}->UserSearch(
-            PostMasterSearch => $Param{Data}->{RecipientMail},
-            Valid            => 1,
+    } else {
+        my $ContactID = $Self->{ContactObject}->ContactLookup(
+            Email  => $Param{Data}->{RecipientMail},
+            Silent => 1
         );
-        for my $Agent ( keys %UserList ) {
-            %User = $Self->{UserObject}->GetUserData(
-                UserID => $Agent,
-                Valid  => 1,
+        if ($ContactID) {
+            my %Contact = $Self->{ContactObject}->ContactGet(
+                ID => $ContactID
             );
-            last;
+            if (IsHashRefWithData(\%Contact) && $Contact{AssignedUserID}) {
+                %User = $Self->{UserObject}->GetUserData(
+                    UserID => $Contact{AssignedUserID},
+                    Valid  => 1,
+                );
+            }
         }
     }
 
@@ -104,12 +109,11 @@ sub Run {
     $EndTime = $Self->{TimeObject}->TimeStamp2SystemTime( String => $EndTime );
     return if ( $StartTime > $CurrTime || $EndTime < $CurrTime );
 
-    # get substitute data
-    my %SubstituteUser = $Self->{UserObject}->GetUserData(
+    # get substitute contact data
+    my %SubstituteUserContact = $Self->{ContactObject}->ContactGet(
         UserID => $User{Preferences}->{OutOfOfficeSubstitute},
-        Valid  => 1,
     );
-    return if !%SubstituteUser || !$SubstituteUser{UserEmail};
+    return if !%SubstituteUserContact || !$SubstituteUserContact{Email};
 
     # prepare notification body
     if ( $User{Preferences}->{OutOfOfficeSubstituteNote} ) {
@@ -135,14 +139,14 @@ sub Run {
     $Self->{LogObject}->Log(
         Priority => 'notice',
         Message =>
-            "Sent substitute email to '$SubstituteUser{UserEmail}' for agent '$User{UserLogin}'",
+            "Sent substitute email to '$SubstituteUserContact{Email}' for agent '$User{UserLogin}'",
     );
 
     # send notification to substitute
     $Self->{SendmailObject}->Send(
         From => $Self->{ConfigObject}->Get('NotificationSenderName') . ' <'
             . $Self->{ConfigObject}->Get('NotificationSenderEmail') . '>',
-        To         => $SubstituteUser{UserEmail},
+        To         => $SubstituteUserContact{Email},
         Subject    => $Notification{Subject},
         MimeType   => $Notification{ContentType} || 'text/plain',
         Charset    => 'utf-8',

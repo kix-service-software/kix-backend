@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "JobResponse.json",
   "type": "object",
-  "description": "A response for job GET request.",
+  "description": "A response for a job GET request.",
   "properties": {
     "Job": {
       "$ref": "Job.json"

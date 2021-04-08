@@ -89,12 +89,9 @@ sub Run {
         return;
     }
 
-    my $Owner = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{OwnerLoginOrID},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    my $Owner = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{OwnerLoginOrID}
     );
 
     my $UserID = $Kernel::OM->Get('User')->UserLookup(

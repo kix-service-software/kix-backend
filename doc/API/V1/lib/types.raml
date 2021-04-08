@@ -62,6 +62,10 @@
   ContactPatchRequest: !include ../types/Contact/ContactPatchRequest.raml
   ContactPostPatchResponse: !include ../types/Contact/ContactPostPatchResponse.raml
 
+# DataSource
+  DataSourceResponse: !include ../types/DataSource/DataSourceResponse.raml
+  DataSourceCollectionResponse: !include ../types/DataSource/DataSourceCollectionResponse.raml
+
 # Error
   Error: !include ../types/Error/Error.raml
 
@@ -97,8 +101,8 @@
   FAQCategoryPostPatchResponse: !include ../types/FAQCategory/FAQCategoryPostPatchResponse.raml
 
 # FAQHistory
-  ConfigItemHistoryResponse: !include ../types/ConfigItemHistory/ConfigItemHistoryResponse.raml
-  ConfigItemHistoryCollectionResponse: !include ../types/ConfigItemHistory/ConfigItemHistoryCollectionResponse.raml
+  FAQHistoryResponse: !include ../types/FAQHistory/FAQHistoryResponse.raml
+  FAQHistoryCollectionResponse: !include ../types/FAQHistory/FAQHistoryCollectionResponse.raml
 
 # FAQVote
   FAQVoteResponse: !include ../types/FAQVote/FAQVoteResponse.raml
@@ -234,6 +238,10 @@
   OrganisationPatchRequest: !include ../types/Organisation/OrganisationPatchRequest.raml
   OrganisationPostPatchResponse: !include ../types/Organisation/OrganisationPostPatchResponse.raml
 
+# OutputFormat
+  OutputFormatResponse: !include ../types/OutputFormat/OutputFormatResponse.raml
+  OutputFormatCollectionResponse: !include ../types/OutputFormat/OutputFormatCollectionResponse.raml
+
 # Permission
   PermissionResponse: !include ../types/Permission/PermissionResponse.raml
   PermissionCollectionResponse: !include ../types/Permission/PermissionCollectionResponse.raml
@@ -257,6 +265,23 @@
   QueuePostRequest: !include ../types/Queue/QueuePostRequest.raml
   QueuePatchRequest: !include ../types/Queue/QueuePatchRequest.raml
   QueuePostPatchResponse: !include ../types/Queue/QueuePostPatchResponse.raml
+
+# Report
+  ReportResponse: !include ../types/Report/ReportResponse.raml
+  ReportCollectionResponse: !include ../types/Report/ReportCollectionResponse.raml
+  ReportPostRequest: !include ../types/Report/ReportPostRequest.raml
+  ReportPostResponse: !include ../types/Report/ReportPostResponse.raml
+
+# ReportDefinition
+  ReportDefinitionResponse: !include ../types/ReportDefinition/ReportDefinitionResponse.raml
+  ReportDefinitionCollectionResponse: !include ../types/ReportDefinition/ReportDefinitionCollectionResponse.raml
+  ReportDefinitionPostRequest: !include ../types/ReportDefinition/ReportDefinitionPostRequest.raml
+  ReportDefinitionPatchRequest: !include ../types/ReportDefinition/ReportDefinitionPatchRequest.raml
+  ReportDefinitionPostPatchResponse: !include ../types/ReportDefinition/ReportDefinitionPostPatchResponse.raml
+
+# ReportResult
+  ReportResultResponse: !include ../types/ReportResult/ReportResultResponse.raml
+  ReportResultCollectionResponse: !include ../types/ReportResult/ReportResultCollectionResponse.raml
 
 # Role
   RoleResponse: !include ../types/Role/RoleResponse.raml

@@ -39,11 +39,11 @@ $Kernel::OM->ObjectParamAdd(
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ValidData = {
-    Queue => 'Postmaster'
+    Queue => 'Junk'
 };
 
 my $InvalidData = {
-    Queue => 'Postmaster-test'
+    Queue => 'Junk-test'
 };
 
 my $ValidData_ID = {

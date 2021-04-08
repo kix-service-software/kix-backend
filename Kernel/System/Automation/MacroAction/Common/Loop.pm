@@ -85,11 +85,14 @@ sub Run {
     return if !$Self->_CheckParams(%Param);
 
     my $Values = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Values},
-        TicketID => $Param{ObjectID},
-        Data     => {},
-        UserID   => $Param{UserID},
+        RichText  => 0,
+        Text      => $Param{Config}->{Values},
+        Data      => {},
+        UserID    => $Param{UserID},
+        Translate => 0,
+
+        # FIXME: as common action, object id could be not a ticket!
+        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
     );
 
     my @ValueList;
@@ -100,7 +103,8 @@ sub Run {
         @ValueList = split('\s*,\s*', $Values);
     }
 
-    my $AutomationObject = $Kernel::OM->Get('Automation');
+    # FIXME: use given instance
+    my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
 
     foreach my $Value ( @ValueList ) {
         if ( $Value !~ /^\d+$/ ) {
@@ -114,7 +118,10 @@ sub Run {
         my $Result = $AutomationObject->MacroExecute(
             ID       => $Param{Config}->{MacroID},
             ObjectID => $Value,
-            UserID   => $Param{UserID}
+            UserID   => $Param{UserID},
+
+            # keep (or overwrite) root object id
+            RootObjectID => $Self->{RootObjectID} || $Param{ObjectID}
         );
     }
 

@@ -434,9 +434,16 @@ sub NotificationSendWorker {
         push(@StatsParts, "$Stats{$Event} $Event".'s');
     }
 
+    if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
+        $Self->{LogObject}->Log( 
+            Priority => 'debug',
+            Message  => "Sending client notifications: ".Data::Dumper::Dumper(\%Param)
+        );
+    }
+
     foreach my $ClientID ( @{$Param{ClientIDs}} ) {
         $Self->{LogObject}->Log( 
-            Priority => 'debug', 
+            Priority => 'debug',
             Message  => "Sending ". @PreparedEventList . " notifications to client \"$ClientID\" (" . (join(', ', @StatsParts)) . ').' 
         );
 

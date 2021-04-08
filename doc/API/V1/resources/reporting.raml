@@ -1,0 +1,35 @@
+  displayName: Reporting
+  description: !include ../descriptions/resources/reporting.md
+  /datasources:
+    description: !include ../descriptions/resources/reporting/datasources.md
+    type: { collection-readonly: { typeName: DataSource } }
+  /outputformats:
+    description: !include ../descriptions/resources/reporting/outputformats.md
+    type: { collection-readonly: { typeName: OutputFormat } }
+  /reportdefinitions:
+    description: !include ../descriptions/resources/reporting/reportdefinitions.md
+    type: { collection: { typeName: ReportDefinition } }
+    /{reportDefinitionId}:
+      type: { item: { typeName: ReportDefinition } }
+      uriParameters:
+        reportDefinitionId:
+          displayName: ReportDefinitionID
+          type: integer
+  /reports:
+    description: !include ../descriptions/resources/reporting/reports.md
+    type: { collection-nopatch: { typeName: Report } }
+    /{reportId}:
+      type: { item-readonly: { typeName: Report } }
+      uriParameters:
+        reportId:
+          displayName: ReportID
+          type: integer
+      /results:
+        description: !include ../descriptions/resources/reporting/reports/results.md
+        type: { collection-readonly: { typeName: ReportResult } }
+        /{reportResultId}:
+          type: { item-deleteonly: { typeName: ReportResult } }
+          uriParameters:
+            reportResultId:
+              displayName: ReportResultID
+              type: integer

@@ -227,12 +227,12 @@ if ( -d "$Options{SchemaDirectory}" ) {
 }
 
 # validating example files against schema
-if ( -d "$Options{ExampleDirectory}" && -d "$TmpDir/schemas") {
+if ( -d "$TmpDir/$Options{ExampleDirectory}" && -d "$TmpDir/schemas") {
     print "\nvalidating examples\n";
 
     # change working directory
     my $Cwd = cwd();
-    chdir "$Options{ExampleDirectory}";
+    chdir "$TmpDir/$Options{ExampleDirectory}";
 
     foreach my $File ( glob("*.json") ) {
         $File = basename($File);

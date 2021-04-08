@@ -578,6 +578,9 @@ sub MacroExecute {
     $Self->{MacroID}  = $Param{ID};
     $Self->{ObjectID} = $Param{ObjectID};
 
+    # keep root object id
+    $Self->{RootObjectID} = $Param{RootObjectID} || $Param{ObjectID};
+
     # get Macro data
     my %Macro = $Self->MacroGet(
         ID => $Param{ID}
@@ -610,9 +613,10 @@ sub MacroExecute {
     );
     return if !$BackendObject;
 
-    # add referrer data
-    $BackendObject->{MacroID}  = $Param{ID};
-    $BackendObject->{ObjectID} = $Param{ObjectID};
+    # add variable referrer data
+    $BackendObject->{MacroID}      = $Param{ID};
+    $BackendObject->{ObjectID}     = $Param{ObjectID};
+    $BackendObject->{RootObjectID} = $Self->{RootObjectID};
 
     # clear result variable cache
     $Kernel::OM->Get('Cache')->CleanUp(
@@ -622,7 +626,10 @@ sub MacroExecute {
     my $Success = $BackendObject->Run(
         ObjectID  => $Param{ObjectID},
         ExecOrder => $Macro{ExecOrder},
-        UserID    => $Param{UserID}
+        UserID    => $Param{UserID},
+
+        # FIXME: add instance if job was triggerd by event with new instance (ExecuteJobsForEvent)
+        AutomationInstance => $Self
     );
 
     # remove result variable cache
@@ -655,6 +662,7 @@ sub _LoadMacroTypeBackend {
     $Self->{MacroTypeModules} //= {};
 
     if ( !$Self->{MacroTypeModules}->{$Param{Name}} ) {
+
         # load backend modules
         my $Backends = $Kernel::OM->Get('Config')->Get('Automation::MacroType');
 
@@ -688,7 +696,6 @@ sub _LoadMacroTypeBackend {
         # add referrer data
         $BackendObject->{JobID}   = $Self->{JobID};
         $BackendObject->{RunID}   = $Self->{RunID};
-        $BackendObject->{MacroID} = $Self->{MacroID};
 
         $Self->{MacroTypeModules}->{$Param{Name}} = $BackendObject;
     }

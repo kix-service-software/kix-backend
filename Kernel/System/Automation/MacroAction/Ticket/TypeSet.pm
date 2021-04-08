@@ -89,12 +89,9 @@ sub Run {
         return;
     }
 
-    my $Type = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Type},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    my $Type = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{Type}
     );
 
     # set the new type

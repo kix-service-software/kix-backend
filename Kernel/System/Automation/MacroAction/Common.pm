@@ -80,12 +80,12 @@ sub Describe {
 get the definition of this macro action module.
 
 Example:
-    my $Config = $Object->DefinitionGet();
+    my %Config = $Object->DefinitionGet();
 
 =cut
 
 sub DefinitionGet {
-    my ( $Self, $Description ) = @_;
+    my ( $Self ) = @_;
 
     return %{$Self->{Definition}};
 }
@@ -193,7 +193,7 @@ sub GetResult {
     }
 
     $Self->{Results} //= {};
-    
+
     return $Self->{Results}->{$Param{Name}};
 }
 

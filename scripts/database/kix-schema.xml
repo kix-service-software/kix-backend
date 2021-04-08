@@ -2910,4 +2910,58 @@
     </Index>
 </Table>
 
+<Table Name="report_definition">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="datasource" Required="true" Size="255" Type="VARCHAR"/>
+    <Column Name="config" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_time" Required="true" Type="DATE"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Index Name="report_definition_name">
+        <IndexColumn Name="name"/>
+    </Index>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+        <Reference Local="change_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+
+<Table Name="report">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="definition_id" Required="true" Type="INTEGER"/>
+    <Column Name="config" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <ForeignKey ForeignTable="report_definition">
+        <Reference Local="definition_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+
+<Table Name="report_result">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="report_id" Required="true" Type="INTEGER"/>
+    <Column Name="format" Required="true" Size="255" Type="VARCHAR"/>
+    <Column Name="content_type" Required="false" Size="255" Type="VARCHAR"/>
+    <Column Name="content_size" Required="false" Size="30" Type="VARCHAR"/>
+    <Column Name="content" Required="false" Type="LONGBLOB"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="create_by" Required="true" Type="INTEGER"/>
+    <ForeignKey ForeignTable="report">
+        <Reference Local="report_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id"/>
+    </ForeignKey>
+</Table>
+
 </database>

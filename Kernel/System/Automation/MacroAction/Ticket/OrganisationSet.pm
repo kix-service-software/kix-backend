@@ -89,12 +89,9 @@ sub Run {
         return;
     }
 
-    my $Organisation = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{OrganisationNumberOrID},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    my $Organisation = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{OrganisationNumberOrID}
     );
 
     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(

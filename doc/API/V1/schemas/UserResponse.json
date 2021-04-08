@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "UserResponse.json",
   "type": "object",
-  "description": "A response for user GET request.",
+  "description": "A response for a user GET request.",
   "properties": {
     "User": {
       "$ref": "User.json"

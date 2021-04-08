@@ -296,6 +296,74 @@ sub Version {
     return $Version;
 }
 
+=item GetSchemaInformation()
+
+get the information about relations and their attributes
+
+    my $DBSchema = $DBObject->GetSchemaInformation();
+
+    returns: a complex structure ;)
+
+=cut
+
+sub GetSchemaInformation {
+    my ( $Self, %Param ) = @_;
+
+    my $SchemaInfo;
+
+    $Self->Connect() || die "Unable to connect to database!";
+    
+    my $SchemaName = $Self->{'DB::Type'} eq 'postgresql' ? 'public' : '';
+
+    # get tables
+    my @Tables = map { 
+        my $Table = (split(/\./, $_))[1]; $Table =~ s/\`//g; $Table 
+    } $Self->{dbh}->tables('', $SchemaName, '', 'TABLE');
+
+    foreach my $Table ( sort @Tables ) {
+        # get column infos
+        my $Handle = $Self->{dbh}->column_info( '', $SchemaName, $Table, undef );
+        my $ColumnInfos = $Handle->fetchall_arrayref({
+            COLUMN_NAME => 1,
+            TYPE_NAME => 1,
+        });
+
+        $SchemaInfo->{$Table}->{Columns} = [];
+
+        foreach my $Column ( @{$ColumnInfos} ) {
+            push @{$SchemaInfo->{$Table}->{Columns}}, {
+                Name => $Column->{COLUMN_NAME},
+                Type => $Column->{TYPE_NAME},
+            }
+        }
+
+        # get primary key infos
+        $Handle = $Self->{dbh}->primary_key_info( '', $SchemaName, $Table );
+        if ( $Handle ) {
+            my $PrimaryKeyInfos = $Handle->fetchall_arrayref({COLUMN_NAME => 1});
+            $SchemaInfo->{$Table}->{PrimaryKey} = [];
+
+            foreach my $Column ( @{$PrimaryKeyInfos} ) {
+                push @{$SchemaInfo->{$Table}->{PrimaryKey}}, $Column->{COLUMN_NAME};
+            }
+        }
+
+        # get foreign key infos
+        $Handle = $Self->{dbh}->foreign_key_info( '', $SchemaName, $Table, '', $SchemaName, undef );
+        if ( $Handle ) {
+            my $ForeignKeyInfos = $Handle->fetchall_arrayref({});
+
+            foreach my $Column ( @{$ForeignKeyInfos} ) {
+                $SchemaInfo->{$Table}->{ForeignKeys}->{$Column->{UK_COLUMN_NAME}} //= [];
+                push @{$SchemaInfo->{$Table}->{ForeignKeys}->{$Column->{UK_COLUMN_NAME}}}, 
+                    "$Column->{FK_TABLE_NAME}.$Column->{FK_COLUMN_NAME}";
+            }
+        }
+    }
+
+    return $SchemaInfo;
+}
+
 =item Quote()
 
 to quote sql parameters

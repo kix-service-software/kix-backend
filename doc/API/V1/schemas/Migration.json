@@ -18,13 +18,13 @@
       "description": "The content depends on the source of the migration.",
       "patternProperties": {
         "^[a-zA-Z]+$": {
-          "type": "object",
-          "items": {
-            "anyOf": [
-              {"type": "string"},
-              {"type": "integer"}
-            ]
-          }
+          "anyOf": [
+              { "type": "object" },
+              { "type": "array" },
+              { "type": "string" },
+              { "type": "number" }
+          ],
+          "readOnly": true
         }
       }
     }

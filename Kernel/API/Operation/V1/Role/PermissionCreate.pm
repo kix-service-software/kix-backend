@@ -82,22 +82,22 @@ sub ParameterDefinition {
         Valid => 1
     );
 
-    return {        
+    return {
         'RoleID' => {
-            Datatype => 'NUMERIC',
+            DataType => 'NUMERIC',
             Required => 1
         },
         'Permission' => {
-            Datatype => 'HASH',
+            DataType => 'HASH',
             Required => 1
-        },        
+        },
         'Permission::TypeID' => {
-            Datatype => 'NUMERIC',
+            DataType => 'NUMERIC',
             Required => 1,
             OneOf    => \(keys %PermissionTypes),
         },
         'Permission::Target' => {
-            Datatype => 'STRING',
+            DataType => 'STRING',
             Required => 1
         },
     }
@@ -122,7 +122,7 @@ perform PermissionCreate Operation. This will return sucsess.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             PermissionID => 123
@@ -139,11 +139,11 @@ sub Run {
         Data => $Param{Data}->{Permission}
     );
 
-    # check if role exists 
+    # check if role exists
     my $Rolename = $Kernel::OM->Get('Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
     );
-  
+
     if ( !$Rolename ) {
         return $Self->_Error(
             Code => 'Object.ParentNotFound',
@@ -156,7 +156,7 @@ sub Run {
         TypeID       => $Permission->{TypeID},
         Target       => $Permission->{Target},
     );
-    
+
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
@@ -169,9 +169,12 @@ sub Run {
         %{$Permission}
     );
     if ( !$ValidationResult ) {
+        my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList( Valid => 1 );
+        my $Type = $PermissionTypeList{$Permission->{TypeID}} || 'unknown';
+
         return $Self->_Error(
             Code    => 'BadRequest',
-            Message => "Cannot create permission. The permission target doesn't match the possible ones for type Object.",
+            Message => "Cannot create permission. The permission target doesn't match the possible ones for type $Type.",
         );
     }
 
@@ -191,12 +194,12 @@ sub Run {
             Code => 'Object.UnableToCreate',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code         => 'Object.Created',
         PermissionID => $PermissionID,
-    );    
+    );
 }
 
 
