@@ -263,7 +263,7 @@ sub Options {
         }
     }
 
-    $Self->_addSchemaAndExamples(Data => \%Data);
+    $Self->_AddSchemaAndExamples(Data => \%Data);
 
     return $Self->_Success(
         IsOptionsResponse => 1,
@@ -3516,7 +3516,7 @@ sub _GetPrepareDynamicFieldValue {
     };
 }
 
-sub _addSchemaAndExamples {
+sub _AddSchemaAndExamples {
     my ( $Self, %Param ) = @_;
 
     return if (!IsHashRefWithData($Param{Data}));
