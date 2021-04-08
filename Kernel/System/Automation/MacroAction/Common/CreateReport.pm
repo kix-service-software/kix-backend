@@ -55,8 +55,8 @@ sub Describe {
     $Self->AddOption(
         Name        => 'Parameters',
         Label       => Kernel::Language::Translatable('Parameters'),
-        Description => Kernel::Language::Translatable('The parameters of the report. This is a JSON string.'),
-        Required    => 1,
+        Description => Kernel::Language::Translatable('The parameters of the report as a HashRef.'),
+        Required    => 0,
     );
     $Self->AddOption(
         Name        => 'OutputFormat',
@@ -66,8 +66,8 @@ sub Describe {
     );
 
     $Self->AddResult(
-        Name        => 'ResultContent',
-        Description => Kernel::Language::Translatable('The content of the report result.'),
+        Name        => 'Report',
+        Description => Kernel::Language::Translatable('The report object including the result.'),
     );
 
     return;
@@ -82,11 +82,11 @@ Example:
         ObjectID => 123,
         Config   => {
             DefinitionID => 123,
-            Parameters   => '{
-                "Param1": "abc",
-                "Param2": 123,
-                "Param3": ["abc", "def"]
-            }',
+            Parameters   => {
+                Param1 => "abc",
+                Param2 => 123,
+                Param3 =>  ["abc", "def"]
+            },
         },
         UserID   => 123,
     );
@@ -99,15 +99,88 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $Values = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Parameters},
-        TicketID => $Param{ObjectID},
-        Data     => {},
-        UserID   => $Param{UserID},
-        Language => 'en' # to not translate values
+    # check the given DefinitionID
+    my %Definition = $Kernel::OM->Get('Reporting')->ReportDefinitionGet(
+        ID => $Param{Config}->{DefinitionID},
+    );
+    if ( !%Definition ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't create report - can't find report definition with ID $Param{Config}->{DefinitionID}!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
+    # replace placeholders - atm only for ticket
+    foreach my $Parameter ( sort keys %{$Param{Config}->{Parameters} ||{}} ) {
+        $Param{Config}->{Parameters}->{$Parameter} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText => 0,
+            Text     => $Param{Config}->{Parameters}->{$Parameter},
+            TicketID => $Param{ObjectID},
+            Data     => {},
+            UserID   => $Param{UserID},
+            Language => 'en' # to not translate values
+        );
+    }
+
+    # check output format
+    my %OutputFormats;
+    if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Reporting::OutputFormat')) ) {
+        %OutputFormats = map { $_ => 1 } sort keys %{ $Kernel::OM->Get('Config')->Get('Reporting::OutputFormat') };
+    }
+    if ( !$OutputFormats{$Param{Config}->{OutputFormat}} ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't create report - output format \"$Param{Config}->{OutputFormat}\" not supported!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+    if ( IsHashRefWithData($Definition{Config}->{OutputFormats}) && !exists $Definition{Config}->{OutputFormats}->{$Param{Config}->{OutputFormat}} ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Output format \"$Param{Config}->{OutputFormat}\" isn't supported for the given report definition \"$Definition{Name}\"!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
+    # create Report
+    my $ReportID = $Kernel::OM->Get('Reporting')->ReportCreate(
+        DefinitionID => $Param{Config}->{DefinitionID},
+        Config       => {
+            Parameters    => $Param{Config}->{Parameters},
+            OutputFormats => [ $Param{Config}->{OutputFormat} ]
+        },
+        UserID => $Param{UserID}
     );
 
+    if ( !$ReportID ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't create report!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
+    my %Report = $Kernel::OM->Get('Reporting')->ReportGet(
+        ID                   => $ReportID,
+        IncludeResults       => 1,
+        IncludeResultContent => 1
+    );
+    if ( !%Report ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't load report with ID $ReportID!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
+    # return the report
+    $Self->SetResult(Name => 'Report', Value => \%Report);
 
     return 1;
 }

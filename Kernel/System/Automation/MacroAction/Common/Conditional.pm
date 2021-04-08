@@ -24,7 +24,7 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Automation::MacroAction::Common::Conditional - A module to loop over given values
+Kernel::System::Automation::MacroAction::Common::Conditional - A module to evaluate a logical expression
 
 =head1 SYNOPSIS
 

@@ -641,11 +641,9 @@ sub MacroActionExecute {
 
     # replace result variables
     if (IsHashRefWithData($Self->{MacroResults})) {
-        foreach my $Parameter ( sort keys %Parameters ) {
-            foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
-                $Parameters{$Parameter} =~ s/\$\{$Variable\}/$Self->{MacroResults}->{$Variable}/gmx;
-            }
-        }
+        $Self->_ReplaceResultVariables(
+            Data => \%Parameters,
+        );
     }
 
     my $Success = $BackendObject->Run(
@@ -668,9 +666,10 @@ sub MacroActionExecute {
 
         # map results to variables
         if (IsHashRefWithData($Definition{Results})) {
-            for my $ResultKey ( keys %{$Definition{Results}} ) {
-                $Self->{MacroResults}->{$MacroAction{ResultVariables}->{$ResultKey} || $ResultKey} = $BackendObject->GetResult(Name => $ResultKey);
-            }
+            $Self->{MacroResults} = {
+                %{$Self->{MacroResults}},
+                %{$BackendObject->GetResults()}
+            };
         }
     }
 
@@ -736,6 +735,35 @@ sub _LoadMacroActionTypeBackend {
     }
 
     return $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}};
+}
+
+# recursively replace result variables
+sub _ReplaceResultVariables {
+    my ( $Self, %Param ) = @_;
+
+    return if !defined $Param{Data};
+
+    if ( IsHashRefWithData($Param{Data}) ) {
+        foreach my $Key ( sort keys %{$Param{Data}} ) {
+            $Param{Data}->{$Key} = $Self->_ReplaceResultVariables(
+                Data => $Param{Data}->{$Key}
+            );
+        }
+    }
+    elsif ( IsArrayRefWithData($Param{Data}) ) {
+        foreach my $Item ( @{$Param{Data}} ) {
+            $Item = $Self->_ReplaceResultVariables(
+                Data => $Item
+            );
+        }
+    }
+    else {
+        foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
+            $Param{Data} =~ s/\$\{\Q$Variable\E\}/$Self->{MacroResults}->{$Variable}/gmx;
+        }
+    }
+
+    return $Param{Data};
 }
 
 1;

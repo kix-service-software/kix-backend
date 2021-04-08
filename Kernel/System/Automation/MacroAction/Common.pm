@@ -13,6 +13,8 @@ use warnings;
 
 use utf8;
 
+use Hash::Flatten;
+
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -169,6 +171,23 @@ sub AddResult {
     return 1;
 }
 
+=item GetResults()
+
+Get all results as HashRef.
+
+Example:
+    my $Results = $Self->GetResults();
+
+=cut
+
+sub GetResults {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{Results} //= {};
+
+    return $Self->{Results};
+}
+
 =item GetResult()
 
 Get the value of a result variable.
@@ -221,7 +240,40 @@ sub SetResult {
         return;
     }
 
+    $Self->{Results} //= {};
+
     $Self->{Results}->{$Param{Name}} = $Param{Value};
+
+    # include all data of an object as separate values
+    if ( IsHashRefWithData($Param{Value}) ) {
+        my $FlatData = Hash::Flatten::flatten(
+            $Param{Value}
+        );
+        if ( IsHashRefWithData($FlatData) ) {
+            # combine with existing results
+            my %TmpHash = map { $Param{Name}.'.'.$_ => $FlatData->{$_} } keys %{$FlatData};
+            $Self->{Results} = {
+                %{$Self->{Results}},
+                %TmpHash,
+            };
+        }
+
+        foreach my $Key ( keys %{$Param{Value}} ) {
+            $Self->SetResult(
+                Name  => $Param{Name}.'.'.$Key,
+                Value => $Param{Value}->{$Key},
+            )
+        }
+    }
+    elsif ( IsArrayRefWithData($Param{Value}) ) {
+        my $Index = 0;
+        foreach my $Item ( @{$Param{Value}} ) {
+            $Self->SetResult(
+                Name  => $Param{Name}.':'.$Index++,
+                Value => $Item,
+            )
+        }
+    }
 
     return 1;
 }
