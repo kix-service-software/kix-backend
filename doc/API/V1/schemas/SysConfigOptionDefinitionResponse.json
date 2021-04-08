@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "SysConfigOptionDefinitionResponse.json",
   "type": "object",
-  "description": "A response for SysConfig option definition GET request.",
+  "description": "A response for a SysConfig option definition GET request.",
   "properties": {
     "SysConfigOptionDefinition": {
       "$ref": "SysConfigOptionDefinition.json"

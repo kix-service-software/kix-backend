@@ -56,6 +56,11 @@ $(document).ready(function() {
     }
   });
 
+  $('pre code.lang-json').each(function() {
+    console.log("JSON: " + $(this).html);
+    $(this).jsonBrowse(JSON.parse($(this).html()), {collapsed: false, withQuotes: true });
+  });
+
   $('[data-toggle]').click(function() {
     var selector = $(this).data('target') + ' pre code';
     $(selector).each(function(i, block) {

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "DataSourceCollectionResponse.json",
+  "type": "object",
+  "description": "A list of data sources.",
+  "properties": {
+    "DataSource": {
+      "type": "array",
+      "items": {
+        "$ref": "DataSource.json"
+      }
+    }
+  },
+  "required": [
+    "DataSource"
+  ]
+}

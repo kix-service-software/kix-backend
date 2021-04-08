@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "TranslationLanguageResponse.json",
   "type": "object",
-  "description": "A response for translation language GET request.",
+  "description": "A response for a translation language GET request.",
   "properties": {
     "TranslationLanguage": {
       "$ref": "TranslationLanguage.json"

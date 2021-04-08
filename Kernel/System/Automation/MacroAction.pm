@@ -577,11 +577,11 @@ sub MacroActionExecute {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID UserID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(ID UserID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }
@@ -633,9 +633,12 @@ sub MacroActionExecute {
     return if !$BackendObject;
 
     # add referrer data
-    for ( qw(JobID RunID MacroID MacroActionID) ) {
-        $BackendObject->{$_} = $Self->{$_};
+    for my $CommonParam ( qw(JobID RunID MacroID MacroActionID) ) {
+        $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
+
+    # add root object id
+    $BackendObject->{RootObjectID} = $Self->{RootObjectID};
 
     my %Parameters = %{$MacroAction{Parameters} || {}};
 
@@ -663,11 +666,14 @@ sub MacroActionExecute {
             Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
             UserID   => $Param{UserID},
         );
-    }
-    else {
-        # map results to variables if given
-        foreach my $Result ( keys %{$MacroAction{ResultVariables}} ) {
-            $Self->{MacroResults}->{$MacroAction{ResultVariables}->{$Result} || $Result} = $BackendObject->GetResult(Name => $Result);
+    } else {
+        my %Definition = $BackendObject->DefinitionGet();
+
+        # map results to variables
+        if (IsHashRefWithData($Definition{Results})) {
+            for my $ResultKey ( keys %{$Definition{Results}} ) {
+                $Self->{MacroResults}->{$MacroAction{ResultVariables}->{$ResultKey} || $ResultKey} = $BackendObject->GetResult(Name => $ResultKey);
+            }
         }
     }
 

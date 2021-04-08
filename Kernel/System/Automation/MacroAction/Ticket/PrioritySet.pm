@@ -89,12 +89,9 @@ sub Run {
         return;
     }
 
-    my $Priority = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Priority},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    my $Priority = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{Priority}
     );
 
     # set the new priority

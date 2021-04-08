@@ -58,7 +58,7 @@ create an article
         ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
         HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
         HistoryComment   => 'Some free text!',
-        TimeUnits        => 123,                                    # optional
+        TimeUnit         => 123,                                    # optional
         UserID           => 123,
         Loop             => 0,                                      # 1|0 used for bulk emails
         Attachment => [
@@ -120,7 +120,7 @@ example with "Charset & MimeType" and no "ContentType"
         HistoryComment   => 'Some free text!',
         UserID           => 123,
         UnlockOnAway     => 1,                                      # Unlock ticket if owner is away
-        TimeUnits        => 123,                                    # optional
+        TimeUnit         => 123,                                    # optional
     );
 
 Events:
@@ -515,11 +515,11 @@ sub ArticleCreate {
     }
 
     # add accounted time if needed
-    if ( $Param{TimeUnits} ) {
+    if ( $Param{TimeUnit} ) {
         my $UpdateSuccess = $Self->TicketAccountTime(
             TicketID  => $Param{TicketID},
             ArticleID => $ArticleID,
-            TimeUnit  => $Param{TimeUnits},
+            TimeUnit  => $Param{TimeUnit},
             UserID    => $Param{UserID},
         );
     }
@@ -1465,7 +1465,7 @@ Article:
     Charset
     MimeType
     IncomingTime
-    TimeUnits
+    TimeUnit
 
     # If DynamicFields => 1 was passed, you'll get an entry like this for each dynamic field:
     DynamicField_X     => 'value_x',
@@ -1839,8 +1839,8 @@ sub ArticleGet {
             $Part->{ $Key . 'Realname' } = $Realname;
         }
 
-        # add TimeUnits
-        $Part->{TimeUnits} = $Self->ArticleAccountedTimeGet(
+        # add TimeUnit
+        $Part->{TimeUnit} = $Self->ArticleAccountedTimeGet(
             ArticleID => $Part->{ArticleID},
         );
     }

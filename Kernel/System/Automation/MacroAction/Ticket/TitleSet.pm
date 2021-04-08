@@ -88,12 +88,10 @@ sub Run {
         return;
     }
 
-    my $Title = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Title},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    my $Title = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value     => $Param{Config}->{Title},
+        Translate => 1
     );
 
     # do nothing if the desired title is already set

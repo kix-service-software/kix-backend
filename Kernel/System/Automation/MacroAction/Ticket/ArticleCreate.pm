@@ -85,6 +85,12 @@ sub Describe {
         Required    => 0,
     );
     $Self->AddOption(
+        Name        => 'CustomerVisible',
+        Label       => Kernel::Language::Translatable('Show in Customer Portal'),
+        Description => Kernel::Language::Translatable('If the new article is visible for customers'),
+        Required    => 0,
+    );
+    $Self->AddOption(
         Name        => 'Subject',
         Label       => Kernel::Language::Translatable('Subject'),
         Description => Kernel::Language::Translatable('The subject of the new article.'),
@@ -103,12 +109,6 @@ sub Describe {
         Required    => 0,
     );
     # FIXME: add if necessary
-    # $Self->AddOption(
-    #     Name        => 'CustomerVisible',
-    #     Label       => 'For Customer Visible',
-    #     Description => '(Optional) If the new article is visible for customer. Possible are 0 or 1.',
-    #     Required    => 0,
-    # );
     # Charset          => 'utf-8',                                # 'ISO-8859-15'
     # MimeType         => 'text/plain',
     # HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
@@ -170,7 +170,7 @@ sub Run {
         }
     }
 
-    $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} || 0,
+    $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} // 0,
     $Param{Config}->{Channel} = $Param{Config}->{Channel} || 'note';
     $Param{Config}->{SenderType} = $Param{Config}->{SenderType} || 'agent';
     $Param{Config}->{Charset} = $Param{Config}->{Charset} || 'utf-8';
@@ -205,24 +205,26 @@ sub Run {
     }
 
     # replace placeholders in non-richtext attributes
-    for my $Attribute ( qw(Channel SenderType Subject To From Cc Bcc AccountTime) ) {
+    for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
         next if !defined $Param{Config}->{$Attribute};
 
-        $Param{Config}->{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $Param{Config}->{$Attribute},
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
+        $Param{Config}->{$Attribute} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $Param{Config}->{$Attribute}
         );
     }
 
-    $Param{Config}->{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 1,
-        Text     => $Param{Config}->{Body},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    $Param{Config}->{Subject} = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value     => $Param{Config}->{Subject},
+        Translate => 1
+    );
+
+    $Param{Config}->{Body} = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value     => $Param{Config}->{Body},
+        Translate => 1,
+        Richtext  => 1
     );
 
     # prepare subject if necessary
@@ -241,7 +243,7 @@ sub Run {
 
     my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         %{ $Param{Config} },
-        TimeUnits => $Param{Config}->{AccountTime},
+        TimeUnit  => $Param{Config}->{AccountTime},
         TicketID  => $Param{TicketID},
         UserID    => $Param{UserID},
     );

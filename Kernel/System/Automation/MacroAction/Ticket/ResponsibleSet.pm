@@ -89,12 +89,9 @@ sub Run {
         return;
     }
 
-    my $Responsible = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{ResponsibleLoginOrID},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    my $Responsible = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{ResponsibleLoginOrID}
     );
 
     my $UserID = $Kernel::OM->Get('User')->UserLookup(

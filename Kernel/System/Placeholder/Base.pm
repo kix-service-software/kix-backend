@@ -74,14 +74,6 @@ sub ReplacePlaceholder {
         }
     }
 
-    if ( !defined $Param{Language} || !$Param{Language}) {
-        my $ConfigObject = $Kernel::OM->Get('Config');
-        $Param{Language}
-            = $Self->{UserLanguage}
-            || $ConfigObject->Get('DefaultLanguage')
-            || 'en';
-    }
-
     # allow both styles but do not capture it
     $Self->{Start} = '(?><|&lt;)';
     $Self->{End}   = '(?>>|&gt;)';

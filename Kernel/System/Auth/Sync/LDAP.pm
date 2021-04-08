@@ -192,6 +192,18 @@ sub Sync {
         );
     }
 
+    # variable to store role permissions from ldap
+    my %RolePermissionsFromLDAP;
+
+    # get RoleObject
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    # get system roles and create lookup
+    my %SystemRoles = $RoleObject->RoleList(Valid => 1);
+    my %SystemRolesByName = reverse %SystemRoles;
+
+    my %UserContextFromLDAP;
+
     # sync contact from ldap
     if (IsHashRefWithData($Self->{ContactUserSync})) {
 
@@ -295,6 +307,7 @@ sub Sync {
                     $AttributeChange = 1;
                     last ATTRIBUTE;
                 }
+                $SyncContact{Email} = (!$SyncContact{Email} && $ContactData{Email}) ? $ContactData{Email} : $SyncContact{Email};
 
                 if ($AttributeChange) {
                     my $Result = $ContactObject->ContactUpdate(
@@ -353,23 +366,11 @@ sub Sync {
                     }
                 }
             }
+
         }
     }
 
-    # get RoleObject
-    my $RoleObject = $Kernel::OM->Get('Role');
-
-    # get system roles and create lookup
-    my %SystemRoles = $RoleObject->RoleList( Valid => 1 );
-    my %SystemRolesByName = reverse %SystemRoles;
-
-    # variable to store role permissions from ldap
-    my %RolePermissionsFromLDAP;
-
     if ( IsHashRefWithData($Self->{GroupDNBasedUsageContextSync}) ) {
-
-        # variable to store role permissions from ldap
-        my %UserContextFromLDAP;
 
         # read and remember roles from ldap
         GROUPDN:
@@ -431,42 +432,6 @@ sub Sync {
 
                 $UserContextFromLDAP{ $SyncContext } = $SyncContexts{$SyncContext};
             }
-        }
-
-        # set user context in DB
-        my %User = $UserObject->GetUserData(User => $Param{User});
-        if ( %User ) {
-            my $Result = $UserObject->UserUpdate(
-                %User,
-                %UserContextFromLDAP,
-                ChangeUserID => 1,
-            );
-            if ( !$Result ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority  => 'error',
-                    Message   => "Unable to update usage context of user \"$Param{User}\" (UserID: $UserID)!",
-                );
-            }
-            else {
-                # update successful
-                $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
-                $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} }   = 0;
-
-                if ( $UserContextFromLDAP{IsAgent} ) {
-                    # add role "Agent User"
-                    $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 1;
-                }
-                if ( $UserContextFromLDAP{IsCustomer} ) {
-                    # add role "Customer"
-                    $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 1;
-                }
-            }
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority  => 'error',
-                Message   => "No such user \"$Param{User}\"!",
-            );
         }
     }
 
@@ -596,6 +561,45 @@ sub Sync {
                 }
             }
         }
+    }
+
+    # set user context in DB
+    my %User = $UserObject->GetUserData(
+        UserID => $UserID
+    );
+    if (%User) {
+        my $Result = $UserObject->UserUpdate(
+            %User,
+            %UserContextFromLDAP,
+            ChangeUserID => 1,
+        );
+
+        if (!$Result) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update usage context of user \"$Param{User}\" (UserID: $UserID)!",
+            );
+        }
+        else {
+            $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
+            $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 0;
+
+            if ($UserContextFromLDAP{IsAgent}) {
+                # add role "Agent User"
+                $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 1;
+            }
+
+            if ($UserContextFromLDAP{IsCustomer}) {
+                # add role "Customer"
+                $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 1;
+            }
+        }
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No such user \"$Param{User}\"!",
+        );
     }
 
     # compare role permissions from ldap with current user role permissions and update if necessary

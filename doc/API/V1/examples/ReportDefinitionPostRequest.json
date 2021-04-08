@@ -1,0 +1,31 @@
+{
+    "ReportDefinition": {
+        "DataSource": "GenericSQL",
+        "Name": "test",
+        "Config": {
+            "Title": "this is a test",
+            "DataSource": {
+                "SQL": {
+                    "any": "SELECT id, name, create_by FROM valid WHERE name LIKE '${Name_Pattern}%'"
+                }
+            },
+            "Parameters": [
+                {
+                    "Name": "Name_Pattern",
+                    "Label": "Name Pattern",
+                    "DataType": "STRING"
+                }
+            ],
+            "OutputFormats": {
+                "CSV": {
+                    "Columns": [
+                        "id",
+                        "name",
+                        "CreatedByUser"
+                    ],
+                    "IncludeColumnHeader": 1
+                }
+            }
+        }
+    }
+}

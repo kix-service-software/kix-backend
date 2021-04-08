@@ -175,26 +175,19 @@ Example:
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check incoming parameters
+    # check default incoming parameters
     return if !$Self->_CheckParams(%Param);
-    return if !$Self->_CheckTicketParams(
-        %{$Param{Config}},
-        UserID => $Param{UserID}
-    );
 
     # collect ticket params (organisation have to be before contact)
     my %TicketParam;
     for my $Attribute (
-        qw(OrganisationNumberOrID ContactEmailOrID Lock OwnerLoginOrID Priority ResponsibleLoginOrID State Title Team Type)
+        qw(OrganisationNumberOrID ContactEmailOrID Lock OwnerLoginOrID Priority ResponsibleLoginOrID State Team Type)
     ) {
         if ( defined $Param{Config}->{$Attribute} ) {
 
-            $Param{Config}->{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-                RichText => 0,
-                Text     => $Param{Config}->{$Attribute},
-                TicketID => $Param{TicketID},
-                Data     => {},
-                UserID   => $Param{UserID},
+            $Param{Config}->{$Attribute} = $Self->_ReplaceValuePlaceholder(
+                %Param,
+                Value => $Param{Config}->{$Attribute}
             );
 
             if ( ($Attribute eq 'OwnerLoginOrID' || $Attribute eq 'ResponsibleLoginOrID') && $Param{Config}->{$Attribute} ) {
@@ -261,6 +254,13 @@ sub Run {
         }
     }
 
+    # check ticket params (with replaced placeholders)
+    return if !$Self->_CheckTicketParams(
+        %{$Param{Config}},
+        %TicketParam,
+        UserID => $Param{UserID}
+    );
+
     if (!$TicketParam{OwnerID}) {
         $TicketParam{OwnerID} = $Param{UserID};
     }
@@ -271,16 +271,11 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    # $TicketParam{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-    #     RichText => 0,
-    #     Text     => $TicketParam{Title},
-    #     TicketID => $Param{TicketID},
-    #     Data     => {
-    #         # TODO: currently not used
-    #         %TicketParam
-    #     },
-    #     UserID   => $Param{UserID},
-    # );
+    $TicketParam{Title} = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value     => $Param{Config}->{Title},
+        Translate => 1
+    );
 
     # create ticket
     my $TicketID = $TicketObject->TicketCreate(
@@ -311,12 +306,9 @@ sub Run {
             UserID   => $Param{UserID},
         );
     } elsif ( %StateData && $StateData{TypeName} =~ m{\A pending}msxi ) {
-        $Param{Config}->{PendingTimeDiff} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $Param{Config}->{PendingTimeDiff},
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
+        $Param{Config}->{PendingTimeDiff} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $Param{Config}->{PendingTimeDiff}
         );
 
         # set pending time
@@ -346,28 +338,21 @@ sub Run {
         }
     }
     $ArticleParam{Subject} = $TicketParam{Title};
-    $ArticleParam{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 1,
-        Text     => $ArticleParam{Body},
-        TicketID => $Param{TicketID},
-        Data     => {
-            # TODO: currently not used
-            %TicketParam
-        },
-        UserID   => $Param{UserID},
+    $ArticleParam{Body}    = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value     => $ArticleParam{Body},
+        Translate => 1,
+        Richtext  => 1
     );
 
 
     # replace placeholders in non-richtext attributes
-    for my $Attribute ( qw(Channel SenderType Subject To From Cc Bcc AccountTime) ) {
+    for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
         next if !defined $ArticleParam{$Attribute};
 
-        $ArticleParam{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $ArticleParam{$Attribute},
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
+        $ArticleParam{$Attribute} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $ArticleParam{$Attribute}
         );
     }
 
@@ -410,17 +395,19 @@ sub ValidateConfig {
 
     return if !$Self->SUPER::ValidateConfig(%Param);
 
-    my %State = $Kernel::OM->Get('State')->StateGet(
-        Name => $Param{Config}->{State}
-    );
+    if ($Param{Config}->{State} && $Param{Config}->{State} !~ m/<KIX_/) {
+        my %State = $Kernel::OM->Get('State')->StateGet(
+            Name => $Param{Config}->{State}
+        );
 
-    if (%State) {
-        if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Validation of parameter \"PendingTimeDiff\" failed!"
-            );
-            return;
+        if (%State) {
+            if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Validation of parameter \"PendingTimeDiff\" failed!"
+                );
+                return;
+            }
         }
     }
 
@@ -600,19 +587,20 @@ sub _SetDynamicFields {
 
             my $ReplacedValue;
 
-            if ($DynamicField->[1] =~ m/^<KIX_TICKET_DynamicField_\w+?>$/) {
-                $ReplacedValue = $DynamicFieldBackendObject->ValueGet(
-                    DynamicFieldConfig => $DynamicFieldLookup{$DynamicField->[0]},
-                    ObjectID           => $Param{TicketID},
-                );
-            }
-            else {
-                $ReplacedValue = $TemplateGeneratorObject->ReplacePlaceHolder(
-                    RichText => 0,
-                    Text     => $DynamicField->[1],
-                    TicketID => $Param{TicketID}, # id of start ticket
-                    Data     => {},
-                    UserID   => $Param{UserID},
+            if ($DynamicField->[1] =~ m/^<KIX_TICKET_DynamicField_(\w+?)>$/) {
+                my $DFName = $1;
+                $DFName =~ s/(\w+?)_.+/$1/;
+
+                if ($DFName && IsHashRefWithData( $DynamicFieldLookup{$DFName} ) ) {
+                    $ReplacedValue = $DynamicFieldBackendObject->ValueGet(
+                        DynamicFieldConfig => $DynamicFieldLookup{$DFName},
+                        ObjectID           => $Self->{RootObjectID} || $Param{TicketID},
+                    );
+                }
+            } else {
+                $ReplacedValue = $Self->_ReplaceValuePlaceholder(
+                    %Param,
+                    Value => $DynamicField->[1]
                 );
             }
 

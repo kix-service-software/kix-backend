@@ -247,9 +247,6 @@ sub Run {
     # import translations if given
     if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
         foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency( Type => 'Translation' );
-    
             my $Content = MIME::Base64::decode_base64($Item->{Content});
                         
             # fire & forget, not result handling at the moment
@@ -263,9 +260,6 @@ sub Run {
 
     # import SysConfig definitions if given
     if ( IsArrayRefWithData($ClientRegistration->{SysConfigOptionDefinitions}) ) {
-        # inform API caching about a new dependency
-        $Self->AddCacheDependency( Type => 'SysConfig' );
-
         my %SysConfigOptions = $Kernel::OM->Get('SysConfig')->OptionGetAll();
 
         foreach my $Item ( @{$ClientRegistration->{SysConfigOptionDefinitions}} ) {
@@ -314,16 +308,94 @@ sub Run {
         }
     }
 
-    my %SystemInfo;
-    foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
-        $SystemInfo{$Key} = $Kernel::OM->Get('Config')->Get($Key);
+    my %Requesting;
+    if ( IsHashRefWithData($ClientRegistration->{Requesting}) ) {
+        if ( $ClientRegistration->{Requesting}->{SystemInfo} ) {
+            foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
+                $Requesting{SystemInfo}->{$Key} = $Kernel::OM->Get('Config')->Get($Key);
+            }
+        }
+        if ( $ClientRegistration->{Requesting}->{DBSchema} ) {
+            $Requesting{DBSchema} = $Kernel::OM->Get('DB')->GetSchemaInformation();
+            if ( IsHashRefWithData($Requesting{DBSchema}) ) {
+                # only white listed tables
+                my @TableWhiteList = (
+                    'article',
+                    'article_attachment',
+                    'article_flag',
+                    'article_plain',
+                    'article_sender_type',
+                    'attachment_dir_preferences',
+                    'attachment_directory',
+                    'attachment_storage',
+                    'channel',
+                    'configitem',
+                    'configitem_counter',
+                    'configitem_definition',
+                    'configitem_history',
+                    'configitem_history_type',
+                    'configitem_version',
+                    'contact',
+                    'contact_organisation',
+                    'contact_preferences',
+                    'dynamic_field',
+                    'dynamic_field_value',
+                    'faq_attachment',
+                    'faq_category',
+                    'faq_history',
+                    'faq_item',
+                    'faq_log',
+                    'faq_voting',
+                    'general_catalog',
+                    'general_catalog_preferences',
+                    'link_object',
+                    'link_relation',
+                    'link_type',
+                    'migration',
+                    'object_icon',
+                    'organisation',
+                    'organisation_prefs',
+                    'permission_type',
+                    'queue',
+                    'queue_preferences',
+                    'role_permission',
+                    'role_user',
+                    'roles',
+                    'sla',
+                    'sla_preferences',
+                    'sysconfig',
+                    'system_address',
+                    'ticket',
+                    'ticket_flag',
+                    'ticket_history',
+                    'ticket_history_type',
+                    'ticket_lock_type',
+                    'ticket_priority',
+                    'ticket_sla_criterion',
+                    'ticket_state',
+                    'ticket_state_type',
+                    'ticket_type',
+                    'time_accounting',
+                    'translation_language',
+                    'translation_pattern',
+                    'user_preferences',
+                    'users',
+                    'valid',
+                    'watcher',
+                    'xml_storage',
+                );
+                foreach my $TableName ( sort keys %{$Requesting{DBSchema}} ) {
+                    delete $Requesting{DBSchema}->{$TableName} if !grep /^$TableName$/g, @TableWhiteList, ;
+                }
+            }
+        }
     }
 
     # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         ClientID => $ClientID,
-        SystemInfo => \%SystemInfo,
+        %Requesting,
     );
 }
 

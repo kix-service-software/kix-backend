@@ -26,12 +26,12 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 When qr/I get this configitem history$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}.'/history/'.S->{ResponseContent}->{ConfigItemHistoryItem}->[0]->{HistoryEntryID}
+      URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}.'/history/'.S->{ResponseContent}->{ConfigItemHistory}->[0]->{HistoryEntryID}
    );
 };
 

@@ -89,12 +89,9 @@ sub Run {
         return;
     }
 
-    my $Team = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Team},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    my $Team = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{Team}
     );
 
     # set the new team
