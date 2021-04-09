@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-4-6 07:49+0000\n"
+"POT-Creation-Date: 2021-4-8 17:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -283,14 +283,6 @@ msgid "Laptop"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Lists tickets closed in a specific date range. Organization may be selected before report creation."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "Lists tickets created in a specific date range. Organization may be selected before report creation."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
@@ -567,14 +559,6 @@ msgid "Ticket is pending for automatic close."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Tickets Closed In Date Range"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "Tickets Created In Date Range"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Time Restricted"
 msgstr ""
 
@@ -631,10 +615,6 @@ msgid "allows to change/edit any system configuration found in the Admin-Module,
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "allows to create and edit report definitions"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "allows to create new tickets by using the \"Customer Portal Light\" webform mechanism"
 msgstr ""
 
@@ -656,10 +636,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "allows to read information of any organization or contact and allows to READ links"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "allows to view report definitions and reports"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -971,7 +947,7 @@ msgid "The name of the dynamic field."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
-msgid "The value for the dynamic field to be set."
+msgid "The value for the dynamic field to be set. Leave empty and uncheck \"Append\" to clear relevant dynamic field value of ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
@@ -1442,6 +1418,30 @@ msgstr ""
 msgid "Source"
 msgstr ""
 
+#. Perl Module: update/build-1415.pl
+msgid "Lists tickets closed in a specific date range. Organization may be selected before report creation."
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "Lists tickets created in a specific date range. Organization may be selected before report creation."
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "Tickets Closed In Date Range"
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "Tickets Created In Date Range"
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "allows to create and edit report definitions"
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "allows to view report definitions and reports"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
 msgstr ""
@@ -1472,14 +1472,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Defines how many threads should be used for parallel tasks. Enter 0 to deactivate."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines the location where the JSON schema files are located."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines the location where the example files are located."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -4439,6 +4431,10 @@ msgid "Expiration Date"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "External Supplier"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "First Usage Date"
 msgstr ""
 
@@ -4476,6 +4472,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Installed Software"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Internal Supplier"
 msgstr ""
 
 #. manual entry from templates.pot.manual

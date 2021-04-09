@@ -2,8 +2,8 @@
   description: !include ../../descriptions/resources/system/sessions.md
   type: { collection-readonly: { typeName: Sessions } }
   /{token}:
-    type: { item: { typeName: Session } }
+    type: { item-nopatch: { typeName: Session } }
     uriParameters:
       token:
         displayName: Token
-        type: string  
+        type: string

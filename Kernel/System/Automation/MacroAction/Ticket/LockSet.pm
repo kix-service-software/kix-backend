@@ -89,13 +89,9 @@ sub Run {
         return;
     }
 
-    my $Lock = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Lock},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
-        Language => 'en' # to not translate values
+    my $Lock = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{Lock}
     );
 
     # set the new lock
