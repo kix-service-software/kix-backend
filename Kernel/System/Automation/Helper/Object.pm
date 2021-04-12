@@ -51,8 +51,6 @@ sub AsObject {
     my ( $Self, %Param ) = @_;
     my $Object;
 
-    print STDERR "AsObject: Definition = $Self->{Definition}\n";
-
     if ( $Self->{Type} eq 'YAML') {
         $Object = $Kernel::OM->Get('YAML')->Load(
             Data => $Self->{Definition}
