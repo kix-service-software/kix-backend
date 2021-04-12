@@ -249,7 +249,7 @@ sub Run {
     for my $ID ( 1..5 ) {
         next if !defined $Param{Config}->{"Attachment$ID"};
 
-        $Param{Config}->{$Attribute} = $$Self->_ReplaceValuePlaceholder(
+        $Param{Config}->{"Attachment$ID"} = $Self->_ReplaceValuePlaceholder(
             %Param,
             Value => $Param{Config}->{"Attachment$ID"},
         );
