@@ -12,12 +12,8 @@ use warnings;
 
 use File::Basename;
 use FindBin qw($Bin);
-use lib dirname($Bin) . '/../../';
-use lib dirname($Bin) . '/../../plugins';
-use lib dirname($Bin) . '/../../Kernel/cpan-lib';
-
-use Getopt::Std;
-use File::Path qw(mkpath);
+use lib dirname($Bin);
+use lib dirname($Bin) . '/Kernel/cpan-lib';
 
 use Kernel::System::ObjectManager;
 use Kernel::System::VariableCheck qw(:all);
@@ -51,7 +47,7 @@ sub _UpdateCustomerRole {
                 Target => '/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber}'
             },
             Change     => {
-                Target => '/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}'
+                Target => '/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title,Priority,State,Type]}'
             }
         },
     );

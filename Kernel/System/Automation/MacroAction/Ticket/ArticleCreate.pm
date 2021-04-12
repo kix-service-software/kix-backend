@@ -239,13 +239,9 @@ sub Run {
     for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
         next if !defined $Param{Config}->{$Attribute};
 
-        $Param{Config}->{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $Param{Config}->{$Attribute},
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
-            Language => 'en' # to not translate values
+        $Param{Config}->{$Attribute} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $Param{Config}->{$Attribute}
         );
     }
 
@@ -253,30 +249,23 @@ sub Run {
     for my $ID ( 1..5 ) {
         next if !defined $Param{Config}->{"Attachment$ID"};
 
-        $Param{Config}->{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $Param{Config}->{"Attachment$ID"},
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
-            Language => 'en' # to not translate values
+        $Param{Config}->{$Attribute} = $$Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $Param{Config}->{"Attachment$ID"},
         );
     }
 
-    $Param{Config}->{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{Subject},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    $Param{Config}->{Subject} = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value     => $Param{Config}->{Subject},
+        Translate => 1
     );
 
-    $Param{Config}->{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 1,
-        Text     => $Param{Config}->{Body},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
+    $Param{Config}->{Body} = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value     => $Param{Config}->{Body},
+        Translate => 1,
+        Richtext  => 1
     );
 
     # prepare subject if necessary

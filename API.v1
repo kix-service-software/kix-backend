@@ -198,10 +198,10 @@
 /addressbook/:AddressID                                                                    | GET              | V1::AddressBook::AddressGet                      | 
 /addressbook/:AddressID                                                                    | PATCH            | V1::AddressBook::AddressUpdate                   | 
 /auth                                                                                      | POST             | V1::Sessions::SessionCreate                      | NoAuthorizationNeeded: 1
-/clientregistration                                                                        | GET              | V1::ClientRegistration::ClientRegistrationSearch | 
-/clientregistration                                                                        | POST             | V1::ClientRegistration::ClientRegistrationCreate | 
-/clientregistration/:ClientID                                                              | DELETE           | V1::ClientRegistration::ClientRegistrationDelete | 
-/clientregistration/:ClientID                                                              | GET              | V1::ClientRegistration::ClientRegistrationGet    | 
+/clientregistrations                                                                       | GET              | V1::ClientRegistration::ClientRegistrationSearch | 
+/clientregistrations                                                                       | POST             | V1::ClientRegistration::ClientRegistrationCreate | 
+/clientregistrations/:ClientID                                                             | DELETE           | V1::ClientRegistration::ClientRegistrationDelete | 
+/clientregistrations/:ClientID                                                             | GET              | V1::ClientRegistration::ClientRegistrationGet    | 
 /cmdb/configitems                                                                          | GET              | V1::CMDB::ConfigItemSearch                       | 
 /cmdb/configitems                                                                          | POST             | V1::CMDB::ConfigItemCreate                       | 
 /cmdb/configitems/:ConfigItemID                                                            | DELETE           | V1::CMDB::ConfigItemDelete                       | 

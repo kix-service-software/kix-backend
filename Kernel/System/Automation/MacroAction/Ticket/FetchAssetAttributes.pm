@@ -112,13 +112,9 @@ sub Run {
 
     return if (!%Ticket);
 
-    my $AssetReferenceDFName = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{AssetReferenceDF},
-        TicketID => $Param{TicketID},
-        Data     => {},
-        UserID   => $Param{UserID},
-        Language => 'en' # to not translate values
+    my $AssetReferenceDFName = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{AssetReferenceDF}
     );
 
     return if (!$AssetReferenceDFName);
@@ -167,22 +163,14 @@ sub Run {
         # skip if config is empty
         next if (!IsArrayRefWithData($CurrMapping) || !$CurrMapping->[0] || !$CurrMapping->[1]);
 
-        my $SourceAttributeName = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $CurrMapping->[0],
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
-            Language => 'en' # to not translate values
+        my $SourceAttributeName = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $CurrMapping->[0]
         );
 
-        my $TargetDFName = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $CurrMapping->[1],
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
-            Language => 'en' # to not translate values
+        my $TargetDFName = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $CurrMapping->[1]
         );
 
         next if (!$SourceAttributeName || !$TargetDFName);

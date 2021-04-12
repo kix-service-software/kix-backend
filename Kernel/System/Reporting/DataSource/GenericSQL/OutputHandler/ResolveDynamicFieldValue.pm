@@ -177,7 +177,7 @@ sub Run {
                 DynamicFieldConfig => $DynamicFieldConfig{$ColumnToFieldName{$Column}},
                 Key                => $Row->{$Column},
             );
-            $Row->{$Column} = join(',', IsArrayRefWithData($Value) ? @{$Value} : [$Value]);
+            $Row->{$Column} = join(',', IsArrayRef($Value) ? @{$Value} : ($Value));
         }
     }
 
