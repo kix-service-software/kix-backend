@@ -763,7 +763,31 @@ sub _ReplaceResultVariables {
     }
     else {
         foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
-            $Param{Data} =~ s/\$\{\Q$Variable\E\}/$Self->{MacroResults}->{$Variable}/gmx;
+            if ( $Param{Data} =~ /^\s*\$\{\Q$Variable\E(\|(.*?))?\}\s*$/ ) {
+                # variable is an assignment, we can replace it with the actual value (i.e. Object)
+                my $Filter = $2;
+                $Param{Data} = $Self->{MacroResults}->{$Variable};
+                if ( $Filter && $Filter eq 'JSON' && IsStringWithData($Param{Data}) ) {
+                    $Param{Data} = $Kernel::OM->Get('JSON')->Encode(
+                        Data => $Param{Data}
+                    );
+                    $Param{Data} =~ s/^"//;
+                    $Param{Data} =~ s/"$//;
+                }
+            }
+            elsif ( $Param{Data} =~ /\$\{\Q$Variable\E(\|(.*?))?\}/ ) {
+                # variable is part of a string, we have to do a string replace
+                my $Filter = $2 || '';
+                my $Value = $Self->{MacroResults}->{$Variable};
+                if ( $Filter && $Filter eq 'JSON' ) {
+                    $Value = $Kernel::OM->Get('JSON')->Encode(
+                        Data => $Value
+                    );
+                    $Value =~ s/^"//;
+                    $Value =~ s/"$//;
+                }
+                $Param{Data} =~ s/\$\{\Q$Variable\E(\|$Filter)?\}/$Value/gmx;
+            }
         }
     }
 

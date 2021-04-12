@@ -30,6 +30,7 @@ AuthSession::DB                                                               = 
 Auth::Sync::LDAP                                                              = Kernel::System::Auth::Sync::LDAP
 Auth::TwoFactor::GoogleAuthenticator                                          = Kernel::System::Auth::TwoFactor::GoogleAuthenticator
 Automation                                                                    = Kernel::System::Automation
+Automation::Helper::Object                                                    = Kernel::System::Automation::Helper::Object
 AutoResponse                                                                  = Kernel::System::AutoResponse
 Autostart                                                                     = Kernel::System::Autostart
 Cache                                                                         = Kernel::System::Cache

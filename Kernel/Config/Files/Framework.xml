@@ -8887,6 +8887,16 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###AssembleObject" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">AssembleObject</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::AssembleObject</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###CreateReport" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>

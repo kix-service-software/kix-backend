@@ -108,6 +108,37 @@ sub Describe {
         Description => Kernel::Language::Translatable('An integer value which will be accounted for the new article (as minutes).'),
         Required    => 0,
     );
+    $Self->AddOption(
+        Name        => 'Attachment1',
+        Label       => Kernel::Language::Translatable('Attachment1'),
+        Description => Kernel::Language::Translatable('An attachment object containing the attributes "Filename", "ContentType" and "Content". You can also use the macro action "AssembleObject" to create one.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'Attachment2',
+        Label       => Kernel::Language::Translatable('Attachment1'),
+        Description => Kernel::Language::Translatable('An attachment object containing the attributes "Filename", "ContentType" and "Content". You can also use the macro action "AssembleObject" to create one.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'Attachment3',
+        Label       => Kernel::Language::Translatable('Attachment1'),
+        Description => Kernel::Language::Translatable('An attachment object containing the attributes "Filename", "ContentType" and "Content". You can also use the macro action "AssembleObject" to create one.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'Attachment4',
+        Label       => Kernel::Language::Translatable('Attachment1'),
+        Description => Kernel::Language::Translatable('An attachment object containing the attributes "Filename", "ContentType" and "Content". You can also use the macro action "AssembleObject" to create one.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'Attachment5',
+        Label       => Kernel::Language::Translatable('Attachment1'),
+        Description => Kernel::Language::Translatable('An attachment object containing the attributes "Filename", "ContentType" and "Content". You can also use the macro action "AssembleObject" to create one.'),
+        Required    => 0,
+    );
+
     # FIXME: add if necessary
     # Charset          => 'utf-8',                                # 'ISO-8859-15'
     # MimeType         => 'text/plain',
@@ -218,6 +249,20 @@ sub Run {
         );
     }
 
+    # replace placeholders in attachment attributes
+    for my $ID ( 1..5 ) {
+        next if !defined $Param{Config}->{"Attachment$ID"};
+
+        $Param{Config}->{$Attribute} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText => 0,
+            Text     => $Param{Config}->{"Attachment$ID"},
+            TicketID => $Param{TicketID},
+            Data     => {},
+            UserID   => $Param{UserID},
+            Language => 'en' # to not translate values
+        );
+    }
+
     $Param{Config}->{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         RichText => 0,
         Text     => $Param{Config}->{Subject},
@@ -248,11 +293,24 @@ sub Run {
         }
     }
 
+    # prepare attachments
+    my @Attachments;
+    foreach my $ID ( 1..5 ) {
+        next if !$Param{Config}->{"Attachment$ID"};
+        if ( ref $Param{Config}->{"Attachment$ID"} eq $Kernel::OM->GetModuleFor('Automation::Helper::Object') ) {
+            push @Attachments, $Param{Config}->{"Attachment$ID"}->AsObject();
+        }
+        else {
+            push @Attachments, $Param{Config}->{"Attachment$ID"};
+        }
+    }
+
     my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         %{ $Param{Config} },
-        TimeUnit  => $Param{Config}->{AccountTime},
-        TicketID  => $Param{TicketID},
-        UserID    => $Param{UserID},
+        TimeUnit   => $Param{Config}->{AccountTime},
+        TicketID   => $Param{TicketID},
+        UserID     => $Param{UserID},
+        Attachment => \@Attachments
     );
 
     if ( !$ArticleID ) {
