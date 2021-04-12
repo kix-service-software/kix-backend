@@ -5,7 +5,7 @@ Feature: GET request to the /reporting/reports/:reportId/results resource
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
       
-  Scenario: get an existing reportdefinition report
+  Scenario: get an existing reportdefinition report result
     Given a reportdefinition
     Then the response code is 201
     Given a report
