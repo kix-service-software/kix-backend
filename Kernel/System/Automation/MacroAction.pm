@@ -236,9 +236,13 @@ sub MacroActionAdd {
     );
 
     if ( !$IsValid ) {
+        my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "MacroAction config is invalid!"
+            Message  => "MacroAction config is invalid ($LogMessage)!"
         );
         return;
     }

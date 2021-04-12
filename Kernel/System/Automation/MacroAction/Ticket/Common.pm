@@ -45,7 +45,7 @@ sub _CheckParams {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(TicketID Config UserID)) {
+    for (qw(Config UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -57,17 +57,19 @@ sub _CheckParams {
 
     return if !$Self->SUPER::_CheckParams(%Param);
     
-    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-        TicketID => $Param{TicketID},
-    );
-
-    if (!%Ticket) {
-        $Kernel::OM->Get('Automation')->LogError(
-            Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - ticket not found!",
-            UserID   => $Param{UserID}
+    if ( $Param{TicketID} ) {
+        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+            TicketID => $Param{TicketID},
         );
-        return;
+
+        if (!%Ticket) {
+            $Kernel::OM->Get('Automation')->LogError(
+                Referrer => $Self,
+                Message  => "Couldn't update ticket $Param{TicketID} - ticket not found!",
+                UserID   => $Param{UserID}
+            );
+            return;
+        }
     }
 
     if (ref $Param{Config} ne 'HASH') {
