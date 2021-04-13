@@ -242,7 +242,9 @@ sub SetResult {
 
     $Self->{Results} //= {};
 
-    $Self->{Results}->{$Param{Name}} = $Param{Value};
+    my $VariableName = $Self->{ResultVariables}->{$Param{Name}} || $Param{Name};
+
+    $Self->{Results}->{} = $Param{Value};
 
     # include all data of an object as separate values
     if ( IsHashRefWithData($Param{Value}) ) {
@@ -251,7 +253,7 @@ sub SetResult {
         );
         if ( IsHashRefWithData($FlatData) ) {
             # combine with existing results
-            my %TmpHash = map { $Param{Name}.'.'.$_ => $FlatData->{$_} } keys %{$FlatData};
+            my %TmpHash = map { $VariableName.'.'.$_ => $FlatData->{$_} } keys %{$FlatData};
             $Self->{Results} = {
                 %{$Self->{Results}},
                 %TmpHash,
@@ -260,7 +262,7 @@ sub SetResult {
 
         foreach my $Key ( keys %{$Param{Value}} ) {
             $Self->SetResult(
-                Name  => $Param{Name}.'.'.$Key,
+                Name  => $VariableName.'.'.$Key,
                 Value => $Param{Value}->{$Key},
             )
         }
@@ -269,7 +271,7 @@ sub SetResult {
         my $Index = 0;
         foreach my $Item ( @{$Param{Value}} ) {
             $Self->SetResult(
-                Name  => $Param{Name}.':'.$Index++,
+                Name  => $VariableName.':'.$Index++,
                 Value => $Item,
             )
         }

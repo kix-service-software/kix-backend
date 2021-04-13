@@ -61,7 +61,7 @@ sub Describe {
     $Self->AddOption(
         Name        => 'CaptureGroupNames',
         Label       => Kernel::Language::Translatable('Capture Group Names'),
-        Description => Kernel::Language::Translatable('A comma separated list of names for the capture groups. The order corresponds to the capture group id. If not given, the IDs of the capture groups will be used, starting from 1.'),
+        Description => Kernel::Language::Translatable('If you don\'t use a RegEx with named capture groups, you can give a comma separated list of names for the capture groups. The order corresponds to the capture group id. If not given, the IDs of the capture groups will be used, starting from 1.'),
         Required    => 0,
     );
 
@@ -111,11 +111,17 @@ sub Run {
     if ( my @Captured = $Text =~ /$Param{Config}->{RegEx}/smx ) {
         my $Index = 0;
         if ( $Param{Config}->{CaptureGroupNames} ) {
+            # use the configured names
             foreach my $Name ( split(/\s*,\s*/, $Param{Config}->{CaptureGroupNames}) ) {
                 $Results{$Name} = $Captured[$Index++];
             }
         }
+        elsif ( %+ ) {
+            # named capture groups
+            %Results = %+;
+        }
         else {
+            # fallback
             %Results = map { ++$Index => $_ } @Captured;
         }
     }

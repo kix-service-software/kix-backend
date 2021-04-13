@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Digest::MD5;
+use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -641,6 +642,9 @@ sub MacroActionExecute {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
 
+    # we need the result variables for the assignments
+    $BackendObject->{ResultVariables} = $MacroAction{ResultVariables} || {};
+
     # add root object id
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
 
@@ -777,6 +781,9 @@ sub _ReplaceResultVariables {
                     $Param{Data} =~ s/^"//;
                     $Param{Data} =~ s/"$//;
                 }
+                elsif ( $Filter && $Filter eq 'base64' ) {
+                    $Param{Data} = MIME::Base64::decode_base64($Param{Data});
+                }
             }
             elsif ( $Param{Data} =~ /\$\{\Q$Variable\E(\|(.*?))?\}/ ) {
                 # variable is part of a string, we have to do a string replace
@@ -788,6 +795,9 @@ sub _ReplaceResultVariables {
                     );
                     $Value =~ s/^"//;
                     $Value =~ s/"$//;
+                }
+                elsif ( $Filter && $Filter eq 'base64' ) {
+                    $Value = MIME::Base64::decode_base64($Value);
                 }
                 $Param{Data} =~ s/\$\{\Q$Variable\E(\|$Filter)?\}/$Value/gmx;
             }
