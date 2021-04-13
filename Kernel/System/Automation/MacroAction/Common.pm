@@ -244,7 +244,7 @@ sub SetResult {
 
     my $VariableName = $Self->{ResultVariables}->{$Param{Name}} || $Param{Name};
 
-    $Self->{Results}->{} = $Param{Value};
+    $Self->{Results}->{$VariableName} = $Param{Value};
 
     # include all data of an object as separate values
     if ( IsHashRefWithData($Param{Value}) ) {
