@@ -53,6 +53,12 @@ sub Describe {
         Required    => 1,
     );
     $Self->AddOption(
+        Name        => 'LoopVariable',
+        Label       => Kernel::Language::Translatable('Loop Variable'),
+        Description => Kernel::Language::Translatable('The value (ObjectID) of the current loop iteration in case it is needed. It can be used like any result variable in a macro.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
         Name        => 'MacroID',
         Label       => Kernel::Language::Translatable('MacroID'),
         Description => Kernel::Language::Translatable('The ID of the macro to execute for each value.'),
@@ -115,6 +121,11 @@ sub Run {
             );
             next;
         }
+
+        if ( $Param{Config}->{LoopVariable} ) {
+            $Self->SetResult(Name => $Param{Config}->{LoopVariable}, Value => $Value);
+        }
+
         my $Result = $AutomationObject->MacroExecute(
             ID       => $Param{Config}->{MacroID},
             ObjectID => $Value,
