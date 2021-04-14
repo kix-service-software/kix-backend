@@ -518,10 +518,25 @@ sub DataIsDifferent {
     return 1;
 }
 
+=item IsBase64()
+
+test supplied sring to determine if it's a base64 coded content
+
+returns 1 if data matches criteria or undef otherwise
+
+    my $Result = IsBase64(scalar);
+
+=cut
+
+sub IsBase64 {
+    my $TestData = $_[0];
+
+    return if $TestData !~ /^[A-Za-z0-9+\/=]+$/;
+    
+    return if length($TestData) % 4 != 0;
+}
+
 1;
-
-
-
 
 =back
 
