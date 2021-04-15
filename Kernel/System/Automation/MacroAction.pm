@@ -642,7 +642,10 @@ sub MacroActionExecute {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
 
-    # we need the result variables for the assignments
+    $Self->{MacroResults} //= {};
+
+    # we need the result variables and macro results for the assignments
+    $BackendObject->{MacroResults} = $Self->{MacroResults};
     $BackendObject->{ResultVariables} = $MacroAction{ResultVariables} || {};
 
     # add root object id
@@ -672,16 +675,6 @@ sub MacroActionExecute {
             Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
             UserID   => $Param{UserID},
         );
-    } else {
-        my %Definition = $BackendObject->DefinitionGet();
-
-        # map results to variables
-        if (IsHashRefWithData($Definition{Results})) {
-            $Self->{MacroResults} = {
-                %{$Self->{MacroResults}},
-                %{$BackendObject->GetResults()}
-            };
-        }
     }
 
     # remove MacroActionID from log reference

@@ -39,17 +39,23 @@ sub SetType {
     my ( $Self, $Type ) = @_;
 
     $Self->{Type} = $Type;
+
+    $Self->{Object} = $Self->AsObject();
 }
 
 sub SetDefinition {
     my ( $Self, $Definition ) = @_;
 
     $Self->{Definition} = $Definition;
+
+    $Self->{Object} = $Self->AsObject();
 }
 
 sub AsObject {
     my ( $Self, %Param ) = @_;
     my $Object;
+
+    return if !$Self->{Type} || !$Self->{Definition};
 
     if ( $Self->{Type} eq 'YAML') {
         $Object = $Kernel::OM->Get('YAML')->Load(

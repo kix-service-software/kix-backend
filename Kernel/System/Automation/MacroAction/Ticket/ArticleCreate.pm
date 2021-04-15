@@ -287,7 +287,7 @@ sub Run {
     # prepare attachments
     my @Attachments;
     foreach my $ID ( 1..5 ) {
-        next if !$Param{Config}->{"AttachmentObject$ID"} || ref $Param{Config}->{"AttachmentObject$ID"} ne $Kernel::OM->GetModuleFor('Automation::Helper::Object');
+        next if !$Param{Config}->{"AttachmentObject$ID"} || !IsObject($Param{Config}->{"AttachmentObject$ID"}, $Kernel::OM->GetModuleFor('Automation::Helper::Object'));
 
         my $Attachment = $Param{Config}->{"AttachmentObject$ID"}->AsObject();
         if ( IsBase64($Attachment->{Content}) ) {
