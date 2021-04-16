@@ -56,7 +56,7 @@ create an article
         InReplyTo        => '<asdasdasd.12@example.com>',           # not required but useful
         References       => '<asdasdasd.1@example.com> <asdasdasd.12@example.com>', # not required but useful
         ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
-        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
+        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|...
         HistoryComment   => 'Some free text!',
         TimeUnit         => 123,                                    # optional
         UserID           => 123,
@@ -116,7 +116,7 @@ example with "Charset & MimeType" and no "ContentType"
         IncomingTime     => 'YYYY-MM-DD HH24:MI:SS',                # optional
         Charset          => 'ISO-8859-15',
         MimeType         => 'text/plain',
-        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
+        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|...
         HistoryComment   => 'Some free text!',
         UserID           => 123,
         UnlockOnAway     => 1,                                      # Unlock ticket if owner is away
@@ -673,7 +673,7 @@ sub ArticleCreate {
         if (
             $FirstArticle &&
             $Param{HistoryType}
-            =~ /^(EmailAgent|EmailCustomer|PhoneCallCustomer|WebRequestCustomer|SystemRequest)$/i
+            =~ /^(EmailAgent|EmailCustomer|SystemRequest)$/i
             )
         {
             # trigger notification event
