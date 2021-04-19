@@ -142,7 +142,7 @@ sub Run {
                 # perform faq search
                 my @SearchResult = $Kernel::OM->Get('FAQ')->FAQSearch(
                     UserID   => $Self->{Authorization}->{UserID},
-                    Limit    => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                    Limit    => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
                     ValidIDs => \@ValidIDs,
                     $SearchItem->{Field} => {
                         $Operator => $Value
@@ -187,7 +187,7 @@ sub Run {
         # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
         @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
             UserID   => $Self->{Authorization}->{UserID},
-            Limit    => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+            Limit   => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
             ValidIDs => \@ValidIDs
         );
     }
