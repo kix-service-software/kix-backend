@@ -422,15 +422,17 @@ sub PrepareData {
         }
     }
 
-    # prepare limiter
-    if ( exists( $Param{Data}->{limit} ) && IsStringWithData( $Param{Data}->{limit} ) ) {
-        foreach my $Limiter ( split( /,/, $Param{Data}->{limit} ) ) {
-            my ( $Object, $Limit ) = split( /\:/, $Limiter, 2 );
-            if ( $Limit && $Limit =~ /^\d+$/ ) {
-                $Self->{Limit}->{$Object} = $Limit;
-            }
-            else {
-                $Self->{Limit}->{__COMMON} = $Object;
+    #prepare limiter and searchlimit
+    foreach my $LimitType ( qw(Limit SearchLimit) ) {
+        if ( exists( $Param{Data}->{lc($LimitType)} ) && IsStringWithData( $Param{Data}->{lc($LimitType)} ) ) {
+            foreach my $Limiter ( split( /,/, $Param{Data}->{lc($LimitType)} ) ) {
+                my ( $Object, $Limit ) = split( /\:/, $Limiter, 2 );
+                if ( $Limit && $Limit =~ /^\d+$/ ) {
+                    $Self->{$LimitType}->{$Object} = $Limit;
+                }
+                else {
+                    $Self->{$LimitType}->{__COMMON} = $Object;
+                }
             }
         }
     }
@@ -800,30 +802,6 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", $TimeDiff));
         }
 
-        # honor an offset, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Offset} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyOffset(
-                Data => \%Param,
-            );
-
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", $TimeDiff));
-        }
-
-        # honor a limiter, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Limit} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyLimit(
-                Data => \%Param,
-            );
-
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", $TimeDiff));
-        }
-
         # honor permission filters
         if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{PermissionFilters} ) ) {
             my $StartTime = Time::HiRes::time();
@@ -901,6 +879,30 @@ sub _Success {
             $Self->_CacheRequest(
                 Data => \%Param,
             );
+        }
+
+        # honor an offset, if we have one
+        if ( IsHashRefWithData( $Self->{Offset} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_ApplyOffset(
+                Data => \%Param,
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", $TimeDiff));
+        }
+
+        # honor a limiter, if we have one
+        if ( IsHashRefWithData( $Self->{Limit} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_ApplyLimit(
+                Data => \%Param,
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", $TimeDiff));
         }
     }
 
@@ -2249,11 +2251,12 @@ sub _Trim {
 sub _GetCacheKey {
     my ( $Self, %Param ) = @_;
 
-    # generate key without offset
+    # generate key without offset & limit
     my %RequestData = %{ $Self->{RequestData} };
     delete $RequestData{offset};
+    delete $RequestData{limit};
 
-    my @CacheKeyParts = qw(limit include expand);
+    my @CacheKeyParts = qw(include expand);
     if ( IsArrayRefWithData( $Self->{CacheKeyExtensions} ) ) {
         @CacheKeyParts = (
             @CacheKeyParts,
