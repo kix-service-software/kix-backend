@@ -28,7 +28,7 @@ Feature: GET request to the /system/cmdb/classes resource
     When I query the cmdb collection of classes with offset 2
     Then the response code is 200
 #    And the response object is ConfigItemClassCollectionResponse
-    And the response contains 7 items of type "ConfigItemClass"
+    And the response contains 5 items of type "ConfigItemClass"
 
   Scenario: get the list of existing classes with limit and offset
     When I query the cmdb collection of classes with limit 2 and offset 2

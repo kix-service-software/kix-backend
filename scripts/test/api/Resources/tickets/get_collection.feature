@@ -58,7 +58,25 @@ Feature: GET request to the /tickets resource
     And the response has no content       
     When I query the collection of tickets
     
-
+  Scenario: get the list of existing tickets searchlimit
+    Given 80 of tickets
+    When I query the collection of tickets 55 searchlimit
+    Then the response code is 200
+    And the response contains 55 items of type "Ticket"
+    When delete all this tickets
+    Then the response code is 204
+    And the response has no content
+        
+  Scenario: get the list of existing tickets searchlimit object
+    Given 80 of tickets  
+    When I query the collection of tickets 35 searchlimit object
+    Then the response code is 200
+    And the response contains 35 items of type "Ticket"        
+    When delete all this tickets
+    Then the response code is 204
+    And the response has no content
+    
+    
     
     
      

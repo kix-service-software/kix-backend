@@ -28,7 +28,7 @@
     When I query the collection of ticket queues with offset 2 
     Then the response code is 200
 #    And the response object is QueueCollectionResponse
-     And the response contains 3 items of type "Queue"
+     And the response contains 1 items of type "Queue"
      
   Scenario: get the list of existing ticket queues with limit and offset  
     When I query the collection of ticket queues with limit 2 and offset 1 

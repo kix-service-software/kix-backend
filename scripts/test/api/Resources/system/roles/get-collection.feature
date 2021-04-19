@@ -33,7 +33,7 @@ Feature: GET request to the /system/roles resource
   Scenario: get the list of existing roles with offset
     When I query the collection of roles with offset 2
     Then the response code is 200
-    And the response contains 15 items of type "Role"
+    And the response contains 13 items of type "Role"
 
   Scenario: get the list of existing roles with limit and offset
     When I query the collection of roles with limit 2 and offset 4
