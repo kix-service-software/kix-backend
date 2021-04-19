@@ -128,7 +128,7 @@ sub Run {
 
                     $Value =~ s/\*/%/g;
 
-                    my @What = IsArrayRefWithData($SearchParam{What}) ? @{$SearchParam{What}} : (); 
+                    my @What = IsArrayRefWithData($SearchParam{What}) ? @{$SearchParam{What}} : ();
                     if ( $OperatorMapping{$SearchItem->{Operator}} ) {
                         push(@What, { $SearchKey."{'Content'}" => { $OperatorMapping{$SearchItem->{Operator}}, $Value } });
                     }
@@ -136,7 +136,7 @@ sub Run {
                         push(@What, { $SearchKey."{'Content'}" => $Value });
                     }
                     $SearchParam{What} = \@What;
-                } 
+                }
                 else {
                     $SearchParam{$Field} = $Value;
                 }
@@ -162,6 +162,7 @@ sub Run {
                 my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                     %SearchParam,
                     UserID  => $Self->{Authorization}->{UserID},
+                    Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'}
                 );
                 @SearchTypeResult = @{$SearchResult};
             }
@@ -185,6 +186,7 @@ sub Run {
         # perform ConfigItem search
         my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
             UserID  => $Self->{Authorization}->{UserID},
+            Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'}
         );
         @ConfigItemList = @{$SearchResult};
     }
@@ -202,7 +204,7 @@ sub Run {
             Data      => {
                 ConfigItemID => join(',', sort @ConfigItemIDList),
             }
-        );   
+        );
 
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
