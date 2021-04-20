@@ -146,6 +146,7 @@ sub Run {
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
                         UserID  => $Self->{Authorization}->{UserID},
+                        Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'}
                     );
 
                     # merge results
