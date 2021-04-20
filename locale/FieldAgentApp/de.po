@@ -474,3 +474,24 @@ msgstr "Es ist ein Serverfehler aufgetreten. Bitte probieren Sie es später erne
 
 msgid "The connection was lost. The ticket couldn't be changed."
 msgstr "Die Verbindung ist abgebrochen. Das Ticket konnte nicht geändert werden."
+
+msgid "Tomorrow"
+msgstr "Morgen"
+
+msgid "Later"
+msgstr "Später"
+
+msgid "Next Week"
+msgstr "Nächste Woche"
+
+msgid "NextWeek"
+msgstr "Nächste Woche"
+
+msgid "New note"
+msgstr "Neue Notiz"
+
+msgid "Edit pending time"
+msgstr "Erinnerungszeit setzen"
+
+msgid "Edit plan time"
+msgstr "Zeitplanung bearbeiten"
