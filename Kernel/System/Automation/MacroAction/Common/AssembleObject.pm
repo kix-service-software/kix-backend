@@ -55,7 +55,7 @@ sub Describe {
     $Self->AddOption(
         Name        => 'Definition',
         Label       => Kernel::Language::Translatable('Definition'),
-        Description => Kernel::Language::Translatable('The definition (structure/content) of the object, i.e. the YAML string or the JSON. You can use variables and placeholders.'),
+        Description => Kernel::Language::Translatable('The definition (structure/content) of the object, i.e. the YAML string or the JSON. You can use variables and placeholders. IMPORTANT: due to the possible use of placeholders and variables, the definition can only be validated when this action gets executed. In case of an error you will find detailed information in the job log and the kix log.'),
         Required    => 1,
     );
 

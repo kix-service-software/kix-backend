@@ -237,14 +237,32 @@ sub Log {
         $Error .= "\n";
         print STDERR $Error;
 
-        # store data (for the frontend)
-        $Self->{error}->{Message}   = $Message;
-        $Self->{error}->{Traceback} = $Error;
+        # store data for reference
+        $Self->{error}->{Message} //= [];
+        $Self->{error}->{Traceback} //= [];
+
+        push @{$Self->{error}->{Message}}, $Message;
+        push @{$Self->{error}->{Traceback}}, $Error;
+
+        # truncate to 100 entries
+        if ( @{$Self->{error}->{Message}} > 100 ) {
+            shift @{$Self->{error}->{Message}};
+        }
+        if ( @{$Self->{error}->{Traceback}} > 100 ) {
+            shift @{$Self->{error}->{Traceback}};
+        }
     }
 
     # remember to info and notice messages
     elsif ( lc $Priority eq 'info' || lc $Priority eq 'notice' ) {
-        $Self->{ lc $Priority }->{Message} = $Message;
+        $Self->{ lc $Priority }->{Message} //= [];
+
+        push @{$Self->{ lc $Priority }->{Message}}, $Message;
+
+        # truncate to 100 entries
+        if ( @{$Self->{ lc $Priority }->{Message}} > 100 ) {
+            shift @{$Self->{ lc $Priority }->{Message}};
+        }
     }
 
     # write shm cache log
@@ -266,8 +284,9 @@ sub Log {
 to get the last log info back
 
     my $Message = $LogObject->GetLogEntry(
-        Type => 'error', # error|info|notice
-        What => 'Message', # Message|Traceback
+        Type  => 'error',   # error|info|notice
+        What  => 'Message', # Message|Traceback,
+        Index => 1,         # optional: index in the list (max. 100 entries). Use negative values to access items at the end of the list (-1 is the last element). If not given, the last entry will be returned.
     );
 
 =cut
@@ -275,7 +294,9 @@ to get the last log info back
 sub GetLogEntry {
     my ( $Self, %Param ) = @_;
 
-    return $Self->{ lc $Param{Type} }->{ $Param{What} } || '';
+    my $Index = $Param{Index} || -1;
+
+    return $Self->{ lc $Param{Type} }->{ $Param{What} }[$Index] || '';
 }
 
 =item GetLog()

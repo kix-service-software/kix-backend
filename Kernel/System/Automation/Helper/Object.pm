@@ -54,17 +54,41 @@ sub SetDefinition {
 sub AsObject {
     my ( $Self, %Param ) = @_;
     my $Object;
+    my $Success;
+    my $LogMessage;
 
     return if !$Self->{Type} || !$Self->{Definition};
 
     if ( $Self->{Type} eq 'YAML') {
-        $Object = $Kernel::OM->Get('YAML')->Load(
+        $Success = $Object = $Kernel::OM->Get('YAML')->Load(
             Data => $Self->{Definition}
         );
+        if ( !$Success ) {
+            # the relevant error message is the 3rd last 
+            $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                Type  => 'error',
+                What  => 'Message',
+                Index => -3,
+            );
+        }
     }
     elsif ( $Self->{Type} eq 'JSON') {
-        $Object = $Kernel::OM->Get('JSON')->Decode(
+        $Success = $Object = $Kernel::OM->Get('JSON')->Decode(
             Data => $Self->{Definition}
+        );
+        if ( !$Success ) {
+            $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                Type => 'error',
+                What => 'Message',
+            );
+        }
+    }
+
+    if ( !$Success ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Unable to assemble object! ($LogMessage)",
+            UserID   => 1
         );
     }
 
