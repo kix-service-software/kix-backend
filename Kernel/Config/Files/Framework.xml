@@ -464,6 +464,8 @@
         <SubGroup>Core::Cache</SubGroup>
         <Setting>
             <Hash>
+                <Item Key="reconnect">1</Item>
+                <Item Key="every">100000</Item>
             </Hash>
         </Setting>
     </ConfigItem>
