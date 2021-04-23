@@ -142,7 +142,6 @@ perform TicketCreate Operation. This will return the created TicketID.
                         Channel                         => 'some channel name',        # optional
                         SenderTypeID                    => 123,                        # optional
                         SenderType                      => 'some sender type name',    # optional
-                        AutoResponseType                => 'some auto response type',  # optional
                         From                            => 'some from string',         # optional
                         HistoryType                     => 'some history type',        # optional
                         HistoryComment                  => 'Some  history comment',    # optional

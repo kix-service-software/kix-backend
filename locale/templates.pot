@@ -3867,10 +3867,6 @@ msgid "Helps to extend your articles full-text search (From, To, Cc, Subject and
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "If this regex matches, no message will be send by the autoresponder."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "If ticket responsible feature is enabled, set responsible on ticket creation or state update."
 msgstr ""
 
