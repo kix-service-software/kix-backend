@@ -27,7 +27,6 @@ my @Objects = (
     'Output::HTML::Layout',
     'Auth',
     'AuthSession',
-    'AutoResponse',
     'Cache',
     'CheckItem',
     'CSV',

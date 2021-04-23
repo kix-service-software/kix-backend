@@ -2048,7 +2048,6 @@
                 <Item>ArticleBounce</Item>
                 <Item>ArticleAgentNotification</Item>
                 <Item>ArticleCustomerNotification</Item>
-                <Item>ArticleAutoResponse</Item>
                 <Item>ArticleFlagSet</Item>
                 <Item>ArticleFlagDelete</Item>
             </Array>
@@ -2601,14 +2600,6 @@ Thanks for your help!
                 <Item Key="OnlyFirstMatch">1</Item>
                 <Item Key="StopAfterMatch">1</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SendNoAutoResponseRegExp" Required="1" Valid="1">
-        <Description Translatable="1">If this regex matches, no message will be send by the autoresponder.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <String Regex="">(MAILER-DAEMON|postmaster|abuse)@.+?\..+?</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0200" Required="0" Valid="1">
