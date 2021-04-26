@@ -39,7 +39,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(TicketID InmailUserID GetParam Tn AutoResponseType)) {
+    for (qw(TicketID InmailUserID GetParam Tn)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -61,7 +61,6 @@ sub Run {
 
     my $Comment          = $Param{Comment}          || '';
     my $Lock             = $Param{Lock}             || '';
-    my $AutoResponseType = $Param{AutoResponseType} || '';
 
     # do db insert
     my $ArticleID = $TicketObject->ArticleCreate(
@@ -81,7 +80,6 @@ sub Run {
         UserID           => $Param{InmailUserID},
         HistoryType      => 'FollowUp',
         HistoryComment   => "\%\%$Param{Tn}\%\%$Comment",
-        AutoResponseType => $AutoResponseType,
         OrigHeader       => \%GetParam,
     );
     if ( !$ArticleID ) {

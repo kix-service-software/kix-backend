@@ -130,7 +130,6 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 CustomerVisible                 => 0|1,                        # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
-                AutoResponseType                => 'some auto response type',  # optional
                 From                            => 'some from string',         # optional
                 To                              => 'some to string',           # optional
                 Cc                              => 'some Cc string',           # optional
@@ -198,9 +197,6 @@ sub Run {
     $Article->{UserType} = $Self->{Authorization}->{UserType};
 
     # set defaults from operation config
-    if ( !$Article->{AutoResponseType} ) {
-        $Article->{AutoResponseType} = $Self->{Config}->{AutoResponseType} || '';
-    }
     if ( !$Article->{ChannelID} && !$Article->{Channel} ) {
         $Article->{Channel} = $Self->{Config}->{Channel} || '';
     }
@@ -354,7 +350,6 @@ sub _ArticleCreate {
         UserID           => $Param{UserID},
         HistoryType      => $Article->{HistoryType},
         HistoryComment   => $Article->{HistoryComment} || '%%',
-        AutoResponseType => $Article->{AutoResponseType},
         OrigHeader       => {
             From    => $From,
             To      => $To,

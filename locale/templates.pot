@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-4-20 12:07+0000\n"
+"POT-Creation-Date: 2021-4-26 06:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1532,10 +1532,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Age"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Ticket.xml
-msgid "Defines the default auto response type of the article for this operation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -3864,10 +3860,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). Runtime will do full-text searches on live data (it works fine for up to 50.000 tickets). StaticDB will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use \"bin/kix.Console.pl Maint::Ticket::FulltextIndexRebuild\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "If this regex matches, no message will be send by the autoresponder."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

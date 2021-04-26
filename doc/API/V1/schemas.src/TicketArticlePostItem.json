@@ -4,9 +4,6 @@
   "type" : "object",
   "description" : "The ticket article object for creation.",
   "properties" : {
-    "AutoResponseType" : {
-      "type" : "string"
-    },
     "Attachments": {
       "type": "array",
       "item": {
