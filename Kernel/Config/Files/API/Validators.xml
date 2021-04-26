@@ -12,17 +12,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###AutoResponseTypeValidator" Required="0" Valid="1">
-        <Description Translatable="1">API module registration for the validator layer.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::API::Validator::AutoResponseTypeValidator</Item>
-                <Item Key="Validates">AutoResponseType</Item>
-                <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(NotificationCreate|NotificationUpdate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Validator::Module###AttachmentsValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
