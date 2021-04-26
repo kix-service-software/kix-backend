@@ -554,7 +554,7 @@ sub MacroExecute {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID ObjectID UserID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -563,6 +563,9 @@ sub MacroExecute {
             return;
         }
     }
+
+    # init ObjectID with a numeric value if given
+    $Param{ObjectID} = 0 if !$Param{ObjectID};
 
     # init call stack
     $Self->{ParentMacroID} //= [];

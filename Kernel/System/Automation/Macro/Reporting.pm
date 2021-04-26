@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Automation::Macro::Ticket;
+package Kernel::System::Automation::Macro::Reporting;
 
 use strict;
 use warnings;
@@ -28,11 +28,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::Automation::Macro::Ticket - macro type for automation lib
+Kernel::System::Automation::Macro::Reporting - macro type for automation lib
 
 =head1 SYNOPSIS
 
-Handles ticket based macros.
+Handles reporting macros.
 
 =head1 PUBLIC INTERFACE
 
@@ -57,7 +57,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ExecOrder UserID)) {
+    for (qw(ObjectID ExecOrder UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -67,19 +67,13 @@ sub Run {
         }
     }
 
-    # FIXME: use given instance
-    my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
-
+    
     # execute all macro action given in the execution order attribute
     foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
-        my $Result = $AutomationObject->MacroActionExecute(
+        my $Result = $Kernel::OM->Get('Automation')->MacroActionExecute(
             ID       => $MacroActionID,
-            ObjectID => $Param{ObjectID},      # give the anonymous ObjectID as well for "Common" macro actions
-            TicketID => $Param{ObjectID},
+            ObjectID => $Param{ObjectID},
             UserID   => $Param{UserID},
-
-            # FIXME: add instance if job was triggerd by event (ExecuteJobsForEvent)
-            AutomationInstance => $Param{AutomationInstance}
         );
         # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here
     }
