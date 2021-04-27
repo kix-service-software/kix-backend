@@ -107,16 +107,6 @@ perform Operation.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
-    # if necessary check if config item is accessible for current customer user
-    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
-        ConfigItemIDList => $Param{Data}->{ConfigItemID}
-    );
-    if ( !$CustomerCheck->{Success} ) {
-        return $Self->_Error(
-            %{$CustomerCheck},
-        );
-    }
 
     foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {
 

@@ -24,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::Common - Base class for all Link Operations
+Kernel::API::Operation::V1::Link::Common - Base class for all Link Operations
 
 =head1 SYNOPSIS
 

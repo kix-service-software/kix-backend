@@ -15,7 +15,7 @@ use Kernel::API::Operation::V1::FAQ::FAQArticleGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -191,6 +191,13 @@ sub Run {
             ValidIDs => \@ValidIDs
         );
     }
+
+    # filter for customer assigned articles if necessary
+    @ArticleIDs = $Self->_FilterCustomerUserVisibleObjectIds(
+        ObjectType   => 'FAQArticle',
+        ObjectIDList => \@ArticleIDs,
+        UserID       => $Self->{Authorization}->{UserID}
+    );
 
     # get already prepared FAQ data from FAQArticleGet operation
     if (@ArticleIDs) {

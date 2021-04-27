@@ -6703,6 +6703,58 @@ sub TicketCalendarGet {
     return '';
 }
 
+=item GetAssignedTicketsForObject()
+
+return all assigned ticket IDs
+
+    my $TicketIDList = $TicketObject->GetAssignedTicketsForObject(
+        ObjectType   => 'Contact',
+        Object       => $ContactHashRef,         # (optional)
+        ObjectIDList => $ObjectIDListArrayRef,   # (optional)
+        UserID       => 1
+    );
+
+=cut
+
+sub GetAssignedTicketsForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedTicketIDs = ();
+
+    my %SearchData = $Self->_GetAssignedSearchParams(
+        %Param,
+        AssignedObjectType => 'Ticket'
+    );
+
+    if (IsHashRefWithData(\%SearchData)) {
+        my %Search;
+        if (IsArrayRefWithData($Param{ObjectIDList})) {
+            $Search{AND} = [
+                { Field => 'TicketID', Operator => 'IN', Value => $Param{ObjectIDList} }
+            ];
+        }
+
+        my @ORSearch = map { { Field => $_, Operator => 'IN', Value => $SearchData{$_} } } keys %SearchData;
+        @AssignedTicketIDs = $Self->TicketSearch(
+            Result     => 'ARRAY',
+            Search     => {
+                %Search,
+                OR => \@ORSearch
+            },
+            UserID => $Param{UserID},
+
+            # TODO: use correct type for permission check if activated
+            # UserType   => 'Agent',
+        );
+
+        if ( IsArrayRefWithData(\@AssignedTicketIDs) ) {
+            @AssignedTicketIDs = map { 0 + $_ } @AssignedTicketIDs;
+        }
+    }
+
+    return \@AssignedTicketIDs;
+}
+
 sub DESTROY {
     my $Self = shift;
 

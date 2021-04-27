@@ -91,10 +91,10 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ConfigItemGet Operation. 
+perform ConfigItemGet Operation.
 
     my $Result = $OperationObject->Run(
-        ConfigItemID => 1,                                # required 
+        ConfigItemID => 1,                                # required
     );
 
     $Result = {
@@ -115,18 +115,8 @@ perform ConfigItemGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # if necessary check if config item is accessible for current customer user
-    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
-        ConfigItemIDList => $Param{Data}->{ConfigItemID}
-    );
-    if ( !$CustomerCheck->{Success} ) {
-        return $Self->_Error(
-            %{$CustomerCheck},
-        );
-    }
-
     my @ConfigItemList;
-    foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {                 
+    foreach my $ConfigItemID ( @{$Param{Data}->{ConfigItemID}} ) {
 
         my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
             ConfigItemID => $ConfigItemID,
@@ -136,7 +126,7 @@ sub Run {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
-        }     
+        }
 
         # include CurrentVersion if requested
         if ( $Param{Data}->{include}->{CurrentVersion} ) {
@@ -148,7 +138,7 @@ sub Run {
                     VersionID     => $ConfigItem->{LastVersionID},
                 }
             );
-            
+
             if ( IsHashRefWithData($Result) && $Result->{Success} ) {
                 $ConfigItem->{CurrentVersion} = $Result->{Data}->{ConfigItemVersion};
             }
@@ -165,7 +155,7 @@ sub Run {
     elsif ( scalar(@ConfigItemList) == 1 ) {
         return $Self->_Success(
             ConfigItem => $ConfigItemList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

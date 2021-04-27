@@ -99,7 +99,13 @@ sub Run {
         UserID     => $Self->{Authorization}->{UserID},
     );
 
-    if ( @TicketIndex ) {
+    # filter for customer assigned tickets if necessary
+    @TicketIndex = $Self->_FilterCustomerUserVisibleObjectIds(
+        ObjectType   => 'Ticket',
+        ObjectIDList => \@TicketIndex
+    );
+
+   if ( @TicketIndex ) {
 
         # get already prepared Ticket data from TicketGet operation
         my $GetResult = $Self->ExecOperation(
