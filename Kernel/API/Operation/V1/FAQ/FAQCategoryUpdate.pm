@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -108,10 +108,10 @@ perform FAQCategoryUpdate Operation. This will return the updated TypeID.
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            FAQCategoryID  => 123,              # ID of the updated FAQCategory 
+            FAQCategoryID  => 123,              # ID of the updated FAQCategory
         },
     };
-   
+
 =cut
 
 
@@ -123,12 +123,12 @@ sub Run {
         Data => $Param{Data}->{FAQCategory}
     );
 
-    # check if FAQCategory exists 
+    # check if FAQCategory exists
     my %FAQCategoryData = $Kernel::OM->Get('FAQ')->CategoryGet(
         CategoryID  => $Param{Data}->{FAQCategoryID},
         UserID      => 1
     );
- 
+
     if ( !%FAQCategoryData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -165,10 +165,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         FAQCategoryID => $Param{Data}->{FAQCategoryID},
-    );    
+    );
 }
 
 1;

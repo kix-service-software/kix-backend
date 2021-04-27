@@ -24,7 +24,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::Ticket::Common - Base class for all DynamicField Operations
+Kernel::API::Operation::V1::DynamicField::Common - Base class for all DynamicField Operations
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ sub _CheckDynamicField {
 
     # check if FieldType is valid
     if ( $DynamicField->{FieldType} ) {
-        
+
         # get FieldTypes
         my $FieldTypeConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::Driver');
 
@@ -91,10 +91,10 @@ sub _CheckDynamicField {
             );
         }
     }
-    
+
     # check if ObjectType is valid
     if ( $DynamicField->{ObjectType} ) {
-        
+
         # get FieldTypes
         my $ObjectTypeConfig = $Kernel::OM->Get('Config')->Get('DynamicFields::ObjectType');
 

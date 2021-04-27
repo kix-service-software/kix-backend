@@ -16,7 +16,7 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -118,7 +118,7 @@ perform FAQArticleAttachmentCreate Operation. This will return the created FAQAt
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             FAQAttachmentID  => '',                 # ID of the created Attachment
@@ -129,7 +129,7 @@ perform FAQArticleAttachmentCreate Operation. This will return the created FAQAt
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # isolate and trim Attachment parameter
     my $Attachment = $Self->_Trim(
         Data => $Param{Data}->{Attachment}
@@ -152,11 +152,11 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         Code            => 'Object.Created',
         FAQAttachmentID => $AttachmentID,
-    );    
+    );
 }
 
 

@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -110,7 +110,7 @@ perform FAQArticleVoteDelete Operation. This will return the deleted VoteID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # start loop
     foreach my $VoteID ( @{$Param{Data}->{FAQVoteID}} ) {
 
@@ -119,7 +119,7 @@ sub Run {
             VoteID => $VoteID,
             UserID => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

@@ -479,10 +479,12 @@ sub FAQAdd {
     # check for base64 encoded images in fields and store them
     my @AttachmentConvert;
     foreach my $Field ( qw(Field1 Field2 Field3 Field4 Field5 Field6) ) {
-        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
-            DocumentRef    => \$Param{$Field},
-            AttachmentsRef => \@AttachmentConvert,
-        );
+        if ($Param{$Field}) {
+            $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
+                DocumentRef    => \$Param{$Field},
+                AttachmentsRef => \@AttachmentConvert,
+            );
+        }
     }
 
     return if !$Kernel::OM->Get('DB')->Do(
@@ -2337,6 +2339,233 @@ sub FAQContentTypeSet {
     return 1;
 }
 
+=item GetAssignedFAQArticlesForObject()
+
+return all assigned faq article IDs
+
+    my $TicketIDList = $TicketObject->GetAssignedFAQArticlesForObject(
+        ObjectType   => 'Contact',
+        Object       => $ContactHashRef,                # (optional)
+        ObjectIDList => $ObjectIDListArrayRef,          # (optional)
+        UserID       => 1
+    );
+
+=cut
+
+sub GetAssignedFAQArticlesForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedFAQArticleIDs = ();
+
+    my %SearchData = $Self->_GetAssignedSearchParams(
+        %Param,
+        AssignedObjectType => 'FAQArticle'
+    );
+
+    if (IsHashRefWithData(\%SearchData)) {
+        my %IDSearch;
+        if (IsArrayRefWithData($Param{ObjectIDList})) {
+            $IDSearch{ArticleIDs} = $Param{ObjectIDList};
+        }
+
+        for my $Attribute ( keys %SearchData ) {
+
+            my %Search;
+
+            # TODO: extend possibilities
+            if ( $Attribute eq 'CustomerVisible' && IsArrayRefWithData($SearchData{$Attribute}) ) {
+                my @Visibility;
+                for my $VisibleValue ( @{ $SearchData{$Attribute} } ) {
+                    if ($VisibleValue) {
+                        push(@Visibility, ('external', 'public'));
+                    } else {
+                        push(@Visibility, 'internal');
+                    }
+                }
+                if (@Visibility) {
+                    $Search{Visibility} = \@Visibility;
+                }
+            } elsif ($Attribute eq 'Languages' || $Attribute eq 'Language') {
+                $Search{Languages} = IsArrayRefWithData($SearchData{$Attribute}) ? $SearchData{$Attribute} : [ $SearchData{$Attribute} ];
+            } elsif ($Attribute eq 'CategoryIDs' || $Attribute eq 'CategoryID') {
+                $Search{CategoryIDs} = IsArrayRefWithData($SearchData{$Attribute}) ? $SearchData{$Attribute} : [ $SearchData{$Attribute} ];
+            } elsif ($Attribute =~ m/^DynamicField_/) {
+                $Search{$Attribute} = {
+                    Like => $SearchData{$Attribute}
+                };
+            } elsif ($Attribute eq 'Title') {
+                $Search{$Attribute} = IsArrayRefWithData($SearchData{$Attribute}) ? $SearchData{$Attribute}->[0] : $SearchData{$Attribute};
+            }
+
+            if (keys %Search) {
+                my @FoundIDs = $Self->FAQSearch(
+                    %IDSearch,
+                    %Search,
+                    UserID => $Param{UserID},
+                );
+
+                @AssignedFAQArticleIDs = $Self->_GetCombinedList(
+                    ListA => \@AssignedFAQArticleIDs,
+                    ListB => \@FoundIDs,
+                    Union => 1
+                );
+            }
+        }
+
+        if ( IsArrayRefWithData(\@AssignedFAQArticleIDs) ) {
+            @AssignedFAQArticleIDs = map { 0 + $_ } @AssignedFAQArticleIDs;
+        }
+    }
+
+    return \@AssignedFAQArticleIDs;
+}
+
+# TODO: move to a "common" module (used in other modules too)
+=item _GetCombinedList()
+
+combines to arrays (intersect or union)
+
+    my @CombinedList = $Self->_GetCombinedList(
+        ListA   => $ListAArrayRef,
+        ListB   => $ListBArrayRef,
+        Union   => 1                # (optional) default 0
+    );
+
+    e.g.
+        ListA = [ 1, 2, 3, 4 ]
+        ListB = [ 2, 4, 5 ]
+
+        as union = [1, 2, 3, 4, 5 ]
+        as intersect = [ 2, 4 ]
+
+=cut
+
+sub _GetCombinedList {
+    my ( $Self, %Param ) = @_;
+
+    my %Union;
+    my %Isect;
+    for my $E ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
+        $Union{$E}++ && $Isect{$E}++
+    }
+
+    return $Param{Union} ? keys %Union : keys %Isect;
+}
+
+# TODO: move to a "common" module (used in other modules too)
+=item _GetAssignedSearchParams()
+
+prepares and transform config from AssignedObjectsMapping to a simple hash
+
+    my %SearchData = $Self->_GetAssignedSearchParams(
+        ObjectType         => 'Contact',
+        Object             => $ContactHash,      # (optional)
+        AssignedObjectType => 'Ticket'
+    );
+
+    e.g. if AssignedObjectType is 'Ticket'
+
+    %SearchData = (
+        ContactID      => 1,
+        OrganisationID => 2,
+        ...
+    );
+
+=cut
+
+sub _GetAssignedSearchParams {
+    my ( $Self, %Param ) = @_;
+
+    for ( qw(AssignedObjectType ObjectType) ) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedObjectsMapping') || '';
+
+    my %SearchData;
+    if ( IsStringWithData($MappingString) ) {
+
+        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
+            Data => $MappingString
+        );
+
+        if ( !IsHashRefWithData($Mapping) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
+            );
+        } elsif (
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
+        ) {
+            my %SearchAttributes = %{ $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } };
+
+            # prepare search data
+            for my $SearchAttribute ( keys %SearchAttributes ) {
+                next if (!$SearchAttribute);
+
+                next if ( !IsHashRefWithData( $SearchAttributes{$SearchAttribute} ) );
+                my $ObjectSearchAttributes = $SearchAttributes{$SearchAttribute}->{SearchAttributes};
+                my $SearchStatics          = $SearchAttributes{$SearchAttribute}->{SearchStatic};
+                next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
+
+                $SearchAttribute =~ s/^\s+//g;
+                $SearchAttribute =~ s/\s+$//g;
+
+                next if (!$SearchAttribute);
+
+                $SearchData{$SearchAttribute} = [];
+
+                # get attributes search data
+                if (IsHashRefWithData( $Param{Object} )) {
+                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                        my $Value;
+
+                        # check if value from sub-object (e.g. User of Contact)
+                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                        } else {
+                            $Value = $Param{Object}->{$ObjectSearchAttribute};
+                        }
+
+                        next if ( !defined $Value );
+
+                        push (
+                            @{ $SearchData{$SearchAttribute} },
+                            IsArrayRefWithData($Value) ? @{$Value} : $Value
+                        );
+                    }
+                }
+
+                # get static search data
+                for my $SearchStatic ( @{$SearchStatics} ) {
+                    next if ( !defined $SearchStatic );
+                    push ( @{ $SearchData{$SearchAttribute} }, $SearchStatic );
+                }
+
+                if (!scalar(@{ $SearchData{$SearchAttribute} })) {
+                    delete $SearchData{$SearchAttribute};
+                }
+            }
+        } else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
+            );
+        }
+    }
+
+    return %SearchData;
+}
+
 =begin Internal:
 
 =item _FAQApprovalUpdate()
@@ -2586,10 +2815,6 @@ sub _FAQApprovalTicketCreate {
 1;
 
 =end Internal:
-
-
-
-
 
 =back
 

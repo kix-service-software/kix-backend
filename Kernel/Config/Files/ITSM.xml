@@ -181,7 +181,7 @@
                 <Item Key="Event">(VersionCreate)</Item>
             </Hash>
         </Setting>
-    </ConfigItem>    
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::EventModulePost###502-RefreshTicketReferenceLinks" Required="0" Valid="1">
         <Description Translatable="1">Searches for attributes of type CIClassReference in the new CIs version data and refreshes all links to that class. It deletes links to this class if the value is not existent in the CIs version data.</Description>
         <Group>ITSM</Group>
@@ -340,7 +340,7 @@
     </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="AssignedConfigItemsMapping" Required="1" Valid="1">
-        <Description Translatable="1">Defines for which object type in which configitem class in which configitem attributes will be search with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon ("ParentAttribute::ChildAttribute::RelevantAttribut").</Description>
+        <Description Translatable="1">Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon ("ParentAttribute::ChildAttribute::RelevantAttribut").</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>
@@ -433,4 +433,3 @@
         </Setting>
     </ConfigItem>
 </kix_config>
-    

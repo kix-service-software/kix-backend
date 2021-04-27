@@ -106,7 +106,7 @@ example with "Charset & MimeType" and no "ContentType"
         Channel          => 'note',                                 # Channel or
         ChannelID        => 1,                                      # ChannelID
         CustomerVisible  => 0|1,                                    # optional - will be set to 1 on special conditions (only if not given)
-        SenderType       => 'agent',                                # agent|system|customer
+        SenderType       => 'agent',                                # agent|system|external
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
         Cc               => 'Some Customer A <customer-a@example.com>', # optional
@@ -616,7 +616,7 @@ sub ArticleCreate {
     }
 
     # check if latest article is sent to customer
-    elsif ( $Param{SenderType} eq 'agent'&& $Param{CustomerVisible} ) {
+    elsif ( $Param{SenderType} eq 'agent' && $Param{CustomerVisible} ) {
         $Self->TicketUnlockTimeoutUpdate(
             UnlockTimeout => $TimeObject->SystemTime(),
             TicketID      => $Param{TicketID},
@@ -3181,6 +3181,68 @@ sub ArticleExists {
     return $Exists;
 }
 
+=item GetAssignedArticlesForObject()
+
+return all assigned article IDs
+
+    my $TicketIDList = $TicketObject->GetAssignedArticlesForObject(
+        TicketID   => 123,
+        ObjectType => 'Contact',
+        Object     => $ContactHashRef,      # (optional)
+        UserID     => 1
+    );
+
+=cut
+
+sub GetAssignedArticlesForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedArticleIDs = ();
+
+    # based on ticket
+    if ($Param{TicketID}) {
+        my $AssignedTicketIDList = $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
+            %Param,
+            ObjectIDList => [$Param{TicketID}]
+        );
+
+        if (
+            IsArrayRefWithData($AssignedTicketIDList) &&
+            scalar(@{$AssignedTicketIDList}) == 1 &&
+            $AssignedTicketIDList->[0] == $Param{TicketID}
+        ) {
+            my %SearchData = $Self->_GetAssignedSearchParams(
+                %Param,
+                AssignedObjectType => 'TicketArticle'
+            );
+
+            # TODO: extend "search", currently only CustomerVisible is possible
+            # (and it is used as only customer visible (1) or all (0) articles - 'not visible' is not possible)
+            if (IsHashRefWithData(\%SearchData) && IsArrayRefWithData($SearchData{CustomerVisible})) {
+
+                my $CustomerVisible = 1;
+                for my $VisibleValue ( @{ $SearchData{CustomerVisible} } ) {
+                    if (!$VisibleValue) {
+                        $CustomerVisible = 0;
+                    }
+                }
+
+                @AssignedArticleIDs = $Self->ArticleIndex(
+                    TicketID        => $Param{TicketID},
+                    CustomerVisible => $CustomerVisible,
+                    UserID          => $Param{UserID},
+                );
+
+                if ( IsArrayRefWithData(\@AssignedArticleIDs) ) {
+                    @AssignedArticleIDs = map { 0 + $_ } @AssignedArticleIDs;
+                }
+            }
+        }
+    }
+
+    return \@AssignedArticleIDs;
+}
+
 sub _HandleCustomerVisible {
     my ( $Self, %Param ) = @_;
 
@@ -3246,6 +3308,120 @@ sub _HandleCustomerVisible {
     }
 
     return 0;
+}
+
+# TODO: move to a "common" module (used in other modules too)
+=item _GetAssignedSearchParams()
+
+prepares and transform config from AssignedObjectsMapping to a simple hash
+
+    my %SearchData = $Self->_GetAssignedSearchParams(
+        ObjectType         => 'Contact',
+        Object             => $ContactHash,         # (optional)
+        AssignedObjectType => 'Ticket'
+    );
+
+    e.g. if AssignedObjectType is 'Ticket'
+
+    %SearchData = (
+        ContactID      => 1,
+        OrganisationID => 2,
+        ...
+    );
+
+=cut
+
+sub _GetAssignedSearchParams {
+    my ( $Self, %Param ) = @_;
+
+    for ( qw(AssignedObjectType ObjectType) ) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedObjectsMapping') || '';
+
+    my %SearchData;
+    if ( IsStringWithData($MappingString) ) {
+
+        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
+            Data => $MappingString
+        );
+
+        if ( !IsHashRefWithData($Mapping) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
+            );
+        } elsif (
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
+        ) {
+            my %SearchAttributes = %{ $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } };
+
+            # prepare search data
+            for my $SearchAttribute ( keys %SearchAttributes ) {
+                next if (!$SearchAttribute);
+
+                next if ( !IsHashRefWithData( $SearchAttributes{$SearchAttribute} ) );
+                my $ObjectSearchAttributes = $SearchAttributes{$SearchAttribute}->{SearchAttributes};
+                my $SearchStatics          = $SearchAttributes{$SearchAttribute}->{SearchStatic};
+                next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
+
+                $SearchAttribute =~ s/^\s+//g;
+                $SearchAttribute =~ s/\s+$//g;
+
+                next if (!$SearchAttribute);
+
+                $SearchData{$SearchAttribute} = [];
+
+                # get attributes search data
+                if (IsHashRefWithData( $Param{Object} )) {
+                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                        my $Value;
+
+                        # check if value from sub-object (e.g. User of Contact)
+                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                        } else {
+                            $Value = $Param{Object}->{$ObjectSearchAttribute};
+                        }
+
+                        next if ( !defined $Value );
+
+                        push (
+                            @{ $SearchData{$SearchAttribute} },
+                            IsArrayRefWithData($Value) ? @{$Value} : $Value
+                        );
+                    }
+                }
+
+                # get static search data
+                for my $SearchStatic ( @{$SearchStatics} ) {
+                    next if ( !defined $SearchStatic );
+                    push ( @{ $SearchData{$SearchAttribute} }, $SearchStatic );
+                }
+
+                if (!scalar(@{ $SearchData{$SearchAttribute} })) {
+                    delete $SearchData{$SearchAttribute};
+                }
+            }
+        } else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
+            );
+        }
+    }
+
+    return %SearchData;
 }
 
 1;

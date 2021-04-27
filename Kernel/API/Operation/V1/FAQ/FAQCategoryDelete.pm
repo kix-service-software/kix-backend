@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -94,7 +94,7 @@ perform FAQCategoryDelete Operation. This will return the deleted FAQCategoryID.
     my $Result = $OperationObject->Run(
         Data => {
             FAQCategoryID => 1,                      # comma separated in case of multiple or arrayref (depending on transport)
-        },      
+        },
     );
 
     $Result = {
@@ -105,7 +105,7 @@ perform FAQCategoryDelete Operation. This will return the deleted FAQCategoryID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-        
+
     # start loop
     foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
 
@@ -121,12 +121,12 @@ sub Run {
             );
         }
 
-        # delete FAQCategory        
+        # delete FAQCategory
         my $Success = $Kernel::OM->Get('FAQ')->CategoryDelete(
             CategoryID => $FAQCategoryID,
             UserID     => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
