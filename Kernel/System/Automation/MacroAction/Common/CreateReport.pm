@@ -59,9 +59,9 @@ sub Describe {
         Required    => 0,
     );
     $Self->AddOption(
-        Name        => 'OutputFormat',
-        Label       => Kernel::Language::Translatable('Output Format'),
-        Description => Kernel::Language::Translatable('The requested output format.'),
+        Name        => 'OutputFormats',
+        Label       => Kernel::Language::Translatable('Output Formats'),
+        Description => Kernel::Language::Translatable('The requested output formats.'),
         Required    => 1,
     );
 
@@ -124,42 +124,24 @@ sub Run {
         );
     }
 
-    # check output format
-    my %OutputFormats;
-    if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Reporting::OutputFormat')) ) {
-        %OutputFormats = map { $_ => 1 } sort keys %{ $Kernel::OM->Get('Config')->Get('Reporting::OutputFormat') };
-    }
-    if ( !$OutputFormats{$Param{Config}->{OutputFormat}} ) {
-        $Kernel::OM->Get('Automation')->LogError(
-            Referrer => $Self,
-            Message  => "Couldn't create report - output format \"$Param{Config}->{OutputFormat}\" not supported!",
-            UserID   => $Param{UserID}
-        );
-        return;
-    }
-    if ( IsHashRefWithData($Definition{Config}->{OutputFormats}) && !exists $Definition{Config}->{OutputFormats}->{$Param{Config}->{OutputFormat}} ) {
-        $Kernel::OM->Get('Automation')->LogError(
-            Referrer => $Self,
-            Message  => "Output format \"$Param{Config}->{OutputFormat}\" isn't supported for the given report definition \"$Definition{Name}\"!",
-            UserID   => $Param{UserID}
-        );
-        return;
-    }
-
     # create Report
     my $ReportID = $Kernel::OM->Get('Reporting')->ReportCreate(
         DefinitionID => $Param{Config}->{DefinitionID},
         Config       => {
             Parameters    => $Param{Config}->{Parameters},
-            OutputFormats => [ $Param{Config}->{OutputFormat} ]
+            OutputFormats => $Param{Config}->{OutputFormats}
         },
         UserID => $Param{UserID}
     );
 
     if ( !$ReportID ) {
+        my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't create report!",
+            Message  => "Couldn't create report! ($LogMessage)",
             UserID   => $Param{UserID}
         );
         return;
@@ -174,6 +156,15 @@ sub Run {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't load report with ID $ReportID!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
+    if ( !IsArrayRefWithData($Report{Results}) ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Report returned no results!",
             UserID   => $Param{UserID}
         );
         return;

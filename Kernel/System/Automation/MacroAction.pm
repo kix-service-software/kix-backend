@@ -775,7 +775,8 @@ sub _ReplaceResultVariables {
                     $Param{Data} =~ s/"$//;
                 }
                 elsif ( $Filter && $Filter eq 'base64' ) {
-                    $Param{Data} = MIME::Base64::decode_base64($Param{Data});
+                    $Param{Data} = MIME::Base64::encode_base64($Param{Data});
+                    $Param{Data} =~ s/\n//g;
                 }
             }
             elsif ( $Param{Data} =~ /\$\{\Q$Variable\E(\|(.*?))?\}/ ) {
@@ -790,7 +791,8 @@ sub _ReplaceResultVariables {
                     $Value =~ s/"$//;
                 }
                 elsif ( $Filter && $Filter eq 'base64' ) {
-                    $Value = MIME::Base64::decode_base64($Value);
+                    $Value = MIME::Base64::encode_base64($Value);
+                    $Value =~ s/\n//g;
                 }
                 $Param{Data} =~ s/\$\{\Q$Variable\E(\|$Filter)?\}/$Value/gmx;
             }
