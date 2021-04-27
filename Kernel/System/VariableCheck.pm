@@ -20,6 +20,7 @@ our %EXPORT_TAGS = (    ## no critic
     all => [
         'IsArrayRef',
         'IsArrayRefWithData',
+        'IsBase64',
         'IsCodeRef',
         'IsHashRef',
         'IsHashRefWithData',
@@ -29,6 +30,7 @@ our %EXPORT_TAGS = (    ## no critic
         'IsMD5Sum',
         'IsNotEqual',
         'IsNumber',
+        'IsObject',
         'IsPositiveInteger',
         'IsString',
         'IsStringWithData',
@@ -518,10 +520,44 @@ sub DataIsDifferent {
     return 1;
 }
 
+=item IsBase64()
+
+test supplied string to determine if it's a base64 coded content
+
+returns 1 if data matches criteria or undef otherwise
+
+    my $Result = IsBase64(scalar);
+
+=cut
+
+sub IsBase64 {
+    my $TestData = $_[0];
+
+    return if $TestData !~ /^[A-Za-z0-9+\/=]+$/;
+    
+    return if length($TestData) % 4 != 0;
+
+    return 1;
+}
+
+=item IsObject()
+
+test supplied data to determine if it's on object of the given package
+
+returns 1 if data matches criteria or undef otherwise
+
+    my $Result = IsObject(data, package);
+
+=cut
+
+sub IsObject {
+    my $TestData = $_[0];
+    my $Package = $_[1];
+
+    return ref $TestData eq $Package;
+}
+
 1;
-
-
-
 
 =back
 
