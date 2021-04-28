@@ -272,7 +272,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::Hook" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="ITSMConfigItem::Hook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a configuration item, e.g. ConfigItem#, MyConfigItem#. The default is ConfigItem#.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>

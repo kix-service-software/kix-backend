@@ -115,6 +115,7 @@
 "Customer";"Resource";"/system/cmdb";;"x";;;
 "Customer";"Resource";"/system/cmdb/*";;;;;
 "Customer";"Resource";"/system/cmdb/classes";;"x";;;
+"Customer";"Property";"/system/cmdb/classes/*{ConfigItemClass.[ID,Name]}";;"x";;;
 "Customer";"Resource";"/system/communication";;"x";;;
 "Customer";"Resource";"/system/communication/*";;;;;
 "Customer";"Resource";"/system/communication/channels";;"x";;;
