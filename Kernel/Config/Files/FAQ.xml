@@ -30,7 +30,7 @@
             <String>2</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="FAQ::FAQHook" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="FAQ::FAQHook" Required="1" Valid="1">
         <Description Translatable="1">The identifier for a FAQ, e.g. FAQ#, KB#, MyFAQ#. The default is FAQ#.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core</SubGroup>
