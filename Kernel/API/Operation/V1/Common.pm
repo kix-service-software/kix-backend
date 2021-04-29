@@ -2550,7 +2550,8 @@ sub _CheckObjectPermission {
                     # check if we have the desired permission
                     my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission::PERMISSION->{$PermissionName};
 
-                    if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
+                    # check if we have a DENY
+                    if ( ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                         $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
 
                         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -2571,6 +2572,15 @@ sub _CheckObjectPermission {
 
         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
         $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
+        
+        if ( $ResultingPermission != -1 && ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
+            $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+
+            # return 403, because we don't have permission to execute this
+            return $Self->_Error(
+                Code => 'Forbidden',
+            );
+        }
     }
 
     return $Self->_Success();
