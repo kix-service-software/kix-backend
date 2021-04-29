@@ -460,7 +460,7 @@ sub ContactGet {
             # get the current value for each dynamic field
             my $Value = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
                 DynamicFieldConfig => $DynamicFieldConfig,
-                ObjectID           => $Param{ID},
+                ObjectID           => $Contact{ID},
             );
 
             # set the dynamic field name and value into the ticket hash

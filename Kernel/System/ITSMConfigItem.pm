@@ -2505,7 +2505,8 @@ return all assigned config item IDs
 
     my $ConfigItemIDList = $ITSMConfigItemObject->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
-        Object     => $ContactHashRef
+        Object     => $ContactHashRef,          # (optional)
+        UserID     => 1
     );
 
 =cut
@@ -2515,7 +2516,7 @@ sub GetAssignedConfigItemsForObject {
 
     my @AssignedCIIDs = ();
 
-    for ( qw(ObjectType Object) ) {
+    for ( qw(ObjectType) ) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -2523,14 +2524,6 @@ sub GetAssignedConfigItemsForObject {
             );
             return;
         }
-    }
-
-    if ( !IsHashRefWithData( $Param{Object} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Object is no hash ref!"
-        );
-        return;
     }
 
     my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedConfigItemsMapping') || '';
@@ -2590,7 +2583,7 @@ sub GetAssignedConfigItemsForObject {
 
                     # ignore not xml attributes
                     next if (
-                        $CISearchAttribute eq 'Name' || 
+                        $CISearchAttribute eq 'Name' ||
                         $CISearchAttribute eq 'Number' ||
                         $CISearchAttribute eq 'DeploymentState' ||
                         $CISearchAttribute eq 'IncidentState'
@@ -2599,28 +2592,34 @@ sub GetAssignedConfigItemsForObject {
                     $SearchData{$CISearchAttribute} = [];
 
                     # get attributes search data
-                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
-                        my $Value;
-                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
-                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
-                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
-                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
-                        } else {
-                            $Value = $Param{Object}->{$ObjectSearchAttribute};
+                    if (IsHashRefWithData( $Param{Object} )) {
+                        for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                            my $Value;
+                            if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                                my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                                next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                                $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                            } else {
+                                $Value = $Param{Object}->{$ObjectSearchAttribute};
+                            }
+
+                            next if ( !defined $Value );
+
+                            push (
+                                @{ $SearchData{$CISearchAttribute} },
+                                IsArrayRefWithData($Value) ? @{$Value} : $Value
+                            );
                         }
-
-                        next if ( !defined $Value );
-
-                        push ( 
-                            @{ $SearchData{$CISearchAttribute} },
-                            IsArrayRefWithData($Value) ? @{$Value} : $Value
-                        );
                     }
 
                     # get static search data
                     for my $SearchStatic ( @{$SearchStatics} ) {
                         next if ( !defined $SearchStatic );
                         push ( @{ $SearchData{$CISearchAttribute} }, $SearchStatic );
+                    }
+
+                    if (!scalar(@{ $SearchData{$CISearchAttribute} })) {
+                        delete $SearchData{$CISearchAttribute};
                     }
                 }
 

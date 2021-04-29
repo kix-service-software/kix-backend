@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -111,13 +111,13 @@ sub Run {
 
     # start loop
     foreach my $FAQArticleID ( @{$Param{Data}->{FAQArticleID}} ) {
-   
-        # delete FAQArticle        
+
+        # delete FAQArticle
         my $Success = $Kernel::OM->Get('FAQ')->FAQDelete(
             ItemID     => $FAQArticleID,
             UserID => $Self->{Authorization}->{UserID},
         );
-  
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

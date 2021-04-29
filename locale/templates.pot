@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-4-26 10:11+0000\n"
+"POT-Creation-Date: 2021-4-29 06:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -847,7 +847,7 @@ msgid "Create a report from a report definition."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
-msgid "Output Format"
+msgid "Output Formats"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
@@ -871,7 +871,7 @@ msgid "The report object including the result."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
-msgid "The requested output format."
+msgid "The requested output formats."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
@@ -2447,6 +2447,10 @@ msgid "Defines which customer ID to use if no company defined - only relevant fo
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines which dependend object (e.g. \"Ticket\") is assigned by which attributes to a relevant object (e.g. \"Contact\") - e.g. \"Tickets of Contact\". Structure is \"{ \"RelevantObject\": { \"DependendObject\": { \"DependendObjectAttribut\": { \"SearchAttribut OR SearchStatic\": [ \"RelevantObjectAttribut OR StaticValue\" ] } } } }. All attributes will be OR combined.\""
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines which email address to use if not defined - strongly depends on backend configuration!!!"
 msgstr ""
 
@@ -3483,7 +3487,7 @@ msgid "ConfigItem link direction for propagating of warning/error incident state
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Defines for which object type in which configitem class in which configitem attributes will be search with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon (\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
+msgid "Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon (\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml

@@ -23,7 +23,7 @@ use Kernel::System::VariableCheck qw(:all);
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-1419',
+        LogPrefix => 'framework_update-to-build-1423',
     },
 );
 my $LogObject = $Kernel::OM->Get('Log');
@@ -31,6 +31,7 @@ my $LogObject = $Kernel::OM->Get('Log');
 use vars qw(%INC);
 
 
+_UpdateSysConfigKeys();
 _AddNewPermissions();
 
 # delete whole cache
@@ -38,8 +39,56 @@ $Kernel::OM->Get('Cache')->CleanUp();
 
 exit 0;
 
-sub _AddNewPermissions {
+sub _UpdateSysConfigKeys {
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
 
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+
+    my @Items = qw{
+        ITSMConfigItem::Hook
+        FAQ::FAQHook
+    };
+
+    foreach my $Key (@Items) {
+        my %Option = $SysConfigObject->OptionGet(
+            Name => $Key
+        );
+        if (!%Option) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to get option $Key from sysconfig!"
+            );
+            return;
+        }
+
+        my $Result = $SysConfigObject->OptionUpdate(
+            %Option,
+            AccessLevel => 'external',
+            UserID      => 1
+        );
+
+        if (!$Result) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to update item $Key from sysconfig!"
+            );
+            return;
+        } else {
+            $LogObject->Log(
+                Priority => 'info',
+                Message  => "Successfully updated sysconfig (key=$Key, AccessLevel=external)!"
+            );
+        }
+    }
+
+    return 1;
+
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
+}
+
+sub _AddNewPermissions {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
     my $RoleObject = $Kernel::OM->Get('Role');
@@ -51,22 +100,10 @@ sub _AddNewPermissions {
     my @NewPermissions = (
         {
             Role   => 'Customer',
-            Type   => 'Resource',
-            Target => '/system/dynamicfields',
-            Value  => 2
+            Type   => 'Property',
+            Target => '/system/cmdb/classes/*{ConfigItemClass.[ID,Name]}',
+            Value  => 2    # READ
         },
-        {
-            Role   => 'Customer',
-            Type   => 'Resource',
-            Target => '/system/dynamicfields/*',
-            Value  => 2
-        },
-        {
-            Role   => 'Customer',
-            Type   => 'Object',
-            Target => '/system/dynamicfields/*{DynamicField.CustomerVisible NE 1}',
-            Value  => 0
-        }
     );
 
     my $PermissionID;

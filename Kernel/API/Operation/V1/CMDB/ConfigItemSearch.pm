@@ -193,8 +193,10 @@ sub Run {
     }
 
     # filter for customer assigned config items if necessary
-    my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
-        ConfigItemIDList => \@ConfigItemList
+    my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleObjectIds(
+        ObjectType   => 'ConfigItem',
+        ObjectIDList => \@ConfigItemList,
+        UserID       => $Self->{Authorization}->{UserID}
     );
 
     # get already prepared CI data from ConfigItemGet operation

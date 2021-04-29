@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -144,7 +144,7 @@ sub Run {
     my $FAQVote = $Self->_Trim(
         Data => $Param{Data}->{FAQVote}
     );
-    
+
     # everything is ok, let's create the Vote
     my $VoteID = $Kernel::OM->Get('FAQ')->VoteAdd(
         ItemID      => $Param{Data}->{FAQArticleID},

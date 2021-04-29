@@ -123,16 +123,6 @@ perform ConfigItemAttachmentGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # if necessary check if config item is accessible for current customer user
-    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
-        ConfigItemIDList => $Param{Data}->{ConfigItemID}
-    );
-    if ( !$CustomerCheck->{Success} ) {
-        return $Self->_Error(
-            %{$CustomerCheck},
-        );
-    }
-
     # check if attachment is "visible" (the version attribute)
     my $CustomerAttachmentAttributeCheck = $Self->_CheckAttachmentAttributeForCustomer(
         VersionID     => $Param{Data}->{VersionID},

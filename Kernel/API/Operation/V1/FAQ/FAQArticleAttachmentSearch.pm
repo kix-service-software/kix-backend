@@ -15,7 +15,7 @@ use Kernel::API::Operation::V1::FAQ::FAQArticleAttachmentGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -84,7 +84,7 @@ perform FAQArticleAttachmentSearch Operation. This will return a FAQArticleAttac
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # perform FAQArticleAttachment search
     my @AttachmentList = $Kernel::OM->Get('FAQ')->AttachmentIndex(
         ItemID => $Param{Data}->{FAQArticleID},
@@ -97,7 +97,7 @@ sub Run {
         foreach my $Attachment ( sort {$a->{FileID} <=> $b->{FileID}} @AttachmentList ) {
             push(@AttachmentIDs, $Attachment->{FileID});
         }
-        
+
         # get already prepared Article data from ArticleGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::FAQ::FAQArticleAttachmentGet',
@@ -115,7 +115,7 @@ sub Run {
         if ( defined $GetResult->{Data}->{Attachment} ) {
             @ResultList = IsArrayRef($GetResult->{Data}->{Attachment}) ? @{$GetResult->{Data}->{Attachment}} : ( $GetResult->{Data}->{Attachment} );
         }
-        
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Attachment => \@ResultList,
