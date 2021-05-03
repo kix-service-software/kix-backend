@@ -15,6 +15,7 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
+my $ContactObject = $Kernel::OM->Get('Contact');
 my $QueueObject   = $Kernel::OM->Get('Queue');
 my $StateObject   = $Kernel::OM->Get('State');
 my $TicketObject  = $Kernel::OM->Get('Ticket');
@@ -33,14 +34,19 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # set fixed time
 $Helper->FixedTimeSet();
 
+my $ContactID = $Helper->TestContactCreate();
+my %Contact = $ContactObject->ContactGet(
+    ID => $ContactID
+);
+
 my $TicketID = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title',
     Queue        => 'Junk',
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',
-    OrganisationID => '123465',
-    ContactID    => 'unittest@kixdesk.com',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID    => $ContactID,
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -75,7 +81,7 @@ $Self->Is(
 );
 $Self->Is(
     $Ticket{Owner},
-    'root@localhost',
+    'admin',
     'TicketGet() (Owner)',
 );
 $Self->Is(
@@ -95,7 +101,7 @@ $Self->Is(
 );
 $Self->Is(
     $Ticket{Responsible},
-    'root@localhost',
+    'admin',
     'TicketGet() (Responsible)',
 );
 $Self->Is(
@@ -130,8 +136,8 @@ my $TicketIDCreatedBy = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'closed',
-    OrganisationID   => '123465',
-    ContactID    => 'unittest@kixdesk.com',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID    => $ContactID,
     OwnerID      => 1,
     UserID       => $TestUserID,
 );
@@ -316,6 +322,46 @@ $Self->True(
 );
 
 %TicketIDs = $TicketObject->TicketSearch(
+    Result       => 'HASH',
+    Limit        => 100,
+    Search       => {
+        AND => [ 
+            {
+                Field => 'Age',
+                Value => 3600,
+                Operator => 'LT',
+            },
+        ]
+    },    
+    UserID       => 1,
+    Permission   => 'rw',
+);
+$Self->True(
+    $TicketIDs{$TicketID},
+    'TicketSearch() (HASH:Age LT)',
+);
+
+%TicketIDs = $TicketObject->TicketSearch(
+    Result       => 'HASH',
+    Limit        => 100,
+    Search       => {
+        AND => [ 
+            {
+                Field => 'Age',
+                Value => 3600,
+                Operator => 'GT',
+            },
+        ]
+    },    
+    UserID       => 1,
+    Permission   => 'rw',
+);
+$Self->False(
+    $TicketIDs{$TicketID},
+    'TicketSearch() (HASH:Age GT)',
+);
+
+%TicketIDs = $TicketObject->TicketSearch(
     Result     => 'HASH',
     Limit      => 100,
     Search       => {
@@ -475,7 +521,7 @@ $Self->True(
         OR => [ 
             {
                 Field => 'OrganisationID',
-                Value => [ $Ticket{OrganisationID}, 'LULU' ],
+                Value => [ $Ticket{OrganisationID}, 12345 ],
                 Operator => 'IN',
             },
         ]  
@@ -500,7 +546,7 @@ $Self->True(
             },
             {
                 Field => 'OrganisationID',
-                Value => 'LULU',
+                Value => 12345,
                 Operator => 'EQ',
             },            
         ]  
@@ -567,7 +613,7 @@ $Self->True(
                 Field => 'Title',
                 Value => $Ticket{Title},
                 Operator => 'EQ',
-            },                     
+            },
             {
                 Field => 'ContactID',
                 Value => $Ticket{ContactID},
@@ -605,12 +651,12 @@ $Self->True(
             },                     
             {
                 Field => 'ContactID',
-                Value => [ $Ticket{ContactID}, 'iadasd' ],
+                Value => [ $Ticket{ContactID}, 12345 ],
                 Operator => 'IN',
             }, 
             {
                 Field => 'OrganisationID',
-                Value => [ $Ticket{OrganisationID}, '1213421' ],
+                Value => [ $Ticket{OrganisationID}, 12345 ],
                 Operator => 'IN',
             },     
         ]  
@@ -640,12 +686,12 @@ $Self->False(
             },                     
             {
                 Field => 'ContactID',
-                Value => [ $Ticket{ContactID}, 'iadasd' ],
+                Value => [ $Ticket{ContactID}, 12345 ],
                 Operator => 'IN',
             }, 
             {
                 Field => 'OrganisationID',
-                Value => [ $Ticket{OrganisationID}, '1213421' ],
+                Value => [ $Ticket{OrganisationID}, 12345 ],
                 Operator => 'IN',
             },     
         ]  
@@ -672,7 +718,7 @@ $Self->True(
                 Field => 'StateType',
                 Value => 'Closed',
                 Operator => 'EQ',
-            },                        
+            },
         ]  
     },      
     UserID       => 1,
@@ -697,7 +743,7 @@ $Self->True(
                 Field => 'StateType',
                 Value => 'Open',
                 Operator => 'EQ',
-            },                        
+            },
         ]  
     },     
     UserID       => 1,
@@ -722,7 +768,7 @@ $Self->False(
                 Field => 'StateType',
                 Value => 'Closed',
                 Operator => 'EQ',
-            },                        
+            },
         ]  
     },        
     UserID              => 1,
@@ -747,7 +793,7 @@ $Self->True(
                 Field => 'StateType',
                 Value => 'Open',
                 Operator => 'EQ',
-            },                        
+            },
         ]  
     },    
     UserID              => 1,
@@ -858,7 +904,7 @@ $Self->False(
 );
 
 my $TicketPriority = $TicketObject->PrioritySet(
-    Priority => '2 low',
+    Priority => '4 low',
     TicketID => $TicketID,
     UserID   => 1,
 );
@@ -1389,7 +1435,7 @@ $Self->Is(
 );
 $Self->Is(
     $Ticket2{Priority},
-    '2 low',
+    '4 low',
     'TicketGet() (Priority)',
 );
 $Self->Is(
@@ -1529,7 +1575,7 @@ if ( $TicketStatus{$TicketID} ) {
     );
     $Self->Is(
         $TicketHistory{Priority},
-        '2 low',
+        '4 low',
         "HistoryTicketStatusGet() (Priority)",
     );
     $Self->Is(
@@ -1565,8 +1611,6 @@ $Self->False(
     'TicketDelete() worked',
 );
 
-my $OrganisationID = 'OrganisationID' . $Helper->GetRandomID();
-
 # ticket search sort/order test
 my $TicketIDSortOrder1 = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title - ticket sort/order by tests',
@@ -1574,8 +1618,8 @@ my $TicketIDSortOrder1 = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
-    OrganisationID => $OrganisationID,
-    ContactID    => 'unittest@kixdesk.com',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID    => $ContactID,
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1594,8 +1638,8 @@ my $TicketIDSortOrder2 = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
-    OrganisationID => $OrganisationID,
-    ContactID    => 'unittest@kixdesk.com',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID    => $ContactID,
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1639,12 +1683,12 @@ my @TicketIDsSortOrder = $TicketObject->TicketSearch(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -1686,12 +1730,12 @@ $Self->Is(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -1732,12 +1776,12 @@ $Self->Is(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -1775,12 +1819,12 @@ $Self->Is(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -1805,10 +1849,10 @@ my $TicketIDSortOrder3 = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title - ticket sort/order by tests2',
     Queue        => 'Junk',
     Lock         => 'unlock',
-    Priority     => '4 high',
+    Priority     => '4 low',
     State        => 'new',
-    OrganisationID   => $OrganisationID,
-    ContactID=> 'unittest@kixdesk.com',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID    => $ContactID,
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1820,10 +1864,10 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
     Title        => 'Some Ticket_Title - ticket sort/order by tests2',
     Queue        => 'Junk',
     Lock         => 'unlock',
-    Priority     => '4 high',
+    Priority     => '4 low',
     State        => 'new',
-    OrganisationID   => $OrganisationID,
-    ContactID=> 'unittest@kixdesk.com',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID    => $ContactID,
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -1845,12 +1889,12 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -1891,12 +1935,12 @@ $Self->Is(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -1937,12 +1981,12 @@ $Self->Is(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -1979,12 +2023,12 @@ $Self->Is(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -2020,12 +2064,12 @@ $Count = $TicketObject->TicketSearch(
             },
             {
                 Field => 'OrganisationID',
-                Value => $OrganisationID,
+                Value => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             }            
         ]
@@ -2080,8 +2124,8 @@ $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'new',
-    OrganisationID   => '123465',
-    ContactID=> 'unittest@kixdesk.com',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID    => $ContactID,
     OwnerID      => 1,
     UserID       => 1,
 );
@@ -2529,7 +2573,7 @@ my @DeleteTicketList = $TicketObject->TicketSearch(
         AND => [ 
             {
                 Field => 'ContactID',
-                Value => 'unittest@kixdesk.com',
+                Value => $ContactID,
                 Operator => 'EQ',
             },                
         ]

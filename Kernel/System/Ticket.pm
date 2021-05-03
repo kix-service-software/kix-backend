@@ -4040,8 +4040,7 @@ sub HistoryTicketStatusGet {
     my $SQLExt = '';
     for my $HistoryTypeData (
         qw(NewTicket FollowUp OwnerUpdate PriorityUpdate CustomerUpdate StateUpdate
-        PhoneCallCustomer Forward Bounce SendAnswer EmailCustomer
-        PhoneCallAgent WebRequestCustomer TicketDynamicFieldUpdate)
+        Forward Bounce SendAnswer EmailCustomer TicketDynamicFieldUpdate)
         )
     {
         my $ID = $Self->HistoryTypeLookup( Type => $HistoryTypeData );

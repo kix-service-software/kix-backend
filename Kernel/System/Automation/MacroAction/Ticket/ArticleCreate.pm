@@ -144,7 +144,7 @@ sub Describe {
     # FIXME: add if necessary
     # Charset          => 'utf-8',                                # 'ISO-8859-15'
     # MimeType         => 'text/plain',
-    # HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
+    # HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|...
     # HistoryComment   => 'Some free text!',
     # UnlockOnAway     => 1,                                      # Unlock ticket if owner is away
     # ForceNotificationToUserID
