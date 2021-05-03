@@ -371,12 +371,13 @@ sub ContainedIn {
         return;
     }
 
-    my %Values = map { $_ => 1 } @{$List};
+    # get checkable but ignore undef
+    my %Values = map { defined $_ ? ($_ => 1) : () } @{$List};
     if ( $Values{$Test} ) {
-        $Self->_Print( 1, "$Name (list contains value)" );
+        $Self->_Print( 1, "$Name (list contains value \"$Test\")" );
         return 1;
     } else {
-        $Self->_Print( 0, "$Name (list does not contain value)" );
+        $Self->_Print( 0, "$Name (list does not contain value \"$Test\" but should)" );
         return;
     }
 }
@@ -423,12 +424,13 @@ sub NotContainedIn {
         return 1;
     }
 
-    my %Values = map { $_ => 1 } @{$List};
+    # get checkable but ignore undef
+    my %Values = map { defined $_ ? ($_ => 1) : () } @{$List};
     if ( $Values{$Test} ) {
-        $Self->_Print( 0, "$Name (list contains value)" );
+        $Self->_Print( 0, "$Name (list contains value \"$Test\" but should not)" );
         return;
     } else {
-        $Self->_Print( 1, "$Name (list does not contain value)" );
+        $Self->_Print( 1, "$Name (list does not contain value \"$Test\")" );
         return 1;
     }
 }
