@@ -86,7 +86,7 @@ sub _RemoveDuplicatePermissions {
     else {
         $LogObject->Log(
             Priority => 'info',
-            Message  => "Deleted " . $Count - $AfterCount . " duplicate permissions."
+            Message  => "Deleted " . ($Count - $AfterCount) . " duplicate permissions."
         );
     }
 
