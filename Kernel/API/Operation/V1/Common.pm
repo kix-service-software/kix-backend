@@ -3127,9 +3127,9 @@ sub _CheckCustomerAssignedObject {
 
 =item _FilterCustomerUserVisibleObjectIds()
 
-filters config items ids for current customer user if necessary
+filters ids for current customer user if necessary
 
-    @FilteredObjectIDList = $ConfigItemObject->_FilterCustomerUserVisibleObjectIds(
+    @FilteredObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
         ObjectType   => 'Ticket'
         ObjectIDList => \@ObjectIDList,
         ...                                 # optional additional params
@@ -3146,6 +3146,47 @@ sub _FilterCustomerUserVisibleObjectIds {
     if (
         $Param{ObjectType} &&
         IsArrayRefWithData(\@ObjectIDList) &&
+        IsHashRefWithData($Self->{Authorization}) &&
+        $Self->{Authorization}->{UserType} eq 'Customer'
+    ) {
+
+        # get object relevant ids
+        my $ItemIDs = $Self->_GetCustomerUserVisibleObjectIds(
+            %Param
+        );
+
+        # keep relevant ids
+        if ( IsArrayRefWithData($ItemIDs) ) {
+            my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
+            my @Result;
+            for my $ObjectID ( @ObjectIDList ) {
+                push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
+            }
+            @ObjectIDList = @Result;
+        } else {
+            @ObjectIDList = ();
+        }
+    }
+
+    return @ObjectIDList;
+}
+=item _GetCustomerUserVisibleObjectIds()
+
+returns object ids for current customer user if necessary
+
+    @ObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
+        ObjectType   => 'Ticket'
+        ...                         # optional additional params
+    )
+
+=cut
+
+sub _GetCustomerUserVisibleObjectIds {
+    my ( $Self, %Param ) = @_;
+
+    # check if customer context
+    if (
+        $Param{ObjectType} &&
         IsHashRefWithData($Self->{Authorization}) &&
         $Self->{Authorization}->{UserType} eq 'Customer'
     ) {
@@ -3167,31 +3208,30 @@ sub _FilterCustomerUserVisibleObjectIds {
         }
 
         # get object relevant ids
-        my $ItemIDs;
         if ( IsHashRefWithData(\%ContactData) ) {
             if ($Param{ObjectType} eq 'ConfigItem') {
-                $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                return $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
                     UserID     => $Self->{Authorization}->{UserID}
                 );
             } elsif ($Param{ObjectType} eq 'Ticket') {
-                $ItemIDs = $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
+                return $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
                     UserID     => $Self->{Authorization}->{UserID}
                 );
             } elsif ($Param{ObjectType} eq 'TicketArticle') {
-                $ItemIDs = $Kernel::OM->Get('Ticket')->GetAssignedArticlesForObject(
+                return $Kernel::OM->Get('Ticket')->GetAssignedArticlesForObject(
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
                     UserID     => $Self->{Authorization}->{UserID}
                 );
             } elsif ($Param{ObjectType} eq 'FAQArticle') {
-                $ItemIDs = $Kernel::OM->Get('FAQ')->GetAssignedFAQArticlesForObject(
+                return $Kernel::OM->Get('FAQ')->GetAssignedFAQArticlesForObject(
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
@@ -3199,21 +3239,9 @@ sub _FilterCustomerUserVisibleObjectIds {
                 );
             }
         }
-
-        # keep relevant ids
-        if ( IsArrayRefWithData($ItemIDs) ) {
-            my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
-            my @Result;
-            for my $ObjectID ( @ObjectIDList ) {
-                push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
-            }
-            @ObjectIDList = @Result;
-        } else {
-            @ObjectIDList = ();
-        }
     }
 
-    return @ObjectIDList;
+    return;
 }
 
 =item _CheckDynamicField()
