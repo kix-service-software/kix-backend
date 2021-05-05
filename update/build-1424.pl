@@ -40,7 +40,7 @@ sub _UpdateCustomerRole {
     my %PermissionTypeList = reverse $RoleObject->PermissionTypeList();
 
     my $RegExTarget = qr/\/tickets\/\*{Ticket\.\[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID/;
-    my $ChangeTarget = '/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber]}';
+    my $ChangeTarget = '/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}';
 
     my $AllOk = 1;
     my $RoleID = $RoleList{Customer};
