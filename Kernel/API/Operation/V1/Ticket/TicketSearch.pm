@@ -88,6 +88,34 @@ perform TicketSearch Operation. This will return a ticket list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # check for customer relevant ids if necessary
+    if ($Self->{Authorization}->{UserType} eq 'Customer') {
+        my $CustomerTicketIDList = $Self->_GetCustomerUserVisibleObjectIds(
+            ObjectType => 'Ticket',
+            UserID     => $Self->{Authorization}->{UserID}
+        );
+
+        # return empty result if there are no assigned tickets for customer
+        return $Self->_Success(
+            Ticket => [],
+        ) if (!IsArrayRefWithData($CustomerTicketIDList));
+
+        # add tickets ids of customer to search as AND condition
+        if ( !IsHashRefWithData($Self->{Search}->{Ticket}) ) {
+            $Self->{Search}->{Ticket} = {};
+        }
+        if ( !IsArrayRefWithData($Self->{Search}->{Ticket}->{AND}) ) {
+            $Self->{Search}->{Ticket}->{AND} = [
+                { Field => 'TicketID', Operator => 'IN', Value => $CustomerTicketIDList }
+            ];
+        } else {
+            push(
+                @{$Self->{Search}->{Ticket}->{AND}},
+                { Field => 'TicketID', Operator => 'IN', Value => $CustomerTicketIDList }
+            );
+        }
+    }
+
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @TicketIndex = $TicketObject->TicketSearch(
@@ -96,13 +124,7 @@ sub Run {
         Limit      => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
         Sort       => $Self->{Sort}->{Ticket},
         UserType   => $Self->{Authorization}->{UserType},
-        UserID     => $Self->{Authorization}->{UserID},
-    );
-
-    # filter for customer assigned tickets if necessary
-    @TicketIndex = $Self->_FilterCustomerUserVisibleObjectIds(
-        ObjectType   => 'Ticket',
-        ObjectIDList => \@TicketIndex
+        UserID     => $Self->{Authorization}->{UserID}
     );
 
    if ( @TicketIndex ) {
@@ -139,13 +161,7 @@ sub Run {
     );
 }
 
-=end Internal:
-
-
 1;
-
-
-
 
 =back
 

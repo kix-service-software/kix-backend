@@ -84,6 +84,20 @@ perform FAQArticleSearch Operation. This will return a FAQArticle ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # get customer relevant ids if necessary
+    my $CustomerFAQIDList;
+    if ($Self->{Authorization}->{UserType} eq 'Customer') {
+        $CustomerFAQIDList = $Self->_GetCustomerUserVisibleObjectIds(
+            ObjectType => 'FAQArticle',
+            UserID     => $Self->{Authorization}->{UserID}
+        );
+
+        # return empty result if there are no assigned faqs for customer
+        return $Self->_Success(
+            FAQArticle => [],
+        ) if (!IsArrayRefWithData($CustomerFAQIDList));
+    }
+
     my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
     my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
     my @ArticleIDs;
@@ -146,7 +160,10 @@ sub Run {
                     ValidIDs => \@ValidIDs,
                     $SearchItem->{Field} => {
                         $Operator => $Value
-                    }
+                    },
+
+                    # use ids of customer if given
+                    ArticleIDs => $CustomerFAQIDList
                 );
 
                 # merge results
@@ -188,16 +205,12 @@ sub Run {
         @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
             UserID   => $Self->{Authorization}->{UserID},
             Limit   => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
-            ValidIDs => \@ValidIDs
+            ValidIDs => \@ValidIDs,
+
+            # use ids of customer if given
+            ArticleIDs => $CustomerFAQIDList
         );
     }
-
-    # filter for customer assigned articles if necessary
-    @ArticleIDs = $Self->_FilterCustomerUserVisibleObjectIds(
-        ObjectType   => 'FAQArticle',
-        ObjectIDList => \@ArticleIDs,
-        UserID       => $Self->{Authorization}->{UserID}
-    );
 
     # get already prepared FAQ data from FAQArticleGet operation
     if (@ArticleIDs) {
