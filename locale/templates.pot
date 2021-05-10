@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-5-10 06:19+0000\n"
+"POT-Creation-Date: 2021-5-10 10:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1584,6 +1584,10 @@ msgstr ""
 
 #. Perl Module: update/build-1415.pl
 msgid "allows to view report definitions and reports"
+msgstr ""
+
+#. Perl Module: update/build-1433.pl
+msgid "Work Order"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
