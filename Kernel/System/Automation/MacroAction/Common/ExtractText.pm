@@ -96,12 +96,14 @@ sub Run {
     return if !$Self->_CheckParams(%Param);
 
     my $Values = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{RegEx},
-        TicketID => $Param{ObjectID},
-        Data     => {},
-        UserID   => $Param{UserID},
-        Language => 'en' # to not translate values
+        RichText  => 0,
+        Text      => $Param{Config}->{RegEx},
+        Data      => {},
+        UserID    => $Param{UserID},
+        Translate => 0,
+
+        # FIXME: as common action, object id could be not a ticket!
+        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
     );
 
     my $Text = $Param{Config}->{Text} || '';

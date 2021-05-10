@@ -115,12 +115,14 @@ sub Run {
     # replace placeholders - atm only for ticket
     foreach my $Parameter ( sort keys %{$Param{Config}->{Parameters} ||{}} ) {
         $Param{Config}->{Parameters}->{$Parameter} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $Param{Config}->{Parameters}->{$Parameter},
-            TicketID => $Param{ObjectID},
-            Data     => {},
-            UserID   => $Param{UserID},
-            Language => 'en' # to not translate values
+            RichText  => 0,
+            Text      => $Param{Config}->{Parameters}->{$Parameter},
+            Data      => {},
+            UserID    => $Param{UserID},
+            Translate => 0,
+
+            # FIXME: as common action, object id could be not a ticket!
+            TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
         );
     }
 
