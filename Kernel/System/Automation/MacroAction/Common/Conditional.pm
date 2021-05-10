@@ -14,6 +14,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Safe;
+
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Automation::MacroAction::Common);
@@ -84,19 +86,29 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $Values = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText => 0,
-        Text     => $Param{Config}->{If},
-        TicketID => $Param{ObjectID},
-        Data     => {},
-        UserID   => $Param{UserID},
-        Language => 'en' # to not translate values
+    my $Expression = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+        RichText  => 0,
+        Text      => $Param{Config}->{If},
+        Data      => {},
+        UserID    => $Param{UserID},
+        Translate => 0,
+
+        # FIXME: as common action, object id could be not a ticket!
+        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
     );
 
-    # evaluate expression - we use a simple string eval a this time, because there are not that much alternatives
-    my $EvalResult = eval $Param{Config}->{If};
+    # make it safe :)
+    my $Compartment = new Safe;
+    $Compartment->permit_only(qw(:base_core :base_mem :base_loop :base_orig :base_math));
+
+    # evaluate expression - we use a simple Safe string reval atm - better than nothing
+    my $EvalResult = $Compartment->reval($Expression, 1);
     if ( $EvalResult ) {
-        my $Result = $Kernel::OM->Get('Automation')->MacroExecute(
+
+        # FIXME: use given instance
+        my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
+
+        my $Result = $AutomationObject->MacroExecute(
             ID       => $Param{Config}->{MacroID},
             ObjectID => $Param{ObjectID},
             UserID   => $Param{UserID}

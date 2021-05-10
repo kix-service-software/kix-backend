@@ -86,14 +86,16 @@ sub Run {
 
     if ( $Param{Config}->{ObjectID} ) {
         $Param{Config}->{ObjectID} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => 0,
-            Text     => $Param{Config}->{ObjectID} || '',
-            TicketID => $Param{ObjectID},
-            Data     => {},
-            UserID   => $Param{UserID},
-            Language => 'en' # to not translate values
+            RichText  => 0,
+            Text      => $Param{Config}->{ObjectID} || '',
+            Data      => {},
+            UserID    => $Param{UserID},
+            Translate => 0,
+
+            # FIXME: as common action, object id could be not a ticket!
+            TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
         );
-    
+
         if ( $Param{Config}->{ObjectID} !~ /^\d+$/ ) {
             $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
@@ -103,8 +105,11 @@ sub Run {
             return;
         }
     }
-    
-    my $Result = $Kernel::OM->Get('Automation')->MacroExecute(
+
+    # FIXME: use given instance
+    my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
+
+    my $Result = $AutomationObject->MacroExecute(
         ID       => $Param{Config}->{MacroID},
         ObjectID => $Param{Config}->{ObjectID},
         UserID   => $Param{UserID}
