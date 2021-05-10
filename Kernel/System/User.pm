@@ -1014,7 +1014,7 @@ sub UserList {
     my $NoOutOfOffice = $Param{NoOutOfOffice} || 0;
 
     # check cache
-    my $CacheKey = join '::', 'UserList', $Type, $Valid, $NoOutOfOffice, $Param{Limit};
+    my $CacheKey = join '::', 'UserList', $Type, $Valid, $NoOutOfOffice, ($Param{Limit} ? $Param{Limit} : '');
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
