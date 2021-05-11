@@ -29,6 +29,7 @@ use vars qw(%INC);
 
 # update initial report
 _UpdateReport();
+_FixAutoIncrementIDs();
 
 sub _UpdateReport {
     my ( $Self, %Param ) = @_;
@@ -81,6 +82,41 @@ sub _UpdateReport {
             $LogObject->Log(
                 Priority => 'notice',
                 Message  => "Did not update report definition '$ReportDefName'."
+            );
+        }
+    }
+
+    return 1;
+}
+
+sub _FixAutoIncrementIDs {
+    my ( $Self, %Param ) = @_;
+
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    # only needed with mysql based DBMS
+    return 1 if $DBObject->{'DB::Type'} ne 'mysql';
+
+    my @Tables = (
+        'article_flag',
+        'ticket_flag',
+        'virtual_fs_preferences',
+    );
+
+    foreach my $Table ( @Tables ) {
+        my $Success = $DBObject->Do(
+            SQL => "ALTER TABLE $Table MODIFY COLUMN id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY"
+        );
+        if ( !$Success ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not update 'id' column of table '$Table'!"
+            );
+        }
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "Updated 'id' column of table '$Table'."
             );
         }
     }
