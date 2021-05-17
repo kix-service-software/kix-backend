@@ -44,7 +44,8 @@ returns a hash with the report data
 
     my %ReportData = $ReportingObject->ReportGet(
         ID             => 2,
-        IncludeResults => 0|1,      # optional, default: 0
+        IncludeResults => 0|1,            # optional, default: 0
+        IncludeResultContent => 0|1,      # optional, default: 0
     );
 
 This returns something like:
@@ -129,7 +130,8 @@ sub ReportGet {
 
         foreach my $ResultID ( @ReportResultList ) {
             my %ResultData = $Self->ReportResultGet(
-                ID => $ResultID
+                ID             => $ResultID,
+                IncludeContent => $Param{IncludeResultContent}
             );
             if ( !%ResultData ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -159,7 +161,6 @@ create a new report
     my $ID = $ReportingObject->ReportCreate(
         DefinitionID  => 123
         Config        => HashRef,
-        ValidID       => 1,                                        # optional
         UserID        => 123,
     );
 

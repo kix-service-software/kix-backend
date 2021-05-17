@@ -109,13 +109,20 @@ perform ArticleSearch Operation. This will return a article list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @ArticleIndex = $TicketObject->ArticleIndex(
         TicketID        => $Param{Data}->{TicketID},
-        CustomerVisible => $Self->{Authorization}->{UserType} eq 'Customer' ? 1 : 0,
         UserID          => $Self->{Authorization}->{UserID},
+    );
+
+    # filter for customer assigned articles if necessary
+    @ArticleIndex = $Self->_FilterCustomerUserVisibleObjectIds(
+        TicketID     => $Param{Data}->{TicketID},
+        ObjectType   => 'TicketArticle',
+        ObjectIDList => \@ArticleIndex,
+        UserID       => $Self->{Authorization}->{UserID}
     );
 
     if ( @ArticleIndex ) {
@@ -128,9 +135,10 @@ sub Run {
                 TicketID  => $Param{Data}->{TicketID},
                 ArticleID => join(',', @ArticleIndex),
                 include   => $Param{Data}->{include},
-                expand    => $Param{Data}->{expand},
+                expand    => $Param{Data}->{expand}
             }
         );
+
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;
         }

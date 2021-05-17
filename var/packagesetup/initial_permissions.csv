@@ -115,12 +115,16 @@
 "Customer";"Resource";"/system/cmdb";;"x";;;
 "Customer";"Resource";"/system/cmdb/*";;;;;
 "Customer";"Resource";"/system/cmdb/classes";;"x";;;
+"Customer";"Property";"/system/cmdb/classes/*{ConfigItemClass.[ID,Name]}";;"x";;;
 "Customer";"Resource";"/system/communication";;"x";;;
 "Customer";"Resource";"/system/communication/*";;;;;
 "Customer";"Resource";"/system/communication/channels";;"x";;;
 "Customer";"Resource";"/system/communication/notifications";;"x";;;
 "Customer";"Resource";"/system/communication/sendertypes";;"x";;;
 "Customer";"Resource";"/system/communication/systemaddresses";;"x";;;
+"Customer";"Resource";"/system/dynamicfields";;"x";;;
+"Customer";"Resource";"/system/dynamicfields/*";;"x";;;
+"Customer";"Object";"/system/dynamicfields/*{DynamicField.CustomerVisible NE 1}";;;;;
 "Customer";"Resource";"/system/objectactions";;"x";;;
 "Customer";"Object";"/system/objectactions/*{ObjectAction.UsageContext EQ 1}";;;;;
 "Customer";"Resource";"/system/objecticons";;"x";;;
@@ -131,9 +135,11 @@
 "Customer";"Resource";"/system/users";;"x";;;
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
-"Customer";"Object";"/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
-"Customer";"Object";"/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
-"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title,Priority,State,Type]}";;"x";;;
+"Customer";"Object";"/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID}";;;;;
+"Customer";"Object";"/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID}";;;;;
+"Customer";"Object";"/tickets{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
+"Customer";"Object";"/tickets/*{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
+"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;
 "Customer";"Object";"/tickets/*/articles/*{Article.CustomerVisible NE 1}";;;;;
@@ -158,3 +164,4 @@
 "Report User";"Object";"/reporting/reports/*{Report.DefinitionID IN [1,2]}";;"x";;;
 "Report Manager";"Resource";"/reporting";"x";"x";"x";"x";
 "Report Manager";"Resource";"/system/roles";"";"x";"x";"";
+

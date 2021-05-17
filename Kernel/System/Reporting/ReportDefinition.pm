@@ -552,10 +552,7 @@ sub ReportDefinitionValidateParameters {
 
     # check if we have a parameter in the data source config which is not defined in the parameters config
     my $FlatConfig = Hash::Flatten::flatten(
-        $Param{Config}->{DataSource},
-        {
-            HashDelimiter => '.',
-        }
+        $Param{Config}->{DataSource}
     );
     foreach my $Key ( keys %{$FlatConfig} ) {
         next if $FlatConfig->{$Key} !~ /\$\{Parameters.(\w+)\}/;

@@ -284,1602 +284,6 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
-    <!-- role "Agent User": permission C____ on /auth -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/auth]]></Data>
-        <Data Key="value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission CRUD_ on /session -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/session]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _____ on /system/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/users -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/users]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/config -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/config]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/objectdefinitions -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/objectdefinitions]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/valid -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/valid]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/objecticons -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/generalcatalog -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/generalcatalog]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/communication -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _____ on /system/communication/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/communication/notifications -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/notifications]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /system/dynamicfields -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/dynamicfields]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission CRUD_ on /watchers -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/watchers]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _R___ on /i18n -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/i18n]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _____ on /system/config/*{SysConfigOption.AccessLevel EQ confidential} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/config/*{SysConfigOption.AccessLevel EQ confidential}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Agent User": permission _____ on /system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">3</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /tickets -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission CRUD_ on /tickets/*/articles/*/flags -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles/*/flags]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _____ on /system/ticket/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/ticket -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/ticket/locks -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/locks]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/ticket/priorities -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/priorities]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/ticket/queues -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/ticket/states -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/states]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/ticket/types -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/types]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/communication -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _____ on /system/communication/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/communication/channels -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/channels]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/communication/sendertypes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/sendertypes]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /system/communication/systemaddresses -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/systemaddresses]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Reader": permission _R___ on /links -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">4</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission CRUD_ on /tickets -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _____ on /system/ticket/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/ticket -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/ticket/locks -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/locks]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/ticket/priorities -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/priorities]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/ticket/queues -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/ticket/states -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/states]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/ticket/types -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket/types]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/communication -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _____ on /system/communication/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/communication/channels -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/channels]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/communication/sendertypes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/sendertypes]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /system/communication/systemaddresses -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/systemaddresses]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /organisations -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/organisations]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission _R___ on /contacts -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission CRUD_ on /links -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Ticket Agent": permission R_ on /system/textmodules -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">5</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/textmodules]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Webform Ticket Creator": permission C____ on /tickets -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">6</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
-        <Data Key="value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Webform Ticket Creator": permission _R___ on /system/ticket -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">6</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">6</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Webform Ticket Creator": permission _____ on /system/communication/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">6</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication/channels -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">6</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/channels]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication/sendertypes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">6</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/sendertypes]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Webform Ticket Creator": permission _R___ on /system/communication/systemaddresses -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">6</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/systemaddresses]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission _R___ on /system/faq -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission _____ on /system/faq/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission _R___ on /system/faq/categories -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq/categories]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission _R___ on /faq -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission _____ on /faq/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission _R___ on /faq/articles -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/articles]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission CRUD_ on /faq/articles/*/votes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/articles/*/votes]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Reader": permission _R___ on /links -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">7</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Editor": permission _R___ on /system/faq -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">8</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Editor": permission _____ on /system/faq/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">8</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Editor": permission _R___ on /system/faq/categories -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">8</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq/categories]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Editor": permission CRUD_ on /faq -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">8</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Editor": permission _____ on /faq/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">8</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Editor": permission CRUD_ on /faq/articles -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">8</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/articles]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "FAQ Editor": permission CRUD_ on /links -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">8</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Reader": permission _R___ on /system/cmdb -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">9</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Reader": permission _____ on /system/cmdb/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">9</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Reader": permission _R___ on /system/cmdb/classes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">9</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb/classes]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Reader": permission _R___ on /cmdb -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">9</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/cmdb]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Reader": permission _____ on /cmdb/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">9</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/cmdb/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Reader": permission _R___ on /cmdb/configitems -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">9</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/cmdb/configitems]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Reader": permission _R___ on /links -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">9</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Maintainer": permission _R___ on /system/cmdb -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">10</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Maintainer": permission _____ on /system/cmdb/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">10</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Maintainer": permission _R___ on /system/cmdb/classes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">10</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb/classes]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Maintainer": permission CRUD_ on /cmdb -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">10</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/cmdb]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Maintainer": permission _____ on /cmdb/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">10</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/cmdb/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Maintainer": permission CRUD_ on /cmdb/configitems -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">10</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/cmdb/configitems]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "CMDB Maintainer": permission CRUD_ on /links -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">10</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer Reader": permission _R___ on /organisations -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">11</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/organisations]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer Reader": permission _R___ on /contacts -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">11</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer Manager": permission CRUD_ on /organisations -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">12</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/organisations]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer Manager": permission CRUD_ on /contacts -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">12</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission CRUD_ on /system -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission C____ on /auth -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/auth]]></Data>
-        <Data Key="value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission CRUD_ on /session -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/session]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission CRUD_ on /contacts -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission _RU__ on /organisations -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/organisations]]></Data>
-        <Data Key="value">6</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission CRUD_ on /*{} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "System Admin": permission CRUD_ on /*{} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">2</Data>
-        <Data Key="type_id">3</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Superuser": permission CRUD_ on /* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">1</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/*]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Superuser": permission CRUD_ on /*{} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">1</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Superuser": permission CRUD_ on /*{} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">1</Data>
-        <Data Key="type_id">3</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/*{}]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission C____ on /auth -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/auth]]></Data>
-        <Data Key="value">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /cmdb -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/cmdb]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission CR___ on /contacts -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
-        <Data Key="value">3</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /faq -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /faq/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /faq/articles -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/articles]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /faq/articles/*{FAQArticle.CustomerVisible NE 1} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/articles/*{FAQArticle.CustomerVisible NE 1}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission CR___ on /faq/articles/*/votes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/faq/articles/*/votes]]></Data>
-        <Data Key="value">3</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /i18n -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/i18n]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /links -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission CRUD_ on /session -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/session]]></Data>
-        <Data Key="value">15</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/cmdb -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/cmdb/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/cmdb/classes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/cmdb/classes]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/communication -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/communication/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/communication/channels -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/channels]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/communication/notifications -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/notifications]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/communication/sendertypes -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/sendertypes]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/communication/systemaddresses -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/communication/systemaddresses]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/objecticons -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/faq -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/faq/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq/*]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/faq/categories -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/faq/categories]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/ticket -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/ticket]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/users -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/users]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission CR___ on /tickets -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
-        <Data Key="value">3</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _RU__ on /tickets/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*]]></Data>
-        <Data Key="value">6</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">3</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission CR___ on /tickets/*/articles -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles]]></Data>
-        <Data Key="value">3</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /tickets/*/articles/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles/*]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /tickets/*/articles/*{Article.CustomerVisible NE 1} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles/*{Article.CustomerVisible NE 1}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit]} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">3</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit]}]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission ____X on /tickets/*/articles{Article.[TimeUnit]} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">3</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles{Article.[!*,TimeUnit]}]]></Data>
-        <Data Key="value">61440</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission CR___ on /tickets/*/articles/*/flags -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/tickets/*/articles/*/flags]]></Data>
-        <Data Key="value">3</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/config -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/config]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/config/* -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/config/*]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/config{SysConfigOption.AccessLevel NE external} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/config{SysConfigOption.AccessLevel NE external}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/config/*{SysConfigOption.AccessLevel NE external} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/config/*{SysConfigOption.AccessLevel NE external}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _R___ on /system/objectactions -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">1</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/objectactions]]></Data>
-        <Data Key="value">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <!-- role "Customer": permission _____ on /system/objectactions/*{ObjectAction.UsageContext EQ 1} -->
-    <Insert Table="role_permission">
-        <Data Key="role_id">13</Data>
-        <Data Key="type_id">2</Data>
-        <Data Key="target" Type="Quote"><![CDATA[/system/objectactions/*{ObjectAction.UsageContext EQ 1}]]></Data>
-        <Data Key="value">0</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-
 <!-- ticket_state_type -->
     <Insert Table="ticket_state_type">
         <Data Key="id" Type="AutoIncrement">1</Data>
@@ -2071,6 +475,14 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote">Service Desk</Data>
+        <Data Key="signature" Type="Quote"><![CDATA[
+
+-- <br/>
+&lt;KIX_CONFIG_OrganizationLong&gt;<br/>
+&lt;KIX_CONFIG_OrganizationAddress&gt;<br/>
+&lt;KIX_CONFIG_OrganizationRegistrationLocation&gt; &lt;KIX_CONFIG_OrganizationRegistrationNumber&gt;<br/>
+&lt;KIX_CONFIG_OrganizationDirectors&gt;
+]]></Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -2085,6 +497,14 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote">Service Desk::Monitoring</Data>
+        <Data Key="signature" Type="Quote"><![CDATA[
+
+-- <br/>
+&lt;KIX_CONFIG_OrganizationLong&gt;<br/>
+&lt;KIX_CONFIG_OrganizationAddress&gt;<br/>
+&lt;KIX_CONFIG_OrganizationRegistrationLocation&gt; &lt;KIX_CONFIG_OrganizationRegistrationNumber&gt;<br/>
+&lt;KIX_CONFIG_OrganizationDirectors&gt;
+]]></Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -2099,6 +519,14 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote">Junk</Data>
+        <Data Key="signature" Type="Quote"><![CDATA[
+
+-- <br/>
+&lt;KIX_CONFIG_OrganizationLong&gt;<br/>
+&lt;KIX_CONFIG_OrganizationAddress&gt;<br/>
+&lt;KIX_CONFIG_OrganizationRegistrationLocation&gt; &lt;KIX_CONFIG_OrganizationRegistrationNumber&gt;<br/>
+&lt;KIX_CONFIG_OrganizationDirectors&gt;
+]]></Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -10211,6 +8639,27 @@ TranslatableValues: '1'
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">9</Data>
+        <Data Key="internal_field">0</Data>
+        <Data Key="name" Type="Quote" Translatable="0">WorkOrder</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Work Order</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+---
+CountMin: '1'
+CountMax: '1'
+CountDefault: '1'
+DefaultValue:
+        ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
 <!-- initial job "KIX Field Agent - Mobile Processing Rejected" -->
     <Insert Table="exec_plan">
         <Data Key="id" Type="AutoIncrement">1</Data>
@@ -10308,7 +8757,7 @@ TranslatableValues: '1'
 {
   "DataSource": {
     "SQL": {
-      "any": "base64(U0VMRUNUIHR0Lm5hbWUgQVMgIlR5cGUiLCAKICAgICAgIHQudG4gQVMgIlROUiIsIAogICAgICAgdC50aXRsZSBBUyAiVGl0bGUiLCAKICAgICAgIHRzLm5hbWUgQVMgIlN0YXRlIiwKICAgICAgIG8ubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwgCiAgICAgICBjLmVtYWlsIEFTICJDb250YWN0IiwgCiAgICAgICB0LmFjY291bnRlZF90aW1lIEFTICJBY2NvdW50ZWQgVGltZSIKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnLAogICAgIGRmdi52YWx1ZV90ZXh0IEFTICJDbG9zZSBDb2RlIiwKICAgICBzbGFfcmVzcG9uc2UubmFtZSBBUyAiU0xBIFJlc3BvbnNlIE5hbWUiLAogICAgIHRzY19yZXNwb25zZS50YXJnZXRfdGltZSBBUyAiU0xBIFJlc3BvbnNlIFRhcmdldCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBSZXNwb25zZSBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgUmVzcG9uc2UgQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iLAogICAgIHNsYV9zb2x1dGlvbi5uYW1lIEFTICJTTEEgU29sdXRpb24gTmFtZSIsCiAgICAgdHNjX3NvbHV0aW9uLnRhcmdldF90aW1lIEFTICJTTEEgU29sdXRpb24gVGFyZ2V0IFRpbWUiLCAKICAgICB0c2Nfc29sdXRpb24uZnVsZmlsbG1lbnRfdGltZSBBUyAiU0xBIFNvbHV0aW9uIEZ1bGZpbGxtZW50IFRpbWUiLCAKICAgICB0c2Nfc29sdXRpb24udGltZV9kZXZpYXRpb25fYnVzaW5lc3MgQVMgIlNMQSBTb2x1dGlvbiBCdXNpbmVzcyBUaW1lIERldmlhdGlvbiIKJyl9CiAgRlJPTSBvcmdhbmlzYXRpb24gbywgCiAgICAgICBjb250YWN0IGMsIAogICAgICAgdGlja2V0X3N0YXRlIHRzLAogICAgICAgdGlja2V0X3R5cGUgdHQsIAogICAgICAgdGlja2V0IHQKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnCiAgTEVGVCBPVVRFUiBKT0lOIGR5bmFtaWNfZmllbGQgZGYgT04gKGRmLm5hbWUgPSAnQ2xvc2VDb2RlJykKICBMRUZUIE9VVEVSIEpPSU4gZHluYW1pY19maWVsZF92YWx1ZSBkZnYgT04gKGRmdi5vYmplY3RfaWQgPSB0LmlkIEFORCBkZnYuZmllbGRfaWQgPSBkZi5pZCkKICBMRUZUIE9VVEVSIEpPSU4gdGlja2V0X3NsYV9jcml0ZXJpb24gdHNjX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2UudGlja2V0X2lkID0gdC5pZCBBTkQgdHNjX3Jlc3BvbnNlLm5hbWUgPSAnUmVzcG9uc2UnKQogIExFRlQgT1VURVIgSk9JTiBzbGEgQVMgc2xhX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2Uuc2xhX2lkID0gc2xhX3Jlc3BvbnNlLmlkKQogIExFRlQgT1VURVIgSk9JTiB0aWNrZXRfc2xhX2NyaXRlcmlvbiB0c2Nfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi50aWNrZXRfaWQgPSB0LmlkIEFORCB0c2Nfc29sdXRpb24ubmFtZSA9ICdTb2x1dGlvbicpCiAgTEVGVCBPVVRFUiBKT0lOIHNsYSBBUyBzbGFfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi5zbGFfaWQgPSBzbGFfc29sdXRpb24uaWQpCicpfQogV0hFUkUgdC50eXBlX2lkID0gdHQuaWQKICAgQU5EIHQudGlja2V0X3N0YXRlX2lkID0gdHMuaWQKICAgQU5EIHQub3JnYW5pc2F0aW9uX2lkID0gby5pZAogICBBTkQgdC5jb250YWN0X2lkID0gYy5pZAogICBBTkQgby5pZCBJTiAoJHtQYXJhbWV0ZXJzLk9yZ2FuaXNhdGlvbklETGlzdH0pCiAgIEFORCB0LmNyZWF0ZV90aW1lIEJFVFdFRU4gJyR7UGFyYW1ldGVycy5TdGFydERhdGV9IDAwOjAwOjAwJyBBTkQgJyR7UGFyYW1ldGVycy5FbmREYXRlfSAyMzo1OTo1OScKIE9SREVSIEJZIHR0Lm5hbWUsIHQudG4=)"
+      "any": "base64(U0VMRUNUIHR0Lm5hbWUgQVMgIlR5cGUiLCAKICAgICAgIHQudG4gQVMgIlROUiIsIAogICAgICAgdC50aXRsZSBBUyAiVGl0bGUiLCAKICAgICAgIHRzLm5hbWUgQVMgIlN0YXRlIiwKICAgICAgIG8ubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwgCiAgICAgICBjLmVtYWlsIEFTICJDb250YWN0IiwgCiAgICAgICB0LmFjY291bnRlZF90aW1lIEFTICJBY2NvdW50ZWQgVGltZSIKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnLAogICAgIGRmdi52YWx1ZV90ZXh0IEFTICJDbG9zZSBDb2RlIiwKICAgICBzbGFfcmVzcG9uc2UubmFtZSBBUyAiU0xBIFJlc3BvbnNlIE5hbWUiLAogICAgIHRzY19yZXNwb25zZS50YXJnZXRfdGltZSBBUyAiU0xBIFJlc3BvbnNlIFRhcmdldCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBSZXNwb25zZSBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgUmVzcG9uc2UgQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iLAogICAgIHNsYV9zb2x1dGlvbi5uYW1lIEFTICJTTEEgU29sdXRpb24gTmFtZSIsCiAgICAgdHNjX3NvbHV0aW9uLnRhcmdldF90aW1lIEFTICJTTEEgU29sdXRpb24gVGFyZ2V0IFRpbWUiLCAKICAgICB0c2Nfc29sdXRpb24uZnVsZmlsbG1lbnRfdGltZSBBUyAiU0xBIFNvbHV0aW9uIEZ1bGZpbGxtZW50IFRpbWUiLCAKICAgICB0c2Nfc29sdXRpb24udGltZV9kZXZpYXRpb25fYnVzaW5lc3MgQVMgIlNMQSBTb2x1dGlvbiBCdXNpbmVzcyBUaW1lIERldmlhdGlvbiIKJyl9CiAgRlJPTSBvcmdhbmlzYXRpb24gbywgCiAgICAgICBjb250YWN0IGMsIAogICAgICAgdGlja2V0X3N0YXRlIHRzLAogICAgICAgdGlja2V0X3R5cGUgdHQsIAogICAgICAgdGlja2V0IHQKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnCiAgTEVGVCBPVVRFUiBKT0lOIGR5bmFtaWNfZmllbGQgZGYgT04gKGRmLm5hbWUgPSAnQ2xvc2VDb2RlJykKICBMRUZUIE9VVEVSIEpPSU4gZHluYW1pY19maWVsZF92YWx1ZSBkZnYgT04gKGRmdi5vYmplY3RfaWQgPSB0LmlkIEFORCBkZnYuZmllbGRfaWQgPSBkZi5pZCkKICBMRUZUIE9VVEVSIEpPSU4gdGlja2V0X3NsYV9jcml0ZXJpb24gdHNjX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2UudGlja2V0X2lkID0gdC5pZCBBTkQgdHNjX3Jlc3BvbnNlLm5hbWUgPSAnRmlyc3RSZXNwb25zZScpCiAgTEVGVCBPVVRFUiBKT0lOIHNsYSBBUyBzbGFfcmVzcG9uc2UgT04gKHRzY19yZXNwb25zZS5zbGFfaWQgPSBzbGFfcmVzcG9uc2UuaWQpCiAgTEVGVCBPVVRFUiBKT0lOIHRpY2tldF9zbGFfY3JpdGVyaW9uIHRzY19zb2x1dGlvbiBPTiAodHNjX3NvbHV0aW9uLnRpY2tldF9pZCA9IHQuaWQgQU5EIHRzY19zb2x1dGlvbi5uYW1lID0gJ1NvbHV0aW9uJykKICBMRUZUIE9VVEVSIEpPSU4gc2xhIEFTIHNsYV9zb2x1dGlvbiBPTiAodHNjX3NvbHV0aW9uLnNsYV9pZCA9IHNsYV9zb2x1dGlvbi5pZCkKJyl9CiBXSEVSRSB0LnR5cGVfaWQgPSB0dC5pZAogICBBTkQgdC50aWNrZXRfc3RhdGVfaWQgPSB0cy5pZAogICBBTkQgdC5vcmdhbmlzYXRpb25faWQgPSBvLmlkCiAgIEFORCB0LmNvbnRhY3RfaWQgPSBjLmlkCiAgIEFORCBvLmlkIElOICgke1BhcmFtZXRlcnMuT3JnYW5pc2F0aW9uSURMaXN0fSkKICAgQU5EIHQuY3JlYXRlX3RpbWUgQkVUV0VFTiAnJHtQYXJhbWV0ZXJzLlN0YXJ0RGF0ZX0gMDA6MDA6MDAnIEFORCAnJHtQYXJhbWV0ZXJzLkVuZERhdGV9IDIzOjU5OjU5JwogT1JERVIgQlkgdHQubmFtZSwgdC50bg==)"
     },
     "OutputHandler": [
       {
@@ -10361,7 +8810,7 @@ TranslatableValues: '1'
 {
   "DataSource": {
     "SQL": {
-      "any": "base64(U0VMRUNUIHR0Lm5hbWUgQVMgIlR5cGUiLCAKICAgICAgIHQudG4gQVMgIlROUiIsIAogICAgICAgdC50aXRsZSBBUyAiVGl0bGUiLCAKICAgICAgIHRzLm5hbWUgQVMgIlN0YXRlIiwKICAgICAgIG8ubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwgCiAgICAgICBjLmVtYWlsIEFTICJDb250YWN0IiwgCiAgICAgICB0LmFjY291bnRlZF90aW1lIEFTICJBY2NvdW50ZWQgVGltZSIKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnLAogICAgIGRmdi52YWx1ZV90ZXh0IEFTICJDbG9zZSBDb2RlIiwKICAgICBzbGFfcmVzcG9uc2UubmFtZSBBUyAiU0xBIFJlc3BvbnNlIE5hbWUiLAogICAgIHRzY19yZXNwb25zZS50YXJnZXRfdGltZSBBUyAiU0xBIFJlc3BvbnNlIFRhcmdldCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBSZXNwb25zZSBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgUmVzcG9uc2UgQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iLAogICAgIHNsYV9zb2x1dGlvbi5uYW1lIEFTICJTTEEgU29sdXRpb24gTmFtZSIsCiAgICAgdHNjX3NvbHV0aW9uLnRhcmdldF90aW1lIEFTICJTTEEgU29sdXRpb24gVGFyZ2V0IFRpbWUiICwgCiAgICAgdHNjX3NvbHV0aW9uLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBTb2x1dGlvbiBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3NvbHV0aW9uLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgU29sdXRpb24gQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iCicpfQogIEZST00gb3JnYW5pc2F0aW9uIG8sIAogICAgICAgY29udGFjdCBjLCAKICAgICAgIHRpY2tldF90eXBlIHR0LAogICAgICAgdGlja2V0X3N0YXRlIHRzLAogICAgICAgdGlja2V0IHQKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnCiAgTEVGVCBPVVRFUiBKT0lOIGR5bmFtaWNfZmllbGQgZGYgT04gKGRmLm5hbWUgPSAnQ2xvc2VDb2RlJykKICBMRUZUIE9VVEVSIEpPSU4gZHluYW1pY19maWVsZF92YWx1ZSBkZnYgT04gKGRmdi5vYmplY3RfaWQgPSB0LmlkIEFORCBkZnYuZmllbGRfaWQgPSBkZi5pZCkKICBMRUZUIE9VVEVSIEpPSU4gdGlja2V0X3NsYV9jcml0ZXJpb24gdHNjX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2UudGlja2V0X2lkID0gdC5pZCBBTkQgdHNjX3Jlc3BvbnNlLm5hbWUgPSAnUmVzcG9uc2UnKQogIExFRlQgT1VURVIgSk9JTiBzbGEgQVMgc2xhX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2Uuc2xhX2lkID0gc2xhX3Jlc3BvbnNlLmlkKQogIExFRlQgT1VURVIgSk9JTiB0aWNrZXRfc2xhX2NyaXRlcmlvbiB0c2Nfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi50aWNrZXRfaWQgPSB0LmlkIEFORCB0c2Nfc29sdXRpb24ubmFtZSA9ICdTb2x1dGlvbicpCiAgTEVGVCBPVVRFUiBKT0lOIHNsYSBBUyBzbGFfc29sdXRpb24gT04gKHRzY19zb2x1dGlvbi5zbGFfaWQgPSBzbGFfc29sdXRpb24uaWQpCicpfQogV0hFUkUgdC50eXBlX2lkID0gdHQuaWQKICAgQU5EIHQudGlja2V0X3N0YXRlX2lkID0gdHMuaWQKICAgQU5EIHQub3JnYW5pc2F0aW9uX2lkID0gby5pZAogICBBTkQgdC5jb250YWN0X2lkID0gYy5pZAogICBBTkQgby5pZCBJTiAoJHtQYXJhbWV0ZXJzLk9yZ2FuaXNhdGlvbklETGlzdH0pCiAgIEFORCBFWElTVFMgKAogICAgIFNFTEVDVCB0aC5pZCAKICAgICAgIEZST00gdGlja2V0X3N0YXRlIHRzLAogICAgICAgICAgICB0aWNrZXRfaGlzdG9yeSB0aCwKICAgICAgICAgICAgdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQsCiAgICAgICAgICAgIHRpY2tldF9zdGF0ZV90eXBlIHRzdAogICAgICBXSEVSRSB0aC50aWNrZXRfaWQgPSB0LmlkCiAgICAgICAgQU5EIHRoLmhpc3RvcnlfdHlwZV9pZCA9IHRodC5pZAogICAgICAgIEFORCB0aHQubmFtZSA9ICdTdGF0ZVVwZGF0ZScKICAgICAgICBBTkQgdGguc3RhdGVfaWQgPSB0cy5pZAogICAgICAgIEFORCB0cy50eXBlX2lkID0gdHN0LmlkCiAgICAgICAgQU5EIHRzdC5uYW1lID0gJ2Nsb3NlZCcKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAnJHtQYXJhbWV0ZXJzLlN0YXJ0RGF0ZX0gMDA6MDA6MDAnIEFORCAnJHtQYXJhbWV0ZXJzLkVuZERhdGV9IDIzOjU5OjU5JwogICApCiBPUkRFUiBCWSB0dC5uYW1lLCB0LnRu)"
+      "any": "base64(U0VMRUNUIHR0Lm5hbWUgQVMgIlR5cGUiLCAKICAgICAgIHQudG4gQVMgIlROUiIsIAogICAgICAgdC50aXRsZSBBUyAiVGl0bGUiLCAKICAgICAgIHRzLm5hbWUgQVMgIlN0YXRlIiwKICAgICAgIG8ubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwgCiAgICAgICBjLmVtYWlsIEFTICJDb250YWN0IiwgCiAgICAgICB0LmFjY291bnRlZF90aW1lIEFTICJBY2NvdW50ZWQgVGltZSIKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnLAogICAgIGRmdi52YWx1ZV90ZXh0IEFTICJDbG9zZSBDb2RlIiwKICAgICBzbGFfcmVzcG9uc2UubmFtZSBBUyAiU0xBIFJlc3BvbnNlIE5hbWUiLAogICAgIHRzY19yZXNwb25zZS50YXJnZXRfdGltZSBBUyAiU0xBIFJlc3BvbnNlIFRhcmdldCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBSZXNwb25zZSBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3Jlc3BvbnNlLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgUmVzcG9uc2UgQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iLAogICAgIHNsYV9zb2x1dGlvbi5uYW1lIEFTICJTTEEgU29sdXRpb24gTmFtZSIsCiAgICAgdHNjX3NvbHV0aW9uLnRhcmdldF90aW1lIEFTICJTTEEgU29sdXRpb24gVGFyZ2V0IFRpbWUiICwgCiAgICAgdHNjX3NvbHV0aW9uLmZ1bGZpbGxtZW50X3RpbWUgQVMgIlNMQSBTb2x1dGlvbiBGdWxmaWxsbWVudCBUaW1lIiwgCiAgICAgdHNjX3NvbHV0aW9uLnRpbWVfZGV2aWF0aW9uX2J1c2luZXNzIEFTICJTTEEgU29sdXRpb24gQnVzaW5lc3MgVGltZSBEZXZpYXRpb24iCicpfQogIEZST00gb3JnYW5pc2F0aW9uIG8sIAogICAgICAgY29udGFjdCBjLCAKICAgICAgIHRpY2tldF90eXBlIHR0LAogICAgICAgdGlja2V0X3N0YXRlIHRzLAogICAgICAgdGlja2V0IHQKJHtGdW5jdGlvbnMuaWZfcGx1Z2luX2F2YWlsYWJsZSgnS0lYUHJvJywnCiAgTEVGVCBPVVRFUiBKT0lOIGR5bmFtaWNfZmllbGQgZGYgT04gKGRmLm5hbWUgPSAnQ2xvc2VDb2RlJykKICBMRUZUIE9VVEVSIEpPSU4gZHluYW1pY19maWVsZF92YWx1ZSBkZnYgT04gKGRmdi5vYmplY3RfaWQgPSB0LmlkIEFORCBkZnYuZmllbGRfaWQgPSBkZi5pZCkKICBMRUZUIE9VVEVSIEpPSU4gdGlja2V0X3NsYV9jcml0ZXJpb24gdHNjX3Jlc3BvbnNlIE9OICh0c2NfcmVzcG9uc2UudGlja2V0X2lkID0gdC5pZCBBTkQgdHNjX3Jlc3BvbnNlLm5hbWUgPSAnRmlyc3RSZXNwb25zZScpCiAgTEVGVCBPVVRFUiBKT0lOIHNsYSBBUyBzbGFfcmVzcG9uc2UgT04gKHRzY19yZXNwb25zZS5zbGFfaWQgPSBzbGFfcmVzcG9uc2UuaWQpCiAgTEVGVCBPVVRFUiBKT0lOIHRpY2tldF9zbGFfY3JpdGVyaW9uIHRzY19zb2x1dGlvbiBPTiAodHNjX3NvbHV0aW9uLnRpY2tldF9pZCA9IHQuaWQgQU5EIHRzY19zb2x1dGlvbi5uYW1lID0gJ1NvbHV0aW9uJykKICBMRUZUIE9VVEVSIEpPSU4gc2xhIEFTIHNsYV9zb2x1dGlvbiBPTiAodHNjX3NvbHV0aW9uLnNsYV9pZCA9IHNsYV9zb2x1dGlvbi5pZCkKJyl9CiBXSEVSRSB0LnR5cGVfaWQgPSB0dC5pZAogICBBTkQgdC50aWNrZXRfc3RhdGVfaWQgPSB0cy5pZAogICBBTkQgdC5vcmdhbmlzYXRpb25faWQgPSBvLmlkCiAgIEFORCB0LmNvbnRhY3RfaWQgPSBjLmlkCiAgIEFORCBvLmlkIElOICgke1BhcmFtZXRlcnMuT3JnYW5pc2F0aW9uSURMaXN0fSkKICAgQU5EIEVYSVNUUyAoCiAgICAgU0VMRUNUIHRoLmlkIAogICAgICAgRlJPTSB0aWNrZXRfc3RhdGUgdHMsCiAgICAgICAgICAgIHRpY2tldF9oaXN0b3J5IHRoLAogICAgICAgICAgICB0aWNrZXRfaGlzdG9yeV90eXBlIHRodCwKICAgICAgICAgICAgdGlja2V0X3N0YXRlX3R5cGUgdHN0CiAgICAgIFdIRVJFIHRoLnRpY2tldF9pZCA9IHQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkID0gdGh0LmlkCiAgICAgICAgQU5EICh0aHQubmFtZSA9ICdTdGF0ZVVwZGF0ZScgT1IgdGh0Lm5hbWUgPSAnTmV3VGlja2V0JykKICAgICAgICBBTkQgdGguc3RhdGVfaWQgPSB0cy5pZAogICAgICAgIEFORCB0cy50eXBlX2lkID0gdHN0LmlkCiAgICAgICAgQU5EIHRzdC5uYW1lID0gJ2Nsb3NlZCcKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAnJHtQYXJhbWV0ZXJzLlN0YXJ0RGF0ZX0gMDA6MDA6MDAnIEFORCAnJHtQYXJhbWV0ZXJzLkVuZERhdGV9IDIzOjU5OjU5JwogICApCiBPUkRFUiBCWSB0dC5uYW1lLCB0LnRu)"
     },
     "OutputHandler": [
       {
@@ -11568,6 +10017,16 @@ TranslatableValues: '1'
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
+    <Data Key="type_id">3</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/cmdb/classes/*{ConfigItemClass.[ID,Name]}]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/communication]]></Data>
     <Data Key="value">2</Data>
@@ -11621,6 +10080,36 @@ TranslatableValues: '1'
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/communication/systemaddresses]]></Data>
     <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/dynamicfields]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/dynamicfields/*]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/dynamicfields/*{DynamicField.CustomerVisible NE 1}]]></Data>
+    <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
@@ -11729,7 +10218,7 @@ TranslatableValues: '1'
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID}]]></Data>
     <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -11739,7 +10228,27 @@ TranslatableValues: '1'
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID}]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
     <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -11749,7 +10258,7 @@ TranslatableValues: '1'
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
     <Data Key="type_id">3</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title,Priority,State,Type]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -11991,6 +10500,16 @@ TranslatableValues: '1'
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/roles]]></Data>
     <Data Key="value">6</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id"></Data>
+    <Data Key="type_id"></Data>
+    <Data Key="target" Type="Quote"><![CDATA[]]></Data>
+    <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>

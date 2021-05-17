@@ -349,7 +349,6 @@ sub Run {
                         InmailUserID     => $Self->{PostmasterUserID},
                         GetParam         => $GetParam,
                         QueueID          => $QueueID,
-                        AutoResponseType => 'auto reply',
                         SkipTicketIDs    => \%SkipTicketIDHash
                     );
 
@@ -390,7 +389,6 @@ sub Run {
                 InmailUserID     => $Self->{PostmasterUserID},
                 GetParam         => $GetParam,
                 QueueID          => $Param{QueueID},
-                AutoResponseType => 'auto reply',
                 SkipTicketIDs    => \%SkipTicketIDHash
             );
 
@@ -447,7 +445,6 @@ sub Run {
                     InmailUserID     => $Self->{PostmasterUserID},
                     GetParam         => $GetParam,
                     QueueID          => $Param{QueueID},
-                    AutoResponseType => 'auto reply',
                     SkipTicketIDs    => \%SkipTicketIDHash
                 );
                 return if !$TicketID;
@@ -834,7 +831,6 @@ sub _HandlePossibleFollowUp {
                 GetParam         => $Param{GetParam},
                 QueueID          => $Param{QueueID},
                 Comment          => "Because the old ticket [$Param{TicketNumber}] is '$State{Name}'",
-                AutoResponseType => 'auto reply/new ticket',
                 LinkToTicketID   => $Param{TicketID},
             );
 
@@ -861,7 +857,6 @@ sub _HandlePossibleFollowUp {
                 Lock             => $Lock,
                 Tn               => $Param{TicketNumber},
                 Comment          => 'Follow up rejected.',
-                AutoResponseType => 'auto reject',
             );
 
             if ( !$Run ) {
@@ -877,7 +872,6 @@ sub _HandlePossibleFollowUp {
                 GetParam         => $Param{GetParam},
                 Lock             => $Lock,
                 Tn               => $Param{TicketNumber},
-                AutoResponseType => 'auto follow up',
             );
 
             if ( !$Run ) {

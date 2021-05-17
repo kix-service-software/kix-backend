@@ -91,6 +91,18 @@ $Self->True(
         Class => 'ITSM::ConfigItem::Class',
     );
 
+    # KIX4OTRS-capeIT
+    my $DeploymentStateDataRef = $GeneralCatalogObject->ItemList(
+        Class => 'ITSM::ConfigItem::DeploymentState',
+        Valid => 1,
+    );
+    my $IncidentStateDataRef = $GeneralCatalogObject->ItemList(
+        Class => 'ITSM::Core::IncidentState',
+        Valid => 1,
+    );
+
+    # EO KIX4OTRS-capeIT
+
     # define the reference hash
     my $ObjectAttributesGet1Reference = [
         {
@@ -124,7 +136,48 @@ $Self->True(
             },
             'Name' => 'Empty fields indicate that the current values are kept',
             'Key'  => 'EmptyFieldsLeaveTheOldValues',
-        }
+        },
+
+        # KIX4OTRS-capeIT
+        {
+            Key   => 'DefaultDeploymentState',
+            Name  => 'Default Deployment State',
+            Input => {
+                Type         => 'Selection',
+                Data         => $DeploymentStateDataRef,
+                Required     => 1,
+                Translation  => 0,
+                PossibleNone => 1,
+            },
+        },
+        {
+            Key   => 'DefaultIncidentState',
+            Name  => 'Default Incident State',
+            Input => {
+                Type         => 'Selection',
+                Data         => $IncidentStateDataRef,
+                Required     => 1,
+                Translation  => 0,
+                PossibleNone => 1,
+            },
+        },
+        {
+            Key   => 'DefaultName',
+            Name  => 'Default Name',
+            Input => {
+                Type         => 'Text',
+                ValueDefault => '',
+                Required     => 0,
+                Regex        => '',
+                Translation  => 0,
+                Size         => 30,
+                MaxLength    => 250,
+
+                # DataType     => 'String',
+            },
+        },
+
+        # EO KIX4OTRS-capeIT
     ];
 
     $Self->IsDeeply(
@@ -217,7 +270,7 @@ $ConfigItemDefinitions[0] = " [
         Name       => 'Customer 1',
         Searchable => 1,
         Input      => {
-            Type => 'Customer',
+            Type => 'Contact',
         },
     },
     {
@@ -257,7 +310,7 @@ $ConfigItemDefinitions[0] = " [
         Name       => 'Integer 1',
         Searchable => 1,
         Input      => {
-            Type => 'Integer',
+            Type => 'Text',
         },
     },
     {
@@ -1046,7 +1099,7 @@ my @ExportDataTests = (
     {
         SourceExportData => {
             ExportDataGet => {
-                TemplateID => $TemplateIDs[-1] + 1,
+                TemplateID => $TemplateIDs[-1] + 1000,
                 UserID     => 1,
             },
         },
@@ -2143,12 +2196,16 @@ for my $Test (@ExportDataTests) {
     );
 
     # check content of export data
+    # ignore sort from exported data, just check if it is included
+    my @SortedExport    = sort { $a->[0] <=> $b->[0] } @{$ExportData};
+    my @SortedReference = sort { $a->[0] <=> $b->[0] } @{$Test->{ReferenceExportData}};
+
     my $CounterRow = 0;
     ROW:
-    for my $ExportRow ( @{$ExportData} ) {
+    for my $ExportRow ( @SortedExport ) {
 
         # extract reference row
-        my $ReferenceRow = $Test->{ReferenceExportData}->[$CounterRow];
+        my $ReferenceRow = $SortedReference[$CounterRow];
 
         if ( ref $ExportRow ne 'ARRAY' || ref $ReferenceRow ne 'ARRAY' ) {
 
@@ -3387,7 +3444,7 @@ my @ImportDataTests = (
     },
 
     # import an empty value for Text1, with EmptyFieldsLeaveTheOldValues turned off
-    # a new version should be created
+    # a new version should be created (value of Text1 will be removed)
     {
         SourceImportData => {
             ObjectData => {
@@ -3430,7 +3487,6 @@ my @ImportDataTests = (
                 Name                 => 'UnitTest - Importtest 5',
                 DeplState            => 'Production',
                 InciState            => 'Operational',
-                'Text1::1'           => '',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test1},
             },
         },
@@ -3845,10 +3901,381 @@ my @ImportDataTests = (
             },
         },
     },
+
+    # special test to check handling of empty fields (should be reused for further values - fill up test)
+    #   e.g. attribut has countMax 10, import has avalue on 5th position (1 - 4 are empty),
+    #   so the imported value has to be on first positon after save
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID => $ConfigItemClassIDs[1],
+            },
+            MappingObjectData => [
+                {
+                    Key => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Main1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main2::1',
+                },
+                {
+                    Key => 'Main2::2',
+                }
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[27],
+                ImportDataRow => [
+                    'UnitTest - ConfigItem for fill up test',
+                    'Production',
+                    'Operational',
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                    undef,
+                    'Main2 (2)',
+                ],
+                UserID => 1,
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 1,
+            LastVersion   => {
+                Name                     => 'UnitTest - ConfigItem for fill up test',
+                DeplState                => 'Production',
+                InciState                => 'Operational',
+                # value of position 2-5-3 shpould be in position 1-1-1 (fill up empty fields)
+                'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1' =>
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                # value of position 2 should be in position 1 (fill up empty fields)
+                'Main2::1'               => 'Main2 (2)',
+            },
+        },
+    },
+
+    # add version with same import and with EmptyFieldsLeaveTheOldValues turned on
+    #     - new values should be appended
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID                      => $ConfigItemClassIDs[1],
+                EmptyFieldsLeaveTheOldValues => 'on',
+            },
+            MappingObjectData => [
+                {
+                    Key => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Main1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main2::1',
+                },
+                {
+                    Key => 'Main2::2',
+                }
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[27],
+                ImportDataRow => [
+                    'UnitTest - ConfigItem for fill up test',
+                    'Production',
+                    'Operational',
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                    undef,
+                    'Main2 (2)',
+                ],
+                UserID => 1,
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 2,
+            LastVersion   => {
+                Name                     => 'UnitTest - ConfigItem for fill up test',
+                DeplState                => 'Production',
+                InciState                => 'Operational',
+                # value from 1st import
+                'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1' =>
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                # value of position 2-5-3 will be in position 2-1-1 too
+                #    1st main1 is already in use, so use next free (main) and it should be in 2
+                'Main1::2::Main1Sub1::1::Main1Sub1SubSub1::1' =>
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                # value from 1st import
+                'Main2::1'               => 'Main2 (2)',
+                # appended and should be on position 2
+                'Main2::2'               => 'Main2 (2)',
+            },
+        },
+    },
+
+    # add another version with same import and with EmptyFieldsLeaveTheOldValues turned on
+    #     - one value should be appended, other should be replaced
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID                      => $ConfigItemClassIDs[1],
+                EmptyFieldsLeaveTheOldValues => 'on',
+            },
+            MappingObjectData => [
+                {
+                    Key => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Main1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main2::1',
+                },
+                {
+                    Key => 'Main2::2',
+                }
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[27],
+                ImportDataRow => [
+                    'UnitTest - ConfigItem for fill up test',
+                    'Production',
+                    'Operational',
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                    undef,
+                    'Main2 (2) - replaced?',
+                ],
+                UserID => 1,
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 3,
+            LastVersion   => {
+                Name                     => 'UnitTest - ConfigItem for fill up test',
+                DeplState                => 'Production',
+                InciState                => 'Operational',
+                # value from 1st import
+                'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1' =>
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                # value from 2nd import
+                'Main1::2::Main1Sub1::1::Main1Sub1SubSub1::1' =>
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                # value of position 2-5-3 will now be in position 2-2-1 too
+                #    - it is not in main position 3 becaus it should be in 2 so it appends there
+                'Main1::2::Main1Sub1::2::Main1Sub1SubSub1::1' =>
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                # value from 1st import
+                'Main2::1'               => 'Main2 (2)',
+                # value from 2nd import shpuld be replaced with new value
+                'Main2::2'               => 'Main2 (2) - replaced?',
+            },
+        },
+    },
+
+    # add another version with same import but with EmptyFieldsLeaveTheOldValues turned off
+    #     - so empty values will replace old values - so there are "free" again
+    #     - should look like first import (fill up does its work)
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID => $ConfigItemClassIDs[1],
+            },
+            MappingObjectData => [
+                {
+                    Key => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Main1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main2::1',
+                },
+                {
+                    Key => 'Main2::2',
+                }
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[27],
+                ImportDataRow => [
+                    'UnitTest - ConfigItem for fill up test',
+                    'Production',
+                    'Operational',
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    undef,
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                    undef,
+                    'Main2 (2)',
+                ],
+                UserID => 1,
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 4,
+            LastVersion   => {
+                Name                     => 'UnitTest - ConfigItem for fill up test',
+                DeplState                => 'Production',
+                InciState                => 'Operational',
+                # value of position 2-5-3 should be in position 1-1-1
+                'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1' =>
+                    'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
+                # value of position 2 should be in position 1
+                'Main2::1'               => 'Main2 (2)',
+            },
+        },
+    },
 );
 
 # ------------------------------------------------------------ #
-# run general ExportDataGet tests
+# run general Import tests
 # ------------------------------------------------------------ #
 
 my $ImportTestCount = 1;
@@ -4053,8 +4480,6 @@ continue {
 # cleanup is done by RestoreDatabase
 
 1;
-
-
 
 =back
 

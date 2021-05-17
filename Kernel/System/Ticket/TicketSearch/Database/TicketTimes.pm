@@ -94,10 +94,10 @@ sub Search {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Age                    => 'st.create_time_unix',        
-        CreateTime             => 'st.create_time_unix',
-        PendingTime            => 'st.until_time',
-        LastChangeTime         => 'st.change_time',
+        Age             => 'st.create_time_unix',
+        CreateTime      => 'st.create_time_unix',
+        PendingTime     => 'st.until_time',
+        LastChangeTime  => 'st.change_time',
     );
 
     # convert to unix time and check
@@ -117,6 +117,20 @@ sub Search {
         'LTE' => '<=',
         'GTE' => '>='
     );
+
+    if ( $Param{Search}->{Field} eq 'Age' ) {
+        # calculate unixtime
+        $Value = $Kernel::OM->Get('Time')->SystemTime() - $Param{Search}->{Value};
+
+        # invert operators since we "go back in time"
+        %OperatorMap = (
+            'EQ'  => '=',
+            'LT'  => '>',
+            'GT'  => '<',
+            'LTE' => '>=',
+            'GTE' => '<='
+        );
+    }
 
     if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
         $Kernel::OM->Get('Log')->Log(

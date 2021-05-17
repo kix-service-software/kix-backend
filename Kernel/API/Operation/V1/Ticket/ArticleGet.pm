@@ -195,12 +195,12 @@ sub Run {
             );
         }
 
-	    # check if article belongs to the given ticket
-	    if ( $ArticleRaw{TicketID} != $Param{Data}->{TicketID} ) {
-	        return $Self->_Error(
-	            Code => 'Object.NotFound',
-	        );
-	    }
+        # check if article belongs to the given ticket
+        if ( $ArticleRaw{TicketID} != $Param{Data}->{TicketID} ) {
+            return $Self->_Error(
+                Code => 'Object.NotFound',
+            );
+        }
 
         my %ArticleData;
         my @DynamicFields;
@@ -273,10 +273,6 @@ sub Run {
 }
 
 1;
-
-
-
-
 
 =back
 

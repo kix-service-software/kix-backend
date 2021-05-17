@@ -15,7 +15,6 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $AutoResponseObject = $Kernel::OM->Get('AutoResponse');
 my $CommandObject      = $Kernel::OM->Get('Console::Command::Maint::PostMaster::Read');
 my $ConfigObject       = $Kernel::OM->Get('Config');
 
@@ -67,35 +66,6 @@ my $QueueID       = $Kernel::OM->Get('Queue')->QueueAdd(
 $Self->True(
     $QueueID,
     "QueueAdd() - $QueueNameRand, $QueueID",
-);
-
-# add auto response
-my $AutoResponseNameRand = 'AutoResponse' . $RandomID;
-my $AutoResponseID       = $AutoResponseObject->AutoResponseAdd(
-    Name        => $AutoResponseNameRand,
-    Subject     => 'Unit Test AutoResponse Bug#4640',
-    Response    => 'KIX_CUSTOMER_REALNAME tag: <KIX_CUSTOMER_REALNAME>',
-    Comment     => 'Unit test auto response',
-    AddressID   => $SystemAddressID,
-    TypeID      => 1,
-    ContentType => 'text/plain',
-    ValidID     => 1,
-    UserID      => 1,
-);
-$Self->True(
-    $AutoResponseID,
-    "AutoResponseAdd() - $AutoResponseNameRand, $AutoResponseID",
-);
-
-# assign auto response to queue
-my $Success = $AutoResponseObject->AutoResponseQueue(
-    QueueID         => $QueueID,
-    AutoResponseIDs => [$AutoResponseID],
-    UserID          => 1,
-);
-$Self->True(
-    $Success,
-    "AutoResponseQueue() - success"
 );
 
 #add organisation
@@ -152,10 +122,6 @@ my @Tests = (
         Name => 'Email without Reply-To tag',
         Email =>
             "From: TestFrom\@home.com\nTo: TestTo\@home.com\nSubject: Email without Reply-To tag\nTest Body Email.\n",
-        ResultAutoResponse => {
-            To   => 'TestFrom@home.com',
-            Body => 'KIX_CUSTOMER_REALNAME tag: TestTo@home.com',
-        },
         ResultNotification => {
             To   => 'TestFrom@home.com',
             Body => 'KIX_CUSTOMER_REALNAME tag: TestFrom@home.com',
@@ -165,10 +131,6 @@ my @Tests = (
         Name => 'Email with Reply-To tag',
         Email =>
             "From: TestFrom\@home.com\nTo: TestTo\@home.com\nReply-To: TestReplyTo\@home.com\nSubject: Email with Reply-To tag\nTest Body Email.\n",
-        ResultAutoResponse => {
-            To   => 'TestReplyTo@home.com',
-            Body => 'KIX_CUSTOMER_REALNAME tag: TestReplyTo@home.com',
-        },
         ResultNotification => {
             To   => 'TestFrom@home.com',
             Body => 'KIX_CUSTOMER_REALNAME tag: TestReplyTo@home.com',
@@ -178,10 +140,6 @@ my @Tests = (
         Name => 'Email with CustomerID',
         Email =>
             "From: $Contact\@home.com\nTo: TestTo\@home.com\nSubject: Email with valid CustomerID\nTest Body Email.\n",
-        ResultAutoResponse => {
-            To   => "$Contact\@home.com",
-            Body => "KIX_CUSTOMER_REALNAME tag: $Contact $Contact",
-        },
         ResultNotification => {
             To   => "$Contact\@home.com",
             Body => "KIX_CUSTOMER_REALNAME tag: $Contact $Contact",
@@ -191,10 +149,6 @@ my @Tests = (
         Name => 'Email with Customer as Recipient',
         Email =>
             "From: TestRecipient\@home.com\nTo: TestTo\@home.com\nSubject: Email with Recipient\nTest Body Email.\n",
-        ResultAutoResponse => {
-            To   => 'TestRecipient@home.com',
-            Body => 'KIX_CUSTOMER_REALNAME tag: TestTo@home.com',
-        },
         ResultNotification => {
             To   => 'TestRecipient@home.com',
             Body => 'KIX_CUSTOMER_REALNAME tag: TestRecipient@home.com',
@@ -240,20 +194,6 @@ for my $Test (@Tests) {
     my @ArticleIDs = $TicketObject->ArticleIndex(
         TicketID => $TicketID,
     );
-    my %ArticleAutoResponse = $TicketObject->ArticleGet(
-        ArticleID => $ArticleIDs[1],
-        UserID    => 1,
-    );
-
-    # check auto response article values
-    for my $AutoResponseKey ( sort keys %{ $Test->{ResultAutoResponse} } ) {
-
-        $Self->Is(
-            $ArticleAutoResponse{$AutoResponseKey},
-            $Test->{ResultAutoResponse}->{$AutoResponseKey},
-            "AutoResponse: $Test->{Name}, tag $AutoResponseKey",
-        );
-    }
 
     # get notification article data
     my %ArticleNotification = $TicketObject->ArticleGet(

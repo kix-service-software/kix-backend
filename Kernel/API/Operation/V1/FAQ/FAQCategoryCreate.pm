@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -106,7 +106,7 @@ perform FAQCategoryCreate Operation. This will return the created FAQCategoryID.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             FAQCategoryID  => '',                         # ID of the created FAQCategory
@@ -152,11 +152,11 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         FAQCategoryID => $FAQCategoryID,
-    );    
+    );
 }
 
 

@@ -186,6 +186,19 @@ sub RunOperation {
 
     # run the operation itself if we don't return a cached response
     if ( !$Self->{'_CachedResponse'} ) {
+
+        # exec pre run method (if possible)
+        if ($Self->can('PreRun')) {
+            my $PreRunResult = $Self->PreRun(
+                %Param,
+            );
+            if ( !$PreRunResult->{Success} ) {
+                return $Self->_Error(
+                    %{$PreRunResult},
+                );
+            }
+        }
+
         $Result = $Self->Run(
             %Param,
         );
@@ -410,27 +423,29 @@ sub PrepareData {
         foreach my $FieldSelector ( split( /,/, $FieldSet ) ) {
             my ( $Object, $Field ) = split( /\./, $FieldSelector, 2 );
             if ( $Field =~ /^\[(.*?)\]$/g ) {
-                my @Fields = split( /\s*;\s*/, $1 );
+                my @Fields = map { { Field => $_ } } split( /\s*;\s*/, $1 );
                 $Self->{Fields}->{$Object} = \@Fields;
             }
             else {
                 if ( !IsArrayRefWithData( $Self->{Fields}->{$Object} ) ) {
                     $Self->{Fields}->{$Object} = [];
                 }
-                push @{ $Self->{Fields}->{$Object} }, $Field;
+                push @{ $Self->{Fields}->{$Object} }, { Field => $Field };
             }
         }
     }
 
-    # prepare limiter
-    if ( exists( $Param{Data}->{limit} ) && IsStringWithData( $Param{Data}->{limit} ) ) {
-        foreach my $Limiter ( split( /,/, $Param{Data}->{limit} ) ) {
-            my ( $Object, $Limit ) = split( /\:/, $Limiter, 2 );
-            if ( $Limit && $Limit =~ /^\d+$/ ) {
-                $Self->{Limit}->{$Object} = $Limit;
-            }
-            else {
-                $Self->{Limit}->{__COMMON} = $Object;
+    #prepare limiter and searchlimit
+    foreach my $LimitType ( qw(Limit SearchLimit) ) {
+        if ( exists( $Param{Data}->{lc($LimitType)} ) && IsStringWithData( $Param{Data}->{lc($LimitType)} ) ) {
+            foreach my $Limiter ( split( /,/, $Param{Data}->{lc($LimitType)} ) ) {
+                my ( $Object, $Limit ) = split( /\:/, $Limiter, 2 );
+                if ( $Limit && $Limit =~ /^\d+$/ ) {
+                    $Self->{$LimitType}->{$Object} = $Limit;
+                }
+                else {
+                    $Self->{$LimitType}->{__COMMON} = $Object;
+                }
             }
         }
     }
@@ -800,30 +815,6 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", $TimeDiff));
         }
 
-        # honor an offset, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Offset} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyOffset(
-                Data => \%Param,
-            );
-
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", $TimeDiff));
-        }
-
-        # honor a limiter, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Limit} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyLimit(
-                Data => \%Param,
-            );
-
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", $TimeDiff));
-        }
-
         # honor permission filters
         if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{PermissionFilters} ) ) {
             my $StartTime = Time::HiRes::time();
@@ -901,6 +892,30 @@ sub _Success {
             $Self->_CacheRequest(
                 Data => \%Param,
             );
+        }
+
+        # honor an offset, if we have one
+        if ( IsHashRefWithData( $Self->{Offset} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_ApplyOffset(
+                Data => \%Param,
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", $TimeDiff));
+        }
+
+        # honor a limiter, if we have one
+        if ( IsHashRefWithData( $Self->{Limit} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_ApplyLimit(
+                Data => \%Param,
+            );
+
+            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", $TimeDiff));
         }
     }
 
@@ -1633,29 +1648,63 @@ sub _ApplyFieldSelector {
         return;
     }
 
+    # condition cache
+    my %ConditionCache;
+
     foreach my $Object ( keys %{ $Param{Fields} } ) {
         if ( $Object eq '*') {
             # wildcard
             $Object = (sort keys %{$Param{Data}})[0];
         }
 
-        my %Tmp = map { $_ => 1 } (
+        my @Fields = (
             @{ $Param{Fields}->{'*'} || [] },
             @{ $Param{Fields}->{$Object} || [] },
-            $Param{IsPermissionFieldSelection} ? () : keys %{ $Self->{Include} },
+            $Param{IsPermissionFieldSelection} ? () : map { { Field => $_ } } keys %{ $Self->{Include} },
         );
-        my @Fields = sort keys %Tmp;
+
+        # count non-auto fields
+        my $FieldCount = 0;
+        foreach my $Field ( @Fields ) {
+            next if $Field->{Auto};
+            $FieldCount++;
+        }
 
         if ( ref( $Param{Data}->{$Object} ) eq 'HASH' ) {
+
+            my $ConditionCount   = 0;
+            my $ConditionMatches = 0;
 
             # extract filtered fields from hash
             my %NewObject;
             my @FieldsToRemove;
-            foreach my $Attribute ( @Fields ) {
+            foreach my $Item ( @Fields ) {
+                if ( IsHashRefWithData($Item->{ConditionFilter}) ) {
+                    $ConditionCount++;
+
+                    # if we have already evaluated that condition, we can use the cache
+                    next if exists $ConditionCache{$Item->{Condition}} && !$ConditionCache{$Item->{Condition}};
+                    
+                    if ( !exists $ConditionCache{$Item->{Condition}} ) {
+                        # check the condition
+                        my %Tmp = ( $Object => \%{ $Param{Data}->{$Object} } );
+                        $Self->_ApplyFilter(
+                            Data               => \%Tmp,
+                            Filter             => $Item->{ConditionFilter},
+                            IsPermissionFilter => 1,
+                        );
+                        $ConditionCache{$Item->{Condition}} = $Tmp{$Object};
+                        next if !$ConditionCache{$Item->{Condition}};
+                    }
+
+                    $ConditionMatches++;
+                }
+
                 my $Not = 0;
 
                 #localise Variable. see perdoc perlsyn
-                my $Field = $Attribute;
+                my $FieldDef = $Item;
+                my $Field    = $FieldDef->{Field};
 
                 if ( $Field =~ /^!(.*?)$/ ) {
                     $Not   = 1;
@@ -1683,22 +1732,55 @@ sub _ApplyFieldSelector {
                 delete $NewObject{$Field};
             }
 
-            $Param{Data}->{$Object} = \%NewObject;
+            # only change object if we have non only conditionals without any matches
+            if ( $FieldCount != $ConditionCount || $ConditionMatches ) {
+                $Param{Data}->{$Object} = \%NewObject;
+            }
         }
         elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
 
             # filter keys in each contained hash
+            OBJECTITEM:
             foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
                 if ( ref($ObjectItem) eq 'HASH' ) {
+                    # reset condition cache for each object
+                    %ConditionCache = ();
+
+                    my $ConditionCount   = 0;
+                    my $ConditionMatches = 0;
+
                     # extract filtered fields from hash
                     my %NewObjectItem;
                     my @FieldsToRemove;
-                    foreach my $Attribute ( @Fields ) {
+                    FIELD:
+                    foreach my $Item ( @Fields ) {
+
+                        if ( IsHashRefWithData($Item->{ConditionFilter}) ) {
+                            $ConditionCount++;
+
+                            # if we have already evaluated that condition, we can use the cache
+                            next FIELD if exists $ConditionCache{$Item->{Condition}} && !$ConditionCache{$Item->{Condition}};
+                            
+                            if ( !exists $ConditionCache{$Item->{Condition}} ) {
+                                # check the condition
+                                my %Tmp = ( $Object => \%{ $ObjectItem } );
+                                $Self->_ApplyFilter(
+                                    Data               => \%Tmp,
+                                    Filter             => $Item->{ConditionFilter},
+                                    IsPermissionFilter => 1,
+                                );
+                                $ConditionCache{$Item->{Condition}} = $Tmp{$Object};
+                                next FIELD if !$ConditionCache{$Item->{Condition}};
+                            }
+
+                            $ConditionMatches++;
+                        }
+
                         my $Not = 0;
 
                         #localise Variable. see perdoc perlsyn
-                        my $Field = $Attribute;
-
+                        my $FieldDef = $Item;
+                        my $Field    = $FieldDef->{Field};
 
                         if ( $Field =~ /^!(.*?)$/ ) {
                             $Not   = 1;
@@ -1724,6 +1806,12 @@ sub _ApplyFieldSelector {
                     # remove all attributes that should be ignored
                     foreach my $Field ( @FieldsToRemove ) {
                         delete $NewObjectItem{$Field};
+                    }
+
+                    # check if we have only conditionals an non matched
+                    if ( $FieldCount == $ConditionCount && !$ConditionMatches ) {
+                        # we have to accept the whole object
+                        next OBJECTITEM;
                     }
 
                     $ObjectItem = \%NewObjectItem;
@@ -2249,11 +2337,12 @@ sub _Trim {
 sub _GetCacheKey {
     my ( $Self, %Param ) = @_;
 
-    # generate key without offset
+    # generate key without offset & limit
     my %RequestData = %{ $Self->{RequestData} };
     delete $RequestData{offset};
+    delete $RequestData{limit};
 
-    my @CacheKeyParts = qw(limit include expand);
+    my @CacheKeyParts = qw(include expand);
     if ( IsArrayRefWithData( $Self->{CacheKeyExtensions} ) ) {
         @CacheKeyParts = (
             @CacheKeyParts,
@@ -2390,6 +2479,9 @@ sub _CheckObjectPermission {
 
             $ObjectData = $GetResult->{Data};
         }
+
+        # save for later use in property permission checks
+        $Self->{PermissionCheckObjectDataCache} = $ObjectData;
 
         my $ResultingPermission = -1;
 
@@ -2534,7 +2626,8 @@ sub _CheckObjectPermission {
                     # check if we have the desired permission
                     my $PermissionCheck = ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission::PERMISSION->{$PermissionName};
 
-                    if ( !$PermissionCheck || ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
+                    # check if we have a DENY
+                    if ( ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                         $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
 
                         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
@@ -2555,6 +2648,15 @@ sub _CheckObjectPermission {
 
         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
         $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
+        
+        if ( $ResultingPermission != -1 && ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
+            $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+
+            # return 403, because we don't have permission to execute this
+            return $Self->_Error(
+                Code => 'Forbidden',
+            );
+        }
     }
 
     return $Self->_Success();
@@ -2631,13 +2733,6 @@ sub _CheckPropertyPermission {
 
         my $StartTime = Time::HiRes::time();
 
-        # inspect the object data
-        my $ObjectData = {};
-        if ( $Self->{RequestMethod} =~ /^POST|PATCH$/ ) {
-            # we have to use the object given in the request data
-            $ObjectData = $Param{Data};
-        }
-
         my $ResultingPermission = -1;
 
         # check each permission and merge them for each attribute
@@ -2645,14 +2740,55 @@ sub _CheckPropertyPermission {
         PERMISSION:
         foreach my $Permission ( @RelevantPermissions ) {
 
-            my ( $Object, $Attributes, @AttributeList);
+            my ( $Object, $Attributes, $Condition, @AttributeList);
 
             if ( !$Permission->{IsWildcard} ) {
                 # extract property value permission
-                next if $Permission->{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/;
+                next if $Permission->{Target} !~ /^.*?\{(\w+)\.\[(.*?)\](\s*IF\s+(.*?)\s*)?\}$/;
 
-                ( $Object, $Attributes) = ( $1, $2 );
+                ( $Object, $Attributes, $Condition) = ( $1, $2, $4 );
                 @AttributeList = split(/\s*,\s*/, $Attributes);
+
+                # check the condition if there is any
+                if ( $Condition ) {
+                    # inspect the object data (we try to use the cached data from the previous object level permission check)
+                    my $ObjectData = $Self->{PermissionCheckObjectDataCache} || {};
+
+                    if ( !IsHashRefWithData($ObjectData) ) {
+                        if ( $Self->{RequestMethod} eq 'POST' ) {
+                            # we have to use the object given in the request data
+                            $ObjectData = $Param{Data};
+                        }
+                        elsif ( $Self->{RequestMethod} ne 'GET' && IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
+                            # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
+                            # a GET request will be handled differently
+                            my $GetResult = $Self->ExecOperation(
+                                RequestMethod     => 'GET',
+                                OperationType     => $Self->{AvailableMethods}->{GET}->{Operation},
+                                Data              => $Param{Data},
+                                IgnorePermissions => 1,
+                            );
+
+                            if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+                                next PERMISSION;
+                            }
+
+                            $ObjectData = $GetResult->{Data};
+                        }
+
+                        # cache it for later use in the next iterations
+                        $Self->{PermissionCheckObjectDataCache} = $ObjectData;
+                    }
+
+                    my $CheckResult = $Self->_CheckPropertyPermissionCondition(
+                        Permission => $Permission,
+                        Condition  => $Condition,
+                        Data       => $ObjectData
+                    );
+        
+                    # if we don't have a GET request and the condition doesn't match, we can ignore this permission
+                    next PERMISSION if $Self->{RequestMethod} ne 'GET' && !$CheckResult;
+                }
             }
             else {
                 $Object = '*';
@@ -2663,22 +2799,30 @@ sub _CheckPropertyPermission {
 
             foreach my $Attribute (sort @AttributeList) {
                 # init
-                $AttributePermissions{"$Object.$Attribute"} = 0 if !exists $AttributePermissions{"$Object.$Attribute"};
-                $AttributePermissions{"$Object.$Attribute"} |= $Permission->{Value};
+                $AttributePermissions{"$Object.$Attribute"}->{Value} = 0 if !exists $AttributePermissions{"$Object.$Attribute"};
+                $AttributePermissions{"$Object.$Attribute"}->{Value} |= $Permission->{Value};
+                
+                if ( $Self->{RequestMethod} eq 'GET' && $Permission->{ConditionFilter} ) {
+                    # if we have a GET request, we have to store the condition filter to later handling
+                    $AttributePermissions{"$Object.$Attribute"}->{Condition}       = $Condition;
+                    $AttributePermissions{"$Object.$Attribute"}->{ConditionFilter} = $Permission->{ConditionFilter};
+                }
             }
         }
 
         # if there is a wildcard permission we need to apply it to all non wildcard permissions
-        foreach my $Attribute ( sort keys %AttributePermissions ) {
-            next if $Attribute eq '*.*';
-            $AttributePermissions{$Attribute} |= $AttributePermissions{'*.*'} || 0;
+        if ( IsHashRefWithData($AttributePermissions{'*.*'}) ) {
+            foreach my $Attribute ( sort keys %AttributePermissions ) {
+                next if $Attribute eq '*.*';
+                $AttributePermissions{$Attribute}->{Value} |= $AttributePermissions{'*.*'}->{Value} || 0;
+            }
         }
-
+        
         my %SeenAttributes;
         foreach my $Attribute ( sort keys %AttributePermissions ) {
 
             my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
-                Value  => $AttributePermissions{$Attribute},
+                Value  => $AttributePermissions{$Attribute}->{Value},
                 Format => 'Short'
             );
 
@@ -2689,11 +2833,11 @@ sub _CheckPropertyPermission {
                 my ($Object, $AttributeName) = split(/\./, $Attribute, 2);
 
                 # init field selector
-                $Self->{PermissionFieldSelector}->{$Object} = [ $Self->{OperationConfig}->{ObjectID} || 'ID' ] if !exists $Self->{PermissionFieldSelector}->{$Object};
+                $Self->{PermissionFieldSelector}->{$Object} = [ { Auto => 1, Field => $Self->{OperationConfig}->{ObjectID} || 'ID' } ] if !exists $Self->{PermissionFieldSelector}->{$Object};
 
                 my $Ignore = '';
-                if ( ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName}
-                    || ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY}
+                if ( ( $AttributePermissions{$Attribute}->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName}
+                    || ( $AttributePermissions{$Attribute}->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY}
                 ) {
                     # access is denied, so we have to add an ignore selector for this attribute
                     $Ignore = '!'
@@ -2703,7 +2847,15 @@ sub _CheckPropertyPermission {
                 my $ResultingFieldSelector = "$Ignore$AttributeName";
                 $ResultingFieldSelector =~ s/^!!//g;
 
-                push @{$Self->{PermissionFieldSelector}->{$Object}}, $ResultingFieldSelector;
+                my %TmpHash = (
+                    Field => $ResultingFieldSelector
+                );
+                if ( exists $AttributePermissions{$Attribute}->{ConditionFilter} ) {
+                    $TmpHash{Condition}       = $AttributePermissions{$Attribute}->{Condition};
+                    $TmpHash{ConditionFilter} = $AttributePermissions{$Attribute}->{ConditionFilter};
+                }
+
+                push @{$Self->{PermissionFieldSelector}->{$Object}}, \%TmpHash;
             }
             else {
                 # we need a flat data structure to easily find the attributes
@@ -2727,11 +2879,12 @@ sub _CheckPropertyPermission {
                 my @MatchingAttributes = grep /^$LookupAttribute$/, keys %{$FlatData};
 
                 foreach my $MatchingAttribute ( @MatchingAttributes ) {
+
                     # ignore everything we have already handled so far
                     next if $SeenAttributes{$MatchingAttribute};
 
-                    my $IsPermissionMatch = ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission::PERMISSION->{$PermissionName} || 0;
-                    my $IsDeny            = ( $AttributePermissions{$Attribute} & Kernel::System::Role::Permission::PERMISSION->{DENY} )            == Kernel::System::Role::Permission::PERMISSION->{DENY} || 0;
+                    my $IsPermissionMatch = ( $AttributePermissions{$Attribute}->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission::PERMISSION->{$PermissionName} || 0;
+                    my $IsDeny            = ( $AttributePermissions{$Attribute}->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} )            == Kernel::System::Role::Permission::PERMISSION->{DENY} || 0;
 
                     $Self->_PermissionDebug($Self->{LevelIndent}.'    ', "found property \"$MatchingAttribute\" (Not: $Not, $PermissionName permission: $IsPermissionMatch, DENY: $IsDeny)");
 
@@ -2763,11 +2916,138 @@ sub _CheckPropertyPermission {
     return $Self->_Success();
 }
 
+=item _CheckPropertyPermissionCondition()
+
+check the condition of a property permission and return true or false
+
+    my $Result = $CommonObject->_CheckPropertyPermissionCondition(
+        Permission => {},
+        Condition  => '...',
+        Data       => ...
+    );
+
+=cut
+
+sub _CheckPropertyPermissionCondition {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(Permission Condition Data)) {
+        if ( !defined $Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    my $UseAnd = 0;
+
+    # check for && and split accordingly
+    my @Parts = $Param{Condition} || '';
+    if ( $Parts[0] =~ /&&/ ) {
+        @Parts = split(/\s+&&\s+/, $Parts[0]);
+
+        # the single parts of the condition are a part of a logical AND
+        $UseAnd = 1;
+    }
+
+    my $Not = 0;
+    my %Filter;
+    my @FilteredObjects;
+
+    PART:
+    foreach my $Part ( @Parts ) {
+        my ( $Object, $Attribute, $Operator, $Value );
+
+        next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
+
+        ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+        if ( $Operator =~ /^!(.*?)$/ ) {
+            $Not      = 1;
+            $Operator = $1;
+        }
+
+        # replace string quotes
+        $Value =~ s/["']//g;
+
+        # prepare value for IN operator
+        if ( $Operator eq 'IN' ) {
+            if ( $Value =~ /^\[(.*?)\]$/ ) {
+                my @ValueParts = map { $_ = $Self->_ReplaceVariablesInPermission(Data => $_) } split(/\s*,\s*/, $1);
+                $Value = \@ValueParts;
+            }
+            else {
+                $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Value of condition part \"%s\" is invalid!", $Part) );
+                return;
+            }
+        }
+        else {
+            $Value = $Self->_ReplaceVariablesInPermission(
+                Data => $Value
+            );
+        }
+
+        # add a filter accordingly
+        my %Result = $Self->_CreateFilterForObject(
+            Filter         => \%Filter,
+            Object         => $Object,
+            Field          => $Attribute,
+            Operator       => $Operator,
+            Value          => $Value,
+            Not            => $Not,
+            UseAnd         => $UseAnd,
+        );
+        if ( !%Result ) {
+            # we can't generate the filter, so this is a false
+            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create object filter for condition part \"%s\"!", $Part) );
+            return;
+        }
+
+        push @FilteredObjects, $Object;
+    }
+
+    if ( $Self->{RequestMethod} ne 'GET' ) {
+        my %ObjectDataToFilter = %{$Param{Data}};        # a deref is required here, because the filter method will change the data
+
+        # we use the permission filters in order to apply them to the given object
+        my $Result = $Self->_ApplyFilter(
+            Data               => \%ObjectDataToFilter,
+            Filter             => \%Filter,
+            IsPermissionFilter => 1,
+        );
+
+        # check if the condition is true
+        my $Result = 1;
+        foreach my $FilteredObject ( @FilteredObjects ) {
+            if ( (!$Not && !defined $ObjectDataToFilter{$FilteredObject}) || ($Not && defined $ObjectDataToFilter{$FilteredObject}) ) {
+                $Result = 0;
+                last;
+            }
+        }
+
+        if ( $Result ) {
+            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Property permission condition \"%s\" matches", $Param{Condition}) );
+        }
+        else {
+            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Property permission condition \"%s\" does not match", $Param{Condition}) );
+        }
+
+        return $Result;
+    }
+    else {
+        # we have a GET request - this has to be handled later, after the execution of the operation
+        $Param{Permission}->{ConditionFilter} = \%Filter;
+    }
+
+    return 1;
+}
+
 =item _AddPermissionFilterForObject()
 
 adds a permission filter
 
-    my $Return = $CommonObject->_AddPermissionFilterForObject(
+    my %Filter = $CommonObject->_AddPermissionFilterForObject(
         Filter         => {},            # optional, if given the method adds the new filter the the existing one
         Object         => 'Ticket',
         Field          => 'QueueID',
@@ -2778,8 +3058,6 @@ adds a permission filter
         StopAfterMatch => 0|1,           # optional, default 0
         AlwaysTrue     => 1              # optional, used for Wildcards
     );
-
-    $Return = %Filter
 
 =cut
 
@@ -2802,13 +3080,50 @@ sub _AddPermissionFilterForObject {
         $Self->_PermissionDebug($Self->{LevelIndent}, "adding ALWAYS TRUE filter" );
     }
 
-    my $Logical = $Param{UseAnd} ? 'AND' : 'OR';
-
     # init PermissionFilters if not done already
     $Self->{PermissionFilters} ||= [];
 
     # store the required filter information for use in PrepareData
     push( @{ $Self->{PermissionFilters} }, {%Param} );
+
+    return $Self->_CreateFilterForObject(
+        %Param
+    );
+}
+
+=item _CreateFilterForObject()
+
+create a filter
+
+    my %Filter = $CommonObject->_CreateFilterForObject(
+        Filter         => {},            # optional, if given the method adds the new filter the the existing one
+        Object         => 'Ticket',
+        Field          => 'QueueID',
+        Operator       => 'EQ',
+        Value          => 12,
+        Not            => 0|1,           # optional, default 0
+        UseAnd         => 0|1,           # optional, default 0
+        StopAfterMatch => 0|1,           # optional, default 0
+        AlwaysTrue     => 1              # optional, used for Wildcards
+    );
+
+=cut
+
+sub _CreateFilterForObject {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{AlwaysTrue} ) {
+        for my $Needed (qw(Object Field Operator Value)) {
+            if ( !defined $Param{$Needed} ) {
+
+                # use Forbidden here to prevent access to data
+                return;
+            }
+        }
+    }
+
+    my $Logical = $Param{UseAnd} ? 'AND' : 'OR';
 
     my %Filter;
     $Filter{ $Param{Object} }->{$Logical} = [];
@@ -3051,29 +3366,134 @@ sub _PermissionDebug {
     printf STDERR "(%5i) %-15s %s%s\n", $$, "[Permission]", $Indent, $Message;
 }
 
+=item _CheckCustomerAssignedObject()
 
-=item _FilterCustomerUserVisibleConfigItems()
+checks the object ids for current customer user if necessary
 
-filters config items ids for current customer user if necessary
+    my $CustomerCheck = $OperationObject->_CheckCustomerAssignedObject(
+        ObjectType => 'Ticket'
+        IDList     => [1,2,3] | 1            # array ref or number
+        ...                                  # optional additional params
+    );
 
-    @ConfigItemIDList = $ConfigItemObject->_FilterCustomerUserVisibleConfigItems(
-        ConfigItemIDList => \@ConfigItemList
+    returns:
+
+    $CustomerCheck = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $CustomerCheck = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub _CheckCustomerAssignedObject {
+    my ( $Self, %Param ) = @_;
+
+    my $IDList = $Param{IDList};
+    if ( $IDList && !IsArrayRefWithData($IDList) ) {
+        $IDList = [ $IDList ];
+    }
+
+    if (
+        $Param{ObjectType} &&
+        IsArrayRefWithData($IDList) &&
+        IsHashRefWithData($Self->{Authorization}) &&
+        $Self->{Authorization}->{UserType} eq 'Customer'
+    ) {
+        my @ObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
+            %Param,
+            ObjectIDList => $IDList
+        );
+        my %IDListHash = map { $_ => 1 } @ObjectIDList;
+
+        foreach my $ID ( @{ $IDList } ) {
+
+            if ( !$IDListHash{$ID} ) {
+                return $Self->_Error(
+                    Code => 'Forbidden',
+                    Message => "Could not access $Param{ObjectType} with id $ID"
+                );
+            }
+        }
+    }
+
+    # if everything is OK then return Success
+    return $Self->_Success();
+}
+
+=item _FilterCustomerUserVisibleObjectIds()
+
+filters ids for current customer user if necessary
+
+    @FilteredObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
+        ObjectType   => 'Ticket'
+        ObjectIDList => \@ObjectIDList,
+        ...                                 # optional additional params
     )
 
 =cut
 
-sub _FilterCustomerUserVisibleConfigItems {
+sub _FilterCustomerUserVisibleObjectIds {
     my ( $Self, %Param ) = @_;
 
-    my @ConfigItemIDList = IsArrayRefWithData($Param{ConfigItemIDList}) ? @{$Param{ConfigItemIDList}} : ();
+    my @ObjectIDList = IsArrayRefWithData($Param{ObjectIDList}) ? @{$Param{ObjectIDList}} : ();
 
+    # check if customer context
     if (
-        IsArrayRefWithData(\@ConfigItemIDList) &&
+        $Param{ObjectType} &&
+        IsArrayRefWithData(\@ObjectIDList) &&
         IsHashRefWithData($Self->{Authorization}) &&
         $Self->{Authorization}->{UserType} eq 'Customer'
     ) {
+
+        # get object relevant ids
+        my $ItemIDs = $Self->_GetCustomerUserVisibleObjectIds(
+            %Param
+        );
+
+        # keep relevant ids
+        if ( IsArrayRefWithData($ItemIDs) ) {
+            my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
+            my @Result;
+            for my $ObjectID ( @ObjectIDList ) {
+                push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
+            }
+            @ObjectIDList = @Result;
+        } else {
+            @ObjectIDList = ();
+        }
+    }
+
+    return @ObjectIDList;
+}
+=item _GetCustomerUserVisibleObjectIds()
+
+returns object ids for current customer user if necessary
+
+    @ObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
+        ObjectType   => 'Ticket'
+        ...                         # optional additional params
+    )
+
+=cut
+
+sub _GetCustomerUserVisibleObjectIds {
+    my ( $Self, %Param ) = @_;
+
+    # check if customer context
+    if (
+        $Param{ObjectType} &&
+        IsHashRefWithData($Self->{Authorization}) &&
+        $Self->{Authorization}->{UserType} eq 'Customer'
+    ) {
+
+        # get contact and user data
         my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-            UserID => $Self->{Authorization}->{UserID},
+            UserID        => $Self->{Authorization}->{UserID},
+            DynamicFields => 1
         );
         if (!$ContactData{User} && $ContactData{AssignedUserID}) {
             my $UserData = $Self->ExecOperation(
@@ -3086,27 +3506,41 @@ sub _FilterCustomerUserVisibleConfigItems {
             $Self->AddCacheDependency(Type => 'User');
         }
 
-        my $ItemIDs;
+        # get object relevant ids
         if ( IsHashRefWithData(\%ContactData) ) {
-            $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-                ObjectType => 'Contact',
-                Object     => \%ContactData
-            );
-        }
-
-        if ( IsArrayRefWithData($ItemIDs) ) {
-            my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
-            my @Result;
-            foreach my $ConfigItemID ( @ConfigItemIDList ) {
-                push(@Result, 0 + $ConfigItemID) if $ItemIDsHash{$ConfigItemID};
+            if ($Param{ObjectType} eq 'ConfigItem') {
+                return $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                    %Param,
+                    ObjectType => 'Contact',
+                    Object     => \%ContactData,
+                    UserID     => $Self->{Authorization}->{UserID}
+                );
+            } elsif ($Param{ObjectType} eq 'Ticket') {
+                return $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
+                    %Param,
+                    ObjectType => 'Contact',
+                    Object     => \%ContactData,
+                    UserID     => $Self->{Authorization}->{UserID}
+                );
+            } elsif ($Param{ObjectType} eq 'TicketArticle') {
+                return $Kernel::OM->Get('Ticket')->GetAssignedArticlesForObject(
+                    %Param,
+                    ObjectType => 'Contact',
+                    Object     => \%ContactData,
+                    UserID     => $Self->{Authorization}->{UserID}
+                );
+            } elsif ($Param{ObjectType} eq 'FAQArticle') {
+                return $Kernel::OM->Get('FAQ')->GetAssignedFAQArticlesForObject(
+                    %Param,
+                    ObjectType => 'Contact',
+                    Object     => \%ContactData,
+                    UserID     => $Self->{Authorization}->{UserID}
+                );
             }
-            @ConfigItemIDList = @Result;
-        } else {
-            @ConfigItemIDList = ();
         }
     }
 
-    return @ConfigItemIDList;
+    return;
 }
 
 =item _CheckDynamicField()

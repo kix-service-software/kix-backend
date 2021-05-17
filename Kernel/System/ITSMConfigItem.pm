@@ -1079,6 +1079,8 @@ return a config item list as an array reference
         DeplStateIDs => [1, 2, 3, 4],             # (optional)
         InciStateIDs => [1, 2, 3, 4],             # (optional)
 
+        ConfigItemIDs => [ 1, 2, 3 ]              # (optional)
+
         # config items with created time after ...
         ConfigItemCreateTimeNewerDate => '2006-01-09 00:00:01',  # (optional)
         # config items with created time before then ....
@@ -1141,6 +1143,7 @@ sub ConfigItemSearchExtended {
         'ConfigItemCreateTimeOlderDate',
         'ConfigItemChangeTimeNewerDate',
         'ConfigItemChangeTimeOlderDate',
+        'ConfigItemIDs'
     );
 
     # check, if config item search is required
@@ -1274,6 +1277,8 @@ return a config item list as an array reference
         InciStateIDs => [1, 2, 3, 4],             # (optional)
         CreateBy     => [1, 2, 3],                # (optional)
         ChangeBy     => [3, 2, 1],                # (optional)
+
+        ConfigItemIDs => [ 1, 2, 3 ]              # (optional)
 
         # config items with created time after ...
         ConfigItemCreateTimeNewerDate => '2006-01-09 00:00:01',  # (optional)
@@ -1474,11 +1479,12 @@ sub ConfigItemSearch {
 
     # set array params
     my %ArrayParams = (
-        ClassIDs     => 'class_id',
-        DeplStateIDs => 'cur_depl_state_id',
-        InciStateIDs => 'cur_inci_state_id',
-        CreateBy     => 'create_by',
-        ChangeBy     => 'change_by',
+        ClassIDs      => 'class_id',
+        DeplStateIDs  => 'cur_depl_state_id',
+        InciStateIDs  => 'cur_inci_state_id',
+        CreateBy      => 'create_by',
+        ChangeBy      => 'change_by',
+        ConfigItemIDs => 'id'
     );
 
     ARRAYPARAM:
@@ -2505,7 +2511,8 @@ return all assigned config item IDs
 
     my $ConfigItemIDList = $ITSMConfigItemObject->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
-        Object     => $ContactHashRef
+        Object     => $ContactHashRef,          # (optional)
+        UserID     => 1
     );
 
 =cut
@@ -2515,7 +2522,7 @@ sub GetAssignedConfigItemsForObject {
 
     my @AssignedCIIDs = ();
 
-    for ( qw(ObjectType Object) ) {
+    for ( qw(ObjectType) ) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -2523,14 +2530,6 @@ sub GetAssignedConfigItemsForObject {
             );
             return;
         }
-    }
-
-    if ( !IsHashRefWithData( $Param{Object} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Object is no hash ref!"
-        );
-        return;
     }
 
     my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedConfigItemsMapping') || '';
@@ -2590,7 +2589,7 @@ sub GetAssignedConfigItemsForObject {
 
                     # ignore not xml attributes
                     next if (
-                        $CISearchAttribute eq 'Name' || 
+                        $CISearchAttribute eq 'Name' ||
                         $CISearchAttribute eq 'Number' ||
                         $CISearchAttribute eq 'DeploymentState' ||
                         $CISearchAttribute eq 'IncidentState'
@@ -2599,28 +2598,34 @@ sub GetAssignedConfigItemsForObject {
                     $SearchData{$CISearchAttribute} = [];
 
                     # get attributes search data
-                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
-                        my $Value;
-                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
-                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
-                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
-                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
-                        } else {
-                            $Value = $Param{Object}->{$ObjectSearchAttribute};
+                    if (IsHashRefWithData( $Param{Object} )) {
+                        for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                            my $Value;
+                            if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                                my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                                next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                                $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                            } else {
+                                $Value = $Param{Object}->{$ObjectSearchAttribute};
+                            }
+
+                            next if ( !defined $Value );
+
+                            push (
+                                @{ $SearchData{$CISearchAttribute} },
+                                IsArrayRefWithData($Value) ? @{$Value} : $Value
+                            );
                         }
-
-                        next if ( !defined $Value );
-
-                        push ( 
-                            @{ $SearchData{$CISearchAttribute} },
-                            IsArrayRefWithData($Value) ? @{$Value} : $Value
-                        );
                     }
 
                     # get static search data
                     for my $SearchStatic ( @{$SearchStatics} ) {
                         next if ( !defined $SearchStatic );
                         push ( @{ $SearchData{$CISearchAttribute} }, $SearchStatic );
+                    }
+
+                    if (!scalar(@{ $SearchData{$CISearchAttribute} })) {
+                        delete $SearchData{$CISearchAttribute};
                     }
                 }
 

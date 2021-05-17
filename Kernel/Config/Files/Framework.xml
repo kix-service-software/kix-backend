@@ -464,6 +464,8 @@
         <SubGroup>Core::Cache</SubGroup>
         <Setting>
             <Hash>
+                <Item Key="reconnect">1</Item>
+                <Item Key="every">100000</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8803,6 +8805,17 @@ You can log in via the following URL:
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Reporting" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a job type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Reporting</Item>
+                <Item Key="Module">Kernel::System::Automation::Job::Reporting</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Synchronisation" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro type for automation.</Description>
         <Group>Automation</Group>
@@ -8810,6 +8823,17 @@ You can log in via the following URL:
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
                 <Item Key="Module">Kernel::System::Automation::Macro::Synchronisation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Reporting" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Reporting</Item>
+                <Item Key="Module">Kernel::System::Automation::Macro::Reporting</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8842,6 +8866,56 @@ You can log in via the following URL:
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Loop</Item>
                 <Item Key="Module">Kernel::System::Automation::MacroAction::Common::Loop</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###ExecuteMacro" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">ExecuteMacro</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::ExecuteMacro</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###ExtractText" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">ExtractText</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::ExtractText</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###AssembleObject" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">AssembleObject</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::AssembleObject</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###CreateReport" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">CreateReport</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::CreateReport</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###Conditional" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Conditional</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::Conditional</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8911,4 +8985,43 @@ You can log in via the following URL:
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="AssignedObjectsMapping" Required="1" Valid="1">
+        <Description Translatable="1">Defines which dependend object (e.g. "Ticket") is assigned by which attributes to a relevant object (e.g. "Contact") - e.g. "Tickets of Contact". Structure is "{ "RelevantObject": { "DependendObject": { "DependendObjectAttribut": { "SearchAttribut OR SearchStatic": [ "RelevantObjectAttribut OR StaticValue" ] } } } }. All attributes will be OR combined."</Description>
+        <Group>ITSM</Group>
+        <SubGroup>Core::ITSMConfigItem</SubGroup>
+        <Setting>
+            <String Regex="">
+{
+    "Contact": {
+        "Ticket": {
+            "ContactID": {
+                "SearchAttributes": [
+                    "ID"
+                ]
+            },
+            "OrganisationID": {
+                "SearchAttributes": [
+                    "PrimaryOrganisationID", "OrganisationIDs"
+                ]
+            }
+        },
+        "TicketArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1
+                ]
+            }
+        },
+        "FAQArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1
+                ]
+            }
+        }
+    }
+}
+            </String>
+        </Setting>
+    </ConfigItem>
 </kix_config>
