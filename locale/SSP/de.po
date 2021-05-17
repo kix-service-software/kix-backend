@@ -1,13 +1,23 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-#: src/components/ConfigItemList.vue:36
+#: src/components/ConfigItemList.vue:44
 msgid "No data available."
 msgstr ""
 
-#: src/components/ArticleEditor.vue:153
+#: src/components/ConfigItemList.vue:56
+#: src/views/FaqList.vue:85
+#: src/views/TicketList.vue:77
+msgid "Load more ..."
+msgstr ""
+
+#: src/components/ConfigItemPreview.vue:20
+msgid "Deployment State"
+msgstr ""
+
+#: src/components/ArticleEditor.vue:99
 #: src/components/FormField/TicketTitleInputFormFieldView.vue:17
-#: src/components/FormField/TicketTitleInputFormFieldView.vue:71
+#: src/components/FormField/TicketTitleInputFormFieldView.vue:70
 msgid "Helptext_Tickets_TicketCreate_Subject"
 msgstr ""
 
@@ -32,19 +42,20 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: src/components/TicketArticleView.vue:96
+#: src/components/TicketArticleView.vue:92
 #: src/components/TicketPreview.vue:20
-#: src/views/TicketDetails.vue:220
+#: src/views/TicketDetails.vue:248
 msgid "Created at"
 msgstr ""
 
 #: src/components/TicketPreview.vue:22
-#: src/views/TicketDetails.vue:216
+#: src/views/TicketDetails.vue:244
 msgid "Age"
 msgstr ""
 
 #: src/components/TicketPreview.vue:23
-msgid "Status"
+#: src/views/TicketDetails.vue:256
+msgid "State"
 msgstr ""
 
 #: src/components/Connectivity.vue:29
@@ -72,30 +83,30 @@ msgid "connectivity.lastUpdate"
 msgstr ""
 
 #: src/components/AttachmentUpload.vue:41
-#: src/components/AttachmentUpload.vue:61
+#: src/components/AttachmentUpload.vue:56
 msgid "Delete"
 msgstr ""
 
-#: src/components/AttachmentUpload.vue:49
+#: src/components/AttachmentUpload.vue:48
 msgid "File(s) added"
 msgstr ""
 
-#: src/components/AttachmentUpload.vue:61
+#: src/components/AttachmentUpload.vue:56
 msgid "All"
 msgstr ""
 
-#: src/components/AttachmentUpload.vue:117
-msgid "The file size of {0} is too large ({1}). Max.: {2}"
-msgstr ""
-
-#: src/components/AttachmentUpload.vue:166
+#: src/components/AttachmentUpload.vue:94
 #: src/components/TicketArticleView.vue:57
 #: src/views/FaqArticleDetails.vue:49
 msgid "Attachments"
 msgstr ""
 
-#: src/components/AttachmentUpload.vue:166
+#: src/components/AttachmentUpload.vue:94
 msgid "Add"
+msgstr ""
+
+#: src/components/AttachmentUpload.vue:116
+msgid "The file size of {0} is too large ({1}). Max.: {2}"
 msgstr ""
 
 #: src/components/FaqListPreview.vue:13
@@ -108,7 +119,7 @@ msgstr ""
 
 #: src/components/TicketListPreview.vue:24
 #: src/views/CreateTicket.vue:11
-#: src/views/TicketList.vue:49
+#: src/views/TicketList.vue:50
 msgid "New Ticket"
 msgstr ""
 
@@ -120,7 +131,7 @@ msgstr ""
 msgid "All tickets"
 msgstr ""
 
-#: src/components/ArticleEditor.vue:13
+#: src/components/ArticleEditor.vue:15
 msgid "Subject"
 msgstr ""
 
@@ -128,16 +139,8 @@ msgstr ""
 msgid "Article Text"
 msgstr ""
 
-#: src/components/ArticleEditor.vue:154
+#: src/components/ArticleEditor.vue:100
 msgid "Helptext_Tickets_ArticleCreateEdit_Subject"
-msgstr ""
-
-#: src/components/CmdbListPreview.vue:14
-msgid "Incident State"
-msgstr ""
-
-#: src/components/CmdbListPreview.vue:16
-msgid "Number of Config Items"
 msgstr ""
 
 #: src/components/LocaleSwitcher.vue:17
@@ -148,25 +151,37 @@ msgstr ""
 msgid "Languages"
 msgstr ""
 
+#: src/components/InputDynamicField/IdfTicketReferenceView.vue:116
+msgid "You can only select max. {0} tickets!"
+msgstr ""
+
+#: src/components/CmdbListPreview.vue:14
+msgid "Incident State"
+msgstr ""
+
+#: src/components/CmdbListPreview.vue:16
+msgid "Number of Config Items"
+msgstr ""
+
+#: src/components/DeploymentState.vue:10
+msgid "Deployment state"
+msgstr ""
+
 #: src/components/DynamicAction.vue:78
-#: src/components/TicketEditor.vue:183
+#: src/components/TicketEditor.vue:181
 #: src/components/TicketEditor.vue:38
 msgid "Cancel"
 msgstr ""
 
-#: src/components/ChangePassword.vue:256
+#: src/components/ChangePassword.vue:147
 #: src/components/ChangePassword.vue:88
 #: src/components/DynamicAction.vue:88
 #: src/components/TicketEditor.vue:46
 msgid "Send"
 msgstr ""
 
-#: src/components/TicketEditor.vue:181
+#: src/components/TicketEditor.vue:179
 msgid "Edit"
-msgstr ""
-
-#: src/components/DeploymentState.vue:10
-msgid "Deployment state"
 msgstr ""
 
 #: src/views/ConfigItemDetails.vue:58
@@ -176,6 +191,10 @@ msgstr ""
 #: src/views/CmdbList.vue:12
 #: src/views/Home.vue:37
 msgid "Config Items"
+msgstr ""
+
+#: src/views/CmdbList.vue:24
+msgid "Asset Classes"
 msgstr ""
 
 #: src/App.vue:133
@@ -196,15 +215,19 @@ msgid "Language"
 msgstr ""
 
 #: src/views/FaqList.vue:12
-#: src/views/Home.vue:51
+#: src/views/Home.vue:53
 msgid "FAQ"
 msgstr ""
 
-#: src/views/Home.vue:23
+#: src/views/FaqList.vue:24
+msgid "FAQ Categories"
+msgstr ""
+
+#: src/views/Home.vue:24
 msgid "News"
 msgstr ""
 
-#: src/views/Home.vue:44
+#: src/views/Home.vue:45
 #: src/views/TicketList.vue:12
 msgid "Tickets"
 msgstr ""
@@ -214,25 +237,25 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#: src/components/ChangePassword.vue:15
+#: src/components/ChangePassword.vue:16
 msgid "Current Password"
 msgstr ""
 
-#: src/components/ChangePassword.vue:199
 #: src/components/ChangePassword.vue:23
+#: src/components/ChangePassword.vue:232
 msgid "Helptext_PersonalSettings_UserPassword_Hint"
 msgstr ""
 
-#: src/components/ChangePassword.vue:31
+#: src/components/ChangePassword.vue:32
 msgid "New Password"
 msgstr ""
 
-#: src/components/ChangePassword.vue:208
+#: src/components/ChangePassword.vue:241
 #: src/components/ChangePassword.vue:39
 msgid "Helptext_PersonalSettings_UserNewPassword_Hint"
 msgstr ""
 
-#: src/components/ChangePassword.vue:55
+#: src/components/ChangePassword.vue:56
 msgid "Confirm New Password"
 msgstr ""
 
@@ -240,38 +263,38 @@ msgstr ""
 msgid "Helptext_PersonalSettings_UserNewPasswordConfirm_Hint"
 msgstr ""
 
-#: src/components/ChangePassword.vue:190
-msgid "Passwords do not match"
-msgstr ""
-
-#: src/components/ChangePassword.vue:265
+#: src/components/ChangePassword.vue:156
 msgid "Success!"
 msgstr ""
 
-#: src/components/ChangePassword.vue:271
+#: src/components/ChangePassword.vue:162
 msgid "Error!"
 msgstr ""
 
-#: src/views/TicketDetails.vue:54
+#: src/components/ChangePassword.vue:223
+msgid "Passwords do not match"
+msgstr ""
+
+#: src/views/TicketDetails.vue:44
+msgid "Dynamic Fields"
+msgstr ""
+
+#: src/views/TicketDetails.vue:77
 msgid "Article Overview"
 msgstr ""
 
-#: src/views/TicketDetails.vue:103
+#: src/views/TicketDetails.vue:126
 msgid "No Articles"
 msgstr ""
 
-#: src/views/TicketDetails.vue:212
+#: src/views/TicketDetails.vue:240
 msgid "Priority"
 msgstr ""
 
-#: src/views/TicketDetails.vue:228
-msgid "States"
-msgstr ""
-
-#: src/views/TicketDetails.vue:234
+#: src/views/TicketDetails.vue:262
 msgid "Pending until"
 msgstr ""
 
-#: src/views/TicketDetails.vue:240
+#: src/views/TicketDetails.vue:268
 msgid "Queue"
 msgstr ""
