@@ -475,6 +475,14 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote">Service Desk</Data>
+        <Data Key="signature" Type="Quote"><![CDATA[
+
+-- <br/>
+&lt;KIX_CONFIG_OrganizationLong&gt;<br/>
+&lt;KIX_CONFIG_OrganizationAddress&gt;<br/>
+&lt;KIX_CONFIG_OrganizationRegistrationLocation&gt; &lt;KIX_CONFIG_OrganizationRegistrationNumber&gt;<br/>
+&lt;KIX_CONFIG_OrganizationDirectors&gt;
+]]></Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -489,6 +497,14 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote">Service Desk::Monitoring</Data>
+        <Data Key="signature" Type="Quote"><![CDATA[
+
+-- <br/>
+&lt;KIX_CONFIG_OrganizationLong&gt;<br/>
+&lt;KIX_CONFIG_OrganizationAddress&gt;<br/>
+&lt;KIX_CONFIG_OrganizationRegistrationLocation&gt; &lt;KIX_CONFIG_OrganizationRegistrationNumber&gt;<br/>
+&lt;KIX_CONFIG_OrganizationDirectors&gt;
+]]></Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
@@ -503,6 +519,14 @@
     <Insert Table="queue">
         <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote">Junk</Data>
+        <Data Key="signature" Type="Quote"><![CDATA[
+
+-- <br/>
+&lt;KIX_CONFIG_OrganizationLong&gt;<br/>
+&lt;KIX_CONFIG_OrganizationAddress&gt;<br/>
+&lt;KIX_CONFIG_OrganizationRegistrationLocation&gt; &lt;KIX_CONFIG_OrganizationRegistrationNumber&gt;<br/>
+&lt;KIX_CONFIG_OrganizationDirectors&gt;
+]]></Data>
         <Data Key="system_address_id">1</Data>
         <Data Key="follow_up_id">1</Data>
         <Data Key="follow_up_lock">0</Data>
