@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-5-17 08:11+0000\n"
-"PO-Revision-Date: 2021-05-04 13:46+0000\n"
-"Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
+"PO-Revision-Date: 2021-05-18 08:46+0000\n"
+"Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -4463,7 +4463,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "%s time unit(s) accounted. Now total %s time unit(s)."
-msgstr "% Zeiteinheit(en) gebucht. Gesamt: % Zeiteinheit(en)."
+msgstr "%s Zeiteinheit(en) gebucht. Gesamt: %s Zeiteinheit(en)."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
