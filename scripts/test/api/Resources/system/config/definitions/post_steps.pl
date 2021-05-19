@@ -26,16 +26,26 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
-When qr/I update this addressbook$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Patch(
-      URL     => S->{API_URL}.'/addressbook/'.S->{AddressIDArray}->[0],
+When qr/added a config definitions$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/system/config/definitions',
       Token   => S->{Token},
       Content => {
-            Address => {
-                EmailAddress => 'test'.rand().'@test.org',
-            }
+          SysConfigOptionDefinition => {
+              AccessLevel => "internal",
+              Name => "test",
+              Type => "String",
+              Description => "this is just a test option",
+              Default => "this is a test"
+          }
+
       }
    );
 };
+
+
+
+
+

@@ -7,6 +7,8 @@ Feature: GET request to the /cmdb/configitems/:ConfigItemID/history resource
 
   Scenario: get the list of existing history
     Given a configitem
+    Then the response code is 201
+
     When I query the cmdb collection of configitem historys
     Then the response code is 200
     When I delete this configitem

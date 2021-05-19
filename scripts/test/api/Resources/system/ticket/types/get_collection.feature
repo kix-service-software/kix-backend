@@ -25,10 +25,10 @@ Feature: GET request to the /system/ticket/types resource
     And the response contains 3 items of type "TicketType"
 
   Scenario: get the list of existing tickettypes with offset
-    When I query the collection of tickettypes with offset 3
+    When I query the collection of tickettypes with offset 1
     Then the response code is 200
 #    And the response object is TicketTypeCollectionResponse
-    And the response contains 3 items of type "TicketType"
+    And the response contains 2 items of type "TicketType"
 
   Scenario: get the list of existing tickettypes with sorted
     When I query the collection of tickettypes with sorted by "TicketType.-Name:textual"
