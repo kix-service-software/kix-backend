@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-5-17 08:11+0000\n"
-"PO-Revision-Date: 2021-05-18 12:46+0000\n"
+"PO-Revision-Date: 2021-05-19 09:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
@@ -667,6 +667,8 @@ msgid ""
 "allows to read information of any organization or contact and allows to READ "
 "links"
 msgstr ""
+"allows to read information of any organisation or contact and allows to READ "
+"links"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "closed"
@@ -756,6 +758,9 @@ msgid ""
 "existing contact or organization entry and allows to CREATE, UPDATE, DELETE "
 "links"
 msgstr ""
+"same as Customer Reader, but additionally allows to create new or update any "
+"existing contact or organisation entry and allows to CREATE, UPDATE, DELETE "
+"links"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -916,10 +921,13 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The ID of the report definition."
 msgstr ""
+"Choose a report definition from the list, then you can fill in parameters "
+"and output format. New report definitions can be created in the \"Reporting\""
+" module."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The parameters of the report as a HashRef."
-msgstr ""
+msgstr "Choose a report definition first to fill in the parameters."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The report object including the result."
@@ -928,6 +936,8 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The requested output formats."
 msgstr ""
+"Choose a report definition first, then you can define the required output "
+"formats."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "Executes a given macro."
@@ -1696,12 +1706,16 @@ msgid ""
 "Lists tickets closed in a specific date range. Organization may be selected "
 "before report creation."
 msgstr ""
+"Lists tickets closed in a specific date range. Organisation may be selected "
+"before report creation."
 
 #. Perl Module: update/build-1415.pl
 msgid ""
 "Lists tickets created in a specific date range. Organization may be selected "
 "before report creation."
 msgstr ""
+"Lists tickets created in a specific date range. Organisation may be selected "
+"before report creation."
 
 #. Perl Module: update/build-1415.pl
 msgid "Tickets Closed In Date Range"
@@ -2982,7 +2996,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Extended organization description."
-msgstr "Extended organization description (also see placeholder)."
+msgstr "Extended organisation description (also see placeholder)."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "ExtractText"
@@ -3847,6 +3861,8 @@ msgid ""
 "The director/s mentioned in your organizations legal registration for use in "
 "placeholder."
 msgstr ""
+"The director/s mentioned in your organisations legal registration for use in "
+"placeholder."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The directory to use for temporary files."
@@ -4057,23 +4073,27 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Your organizations name for use in placeholder."
-msgstr ""
+msgstr "Your organisations name for use in placeholder."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Your organizations registration location according to legal requirements (if "
 "applicable) for use in placeholder."
 msgstr ""
+"Your organisations registration location according to legal requirements (if "
+"applicable) for use in placeholder."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Your organizations registration number according to legal requirements (if "
 "applicable) for use in placeholder."
 msgstr ""
+"Your organisations registration number according to legal requirements (if "
+"applicable) for use in placeholder."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Your organizations street for use in placeholder."
-msgstr ""
+msgstr "Your organisations street for use in placeholder."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "attachment"
