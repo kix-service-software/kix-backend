@@ -52,26 +52,31 @@ sub _RemoveDuplicatePermissions {
         last;
     }
 
-    # prepare temp table
-    if ( !$DBObject->Do( SQL => "CREATE TABLE tmp_role_permission AS SELECT * FROM role_permission" ) ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Unable to create temporary permission table for deletion!"
-        );
-        return;
-    }
-
-    # do the actual deletion
-    my $Result = $DBObject->Do(
-        SQL => 'DELETE FROM role_permission rp 
-                 WHERE EXISTS (
-                     SELECT id FROM tmp_role_permission rp2 
-                      WHERE rp2.role_id = rp.role_id 
+    # do the deletion of duplicates
+    my $Result;
+    if ( $DBObject->{'DB::Type'} eq 'mysql' ) {
+        $Result = $DBObject->Do(
+            SQL => 'DELETE rp FROM role_permission rp
+                    INNER JOIN role_permission rp2
+                    WHERE rp2.id > rp.id
+                        AND rp2.role_id = rp.role_id 
                         AND rp2.target = rp.target 
                         AND rp2.type_id = rp.type_id 
-                        AND rp2.id <> rp.id
-                )'
-    );
+                        AND rp2.id <> rp.id'
+        );
+    }
+    elsif ( $DBObject->{'DB::Type'} eq 'mysql' ) {
+        $Result = $DBObject->Do(
+            SQL => 'DELETE FROM role_permission rp 
+                    WHERE EXISTS (
+                        SELECT id FROM tmp_role_permission rp2 
+                        WHERE rp2.role_id = rp.role_id 
+                            AND rp2.target = rp.target 
+                            AND rp2.type_id = rp.type_id 
+                            AND rp2.id <> rp.id
+                    )'
+        );
+    }
 
     if ( !$DBObject->Prepare( SQL => "SELECT count(*) FROM role_permission" ) ) {
         $LogObject->Log(

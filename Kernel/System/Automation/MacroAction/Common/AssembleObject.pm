@@ -61,7 +61,7 @@ sub Describe {
 
     $Self->AddResult(
         Name        => 'Object',
-        Description => Kernel::Language::Translatable('The assembled object containing two the attributes "Type" and "Definition", which is a string representation of the object.'),
+        Description => Kernel::Language::Translatable('The assembled object containing the two attributes "Type" and "Definition", which is a string representation of the object.'),
     );
 
     return;
