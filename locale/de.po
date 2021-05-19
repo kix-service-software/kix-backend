@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-5-17 08:11+0000\n"
-"PO-Revision-Date: 2021-05-18 12:46+0000\n"
+"PO-Revision-Date: 2021-05-19 09:46+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -911,7 +911,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Parameters"
-msgstr ""
+msgstr "Parameter"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Report Definition"
@@ -920,10 +920,15 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The ID of the report definition."
 msgstr ""
+"Wählen Sie eine Berichtsdefinition aus der Liste. Anschließend können Sie "
+"Paramter & Ausgabeformate auswählen. Neue Berichtsdefinitionen können Sie im "
+"Modul \"Berichte\" anlegen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The parameters of the report as a HashRef."
 msgstr ""
+"Wählen Sie zuerst eine Berichtsdefinition, anschließend können Sie die "
+"Parameter definieren."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The report object including the result."
@@ -932,6 +937,8 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The requested output formats."
 msgstr ""
+"Wählen Sie zuerst eine Berichtsdefinition, anschließend können Sie die "
+"benötigten Ausgabeformate festlegen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "Executes a given macro."
@@ -951,7 +958,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "Capture Group Names"
-msgstr ""
+msgstr "Gruppierungskonstrukte"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "Extract parts of a text via Regular Expressions (RegEx)."
@@ -1205,11 +1212,11 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Asset Reference Dynamic Field"
-msgstr ""
+msgstr "Assetbezug aus dynamischen Feld"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Attribute - DynamicField Mapping"
-msgstr ""
+msgstr "Attribut - Dynamisches Feld Mapping"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid ""
@@ -1235,7 +1242,7 @@ msgstr ""
 msgid "The mapping which asset attribute will set which ticket dynamic field."
 msgstr ""
 "Mapping, welches Asset Attribut in welches dynamische Feld gespeichert wird. "
-"Erwartetes Format: \"<WriteToDFKey> - <AssetAttributeKey>\""
+"Erwartetes Format: \"<WriteToDFKey> - <AssetAttributeKey>\"."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "The name of the dynamic field which contains the relevant asset ID."
@@ -1785,7 +1792,7 @@ msgstr ""
 
 #. Perl Module: update/build-1433.pl
 msgid "Work Order"
-msgstr ""
+msgstr "Arbeitsanweisung"
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
