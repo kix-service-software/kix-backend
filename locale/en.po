@@ -922,8 +922,8 @@ msgstr ""
 msgid "The ID of the report definition."
 msgstr ""
 "Choose a report definition from the list, then you can fill in parameters "
-"and output format. New report definitions can be created in the \"Reporting\""
-" module."
+"and output format. New report definitions can be created in the \"Reporting"
+"\" module."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The parameters of the report as a HashRef."
