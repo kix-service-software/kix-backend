@@ -580,7 +580,8 @@ sub Sync {
                 Message  => "Unable to update usage context of user \"$Param{User}\" (UserID: $UserID)!",
             );
         }
-        else {
+        elsif ( IsHashRefWithData(\%UserContextFromLDAP) ) {
+            # only change roles if we have context configurations
             $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
             $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 0;
 
