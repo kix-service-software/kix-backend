@@ -458,12 +458,15 @@ sub _CheckValue {
     if ( !$Self->{AttributeTypeModules}->{$Param{Input}->{Type}} ) {
         # create module instance
         my $Module = 'ITSMConfigItem::XML::Type::'.$Param{Input}->{Type};
-        my $Object = $Kernel::OM->Get($Module);
+        my $Object;
+        eval {
+            $Object = $Kernel::OM->Get($Module);
+        };
 
-        if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
+        if (!$Object || ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
             return $Self->_Error(
-                Code    => "Operation.InternalError",
-                Message => "Unable to create instance of attribute type module for parameter Version::Data::$Parent$ItemKey!",
+                Code    => "InternalError",
+                Message => "Invalid asset class definition! Unable to create instance of attribute type module for parameter Version::Data::$Parent$ItemKey!",
             );
         }
         $Self->{AttributeTypeModules}->{$Param{Input}->{Type}} = $Object;
@@ -952,6 +955,20 @@ sub _CheckDefinition {
             );
         }
 
+        if ( IsHashRefWithData($Attribute->{Input}) && $Attribute->{Input}->{Type} ) {
+            # create module instance
+            my $Module = 'ITSMConfigItem::XML::Type::'.$Attribute->{Input}->{Type};
+            my $Object;
+            eval {
+                $Object = $Kernel::OM->Get($Module);
+            };
+            if (!$Object || ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
+                return $Self->_Error(
+                    Code    => "BadRequest",
+                    Message => "Invalid definition! Type '$Attribute->{Input}->{Type}' of key '$Attribute->{Key}' is unknown!",
+                );
+            }
+        }
 
         # check if the key contains no spaces
         if ( $Attribute->{Key} && $Attribute->{Key} =~ m{ \s }xms ) {

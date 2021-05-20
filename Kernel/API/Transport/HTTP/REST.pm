@@ -474,7 +474,7 @@ sub ProviderGenerateResponse {
                     Code    => $Param{Code},
                     Message => $Result->{Message},
                 }
-            );            
+            );
         }
         else {
             ($MappedCode, $MappedMessage) = split(/:/, $Result, 2);
@@ -1024,12 +1024,6 @@ sub _Output {
 
     # prepare protocol
     my $Protocol = defined $ENV{SERVER_PROTOCOL} ? $ENV{SERVER_PROTOCOL} : 'HTTP/1.0';
-
-    # FIXME
-    # according to SOAP::Transport::HTTP the previous should only be used
-    # for IIS to imitate nph- behavior
-    # for all other browser 'Status:' should be used here
-    # this breaks apache though
 
     # prepare data
     $Param{Content}  ||= '';
