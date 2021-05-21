@@ -298,3 +298,11 @@ msgstr ""
 #: src/views/TicketDetails.vue:268
 msgid "Queue"
 msgstr ""
+
+#: manuel added from scr/views/TicketList.vue:151
+msgid "My Tickets"
+msgstr ""
+
+#: manuel added from scr/views/TicketList.vue:152
+msgid "Tickets by others"
+msgstr ""
