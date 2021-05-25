@@ -169,15 +169,10 @@ sub ContactAdd {
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
         # check if primary OrganisationID is contained in assigned OrganisationIDs
-        my @OrgIDs = @{$Param{OrganisationIDs}};
-        if (!grep /$Param{PrimaryOrganisationID}/, @OrgIDs) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Primary organisation ID "' . $Param{PrimaryOrganisationID} . '" is not available in assigned organisation IDs "' . (join(", ", @OrgIDs)) . '".',
-            );
-            return;
+        if (!grep /$Param{PrimaryOrganisationID}/, @{$Param{OrganisationIDs}}) {
+            push(@{$Param{OrganisationIDs}}, $Param{PrimaryOrganisationID});
         }
-        foreach my $OrgID (@OrgIDs) {
+        foreach my $OrgID (@{$Param{OrganisationIDs}}) {
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
@@ -443,7 +438,7 @@ sub ContactGet {
 
     # check if need to return DynamicFields
     if ($FetchDynamicFields) {
-        
+
         # get all dynamic fields for the object type Ticket
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             ObjectType => 'Contact'
@@ -739,16 +734,7 @@ sub ContactUpdate {
     }
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
-        # check if primary OrganisationID is contained in assigned OrganisationIDs
-        my @OrgIDs = @{$Param{OrganisationIDs}};
-        if (!grep /$Param{PrimaryOrganisationID}/, @OrgIDs) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Primary organisation ID "' . $Param{PrimaryOrganisationID} . '" is not available in assigned organisation IDs "' . (join(", ", @OrgIDs)) . '".',
-            );
-            return;
-        }
-        foreach my $OrgID (@OrgIDs) {
+        foreach my $OrgID (@{$Param{OrganisationIDs}}) {
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
@@ -760,9 +746,16 @@ sub ContactUpdate {
                 return;
             }
         }
+    } elsif (!defined $Param{OrganisationIDs}) {
+        $Param{OrganisationIDs} = $Contact{OrganisationIDs};
     }
 
-    #if assigned user ist given, check associated user exists
+    # check if primary OrganisationID is contained in assigned OrganisationIDs
+    if ($Param{PrimaryOrganisationID} && !grep /$Param{PrimaryOrganisationID}/, @{$Param{OrganisationIDs}}) {
+        push(@{$Param{OrganisationIDs}}, $Param{PrimaryOrganisationID});
+    }
+
+    # if assigned user ist given, check associated user exists
     if ($Param{AssignedUserID}) {
         my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
             UserID => $Param{AssignedUserID},
@@ -802,22 +795,24 @@ sub ContactUpdate {
         last KEY;
     }
 
-    my @deleteOrgIDs;
-    my @insertOrgIDs;
-    for my $orgID (@{$Param{OrganisationIDs}}) {
-        if (!grep ( /$orgID/, @{$Contact{OrganisationIDs}})) {
-            push(@insertOrgIDs, $orgID);
+    my @DeleteOrgIDs;
+    my @InsertOrgIDs;
+    for my $OrgID (@{$Param{OrganisationIDs}}) {
+        if (!grep ( /$OrgID/, @{$Contact{OrganisationIDs}})) {
+            push(@InsertOrgIDs, $OrgID);
         }
     }
-    for my $orgID (@{$Contact{OrganisationIDs}}) {
-        if (!grep ( /$orgID/, @{$Param{OrganisationIDs}})) {
-            push(@deleteOrgIDs, $orgID);
+    for my $OrgID (@{$Contact{OrganisationIDs}}) {
+        if (!grep ( /$OrgID/, @{$Param{OrganisationIDs}})) {
+            push(@DeleteOrgIDs, $OrgID);
         }
     }
 
-    $ChangeRequired = 1 if ($Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID});
+    $ChangeRequired = 1 if (
+        $Param{PrimaryOrganisationID} && $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID}
+    );
 
-    $ChangeRequired = 1 if (@deleteOrgIDs || @insertOrgIDs);
+    $ChangeRequired = 1 if (@DeleteOrgIDs || @InsertOrgIDs);
 
     return 1 if !$ChangeRequired;
 
@@ -835,22 +830,22 @@ sub ContactUpdate {
         ],
     );
 
-    #update organisation IDs
-    if (@deleteOrgIDs) {
+    # update organisation IDs
+    if (@DeleteOrgIDs) {
         return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'DELETE FROM contact_organisation WHERE contact_id = ? AND org_id IN (?)',
-            Bind => [ \$Param{ID}, \${\(join ', ', @deleteOrgIDs)} ],
+            Bind => [ \$Param{ID}, \${\(join ', ', @DeleteOrgIDs)} ],
         );
     }
 
-    for my $orgID (@insertOrgIDs) {
+    for my $orgID (@InsertOrgIDs) {
         return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'INSERT INTO contact_organisation (contact_id, org_id) VALUES (?,?)',
             Bind => [ \$Param{ID}, \$orgID ],
         );
     }
 
-    #update Primary Org ID
+    # update Primary Org ID
     if ($Param{PrimaryOrganisationID} ne $Contact{PrimaryOrganisationID}) {
         return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE contact_organisation SET is_primary = 0 WHERE org_id = ? AND contact_id = ?',
