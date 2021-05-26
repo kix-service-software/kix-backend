@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-5-17 08:11+0000\n"
-"PO-Revision-Date: 2021-05-26 08:47+0000\n"
+"PO-Revision-Date: 2021-05-26 12:47+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
@@ -939,6 +939,8 @@ msgstr "Choose a report definition first to fill in the parameters."
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The report object including the result."
 msgstr ""
+"Add a name for the report if you want to use the result in further macro "
+"actions."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The requested output formats."
@@ -977,6 +979,10 @@ msgid ""
 "capture group id. If not given, the IDs of the capture groups will be used, "
 "starting from 1."
 msgstr ""
+"If you don't use a RegEx with named capture groups, you can give a comma "
+"separated list of names for the capture groups. The first name corresponds "
+"to the first capture group. If not given, the capture groups will be "
+"nummbered consecutively, starting from 1."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "RegEx"
@@ -989,10 +995,17 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The extracted text(s)."
 msgstr ""
+"Add a name for the extracted text if you want to use the result in further "
+"macro actions."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The text containing the data."
 msgstr ""
+"Contains the object the RegEx is applied to, i.e. a perviously created "
+"report. Insert the place holder you defined as result variable (\""
+"${VariableName}\"). For complex objects, also subatributes can be addressed ("
+"i.e. \"${MyReport.Results:0.Content}\") More specific information can be "
+"found in the admin manual."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid ""
@@ -1023,6 +1036,8 @@ msgid ""
 "The value (ObjectID) of the current loop iteration in case it is needed. It "
 "can be used like any result variable in a macro."
 msgstr ""
+"Add a name for the current loop iteration in case it is needed. It can be "
+"used like any result variable in a macro."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "Values"
@@ -1243,7 +1258,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "The lock state to be set."
-msgstr "The name of the lock state to be set."
+msgstr ""
+"The name of the lock state to be set (Attention: Translations are not "
+"possible)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
 msgid "Sets the organisation of a ticket."
@@ -1341,6 +1358,8 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID of the new ticket."
 msgstr ""
+"Add the name of a variable if you want to use the result in further macro "
+"actions."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID or email of the contact of the new ticket."
