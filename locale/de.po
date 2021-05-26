@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-5-17 08:11+0000\n"
-"PO-Revision-Date: 2021-05-21 09:47+0000\n"
-"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
+"PO-Revision-Date: 2021-05-26 08:47+0000\n"
+"Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -871,6 +871,10 @@ msgid ""
 "The assembled object containing two the attributes \"Type\" and \"Definition"
 "\", which is a string representation of the object."
 msgstr ""
+"Die hier festgelegte Bezeichnung ist eine Textrepresentation des Objektes, "
+"d.h. es ist möglich, auf Subattribute des Objektes zuzugreifen. Dazu muss "
+"die Bezeichnung die Form \"ObjectName.Definition.Attribute.SubAttibute\" "
+"haben."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid ""
@@ -880,10 +884,17 @@ msgid ""
 "validated when this action gets executed. In case of an error you will find "
 "detailed information in the job log and the kix log."
 msgstr ""
+"Die Definition (Struktur/Inhalt) des Objektes, also der YAML String oder "
+"JSON. Variablen & Platzhalter können genutzt werden. WICHTIG: Aufgrund der "
+"Möglichkeit, Platzhalter zu nutzen, kann die Definition nur validiert "
+"werden, wenn der Job ausgeführt wird. Im Fehlerfall sind detailierte "
+"Informationen im Job Log & im KIX Log zu finden."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid "The type of the object. Either JSON or YAML."
 msgstr ""
+"Der Typ des Objektes kann JSON oder YAML sein. Legt die Syntax für die "
+"Definition fest."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "Execute the depending macro if the logical expression is true."
@@ -900,6 +911,9 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The logical expression to evaluate."
 msgstr ""
+"Fügen Sie einen logischen Ausdruck ein. Wenn dieser zutrifft, werden die "
+"folgenden Macro-Actions ausgeführt. Im Admin-Handbuch finden Sie "
+"detailiertere Informationen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Create a report from a report definition."
@@ -1085,23 +1099,23 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Attachment Object 1"
-msgstr ""
+msgstr "Anhangsobjekt 1"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Attachment Object 2"
-msgstr ""
+msgstr "Anhangsobjekt 2"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Attachment Object 3"
-msgstr ""
+msgstr "Anhangsobjekt 3"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Attachment Object 4"
-msgstr ""
+msgstr "Anhangsobjekt 4"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Attachment Object 5"
-msgstr ""
+msgstr "Anhangsobjekt 5"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Bcc"
@@ -1130,6 +1144,7 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "If the new article is visible for customers"
 msgstr ""
+"Wenn der Hacken gesetzt ist, ist der Artikel im Self Service Portal sichtbar."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Sender Type"
@@ -1145,7 +1160,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The ID of the new article."
-msgstr "Die ID des neuen Artikels."
+msgstr ""
+"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
+"Sie dieses weiterverwenden wollen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The subject of the new article."
@@ -1153,7 +1170,7 @@ msgstr "Der Betreff des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The text of the new article."
-msgstr ""
+msgstr "Der Inhalt des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "To"
@@ -4770,7 +4787,8 @@ msgstr ""
 "Definiert die Layout-Vorlage für Benachrichtigungen. Die Platzhalter \"[% "
 "Data.Subject %]\" und \"[% Data.Body %]\" werden verwendet, um den in der "
 "Benachrichtigung konfigurierten Betreff und Text an diesen Positionen "
-"anzuzeigen."
+"anzuzeigen. Falls Sie den initialen Quellcode der Vorlage wieder herstellen "
+"wollen, finden Sie diesen im KIX Admin Handbuch."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
