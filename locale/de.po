@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-5-17 08:11+0000\n"
-"PO-Revision-Date: 2021-05-26 08:47+0000\n"
+"PO-Revision-Date: 2021-05-26 12:47+0000\n"
 "Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -947,6 +947,8 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The report object including the result."
 msgstr ""
+"Legen Sie eine Variable für den zu erstellenden Bericht fest, um dies in "
+"anderen Macro-Actions weiter zu verwenden."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The requested output formats."
@@ -968,7 +970,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "The ID of the object to run the macro for."
-msgstr ""
+msgstr "Die ID des Objektes, für das das Macro ausgeführt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "Capture Group Names"
@@ -985,6 +987,11 @@ msgid ""
 "capture group id. If not given, the IDs of the capture groups will be used, "
 "starting from 1."
 msgstr ""
+"Wenn die Gruppierungskonstrukte in Ihrer RegEx nicht benannt sind, können "
+"Sie hier eine Komma-separierte Liste angeben. Dabei entspricht der 1. Name "
+"der 1. Klammer (Kapselung von Klammern beachten). Wenn hier keine Namen "
+"festgelegt werden, werden die Gruppierungskonstrukte bei 1 beginnend "
+"durchnummeriert."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "RegEx"
@@ -992,15 +999,23 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The RegEx containing the capture groups."
-msgstr ""
+msgstr "Kann Gruppierungskonstrukte enthalten."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The extracted text(s)."
 msgstr ""
+"Legen Sie eine Variable für den entnommen Text fest, um dies in anderen "
+"Macro-Actions weiter zu verwenden."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The text containing the data."
 msgstr ""
+"Enthält das Objekt, auf welches die RegEx angewendet wird, z.B. einen vorher "
+"erstellten Bericht. Tragen Sie den Platzhalter für die im Bereich "
+"\"Ergebnisbezeichnungen\" definierte Objekt-Variable (\"${VariableName}\") "
+"hier ein. Bei komplexeren Objekten können auch Subattribute adressiert "
+"werden (z.B.: \"${MyReport.Results:0.Content}\"). Ausführlichere "
+"Informationen finden Sie in der Admin-Doku."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid ""
@@ -1034,6 +1049,8 @@ msgid ""
 "The value (ObjectID) of the current loop iteration in case it is needed. It "
 "can be used like any result variable in a macro."
 msgstr ""
+"Legen Sie eine Variable für die aktuelle Loop-Wiederholung fest, falls "
+"benötigt. Diese kann analog zu anderen Ergebnis-Variablen verwendet werden."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "Values"
@@ -1383,7 +1400,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID of the new ticket."
-msgstr "Die ID des neuen Tickets."
+msgstr ""
+"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
+"Sie dieses weiterverwenden wollen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID or email of the contact of the new ticket."
@@ -1394,14 +1413,16 @@ msgid ""
 "The ID or login of the owner of the new ticket. Current user will be used if "
 "omitted."
 msgstr ""
+"Die ID oder der Nutzername des Agenten, der am neuen Ticket als Bearbeiter "
+"gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
 "The ID or login of the responsible of the new ticket. Root user (ID = 1) "
 "will be used if omitted."
 msgstr ""
-"Die ID oder Login des Agenten, der als Verantwortlicher an dem neuen Ticket "
-"gesetzt werden soll. Wenn leer, wird \"root\" (ID=1) gesetzt."
+"Die ID oder der Nutzername des Agenten, der als Verantwortlicher an dem "
+"neuen Ticket gesetzt werden soll. Wenn leer, wird \"root\" (ID=1) gesetzt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1427,7 +1448,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The name of the state of the new ticket."
-msgstr "Der Name des Status für das neue Ticket."
+msgstr ""
+"Der Name des Status für das neue Ticket (Achtung: Übersetzungen sind nicht "
+"möglich)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1435,6 +1458,10 @@ msgid ""
 "name has to be used (separated by two colons - e.g. \"NameOfParentTeam::"
 "NameOfTeamToBeSet\")."
 msgstr ""
+"Der Name des Teams, das gesetzt werden soll. Handelt es sich um ein "
+"untergeordnetes Team, muss der vollständige Pfad-Name angegeben werden ("
+"Namen getrennt durch doppelte Doppelpunkte, z.B. \"NameÜbergeordnetesTeam::"
+"NameZuSetzendesTeam\")."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -4631,7 +4658,7 @@ msgstr "Artikel erstellen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create Ticket"
-msgstr "Erstelle Ticket"
+msgstr "Ticket anlegen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
