@@ -108,6 +108,11 @@ sub Run {
     # return the object
     $Self->SetResult(Name => 'Object', Value => $Object);
 
+    # discard object, next use have to create new instance (for other content)
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Automation::Helper::Object']
+    );
+
     return 1;
 }
 
