@@ -83,19 +83,44 @@ perform ClassSearch Operation. This will return a class list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # get IDs of CI classes from General Catalog
-    my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-        Class   => 'ITSM::ConfigItem::Class',
-        Valid   => 0
-    );
+    my $ClassIDList;
+
+    # if UserType is Customer, than search all customer ConfigItems and retrieve classes from their
+    my $IsCustomer = $Self->{Authorization}->{UserType} eq 'Customer';
+    if ( $IsCustomer ) {
+        my $ConfigItemSearchResult = $Self->ExecOperation(
+            OperationType            => 'V1::CMDB::ConfigItemSearch',
+            SuppressPermissionErrors => 1
+        );
+
+        if ( defined $ConfigItemSearchResult->{Data}->{ConfigItem} ) {
+            my @ConfigItemClassIds = ();
+            foreach my $ConfigItem ( @{ $ConfigItemSearchResult->{Data}->{ConfigItem} } ) {
+                push(@ConfigItemClassIds, $ConfigItem->{ClassID}) unless grep{$_ == $ConfigItem->{ClassID}} @ConfigItemClassIds;
+            }
+
+            $ClassIDList = join(',', @ConfigItemClassIds);
+        }
+
+    } else {
+        # get IDs of CI classes from General Catalog
+        my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+            Class   => 'ITSM::ConfigItem::Class',
+            Valid   => 0
+        );
+
+        if ( IsHashRefWithData($ItemList) ) {
+            $ClassIDList = join(',', sort keys %{$ItemList});
+        }
+    }
 
 	# get already prepared CI Class data from ClassGet operation
-    if ( IsHashRefWithData($ItemList) ) {  	
+    if ( $ClassIDList ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::CMDB::ClassGet',
             SuppressPermissionErrors => 1,
             Data      => {
-                ClassID => join(',', sort keys %{$ItemList}),
+                ClassID => $ClassIDList
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

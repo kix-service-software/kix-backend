@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Digest::MD5;
+use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -236,9 +237,13 @@ sub MacroActionAdd {
     );
 
     if ( !$IsValid ) {
+        my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "MacroAction config is invalid!"
+            Message  => "MacroAction config is invalid ($LogMessage)!"
         );
         return;
     }
@@ -637,6 +642,12 @@ sub MacroActionExecute {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
 
+    $Self->{MacroResults} //= {};
+
+    # we need the result variables and macro results for the assignments
+    $BackendObject->{MacroResults} = $Self->{MacroResults};
+    $BackendObject->{ResultVariables} = $MacroAction{ResultVariables} || {};
+
     # add root object id
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
 
@@ -644,11 +655,9 @@ sub MacroActionExecute {
 
     # replace result variables
     if (IsHashRefWithData($Self->{MacroResults})) {
-        foreach my $Parameter ( sort keys %Parameters ) {
-            foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
-                $Parameters{$Parameter} =~ s/\$\{$Variable\}/$Self->{MacroResults}->{$Variable}/gmx;
-            }
-        }
+        $Self->_ReplaceResultVariables(
+            Data => \%Parameters,
+        );
     }
 
     my $Success = $BackendObject->Run(
@@ -666,15 +675,6 @@ sub MacroActionExecute {
             Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
             UserID   => $Param{UserID},
         );
-    } else {
-        my %Definition = $BackendObject->DefinitionGet();
-
-        # map results to variables
-        if (IsHashRefWithData($Definition{Results})) {
-            for my $ResultKey ( keys %{$Definition{Results}} ) {
-                $Self->{MacroResults}->{$MacroAction{ResultVariables}->{$ResultKey} || $ResultKey} = $BackendObject->GetResult(Name => $ResultKey);
-            }
-        }
     }
 
     # remove MacroActionID from log reference
@@ -739,6 +739,67 @@ sub _LoadMacroActionTypeBackend {
     }
 
     return $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}};
+}
+
+# recursively replace result variables
+sub _ReplaceResultVariables {
+    my ( $Self, %Param ) = @_;
+
+    return if !defined $Param{Data};
+
+    if ( IsHashRefWithData($Param{Data}) ) {
+        foreach my $Key ( sort keys %{$Param{Data}} ) {
+            $Param{Data}->{$Key} = $Self->_ReplaceResultVariables(
+                Data => $Param{Data}->{$Key}
+            );
+        }
+    }
+    elsif ( IsArrayRefWithData($Param{Data}) ) {
+        foreach my $Item ( @{$Param{Data}} ) {
+            $Item = $Self->_ReplaceResultVariables(
+                Data => $Item
+            );
+        }
+    }
+    else {
+        foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
+            if ( $Param{Data} =~ /^\s*\$\{\Q$Variable\E(\|(.*?))?\}\s*$/ ) {
+                # variable is an assignment, we can replace it with the actual value (i.e. Object)
+                my $Filter = $2;
+                $Param{Data} = $Self->{MacroResults}->{$Variable};
+                if ( $Filter && $Filter eq 'JSON' && IsStringWithData($Param{Data}) ) {
+                    $Param{Data} = $Kernel::OM->Get('JSON')->Encode(
+                        Data => $Param{Data}
+                    );
+                    $Param{Data} =~ s/^"//;
+                    $Param{Data} =~ s/"$//;
+                }
+                elsif ( $Filter && $Filter eq 'base64' ) {
+                    $Param{Data} = MIME::Base64::encode_base64($Param{Data});
+                    $Param{Data} =~ s/\n//g;
+                }
+            }
+            elsif ( $Param{Data} =~ /\$\{\Q$Variable\E(\|(.*?))?\}/ ) {
+                # variable is part of a string, we have to do a string replace
+                my $Filter = $2 || '';
+                my $Value = $Self->{MacroResults}->{$Variable};
+                if ( $Filter && $Filter eq 'JSON' ) {
+                    $Value = $Kernel::OM->Get('JSON')->Encode(
+                        Data => $Value
+                    );
+                    $Value =~ s/^"//;
+                    $Value =~ s/"$//;
+                }
+                elsif ( $Filter && $Filter eq 'base64' ) {
+                    $Value = MIME::Base64::encode_base64($Value);
+                    $Value =~ s/\n//g;
+                }
+                $Param{Data} =~ s/\$\{\Q$Variable\E(\|$Filter)?\}/$Value/gmx;
+            }
+        }
+    }
+
+    return $Param{Data};
 }
 
 1;

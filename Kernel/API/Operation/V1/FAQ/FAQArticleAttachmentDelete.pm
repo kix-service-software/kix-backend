@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -98,7 +98,7 @@ perform FAQArticleAttachmentDelete Operation.
     my $Result = $OperationObject->Run(
         Data => {
             FAQAttachmentID  => '...',
-        },      
+        },
     );
 
     $Result = {
@@ -109,17 +109,17 @@ perform FAQArticleAttachmentDelete Operation.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-             
+
     # start loop
     foreach my $FAQAttachmentID ( @{$Param{Data}->{FAQAttachmentID}} ) {
 
-        # delete FAQArticleAttachment        
+        # delete FAQArticleAttachment
         my $Success = $Kernel::OM->Get('FAQ')->AttachmentDelete(
             ItemID => $Param{Data}->{FAQArticleID},
             FileID => $FAQAttachmentID,
             UserID => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

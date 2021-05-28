@@ -56,7 +56,7 @@ create an article
         InReplyTo        => '<asdasdasd.12@example.com>',           # not required but useful
         References       => '<asdasdasd.1@example.com> <asdasdasd.12@example.com>', # not required but useful
         ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
-        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
+        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|...
         HistoryComment   => 'Some free text!',
         TimeUnit         => 123,                                    # optional
         UserID           => 123,
@@ -88,7 +88,6 @@ create an article
             Key     => '3b630c80',
         },
         NoAgentNotify    => 0,                                      # if you don't want to send agent notifications
-        AutoResponseType => 'auto reply'                            # auto reject|auto follow up|auto reply/new ticket|auto remove
 
         ForceNotificationToUserID   => [ 1, 43, 56 ],               # if you want to force somebody
         ExcludeNotificationToUserID => [ 43,56 ],                   # if you want full exclude somebody from notfications,
@@ -106,7 +105,7 @@ example with "Charset & MimeType" and no "ContentType"
         Channel          => 'note',                                 # Channel or
         ChannelID        => 1,                                      # ChannelID
         CustomerVisible  => 0|1,                                    # optional - will be set to 1 on special conditions (only if not given)
-        SenderType       => 'agent',                                # agent|system|customer
+        SenderType       => 'agent',                                # agent|system|external
         From             => 'Some Agent <email@example.com>',       # not required but useful
         To               => 'Some Customer A <customer-a@example.com>', # not required but useful
         Cc               => 'Some Customer A <customer-a@example.com>', # optional
@@ -116,7 +115,7 @@ example with "Charset & MimeType" and no "ContentType"
         IncomingTime     => 'YYYY-MM-DD HH24:MI:SS',                # optional
         Charset          => 'ISO-8859-15',
         MimeType         => 'text/plain',
-        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|WebRequestCustomer|...
+        HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|...
         HistoryComment   => 'Some free text!',
         UserID           => 123,
         UnlockOnAway     => 1,                                      # Unlock ticket if owner is away
@@ -616,23 +615,11 @@ sub ArticleCreate {
     }
 
     # check if latest article is sent to customer
-    elsif ( $Param{SenderType} eq 'agent'&& $Param{CustomerVisible} ) {
+    elsif ( $Param{SenderType} eq 'agent' && $Param{CustomerVisible} ) {
         $Self->TicketUnlockTimeoutUpdate(
             UnlockTimeout => $TimeObject->SystemTime(),
             TicketID      => $Param{TicketID},
             UserID        => $Param{UserID},
-        );
-    }
-
-    # send auto response
-    if ( $Param{AutoResponseType} ) {
-        $Self->SendAutoResponse(
-            OrigHeader       => $Param{OrigHeader},
-            TicketID         => $Param{TicketID},
-            UserID           => $Param{UserID},
-            AutoResponseType => $Param{AutoResponseType},
-            Channel          => $Param{Channel},
-            CustomerVisible  => $Param{CustomerVisible}
         );
     }
 
@@ -673,7 +660,7 @@ sub ArticleCreate {
         if (
             $FirstArticle &&
             $Param{HistoryType}
-            =~ /^(EmailAgent|EmailCustomer|PhoneCallCustomer|WebRequestCustomer|SystemRequest)$/i
+            =~ /^(EmailAgent|EmailCustomer|SystemRequest)$/i
             )
         {
             # trigger notification event
@@ -2212,276 +2199,6 @@ sub ArticleBounce {
     return 1;
 }
 
-=item SendAutoResponse()
-
-send an auto response to a customer via email
-
-    my $ArticleID = $TicketObject->SendAutoResponse(
-        TicketID         => 123,
-        AutoResponseType => 'auto reply',
-        OrigHeader       => {
-            From    => 'some@example.com',
-            Subject => 'For the message!',
-        },
-        UserID          => 123,
-        Channel         => 'email'  # optional
-    );
-
-Events:
-    ArticleAutoResponse
-
-=cut
-
-sub SendAutoResponse {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(TicketID UserID OrigHeader AutoResponseType)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # return if no notification is active
-    return 1 if $Self->{SendNoNotification};
-
-    # get orig email header
-    my %OrigHeader = %{ $Param{OrigHeader} };
-
-    # get ticket
-    my %Ticket = $Self->TicketGet(
-        TicketID      => $Param{TicketID},
-        DynamicFields => 0,                  # not needed here, TemplateGenerator will fetch the ticket on its own
-    );
-
-    # get auto default responses
-    my %AutoResponse = $Kernel::OM->Get('TemplateGenerator')->AutoResponse(
-        TicketID         => $Param{TicketID},
-        AutoResponseType => $Param{AutoResponseType},
-        OrigHeader       => $Param{OrigHeader},
-        UserID           => $Param{UserID},
-    );
-
-    # return if no valid auto response exists
-    return if !$AutoResponse{Text};
-    return if !$AutoResponse{SenderRealname};
-    return if !$AutoResponse{SenderAddress};
-
-    # send if notification should be sent (not for closed tickets)!?
-    my %State = $Kernel::OM->Get('State')->StateGet( ID => $Ticket{StateID} );
-    if (
-        $Param{AutoResponseType} eq 'auto reply'
-        && ( $State{TypeName} eq 'closed' || $State{TypeName} eq 'removed' )
-        )
-    {
-
-        # add history row
-        $Self->HistoryAdd(
-            TicketID    => $Param{TicketID},
-            HistoryType => 'Misc',
-            Name        => "Sent no auto response or agent notification because ticket is "
-                . "state-type '$State{TypeName}'!",
-            CreateUserID => $Param{UserID},
-        );
-
-        # return
-        return;
-    }
-
-    # log that no auto response was sent!
-    if ( $OrigHeader{'X-KIX-Loop'} ) {
-
-        # add history row
-        $Self->HistoryAdd(
-            TicketID    => $Param{TicketID},
-            HistoryType => 'Misc',
-            Name        => "Sent no auto-response because the sender doesn't want "
-                . "an auto-response (e. g. loop or precedence header)",
-            CreateUserID => $Param{UserID},
-        );
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'info',
-            Message  => "Sent no '$Param{AutoResponseType}' for Ticket ["
-                . "$Ticket{TicketNumber}] ($OrigHeader{From}) because the "
-                . "sender doesn't want an auto-response (e. g. loop or precedence header)"
-        );
-        return;
-    }
-
-    # check reply to for auto response recipient
-    if ( $OrigHeader{ReplyTo} ) {
-        $OrigHeader{From} = $OrigHeader{ReplyTo};
-    }
-
-    # get loop protection object
-    my $LoopProtectionObject = $Kernel::OM->Get('PostMaster::LoopProtection');
-
-    # create email parser object
-    my $EmailParser = Kernel::System::EmailParser->new(
-        Mode => 'Standalone',
-    );
-
-    my @AutoReplyAddresses;
-    my @Addresses = $EmailParser->SplitAddressLine( Line => $OrigHeader{From} );
-    ADDRESS:
-    for my $Address (@Addresses) {
-        my $Email = $EmailParser->GetEmailAddress( Email => $Address );
-        if ( !$Email ) {
-
-            # add it to ticket history
-            $Self->HistoryAdd(
-                TicketID     => $Param{TicketID},
-                CreateUserID => $Param{UserID},
-                HistoryType  => 'Misc',
-                Name         => "Sent no auto response to '$Address' - no valid email address.",
-            );
-
-            # log
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "Sent no auto response to '$Address' because of invalid address.",
-            );
-            next ADDRESS;
-
-        }
-        if ( !$LoopProtectionObject->Check( To => $Email ) ) {
-
-            # add history row
-            $Self->HistoryAdd(
-                TicketID     => $Param{TicketID},
-                HistoryType  => 'LoopProtection',
-                Name         => "\%\%$Email",
-                CreateUserID => $Param{UserID},
-            );
-
-            # log
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "Sent no '$Param{AutoResponseType}' for Ticket ["
-                    . "$Ticket{TicketNumber}] ($Email) because of loop protection."
-            );
-            next ADDRESS;
-        }
-        else {
-
-            # increase loop count
-            return if !$LoopProtectionObject->SendEmail( To => $Email );
-        }
-
-        # check if sender is e. g. MAILER-DAEMON or Postmaster
-        my $NoAutoRegExp = $Kernel::OM->Get('Config')->Get('SendNoAutoResponseRegExp');
-        if ( $Email =~ /$NoAutoRegExp/i ) {
-
-            # add it to ticket history
-            $Self->HistoryAdd(
-                TicketID     => $Param{TicketID},
-                CreateUserID => $Param{UserID},
-                HistoryType  => 'Misc',
-                Name         => "Sent no auto response to '$Email', SendNoAutoResponseRegExp matched.",
-            );
-
-            # log
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'info',
-                Message  => "Sent no auto response to '$Email' because config"
-                    . " option SendNoAutoResponseRegExp (/$NoAutoRegExp/i) matched.",
-            );
-            next ADDRESS;
-        }
-
-        push @AutoReplyAddresses, $Address;
-    }
-
-    my $AutoReplyAddresses = join( ', ', @AutoReplyAddresses );
-    my $Cc;
-
-    # also send CC to customer user if customer user id is used and addresses do not match
-    if ( $Ticket{ContactID} ) {
-
-        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-            ID => $Ticket{ContactID},
-        );
-
-        $Param{Channel} //= '';
-        if (
-            $Contact{Email}
-            && $OrigHeader{From} !~ /\Q$Contact{Email}\E/i
-            && $Param{Channel} ne 'email'
-            )
-        {
-            $Cc = $Contact{Email};
-        }
-    }
-
-    # get history type
-    my $HistoryType;
-    if ( $Param{AutoResponseType} =~ /^auto follow up$/i ) {
-        $HistoryType = 'SendAutoFollowUp';
-    }
-    elsif ( $Param{AutoResponseType} =~ /^auto reply$/i ) {
-        $HistoryType = 'SendAutoReply';
-    }
-    elsif ( $Param{AutoResponseType} =~ /^auto reply\/new ticket$/i ) {
-        $HistoryType = 'SendAutoReply';
-    }
-    elsif ( $Param{AutoResponseType} =~ /^auto reject$/i ) {
-        $HistoryType = 'SendAutoReject';
-    }
-    else {
-        $HistoryType = 'Misc';
-    }
-
-    if ( !@AutoReplyAddresses && !$Cc ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'info',
-            Message  => "No auto response addresses for Ticket [$Ticket{TicketNumber}]"
-                . " (TicketID=$Param{TicketID})."
-        );
-        return;
-    }
-
-    # send email
-    my $ArticleID = $Self->ArticleCreate(
-        Channel        => 'email',
-        SenderType     => 'system',
-        TicketID       => $Param{TicketID},
-        HistoryType    => $HistoryType,
-        HistoryComment => "\%\%$AutoReplyAddresses",
-        From           => "$AutoResponse{SenderRealname} <$AutoResponse{SenderAddress}>",
-        To             => $AutoReplyAddresses,
-        Cc             => $Cc,
-        Charset        => 'utf-8',
-        MimeType       => $AutoResponse{ContentType},
-        Subject        => $AutoResponse{Subject},
-        Body           => $AutoResponse{Text},
-        InReplyTo      => $OrigHeader{'Message-ID'},
-        Loop           => 1,
-        UserID         => $Param{UserID},
-    );
-
-    # log
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => "Sent auto response ($HistoryType) for Ticket [$Ticket{TicketNumber}]"
-            . " (TicketID=$Param{TicketID}, ArticleID=$ArticleID) to '$AutoReplyAddresses'."
-    );
-
-    # event
-    $Self->EventHandler(
-        Event => 'ArticleAutoResponse',
-        Data  => {
-            TicketID => $Param{TicketID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    return 1;
-}
-
 =item ArticleFlagSet()
 
 set article flags
@@ -3181,6 +2898,68 @@ sub ArticleExists {
     return $Exists;
 }
 
+=item GetAssignedArticlesForObject()
+
+return all assigned article IDs
+
+    my $TicketIDList = $TicketObject->GetAssignedArticlesForObject(
+        TicketID   => 123,
+        ObjectType => 'Contact',
+        Object     => $ContactHashRef,      # (optional)
+        UserID     => 1
+    );
+
+=cut
+
+sub GetAssignedArticlesForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedArticleIDs = ();
+
+    # based on ticket
+    if ($Param{TicketID}) {
+        my $AssignedTicketIDList = $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
+            %Param,
+            ObjectIDList => [$Param{TicketID}]
+        );
+
+        if (
+            IsArrayRefWithData($AssignedTicketIDList) &&
+            scalar(@{$AssignedTicketIDList}) == 1 &&
+            $AssignedTicketIDList->[0] == $Param{TicketID}
+        ) {
+            my %SearchData = $Self->_GetAssignedSearchParams(
+                %Param,
+                AssignedObjectType => 'TicketArticle'
+            );
+
+            # TODO: extend "search", currently only CustomerVisible is possible
+            # (and it is used as only customer visible (1) or all (0) articles - 'not visible' is not possible)
+            if (IsHashRefWithData(\%SearchData) && IsArrayRefWithData($SearchData{CustomerVisible})) {
+
+                my $CustomerVisible = 1;
+                for my $VisibleValue ( @{ $SearchData{CustomerVisible} } ) {
+                    if (!$VisibleValue) {
+                        $CustomerVisible = 0;
+                    }
+                }
+
+                @AssignedArticleIDs = $Self->ArticleIndex(
+                    TicketID        => $Param{TicketID},
+                    CustomerVisible => $CustomerVisible,
+                    UserID          => $Param{UserID},
+                );
+
+                if ( IsArrayRefWithData(\@AssignedArticleIDs) ) {
+                    @AssignedArticleIDs = map { 0 + $_ } @AssignedArticleIDs;
+                }
+            }
+        }
+    }
+
+    return \@AssignedArticleIDs;
+}
+
 sub _HandleCustomerVisible {
     my ( $Self, %Param ) = @_;
 
@@ -3246,6 +3025,120 @@ sub _HandleCustomerVisible {
     }
 
     return 0;
+}
+
+# TODO: move to a "common" module (used in other modules too)
+=item _GetAssignedSearchParams()
+
+prepares and transform config from AssignedObjectsMapping to a simple hash
+
+    my %SearchData = $Self->_GetAssignedSearchParams(
+        ObjectType         => 'Contact',
+        Object             => $ContactHash,         # (optional)
+        AssignedObjectType => 'Ticket'
+    );
+
+    e.g. if AssignedObjectType is 'Ticket'
+
+    %SearchData = (
+        ContactID      => 1,
+        OrganisationID => 2,
+        ...
+    );
+
+=cut
+
+sub _GetAssignedSearchParams {
+    my ( $Self, %Param ) = @_;
+
+    for ( qw(AssignedObjectType ObjectType) ) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedObjectsMapping') || '';
+
+    my %SearchData;
+    if ( IsStringWithData($MappingString) ) {
+
+        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
+            Data => $MappingString
+        );
+
+        if ( !IsHashRefWithData($Mapping) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
+            );
+        } elsif (
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
+        ) {
+            my %SearchAttributes = %{ $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } };
+
+            # prepare search data
+            for my $SearchAttribute ( keys %SearchAttributes ) {
+                next if (!$SearchAttribute);
+
+                next if ( !IsHashRefWithData( $SearchAttributes{$SearchAttribute} ) );
+                my $ObjectSearchAttributes = $SearchAttributes{$SearchAttribute}->{SearchAttributes};
+                my $SearchStatics          = $SearchAttributes{$SearchAttribute}->{SearchStatic};
+                next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
+
+                $SearchAttribute =~ s/^\s+//g;
+                $SearchAttribute =~ s/\s+$//g;
+
+                next if (!$SearchAttribute);
+
+                $SearchData{$SearchAttribute} = [];
+
+                # get attributes search data
+                if (IsHashRefWithData( $Param{Object} )) {
+                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                        my $Value;
+
+                        # check if value from sub-object (e.g. User of Contact)
+                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                        } else {
+                            $Value = $Param{Object}->{$ObjectSearchAttribute};
+                        }
+
+                        next if ( !defined $Value );
+
+                        push (
+                            @{ $SearchData{$SearchAttribute} },
+                            IsArrayRefWithData($Value) ? @{$Value} : $Value
+                        );
+                    }
+                }
+
+                # get static search data
+                for my $SearchStatic ( @{$SearchStatics} ) {
+                    next if ( !defined $SearchStatic );
+                    push ( @{ $SearchData{$SearchAttribute} }, $SearchStatic );
+                }
+
+                if (!scalar(@{ $SearchData{$SearchAttribute} })) {
+                    delete $SearchData{$SearchAttribute};
+                }
+            }
+        } else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
+            );
+        }
+    }
+
+    return %SearchData;
 }
 
 1;

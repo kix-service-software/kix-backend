@@ -70,7 +70,31 @@ sub _Replace {
 
     if (%Recipient) {
 
-        # HTML quoting of content
+        # get contact of user if possible
+        my %ContactOfUser;
+        if ($Recipient{UserID} && $Recipient{Type} eq 'Agent') {
+            %ContactOfUser = $Kernel::OM->Get('Contact')->ContactGet(
+                UserID => $Recipient{UserID},
+            );
+
+            # FIXME: change/remove it (ID handling) with placeholder refactoring
+            $Recipient{ID} = $Recipient{UserID};
+            if (IsHashRefWithData(\%ContactOfUser)) {
+                $ContactOfUser{ContactID} = $ContactOfUser{ID};
+                delete $ContactOfUser{ID};
+
+                # HTML quoting of content
+                if ( $Param{RichText} ) {
+                    for my $Attribute ( keys %ContactOfUser ) {
+                        next if !$ContactOfUser{$Attribute};
+                        $ContactOfUser{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
+                            String => $ContactOfUser{$Attribute},
+                        );
+                    }
+                }
+            }
+        }
+
         if ( $Param{RichText} ) {
             ATTRIBUTE:
             for my $Attribute ( sort keys %Recipient ) {
@@ -81,7 +105,7 @@ sub _Replace {
             }
         }
 
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, "$RecipientTag|$OldRecipientTag", %Recipient );
+        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, "$RecipientTag|$OldRecipientTag", %ContactOfUser, %Recipient );
     }
 
     # cleanup

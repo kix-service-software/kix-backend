@@ -60,7 +60,6 @@ sub Run {
     }
     my %GetParam         = %{ $Param{GetParam} };
     my $Comment          = $Param{Comment} || '';
-    my $AutoResponseType = $Param{AutoResponseType} || '';
 
     # get queue id and name
     my $QueueID = $Param{QueueID} || die "need QueueID!";
@@ -595,7 +594,6 @@ sub Run {
         HistoryType      => 'EmailCustomer',
         HistoryComment   => "\%\%$Comment",
         OrigHeader       => \%GetParam,
-        AutoResponseType => $AutoResponseType,
         Queue            => $Queue,
     );
 

@@ -16,7 +16,7 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -86,12 +86,12 @@ sub ParameterDefinition {
     return {
         'FAQArticleID' => {
             Required => 1
-        },      
+        },
         'FAQHistoryID' => {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -155,7 +155,7 @@ sub Run {
     if ( scalar(@FAQArticleHistoryData) == 1 ) {
         return $Self->_Success(
             FAQHistory => $FAQArticleHistoryData[0],
-        );    
+        );
     }
 
     # return result

@@ -34,6 +34,41 @@ Kernel::API::Operation::V1::CMDB::Common - Base class for all CMDB operations
 
 =cut
 
+=item PreRun()
+
+some code to run before actual execution
+
+    my $Success = $CommonObject->PreRun(
+        ...
+    );
+
+    returns:
+
+    $Success = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $Success = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub PreRun {
+    my ( $Self, %Param ) = @_;
+
+    # check if config items are accessible for current customer user
+    if ($Param{Data}->{ConfigItemID}) {
+        return $Self->_CheckCustomerAssignedObject(
+            ObjectType => 'ConfigItem',
+            IDList     => $Param{Data}->{ConfigItemID}
+        );
+    }
+
+    return $Self->_Success();
+}
+
 =begin Internal:
 
 =item _CheckConfigItem()
@@ -423,12 +458,15 @@ sub _CheckValue {
     if ( !$Self->{AttributeTypeModules}->{$Param{Input}->{Type}} ) {
         # create module instance
         my $Module = 'ITSMConfigItem::XML::Type::'.$Param{Input}->{Type};
-        my $Object = $Kernel::OM->Get($Module);
+        my $Object;
+        eval {
+            $Object = $Kernel::OM->Get($Module);
+        };
 
-        if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
+        if (!$Object || ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
             return $Self->_Error(
-                Code    => "Operation.InternalError",
-                Message => "Unable to create instance of attribute type module for parameter Version::Data::$Parent$ItemKey!",
+                Code    => "InternalError",
+                Message => "Invalid asset class definition! Unable to create instance of attribute type module for parameter Version::Data::$Parent$ItemKey!",
             );
         }
         $Self->{AttributeTypeModules}->{$Param{Input}->{Type}} = $Object;
@@ -917,6 +955,20 @@ sub _CheckDefinition {
             );
         }
 
+        if ( IsHashRefWithData($Attribute->{Input}) && $Attribute->{Input}->{Type} ) {
+            # create module instance
+            my $Module = 'ITSMConfigItem::XML::Type::'.$Attribute->{Input}->{Type};
+            my $Object;
+            eval {
+                $Object = $Kernel::OM->Get($Module);
+            };
+            if (!$Object || ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
+                return $Self->_Error(
+                    Code    => "BadRequest",
+                    Message => "Invalid definition! Type '$Attribute->{Input}->{Type}' of key '$Attribute->{Key}' is unknown!",
+                );
+            }
+        }
 
         # check if the key contains no spaces
         if ( $Attribute->{Key} && $Attribute->{Key} =~ m{ \s }xms ) {
@@ -955,60 +1007,6 @@ sub _CheckDefinition {
         }
     }
 
-    return $Self->_Success();
-}
-
-=item _CheckCustomerAssignedConfigItem()
-
-checks the configitem ids for current customer user if necessary
-
-    my $CustomerCheck = $OperationObject->_CheckCustomerAssignedConfigItem(
-        ConfigItemIDList  => [1,2,3] | 1            # array ref or number
-    );
-
-    returns:
-
-    $CustomerCheck = {
-        Success => 1,                     # if everything is OK
-    }
-
-    $CustomerCheck = {
-        Code    => 'Forbidden',           # if error
-        Message => 'Error description',
-    }
-
-=cut
-
-sub _CheckCustomerAssignedConfigItem {
-    my ( $Self, %Param ) = @_;
-
-    my $IDList = $Param{ConfigItemIDList};
-    if ( $IDList && !IsArrayRefWithData($IDList) ) {
-        $IDList = [ $IDList ];
-    }
-
-    if (
-        IsArrayRefWithData($IDList) &&
-        IsHashRefWithData($Self->{Authorization}) &&
-        $Self->{Authorization}->{UserType} eq 'Customer'
-    ) {
-        my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
-            ConfigItemIDList => $IDList
-        );
-        my %ConfigItemIDListHash = map { $_ => 1 } @ConfigItemIDList;
-
-        foreach my $ConfigItemID ( @{ $IDList } ) {
-
-            if ( !$ConfigItemIDListHash{$ConfigItemID} ) {
-                return $Self->_Error(
-                    Code => 'Forbidden',
-                    Message => "Could not access config item with id $ConfigItemID"
-                );
-            }
-        }
-    }
-
-    # if everything is OK then return Success
     return $Self->_Success();
 }
 

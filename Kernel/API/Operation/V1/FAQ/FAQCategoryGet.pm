@@ -16,7 +16,7 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -168,7 +168,7 @@ sub Run {
 
             $FAQCategory{Articles} = \@ArticleIDs;
         }
-        
+
         # add
         push(@FAQCategoryData, \%FAQCategory);
     }
@@ -176,7 +176,7 @@ sub Run {
     if ( scalar(@FAQCategoryData) == 1 ) {
         return $Self->_Success(
             FAQCategory => $FAQCategoryData[0],
-        );    
+        );
     }
 
     # return result
