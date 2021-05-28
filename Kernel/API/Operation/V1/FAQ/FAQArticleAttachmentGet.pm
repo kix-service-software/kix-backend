@@ -16,7 +16,7 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -166,7 +166,7 @@ sub Run {
                 $Attachment{Filesize} = $Attachment{FilesizeRaw} . ' Bytes';
             }
         }
-        
+
         # add
         push(@AttachmentData, \%Attachment);
     }
@@ -174,7 +174,7 @@ sub Run {
     if ( scalar(@AttachmentData) == 1 ) {
         return $Self->_Success(
             Attachment => $AttachmentData[0],
-        );    
+        );
     }
 
     # return result

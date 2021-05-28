@@ -17,7 +17,7 @@ By using the optional query parameter ```offset``` a collection resource can be 
 |```<Object>```||The object in the JSON response to apply an offset to. If omitted the offset will be applied to all object lists in the response (if the response contains such).|
 |```<Offset>```|yes|The numeric offset to apply.|
 
-If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma. 
+If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma.
 
 
 **Example**
@@ -27,7 +27,7 @@ If a response contains different objects in different lists, separate offsets ca
 ```
 
 
-### Limit results
+### Limit API results
 
 The optional query parameter ```limit``` allows to limit the number objects contained in the response of a collection.
 
@@ -36,7 +36,6 @@ The optional query parameter ```limit``` allows to limit the number objects cont
 .../<resource>?limit=[<Object>:]<Limit>
 ```
 
-
 **Explanation**
 
 |Parameter|Required?|Description|
@@ -44,11 +43,33 @@ The optional query parameter ```limit``` allows to limit the number objects cont
 |```<Object>```||The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).|
 |```<Limit>```|yes|The numeric limit to apply.|
 
-If a response contains different objects in different lists, separate limits can be applied by separating them the with comma. 
+If a response contains different objects in different lists, separate limits can be applied by separating them the with comma.
 
 
 **Example**
 
 ``` bash
 .../users?limit=100,User:10
+```
+
+### Limit Search results
+
+The optional query parameter ```searchlimit``` is provided to the core search and limits the search result at database layer.
+
+**Usage in URL**
+``` bash
+.../<resource>?searchlimit=[<Object>:]<Limit>
+```
+
+**Explanation**
+
+|Parameter|Required?|Description|
+|-|:-:|-|
+|```<Object>```||The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).|
+|```<SearchLimit>```|yes|The numeric limit to apply.|
+
+**Example**
+
+``` bash
+.../users?searchlimit=100,Ticket:10
 ```

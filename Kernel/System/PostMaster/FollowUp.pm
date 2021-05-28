@@ -45,7 +45,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(TicketID InmailUserID GetParam Tn AutoResponseType)) {
+    for (qw(TicketID InmailUserID GetParam Tn)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -67,7 +67,6 @@ sub Run {
 
     my $Comment          = $Param{Comment}          || '';
     my $Lock             = $Param{Lock}             || '';
-    my $AutoResponseType = $Param{AutoResponseType} || '';
 
     # Check if owner of ticket is still valid
     my %UserInfo = $Kernel::OM->Get('User')->GetUserData(
@@ -530,7 +529,6 @@ sub Run {
         UserID           => $Param{InmailUserID},
         HistoryType      => 'FollowUp',
         HistoryComment   => "\%\%$Param{Tn}\%\%$Comment",
-        AutoResponseType => $AutoResponseType,
         OrigHeader       => \%GetParam,
     );
     return if !$ArticleID;

@@ -15,7 +15,7 @@ use Kernel::API::Operation::V1::FAQ::FAQArticleGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -84,6 +84,20 @@ perform FAQArticleSearch Operation. This will return a FAQArticle ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # get customer relevant ids if necessary
+    my $CustomerFAQIDList;
+    if ($Self->{Authorization}->{UserType} eq 'Customer') {
+        $CustomerFAQIDList = $Self->_GetCustomerUserVisibleObjectIds(
+            ObjectType => 'FAQArticle',
+            UserID     => $Self->{Authorization}->{UserID}
+        );
+
+        # return empty result if there are no assigned faqs for customer
+        return $Self->_Success(
+            FAQArticle => [],
+        ) if (!IsArrayRefWithData($CustomerFAQIDList));
+    }
+
     my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
     my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
     my @ArticleIDs;
@@ -142,11 +156,14 @@ sub Run {
                 # perform faq search
                 my @SearchResult = $Kernel::OM->Get('FAQ')->FAQSearch(
                     UserID   => $Self->{Authorization}->{UserID},
-                    Limit    => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                    Limit    => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
                     ValidIDs => \@ValidIDs,
                     $SearchItem->{Field} => {
                         $Operator => $Value
-                    }
+                    },
+
+                    # use ids of customer if given
+                    ArticleIDs => $CustomerFAQIDList
                 );
 
                 # merge results
@@ -187,8 +204,11 @@ sub Run {
         # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
         @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
             UserID   => $Self->{Authorization}->{UserID},
-            Limit    => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
-            ValidIDs => \@ValidIDs
+            Limit   => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
+            ValidIDs => \@ValidIDs,
+
+            # use ids of customer if given
+            ArticleIDs => $CustomerFAQIDList
         );
     }
 

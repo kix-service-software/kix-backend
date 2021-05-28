@@ -168,7 +168,10 @@ sub ReportResultAdd {
 
     # get the content size and encode content
     my $ContentSize = bytes::length( $Param{Content} );
-    my $Content     = MIME::Base64::encode_base64($Param{Content});
+
+    my $Content = $Param{Content};
+    $Kernel::OM->Get('Encode')->EncodeOutput(\$Content);
+    $Content = MIME::Base64::encode_base64($Content);
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');

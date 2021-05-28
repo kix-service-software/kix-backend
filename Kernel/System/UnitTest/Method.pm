@@ -329,6 +329,112 @@ sub IsNotDeeply {
     }
 }
 
+=item ContainedIn()
+
+checks if a list contains a value.
+
+To this function you must send a value, an array-ref,
+and the name that the test will take, this is done as shown in the examples
+below.
+
+    $UnitTestObject->ContainedIn($A, $B, 'Test Name');
+
+Returns 1 if the list contains the value, or undef otherwise.
+
+    my $ContainedInResult = $UnitTestObject->ContainedIn(
+        $ValueFromFunction,      # test data
+        [ value1, value2, ...],  # list with values
+        'Test Name',
+    );
+
+=cut
+
+sub ContainedIn {
+    my ( $Self, $Test, $List, $Name ) = @_;
+
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output}->{ASCII});
+
+    if ( !$Name ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need Name! E. g. Is(\$A, \$B, \'Test Name\')!'
+        );
+        $Self->_Print( 0, 'ERROR: Need Name! E. g. Is(\$A, \$B, \'Test Name\')' );
+        return;
+    }
+
+    if ( !IsArrayRefWithData($List) ) {
+        $Self->_Print( 0, "$Name (list is not given or empty)" );
+        return;
+    } elsif ( !defined $Test ) {
+        $Self->_Print( 0, "$Name (value is 'undef')" );
+        return;
+    }
+
+    # get checkable but ignore undef
+    my %Values = map { defined $_ ? ($_ => 1) : () } @{$List};
+    if ( $Values{$Test} ) {
+        $Self->_Print( 1, "$Name (list contains value \"$Test\")" );
+        return 1;
+    } else {
+        $Self->_Print( 0, "$Name (list does not contain value \"$Test\" but should)" );
+        return;
+    }
+}
+
+=item NotContainedIn()
+
+checks if a list does not contain a value.
+
+To this function you must send a value, an array-ref,
+and the name that the test will take, this is done as shown in the examples
+below.
+
+    $UnitTestObject->NotContainedIn($A, $B, 'Test Name');
+
+Returns 1 if the list does not contain the value, or undef otherwise.
+
+    my $NotContainedInResult = $UnitTestObject->NotContainedIn(
+        $ValueFromFunction,      # test data
+        [ value1, value2, ...],  # list with values
+        'Test Name',
+    );
+
+=cut
+
+sub NotContainedIn {
+    my ( $Self, $Test, $List, $Name ) = @_;
+
+    $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output}->{ASCII});
+
+    if ( !$Name ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need Name! E. g. Is(\$A, \$B, \'Test Name\')!'
+        );
+        $Self->_Print( 0, 'ERROR: Need Name! E. g. Is(\$A, \$B, \'Test Name\')' );
+        return;
+    }
+
+    if ( !IsArrayRefWithData($List) ) {
+        $Self->_Print( 1, "$Name (list is not given or empty)" );
+        return 1;
+    } elsif ( !defined $Test ) {
+        $Self->_Print( 1, "$Name (value is 'undef')" );
+        return 1;
+    }
+
+    # get checkable but ignore undef
+    my %Values = map { defined $_ ? ($_ => 1) : () } @{$List};
+    if ( $Values{$Test} ) {
+        $Self->_Print( 0, "$Name (list contains value \"$Test\" but should not)" );
+        return;
+    } else {
+        $Self->_Print( 1, "$Name (list does not contain value \"$Test\")" );
+        return 1;
+    }
+}
+
 =begin Internal:
 
 =cut

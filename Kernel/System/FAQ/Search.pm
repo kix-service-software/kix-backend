@@ -53,6 +53,8 @@ search in FAQ articles
         CategoryIDs => [ 7, 8, 9 ],                                   # (optional)
         ValidIDs    => [ 1, 2, 3 ],                                   # (optional) (default 1)
 
+        ArticleIDs  => [ 1, 2, 3 ]                                    # (optional)
+
         # Approved
         #    Only available in internal interface (agent interface)
         Approved    => 1,                                             # (optional) 1 or 0,
@@ -218,7 +220,7 @@ sub FAQSearch {
 
     # quote id array elements
     ARGUMENT:
-    for my $Key (qw(Languages CategoryIDs ValidIDs CreatedUserIDs LastChangedUserIDs)) {
+    for my $Key (qw(CategoryIDs ValidIDs CreatedUserIDs LastChangedUserIDs ArticleIDs)) {
         next ARGUMENT if !$Param{$Key};
 
         if ( !IsArrayRefWithData( $Param{$Key} ) ) {
@@ -414,15 +416,29 @@ sub FAQSearch {
         $Ext .= " LOWER(i.f_subject) LIKE LOWER('" . $Param{Title} . "') $Self->{LikeEscapeString}";
     }
 
+    # search for ids of articles
+    if ( $Param{ArticleIDs} && ref $Param{ArticleIDs} eq 'ARRAY' && @{ $Param{ArticleIDs} } ) {
+
+        my $InString = $Self->_InConditionGet(
+            TableColumn => 'i.id',
+            ValueList   => $Param{ArticleIDs},
+        );
+
+        if ($InString && $Ext) {
+            $Ext .= ' AND';
+        }
+        $Ext .= $InString;
+    }
+
     # search for languages
     if ( $Param{Languages} && ref $Param{Languages} eq 'ARRAY' && @{ $Param{Languages} } ) {
 
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.language',
-            IDRef       => $Param{Languages},
+            ValueList   => $Param{Languages},
         );
 
-        if ($Ext) {
+        if ($InString && $Ext) {
             $Ext .= ' AND';
         }
         $Ext .= $InString;
@@ -433,10 +449,10 @@ sub FAQSearch {
 
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.category_id',
-            IDRef       => $Param{CategoryIDs},
+            ValueList   => $Param{CategoryIDs},
         );
 
-        if ($Ext) {
+        if ($InString && $Ext) {
             $Ext .= ' AND';
         }
         $Ext .= $InString;
@@ -456,10 +472,10 @@ sub FAQSearch {
 
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.valid_id',
-            IDRef       => $Param{ValidIDs},
+            ValueList   => $Param{ValidIDs},
         );
 
-        if ($Ext) {
+        if ($InString && $Ext) {
             $Ext .= ' AND';
         }
         $Ext .= $InString;
@@ -469,11 +485,11 @@ sub FAQSearch {
     if ( $Param{Visibility} && ref $Param{Visibility} eq 'ARRAY' && @{ $Param{Visibility} } ) {
 
         my $InString = $Self->_InConditionGet(
-            TableColumn => 'i.visbility',
-            IDRef       => $Param{Visibility},
+            TableColumn => 'i.visibility',
+            ValueList   => $Param{Visibility},
         );
 
-        if ($Ext) {
+        if ($InString && $Ext) {
             $Ext .= ' AND';
         }
         $Ext .= $InString;
@@ -533,10 +549,10 @@ sub FAQSearch {
 
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.created_by',
-            IDRef       => $Param{CreatedUserIDs},
+            ValueList   => $Param{CreatedUserIDs},
         );
 
-        if ($Ext) {
+        if ($InString && $Ext) {
             $Ext .= ' AND';
         }
         $Ext .= $InString;
@@ -552,10 +568,10 @@ sub FAQSearch {
 
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.changed_by',
-            IDRef       => $Param{LastChangedUserIDs},
+            ValueList   => $Param{LastChangedUserIDs},
         );
 
-        if ($Ext) {
+        if ($InString && $Ext) {
             $Ext .= ' AND';
         }
         $Ext .= $InString;
@@ -773,7 +789,7 @@ sub FAQSearch {
         $Ext = ' WHERE ' . $Ext;
     }
 
-    # Remember already joined tables for sorting.
+    # remember already joined tables for sorting.
     my %DynamicFieldJoinTables;
     my $DynamicFieldJoinCounter = 1;
 
@@ -1036,7 +1052,7 @@ condition string from an array.
 
     my $SQLPart = $TicketObject->_InConditionGet(
         TableColumn => 'table.column',
-        IDRef       => $ArrayRef,
+        ValueList   => $ArrayRef,
     );
 
 =cut
@@ -1052,33 +1068,44 @@ sub _InConditionGet {
         return;
     }
 
-    if ( !IsArrayRefWithData( $Param{IDRef} ) ) {
+    if ( !IsArrayRefWithData( $Param{ValueList} ) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Need IDRef!",
+            Message  => "Need ValueList!",
         );
         return;
     }
 
-    # sort ids to cache the SQL query
-    my @SortedIDs = sort { $a <=> $b } @{ $Param{IDRef} };
+    # sort to cache the SQL query
+    my @Sorted;
+    if ($Param{ValueList}->[0] =~ m/^\d+$/) {
+        @Sorted = sort { $a <=> $b } @{ $Param{ValueList} };
+    } else {
+        @Sorted = sort { $a cmp $b } @{ $Param{ValueList} };
+    }
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    # Error out if some values were not integers.
-    @SortedIDs = map { $Kernel::OM->Get('DB')->Quote( $_, 'Integer' ) } @SortedIDs;
-    return if scalar @SortedIDs != scalar @{ $Param{IDRef} };
+    if ($Sorted[0] =~ m/^\d+$/) {
+        @Sorted = map { $DBObject->Quote( $_, 'Integer' ) } @Sorted;
+    } else {
+        @Sorted = map { $DBObject->Quote( $_ ) } @Sorted;
+        if ($Sorted[0] !~ m/^'.+'$/) {
+            @Sorted = map { "'$_'" } @Sorted;
+        }
+    }
+    return if scalar @Sorted != scalar @{ $Param{ValueList} };
 
     # split IN statement with more than 900 elements in more statements combined with OR
     # because Oracle doesn't support more than 1000 elements in one IN statement.
     my @SQLStrings;
     LOOP:
-    while ( scalar @SortedIDs ) {
+    while ( scalar @Sorted ) {
 
-        my @SortedIDsPart = splice @SortedIDs, 0, 900;
+        my @SortedPart = splice @Sorted, 0, 900;
 
-        my $IDString = join ', ', @SortedIDsPart;
+        my $IDString = join ', ', @SortedPart;
 
         push @SQLStrings, " $Param{TableColumn} IN ($IDString) ";
     }

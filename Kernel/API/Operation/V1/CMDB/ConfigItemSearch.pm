@@ -82,6 +82,21 @@ perform ConfigItemSearch Operation. This will return a class list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+
+    # get customer relevant ids if necessary
+    my $CustomerCIIDList;
+    if ($Self->{Authorization}->{UserType} eq 'Customer') {
+        $CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
+            ObjectType => 'ConfigItem',
+            UserID     => $Self->{Authorization}->{UserID}
+        );
+
+        # return empty result if there are no assigned config items for customer
+        return $Self->_Success(
+            ConfigItem => [],
+        ) if (!IsArrayRefWithData($CustomerCIIDList));
+    }
+
     my @ConfigItemList;
 
     # prepare search if given
@@ -128,7 +143,7 @@ sub Run {
 
                     $Value =~ s/\*/%/g;
 
-                    my @What = IsArrayRefWithData($SearchParam{What}) ? @{$SearchParam{What}} : (); 
+                    my @What = IsArrayRefWithData($SearchParam{What}) ? @{$SearchParam{What}} : ();
                     if ( $OperatorMapping{$SearchItem->{Operator}} ) {
                         push(@What, { $SearchKey."{'Content'}" => { $OperatorMapping{$SearchItem->{Operator}}, $Value } });
                     }
@@ -136,7 +151,7 @@ sub Run {
                         push(@What, { $SearchKey."{'Content'}" => $Value });
                     }
                     $SearchParam{What} = \@What;
-                } 
+                }
                 else {
                     $SearchParam{$Field} = $Value;
                 }
@@ -146,6 +161,10 @@ sub Run {
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
                         UserID  => $Self->{Authorization}->{UserID},
+                        Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+
+                        # use ids of customer if given
+                        ConfigItemIDs => $CustomerCIIDList
                     );
 
                     # merge results
@@ -162,6 +181,10 @@ sub Run {
                 my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                     %SearchParam,
                     UserID  => $Self->{Authorization}->{UserID},
+                    Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+
+                    # use ids of customer if given
+                    ConfigItemIDs => $CustomerCIIDList
                 );
                 @SearchTypeResult = @{$SearchResult};
             }
@@ -185,24 +208,23 @@ sub Run {
         # perform ConfigItem search
         my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
             UserID  => $Self->{Authorization}->{UserID},
+            Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+
+            # use ids of customer if given
+            ConfigItemIDs => $CustomerCIIDList
         );
         @ConfigItemList = @{$SearchResult};
     }
 
-    # filter for customer assigned config items if necessary
-    my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
-        ConfigItemIDList => \@ConfigItemList
-    );
-
     # get already prepared CI data from ConfigItemGet operation
-    if ( IsArrayRefWithData(\@ConfigItemIDList) ) {
+    if ( IsArrayRefWithData(\@ConfigItemList) ) {
 
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data      => {
-                ConfigItemID => join(',', sort @ConfigItemIDList),
+                ConfigItemID => join(',', sort @ConfigItemList),
             }
-        );   
+        );
 
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;

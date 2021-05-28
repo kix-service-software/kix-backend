@@ -13,6 +13,8 @@ package Kernel::System::ITSMConfigItem::Definition;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -443,6 +445,23 @@ sub DefinitionCheck {
                 Message  => 'Invalid Definition! At least one definition attribute is not a hash reference.',
             );
             return;
+        }
+
+        if ( IsHashRefWithData($Attribute->{Input}) && $Attribute->{Input}->{Type} ) {
+
+            # create module instance
+            my $Module = 'ITSMConfigItem::XML::Type::'.$Attribute->{Input}->{Type};
+            my $Object;
+            eval {
+                $Object = $Kernel::OM->Get($Module);
+            };
+            if (!$Object || ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message => "Invalid definition! Type '$Attribute->{Input}->{Type}' of key '$Attribute->{Key}' is unknown!",
+                );
+                return;
+            }
         }
 
         # check if the key contains no spaces

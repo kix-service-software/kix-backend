@@ -118,8 +118,8 @@ sub Run {
 
     # merge common types
     $MacroActionTypes = {
-        %{$MacroActionTypesCommon},
-        %{$MacroActionTypes}
+        %{$MacroActionTypesCommon || {}},
+        %{$MacroActionTypes || {}}
     };
 
 	# get already prepared MacroActionType data from MacroActionTypeGet operation
@@ -146,7 +146,7 @@ sub Run {
             )
         }
     }
-   
+
     # return result
     return $Self->_Success(
         MacroActionType => [],

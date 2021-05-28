@@ -372,8 +372,9 @@ sub _GetContactData {
         );
 
         # filter for customer assigned config items if necessary
-        my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleConfigItems(
-            ConfigItemIDList => $ItemIDs
+        my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleObjectIds(
+            ObjectType   => 'ConfigItem',
+            ObjectIDList => $ItemIDs
         );
 
         $ContactData{AssignedConfigItems} = \@ConfigItemIDList;

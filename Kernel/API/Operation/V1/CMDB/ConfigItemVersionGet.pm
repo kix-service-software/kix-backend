@@ -120,16 +120,6 @@ perform ConfigItemVersionGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # if necessary check if config item is accessible for current customer user
-    my $CustomerCheck = $Self->_CheckCustomerAssignedConfigItem(
-        ConfigItemIDList => $Param{Data}->{ConfigItemID}
-    );
-    if ( !$CustomerCheck->{Success} ) {
-        return $Self->_Error(
-            %{$CustomerCheck},
-        );
-    }
-
     # check if ConfigItem exists
     my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $Param{Data}->{ConfigItemID},

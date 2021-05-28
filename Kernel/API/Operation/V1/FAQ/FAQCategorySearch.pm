@@ -15,7 +15,7 @@ use Kernel::API::Operation::V1::FAQ::FAQCategoryGet;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::FAQ::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -92,7 +92,7 @@ sub Run {
     # get already prepared FAQ data from FAQCategoryGet operation
     if ( IsHashRefWithData($FAQCategoryList) ) {
         my $FAQCategories;
-        
+
         foreach my $ParentID ( keys %{$FAQCategoryList} ){
             foreach my $Key ( keys %{$FAQCategoryList->{$ParentID}}){
                 $FAQCategories->{$Key} = $FAQCategoryList->{$ParentID}->{$Key};

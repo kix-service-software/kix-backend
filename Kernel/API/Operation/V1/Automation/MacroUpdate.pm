@@ -178,8 +178,6 @@ sub Run {
                 UserID      => $Self->{Authorization}->{UserID}
             );
 
-            print STDERR Data::Dumper::Dumper($Result);
-
             if ( !$Result ) {
                 return $Self->_Error(
                     Code => 'Error executing macro for ObjectID $_',

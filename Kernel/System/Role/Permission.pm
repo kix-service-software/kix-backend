@@ -844,7 +844,7 @@ sub ValidatePermission {
         }
     } elsif ( $PermissionTypeList{$Param{TypeID}} eq 'Property' ) {
         # check if the target contains a filter expression and the pattern matches the required format
-        if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\]\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
+        if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\](\s*IF\s+(.*?)\s*)?\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
             return;
         }
     }

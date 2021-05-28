@@ -34,6 +34,51 @@ Kernel::API::Operation::V1::Ticket::Common - Base class for all Ticket Operation
 
 =cut
 
+=item PreRun()
+
+some code to run before actual execution
+
+    my $Success = $CommonObject->PreRun(
+        ...
+    );
+
+    returns:
+
+    $Success = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $Success = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub PreRun {
+    my ( $Self, %Param ) = @_;
+
+    if ($Param{Data}->{TicketID}) {
+
+        # check if articles are accessible for current customer user
+        if ($Param{Data}->{ArticleID}) {
+            return $Self->_CheckCustomerAssignedObject(
+                ObjectType => 'TicketArticle',
+                IDList     => $Param{Data}->{ArticleID},
+                TicketID   => $Param{Data}->{TicketID}
+            );
+        }
+
+        # check if tickets are accessible for current customer user
+        return $Self->_CheckCustomerAssignedObject(
+            ObjectType => 'Ticket',
+            IDList     => $Param{Data}->{TicketID}
+        );
+    }
+
+    return $Self->_Success();
+}
+
 =item ValidatePendingTime()
 
 checks if the given pending time is valid.
@@ -385,10 +430,6 @@ sub _CheckAttachment {
 1;
 
 =end Internal:
-
-
-
-
 
 =back
 

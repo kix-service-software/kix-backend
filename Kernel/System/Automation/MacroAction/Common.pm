@@ -13,6 +13,8 @@ use warnings;
 
 use utf8;
 
+use Hash::Flatten;
+
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -169,34 +171,6 @@ sub AddResult {
     return 1;
 }
 
-=item GetResult()
-
-Get the value of a result variable.
-
-Example:
-    my $Value = $Self->GetResult(
-        Name => 'TicketID',
-    );
-
-=cut
-
-sub GetResult {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Name!',
-        );
-        return;
-    }
-
-    $Self->{Results} //= {};
-
-    return $Self->{Results}->{$Param{Name}};
-}
-
 =item SetResult()
 
 Assign a value for a result variable.
@@ -220,8 +194,51 @@ sub SetResult {
         );
         return;
     }
+    
+    $Self->{Results} //= {};
 
-    $Self->{Results}->{$Param{Name}} = $Param{Value};
+    my $VariableName = $Self->{ResultVariables}->{$Param{Name}} || $Param{Name};
+
+    $Self->{Results}->{$VariableName} = $Param{Value};
+
+    # include all data of an object as separate values
+    if ( IsHashRefWithData($Param{Value}) || IsObject($Param{Value}, $Kernel::OM->GetModuleFor('Automation::Helper::Object')) ) {
+        my $FlatData = Hash::Flatten::flatten(
+            $Param{Value}
+        );
+        if ( IsHashRefWithData($FlatData) ) {
+            # combine with existing results
+            my %TmpHash = map { $VariableName.'.'.$_ => $FlatData->{$_} } keys %{$FlatData};
+            $Self->{Results} = {
+                %{$Self->{Results}},
+                %TmpHash,
+            };
+        }
+
+        foreach my $Key ( keys %{$Param{Value}} ) {
+            $Self->SetResult(
+                Name  => $VariableName.'.'.$Key,
+                Value => $Param{Value}->{$Key},
+            )
+        }
+    }
+    elsif ( IsArrayRefWithData($Param{Value}) ) {
+        my $Index = 0;
+        foreach my $Item ( @{$Param{Value}} ) {
+            $Self->SetResult(
+                Name  => $VariableName.':'.$Index++,
+                Value => $Item,
+            )
+        }
+    }
+
+    # merge results
+    if (IsHashRefWithData($Self->{Results})) {
+        %{$Self->{MacroResults}} = (
+            %{$Self->{MacroResults}},
+            %{$Self->{Results}}
+        );
+    }
 
     return 1;
 }
