@@ -65,15 +65,15 @@ sub _RemoveDuplicatePermissions {
                         AND rp2.id <> rp.id'
         );
     }
-    elsif ( $DBObject->{'DB::Type'} eq 'mysql' ) {
+    else {
         $Result = $DBObject->Do(
             SQL => 'DELETE FROM role_permission rp 
                     WHERE EXISTS (
-                        SELECT id FROM tmp_role_permission rp2 
+                        SELECT id FROM role_permission rp2 
                         WHERE rp2.role_id = rp.role_id 
                             AND rp2.target = rp.target 
                             AND rp2.type_id = rp.type_id 
-                            AND rp2.id <> rp.id
+                            AND rp2.id > rp.id
                     )'
         );
     }
