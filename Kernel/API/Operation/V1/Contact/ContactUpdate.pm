@@ -183,6 +183,21 @@ sub Run {
         }
     }
 
+    # check if primary OrganisationID exists
+    if ($Contact->{PrimaryOrganisationID}) {
+        my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
+            ID => $Contact->{PrimaryOrganisationID},
+        );
+
+        if (!%OrgData || $OrgData{ValidID} != 1) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Validation failed. No valid organisation found for primary organisation ID "' . $Contact->{PrimaryOrganisationID} . '".',
+            );
+        }
+
+    }
+
     # check each assigned customer
     if ( IsArrayRefWithData($Contact->{OrganisationIDs}) ) {
         foreach my $OrgID ( @{ $Contact->{OrganisationIDs} } ) {
@@ -198,31 +213,10 @@ sub Run {
         }
     }
 
-    my @OrgIDs = @{ IsArrayRefWithData( $Contact->{OrganisationIDs} ) ? $Contact->{OrganisationIDs} : $ContactData{OrganisationIDs} };
-
-    # check if primary OrganisationID exists
-    if ( $Contact->{PrimaryOrganisationID} ) {
-        my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
-            ID => $Contact->{PrimaryOrganisationID},
-        );
-
-        if ( !%OrgData || $OrgData{ValidID} != 1 ) {
-            return $Self->_Error(
-                Code    => 'BadRequest',
-                Message => 'Validation failed. No valid organisation found for primary organisation ID "' . $Contact->{PrimaryOrganisationID} . '".',
-            );
-        }
-
-        if ( !grep /$Contact->{PrimaryOrganisationID}/, @OrgIDs ) {
-            push(@OrgIDs, $Contact->{PrimaryOrganisationID});
-        }
-    }
-
     # update Contact
     my $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
         %ContactData,
         %{$Contact},
-        OrganisationIDs => \@OrgIDs,
         ID              => $Param{Data}->{ContactID},
         UserID          => $Self->{Authorization}->{UserID},
     );

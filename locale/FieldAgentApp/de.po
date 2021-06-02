@@ -481,6 +481,12 @@ msgstr "Morgen"
 msgid "Later"
 msgstr "Später"
 
+msgid "This Week"
+msgstr "Diese Woche"
+
+msgid "Next week"
+msgstr "Nächste Woche"
+
 msgid "Next Week"
 msgstr "Nächste Woche"
 
