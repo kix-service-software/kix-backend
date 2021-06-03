@@ -1964,12 +1964,12 @@
     <Column Name="valid_id" Required="true" Default="1" Type="SMALLINT" />
     <Column Name="content_type" Required="true" Default="text/html" Size="250" Type="VARCHAR" />
     <Column Name="f_keywords" Required="false" Size="400" Type="VARCHAR" />
-    <Column Name="f_field1" Required="false" Size="20000" Type="VARCHAR" />
-    <Column Name="f_field2" Required="false" Size="20000" Type="VARCHAR" />
-    <Column Name="f_field3" Required="false" Size="20000" Type="VARCHAR" />
-    <Column Name="f_field4" Required="false" Size="20000" Type="VARCHAR" />
-    <Column Name="f_field5" Required="false" Size="20000" Type="VARCHAR" />
-    <Column Name="f_field6" Required="false" Size="20000" Type="VARCHAR" />
+    <Column Name="f_field1" Required="false" Size="1800000" Type="VARCHAR" />
+    <Column Name="f_field2" Required="false" Size="1800000" Type="VARCHAR" />
+    <Column Name="f_field3" Required="false" Size="1800000" Type="VARCHAR" />
+    <Column Name="f_field4" Required="false" Size="1800000" Type="VARCHAR" />
+    <Column Name="f_field5" Required="false" Size="1800000" Type="VARCHAR" />
+    <Column Name="f_field6" Required="false" Size="1800000" Type="VARCHAR" />
     <Column Name="created" Required="true" Type="DATE" />
     <Column Name="created_by" Required="true" Type="INTEGER" />
     <Column Name="changed" Required="true" Type="DATE" />

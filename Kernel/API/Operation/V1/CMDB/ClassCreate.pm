@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::CMDB::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -85,7 +85,7 @@ sub ParameterDefinition {
         },
         'ConfigItemClass::Name' => {
             Required => 1
-        },                             
+        },
     }
 }
 
@@ -95,7 +95,7 @@ perform ClassCreate Operation. This will return the created ClassID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ConfigItemClass  => {                
+            ConfigItemClass  => {
                 Name    => 'class name',
                 ValidID => 1,
                 Comment => 'Comment',              # (optional)
@@ -105,7 +105,7 @@ perform ClassCreate Operation. This will return the created ClassID.
 
     $Result = {
         Success => 1,                       # 0 or 1
-        Code    => '',                      # 
+        Code    => '',                      #
         Message => '',                      # in case of error
         Data    => {                        # result data payload after Operation
             ConfigItemClassID  => '',       # ID of the created ConfigItemClassID
@@ -127,23 +127,23 @@ sub Run {
     );
 
     foreach my $Item ( keys %$ItemList ) {
-    	if ( $ItemList->{$Item} eq $ConfigItemClass->{Name} ) {
-	        return $Self->_Error(
+        if ( $ItemList->{$Item} eq $ConfigItemClass->{Name} ) {
+            return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => "Cannot create class. A class with the same name '$ConfigItemClass->{Name}' already exists.",
-	        );    		
-    	}
+            );
+        }
     }
 
     # validate definition if given
     if ( $ConfigItemClass->{DefinitionString} ) {
-        my $Check = $Kernel::OM->Get('ITSMConfigItem')->DefinitionCheck(
+        my $Check = $Self->_CheckDefinition(
             Definition => $ConfigItemClass->{DefinitionString},
         );
 
-        if ( !$Check ) {
+        if ( !$Check->{Success} ) {
             my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
-                Type => 'error', 
+                Type => 'error',
                 What => 'Message',
             );
             return $Self->_Error(
@@ -159,7 +159,7 @@ sub Run {
         Name     => $ConfigItemClass->{Name},
         Comment  => $ConfigItemClass->{Comment} || '',
         ValidID  => $ConfigItemClass->{ValidID} || 1,
-        UserID   => $Self->{Authorization}->{UserID},              
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$GeneralCatalogItemID ) {
@@ -168,7 +168,7 @@ sub Run {
             Message => 'Could not create class, please contact the system administrator',
         );
     }
-    
+
     if ( $ConfigItemClass->{DefinitionString} ) {
         my $Result = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ClassDefinitionCreate',
@@ -179,7 +179,7 @@ sub Run {
                 }
             }
         );
-        
+
         if ( !$Result->{Success} ) {
             return $Self->_Error(
                 %{$Result},
@@ -187,11 +187,11 @@ sub Run {
         }
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         Code              => 'Object.Created',
         ConfigItemClassID => $GeneralCatalogItemID,
-    );    
+    );
 }
 
 

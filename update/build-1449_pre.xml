@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="faq_item">
+        <ColumnChange NameOld="f_field1" NameNew="f_field1" Required="false" Size="1800000" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_field2" NameNew="f_field2" Required="false" Size="1800000" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_field3" NameNew="f_field3" Required="false" Size="1800000" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_field4" NameNew="f_field4" Required="false" Size="1800000" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_field5" NameNew="f_field5" Required="false" Size="1800000" Type="VARCHAR"/>
+        <ColumnChange NameOld="f_field6" NameNew="f_field6" Required="false" Size="1800000" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>

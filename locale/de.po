@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-4-6 07:49+0000\n"
-"PO-Revision-Date: 2021-04-07 13:46+0000\n"
-"Last-Translator: bpohlers <Beate.Pohlers@cape-it.de>\n"
+"POT-Creation-Date: 2021-5-17 08:11+0000\n"
+"PO-Revision-Date: 2021-05-27 07:47+0000\n"
+"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -293,18 +293,6 @@ msgid "Laptop"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid ""
-"Lists tickets closed in a specific date range. Organization may be selected "
-"before report creation."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid ""
-"Lists tickets created in a specific date range. Organization may be selected "
-"before report creation."
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
@@ -587,14 +575,6 @@ msgid "Ticket is pending for automatic close."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Tickets Closed In Date Range"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "Tickets Created In Date Range"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Time Restricted"
 msgstr ""
 
@@ -657,10 +637,6 @@ msgid ""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "allows to create and edit report definitions"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to create new tickets by using the \"Customer Portal Light\" webform "
 "mechanism"
@@ -691,10 +667,6 @@ msgstr ""
 msgid ""
 "allows to read information of any organization or contact and allows to READ "
 "links"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid "allows to view report definitions and reports"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -886,6 +858,164 @@ msgstr ""
 msgid "Weekday"
 msgstr ""
 
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
+msgid "Assembles a new object to be used later in the execution."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
+msgid "Definition"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
+msgid ""
+"The assembled object containing two the attributes \"Type\" and \"Definition"
+"\", which is a string representation of the object."
+msgstr ""
+"Die hier festgelegte Bezeichnung ist eine Textrepresentation des Objektes, d."
+"h. es ist möglich, auf Subattribute des Objektes zuzugreifen. Dazu muss die "
+"Bezeichnung die Form \"ObjectName.Definition.Attribute.SubAttibute\" haben."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
+msgid ""
+"The definition (structure/content) of the object, i.e. the YAML string or "
+"the JSON. You can use variables and placeholders. IMPORTANT: due to the "
+"possible use of placeholders and variables, the definition can only be "
+"validated when this action gets executed. In case of an error you will find "
+"detailed information in the job log and the kix log."
+msgstr ""
+"Die Definition (Struktur/Inhalt) des Objektes, also der YAML String oder "
+"JSON. Variablen & Platzhalter können genutzt werden. WICHTIG: Aufgrund der "
+"Möglichkeit, Platzhalter zu nutzen, kann die Definition nur validiert "
+"werden, wenn der Job ausgeführt wird. Im Fehlerfall sind detailierte "
+"Informationen im Job Log & im KIX Log zu finden."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
+msgid "The type of the object. Either JSON or YAML."
+msgstr ""
+"Der Typ des Objektes kann JSON oder YAML sein. Legt die Syntax für die "
+"Definition fest."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "Execute the depending macro if the logical expression is true."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "If"
+msgstr "Wenn"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "The ID of the macro to execute if the logical expression is true."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "The logical expression to evaluate."
+msgstr ""
+"Fügen Sie einen logischen Ausdruck ein. Wenn dieser zutrifft, werden die "
+"folgenden Macro-Actions ausgeführt. Im Admin-Handbuch finden Sie "
+"detailiertere Informationen."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "Create a report from a report definition."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "Output Formats"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "Parameters"
+msgstr "Parameter"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "Report Definition"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "The ID of the report definition."
+msgstr ""
+"Wählen Sie eine Berichtsdefinition aus der Liste. Anschließend können Sie "
+"Paramter & Ausgabeformate auswählen. Neue Berichtsdefinitionen können Sie im "
+"Modul \"Berichte\" anlegen."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "The parameters of the report as a HashRef."
+msgstr ""
+"Wählen Sie zuerst eine Berichtsdefinition, anschließend können Sie die "
+"Parameter definieren."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "The report object including the result."
+msgstr ""
+"Legen Sie eine Variable für den zu erstellenden Bericht fest, um dies in "
+"anderen Macro-Actions weiter zu verwenden."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
+msgid "The requested output formats."
+msgstr ""
+"Wählen Sie zuerst eine Berichtsdefinition, anschließend können Sie die "
+"benötigten Ausgabeformate festlegen."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
+msgid "Executes a given macro."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
+msgid "ObjectID"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
+msgid "The ID of the macro to execute."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
+msgid "The ID of the object to run the macro for."
+msgstr "Die ID des Objektes, für das das Macro ausgeführt werden soll."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid "Capture Group Names"
+msgstr "Capture Group Namen"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid "Extract parts of a text via Regular Expressions (RegEx)."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid ""
+"If you don't use a RegEx with named capture groups, you can give a comma "
+"separated list of names for the capture groups. The order corresponds to the "
+"capture group id. If not given, the IDs of the capture groups will be used, "
+"starting from 1."
+msgstr ""
+"Wenn die Capture Group Namen in Ihrer RegEx nicht benannt sind, können Sie "
+"hier eine Komma-separierte Liste angeben. Dabei entspricht der 1. Name der "
+"1. Klammer (Kapselung von Klammern beachten). Wenn hier keine Namen "
+"festgelegt werden, werden die Capture Group Namen bei 1 beginnend "
+"durchnummeriert."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid "RegEx"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid "The RegEx containing the capture groups."
+msgstr "Kann Capture Group Namen enthalten."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid "The extracted text(s)."
+msgstr ""
+"Legen Sie eine Variable für den entnommen Text fest, um dies in anderen "
+"Macro-Actions weiter zu verwenden."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid "The text containing the data."
+msgstr ""
+"Enthält das Objekt, auf welches die RegEx angewendet wird, z.B. einen vorher "
+"erstellten Bericht. Tragen Sie den Platzhalter für die im Bereich "
+"\"Ergebnisbezeichnungen\" definierte Objekt-Variable (\"${VariableName}\") "
+"hier ein. Bei komplexeren Objekten können auch Subattribute adressiert "
+"werden (z.B.: \"${MyReport.Results:0.Content}\"). Ausführlichere "
+"Informationen finden Sie in der Admin-Doku."
+
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid ""
 "A list of values to go through. Either a comma separated list or an array "
@@ -902,12 +1032,24 @@ msgid ""
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
+msgid "Loop Variable"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "MacroID"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "The ID of the macro to execute for each value."
 msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
+msgid ""
+"The value (ObjectID) of the current loop iteration in case it is needed. It "
+"can be used like any result variable in a macro."
+msgstr ""
+"Legen Sie eine Variable für die aktuelle Loop-Wiederholung fest, falls "
+"benötigt. Diese kann analog zu anderen Ergebnis-Variablen verwendet werden."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "Values"
@@ -956,10 +1098,40 @@ msgstr "Zeit buchen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
+"An attachment object containing the attributes \"Filename\", \"ContentType\" "
+"and \"Content\" generated by the macro action \"AssembleObject\". Binary "
+"content needs to be base64 coded."
+msgstr ""
+"Ein Objekt vom Typ \"Anhang\", enthält die Attribute \"Dateiname\", "
+"\"Inhaltstyp\" und \"Inhalt\", erstellt von der Macro Action \"Objekt "
+"zusammenstellen\". Inhalte in Binärform müssen base64-kodiert sein."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid ""
 "An integer value which will be accounted for the new article (as minutes)."
 msgstr ""
 "Ein ganzzahliger Wert, welcher für den neuen Artikel gebucht wird (in "
 "Minuten)."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "Attachment Object 1"
+msgstr "Anhangsobjekt 1"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "Attachment Object 2"
+msgstr "Anhangsobjekt 2"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "Attachment Object 3"
+msgstr "Anhangsobjekt 3"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "Attachment Object 4"
+msgstr "Anhangsobjekt 4"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "Attachment Object 5"
+msgstr "Anhangsobjekt 5"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Bcc"
@@ -988,6 +1160,7 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "If the new article is visible for customers"
 msgstr ""
+"Wenn der Hacken gesetzt ist, ist der Artikel im Self Service Portal sichtbar."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Sender Type"
@@ -1003,7 +1176,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The ID of the new article."
-msgstr "Die ID des neuen Artikels."
+msgstr ""
+"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
+"Sie dieses weiterverwenden wollen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The subject of the new article."
@@ -1011,7 +1186,7 @@ msgstr "Der Betreff des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The text of the new article."
-msgstr ""
+msgstr "Der Inhalt des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "To"
@@ -1070,11 +1245,11 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Asset Reference Dynamic Field"
-msgstr ""
+msgstr "Assetbezug aus dynamischen Feld"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Attribute - DynamicField Mapping"
-msgstr ""
+msgstr "Attribut - Dynamisches Feld Mapping"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid ""
@@ -1100,7 +1275,7 @@ msgstr ""
 msgid "The mapping which asset attribute will set which ticket dynamic field."
 msgstr ""
 "Mapping, welches Asset Attribut in welches dynamische Feld gespeichert wird. "
-"Erwartetes Format: \"<WriteToDFKey> - <AssetAttributeKey>\""
+"Erwartetes Format: \"<WriteToDFKey> - <AssetAttributeKey>\"."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "The name of the dynamic field which contains the relevant asset ID."
@@ -1200,7 +1375,7 @@ msgstr "Organisation"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Owner"
-msgstr ""
+msgstr "Bearbeiter"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Pending Time Difference"
@@ -1208,7 +1383,7 @@ msgstr "\"Warten\" - Zeitdifferenz"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Priority"
-msgstr ""
+msgstr "Priorität"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Responsible"
@@ -1216,7 +1391,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "State"
-msgstr ""
+msgstr "Status"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Team"
@@ -1224,7 +1399,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID of the new ticket."
-msgstr "Die ID des neuen Tickets."
+msgstr ""
+"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
+"Sie dieses weiterverwenden wollen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID or email of the contact of the new ticket."
@@ -1235,14 +1412,16 @@ msgid ""
 "The ID or login of the owner of the new ticket. Current user will be used if "
 "omitted."
 msgstr ""
+"Die ID oder der Nutzername des Agenten, der am neuen Ticket als Bearbeiter "
+"gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
 "The ID or login of the responsible of the new ticket. Root user (ID = 1) "
 "will be used if omitted."
 msgstr ""
-"Die ID oder Login des Agenten, der als Verantwortlicher an dem neuen Ticket "
-"gesetzt werden soll. Wenn leer, wird \"root\" (ID=1) gesetzt."
+"Die ID oder der Nutzername des Agenten, der als Verantwortlicher an dem "
+"neuen Ticket gesetzt werden soll. Wenn leer, wird \"root\" (ID=1) gesetzt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1268,7 +1447,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The name of the state of the new ticket."
-msgstr "Der Name des Status für das neue Ticket."
+msgstr ""
+"Der Name des Status für das neue Ticket (Achtung: Übersetzungen sind nicht "
+"möglich)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1276,6 +1457,10 @@ msgid ""
 "name has to be used (separated by two colons - e.g. \"NameOfParentTeam::"
 "NameOfTeamToBeSet\")."
 msgstr ""
+"Der Name des Teams, das gesetzt werden soll. Handelt es sich um ein "
+"untergeordnetes Team, muss der vollständige Pfad-Name angegeben werden "
+"(Namen getrennt durch doppelte Doppelpunkte, z.B. \"NameÜbergeordnetesTeam::"
+"NameZuSetzendesTeam\")."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid ""
@@ -1327,7 +1512,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/DynamicField/Driver/BaseText.pm
 msgid "This field is required."
-msgstr ""
+msgstr "Dieses Feld ist ein Pflichtfeld."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "and"
@@ -1620,6 +1805,38 @@ msgstr "Relevante Assets"
 msgid "Source"
 msgstr ""
 
+#. Perl Module: update/build-1415.pl
+msgid ""
+"Lists tickets closed in a specific date range. Organization may be selected "
+"before report creation."
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid ""
+"Lists tickets created in a specific date range. Organization may be selected "
+"before report creation."
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "Tickets Closed In Date Range"
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "Tickets Created In Date Range"
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "allows to create and edit report definitions"
+msgstr ""
+
+#. Perl Module: update/build-1415.pl
+msgid "allows to view report definitions and reports"
+msgstr ""
+
+#. Perl Module: update/build-1433.pl
+msgid "Work Order"
+msgstr "Arbeitsanweisung"
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
 msgstr ""
@@ -1656,14 +1873,6 @@ msgstr ""
 msgid ""
 "Defines how many threads should be used for parallel tasks. Enter 0 to "
 "deactivate."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines the location where the JSON schema files are located."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines the location where the example files are located."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1749,11 +1958,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Age"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Ticket.xml
-msgid ""
-"Defines the default auto response type of the article for this operation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -2016,6 +2220,10 @@ msgid "Alternative to"
 msgstr "Alternativ zu"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "AssembleObject"
+msgstr "Objekt zusammenstellen"
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "AssetReference"
 msgstr ""
 
@@ -2098,11 +2306,15 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Company name which will be included in outgoing emails as an X-Header."
 msgstr "Der Name Ihres Unternehmens für die Verwendung im KIX-Mail-Header."
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Conditional"
+msgstr "Bedingungen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2128,6 +2340,10 @@ msgid ""
 "Controls if the admin is allowed to make changes to the database via "
 "AdminSelectBox."
 msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "CreateReport"
+msgstr "Bericht erstellen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Daily"
@@ -2745,6 +2961,16 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
+"Defines which dependend object (e.g. \"Ticket\") is assigned by which "
+"attributes to a relevant object (e.g. \"Contact\") - e.g. \"Tickets of "
+"Contact\". Structure is \"{ \"RelevantObject\": { \"DependendObject\": "
+"{ \"DependendObjectAttribut\": { \"SearchAttribut OR SearchStatic\": "
+"[ \"RelevantObjectAttribut OR StaticValue\" ] } } } }. All attributes will "
+"be OR combined.\""
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
 "Defines which email address to use if not defined - strongly depends on "
 "backend configuration!!!"
 msgstr ""
@@ -2864,6 +3090,10 @@ msgid "Excel"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "ExecuteMacro"
+msgstr "Macro ausführen"
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Executes a custom command or module. Note: if module is used, function is "
 "required."
@@ -2873,6 +3103,10 @@ msgstr ""
 msgid "Extended organization description."
 msgstr ""
 "Weitere Informationen über Ihr Unternehmen (vgl. auch Platzhaltertext)."
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "ExtractText"
+msgstr "Text entnehmen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Fetch emails via fetchmail (using SSL)."
@@ -3391,6 +3625,10 @@ msgid ""
 "Renew existing SMIME certificates from customer backend. Note: SMIME and "
 "SMIME::FetchFromCustomer needs to be active in SysConfig and customer "
 "backend needs to be configured to fetch UserSMIMECertificate attribute."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Reporting"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4049,7 +4287,7 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
 "Defines for which object type in which configitem class in which configitem "
-"attributes will be search with which object attributes values "
+"attributes will be searched with which object attributes values "
 "(SearchAttributes) or static values (SearchStatic). Configitem attributes "
 "should contain their structure separated with double colon "
 "(\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
@@ -4278,7 +4516,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "%s time unit(s) accounted. Now total %s time unit(s)."
-msgstr ""
+msgstr "%s Zeiteinheit(en) gebucht. Gesamt: %s Zeiteinheit(en)."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -4419,7 +4657,7 @@ msgstr "Artikel erstellen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create Ticket"
-msgstr "Ticket erstellen"
+msgstr "Ticket anlegen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -4575,7 +4813,8 @@ msgstr ""
 "Definiert die Layout-Vorlage für Benachrichtigungen. Die Platzhalter \"[% "
 "Data.Subject %]\" und \"[% Data.Body %]\" werden verwendet, um den in der "
 "Benachrichtigung konfigurierten Betreff und Text an diesen Positionen "
-"anzuzeigen."
+"anzuzeigen. Falls Sie den initialen Quellcode der Vorlage wieder herstellen "
+"wollen, finden Sie diesen im KIX Admin Handbuch."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -5387,7 +5626,7 @@ msgstr "Stadt"
 
 #. manual entry from templates.pot.manual
 msgid "Contact"
-msgstr "Ansprechpartner"
+msgstr "Kontakt"
 
 #. manual entry from templates.pot.manual
 msgid "Contact Information"
@@ -5432,6 +5671,10 @@ msgid "Expiration Date"
 msgstr "Ablaufdatum"
 
 #. manual entry from templates.pot.manual
+msgid "External Supplier"
+msgstr "Externer Lieferant"
+
+#. manual entry from templates.pot.manual
 msgid "First Usage Date"
 msgstr "Inbetriebnahme"
 
@@ -5469,8 +5712,16 @@ msgid "IP over DHCP"
 msgstr "IP via DHCP"
 
 #. manual entry from templates.pot.manual
+msgid "Incident Report"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Installed Software"
 msgstr "Installierte Software"
+
+#. manual entry from templates.pot.manual
+msgid "Internal Supplier"
+msgstr "Interner Lieferant"
 
 #. manual entry from templates.pot.manual
 msgid "Licence Type"
@@ -5671,14 +5922,6 @@ msgstr "Abgeschlossen"
 #. manual entry from templates.pot.manual
 msgid "downloaded"
 msgstr "Herungergeladen"
-
-#. manual entry from templates.pot.manual
-msgid "External Supplier"
-msgstr "Externer Lieferant"
-
-#. manual entry from templates.pot.manual
-msgid "Internal Supplier"
-msgstr "Interner Lieferant"
 
 #. manual entry from templates.pot.manual
 msgid "no"

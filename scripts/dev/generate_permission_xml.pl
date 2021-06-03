@@ -152,8 +152,12 @@ sub ReadCSV {
     open my $FileHandle, '<', $Param{CSVFile} || die "unable to open file $Param{CSVFile}";    ## no critic
 
     while ( my $ColRef = $CSV->getline($FileHandle) ) {
-        push @Lines, $ColRef;
         $LineCounter++;
+
+        # skip empty lines
+        next if (!$ColRef->[0]);
+
+        push @Lines, $ColRef;
     }
 
     # log error if occurred and exit

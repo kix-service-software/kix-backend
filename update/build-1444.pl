@@ -50,7 +50,7 @@ sub _UpdateCustomerRole {
                 Target => '/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}'
             },
             Change => {
-                Target => '/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID',
+                Target => '/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID}',
             }
         },
         {
@@ -60,7 +60,7 @@ sub _UpdateCustomerRole {
                 Target => '/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID && Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}'
             },
             Change => {
-                Target => '/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID',
+                Target => '/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID}',
             }
         }
     );
@@ -169,13 +169,13 @@ sub _UpdateCustomerRole {
         );
 
         if (!$PermissionID) {
-            $LogObject->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to add permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target})!"
             );
             $AllOk = 0;
         } else {
-            $LogObject->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'info',
                 Message  => "Successfully created a new permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target})!"
             );

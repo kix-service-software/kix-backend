@@ -192,14 +192,6 @@ sub Run {
                 );
             }
         }
-
-        # check if primary OrganisationID is contained in assigned OrganisationIDs
-        if ($Contact->{PrimaryOrganisationID} && !grep /$Contact->{PrimaryOrganisationID}/, @{ $Contact->{OrganisationIDs } } ) {
-            push(@{ $Contact->{OrganisationIDs} }, $Contact->{PrimaryOrganisationID});
-        }
-    }
-    else {
-        $Contact->{OrganisationIDs} = ($Contact->{PrimaryOrganisationID}) ? [$Contact->{PrimaryOrganisationID}] : undef;
     }
 
     # create Contact

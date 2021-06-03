@@ -530,6 +530,9 @@ sub CleanUp {
         $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
     }
 
+    # save to prevent cleanup loops
+    $Self->{CleanupTypesSeen}->{$Param{Type}} = 1 if $Param{Type};
+
     # cleanup in-memory cache
     # We don't have TTL/expiry information here, so just always delete to be sure.
     if ( $Param{Type} ) {
@@ -608,6 +611,9 @@ sub CleanUp {
             );
         }
     }
+
+    # clear loop prevention for this type
+    $Self->{CleanupTypesSeen}->{$Param{Type}} = 0 if $Param{Type};
 
     # cleanup persistent cache
     return $Self->{CacheObject}->CleanUp(%Param);
@@ -738,6 +744,9 @@ sub _HandleDependingCacheTypes {
             if ( !IsHashRefWithData($Self->{TypeDependencies}) ) {
                 $Self->{TypeDependencies} = undef;
             }
+
+            # don't do another loop, if we've seen this type already
+            next if $Self->{CleanupTypesSeen}->{$DependentType};
 
             $Self->CleanUp(
                 Type => $DependentType,

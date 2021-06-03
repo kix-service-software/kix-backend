@@ -91,7 +91,12 @@ msgstr ""
 msgid "Network Information"
 msgstr ""
 
+#. from class computer
 msgid "Network Interface"
+msgstr ""
+
+#. from class hardware
+msgid "Network Adapter"
 msgstr ""
 
 msgid "IP over DHCP"

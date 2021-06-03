@@ -52,16 +52,31 @@ sub _RemoveDuplicatePermissions {
         last;
     }
 
-    my $Result = $DBObject->Do(
-        SQL => 'DELETE FROM role_permission rp 
-                 WHERE EXISTS (
-                     SELECT id FROM role_permission rp2 
-                      WHERE rp2.role_id = rp.role_id 
+    # do the deletion of duplicates
+    my $Result;
+    if ( $DBObject->{'DB::Type'} eq 'mysql' ) {
+        $Result = $DBObject->Do(
+            SQL => 'DELETE rp FROM role_permission rp
+                    INNER JOIN role_permission rp2
+                    WHERE rp2.id > rp.id
+                        AND rp2.role_id = rp.role_id 
                         AND rp2.target = rp.target 
                         AND rp2.type_id = rp.type_id 
-                        AND rp2.id <> rp.id
-                )'
-    );
+                        AND rp2.id <> rp.id'
+        );
+    }
+    else {
+        $Result = $DBObject->Do(
+            SQL => 'DELETE FROM role_permission rp 
+                    WHERE EXISTS (
+                        SELECT id FROM role_permission rp2 
+                        WHERE rp2.role_id = rp.role_id 
+                            AND rp2.target = rp.target 
+                            AND rp2.type_id = rp.type_id 
+                            AND rp2.id > rp.id
+                    )'
+        );
+    }
 
     if ( !$DBObject->Prepare( SQL => "SELECT count(*) FROM role_permission" ) ) {
         $LogObject->Log(
