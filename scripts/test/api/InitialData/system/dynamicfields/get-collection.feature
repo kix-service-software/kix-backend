@@ -11,8 +11,8 @@ Feature: GET request to the /system/dynamicfields resource
 
   Scenario: get the list of existing dynamicfields
     When I query the collection of dynamicfields
-    Then the response code is 200    
-    Then the response contains 10 items of type "DynamicField"
+    Then the response code is 200
+    Then the response contains 11 items of type "DynamicField"
     And the response contains the following items of type DynamicField
       | Name                         | Label                  | FieldType               | ObjectType   |
       | AffectedAsset                | Affected Asset         | ITSMConfigItemReference | Ticket       |
@@ -27,7 +27,7 @@ Feature: GET request to the /system/dynamicfields resource
       | RiskAssumptionRemark         | Risk Assumption Remark | TextArea                | Ticket       |
       | Source                       | Source                 | Text                    | Contact      |
       | Type                         | Type                   | Multiselect             | Organisation |
-
+      | WorkOrder                    | Work Order             | TextArea                | Ticket       |
 
 
 

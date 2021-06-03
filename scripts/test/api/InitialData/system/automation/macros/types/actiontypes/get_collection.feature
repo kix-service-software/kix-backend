@@ -8,12 +8,17 @@ Feature: GET request to the /system/automation/macros/types/:MacroType/actiontyp
   Scenario: get the list of automation macro type actiontypes
     When I query the collection of automation macro type "Ticket" actiontypes
     Then the response code is 200
-    And the response contains 16 items of type "MacroActionType"
+    And the response contains 21 items of type "MacroActionType"
     And the response contains the following items of type MacroActionType
       | Name                 | Description                                                                                                | MacroType |
       | ArticleCreate        | Creates an article for a ticket.                                                                           | Ticket    |
+      | AssembleObject       | Execute the depending macro if the logical expression is true.                                             | Ticket    |
+      | Conditional          | Execute the depending macro if the logical expression is true.                                             | Ticket    |
       | ContactSet           | Sets the contact (and its primary organisation as organisation) of a ticket.                               | Ticket    |
+      | CreateReport         | Create a report from a report definition.                                                                  | Ticket    |
       | DynamicFieldSet      | Sets a dynamic field value of a ticket.                                                                    | Ticket    |
+      | ExecuteMacro         | Executes a given macro.                                                                                    | Ticket    |
+      | ExtractText          | Extract parts of a text via Regular Expressions (RegEx).                                                   | Ticket    |
       | FetchAssetAttributes | Fetch value from attachments and use them to set dynamic fields of ticket.                                 | Ticket    |
       | LockSet              | Sets the lock state of a ticket.                                                                           | Ticket    |
       | Loop                 | Execute a loop over each of the given values. Each value will be the new ObjectID for the depending macro. | Ticket    |
