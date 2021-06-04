@@ -49,7 +49,9 @@
 "Ticket Agent";"Resource";"/contacts";;"x";;;
 "Ticket Agent";"Resource";"/links";"x";"x";"x";"x";
 "Ticket Agent";"Resource";"/system/textmodules";;"x";;;
-"Webform Ticket Creator";"Resource";"/tickets";"x";;;;
+"Webform Ticket Creator";"Resource";"/auth";"x";;;;
+"Webform Ticket Creator";"Resource";"/session";;;;"x";
+"Webform Ticket Creator";"Resource";"/tickets";"x";;"x";;
 "Webform Ticket Creator";"Resource";"/system/ticket";;"x";;;
 "Webform Ticket Creator";"Resource";"/system/communication";;"x";;;
 "Webform Ticket Creator";"Resource";"/system/communication/*";;;;;
