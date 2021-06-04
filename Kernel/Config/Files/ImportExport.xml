@@ -37,9 +37,9 @@
         <Group>ITSMConfigItemCSVMappingAutoCreate</Group>
         <SubGroup>ImportExportITSMConfigItem</SubGroup>
         <Setting>
-            <Option SelectedID="on">
-                <Item Key="">No</Item>
-                <Item Key="on">Yes</Item>
+            <Option SelectedID="1">
+                <Item Key="0">No</Item>
+                <Item Key="1">Yes</Item>
             </Option>
         </Setting>
     </ConfigItem>
@@ -101,4 +101,3 @@
         </Setting>
     </ConfigItem>
 </kix_config>
-    
