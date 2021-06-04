@@ -112,7 +112,9 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     And the response contains 7 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                | Value | TypeID |
-      | /tickets                              | 1     | 1      |
+      | /auth                                 | 1     | 1      |
+      | /session                              | 8     | 1      |
+      | /tickets                              | 5     | 1      |
       | /system/ticket                        | 2     | 1      |
       | /system/communication                 | 2     | 1      |
       | /system/communication/*               | 0     | 1      |
