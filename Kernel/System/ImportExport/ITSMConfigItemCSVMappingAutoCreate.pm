@@ -89,7 +89,7 @@ sub CSVMappingAutoCreate {
     ) {
         $Self->{LogObject}->Log(
             Priority => 'error',
-            Message  => "Event::ITSMConfigItemCSVMappingAutoCreate: No relevant XMLDefinition exists" 
+            Message  => "Event::ITSMConfigItemCSVMappingAutoCreate: No relevant XMLDefinition exists"
             . ($Param{XMLDefinitionID} ? " (with ID $Param{XMLDefinitionID})" : "") . "!"
         );
         return;
@@ -210,7 +210,7 @@ sub CSVMappingAutoCreate {
     my %AttributeValues = (
         ClassID                      => $CIClassHash{ItemID},
         CountMax                     => $CSVMappingAutoCreateConfig->{CountMax}                     || '10',
-        EmptyFieldsLeaveTheOldValues => $CSVMappingAutoCreateConfig->{EmptyFieldsLeaveTheOldValues} || 'on',
+        EmptyFieldsLeaveTheOldValues => $CSVMappingAutoCreateConfig->{EmptyFieldsLeaveTheOldValues} // '1',
         Charset                      => $CSVMappingAutoCreateConfig->{Charset}                      || 'UTF-8',
         ColumnSeparator              => $CSVMappingAutoCreateConfig->{ColumnSeparator}              || 'Semicolon',
         IncludeColumnHeaders         => $CSVMappingAutoCreateConfig->{IncludeColumnHeaders}         || '1',
