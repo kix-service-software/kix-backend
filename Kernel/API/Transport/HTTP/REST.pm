@@ -219,8 +219,25 @@ sub ProviderProcessRequest {
         }
     }
 
+    # determine base route for later
+    my $BaseRoute;
+    for my $Route ( keys %PossibleOperations ) {
+        if ( !IsHashRefWithData($PossibleOperations{$Route}->{URIParams}) ) {
+            # we found the correct route
+            $BaseRoute = $Route;
+            last;
+        }
+        $BaseRoute = $Route;
+        foreach my $URIParam ( keys %{$PossibleOperations{$Route}->{URIParams}} ) {
+            $BaseRoute =~ s/:$URIParam//g;
+        }
+        # replace multiple slashes and the training slash
+        $BaseRoute =~ s/\/+/\//g;
+        $BaseRoute =~ s/\/$//g;
+    }
+
     # TODO: the following code is nearly identical to the code used in Operation::V1::Common, method ExecOperation -> should be generalized
-    # determine all the  allowed methods
+    # determine all the allowed methods
     my %AvailableMethods;
     for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
 
@@ -230,7 +247,14 @@ sub ProviderProcessRequest {
         my $RouteRegEx = $RouteMapping{Route};
         $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
 
+        my $Base = $RouteMapping{Route};
+        $Base =~ s{(/:[^\/]+)}{}xmsg;
+
+        next if !( $Base =~ m{^ $BaseRoute }xms );
+
         next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        # only add if we didn't have a match upto now
+        next if IsHashRefWithData($AvailableMethods{$RouteMapping{RequestMethod}->[0]});
 
         $AvailableMethods{$RouteMapping{RequestMethod}->[0]} = {
             Operation => $CurrentOperation,
@@ -960,7 +984,7 @@ Returns structure to be passed to provider.
         HTTPCode  => 200,           # http code to be returned, optional
         Content   => 'response',    # message content, XML response on normal execution
         AddHeader => {              # optional to set some special headers in response
-            <Header> => <Value>     
+            <Header> => <Value>
         }
     );
 
@@ -968,13 +992,13 @@ Returns structure to be passed to provider.
         Success      => 1,
     };
 
-    or 
+    or
 
     $Result = {
         Success      => 0,
         Code    => <code>
         Message => '...'
-    };    
+    };
 
 =cut
 
@@ -991,12 +1015,12 @@ sub _Output {
         if ( !$Param{Content} ) {
             $Param{HTTPCode} = 500;
             $Param{Content}  = '
-{ 
+{
     "Code": "Transport.REST.InternalError",
     "Message": "Error while encoding return JSON structure."
 }';
             $Success         = 0;
-            $Message         = 'Error while encoding return JSON structure.';            
+            $Message         = 'Error while encoding return JSON structure.';
         }
     }
 
@@ -1004,7 +1028,7 @@ sub _Output {
     if ( defined $Param{HTTPCode} && !IsInteger( $Param{HTTPCode} ) ) {
         $Param{HTTPCode} = 500;
         $Param{Content}  = '
-{ 
+{
     "Code": "Transport.REST.InternalError",
     "Message": "Invalid internal HTTPCode"
 }';
@@ -1014,7 +1038,7 @@ sub _Output {
     elsif ( defined $Param{Content} && !IsString( $Param{Content} ) ) {
         $Param{HTTPCode} = 500;
         $Param{Content}  = '
-{ 
+{
     "Code": "Transport.REST.InternalError",
     "Message": "Invalid Content"
 }';
@@ -1074,14 +1098,14 @@ sub _Output {
     print STDOUT "Content-Type: $ContentType; charset=UTF-8\r\n";
     print STDOUT "Content-Length: $ContentLength\r\n";
     print STDOUT "Connection: $Connection\r\n";
-    
+
     # add headers if requested
     if ( IsHashRefWithData($Param{AddHeader}) ) {
         foreach my $Header ( sort keys %{$Param{AddHeader}} ) {
             print STDOUT "$Header: $Param{AddHeader}->{$Header}\r\n";
         }
     }
-    
+
     print STDOUT "\r\n";
     print STDOUT $Param{Content};
 
