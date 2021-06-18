@@ -1608,685 +1608,603 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0001-SystemMonitoring" Required="0" Valid="1">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0002-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0003-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0004-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0005-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0006-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0007-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0008-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0009-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0010-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0010-SystemMonitoring" Required="0" Valid="10">
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0011-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0012-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0013-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0014-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0015-SystemMonitoring" Required="0" Valid="0">
-        <Description Translatable="1">Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter.</Description>
+        <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Hash>
-            <!-- if new keys are updated or to be added in SystemMonitoringX.xml, do the same in the fallback-configuration in Kernel/System/PostMaster/Filter/SystemMonitoringX.pm -->
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
-                <Item Key="DynamicFieldContent::Ticket">Host,Service,Address,Alias</Item>
-                <Item Key="DynamicFieldContent::Article">State</Item>
-
-                <Item Key="DynamicFieldAlias">SysMonXAlias</Item>
-                <Item Key="DynamicFieldAddress">SysMonXAddress</Item>
-                <Item Key="DynamicFieldHost">SysMonXHost</Item>
-                <Item Key="DynamicFieldService">SysMonXService</Item>
-                <Item Key="DynamicFieldState">SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
+                <Item Key="DynamicFieldContent::Article"></Item>
 
                 <Item Key="AcknowledgeName">Nagios1</Item>
+                <Item Key="AffectedAssetName">AffectedAsset</Item>
+                <Item Key="SysMonXStateName">SysMonXState</Item>
+
                 <Item Key="CreateTicketType">Incident</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketState"></Item>
-                <Item Key="CreateTicketService"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
-                <Item Key="CreateChannel">note-report</Item>
+                <Item Key="CreateChannel">note</Item>
+                <Item Key="CreateTicketQueue"></Item>
+                <Item Key="CreateTicketSLA"></Item>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
+                <Item Key="FromAddressRegExp">sysmon@example.com</Item>
+                <Item Key="ToAddressRegExp">.*</Item>
 
-                <Item Key="AddressRegExp">\s*Address:\s+(.*)\s*</Item>
-                <Item Key="AliasRegExp">\s*Alias:\s+(.*)\s*</Item>
-                <Item Key="FromAddressRegExp">nagios@example.com</Item>
-                <Item Key="ToAddressRegExp">kix@example.com</Item>
-                <Item Key="StateRegExp">\s*State:\s+(\S+)</Item>
-                <Item Key="HostRegExp">\s*Host:\s+(.*)\s*</Item>
-                <Item Key="ServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAddressRegExp">\s*Address:\s+(.*)\s*</Item>
+                <Item Key="SysMonXAliasRegExp">\s*Alias:\s+(.*)\s*</Item>
+                <Item Key="SysMonXStateRegExp">\s*State:\s+(\S+)</Item>
+                <Item Key="SysMonXHostRegExp">\s*Host:\s+(.*)\s*</Item>
+                <Item Key="SysMonXServiceRegExp">\s*Service:\s+(.*)\s*</Item>
+                <Item Key="DefaultService">Host</Item>
+
                 <Item Key="NewTicketRegExp">CRITICAL|DOWN|WARNING</Item>
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-                <Item Key="DefaultService">Host</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SystemMonitoringX::SetIncidentState" Required="0" Valid="1">
-        <Description Translatable="1">Set the incident state of a CI automatically when a system monitoring email arrives.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::ConfigItem</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SystemMonitoringX::LinkTicketWithCI" Required="0" Valid="1">
-        <Description Translatable="1">Link an already opened incident ticket with the affected CI. This is only possible when a subsequent system monitoring email arrives.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::ConfigItem</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0">No</Item>
-                <Item Key="1">Yes</Item>
-            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::Registration" Required="1" Valid="1">
@@ -2379,7 +2297,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::HTTP::User" Required="0" Valid="1">
-       <Description Translatable="1">The http acknowledge user.</Description>
+        <Description Translatable="1">The http acknowledge user.</Description>
         <Group>Framework</Group>
         <SubGroup>Tool::Acknowledge</SubGroup>
         <Setting>
@@ -8536,7 +8454,7 @@ You can log in via the following URL:
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Organisation::Preferences::DB</Item>
-                <Item  Key="Params">
+                <Item Key="Params">
                     <Hash>
                         <Item Key="Table">kix_customer_company_prefs</Item>
                         <Item Key="TableKey">preferences_key</Item>
@@ -8588,9 +8506,9 @@ You can log in via the following URL:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SysConfigChangeLog::LogModule::SysLog::Facility" Required="1" Valid="1">
-       <Description Translatable="1">If "SysLog" was selected for LogModule, you can specify a special log facility.</Description>
+        <Description Translatable="1">If "SysLog" was selected for LogModule, you can specify a special log facility.</Description>
         <Group>Framework</Group>
-       <SubGroup>Core::Log</SubGroup>
+        <SubGroup>Core::Log</SubGroup>
         <Setting>
             <String Regex="">user</String>
         </Setting>

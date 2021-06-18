@@ -1,0 +1,22 @@
+Return-Path: <nagios@example.com>
+To: nagios-service-mailbox@example.com
+Subject: ** RECOVERY alert 1 - ddsrv007 host is UP **
+Date: Sun, 10 May 2021 01:00:00 +0100 (CET)
+From: sysmon@example.com
+Mime-Version: 1.0
+Message-Id: <20210501000020.1212121212A@xyzabc.example.com>
+
+***** Nagios  *****
+
+Notification Type: RECOVERY
+Host: ddsrv007
+State: UP for 0d 0h 1m 0s
+Address: 192.168.1.2
+Info: 1st-recovery should be appended and cause closure of ticket
+
+PING OK - Packet loss = 0%, RTA = 15.09 ms
+
+Date/Time: Sun May 2 00:00:00 CET 2021
+
+ACK by:
+Comment:
