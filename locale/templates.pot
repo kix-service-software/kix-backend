@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-6-18 09:09+0000\n"
+"POT-Creation-Date: 2021-6-18 11:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1590,6 +1590,30 @@ msgstr ""
 msgid "Work Order"
 msgstr ""
 
+#. Perl Module: update/build-1455.pl
+msgid "System Acknowledge Name"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Address"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Alias"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Host"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Service"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System State"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
 msgstr ""
@@ -1927,7 +1951,7 @@ msgid "Automatically sets the state named by value if the state named in key is 
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter."
+msgid "Basic mail interface to System Monitoring Suites. See also event \"TicketAutoLinkConfigItem\" for more specific asset search, than by host-/service name."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2767,10 +2791,6 @@ msgid "Lastname, Firstname (UserLogin)"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Link an already opened incident ticket with the affected CI. This is only possible when a subsequent system monitoring email arrives."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Link to the admin manual."
 msgstr ""
 
@@ -3056,10 +3076,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Set minimum loglevel. If you select 'error', just errors are logged. With 'debug' you get all logging messages."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set the incident state of a CI automatically when a system monitoring email arrives."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
