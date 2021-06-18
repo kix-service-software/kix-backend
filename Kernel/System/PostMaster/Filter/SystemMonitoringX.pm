@@ -35,59 +35,43 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{Debug} = $Param{Debug} || 0;
-    $Self->{MainObject} = $Kernel::OM->Get('Main');
+    $Self->{Debug}                = $Param{Debug} || 0;
+    $Self->{MainObject}           = $Kernel::OM->Get('Main');
+    $Self->{ParserObject}         = $Param{ParserObject} || die "Got no ParserObject!";
+    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
 
-    # parser-object needs to bei instantiated in OTRS V4-style - no workaround found yet
-    $Self->{ParserObject} = $Kernel::OM->GetModuleFor('EmailParser')->new(
-        Mode => 'Standalone',
-    );
-
-    # check if it is nesessary to update CIs - load related objects
-    if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState') ) {
-        $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
-        $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
-    }
-
-# Default (FALLBACK) Settings
-# if new keys are updated or to be added in Kernel/Config/Files/SystemMonitoringX.xml, do the same right here
     $Self->{Config} = {
         Module                         => 'Kernel::System::PostMaster::Filter::SystemMonitoringX',
-        'DynamicFieldContent::Ticket'  => 'Host,Service,Address,Alias',
-        'DynamicFieldContent::Article' => 'State',
+        'DynamicFieldContent::Ticket'  => 'SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState',
+        'DynamicFieldContent::Article' => '',
 
-        DynamicFieldAlias   => 'SysMonXAlias',
-        DynamicFieldAddress => 'SysMonXAddress',
-        DynamicFieldHost    => 'SysMonXHost',
-        DynamicFieldService => 'SysMonXService',
-        DynamicFieldState   => 'SysMonXState',
+        AcknowledgeName      => 'Nagios1',
+        AffectedAssetName    => 'AffectedAsset',
 
-        AcknowledgeName         => 'Nagios1',
-        CreateTicketType    => 'Incident',
-        CreateTicketQueue   => '',
-        CreateTicketState   => '',
-        CreateTicketService => '',
-        CreateTicketSLA     => '',
-        CreateSenderType    => 'system',
-        CreateChannel       => 'note',
+        CreateTicketType     => 'Incident',
+        CreateTicketState    => 'new',
+        CreateSenderType     => 'system',
+        CreateChannel        => 'note',
+        CreateTicketQueue    => '',
+        CreateTicketSLA      => '',
 
-        CloseNotIfLocked => 0,
-        StopAfterMatch   => 1,
+        CloseNotIfLocked     => '0',
+        StopAfterMatch       => '1',
+        FromAddressRegExp    => '.*',
+        ToAddressRegExp      => '.*',
 
-        AddressRegExp => '\s*Address:\s+(.*)\s*',
-        AliasRegExp   => '\s*Alias:\s+(.*)\s*',
-        FromAddressRegExp => '.*',    # always do a reaction - this differs from xml-configuration
-        ToAddressRegExp =>
-            '.*',  # regardless or the receipient - it is true - this differs from xml-configuration
-        StateRegExp       => '\s*State:\s+(\S+)',
-        HostRegExp        => '\s*Address:\s+(\d+\.\d+\.\d+\.\d+)\s*',
-        ServiceRegExp     => '\s*Service:\s+(.*)\s*',
-        NewTicketRegExp   => 'CRITICAL|DOWN|WARNING',
-        CloseNotIfLocked  => '0',
-        CloseTicketRegExp => 'OK|UP',
-        CloseActionState  => 'closed',
-        ClosePendingTime  => 60 * 60 * 24 * 2,                          # equals 2 days
-        DefaultService    => 'Host',
+        SysMonXAddressRegExp => '\s*Address:\s+(.*)\s*',
+        SysMonXAliasRegExp   => '\s*Alias:\s+(.*)\s*',
+        SysMonXStateRegExp   => '\s*State:\s+(\S+)',
+        SysMonXHostRegExp    => '\s*Host:\s+(.*)\s*',
+        SysMonXServiceRegExp => '\s*Service:\s+(.*)\s*',
+        DefaultService       => 'Host',
+
+        NewTicketRegExp      => 'CRITICAL|DOWN|WARNING',
+        CloseTicketRegExp    => 'OK|UP',
+        CloseActionState     => 'closed',
+        ClosePendingTime     => 60 * 60 * 24 * 2,
     };
 
     return $Self;
@@ -141,40 +125,65 @@ sub Run {
         $ReceipientOfInterest = 1;
     }
 
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'debug',
+        Message  => 'SysMon Mail: Receipient relevant <$ReceipientOfInterest>.',
+    );
+
     return 1 if !$ReceipientOfInterest;
 
     # check if sender is of interest
     return 1 if !$Param{GetParam}->{From};
 
     return 1 if $Param{GetParam}->{From} !~ /$Self->{Config}->{FromAddressRegExp}/i;
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'debug',
+        Message  => 'SysMon Mail: From accepted.',
+    );
+
     $Self->_MailParse(%Param);
 
+    # set default sysmon service...
+    $Self->{SysMonXService} ||= $Self->{Config}->{DefaultService};
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'debug',
+        Message  => "SysMon Mail: mail parsed - Host: ".$Self->{SysMonXHost}
+            . ", State: ".$Self->{SysMonXState}
+            . ", Service: ".$Self->{SysMonXService},
+    );
+
     # we need State and Host to proceed
-    if ( !$Self->{State} || !$Self->{Host} ) {
+    if ( !$Self->{SysMonXHost} || !$Self->{SysMonXState} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => 'SystemMonitoring Mail: '
-                . 'SystemMonitoring: Could not find host address '
+            Message  => 'SysMon Mail: '
+                . 'SysMon Mail: Could not find host address '
                 . 'and/or state in mail => Ignoring',
         );
 
         return 1;
     }
 
-    # Check for Service
-    $Self->{Service} ||= $Self->{Config}->{DefaultService};
-    # get Ticket ID
-    my $TicketID = $Self->_TicketSearch();
+    # search ticket if followup...
+    my $TicketID = $Self->_TicketSearch() || '';
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'debug',
+        Message  => 'SysMon Mail: TID found <$TicketID>.',
+    );
 
     # OK, found ticket to deal with
     if ($TicketID) {
-
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => 'SysMon Mail: FUP for TID <$TicketID> received.',
+        );
         $Self->_TicketUpdate(
             TicketID => $TicketID,
             Param    => \%Param,
         );
     }
-    elsif ( $Self->{State} =~ /$Self->{Config}->{NewTicketRegExp}/ ) {
+    elsif ( $Self->{SysMonXState} =~ /$Self->{Config}->{NewTicketRegExp}/ ) {
         $Self->_TicketCreate( \%Param );
     }
     else {
@@ -184,123 +193,6 @@ sub Run {
     return 1;
 }
 
-sub _GetDynamicFieldDefinition {
-    my ( $Self, %Param ) = @_;
-    for my $Argument (qw(Config Key Default Base Name ObjectType)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    my $Config     = $Param{Config};
-    my $Key        = $Param{Key};          #DynamicFieldHost
-    my $Default    = $Param{Default};      #1 the default value
-    my $Base       = $Param{Base};         #DynamicFieldTicketTextPrefix
-    my $Name       = $Param{Name};         #HostName
-    my $ObjectType = $Param{ObjectType};
-
-    my $ConfigDynamicField = $Config->{$Key};
-
-    if ( !$ConfigDynamicField ) {
-        $ConfigDynamicField = $Default;
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Missing CI Config $Key, using value $Default!"
-        );
-    }
-
-    my $FieldNameHost = $ConfigDynamicField;
-
-    if ( $ConfigDynamicField =~ /^\d+$/ ) {
-        if ( ( $ConfigDynamicField < 1 ) || ( $ConfigDynamicField > 16 ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message =>
-                    "Bad value $ConfigDynamicField for CI Config $Key, must be between 1 and 16!"
-            );
-            die "Bad value $ConfigDynamicField for CI Config $Key!";
-        }
-        $FieldNameHost = $Base . $ConfigDynamicField;
-    }
-
-    # define all dynamic fields for system monitoring, those need to be changed as well as if the
-    # configuration is changed
-    return (
-        {
-            Name       => $FieldNameHost,
-            Label      => 'SystemMonitoring ' . $Name,
-            FieldType  => 'Text',
-            ObjectType => $ObjectType,
-            Config     => {
-                TranslatableValues => 1,
-            },
-        }
-    );
-}
-
-sub GetDynamicFieldsDefinition {
-    my ( $Self, %Param ) = @_;
-
-    my $Config = $Param{Config};
-
-    my @DynamicFieldContentTicket  = split( ',', $Config->{'DynamicFieldContent::Ticket'} );
-    my @DynamicFieldContentArticle = split( ',', $Config->{'DynamicFieldContent::Article'} );
-
-    for my $DFN (@DynamicFieldContentTicket) {
-        push @{ $Param{NewFields} },
-            $Self->_GetDynamicFieldDefinition(
-            Config     => $Config,
-            Key        => "DynamicField" . $DFN,
-            Default    => 1,
-            Base       => $DynamicFieldTicketTextPrefix,
-            Name       => $DFN . "Name",
-            ObjectType => "Ticket"
-            );
-    }
-
-    for my $DFN (@DynamicFieldContentArticle) {
-        push @{ $Param{NewFields} },
-            $Self->_GetDynamicFieldDefinition(
-            Config     => $Config,
-            Key        => "DynamicField" . $DFN,
-            Default    => 1,
-            Base       => $DynamicFieldArticleTextPrefix,
-            Name       => $DFN . "Name",
-            ObjectType => "Article"
-            );
-    }
-
-    return 1;
-}
-
-sub _IncidentStateIncident {
-    my ( $Self, %Param ) = @_;
-
-    # set the CI incident state to 'Incident'
-    $Self->_SetIncidentState(
-        Name          => $Self->{Host},
-        IncidentState => 'Incident',
-    );
-
-    return 1;
-}
-
-sub _IncidentStateOperational {
-    my ( $Self, %Param ) = @_;
-
-    # set the CI incident state to 'Operational'
-    $Self->_SetIncidentState(
-        Name          => $Self->{Host},
-        IncidentState => 'Operational',
-    );
-
-    return 1;
-}
 
 # the following are optional modules from the ITSM Kernel::System::GeneralCatalog and Kernel::System::ITSMConfigItem
 
@@ -317,55 +209,45 @@ sub _MailParse {
     }
 
     my @DynamicFieldContentTicket = split( ',', $Self->{Config}->{'DynamicFieldContent::Ticket'} );
-    my @DynamicFieldContentArticle
-        = split( ',', $Self->{Config}->{'DynamicFieldContent::Article'} );
+    my @DynamicFieldContentArticle = split( ',', ($Self->{Config}->{'DynamicFieldContent::Article'} || ''));
     my @DynamicFieldContent = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
 
     my $Subject = $Param{GetParam}->{Subject};
+    my %AlreadyMatched;
 
-    # Try to get State, Host and Service from email SUBJECT
+    # examine email SUBJECT...
     my @SubjectLines = split /\n/, $Subject;
     for my $Line (@SubjectLines) {
 
+        # extract to SysMon-State, -Host, -Service, -Address from email BODY
+        ITEM:
         for my $Item (@DynamicFieldContent) {
-
-            if (
-                $Self->{Config}->{ $Item . 'RegExp' }
-                && $Line =~ /$Self->{Config}->{ $Item . 'RegExp' }/
-                )
-            {
+            next ITEM if !$Self->{Config}->{ $Item . 'RegExp' };
+            my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
+            if ( $Line =~ /$Regex/ ) {
                 $Self->{$Item} = $1;
+                $AlreadyMatched{$Item} = 1;
             }
         }
     }
 
-    # split the body into separate lines
+    # examine email BODY line by line...
     my $Body = $Param{GetParam}->{Body} || die "Message has no Body";
-
     my @BodyLines = split /\n/, $Body;
-
-    # to remember if an element was found before
-    my %AlreadyMatched;
 
     LINE:
     for my $Line (@BodyLines) {
 
-        # Try to get State, Host and Service from email BODY
-        ELEMENT:
+        # extract to SysMon-State, -Host, -Service, -Address from email BODY
+        ITEM:
+        for my $Item (@DynamicFieldContent) {
+            next ITEM if !$Self->{Config}->{ $Item . 'RegExp' };
+            next ITEM if $AlreadyMatched{$Item};
 
-        for my $Element (@DynamicFieldContent) {
-            next ELEMENT if !$Self->{Config}->{ $Element . 'RegExp' };
-
-            next ELEMENT if $AlreadyMatched{$Element};
-
-            my $Regex = $Self->{Config}->{ $Element . 'RegExp' };
-
+            my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
             if ( $Line =~ /$Regex/ ) {
-
-                # get the found element value
-                $Self->{$Element} = $1;
-                # remember that we found this element already
-                $AlreadyMatched{$Element} = 1;
+                $Self->{$Item} = $1;
+                $AlreadyMatched{$Item} = 1;
             }
         }
     }
@@ -388,24 +270,22 @@ sub _LogMessage {
     my $MessageText = $Param{MessageText};
 
     # define log message
-    $Self->{Service} ||= "No Service";
-    $Self->{State}   ||= "No State";
-    $Self->{Host}    ||= "No Host";
-    $Self->{Address} ||= "No Address";
-    $Self->{Alias}   ||= "No Alias";
+    $Self->{SysMonXService} ||= "No Service";
+    $Self->{SysMonXState}   ||= "No State";
+    $Self->{SysMonXHost}    ||= "No Host";
+    $Self->{SysMonXAddress} ||= "No Address";
+    $Self->{SysMonXAlias}   ||= "No Alias";
 
     my $LogMessage = $MessageText . " - "
-        . "Host: $Self->{Host}, "
-        . "State: $Self->{State}, "
-
-        . "Address: $Self->{Address}"
-        . "Alias: $Self->{Alias}"
-
-        . "Service: $Self->{Service}";
+        . "Host: $Self->{SysMonXHost}, "
+        . "State: $Self->{SysMonXState}, "
+        . "Address: $Self->{SysMonXAddress}, "
+        . "Alias: $Self->{SysMonXAlias}, "
+        . "Service: $Self->{SysMonXService}";
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message  => 'SystemMonitoring Mail: ' . $LogMessage,
+        Message  => 'SysMon Mail: '.$LogMessage,
     );
 
     return 1;
@@ -414,84 +294,64 @@ sub _LogMessage {
 sub _TicketSearch {
     my ( $Self, %Param ) = @_;
 
-    # Is there a ticket for this Host/Service pair?
-    my %Query = (
-        Result    => 'ARRAY',
-        Limit     => 1,
-        UserID    => 1,
-        StateType => 'Open',
-    );
-
-    for my $Type (qw(Host Service)) {
-        my $DField = $Self->{Config}->{ 'DynamicField' . $Type };
-
-        my $KeyName = $DField;
-        if ( $DField =~ /^\d+$/ ) {
-            $KeyName = $DynamicFieldTicketTextPrefix . $DField;
-        }
-
-        $KeyName = "DynamicField_$KeyName";
-
-        my $KeyValue = $Self->{$Type};
-
-        $Query{$KeyName}->{Equals} = $KeyValue;
-    }
-
-    # get dynamic field object
+    # search Open tickets with SysMonService and SysMonHost...
     my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
-
-    # Check if dynamic fields really exists.
-    # If dynamic fields don't exists, TicketSearch will return all tickets
-    # and then the new article/ticket could take wrong place.
-    # The lesser of the three evils is to create a new ticket
-    # instead of defacing existing tickets or dropping it.
-    # This behavior will come true if the dynamic fields
-    # are named like TicketDynamicFieldHost. Its also bad.
     my $Errors = 0;
-    for my $Type (qw(Host Service)) {
-        my $DField = $Self->{Config}->{ 'DynamicField' . $Type };
+    my @Conditions = qw{};
+    my %StateTypeCriteria = (
+            Field    =>'StateType',
+            Operator => 'EQ',
+            Value    => 'Open',
+    );
+    push( @Conditions, \%StateTypeCriteria );
 
-        if ( $DField =~ /^\d+$/ ) {
-            $DField = $DynamicFieldTicketTextPrefix . $DField;
-        }
-
+    ITEM:
+    for my $DFName (qw(SysMonXHost SysMonXService)) {
         my $DynamicField = $DynamicFieldObject->DynamicFieldGet(
-
-            Name => $DField,
-
+            Name => $DFName,
         );
 
         if ( !IsHashRefWithData($DynamicField) ) {
-
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "DynamicField "
-
-                    . $DField
-                    . " does not exists or misnamed."
-                    . " The configuration is based on dynamic fields, so the number of the dynamic fields is expected"
-                    . " (wrong value for dynamic field" . $Type . " is set).",
+                Message  => "SysMon Mail DF <".$DFName. "> does not exists.",
             );
             $Errors = 1;
+            next ITEM;
         }
+
+        my %DFCriteria = (
+           Field    => "DynamicField_$DFName",
+           Operator => 'EQ',
+           Value    => $Self->{$DFName},
+        );
+        push( @Conditions, \%DFCriteria );
+
     }
 
-    # get the first and only ticket id
+    # Is there a ticket for this Host/Service pair?
+    my %Query = (
+        Result   => 'ARRAY',
+        Limit    => 1,
+        UserID   => 1,
+        'Search' => {
+            'AND' => \@Conditions,
+        },
+    );
+
+    # get 1st ticket for search (if there is one)...
     my $TicketID;
-
     if ( !$Errors ) {
-        my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(%Query);
-
+        my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch( %Query );
         if (@TicketIDs) {
-
-            $TicketID = shift @TicketIDs;
+            $TicketID = shift( @TicketIDs );
         }
     }
 
     return $TicketID;
 }
 
-# the sub takes the param as a hash reference not as a copy, because it is updated
+# Side Effect Notice: this sub modifies param hash!
 sub _TicketUpdate {
     my ( $Self, %Param ) = @_;
 
@@ -523,26 +383,15 @@ sub _TicketUpdate {
         Subject      => $Param->{GetParam}->{Subject},
     );
 
-    # set sender type and article type
+    # set sender type and article channel and sysmon state
     $Param->{GetParam}->{'X-KIX-FollowUp-SenderType'} = $Self->{Config}->{CreateSenderType};
     $Param->{GetParam}->{'X-KIX-FollowUp-Channel'}    = $Self->{Config}->{CreateChannel};
-
-    # Set Article Free Field for State
-    my $ArticleDFNumber = $Self->{Config}->{'DynamicFieldState'};
-
-    # ArticleDFNumber is a number
-    if ( $ArticleDFNumber =~ /^\d+$/ ) {
-
-        $Param->{GetParam}->{ 'X-KIX-FollowUp-ArticleKey' . $ArticleDFNumber } = 'State';
-        $Param->{GetParam}->{ 'X-KIX-FollowUp-ArticleValue' . $ArticleDFNumber }
-            = $Self->{State};
-    }
-    else {
-        $Param->{GetParam}->{ 'X-KIX-FollowUp-DynamicField-' . $ArticleDFNumber }
-            = $Self->{State};
+    if( $Self->{Config}->{SysMonXStateName} ) {
+      my $DFSMStateFilter = 'X-KIX-FollowUp-DynamicField-'.$Self->{Config}->{SysMonXStateName};
+      $Param->{GetParam}->{$DFSMStateFilter} = $Self->{SysMonXState};
     }
 
-    if ( $Self->{State} =~ /$Self->{Config}->{CloseTicketRegExp}/ ) {
+    if ( $Self->{SysMonXState} =~ /$Self->{Config}->{CloseTicketRegExp}/ ) {
 
         if (
             $Self->{Config}->{CloseActionState} ne 'OLD'
@@ -550,138 +399,79 @@ sub _TicketUpdate {
                 $Self->{Config}->{CloseNotIfLocked}
                 && $TicketObject->TicketLockGet( TicketID => $TicketID )
             )
-            )
+        )
         {
-
             $Param->{GetParam}->{'X-KIX-FollowUp-State'} = $Self->{Config}->{CloseActionState};
-
-            # get time object
-            my $TimeObject = $Kernel::OM->Get('Time');
-
-            my $TimeStamp = $TimeObject->SystemTime2TimeStamp(
-                SystemTime => $TimeObject->SystemTime()
-                    + $Self->{Config}->{ClosePendingTime},
+            my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+                SystemTime => $Kernel::OM->Get('Time')->SystemTime() + $Self->{Config}->{ClosePendingTime},
             );
             $Param->{GetParam}->{'X-KIX-State-PendingTime'} = $TimeStamp;
         }
 
-        # set log message
         $Self->_LogMessage( MessageText => 'Recovered' );
 
-        # if the CI incident state should be set
-        if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState') ) {
-            $Self->_IncidentStateOperational();
-        }
     }
     else {
-
-        # Attach note to existing ticket
         $Self->_LogMessage( MessageText => 'New Notice' );
     }
 
-    # link ticket with CI, this is only possible if the ticket already exists,
-    # e.g. in a subsequent email request, because we need a ticket id
-    if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::LinkTicketWithCI') ) {
-
-        # link ticket with CI
-        $Self->_LinkTicketWithCI(
-            Name     => $Self->{Host},
-            TicketID => $TicketID,
-        );
-    }
     return 1;
 }
 
-# the sub takes the param as a hash reference not as a copy, because it is updated
+# Side Effect Notice: this sub modifies param hash!
 sub _TicketCreate {
     my ( $Self, $Param ) = @_;
 
-    # get Dynamic Field list
-    my $DynamicFieldsTickets
-        = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
-        Valid      => 1,
-        ObjectType => 'Ticket',
-        ResultType => 'HASH',
-        );
-
     my @DynamicFieldContentTicket
-        = split( ',', $Self->{Config}->{'DynamicFieldContent::Ticket'} );
+        = split( ',', ($Self->{Config}->{'DynamicFieldContent::Ticket'} || '') );
     my @DynamicFieldContentArticle
-        = split( ',', $Self->{Config}->{'DynamicFieldContent::Article'} );
+        = split( ',', ($Self->{Config}->{'DynamicFieldContent::Article'} || '') );
     my @DynamicFieldContent = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
 
     for my $ConfiguredDynamicField (@DynamicFieldContentTicket) {
-
-        my $TicketDFNumber
-            = $Self->{Config}->{ 'DynamicField' . $ConfiguredDynamicField };
-
-        # identifier is a number
-        if ( $TicketDFNumber =~ /^\d+$/ ) {
-            $TicketDFNumber = $DynamicFieldTicketTextPrefix . $TicketDFNumber
-        }
         my $DynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
-            'Name' => $TicketDFNumber,
+            'Name' => $ConfiguredDynamicField,
         );
         if ( !IsHashRefWithData($DynamicField) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "DynamicField " . $TicketDFNumber
-                    . " does not exists or missnamed.",
+                Message  => "SysMon Mail DF <" . $ConfiguredDynamicField
+                    . "> does not exist.",
             );
         }
-        $Param->{GetParam}->{ 'X-KIX-DynamicField-' . $TicketDFNumber }
+        $Param->{GetParam}->{ 'X-KIX-DynamicField-' . $ConfiguredDynamicField }
             = $Self->{$ConfiguredDynamicField};
     }
 
-    # Set Article Dynamic Field for State
-    my $ArticleDFNumber = $Self->{Config}->{'DynamicFieldState'};
-
-    # ArticleDFNumber is a number
-    if ( $ArticleDFNumber =~ /^\d+$/ ) {
-
-        $Param->{GetParam}->{ 'X-KIX-ArticleKey' . $ArticleDFNumber }   = 'State';
-        $Param->{GetParam}->{ 'X-KIX-ArticleValue' . $ArticleDFNumber } = $Self->{State};
-    }
-    else {
-        $Param->{GetParam}->{ 'X-KIX-FollowUp-DynamicField-' . $ArticleDFNumber }
-            = $Self->{State};
-    }
-
-    # set sender type and article type
+    # set basic ticket- and article params...
     $Param->{GetParam}->{'X-KIX-SenderType'} = $Self->{Config}->{CreateSenderType}
         || $Param->{GetParam}->{'X-KIX-SenderType'};
     $Param->{GetParam}->{'X-KIX-Channel'} = $Self->{Config}->{CreateChannel}
         || $Param->{GetParam}->{'X-KIX-Channel'};
-
     $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
         || $Param->{GetParam}->{'X-KIX-Queue'};
     $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState}
         || $Param->{GetParam}->{'X-KIX-State'};
     $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType}
         || $Param->{GetParam}->{'X-KIX-Type'};
-    $Param->{GetParam}->{'X-KIX-Service'} = $Self->{Config}->{CreateTicketService}
-        || $Param->{GetParam}->{'X-KIX-Service'};
     $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{CreateTicketSLA}
         || $Param->{GetParam}->{'X-KIX-SLA'};
 
-    # AcknowledgeNameField
+    # set DF AcknowledgeNameField to allow later sysmon source identification...
     if ( $Self->{Config}->{AcknowledgeName} ) {
-        my $AcknowledgeNameField
-            = $Kernel::OM->Get('Config')
-            ->Get('Tool::Acknowledge::RegistrationAllocation');
+        my $AcknowledgeNameField = $Kernel::OM->Get('Config')->Get('Tool::Acknowledge::RegistrationAllocation');
         if ($AcknowledgeNameField) {
             if ( $AcknowledgeNameField =~ /^\d+$/ ) {
                 $AcknowledgeNameField = $DynamicFieldTicketTextPrefix . $AcknowledgeNameField
             }
-            my $DynamicField
-                = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+            my $DynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                 'Name' => $AcknowledgeNameField,
-                );
+            );
             if ( !IsHashRefWithData($DynamicField) ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "DynamicField " . $AcknowledgeNameField
-                        . " does not exists or missnamed.",
+                    Message  => "SysMon Mail DF <" . $AcknowledgeNameField
+                        . "> does not exist.",
                 );
             }
             else {
@@ -691,193 +481,91 @@ sub _TicketCreate {
         }
     }
 
+    # set AffectedAssetNameField (thus linking ticket with asset and set inci state)
+    if ( $Self->{Config}->{AffectedAssetName} ) {
+        my $AffectedAssetNameField = $Self->{Config}->{AffectedAssetName};
+        my $DynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+            'Name' => $AffectedAssetNameField,
+        );
+        if ( !IsHashRefWithData($DynamicField) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "SysMon Mail DF <" . $AffectedAssetNameField
+                    . "> does not exist.",
+            );
+        }
+        else {
+            my $AssetID = "";
+
+            # search for CI by SysMonHost-Name...
+            my $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
+                Name => $Self->{SysMonXHost},
+            );
+            if ( IsArrayRefWithData($ConfigItemIDs) ) {
+                if ( scalar @{$ConfigItemIDs} > 1 ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "Multiple assets for SysMon host <"
+                            .$Self->{Host}
+                            . "> found, using first item only!",
+                    );
+                }
+                $AssetID = $ConfigItemIDs->[0];
+            }
+
+            # if no CI found by SysMonHost-Name, search for SysMonService...
+            else {
+              $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
+                  Name => $Self->{SysMonXService},
+              );
+              if (  IsArrayRefWithData($ConfigItemIDs) ) {
+                    if ( scalar @{$ConfigItemIDs} > 1 ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'notice',
+                            Message  => "Multiple assets for SysMon service <"
+                                .$Self->{Host}
+                                . "> found, using first item only!",
+                        );
+                    }
+                    $AssetID = $ConfigItemIDs->[0];
+              }
+            }
+
+            # set affected asset in ticket...
+            if ( $AssetID ) {
+              $Param->{GetParam}->{ 'X-KIX-DynamicField-' . $AffectedAssetNameField } = $AssetID;
+            }
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => 'SysMon Mail: asset found <$AssetID>.',
+            );
+
+        }
+    }
+
     # set log message
     $Self->_LogMessage( MessageText => 'New Ticket' );
-      $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState');
-
-    # if the CI incident state should be set
-    if ( $Kernel::OM->Get('Config')->Get('SystemMonitoringX::SetIncidentState') ) {
-        $Self->_IncidentStateIncident();
-    }
 
     return 1;
 }
 
-# the sub takes the param as a hash reference not as a copy, because it is updated
+# Side Effect Notice: this sub modifies param hash!
 sub _TicketDrop {
     my ( $Self, $Param ) = @_;
 
     # No existing ticket and no open condition -> drop silently
     $Param->{GetParam}->{'X-KIX-Ignore'} = 'yes';
-    $Self->_LogMessage(
-        MessageText => 'Mail Dropped, no matching ticket found, no open on this state ',
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'notice',
+        Message  => "Mail dropped - no matching ticket found "
+            . "nor new ticket on this system monitoring state!",
     );
 
     return 1;
 }
 
-sub _SetIncidentState {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Name IncidentState )) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # check configitem object
-    return if !$Self->{ConfigItemObject};
-
-    # search configitem
-    my $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
-        Name => $Param{Name},
-    );
-
-    # if no config item with this name was found
-    if ( !$ConfigItemIDs || ref $ConfigItemIDs ne 'ARRAY' || !@{$ConfigItemIDs} ) {
-
-        # log error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Could not find any CI with the name '$Param{Name}'. ",
-        );
-
-        return;
-    }
-
-    # if more than one config item with this name was found
-    if ( scalar @{$ConfigItemIDs} > 1 ) {
-
-        # log error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Cannot set incident state for CI with the name '$Param{Name}'. "
-                . "More than one CI with this name was found!",
-        );
-
-        return;
-    }
-
-    # we only found one config item
-    my $ConfigItemID = shift @{$ConfigItemIDs};
-
-    # get config item
-    my $ConfigItem = $Self->{ConfigItemObject}->ConfigItemGet(
-        ConfigItemID => $ConfigItemID,
-    );
-
-    # get latest version data of config item
-    my $Version = $Self->{ConfigItemObject}->VersionGet(
-        ConfigItemID => $ConfigItemID,
-    );
-    return if !$Version;
-    return if ref $Version ne 'HASH';
-
-    # get incident state list
-    my $InciStateList = $Self->{GeneralCatalogObject}->ItemList(
-        Class => 'ITSM::Core::IncidentState',
-    );
-    return if !$InciStateList;
-    return if ref $InciStateList ne 'HASH';
-
-    # reverse the incident state list
-    my %ReverseInciStateList = reverse %{$InciStateList};
-
-    # check if incident state is valid
-    if ( !$ReverseInciStateList{ $Param{IncidentState} } ) {
-
-        # log error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid incident state '$Param{IncidentState}'!",
-        );
-
-        return;
-    }
-
-    # add a new version with the new incident state
-    my $VersionID = $Self->{ConfigItemObject}->VersionAdd(
-        %{$Version},
-        InciStateID => $ReverseInciStateList{ $Param{IncidentState} },
-        UserID      => 1,
-    );
-    return $VersionID;
-}
-
-sub _LinkTicketWithCI {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Name TicketID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # check configitem object
-    return if !$Self->{ConfigItemObject};
-
-    # search configitem
-    my $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
-        Name => $Param{Name},
-    );
-
-    # if no config item with this name was found
-    if ( !$ConfigItemIDs || ref $ConfigItemIDs ne 'ARRAY' || !@{$ConfigItemIDs} ) {
-
-        # log error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Could not find any CI with the name '$Param{Name}'. ",
-        );
-
-        return;
-    }
-
-    # if more than one config item with this name was found
-    if ( scalar @{$ConfigItemIDs} > 1 ) {
-
-        # log error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Cannot set incident state for CI with the name '$Param{Name}'. "
-                . "More than one CI with this name was found!",
-        );
-
-        return;
-    }
-
-    # we only found one config item
-    my $ConfigItemID = shift @{$ConfigItemIDs};
-
-    # link the ticket with the CI
-    my $LinkResult = $Kernel::OM->Get('LinkObject')->LinkAdd(
-        SourceObject => 'Ticket',
-        SourceKey    => $Param{TicketID},
-        TargetObject => 'ConfigItem',
-        TargetKey    => $ConfigItemID,
-        Type         => 'RelevantTo',
-        UserID       => 1,
-    );
-
-    return $LinkResult;
-}
-
 1;
-
-
-
 
 =back
 
