@@ -69,7 +69,6 @@
 /system/communication/systemaddresses/:SystemAddressID                                     | GET              | V1::SystemAddress::SystemAddressGet              |
 /system/communication/systemaddresses/:SystemAddressID                                     | PATCH            | V1::SystemAddress::SystemAddressUpdate           |
 /system/config                                                                             | GET              | V1::SysConfig::SysConfigOptionSearch             |
-/system/config/optiontypes                                                                 | GET              | V1::SysConfig::SysConfigOptionTypeSearch         |      
 /system/config/:Option                                                                     | GET              | V1::SysConfig::SysConfigOptionGet                |
 /system/config/:Option                                                                     | PATCH            | V1::SysConfig::SysConfigOptionUpdate             |
 /system/config/definitions                                                                 | GET              | V1::SysConfig::SysConfigOptionDefinitionSearch   |
