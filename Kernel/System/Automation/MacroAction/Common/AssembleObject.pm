@@ -100,18 +100,32 @@ sub Run {
         TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
     );
 
-    my $Object = $Kernel::OM->Get('Automation::Helper::Object');
+    # create new instance of helper module
+    my $Module = $Kernel::OM->GetModuleFor('Automation::Helper::Object');
+    if ( !$Kernel::OM->Get('Main')->Require($Module) ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't require helper object!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+    
+    my $Object = $Module->new();
+    if ( !IsObject($Object, $Module) ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't create helper object!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
 
     $Object->SetType($Param{Config}->{Type});
     $Object->SetDefinition($Definition);
 
     # return the object
     $Self->SetResult(Name => 'Object', Value => $Object);
-
-    # discard object, next use have to create new instance (for other content)
-    $Kernel::OM->ObjectsDiscard(
-        Objects => ['Automation::Helper::Object']
-    );
 
     return 1;
 }
