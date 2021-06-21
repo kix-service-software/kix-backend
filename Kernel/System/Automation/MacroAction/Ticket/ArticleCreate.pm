@@ -293,6 +293,9 @@ sub Run {
         if ( IsBase64($Attachment->{Content}) ) {
             $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
         }
+        # convert back from byte sequence to prevent double encoding when storing the attachment
+        utf8::decode($Attachment->{Content});
+
         push @Attachments, $Attachment;
     }
 
