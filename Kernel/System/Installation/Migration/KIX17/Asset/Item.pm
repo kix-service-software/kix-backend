@@ -38,6 +38,8 @@ sub Describe {
         ],
         DependsOnType => [
             'configitem_definition',
+            'customer_user',
+            'customer_company',
         ],
         Depends => {
             'change_by'         => 'users',
@@ -392,7 +394,7 @@ sub _MigrateXMLData {
 
         # insert row
         if ( !$ID ) {
-            # map value if needed
+            # map the original ID in the XML data to the migrated one
             $Self->_MapAttributeValue(Item => $Item, DefinitionID => $Param{DefinitionID});
 
             my $ID = $Self->Insert(
@@ -419,11 +421,9 @@ sub _MapAttributeValue {
     my ( $Self, %Param ) = @_;
 
     my %TypeLookupMapping = (
-        'CIACCustomerCompany' => 'customer_company',
         'CIClassReference'    => 'configitem',
-        'CustomerCompany'     => 'customer_company',
-        'Customer'            => 'customer_user',
-        'CustomerUserCompany' => 'customer_company',
+        'Organisation'        => 'organisation',
+        'Contact'             => 'contact',
         'GeneralCatalog'      => 'general_catalog',
     );
 
@@ -466,8 +466,44 @@ sub _MapAttributeValue {
     return 1 if !$PreparedKey;
     return 1 if !$Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey};
     
+    # now map the field type to the object type
     my $TypeMapping = $TypeLookupMapping{$Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey}};
     if ( $TypeMapping ) {
+        # we need to take special care of some values because we now store the IDs of the objects
+
+        # define the source type
+        my %LookupTypeMapping = (
+            'contact' => 'customer_user',
+        );
+
+        if ( $LookupTypeMapping{$TypeMapping} ) {
+            # define the lookup attribute for this source type
+            my %LookupAttributeMapping = (
+                'contact' => 'login',
+            );
+
+            # get source data if not already cached
+            if ( !IsArrayRef($Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}) ) {
+                $Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}} = $Self->GetSourceData(Type => $LookupTypeMapping{$TypeMapping}, Where => "$LookupAttributeMapping{$TypeMapping} = '$Param{Item}->{xml_content_value}'");
+                if ( !IsArrayRefWithData($Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}) ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to lookup $LookupTypeMapping{TypeMapping} row with $LookupAttributeMapping{$TypeMapping} \"$Param{Item}->{xml_content_value}'\"!"
+                    );
+                    return;
+                }
+            }
+            if ( IsArrayRef($Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}) ) {
+                # define the reference attribute to be used for this type
+                my %ReferenceAttributeMapping = (
+                    'contact' => 'id',
+                );
+                
+                # we have an object, so we can use its id for the OID mapping 
+                $Param{Item}->{xml_content_value} = $Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}->[0]->{$ReferenceAttributeMapping{$TypeMapping} || 'id'}
+            }
+        }
+
         my $MappedID = $Self->GetOIDMapping(
             ObjectType     => $TypeMapping,
             SourceObjectID => $Param{Item}->{xml_content_value},
