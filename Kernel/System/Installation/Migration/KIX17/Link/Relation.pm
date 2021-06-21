@@ -28,6 +28,8 @@ my %LinkObjectTypeMapping = (
     'Ticket'         => 'ticket',
     'ITSMConfigItem' => 'configitem',
     'FAQ'            => 'faq_item',
+    'ConfigItem'     => 'configitem',       # new one
+    'FAQArticle'     => 'faq_item',         # new one
 );
 
 =item Describe()
