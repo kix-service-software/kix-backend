@@ -120,7 +120,7 @@ perform QueueUpdate Operation. This will return the updated TypeID.
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            QueueID  => 123,                     # ID of the updated Queue 
+            QueueID  => 123,                     # ID of the updated Queue
         },
     };
 
@@ -143,6 +143,13 @@ sub Run {
     if ( !$QueueFullName ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
+        );
+    }
+
+    if ( $Queue->{ParentID} && $Queue->{ParentID} == $Param{Data}->{QueueID}) {
+        return $Self->_Error(
+            Code    => 'Validator.Failed',
+            Message => "Validation of attribute ParentID failed! It can not be its own parent.",
         );
     }
 
@@ -197,7 +204,7 @@ sub Run {
         Comment             => exists $Queue->{Comment} ? $Queue->{Comment} : $QueueData{Comment},
         ValidID             => $Queue->{ValidID}  || $QueueData{ValidID},
         UserID              => $Self->{Authorization}->{UserID},
-    ); 
+    );
 
     if ( !$Success ) {
         return $Self->_Error(
