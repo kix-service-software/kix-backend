@@ -28,45 +28,72 @@
      And the response has no content
 
    Scenario: get the list of initial faq articles with limit and offset
+     Given 8 of faq articles
      When I query the collection of faq articles with limit 2 and offset 4
      Then the response code is 200
      And the response contains 2 items of type "FAQArticle"
+     When delete all this faq articles
+     Then the response code is 204
+     And the response has no content
 
   Scenario: get the list of existing faq articles filtered
+    Given 8 of faq articles
     When I query the collection of faq articles with filter of General
     Then the response code is 200
     And the response contains the following items of type FAQArticle
       | Title                                          |
       | General information on how to work with KIX 18 |
+    When delete all this faq articles
+    Then the response code is 204
+    And the response has no content
 
   Scenario: get the list of initial faq articles with limit
+    Given 8 of faq articles
     When I query the collection of faq articles with limit 4
     Then the response code is 200
     And the response contains 4 items of type "FAQArticle"
-    
-  Scenario: get the list of initial faq articles with sorted 
+    When delete all this faq articles
+    Then the response code is 204
+    And the response has no content
+
+  Scenario: get the list of initial faq articles with sorted
+    Given 8 of faq articles
     When I query the collection of faq articles with sorted by "FAQArticle.-Title:textual"
     Then the response code is 200
     And the response contains 8 items of type "FAQArticle"
     And the response contains the following items of type FAQArticle
       | Title                    |
-      | Wie suche ich in KIX 18? |    
+      | Wie suche ich in KIX 18? |
+    When delete all this faq articles
+    Then the response code is 204
+    And the response has no content
 
   Scenario: get the list of initial faq articles with offset
+    Given 8 of faq articles
     When I query the collection of faq articles with offset 6
     Then the response code is 200
     And the response contains 2 items of type "FAQArticle"
-    
+    When delete all this faq articles
+    Then the response code is 204
+    And the response has no content
+
   Scenario: get the list of initial faq articles with limit and offset
+    Given 8 of faq articles
     When I query the collection of faq articles with limit 4 and offset 1
     Then the response code is 200
     And the response contains 4 items of type "FAQArticle"
-  
+    When delete all this faq articles
+    Then the response code is 204
+    And the response has no content
+
   Scenario: get the list of initial faq articles with sorted, limit and offset
+    Given 8 of faq articles
     When I query the collection of faq articles with sorted by "Address.-EmailAddress:textual" limit 4 and offset 2
     Then the response code is 200
     And the response contains 4 items of type "FAQArticle"
-
+    When delete all this faq articles
+    Then the response code is 204
+    And the response has no content
 
 
 
