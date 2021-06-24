@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-6-24 07:06+0000\n"
-"PO-Revision-Date: 2021-06-10 15:47+0000\n"
-"Last-Translator: fkrahl <Frank.Krahl@cape-it.de>\n"
+"PO-Revision-Date: 2021-06-24 08:29+0000\n"
+"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -36,7 +36,7 @@ msgstr "5 sehr niedrig"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Admin Tool"
-msgstr ""
+msgstr "Admin Tool"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Affected Asset"
@@ -44,59 +44,59 @@ msgstr "Betroffenes Asset"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - FUP Notification (if locked)"
-msgstr ""
+msgstr "Agent - Nachfragebenachrichtigung (wenn gesperrt)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - FUP Notification (if unlocked)"
-msgstr ""
+msgstr "Agent - Nachfragebenachrichtigung (wenn entsperrt)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - Lock Timeout"
-msgstr ""
+msgstr "Agent - Sperre Timeout"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - New Note Notification"
-msgstr ""
+msgstr "Agent - Neue Nachricht Benachrichtigung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - New Ticket Notification"
-msgstr ""
+msgstr "Agent - Neues Ticket Benachrichtigung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - Owner Assignment"
-msgstr ""
+msgstr "Agent - Bearbeiter Zuweisung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - Reminder (if locked)"
-msgstr ""
+msgstr "Agent - Erinnerung (wenn gesperrt)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - Reminder (if unlocked)"
-msgstr ""
+msgstr "Agent - Erinnerung (wenn entsperrt)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - Responsible Assignment"
-msgstr ""
+msgstr "Agent - Verantwortlicher Zuweisung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent - Ticket Move Notification"
-msgstr ""
+msgstr "Agent - Ticketverschiebung Benachrichtigung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Agent User"
-msgstr ""
+msgstr "Agentennutzer"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All 'pending auto *' state types (default: viewable)."
-msgstr ""
+msgstr "Alle 'warten auto *'-Statustypen (Vorgabe: sichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All 'pending reminder' state types (default: viewable)."
-msgstr ""
+msgstr "Alle 'warten Erinnerung *'-Statustypen (Vorgabe: sichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All 'removed' state types (default: not viewable)."
-msgstr ""
+msgstr "Alle 'entfernt'-Statustypen (Vorgabe: unsichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All closed state types (default: not viewable)."
