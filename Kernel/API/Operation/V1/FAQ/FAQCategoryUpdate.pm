@@ -135,6 +135,13 @@ sub Run {
         );
     }
 
+    if ( $FAQCategory->{ParentID} && $FAQCategory->{ParentID} == $Param{Data}->{FAQCategoryID}) {
+        return $Self->_Error(
+            Code    => 'Validator.Failed',
+            Message => "Validation of attribute ParentID failed! It can not be its own parent.",
+        );
+    }
+
     # check for duplicated
     my $Exists = $Kernel::OM->Get('FAQ')->CategoryDuplicateCheck(
         CategoryID => $Param{Data}->{FAQCategoryID},

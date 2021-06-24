@@ -1,0 +1,22 @@
+Return-Path: <nagios@example.com>
+To: nagios-service-mailbox@example.com
+Subject: ** PROBLEM alert 2 - ddsrv007 host is DOWN **
+Date: Sun, 10 May 2021 01:00:00 +0100 (CET)
+From: sysmon@example.com
+Mime-Version: 1.0
+Message-Id: <20210501000010.1212121212A@xyzabc.example.com>
+
+***** Nagios  *****
+
+Notification Type: PROBLEM
+Host: ddsrv007
+State: DOWN for 0d 0h 15m 0s
+Address: 192.168.1.2
+Info: 2nd-critical report should be appended
+
+CRITICAL - Time to live exceeded (192.168.1.2)
+
+Date/Time: Sun May 2 00:00:00 CET 2021
+
+ACK by:
+Comment:

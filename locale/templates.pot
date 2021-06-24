@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-5-17 08:11+0000\n"
+"POT-Creation-Date: 2021-6-24 07:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -815,7 +815,7 @@ msgid "Definition"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
-msgid "The assembled object containing two the attributes \"Type\" and \"Definition\", which is a string representation of the object."
+msgid "The assembled object containing the two attributes \"Type\" and \"Definition\", which is a string representation of the object."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
@@ -1590,6 +1590,30 @@ msgstr ""
 msgid "Work Order"
 msgstr ""
 
+#. Perl Module: update/build-1455.pl
+msgid "System Acknowledge Name"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Address"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Alias"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Host"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Service"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System State"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
 msgstr ""
@@ -1911,7 +1935,7 @@ msgid "Alternative to"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "AssembleObject"
+msgid "Assemble Object"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -1927,7 +1951,7 @@ msgid "Automatically sets the state named by value if the state named in key is 
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Basic mail interface to System Monitoring Suites. Use this block if the filter should run AFTER PostMasterFilter."
+msgid "Basic mail interface to System Monitoring Suites. See also event \"TicketAutoLinkConfigItem\" for more specific asset search, than by host-/service name."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2011,7 +2035,7 @@ msgid "Controls if the admin is allowed to make changes to the database via Admi
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "CreateReport"
+msgid "Create Report"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2559,7 +2583,7 @@ msgid "Excel"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "ExecuteMacro"
+msgid "Execute Macro"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2571,7 +2595,7 @@ msgid "Extended organization description."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "ExtractText"
+msgid "Extract Text"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2764,10 +2788,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname, Firstname (UserLogin)"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Link an already opened incident ticket with the affected CI. This is only possible when a subsequent system monitoring email arrives."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3056,10 +3076,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Set minimum loglevel. If you select 'error', just errors are logged. With 'debug' you get all logging messages."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set the incident state of a CI automatically when a system monitoring email arrives."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4672,6 +4688,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Network"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Network Adapter"
 msgstr ""
 
 #. manual entry from templates.pot.manual
