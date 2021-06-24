@@ -152,6 +152,8 @@
 "Customer";"Object";"/system/config{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Object";"/system/config/*{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Property";"/tickets/*/articles{Article.[!*,TimeUnit]}";;;;;"x"
+"Customer";"Resource";"/system/templates/categories ";;"x";;;
+"Customer";"Resource";"/system/templates/categories/* ";;"x";;;
 "Report User";"Resource";"/reporting";"x";"x";;;
 "Report User";"Resource";"/reporting/*";;;;;
 "Report User";"Resource";"/reporting/outputformats";;"x";;;
@@ -166,4 +168,3 @@
 "Report User";"Object";"/reporting/reports/*{Report.DefinitionID IN [1,2]}";;"x";;;
 "Report Manager";"Resource";"/reporting";"x";"x";"x";"x";
 "Report Manager";"Resource";"/system/roles";"";"x";"x";"";
-

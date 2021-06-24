@@ -10465,6 +10465,26 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/templates/categories]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/templates/categories/*]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
     <Data Key="role_id">14</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/reporting]]></Data>
