@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-5-17 08:11+0000\n"
+"POT-Creation-Date: 2021-6-24 07:06+0000\n"
 "PO-Revision-Date: 2021-06-10 15:47+0000\n"
 "Last-Translator: fkrahl <Frank.Krahl@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -868,12 +868,9 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid ""
-"The assembled object containing two the attributes \"Type\" and \"Definition"
+"The assembled object containing the two attributes \"Type\" and \"Definition"
 "\", which is a string representation of the object."
 msgstr ""
-"Die hier festgelegte Bezeichnung ist eine Textrepresentation des Objektes, d."
-"h. es ist möglich, auf Subattribute des Objektes zuzugreifen. Dazu muss die "
-"Bezeichnung die Form \"ObjectName.Definition.Attribute.SubAttibute\" haben."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid ""
@@ -1837,6 +1834,30 @@ msgstr ""
 msgid "Work Order"
 msgstr "Arbeitsanweisung"
 
+#. Perl Module: update/build-1455.pl
+msgid "System Acknowledge Name"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Address"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Alias"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Host"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System Service"
+msgstr ""
+
+#. Perl Module: update/build-1455.pl
+msgid "System State"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
 msgstr ""
@@ -2220,8 +2241,8 @@ msgid "Alternative to"
 msgstr "Alternativ zu"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "AssembleObject"
-msgstr "Objekt zusammenstellen"
+msgid "Assemble Object"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "AssetReference"
@@ -2242,8 +2263,9 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Basic mail interface to System Monitoring Suites. Use this block if the "
-"filter should run AFTER PostMasterFilter."
+"Basic mail interface to System Monitoring Suites. See also event "
+"\"TicketAutoLinkConfigItem\" for more specific asset search, than by host-/"
+"service name."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2342,8 +2364,8 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "CreateReport"
-msgstr "Bericht erstellen"
+msgid "Create Report"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Daily"
@@ -3090,8 +3112,8 @@ msgid "Excel"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "ExecuteMacro"
-msgstr "Macro ausführen"
+msgid "Execute Macro"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3105,8 +3127,8 @@ msgstr ""
 "Weitere Informationen über Ihr Unternehmen (vgl. auch Platzhaltertext)."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "ExtractText"
-msgstr "Text entnehmen"
+msgid "Extract Text"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Fetch emails via fetchmail (using SSL)."
@@ -3380,12 +3402,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname, Firstname (UserLogin)"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Link an already opened incident ticket with the affected CI. This is only "
-"possible when a subsequent system monitoring email arrives."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3709,12 +3725,6 @@ msgstr ""
 msgid ""
 "Set minimum loglevel. If you select 'error', just errors are logged. With "
 "'debug' you get all logging messages."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Set the incident state of a CI automatically when a system monitoring email "
-"arrives."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -5748,6 +5758,10 @@ msgid "Network"
 msgstr "Netzwerk"
 
 #. manual entry from templates.pot.manual
+msgid "Network Adapter"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Network Address"
 msgstr "Netzwerkadresse"
 
@@ -5946,6 +5960,27 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid ""
+#~ "The assembled object containing two the attributes \"Type\" and "
+#~ "\"Definition\", which is a string representation of the object."
+#~ msgstr ""
+#~ "Die hier festgelegte Bezeichnung ist eine Textrepresentation des "
+#~ "Objektes, d.h. es ist möglich, auf Subattribute des Objektes zuzugreifen. "
+#~ "Dazu muss die Bezeichnung die Form \"ObjectName.Definition.Attribute."
+#~ "SubAttibute\" haben."
+
+#~ msgid "AssembleObject"
+#~ msgstr "Objekt zusammenstellen"
+
+#~ msgid "CreateReport"
+#~ msgstr "Bericht erstellen"
+
+#~ msgid "ExecuteMacro"
+#~ msgstr "Macro ausführen"
+
+#~ msgid "ExtractText"
+#~ msgstr "Text entnehmen"
 
 #~ msgid "ObjectReference"
 #~ msgstr "Objekt Referenz"
