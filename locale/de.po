@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-6-24 08:18+0000\n"
-"PO-Revision-Date: 2021-06-24 08:29+0000\n"
+"PO-Revision-Date: 2021-06-24 13:47+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -100,27 +100,27 @@ msgstr "Alle 'entfernt'-Statustypen (Vorgabe: unsichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All closed state types (default: not viewable)."
-msgstr ""
+msgstr "Alle 'geschlossen'-Statustypen (Vorgabe: unsichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All junk tickets."
-msgstr ""
+msgstr "Alle \"Junk\"-Tickets."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All new state types (default: viewable)."
-msgstr ""
+msgstr "Alle 'neu'-Statustypen (Vorgabe: sichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "All open state types (default: viewable)."
-msgstr ""
+msgstr "Alle 'offen'-Statustypen (Vorgabe: sichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Asset Maintainer"
-msgstr ""
+msgstr "Asset Maintainer"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Asset Reader"
-msgstr ""
+msgstr "Asset Reader"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Backup Device"
@@ -128,7 +128,7 @@ msgstr "Backup Gerät"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Beamer"
-msgstr ""
+msgstr "Beamer"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Camera"
@@ -148,15 +148,15 @@ msgstr "Checkliste 02"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Client Application"
-msgstr ""
+msgstr "Client Anwendung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Client OS"
-msgstr ""
+msgstr "Client OS"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Computer"
-msgstr ""
+msgstr "Computer"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Concurrent Users"
@@ -168,27 +168,27 @@ msgstr "Kunde"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer - New Ticket Receipt"
-msgstr ""
+msgstr "Customer - Neues Ticket Bestätigung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer Manager"
-msgstr ""
+msgstr "Customer Manager"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer Reader"
-msgstr ""
+msgstr "Customer Reader"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer removed ticket."
-msgstr ""
+msgstr "Kunde/Anwender entfernte das Ticket."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Demo"
-msgstr ""
+msgstr "Demo"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Desktop"
-msgstr ""
+msgstr "Desktop"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Developer Licence"
@@ -196,21 +196,23 @@ msgstr "Entwickler Lizenz"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Docking Station"
-msgstr ""
+msgstr "Docking Station"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Embedded"
-msgstr ""
+msgstr "Embedded"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Enterprise Licence"
-msgstr ""
+msgstr "Enterprise Lizenz"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "Event based Execution Plan for Job \"KIX Field Agent - Mobile Processing "
 "Rejected\""
 msgstr ""
+"Event-basierter Ausführungsplan für Job \"KIX Field Agent - Mobile "
+"Processing Rejected\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
@@ -218,51 +220,57 @@ msgstr "Abgelaufen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQ Editor"
-msgstr ""
+msgstr "FAQ Editor"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQ Reader"
-msgstr ""
+msgstr "FAQ Reader"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQArticle"
-msgstr ""
+msgstr "FAQ Artikel"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "Follow-ups for closed tickets are not possible. A new ticket will be "
 "created.."
 msgstr ""
+"Nachfragen an geschlossenen Tickets sind nicht möglich. Es wird ein neues "
+"Ticket erstellt."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "Follow-ups for closed tickets are not possible. No new ticket will be "
 "created."
 msgstr ""
+"Nachfragen an geschlossenen Tickets sind nicht möglich. Es wird kein neues "
+"Ticket erstellt."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Follow-ups for closed tickets are possible. Ticket will be reopened."
 msgstr ""
+"Nachfragen an geschlossenen Tickets sind nicht möglich. Das Ticket wird "
+"wieder geöffnet."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Freeware"
-msgstr ""
+msgstr "Freeware"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "GSM"
-msgstr ""
+msgstr "GSM"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Hardware"
-msgstr ""
+msgstr "Hardware"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "IT Facility"
-msgstr ""
+msgstr "IT Einrichtung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "ITSMConfigItemReference"
-msgstr ""
+msgstr "ITSMConfigItemReference"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Inactive"
@@ -274,31 +282,31 @@ msgstr "Störung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Incoming monitoring messages."
-msgstr ""
+msgstr "Eingehende Monitoring Nachrichten."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "KIX Field Agent - Mobile Processing Rejected"
-msgstr ""
+msgstr "KIX Field Agent - Mobile Processing Rejected"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Keyboard"
-msgstr ""
+msgstr "Keyboard"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "LAN"
-msgstr ""
+msgstr "LAN"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Laptop"
-msgstr ""
+msgstr "Laptop"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
-msgstr ""
+msgstr "Macro für Job \"KIX Field Agent - Mobile Processing Rejected\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
-msgstr ""
+msgstr "MacroAction für Job \"KIX Field Agent - Mobile Processing Rejected\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Maintenance"
@@ -306,7 +314,7 @@ msgstr "In Wartung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Middleware"
-msgstr ""
+msgstr "Middleware"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Mobile Processing"
@@ -314,11 +322,11 @@ msgstr "Mobile Bearbeitung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Modem"
-msgstr ""
+msgstr "Modem"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Monitor"
-msgstr ""
+msgstr "Monitor"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Mouse"
@@ -326,11 +334,11 @@ msgstr "Maus"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Multiselect"
-msgstr ""
+msgstr "Mehrfachauswahl"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "New ticket created by customer."
-msgstr ""
+msgstr "Neues Ticket durch Anwender/Kunde erstellt."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Object"
@@ -338,15 +346,15 @@ msgstr "Objekt"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Office"
-msgstr ""
+msgstr "Office"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Open Source"
-msgstr ""
+msgstr "Open Source"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Open tickets."
-msgstr ""
+msgstr "Offene Tickets."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Operational"
@@ -354,47 +362,51 @@ msgstr "Betriebsbereit"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Other"
-msgstr ""
+msgstr "andere"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Outlet"
-msgstr ""
+msgstr "Outlet"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per Node"
-msgstr ""
+msgstr "pro Knoten"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per Processor"
-msgstr ""
+msgstr "pro Prozessor"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per Server"
-msgstr ""
+msgstr "pro Server"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per User"
-msgstr ""
+msgstr "pro Nutzer"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Permission type that corresponds with a API resource."
-msgstr ""
+msgstr "Berechtigungstyp zur API-Ressource."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "Permission type that restricts access of objects based on their property "
 "values (i.e. tickets with QueueID=1)."
 msgstr ""
+"Berechtigungstyp der Zugriff auf Objekte basierend auf deren Eigenschaften "
+"einschränkt (z.B. Ticket mit QueueID=1)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "Permission type that restricts access on object properties (QueueID in "
 "tickets)."
 msgstr ""
+"Berechtigungstyp der Zugriff zu Objekteigenschaften einschränkt (z.B. "
+"QueueID eines Tickets)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Phone"
-msgstr ""
+msgstr "Telefon"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Pilot"
@@ -414,11 +426,11 @@ msgstr "Produktiv"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Property"
-msgstr ""
+msgstr "Eigenschaft"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Rack"
-msgstr ""
+msgstr "Rack"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Repair"
@@ -426,15 +438,15 @@ msgstr "In Reparatur"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Report Manager"
-msgstr ""
+msgstr "Report Manager"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Report User"
-msgstr ""
+msgstr "Report User"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Resource"
-msgstr ""
+msgstr "Ressource"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Retired"
@@ -450,11 +462,11 @@ msgstr "Gefahrenübergang"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Router"
-msgstr ""
+msgstr "Router"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Scanner"
-msgstr ""
+msgstr "Scanner"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Security Device"
@@ -462,15 +474,15 @@ msgstr "Sicherheitsgerät"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Server"
-msgstr ""
+msgstr "Server"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Server Application"
-msgstr ""
+msgstr "Server Application"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Server OS"
-msgstr ""
+msgstr "Server OS"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Service Request"
@@ -478,43 +490,43 @@ msgstr "Service Anfrage"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Single Licence"
-msgstr ""
+msgstr "Einzellizenz"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Software"
-msgstr ""
+msgstr "Software"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Standard Address."
-msgstr ""
+msgstr "Standardadresse."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "State for merged tickets."
-msgstr ""
+msgstr "Status für zusammengefasste Tickets."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "State type for merged tickets (default: not viewable)."
-msgstr ""
+msgstr "Statustyp für zusammengefasste Tickets (Vorgabe: nicht sichtbar)."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Superuser"
-msgstr ""
+msgstr "Superuser"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Switch"
-msgstr ""
+msgstr "Switch"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "System Admin"
-msgstr ""
+msgstr "System Admin"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Team Service Desk."
-msgstr ""
+msgstr "Team Service Desk."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Telco"
-msgstr ""
+msgstr "Telco"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Test/QA"
@@ -522,61 +534,63 @@ msgstr "Test/QS"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "TextArea"
-msgstr ""
+msgstr "Texteingabe"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The import is running."
-msgstr ""
+msgstr "Import läuft."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The import run has been finished."
-msgstr ""
+msgstr "Import fertig."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The job is running."
-msgstr ""
+msgstr "Job läuft."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The last job run has been finished but some errors occured."
-msgstr ""
+msgstr "Die letzte Jobausführung wurde beendet. Es traten Fehler auf."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The last job run has been finished."
-msgstr ""
+msgstr "Die letzte Jobausführung wurde beendet."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "This job resets owner and lock state of a ticket, when its mobile processing "
 "state is set to \"rejected\"."
 msgstr ""
+"Dieser Job setzt Bearbeiter und Sperrstatus eines Tickets zurück, wenn der "
+"mobile Bearbeitungsstatus \"abglehnt\" gesetzt wird."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket"
-msgstr ""
+msgstr "Ticket"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent"
-msgstr ""
+msgstr "Ticket Agent"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
-msgstr ""
+msgstr "Ticket Reader"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket is closed."
-msgstr ""
+msgstr "Ticket ist geschlossen."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket is pending for agent reminder."
-msgstr ""
+msgstr "Ticket wartet auf Erinnerung für Agenten."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket is pending for automatic close."
-msgstr ""
+msgstr "Ticket wartet auf autom. Abschluss."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Time Restricted"
-msgstr ""
+msgstr "zeitbeschränkt"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "USB Device"
@@ -589,19 +603,19 @@ msgstr "Unklassifiziert"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Unlimited"
-msgstr ""
+msgstr "Unbegrenzt"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "User Tool"
-msgstr ""
+msgstr "User Tool"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Volume Licence"
-msgstr ""
+msgstr "Volumenlizenz"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "WLAN"
-msgstr ""
+msgstr "WLAN"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "WLAN Access Point"
@@ -613,15 +627,15 @@ msgstr "Warnung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Webform Ticket Creator"
-msgstr ""
+msgstr "Webform Ticket Creator"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Workplace"
-msgstr ""
+msgstr "Workplace"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "agent"
-msgstr ""
+msgstr "Agent"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -629,45 +643,58 @@ msgid ""
 "create FAQ votes, allows to change data of the personal user, allows to set "
 "ticket article flags"
 msgstr ""
+"erlaubt einem Anwender/Kunden sich anzumelden, Tickets, FAQ und Assetdaten "
+"einzusehen, FAQ-Artikel zu bewerten und Änderungen an persönlichen "
+"Einstellungen oder Ticketartikel-Flags vorzunehmen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to change/edit any system configuration found in the Admin-Module, "
 "requires Agent-User role though in order to log in the system"
 msgstr ""
+"erlaubt Änderungen in Systemkonfiguration via der Admin-Module, erfordert "
+"dennoch Rolle Agent-User für Anmeldung am System"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to create new tickets by using the \"Customer Portal Light\" webform "
 "mechanism"
 msgstr ""
+"erlaubt das Erstellen neuer Tickets mittels \"Customer Portal Light\" "
+"Webformulare"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to login in both frontend- and backend application but does not grant "
 "any further permissions"
 msgstr ""
+"erlaubt Anmeldung an Backend und Frontend, darüber hinaus jedoch keine "
+"weiteren Berechtigungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to read any FAQ article in any FAQ category and allows to READ links"
-msgstr ""
+msgstr "erlaubt FAQ-Artikel in jeder FAQ-Kategorie und Verknüpfungen einzusehen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to read any asset information in any asset class and allows to READ "
 "links"
 msgstr ""
+"erlaubt das Einsehen von Assetinformationen jeder Assetklasse und deren "
+"Verknüpfungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "allows to read any ticket in any queue and allows to READ links"
 msgstr ""
+"erlaubt alle Tickets in allen Queues/Teams sowie deren Verknüpfungen "
+"einzusehen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "allows to read information of any organization or contact and allows to READ "
 "links"
-msgstr ""
+msgstr "erlaubt Informationen zu Organisationen und Kontakten einzusehen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "closed"
@@ -675,15 +702,15 @@ msgstr "geschlossen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "email"
-msgstr ""
+msgstr "E-Mail"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "external"
-msgstr ""
+msgstr "extern"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "full permissions on everything (CRUD on resource /*)"
-msgstr ""
+msgstr "volle Berechtigungen auf alles (CRUD auf Ressource /*)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "invalid"
@@ -695,7 +722,7 @@ msgstr "temporär ungültig"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "lock"
-msgstr ""
+msgstr "gesperrt"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "merged"
@@ -712,7 +739,7 @@ msgstr "neues Ticket"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "note"
-msgstr ""
+msgstr "Notiz"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "open"
@@ -720,7 +747,7 @@ msgstr "offen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "pending auto"
-msgstr ""
+msgstr "warten auto"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "pending auto close"
@@ -745,13 +772,15 @@ msgstr "entfernt"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "running"
-msgstr ""
+msgstr "laufend"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "same as Asset-Reader, but additionally  allows to create new or update any "
 "existing asset entry and allows to CREATE, UPDATE, DELETE links"
 msgstr ""
+"wie Asset-Reader, ermöglicht jedoch zusätzlich das Erstellen neuer oder "
+"Bearbeiten vorhandener Assets und Verknüpfungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -759,26 +788,32 @@ msgid ""
 "existing contact or organization entry and allows to CREATE, UPDATE, DELETE "
 "links"
 msgstr ""
+"wie Customer Reader, ermöglicht jedoch zusätzlich das Erstellen neuer oder "
+"Bearbeiten vorhandener Organisationen, Kontakte und deren Verknüpfungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "same as FAQ Reader, but additionally allows to create new or edit any "
 "existing FAQ article and allows to CREATE, UPDATE, DELETE links"
 msgstr ""
+"wie FAQ Reader, ermöglicht jedoch zusätzlich das Erstellen neuer oder "
+"Bearbeiten vorhandener FAQ-Artikel und deren Verknüpfungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
 "same as Ticket Reader, but additionally allows to create new or edit any "
 "existing ticket and allows to CREATE, UPDATE, DELETE links"
 msgstr ""
+"wie Ticket Reader, ermöglicht jedoch zusätzlich das Erstellen neuer oder "
+"Bearbeiten vorhandener Tickets, -Artikel und deren Verknüpfungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "system"
-msgstr ""
+msgstr "System"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "unlock"
-msgstr ""
+msgstr "entsperrt"
 
 # valid
 #. Database: scripts/database/kix-initial_insert.xml
@@ -791,80 +826,90 @@ msgstr "Warnung"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "d"
-msgstr ""
+msgstr "d"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "h"
-msgstr ""
+msgstr "h"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "No matches found."
-msgstr ""
+msgstr "Keine Treffer gefunden."
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "Page"
-msgstr ""
+msgstr "Seite"
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "Time Zone"
-msgstr ""
+msgstr "Zeitzone"
 
 #. Perl Module: Kernel/System/Auth.pm
 msgid ""
 "It is currently not possible to login due to a scheduled system maintenance."
 msgstr ""
+"Auf Grund geplanter Wartungsarbeiten ist eine Anmeldung aktuell nicht "
+"möglich."
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/EventBased.pm
 msgid ""
 "Allows an event based execution of automation jobs. At least one event must "
 "be configured."
 msgstr ""
+"Erlaubt die event-basierte Ausführung von Automatisierungsjobs. Es muss "
+"mind. ein Event konfiguriert sein."
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/EventBased.pm
 msgid "An array of events that should trigger the execution of the job."
-msgstr ""
+msgstr "Ein Reihe von Ereignissen, welche die Ausführung eines Jobs auslösen."
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/EventBased.pm
 msgid "Event"
-msgstr ""
+msgstr "Ereignis"
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/TimeBased.pm
 msgid ""
 "Allows a time based execution of automation jobs. At least one weekday and "
 "time must be configured."
 msgstr ""
+"Erlaubt die zeitbasierte Ausführung von Automatisierungsjobs. Mind. ein "
+"Wochentag und Zeit muss konfiguriert sein."
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/TimeBased.pm
 msgid ""
 "An array of times when the job should be executed on every configured "
 "weekday."
 msgstr ""
+"Eine Reihe von Zeiten zu denen der Job an jedem definiertem Wochentag "
+"ausgeführt wird."
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/TimeBased.pm
 msgid ""
 "An array of weekdays (Mon,Tue,Wed,Thu,Fri,Sat,Sun) when the job should be "
 "executed."
 msgstr ""
+"Eine Reihe von Wochentagen (Mon,Tue,Wed,Thu,Fri,Sat,Sun) zu denen der Job "
+"ausgeführt wird."
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/TimeBased.pm
 msgid "Time"
-msgstr ""
+msgstr "Zeit"
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/TimeBased.pm
 msgid "Weekday"
-msgstr ""
+msgstr "Wochentag"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid "Assembles a new object to be used later in the execution."
-msgstr ""
+msgstr "Stellt ein Objekt für weitere Nutzung in einer Jobausführung zusammen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid "Definition"
-msgstr ""
+msgstr "Definition"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid ""
@@ -894,7 +939,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "Execute the depending macro if the logical expression is true."
-msgstr ""
+msgstr "Führe das Macro aus, wenn der logische Ausdruck \"true\" ist."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "If"
@@ -903,6 +948,7 @@ msgstr "Wenn"
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The ID of the macro to execute if the logical expression is true."
 msgstr ""
+"Die ID des auszuführenden Makros, wenn der logischen Ausdrucks \"true\" ist."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The logical expression to evaluate."
@@ -913,11 +959,11 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Create a report from a report definition."
-msgstr ""
+msgstr "Erstelle einen Bericht aus einer Reportdefinition."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Output Formats"
-msgstr ""
+msgstr "Ausgabeformate"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Parameters"
@@ -925,7 +971,7 @@ msgstr "Parameter"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Report Definition"
-msgstr ""
+msgstr "Reportdefinition"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The ID of the report definition."
@@ -954,15 +1000,15 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "Executes a given macro."
-msgstr ""
+msgstr "Führt ein angegebene Makro aus."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "ObjectID"
-msgstr ""
+msgstr "ObjectID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "The ID of the macro to execute."
-msgstr ""
+msgstr "ID des auszuführenden Makros."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "The ID of the object to run the macro for."
@@ -974,7 +1020,7 @@ msgstr "Capture Group Namen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "Extract parts of a text via Regular Expressions (RegEx)."
-msgstr ""
+msgstr "Extrahiert Teile eines Texts mittels regulärer Ausdrücke (RegEx)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid ""
@@ -991,7 +1037,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "RegEx"
-msgstr ""
+msgstr "RegEx"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The RegEx containing the capture groups."
@@ -1027,18 +1073,20 @@ msgid ""
 "Execute a loop over each of the given values. Each value will be the new "
 "ObjectID for the depending macro."
 msgstr ""
+"Führt das innere Makro mit dem zugeordneten Objekttyp zu jedem gegebenen "
+"Wert aus. Der Wert wird dabei als Objekt-ID verwendet."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "Loop Variable"
-msgstr ""
+msgstr "Schleifenvariable"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "MacroID"
-msgstr ""
+msgstr "MacroID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "The ID of the macro to execute for each value."
-msgstr ""
+msgstr "Die ID des für jeden Wert auszuführenden Makros."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid ""
@@ -1132,15 +1180,15 @@ msgstr "Anhangsobjekt 5"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Bcc"
-msgstr ""
+msgstr "Bcc"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Body"
-msgstr ""
+msgstr "Body"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Cc"
-msgstr ""
+msgstr "Cc"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Channel"
@@ -1148,11 +1196,11 @@ msgstr "Kanal"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Creates an article for a ticket."
-msgstr ""
+msgstr "Erstellt einen Artikel für ein Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "From"
-msgstr ""
+msgstr "From"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "If the new article is visible for customers"
@@ -1161,7 +1209,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Sender Type"
-msgstr ""
+msgstr "Sendertyp"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Show in Customer Portal"
@@ -1169,7 +1217,7 @@ msgstr "Für Self Service Portal freigeben"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Subject"
-msgstr ""
+msgstr "Betreff"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The ID of the new article."
@@ -1187,12 +1235,14 @@ msgstr "Der Inhalt des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "To"
-msgstr ""
+msgstr "To"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
 msgid ""
 "Sets the contact (and its primary organisation as organisation) of a ticket."
 msgstr ""
+"Setzt den Kontakt und dessen Primäre Organisation als Kontakt und "
+"Organisation an einem Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
 msgid "The ID or email of the contact to be set."
@@ -1204,15 +1254,15 @@ msgstr "Hinzufügen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Dynamic Field Name"
-msgstr ""
+msgstr "Dynamic Field Name"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Dynamic Field Value"
-msgstr ""
+msgstr "Dynamic Field Value"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Sets a dynamic field value of a ticket."
-msgstr ""
+msgstr "Setzt den Wert eines Dynamischen Feldes eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Specifies whether the new value should be appended or set."
@@ -1232,13 +1282,13 @@ msgid ""
 "The value for the dynamic field to be set. Leave empty and uncheck \"Append"
 "\" to clear relevant dynamic field value of ticket."
 msgstr ""
-"Der \"value\" des dynamischen Feldes, welches gesetzt werden soll. Zum "
-"Entfernen des dynamischen Feldwertes am Ticket leer lassen und \"Hinzufügen"
-"\" nicht anhaken. Feldtyp \"Selection\" erwartet den \"key\" des zu "
-"setzenden Wertes, Feldtyp \"AssetReference\" erwartet die Asset ID, Feldtyp "
-"\"TicketReference\" erwartet die Ticket ID, Feldtyp \"Checklist\" erwartet "
-"das entsprechende JSON-Format, Feldtyp \"Date\" erwartet das Format <YYYY-MM-"
-"DD 00:00:00>, Feldtyp \"DateTime\" das Format <YYYY-MM-DD hh:mm:ss>."
+"Der \"value\" des dynamischen Feldes, das gesetzt werden soll. Zum Entfernen "
+"des Feldwertes am Ticket leer lassen und \"Hinzufügen\" nicht anhaken. "
+"Feldtyp \"Selection\" erwartet den \"key\" des zu setzenden Wertes, Feldtyp "
+"\"AssetReference\" erwartet die Asset ID, Feldtyp \"TicketReference\" "
+"erwartet die Ticket ID, Feldtyp \"Checklist\" erwartet das entsprechende "
+"JSON-Format, Feldtyp \"Date\" erwartet Format <YYYY-MM-DD 00:00:00>, Feldtyp "
+"\"DateTime\" das Format <YYYY-MM-DD hh:mm:ss>."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Asset Reference Dynamic Field"
@@ -1257,7 +1307,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "Force"
-msgstr ""
+msgstr "Erzwingen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid ""
@@ -1282,17 +1332,17 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "Sets the lock state of a ticket."
-msgstr ""
+msgstr "Setzt den Sperrstatus eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/LockSet.pm
 msgid "The lock state to be set."
 msgstr ""
 "Der Name des Sperrstatus, der gesetzt werden soll. (Achtung: Übersetzungen "
-"des Namens sind nicht möglich)"
+"des Namens sind nicht möglich)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
 msgid "Sets the organisation of a ticket."
-msgstr ""
+msgstr "Setzt die Organisation eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OrganisationSet.pm
 msgid "The ID or number of the organisation to be set."
@@ -1300,7 +1350,7 @@ msgstr "Die ID oder KNR des Kunden, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
 msgid "Sets the owner of a ticket."
-msgstr ""
+msgstr "Setzt den Bearbeiter eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
 msgid "The ID or login of the agent to be set."
@@ -1308,27 +1358,27 @@ msgstr "Die ID oder der Login des Agenten, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/PrioritySet.pm
 msgid "Sets the priority of a ticket."
-msgstr ""
+msgstr "Setzt die Priorität eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/PrioritySet.pm
 msgid "The name of the priority to be set."
 msgstr ""
 "Der Name der Priorität, die gesetzt werden soll. (Achtung: Übersetzungen des "
-"Namens sind nicht möglich)"
+"Namens sind nicht möglich)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
 msgid "Sets the responsible of a ticket."
-msgstr ""
+msgstr "Setzt den Verantwortlichen eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "Sets the state of a ticket."
-msgstr ""
+msgstr "Setzt den Status eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "The name of the state to be set."
 msgstr ""
 "Der Name des Status, der gesetzt wird. (Achtung: Übersetzungen des Namens "
-"sind nicht möglich)"
+"sind nicht möglich)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TeamSet.pm
 msgid "Sets the team of a ticket."
@@ -1360,11 +1410,11 @@ msgstr "Erstellt ein neues Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Dynamic Fields"
-msgstr ""
+msgstr "Dynamische Felder"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Lock"
-msgstr ""
+msgstr "Sperre"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Organisation"
@@ -1384,7 +1434,7 @@ msgstr "Priorität"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Responsible"
-msgstr ""
+msgstr "Verantwortlicher"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "State"
@@ -1392,7 +1442,7 @@ msgstr "Status"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Team"
-msgstr ""
+msgstr "Team"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID of the new ticket."
@@ -1440,7 +1490,7 @@ msgstr "Der Name des Sperrstatus des neuen Tickets."
 msgid "The name of the priority of the new ticket."
 msgstr ""
 "Der Name der Priorität des neuen Tickets. (Achtung: Übersetzungen des Namens "
-"sind nicht möglich)"
+"sind nicht möglich)."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The name of the state of the new ticket."
@@ -1473,7 +1523,7 @@ msgstr "Der Titel des neuen Tickets und Betreff des ersten Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "Sets the title of a ticket."
-msgstr ""
+msgstr "Setzt den Titel eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "The new title of a ticket to be set."
@@ -1481,7 +1531,7 @@ msgstr "Der neue Titel der Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TypeSet.pm
 msgid "Sets the type of a ticket."
-msgstr ""
+msgstr "Setzt den Typ eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TypeSet.pm
 msgid "The name of the type to be set."
@@ -1513,83 +1563,83 @@ msgstr "Dieses Feld ist ein Pflichtfeld."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "and"
-msgstr ""
+msgstr "und"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "before/after"
-msgstr ""
+msgstr "vor/nach"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "between"
-msgstr ""
+msgstr "zwischen"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "day"
-msgstr ""
+msgstr "Tag"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "day(s)"
-msgstr ""
+msgstr "Tag(e)"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "hour(s)"
-msgstr ""
+msgstr "Stunde(n)"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "in more than ..."
-msgstr ""
+msgstr "in mehr als..."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "minute(s)"
-msgstr ""
+msgstr "Minute(n)"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "month(s)"
-msgstr ""
+msgstr "Monat(e)"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "more than ... ago"
-msgstr ""
+msgstr "vor mehr als ..."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "week(s)"
-msgstr ""
+msgstr "Woche(n)"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "within the last ..."
-msgstr ""
+msgstr "innerhalb der letzten ..."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "within the next ..."
-msgstr ""
+msgstr "innerhalb der nächsten ..."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
 msgid "year(s)"
-msgstr ""
+msgstr "Jahr(e)"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Multiselect.pm
 msgid "Show Tree Selection"
-msgstr ""
+msgstr "Baumauswahl anzeigen"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
 msgid "Remove selection"
-msgstr ""
+msgstr "Auswahl entfernen"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
 msgid "Maximum size is %s characters."
-msgstr ""
+msgstr "Maximale Länge ist %s Zeichen."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
 msgid "The field content is too long!"
-msgstr ""
+msgstr "Der Feldinhalt ist zu lang!"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
 msgid "This field is required or"
-msgstr ""
+msgstr "Das Feld wird benötigt oder"
 
 #. Perl Module: Kernel/System/FwdLinkedObjectData.pm
 msgid "Location Information"
-msgstr ""
+msgstr "Standortinformation"
 
 #. Perl Module: Kernel/System/ITSMConfigItem/History.pm
 msgid "CIHistory::"
@@ -1601,49 +1651,53 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17.pm
 msgid "in progress"
-msgstr ""
+msgstr "in Bearbeitung"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "aborted"
-msgstr ""
+msgstr "abgebrochen"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "finished"
-msgstr ""
+msgstr "beendet"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "loading data from source"
-msgstr ""
+msgstr "lade Daten aus Quelle"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "pending"
-msgstr ""
+msgstr "wartend"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
 msgid "DF Type not yet supported!"
-msgstr ""
+msgstr "DF Typ nicht unterstützt!"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
 msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
-msgstr ""
+msgstr "DIESES FELD NICHT AKTIVIEREN BIS DER TYP UNTERSTÜTZT WIRD!"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
 msgid ""
 "A list of output handler to be run on the data in the given order. The "
 "output of each handler will be used as the input of the following handler."
 msgstr ""
+"Eine Lsite von Output-Handlern (Ausgabeprozessoren) die Daten in der "
+"gegebenen Reihenfolge bearbeiten. Die Ausgabe eines jeden Ausgabeprozessors "
+"wird als Input für den folgenden verwendet."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
 msgid "Allows to retrieve report data based on an SQL statement."
 msgstr ""
+"Ermöglich das Beziehen von Berichtsdaten basierend auf einer SQL-Abfrage."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
 msgid "Output Handler"
-msgstr ""
+msgstr "Output Handler"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
 msgid "SQL"
-msgstr ""
+msgstr "SQL"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
 msgid ""
@@ -1655,24 +1709,26 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "Plugin"
-msgstr ""
+msgstr "Plugin"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid ""
 "Returns the given text if the requested plugin is available in this system."
 msgstr ""
+"Gibt den definierten Text zurück, wenn das angefragte Plugin im System "
+"vorhanden ist."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "The name of the plugin to check for."
-msgstr ""
+msgstr "Der Name des zu prüfenden Plugins."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "The text to return if the requested plugin is available."
-msgstr ""
+msgstr "Der zurückzugebende Text, wenn das Plugin vorhanden ist."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
 msgid "Columns"
@@ -1680,7 +1736,7 @@ msgstr "Spalten"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
 msgid "Field Names"
-msgstr ""
+msgstr "Feldnamen"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
 msgid "Resolves the actual display value of a dynamic field."
@@ -1697,7 +1753,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
 msgid "Language"
-msgstr ""
+msgstr "Sprache"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
 msgid "The columns in the raw data to be translated."
@@ -1708,10 +1764,12 @@ msgid ""
 "The identifier of the language, i.e \"de\". If not given, the systems "
 "default language will be used."
 msgstr ""
+"Der Sprachidentifikator, z.B. \"de\". Wenn nicht angegeben wird die "
+"Standardsprache des Systems benutzt."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
 msgid "Translate a value."
-msgstr ""
+msgstr "Einen Wert übersetzen."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid ""
@@ -1724,7 +1782,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Converts the report data to CSV."
-msgstr ""
+msgstr "Wandelt die Berichtsdaten in CSV um."
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid ""
@@ -1742,7 +1800,7 @@ msgstr "Spalten-Header beachten"
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Quote"
-msgstr ""
+msgstr "Quote"
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Separator"
@@ -1784,15 +1842,15 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
-msgstr ""
+msgstr "Entsperrzeit zurück setzen."
 
 #. Perl Module: Kernel/System/Ticket/Event/CreateFAQEntry.pm
 msgid "FAQ Item suggested in source ticket:"
-msgstr ""
+msgstr "FAQ Eintrag vorgeschlagen in Quellticket:"
 
 #. Perl Module: update/build-1373.pl
 msgid "Related Assets"
@@ -1800,7 +1858,7 @@ msgstr "Relevante Assets"
 
 #. Perl Module: update/build-1391.pl
 msgid "Source"
-msgstr ""
+msgstr "Quelle"
 
 #. Perl Module: update/build-1415.pl
 msgid ""
@@ -1836,27 +1894,27 @@ msgstr "Arbeitsanweisung"
 
 #. Perl Module: update/build-1455.pl
 msgid "System Acknowledge Name"
-msgstr ""
+msgstr "System Acknowledge Name"
 
 #. Perl Module: update/build-1455.pl
 msgid "System Address"
-msgstr ""
+msgstr "Systemadresse"
 
 #. Perl Module: update/build-1455.pl
 msgid "System Alias"
-msgstr ""
+msgstr "Systemalias"
 
 #. Perl Module: update/build-1455.pl
 msgid "System Host"
-msgstr ""
+msgstr "Systemhost"
 
 #. Perl Module: update/build-1455.pl
 msgid "System Service"
-msgstr ""
+msgstr "Systemservice"
 
 #. Perl Module: update/build-1455.pl
 msgid "System State"
-msgstr ""
+msgstr "Systemstatus"
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the invoker layer."
@@ -1979,7 +2037,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Age"
-msgstr ""
+msgstr "Alter"
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid ""
@@ -2020,7 +2078,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Queue"
-msgstr ""
+msgstr "Team"
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Up"
@@ -2036,7 +2094,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Decimal places of the voting result."
-msgstr ""
+msgstr "Dezimalstellen des Bewertungsergebnisses."
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Default maximum size of the titles in a FAQ article to be shown."
@@ -2064,7 +2122,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "FAQ"
-msgstr ""
+msgstr "FAQ"
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Field4"
@@ -2104,11 +2162,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Solution"
-msgstr ""
+msgstr "Lösung"
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Symptom"
-msgstr ""
+msgstr "Symptom"
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "The identifier for a FAQ, e.g. FAQ#, KB#, MyFAQ#. The default is FAQ#."
@@ -2365,7 +2423,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Create Report"
-msgstr ""
+msgstr "Bericht erstellen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Daily"
@@ -3105,7 +3163,7 @@ msgstr "Englisch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Event Based"
-msgstr ""
+msgstr "Eventgesteuert"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Excel"
@@ -3575,7 +3633,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Print"
-msgstr ""
+msgstr "Drucken"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "PrintBehaviour"
@@ -3645,7 +3703,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Reporting"
-msgstr ""
+msgstr "Berichte"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4132,7 +4190,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Time Based"
-msgstr ""
+msgstr "Zeitgesteuert"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Translate"
@@ -4168,7 +4226,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "User"
-msgstr ""
+msgstr "Nutzer"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4444,23 +4502,23 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ImportExport.xml
 msgid ", (comma)"
-msgstr ""
+msgstr ", (Komma)"
 
 #. SysConfig: Kernel/Config/Files/ImportExport.xml
 msgid "-> (tab)"
-msgstr ""
+msgstr "-> (Tabulator)"
 
 #. SysConfig: Kernel/Config/Files/ImportExport.xml
 msgid ". (dot)"
-msgstr ""
+msgstr ". (Punkt)"
 
 #. SysConfig: Kernel/Config/Files/ImportExport.xml
 msgid ": (colon)"
-msgstr ""
+msgstr ": (Doppelpunkt)"
 
 #. SysConfig: Kernel/Config/Files/ImportExport.xml
 msgid "; (semicolon)"
-msgstr ""
+msgstr "; (Semikolon)"
 
 #. SysConfig: Kernel/Config/Files/ImportExport.xml
 msgid "Defines if CSV-mappings are re-created if already existent."
@@ -4893,7 +4951,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Email"
-msgstr ""
+msgstr "E-Mail"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Email sent to \"%s\"."
@@ -5723,7 +5781,7 @@ msgstr "IP via DHCP"
 
 #. manual entry from templates.pot.manual
 msgid "Incident Report"
-msgstr ""
+msgstr "Störungsmeldung"
 
 #. manual entry from templates.pot.manual
 msgid "Installed Software"
@@ -5759,7 +5817,7 @@ msgstr "Netzwerk"
 
 #. manual entry from templates.pot.manual
 msgid "Network Adapter"
-msgstr ""
+msgstr "Netzwerk Adapter"
 
 #. manual entry from templates.pot.manual
 msgid "Network Address"
