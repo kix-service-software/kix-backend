@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-6-24 08:18+0000\n"
-"PO-Revision-Date: 2021-06-24 13:47+0000\n"
+"PO-Revision-Date: 2021-06-24 16:52+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
@@ -334,7 +334,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Object"
-msgstr ""
+msgstr "Object"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Office"
@@ -1326,11 +1326,11 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Organisation"
-msgstr ""
+msgstr "Organisation"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Owner"
-msgstr ""
+msgstr "Owner"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "Pending Time Difference"
@@ -5669,7 +5669,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #. manual entry from templates.pot.manual
 msgid "No \"Authorization\" header found."
