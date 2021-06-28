@@ -150,7 +150,7 @@ sub Run {
 
     # get sender email
     my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine(
-        Line => $GetParam{From},
+        Line => $GetParam{'X-KIX-From'} || $GetParam{From},
     );
     for my $Address (@EmailAddresses) {
         $GetParam{SenderEmailAddress} = $Self->{ParserObject}->GetEmailAddress(
@@ -191,9 +191,19 @@ sub Run {
 
         if ( %List ) {
             $GetParam{'X-KIX-Contact'} = (keys %List)[0];
+
+            #if contact given, also assign its primary organisation id...
+            if( $GetParam{'X-KIX-Contact'} ) {
+                my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+                  ID => $GetParam{'X-KIX-Contact'},
+                );
+                if( %ContactData && $ContactData{'PrimaryOrganisationID'} ) {
+                    $GetParam{'X-KIX-Organisation'} = $ContactData{'PrimaryOrganisationID'};
+                }
+            }
         }
         else {
-            # we can't assign a contact to it, clear it to give was to the fallback
+            # if we can't assign a contact, clear it...
             $GetParam{'X-KIX-Contact'} = undef;
         }
     }
@@ -578,7 +588,7 @@ sub Run {
         Channel          => $GetParam{'X-KIX-Channel'} || 'email',
         CustomerVisible  => 1,
         SenderType       => $GetParam{'X-KIX-SenderType'} || 'external',
-        From             => $GetParam{From},
+        From             => $GetParam{'X-KIX-From'} || $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
         Cc               => $GetParam{Cc},
