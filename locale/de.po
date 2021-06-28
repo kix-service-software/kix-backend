@@ -2300,7 +2300,7 @@ msgstr "Alternativ zu"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Assemble Object"
-msgstr ""
+msgstr "Objekt zusammenstellen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "AssetReference"
@@ -3171,7 +3171,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Execute Macro"
-msgstr ""
+msgstr "Macro ausführen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3186,7 +3186,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Extract Text"
-msgstr ""
+msgstr "Text entnehmen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Fetch emails via fetchmail (using SSL)."
@@ -6027,18 +6027,6 @@ msgstr "ja"
 #~ "Objektes, d.h. es ist möglich, auf Subattribute des Objektes zuzugreifen. "
 #~ "Dazu muss die Bezeichnung die Form \"ObjectName.Definition.Attribute."
 #~ "SubAttibute\" haben."
-
-#~ msgid "AssembleObject"
-#~ msgstr "Objekt zusammenstellen"
-
-#~ msgid "CreateReport"
-#~ msgstr "Bericht erstellen"
-
-#~ msgid "ExecuteMacro"
-#~ msgstr "Macro ausführen"
-
-#~ msgid "ExtractText"
-#~ msgstr "Text entnehmen"
 
 #~ msgid "ObjectReference"
 #~ msgstr "Objekt Referenz"
