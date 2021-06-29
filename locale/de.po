@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-6-24 08:18+0000\n"
-"PO-Revision-Date: 2021-06-25 08:47+0000\n"
+"PO-Revision-Date: 2021-06-29 08:47+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -3171,7 +3171,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Execute Macro"
-msgstr ""
+msgstr "Makro Ausführen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
