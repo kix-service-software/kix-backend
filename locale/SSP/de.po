@@ -87,9 +87,9 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/components/AttachmentUpload.vue:48
+#: src/components/AttachmentUpload.vue:45
 msgid "File(s) added"
-msgstr ""
+msgstr "Datei(en) hinzugefügt"
 
 #: src/components/AttachmentUpload.vue:56
 msgid "All"
@@ -301,8 +301,24 @@ msgstr ""
 
 #: manuel added from scr/views/TicketList.vue:151
 msgid "My Tickets"
-msgstr ""
+msgstr "Meine Tickets"
 
 #: manuel added from scr/views/TicketList.vue:152
 msgid "Tickets by others"
+msgstr "Ticket von anderen"
+
+#: manuel added from SSP src/views/TicketDetails.vue:44
+msgid "Further information"
+msgstr "Weitere Informationen"
+
+#: manuel added from SSP src/App.vue:41
+msgid "Dark mode"
 msgstr ""
+
+#: manuel added from SSP src/models/ticket/article.ts:34
+msgid "Number of attachments"
+msgstr "Anzahl Anhänge"
+
+#: manuel added from SSP src/views/ConfigItemDetails.vue:58
+msgid "No further information."
+msgstr "Keine weiteren Informationen."

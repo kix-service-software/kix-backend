@@ -5856,15 +5856,3 @@ msgstr ""
 #~ "This label is a text representation of the object. It is possible to "
 #~ "address subattributes of the object. Therefore use the form \"ObjectName."
 #~ "Definition.Attribute.SubAttibute\"."
-
-#~ msgid "AssembleObject"
-#~ msgstr "Assemble Object"
-
-#~ msgid "CreateReport"
-#~ msgstr "Create Report"
-
-#~ msgid "ExecuteMacro"
-#~ msgstr "Executie Macro"
-
-#~ msgid "ExtractText"
-#~ msgstr "Extract Text"
