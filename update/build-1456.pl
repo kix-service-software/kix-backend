@@ -28,6 +28,7 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 use vars qw(%INC);
 
 _UpdateMyQueuePreference();
+_UpdateCustomerRole();
 
 exit 0;
 
@@ -71,6 +72,107 @@ sub _UpdateMyQueuePreference {
         Priority => 'info',
         Message  => "Updated $UpdateCount 'MyQueues' user preferences!"
     );
+
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
+
+    return 1;
+}
+
+sub _UpdateCustomerRole {
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    my %RoleList = reverse $RoleObject->RoleList();
+    my %PermissionTypeList = reverse $RoleObject->PermissionTypeList();
+
+    my $AllOk = 1;
+
+    # permissions to delete
+    my @PermissionUpdates = (
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'Object',
+                Target => '/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID}'
+            },
+            Change => {}
+        },
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'Object',
+                Target => '/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID}'
+            },
+            Change => {}
+        },
+        ,
+        {
+            Permission => {
+                Role   => 'Customer',
+                Type   => 'Object',
+                Target => '/tickets{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}'
+            },
+            Change => {}
+        }
+    );
+
+    foreach my $Update ( @PermissionUpdates ) {
+        my $RoleID = $RoleList{$Update->{Permission}->{Role}};
+        if (!$RoleID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find role "'.$Update->{Permission}->{Role}.'"! Skipping...'
+            );
+            $AllOk = 0;
+            next;
+        }
+        my $PermissionTypeID = $PermissionTypeList{$Update->{Permission}->{Type}};
+        if (!$PermissionTypeID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find permission type "'.$Update->{Permission}->{Type}.'"! Skipping...'
+            );
+            $AllOk = 0;
+            next;
+        }
+
+        my $PermissionID = $RoleObject->PermissionLookup(
+            RoleID => $RoleID,
+            TypeID => $PermissionTypeID,
+            Target => $Update->{Permission}->{Target}
+        );
+        # nothing to do
+        if (!$PermissionID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to find permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})! Skipping..."
+            );
+            $AllOk = 0;
+            next;
+        }
+
+        my $Success = $RoleObject->PermissionDelete(
+            ID     => $PermissionID,
+            UserID => 1,
+            %{$Update->{Change}}
+        );
+
+        if (!$Success) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to delete permission (role=$Update->{Permission}->{Role}, type=$Update->{Permission}->{Type}, target=$Update->{Permission}->{Target})!"
+            );
+            $AllOk = 0;
+        }
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "deleted permission ID $PermissionID!"
+            );
+        }
+    }    
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();

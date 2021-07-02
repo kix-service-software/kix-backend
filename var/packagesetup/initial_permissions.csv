@@ -137,9 +137,6 @@
 "Customer";"Resource";"/system/users";;"x";;;
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
-"Customer";"Object";"/tickets{Ticket.ContactID NE $CurrentUser.Contact.ID}";;;;;
-"Customer";"Object";"/tickets/*{Ticket.ContactID NE $CurrentUser.Contact.ID}";;;;;
-"Customer";"Object";"/tickets{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
 "Customer";"Object";"/tickets/*{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
 "Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
