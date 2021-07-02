@@ -253,10 +253,7 @@ sub Search {
 
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'art_left.customer_visible = 1' );
-            push( @SQLWhere, 'art_right.customer_visible = 1' );
-        } else {
+        if ( $Param{BoolOperator} eq 'AND') {
             push( @SQLWhere, 'art.customer_visible = 1' );
         }
     }
