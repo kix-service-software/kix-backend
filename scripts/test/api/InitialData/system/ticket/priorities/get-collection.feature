@@ -8,7 +8,7 @@ Feature: GET request to the /system/ticket/priorities resource
   Scenario: check is the existing priorities are consistent with the delivery defaults
     When I query the collection of ticket priorities
     Then the response code is 200
-    And the response object is PriorityCollectionResponse
+#    And the response object is PriorityCollectionResponse
     Then the response contains 5 items of type "Priority"
     Then the response contains the following items of type Priority
       | Name        | ValidID |

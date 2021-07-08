@@ -32,6 +32,7 @@ When qr/I query the cmdb collection of classes$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/cmdb/classes',
+      Sort  => 'ConfigItemClass.Name:textual'
    );
 };
 

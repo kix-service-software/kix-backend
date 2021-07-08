@@ -31,7 +31,7 @@ require '_StepsLib.pl';
 When qr/I delete this clientregistration$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Delete(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration/'.S->{ClientIDArray}->[0],
+      URL   => S->{API_URL}.'/clientregistrations/'.S->{ClientIDArray}->[0],
    );
 };
 
@@ -39,7 +39,7 @@ When qr/delete all this clientregistrations$/, sub {
     for ($i=0;$i<@{S->{ClientIDArray}};$i++){ 
         ( S->{Response}, S->{ResponseContent} ) = _Delete(
             Token => S->{Token},
-            URL   => S->{API_URL}.'/clientregistration/'.S->{ClientIDArray}->[$i],
+            URL   => S->{API_URL}.'/clientregistrations/'.S->{ClientIDArray}->[$i],
         );
     }
 

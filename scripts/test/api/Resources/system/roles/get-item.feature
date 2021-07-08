@@ -9,7 +9,7 @@ Feature: GET request to the /system/roles/:RoleID resource
     Given a role
     When I get this role
     Then the response code is 200
-    And the response object is RoleResponse
+#    And the response object is RoleResponse
     And the attribute "Role.Name" is "the new stats role GET"
     When I delete this role
     Then the response code is 204    

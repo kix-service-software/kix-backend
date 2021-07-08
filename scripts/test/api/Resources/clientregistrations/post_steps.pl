@@ -30,7 +30,7 @@ require '_StepsLib.pl';
 
 Given qr/a clientregistration$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
-      URL     => S->{API_URL}.'/clientregistration',
+      URL     => S->{API_URL}.'/clientregistrations',
       Token   => S->{Token},
       Content => {
         ClientRegistration => {
@@ -55,7 +55,7 @@ Given qr/(\d+) of clientregistrations$/, sub {
         }
 
        ( S->{Response}, S->{ResponseContent} ) = _Post(
-          URL     => S->{API_URL}.'/clientregistration',
+          URL     => S->{API_URL}.'/clientregistrations',
           Token   => S->{Token},
           Content => {
                 ClientRegistration => {
@@ -71,7 +71,7 @@ Given qr/(\d+) of clientregistrations$/, sub {
 
 When qr/added a clientregistration$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
-      URL     => S->{API_URL}.'/clientregistration',
+      URL     => S->{API_URL}.'/clientregistrations',
       Token   => S->{Token},
       Content => {
         ClientRegistration => {

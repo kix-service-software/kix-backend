@@ -10,7 +10,7 @@
     When I get this link
     Then the response code is 200 
     And the attribute "Link.Type" is "Normal"
-    And the response object is LinkResponse
+#    And the response object is LinkResponse
     When I delete this link
     Then the response code is 204
     And the response has no content

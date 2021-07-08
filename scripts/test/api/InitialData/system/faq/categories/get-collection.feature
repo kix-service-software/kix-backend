@@ -8,8 +8,7 @@
   Scenario: check is the existing faq categories are consistent with the delivery defaults
     When I query the collection of faq categories
     Then the response code is 200
-    Then the response contains 2 items of type "FAQCategory"
+    Then the response contains 1 items of type "FAQCategory"
     And the response contains the following items of type FAQCategory
       | Name |
       | Misc |
-      | KIX  |

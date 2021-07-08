@@ -39,7 +39,7 @@ Then qr/the response contains the following (.*?) key "(.*?)"$/, sub {
     my $Object = $1;
     my $Index = 0;
     my @SysConfigOptionArray;
-    
+
     foreach my $Row ( @{S->{ResponseContent}->{SysConfigOption}} ) {
         if ($Row->{Name} eq "$2") {
             push (@SysConfigOptionArray, $Row);

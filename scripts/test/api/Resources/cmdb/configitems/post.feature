@@ -31,6 +31,6 @@ Feature: POST request to the /cmdb/configitems resource
     When I create a configitem with no incistate id
     Then the response code is 400
     And the response object is Error
-    And the error code is "Validator.Failed"
-    And the error message is "Validation of attribute InciStateID failed!"
+    And the error code is "BadRequest"
+    And the error message is "Required parameter ConfigItem::Version::InciStateID is missing or undefined!"
 

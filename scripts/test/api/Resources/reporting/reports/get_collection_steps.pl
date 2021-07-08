@@ -28,14 +28,10 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I update this addressbook$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Patch(
-      URL     => S->{API_URL}.'/addressbook/'.S->{AddressIDArray}->[0],
-      Token   => S->{Token},
-      Content => {
-            Address => {
-                EmailAddress => 'test'.rand().'@test.org',
-            }
-      }
+When qr/I query the reports collection$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/reporting/reports',
    );
 };
+

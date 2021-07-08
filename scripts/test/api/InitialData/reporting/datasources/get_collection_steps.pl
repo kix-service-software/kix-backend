@@ -28,25 +28,10 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I delete this addressbook$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Delete(
+When qr/I query the datasources collection$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/addressbook/'.S->{AddressID},
+      URL   => S->{API_URL}.'/reporting/datasources',
    );
 };
 
-When qr/delete all this addressbooks$/, sub {
-    for ($i=0;$i<@{S->{AddressIDArray}};$i++){ 
-        ( S->{Response}, S->{ResponseContent} ) = _Delete(
-            Token => S->{Token},
-            URL   => S->{API_URL}.'/addressbook/'.S->{AddressIDArray}->[$i],
-        );
-    }
-
-    S->{AddressIDArray} = ();
-
-};
-
-
-
-	

@@ -52,7 +52,17 @@ When qr/added a console command$/, sub {
    );
 };
 
-
+When qr/added a console command "(.*?)"$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/system/console',
+      Token   => S->{Token},
+      Content => {
+        ConsoleExecute => {
+            Command => $1
+        }
+      }
+   );
+};
 
 
 

@@ -7,7 +7,7 @@ Feature: POST request to the /system/dynamicfields resource
     
   Scenario: create a dynamicfield
     When I create a dynamicfield
-    Then the response code is 200
+    Then the response code is 201
     When I delete this dynamicfield
     Then the response code is 204
 

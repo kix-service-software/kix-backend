@@ -85,3 +85,28 @@ When qr/I create a faq article$/, sub {
       }
    );
 };
+
+Given qr/(\d+) of faq articles$/, sub {
+    for ($i=0;$i<$1;$i++){
+        ( S->{Response}, S->{ResponseContent} ) = _Post(
+            URL     => S->{API_URL}.'/faq/articles',
+            Token   => S->{Token},
+            Content => {
+                FAQArticle => {
+                    Title => "Some Text".rand(),
+                    CategoryID => 3,
+                    Language => "de",
+                    Field1 => "ahahahbhabshab hbah bshbsha bhab hbah ",
+                    Field2 => "ahahahbhabshab hbah bshbsha bhab hbah ",
+                    Field3 => "ahahahbhabshab hbah bshbsha bhab hbah ",
+                    Field6 => "ahahahbhabshab hbah bshbsha bhab hbah "
+                }
+            }
+        );
+    }
+};
+
+
+
+
+
