@@ -204,7 +204,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer
     When I query the collection of permissions with roleid 13
     Then the response code is 200
-    And the response contains 51 items of type "Permission"
+    And the response contains 53 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                                       | Value | TypeID |
       | /auth                                                                                                                                                        | 1     | 1      |
@@ -255,8 +255,9 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/config                                                                                                                                               | 2     | 1      |
       | /system/config/*                                                                                                                                             | 2     | 1      |
       | /system/config{SysConfigOption.AccessLevel NE external}                                                                                                      | 0     | 2      |
-      | /system/config/*{SysConfigOption.AccessLevel NE external}                                                                                                    | 0     | 2      |
-      | /tickets/*/articles{Article.[!*,TimeUnit]}                                                                                                                   | 61440 | 3      |
+      | /system/templates/categories                                                                                                                                 | 2     | 1      |
+      | /system/templates/categories/*                                                                                                                               | 2     | 1      |
+
 
   Scenario: get the list of existing permissions of Report User
     When I query the collection of permissions with roleid 14
