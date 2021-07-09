@@ -3349,7 +3349,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3399,7 +3399,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3598,7 +3598,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3648,7 +3648,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3728,7 +3728,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3778,7 +3778,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3818,7 +3818,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3868,7 +3868,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[0],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -3997,7 +3997,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[1],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {
@@ -4092,7 +4092,7 @@ my @ImportDataTests = (
         SourceImportData => {
             ObjectData => {
                 ClassID                      => $ConfigItemClassIDs[1],
-                EmptyFieldsLeaveTheOldValues => 'on',
+                EmptyFieldsLeaveTheOldValues => '1',
             },
             MappingObjectData => [
                 {

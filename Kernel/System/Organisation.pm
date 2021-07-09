@@ -266,7 +266,7 @@ sub OrganisationGet {
 
     # check if need to return DynamicFields
     if ($FetchDynamicFields) {
-        
+
         # get all dynamic fields for the object type Ticket
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             ObjectType => 'Organisation'
@@ -303,7 +303,7 @@ sub OrganisationGet {
 
 =item OrganisationLookup()
 
-contact id or login lookup
+organisation id or number lookup
 
     my $Number = $OrganisationObject->OrganisationLookup(
         ID     => 1,

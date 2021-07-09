@@ -17,6 +17,11 @@ use base qw(
     Kernel::System::Installation::Migration::KIX17::Common
 );
 
+my %ObjectMap = (
+    'FAQ'            => 'FAQArticle',
+    'ITSMConfigItem' => 'ConfigItem',
+);
+
 our @ObjectDependencies = (
     'Config',
     'DB',
@@ -67,6 +72,9 @@ sub Run {
             $Self->UpdateProgress($Param{Type}, 'Ignored');
             next;
         }
+
+        # map objects
+        $Item->{name} = $ObjectMap{$Item->{name}} || $Item->{name};
 
         # check if this item already exists (i.e. some initial data)
         my $ID = $Self->Lookup(
