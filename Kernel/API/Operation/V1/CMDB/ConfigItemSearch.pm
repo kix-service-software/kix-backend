@@ -102,7 +102,11 @@ sub Run {
     # prepare search if given
     my %SearchParam;
     if ( IsHashRefWithData($Self->{Search}->{ConfigItem}) ) {
-        foreach my $SearchType ( keys %{$Self->{Search}->{ConfigItem}} ) {
+
+        # do first OR to prevent replacement of prior AND search with empty result
+        foreach my $SearchType ( qw(OR AND) ) {
+            next if ( !IsArrayRefWithData($Self->{Search}->{ConfigItem}->{$SearchType}) );
+
             my @SearchTypeResult;
             foreach my $SearchItem ( @{$Self->{Search}->{ConfigItem}->{$SearchType}} ) {
                 my $Value = $SearchItem->{Value};
@@ -193,6 +197,7 @@ sub Run {
                 @ConfigItemList = @SearchTypeResult;
             }
             else {
+
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search
                 my %SearchTypeResultHash = map { $_ => 1 } @SearchTypeResult;

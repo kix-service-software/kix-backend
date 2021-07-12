@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Search => [ 
+        Search => [
             'ContactID',
         ],
         Sort => [
@@ -86,8 +86,13 @@ sub Search {
         return;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {        
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, "st.contact_id = '".$Param{Search}->{Value}."'" );
+    }
+
+    # TODO: temporary enabled NE - remove or extend if negative searches enabled
+    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+        push( @SQLWhere, "st.contact_id != '".$Param{Search}->{Value}."'" );
     }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
         my ($Field, $Value) = $Self->_PrepareFieldAndValue(
@@ -119,7 +124,7 @@ sub Search {
             Value => $Param{Search}->{Value}
         );
         push( @SQLWhere, $Field." LIKE ".$Value );
-    }    
+    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.contact_id IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
@@ -133,7 +138,7 @@ sub Search {
 
     return {
         SQLWhere => \@SQLWhere,
-    };        
+    };
 }
 
 =item Sort()
@@ -161,7 +166,7 @@ sub Sort {
         SQLOrderBy => [
             "st.contact_id"
         ],
-    };        
+    };
 }
 
 1;

@@ -11,6 +11,8 @@ package Kernel::System::ITSMConfigItem::XML::Type::Organisation;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'Organisation',
@@ -164,7 +166,7 @@ prepare value for export
 sub ExportValuePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check what should be exported: CustomerID or OrganisationName
+    # check what should be exported: Number, ID or Name
     my $CustOrganisationContent =
         $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::Organisation::Content');
 
@@ -175,13 +177,12 @@ sub ExportValuePrepare {
         ID => $Param{Value},
     );
 
-    # get company name
-    my $OrganisationDataStr = $Organisation{Name};
+    # get Organisation attribute content
+    my $OrganisationDataStr = $Organisation{$CustOrganisationContent};
 
     $OrganisationDataStr =~ s/\s+$//g;
     $OrganisationDataStr =~ s/^\s+//g;
 
-    # return company name
     return $OrganisationDataStr;
 }
 
@@ -232,7 +233,7 @@ sub ImportValuePrepare {
 
     return if !defined $Param{Value};
 
-    # check if content is CustomerID or OrganisationName
+    # check if content should be Number, ID or Name
     my $CustOrganisationContent =
         $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::Organisation::Content');
 
@@ -240,47 +241,47 @@ sub ImportValuePrepare {
 
     my $OrganisationDataStr = '';
 
-    if ( $CustOrganisationContent eq 'ID' && $Param{Value} ne '' ) {
-        # check if it is a valid CustomerID
-        my %OrganisationSearchList = $Self->{OrganisationObject}->OrganisationGet(
-            ID => $Param{Value},
-        );
+    if ($Param{Value} ne '') {
+        if ( $CustOrganisationContent eq 'ID') {
 
-        if (%OrganisationSearchList) {
-            $OrganisationDataStr = $Param{Value};
-        }
-    }
-    elsif ( $CustOrganisationContent eq 'Name' && $Param{Value} ne '') {
+            # check if it is a valid Organisation
+            my $Number = $Self->{OrganisationObject}->OrganisationLookup(
+                ID => $Param{Value}
+            );
 
-        # search for Organisation data
-        my %OrganisationSearchList = $Self->{OrganisationObject}->OrganisationSearch(
-            Search => '*' . $Param{Value} . '*',
-            Limit  => 500,
-        );
+            if ($Number) {
+                $OrganisationDataStr = $Param{Value};
+            }
+        } elsif ( $CustOrganisationContent eq 'Number') {
 
-        # check each found Organisation
-        if (%OrganisationSearchList) {
-            foreach my $OrgID ( keys(%OrganisationSearchList) ) {
+            # check if it is a valid Organisation
+            my $ID = $Self->{OrganisationObject}->OrganisationLookup(
+                Number => $Param{Value}
+            );
 
-                my %OrganisationData = $Self->{OrganisationObject}->OrganisationGet(
-                    ID => $OrgID,
-                );
+            if ($ID) {
+                $OrganisationDataStr = $ID;
+            }
+        } elsif ( $CustOrganisationContent eq 'Name') {
 
-                # if Name matches - use this OrgID and stop searching
-                if ( $OrganisationData{Name} eq $Param{Value} ) {
-                    $OrganisationDataStr = $OrganisationData{ID};
-                    last;
-                }
+            # search for Organisation
+            my %OrganisationSearchList = $Self->{OrganisationObject}->OrganisationSearch(
+                Name  => $Param{Value},
+                Limit => 1,
+            );
+
+            if (IsHashRefWithData(\%OrganisationSearchList)) {
+                $OrganisationDataStr = [keys %OrganisationSearchList]->[0];
             }
         }
     }
 
-    # warning if no dada found for the given ID or Name
+    # warning if no dada found
     if ( !$OrganisationDataStr ) {
         $Self->{LogObject}->Log(
             Priority => 'warning',
             Message =>
-                "Could not import Organisation: no ID found for Name $Param{Value}!"
+                "Could not import Organisation: no Organisation ID found for $CustOrganisationContent ($Param{Value})!"
         );
         return $Param{Value};
     }
@@ -292,10 +293,6 @@ sub ImportValuePrepare {
 }
 
 1;
-
-
-
-
 
 =back
 
