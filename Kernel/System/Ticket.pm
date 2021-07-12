@@ -1343,6 +1343,11 @@ sub _TicketCacheClear {
         Type => "TicketSearch",
     );
 
+    # cleanup index cache
+    $CacheObject->CleanUp(
+        Type => "TicketIndex",
+    );
+
     return 1;
 }
 
