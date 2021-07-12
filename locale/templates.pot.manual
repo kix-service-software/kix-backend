@@ -266,3 +266,31 @@ msgstr ""
 
 msgid "Incident Report"
 msgstr ""
+
+#: manuel added from SSP scr/views/TicketList.vue:151
+msgid "My Tickets"
+msgstr ""
+
+#: manuel added from SSP scr/views/TicketList.vue:152
+msgid "Tickets by others"
+msgstr ""
+
+#: manuel added from SSP src/views/TicketDetails.vue:44
+msgid "Further information"
+msgstr ""
+
+#: manuel added from SSP src/App.vue:41
+msgid "Dark mode"
+msgstr ""
+
+#: manuel added from SSP src/models/ticket/article.ts:34
+msgid "Number of attachments"
+msgstr ""
+
+#: manuel added from SSP src/views/ConfigItemDetails.vue:58
+msgid "No further information."
+msgstr ""
+
+#: manuel added from SSP src/components/AttachmentUpload.vue:45
+msgid "File(s) added"
+msgstr ""

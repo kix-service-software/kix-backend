@@ -166,8 +166,9 @@
         <SubGroup>CIACCustomerCompany</SubGroup>
         <Setting>
             <Option SelectedID="Number">
-                <Item Key="Number">CustomerNumber</Item>
+                <Item Key="Number">Number</Item>
                 <Item Key="Name">Name</Item>
+                <Item Key="ID">ID</Item>
             </Option>
         </Setting>
     </ConfigItem>

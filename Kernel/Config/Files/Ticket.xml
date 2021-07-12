@@ -449,6 +449,7 @@
     </div>
   </div>
   </center>
+  <div style="text-align:center"><span style="font-size:12px"><span style="color:#7f8c8d"><em><span style="font-family:Arial,Helvetica,sans-serif">Powered by <a href="https://kixdesk.com">KIX</a> Service Management.</span></em></span></span></div>
 </body>
 
 </html>
@@ -2210,6 +2211,7 @@
                 <Item>Reply-To</Item>
                 <Item>ReplyTo</Item>
                 <Item Translatable="1">Subject</Item>
+                <Item Translatable="1">Body</Item>
                 <Item>Message-ID</Item>
                 <Item>Message-Id</Item>
                 <Item>Resent-To</Item>
@@ -2254,6 +2256,21 @@
                 <Item>X-KIX-Contact</Item>
                 <Item>X-KIX-SenderType</Item>
                 <Item>X-KIX-Channel</Item>
+                <Item>X-KIX-DynamicField-PlanBegin</Item>
+                <Item>X-KIX-DynamicField-PlanEnd</Item>
+                <Item>X-KIX-DynamicField-PlannedEffort</Item>
+                <Item>X-KIX-DynamicField-MergeToTicket</Item>
+                <Item>X-KIX-DynamicField-CloseCode</Item>
+                <Item>X-KIX-DynamicField-AnonymiseTicket</Item>
+                <Item>X-KIX-DynamicField-ParentTickets</Item>
+                <Item>X-KIX-DynamicField-ChildTickets</Item>
+                <Item>X-KIX-DynamicField-RelatedTickets</Item>
+                <Item>X-KIX-DynamicField-MobileProcessingState</Item>
+                <Item>X-KIX-DynamicField-RiskAssumptionRemark</Item>
+                <Item>X-KIX-DynamicField-MobileProcessingChecklist010</Item>
+                <Item>X-KIX-DynamicField-MobileProcessingChecklist020</Item>
+                <Item>X-KIX-DynamicField-AffectedAsset</Item>
+                <Item>X-KIX-DynamicField-WorkOrder</Item>
                 <Item>X-KIX-FollowUp-Priority</Item>
                 <Item>X-KIX-FollowUp-Queue</Item>
                 <Item>X-KIX-FollowUp-Lock</Item>
@@ -2262,6 +2279,21 @@
                 <Item>X-KIX-FollowUp-Type</Item>
                 <Item>X-KIX-FollowUp-SenderType</Item>
                 <Item>X-KIX-FollowUp-Channel</Item>
+                <Item>X-KIX-FollowUp-DynamicField-PlanBegin</Item>
+                <Item>X-KIX-FollowUp-DynamicField-PlanEnd</Item>
+                <Item>X-KIX-FollowUp-DynamicField-PlannedEffort</Item>
+                <Item>X-KIX-FollowUp-DynamicField-MergeToTicket</Item>
+                <Item>X-KIX-FollowUp-DynamicField-CloseCode</Item>
+                <Item>X-KIX-FollowUp-DynamicField-AnonymiseTicket</Item>
+                <Item>X-KIX-FollowUp-DynamicField-ParentTickets</Item>
+                <Item>X-KIX-FollowUp-DynamicField-ChildTickets</Item>
+                <Item>X-KIX-FollowUp-DynamicField-RelatedTickets</Item>
+                <Item>X-KIX-FollowUp-DynamicField-MobileProcessingState</Item>
+                <Item>X-KIX-FollowUp-DynamicField-RiskAssumptionRemark</Item>
+                <Item>X-KIX-FollowUp-DynamicField-MobileProcessingChecklist010</Item>
+                <Item>X-KIX-FollowUp-DynamicField-MobileProcessingChecklist020</Item>
+                <Item>X-KIX-FollowUp-DynamicField-AffectedAsset</Item>
+                <Item>X-KIX-FollowUp-DynamicField-WorkOrder</Item>
                 <Item>X-KIX-BodyDecrypted</Item>
                 <Item>X-KIX-TicketTemplate</Item>
             </Array>
