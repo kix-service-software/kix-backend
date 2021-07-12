@@ -37,92 +37,45 @@ sub TicketIndexUpdate {
     }
 
     # check if ticket is shown or not
-    my $IndexUpdateNeeded = 0;
-    my $IndexSelected     = 0;
-    my %TicketData        = $Self->TicketGet(
+    my %Ticket = $Self->TicketGet(
         %Param,
         DynamicFields => 0,
     );
 
-    my %IndexTicketData = $Self->TicketIndexGetTicket(%Param);
+    my %IndexData = $Self->TicketIndexGetTicket(%Param);
 
-    if ( !%IndexTicketData ) {
-        $IndexUpdateNeeded = 1;
-    }
-    else {
-
-        # check if we need to update
-        if ( $TicketData{LockID} ne $IndexTicketData{LockID} ) {
-            $IndexUpdateNeeded = 1;
-        }
-        elsif ( $TicketData{StateID} ne $IndexTicketData{StateID} ) {
-            $IndexUpdateNeeded = 1;
-        }
-        elsif ( $TicketData{QueueID} ne $IndexTicketData{QueueID} ) {
-            $IndexUpdateNeeded = 1;
-        }
+    if ( %IndexData && $Ticket{LockID} eq $IndexData{LockID} && $Ticket{StateID} eq $IndexData{StateID} && $Ticket{QueueID} eq $IndexData{QueueID} ) {
+        # no lock, state or queue changed...
+        return 1;
     }
 
     # check if this ticket is still viewable
-    my @ViewableStates = $Kernel::OM->Get('State')->StateGetStatesByType(
+    my %ViewableStates = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Viewable',
-        Result => 'ID',
+        Result => 'HASH',
     );
 
-    my $ViewableStatesHit = 0;
-
-    for (@ViewableStates) {
-
-        if ( $_ != $TicketData{StateID} ) {
-            $ViewableStatesHit = 1;
-        }
+    if ( !$ViewableStates{$Ticket{StateID}} || $Ticket{ArchiveFlag} eq 'y' ) {
+        # remove the ticket from the index if it's archived or no longer viewable 
+        return $Self->TicketIndexDelete(%Param);
     }
 
-    my @ViewableLocks = $Kernel::OM->Get('Lock')->LockViewableLock(
-        Type => 'ID',
-    );
-
-    my $ViewableLocksHit = 0;
-
-    for (@ViewableLocks) {
-
-        if ( $_ != $TicketData{LockID} ) {
-            $ViewableLocksHit = 1;
-        }
+    # update the index
+    if ( $IndexData{TicketID} ) {
+        # update the existing index entry
+        $Kernel::OM->Get('DB')->Do(
+            SQL  => 'UPDATE ticket_index'
+                    . ' SET queue_id = ?, lock_id = ?, state_id = ?'
+                    . ' WHERE ticket_id = ?',
+            Bind => [
+                \$Ticket{QueueID}, \$Ticket{LockID},
+                \$Ticket{StateID}, \$Param{TicketID},
+            ],
+        );
     }
-
-    if ($ViewableStatesHit) {
-        $IndexSelected = 1;
-    }
-
-    if ( $TicketData{ArchiveFlag} eq 'y' ) {
-        $IndexSelected = 0;
-    }
-
-    # write index back
-    if ($IndexUpdateNeeded) {
-
-        if ($IndexSelected) {
-
-            if ( $IndexTicketData{TicketID} ) {
-
-                $Kernel::OM->Get('DB')->Do(
-                    SQL  => 'UPDATE ticket_index'
-                          . ' SET queue_id = ?, lock_id = ?, state_id = ?'
-                          . ' WHERE ticket_id = ?',
-                    Bind => [
-                        \$TicketData{QueueID}, \$TicketData{LockID},
-                        \$TicketData{StateID}, \$Param{TicketID},
-                    ],
-                );
-            }
-            else {
-                $Self->TicketIndexAdd(%TicketData);
-            }
-        }
-        else {
-            $Self->TicketIndexDelete(%Param);
-        }
+    else {
+        # add a new index entry for this ticket
+        $Self->TicketIndexAdd(%Ticket);
     }
 
     return 1;
@@ -175,41 +128,28 @@ sub TicketIndexAdd {
     }
 
     # get ticket data
-    my %TicketData = $Self->TicketGet(
+    my %Ticket = $Self->TicketGet(
         %Param,
         DynamicFields => 0,
     );
 
     # check if this ticket is still viewable
-    my @ViewableStates = $Kernel::OM->Get('State')->StateGetStatesByType(
+    my %ViewableStates = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'Viewable',
-        Result => 'ID',
+        Result => 'HASH',
     );
 
-    my $ViewableStatesHit = 0;
-
-    for (@ViewableStates) {
-        if ( $_ != $TicketData{StateID} ) {
-            $ViewableStatesHit = 1;
-        }
-    }
-
-    # do nothing if state is not viewable
-    if ( !$ViewableStatesHit ) {
-        return 1;
-    }
-
-    # do nothing if ticket is archived
-    if ( $TicketData{ArchiveFlag} eq 'y' ) {
-        return 1;
+    if ( !$ViewableStates{$Ticket{StateID}} || $Ticket{ArchiveFlag} eq 'y' ) {
+        # do nothing if the ticket isn't viewable or archived
+        return;
     }
 
     return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'INSERT INTO ticket_index (ticket_id, queue_id, lock_id, state_id, create_time_unix)'
               . ' VALUES (?, ?, ?, ?, ?)',
         Bind => [
-            \$Param{TicketID}, \$TicketData{QueueID}, \$TicketData{LockID},
-            \$TicketData{StateID}, \$TicketData{CreateTimeUnix},
+            \$Param{TicketID}, \$Ticket{QueueID}, \$Ticket{LockID},
+            \$Ticket{StateID}, \$Ticket{CreateTimeUnix},
         ],
     );
 
@@ -305,7 +245,7 @@ sub TicketIndexGetQueueStats {
 
     my $CacheKey = 'TicketIndexGetQueueStats';
     my $Cached = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
+        Type => 'TicketIndex',
         Key  => $CacheKey,
     );
     return %{$Cached} if $Cached;
@@ -326,7 +266,7 @@ sub TicketIndexGetQueueStats {
     )};
 
     $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
+        Type  => 'TicketIndex',
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Data,
