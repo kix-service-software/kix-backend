@@ -130,7 +130,7 @@ sub Validate {
             if ( $ContentType =~ /^(\w+\/\w+)/i ) {
                 $MimeType = $1;
                 $MimeType =~ s/"|'//g;
-            }            
+            }
             my $Result = Kernel::API::Validator::MimeTypeValidator::Validate(
                 $Self, 
                 Attribute => 'MimeType',
