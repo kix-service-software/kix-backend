@@ -258,10 +258,13 @@ msgstr ""
 msgid "cancelled"
 msgstr ""
 
-msgid "External Supplier"
+msgid "supplier/partner (external)"
 msgstr ""
 
-msgid "Internal Supplier"
+msgid "supplier/partner (internal)"
+msgstr ""
+
+msgid "service provider"
 msgstr ""
 
 msgid "Incident Report"
