@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-7-19 14:31+0000\n"
+"POT-Creation-Date: 2021-7-20 16:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4619,10 +4619,6 @@ msgid "Expiration Date"
 msgstr ""
 
 #. manual entry from templates.pot.manual
-msgid "External Supplier"
-msgstr ""
-
-#. manual entry from templates.pot.manual
 msgid "File(s) added"
 msgstr ""
 
@@ -4672,10 +4668,6 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Installed Software"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Internal Supplier"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -4904,6 +4896,18 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "rejected"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "service provider"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "supplier/partner (external)"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "supplier/partner (internal)"
 msgstr ""
 
 #. manual entry from templates.pot.manual

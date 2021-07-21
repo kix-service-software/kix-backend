@@ -117,7 +117,7 @@ sub Validate {
     if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => "Validation of attribute $Param{Attribute} failed!",
+            Message => "Validation of attribute $Param{Attribute} ($Param{Data}->{$Param{Attribute}}) failed!",
         );        
     }
 
