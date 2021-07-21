@@ -34,7 +34,7 @@ Given qr/a configitem$/, sub {
       Token   => S->{Token},
       Content => {
 		   ConfigItem => {
-		      ClassID => 4,
+		      ClassID => 10,
 		      Version => {
 		         Name => "test ci xx1111",
 		         DeplStateID => 16,
@@ -53,8 +53,20 @@ Given qr/a configitem$/, sub {
 		                     "192.168.1.2",
 		                     "192.168.1.3"
 		                  ],
+		                  Attachment => [
+		                     {
+		                        Content =>  "cdfrdrfde",
+		                        ContentType =>  "application/pdf",
+		                        Filename =>  "Test2.pdf"
+		                     }
+		                  ]
 		               }
 		            ],
+		            SectionWarranty => [
+		               {
+		                  FirstUsageDate => "04-09-2018"
+		               }
+		            ]
 		         }
 		      },
 		      Images => [

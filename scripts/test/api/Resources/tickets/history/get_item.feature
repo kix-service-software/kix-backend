@@ -10,7 +10,6 @@ Feature: GET request to the /tickets/:TicketID/history/:HistoryID resource
     Given a article
     When I get a collection of tickethistory
     Then the response code is 200
-    Then the response content is
     When I get the tickethistory
     Then the response code is 200
     And the attribute "History.HistoryType" is "NewTicket"
