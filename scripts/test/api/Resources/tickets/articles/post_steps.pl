@@ -88,3 +88,49 @@ When qr/I create a article$/, sub {
    );
 };
 
+When qr/I create a article with fail mimetype$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/tickets/'.S->{TicketID}.'/articles',
+      Token   => S->{Token},
+      Content => {
+		Article => {
+		    TimeUnit => 12,
+#            To => "someone@cape-it.de",
+            Subject => "A Channel 2 article",
+			Body => "<p>I think I know exactly what you mean. Yeah. Lorraine. George, buddy. remember that girl I introduced you to, Lorraine. What are you writing? Oh, I sure like her, Marty, she is such a sweet girl. Isn't tonight the night of the big date?</p><p>Hey I'm talking to you, McFly, you Irish bug. Quiet. Of course I do. Just a second, let's see if I could find it. That's right. Biff, stop it. Biff, you're breaking his arm. Biff, stop.</p><p>It's <b>about the future</b>, isn't it? Hello, Jennifer. Biff, stop it. Biff, you're breaking his arm. Biff, stop. Just say anything, George, say what ever's natural, the first thing that comes to your mind. Yeah Mom, we know, you've told us this story a million times. You felt sorry for him so you decided to go with him to The Fish Under The Sea Dance.</p>",
+			ContentType => "html/text; charset=utf8",
+            MimeType => "html/text",
+            Charset => "utf8",
+            ChannelID => 1,
+            SenderTypeID => 1,
+            CustomerVisible => 1
+        }
+	  }
+   );
+};
+
+When qr/I create a article with fail mimetype 2$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/tickets/'.S->{TicketID}.'/articles',
+      Token   => S->{Token},
+      Content => {
+		Article => {
+		    TimeUnit => 12,
+#            To => "someone@cape-it.de",
+            Subject => "Some Sample Subject",
+			Body => "<!doctype html>\r\n<meta charset=\"utf-8\">\r\n<html>\r\n<body>\r\n<h1>Headline<\/h1\/>\r\n<pr>Lorem ipsum dolor sit amet<\/p>\r\n<\/body>\r\n<\/html>\r\n",
+			ContentType => "html/text; charset=utf8",
+            MimeType => "html/text",
+            Charset => "utf8",
+            Attachment => {
+                  Content => "VGhpcyBpcyBqdXN0IGEgdGVzdC4=",
+                  ContentType => "text/pain; charset=utf8",
+                  Filename => "test.txt"
+            },
+            ChannelID => 1,
+            SenderTypeID => 1,
+            CustomerVisible => 1
+        }
+	  }
+   );
+};

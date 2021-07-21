@@ -60,7 +60,7 @@ Given qr/a configitem$/, sub {
 		      Images => [
 		         {
 		            Filename => "SomeImage.jpg",
-		            ContentType => "jpg",
+		            ContentType => "image/jpeg",
 		            Content => "..."
 		         }
 		      ]
@@ -108,7 +108,7 @@ Given qr/a configitem with attachment$/, sub {
 		      Images => [
 		         {
 		            Filename => "SomeImage.jpg",
-		            ContentType => "jpg",
+		            ContentType => "image/jpeg",
 		            Content => "..."
 		         }
 		      ]
@@ -161,7 +161,7 @@ Given qr/(\d+) of configitems$/, sub {
                       Images => [
                          {
                             Filename => "SomeImage.jpg",
-                            ContentType => "jpg",
+                            ContentType => "image/jpeg",
                             Content => "..."
                          }
                       ]
@@ -204,7 +204,7 @@ When qr/I create a configitem$/, sub {
 		      Images => [
 		         {
 		            Filename => "SomeImage.jpg",
-		            ContentType => "jpg",
+		            ContentType => "image/jpeg",
 		            Content => "..."
 		         }
 		      ]
@@ -245,7 +245,7 @@ When qr/I create a configitem with not existing class id$/, sub {
               Images => [
                  {
                     Filename => "SomeImage.jpg",
-                    ContentType => "jpg",
+                    ContentType => "image/jpeg",
                     Content => "..."
                  }
               ]
@@ -286,7 +286,7 @@ When qr/I create a configitem with no class id$/, sub {
               Images => [
                  {
                     Filename => "SomeImage.jpg",
-                    ContentType => "jpg",
+                    ContentType => "image/jpeg",
                     Content => "..."
                  }
               ]
@@ -327,7 +327,7 @@ When qr/I create a configitem with no incistate id$/, sub {
               Images => [
                  {
                     Filename => "SomeImage.jpg",
-                    ContentType => "jpg",
+                    ContentType => "image/jpeg",
                     Content => "..."
                  }
               ]

@@ -14,3 +14,22 @@ Feature: POST request to the /tickets/:TicketID/articles resource
     When I delete this ticket
     Then the response code is 204
     And the response has no content
+
+  Scenario: create a article with fail mimetype
+    Given a ticket
+    When I create a article with fail mimetype
+    Then the response content is
+    Then the response code is 400
+    When I delete this ticket
+    Then the response code is 204
+    And the response has no content
+
+  Scenario: create a article with fail mimetype (write error)
+    Given a ticket
+    When I create a article with fail mimetype 2
+    Then the response content is
+    Then the response code is 400
+    When I delete this ticket
+    Then the response code is 204
+    And the response has no content
+

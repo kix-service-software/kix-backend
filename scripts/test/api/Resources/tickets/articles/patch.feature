@@ -16,3 +16,25 @@ Feature: PATCH request to the /tickets/:TicketID/articles/:ArticleID resource
     Then the response code is 204
     And the response has no content
 
+  Scenario: update a article with fail mimetype
+    Given a ticket
+    Given a article
+    When I update this article with fail mimetype
+    Then the response code is 400
+    When I delete this article
+    Then the response code is 204
+    When I delete this ticket
+    Then the response code is 204
+    And the response has no content
+
+  Scenario: update a article with fail mimetype (write error)
+    Given a ticket
+    Given a article
+    When I update this article with fail mimetype 2
+    Then the response code is 400
+    When I delete this article
+    Then the response code is 204
+    When I delete this ticket
+    Then the response code is 204
+    And the response has no content
+
