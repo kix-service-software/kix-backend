@@ -72,7 +72,7 @@ When qr/I update this configitem$/, sub {
                Images => [
                   {
                      Filename => "SomeImage.jpg",
-                     ContentType => "jpg",
+                     ContentType => "image/jpeg",
                      Content => "..."
                   }
                ]

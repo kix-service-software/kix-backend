@@ -34,7 +34,7 @@ Given qr/a configitem$/, sub {
       Token   => S->{Token},
       Content => {
 		   ConfigItem => {
-		      ClassID => 4,
+		      ClassID => 10,
 		      Version => {
 		         Name => "test ci xx1111",
 		         DeplStateID => 16,
@@ -53,14 +53,26 @@ Given qr/a configitem$/, sub {
 		                     "192.168.1.2",
 		                     "192.168.1.3"
 		                  ],
+		                  Attachment => [
+		                     {
+		                        Content =>  "cdfrdrfde",
+		                        ContentType =>  "application/pdf",
+		                        Filename =>  "Test2.pdf"
+		                     }
+		                  ]
 		               }
 		            ],
+		            SectionWarranty => [
+		               {
+		                  FirstUsageDate => "04-09-2018"
+		               }
+		            ]
 		         }
 		      },
 		      Images => [
 		         {
 		            Filename => "SomeImage.jpg",
-		            ContentType => "jpg",
+		            ContentType => "image/jpeg",
 		            Content => "..."
 		         }
 		      ]
@@ -108,7 +120,7 @@ Given qr/a configitem with attachment$/, sub {
 		      Images => [
 		         {
 		            Filename => "SomeImage.jpg",
-		            ContentType => "jpg",
+		            ContentType => "image/jpeg",
 		            Content => "..."
 		         }
 		      ]
@@ -161,7 +173,7 @@ Given qr/(\d+) of configitems$/, sub {
                       Images => [
                          {
                             Filename => "SomeImage.jpg",
-                            ContentType => "jpg",
+                            ContentType => "image/jpeg",
                             Content => "..."
                          }
                       ]
@@ -204,7 +216,7 @@ When qr/I create a configitem$/, sub {
 		      Images => [
 		         {
 		            Filename => "SomeImage.jpg",
-		            ContentType => "jpg",
+		            ContentType => "image/jpeg",
 		            Content => "..."
 		         }
 		      ]
@@ -245,7 +257,7 @@ When qr/I create a configitem with not existing class id$/, sub {
               Images => [
                  {
                     Filename => "SomeImage.jpg",
-                    ContentType => "jpg",
+                    ContentType => "image/jpeg",
                     Content => "..."
                  }
               ]
@@ -286,7 +298,7 @@ When qr/I create a configitem with no class id$/, sub {
               Images => [
                  {
                     Filename => "SomeImage.jpg",
-                    ContentType => "jpg",
+                    ContentType => "image/jpeg",
                     Content => "..."
                  }
               ]
@@ -327,7 +339,7 @@ When qr/I create a configitem with no incistate id$/, sub {
               Images => [
                  {
                     Filename => "SomeImage.jpg",
-                    ContentType => "jpg",
+                    ContentType => "image/jpeg",
                     Content => "..."
                  }
               ]
