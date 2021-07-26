@@ -234,27 +234,38 @@ sub Search {
                 FieldValue     => $FieldValue,
                 IsStaticSearch => $IsStaticSearch
             );
-            push( @SQLWhere, $Where[0] . ' LIKE ' . $Where[1] );
+
+            my $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
+            if ( $Param{UserType} eq 'Customer' ) {
+                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art_left.customer_visible = 1)';
+            }
+            push( @SQLWhere, $FieldQuery );
+            
             @Where = $Self->_prepareField(
                 Field          => 'art_right.' . $Field,
                 FieldValue     => $FieldValue,
                 IsStaticSearch => $IsStaticSearch
             );
-            push( @SQLWhere, $Where[0] . ' LIKE ' . $Where[1] );
+            
+            $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
+            if ( $Param{UserType} eq 'Customer' ) {
+                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art_right.customer_visible = 1)';
+            }
+
+            push( @SQLWhere, $FieldQuery );
         } else {
             my @Where = $Self->_prepareField(
                 Field          => 'art.' . $Field,
                 FieldValue     => $FieldValue,
                 IsStaticSearch => $IsStaticSearch
             );
-            push( @SQLWhere, $Where[0] . ' LIKE ' . $Where[1] );
-        }
-    }
 
-    # restrict search from customers to only customer articles
-    if ( $Param{UserType} eq 'Customer' ) {
-        if ( $Param{BoolOperator} eq 'AND') {
-            push( @SQLWhere, 'art.customer_visible = 1' );
+            my $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
+            if ( $Param{UserType} eq 'Customer' ) {
+                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art.customer_visible = 1)';
+            }
+
+            push( @SQLWhere, '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art.customer_visible = 1)' );
         }
     }
 
