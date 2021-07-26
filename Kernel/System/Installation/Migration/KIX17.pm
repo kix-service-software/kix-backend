@@ -176,7 +176,7 @@ sub Run {
     my @MissingDeps = grep { !exists $DepCount{$_} } sort keys %AllDeps;
     if ( @MissingDeps ) {
         if ( !$Self->{Options}->{AutoDeps} ) {
-            print "the following dependending types are missing: " . join(', ', @MissingDeps) . ".\nIt's recommended to include those types. Also you can use the auto-deps option.\n\n";
+            print "the following depending types are missing: " . join(', ', @MissingDeps) . ".\nIt's recommended to include those types. Also you can use the auto-deps option.\n\n";
         }
         else {
             print "automatically adding missing dependencies: " . join(', ', @MissingDeps) . "\n\n";
