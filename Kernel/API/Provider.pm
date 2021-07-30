@@ -13,9 +13,10 @@ use warnings;
 
 use URI::Escape;
 
-use Kernel::System::VariableCheck (qw(IsHashRefWithData));
+use Kernel::System::VariableCheck (qw(IsHashRefWithData IsInteger));
 
 our @ObjectDependencies = (
+    'Config',
     'Log',
     'API::Webservice',
 );
@@ -154,6 +155,12 @@ sub Run {
     #
 
     my $ProviderConfig = $Webservice->{Config}->{Provider};
+
+    # use max lenght from config
+    my $LengthFromConfig = $Kernel::OM->Get('Config')->Get('API::Provider::Transport::MaxLength');
+    if (IsInteger($LengthFromConfig) && $LengthFromConfig > 0) {
+        $ProviderConfig->{Transport}->{Config}->{MaxLength} = $LengthFromConfig;
+    }
 
     my $TransportModule = $Kernel::OM->GetModuleFor('API::Transport');
     if ( !$Kernel::OM->Get('Main')->Require($TransportModule) ) {
@@ -322,7 +329,7 @@ sub Run {
                 }
             }
             else {
-                # don't execute GET operation on collections 
+                # don't execute GET operation on collections
                 # (atm we simply check if the OperationType ends with 'Search', that will cover all critical collections so far)
                 if ( $ProviderConfig->{Operation}->{$Operation}->{Type} !~ /Search$/ || $Method ne 'GET' ) {
                     my $OperationResult = $OperationObject->Run(
