@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-7-30 07:28+0000\n"
+"POT-Creation-Date: 2021-7-30 08:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1159,7 +1159,23 @@ msgid "Sets the responsible of a ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
+msgid "(Optional) If pending time should be modified to fit BOB (begin of business day) or EOB (end of business day) of the specified date, select one of these options otherwise the provided/calculated time stamp is used without modification."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
+msgid "(Optional) The pending time in format YYYY-MM-DD hh:mm:ss. This timestamp will be set as pending time. Setting \"Pending Time Difference\" will overwrite this parameter. Used for pending states only."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
+msgid "Pending Date Time"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "Sets the state of a ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
+msgid "Target Time"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
