@@ -193,7 +193,7 @@ sub Sync {
     }
 
     # variable to store role permissions from ldap
-    my %RolePermissionsFromLDAP;
+    my %RolesFromLDAP;
 
     # get RoleObject
     my $RoleObject = $Kernel::OM->Get('Role');
@@ -494,7 +494,7 @@ sub Sync {
                 }
 
                 # set/overwrite remembered permissions
-                $RolePermissionsFromLDAP{ $SystemRolesByName{$SyncRole} } =
+                $RolesFromLDAP{ $SystemRolesByName{$SyncRole} } =
                     $SyncRoles{$SyncRole};
             }
         }
@@ -548,13 +548,13 @@ sub Sync {
                                 $Kernel::OM->Get('Log')->Log(
                                     Priority => 'notice',
                                     Message =>
-                                        "Invalid role \"$SyncRole\" in AttributeBasedGroupDNBasedRoleSync!",
+                                        "Invalid role \"$SyncRole\" in AttributeBasedRoleSync!",
                                 );
                                 next SYNCROLE;
                             }
 
                             # set/overwrite remembered permissions
-                            $RolePermissionsFromLDAP{ $SystemRolesByName{$SyncRole} } =
+                            $RolesFromLDAP{ $SystemRolesByName{$SyncRole} } =
                                 $SyncRoles{$SyncRole};
                         }
                     }
@@ -582,17 +582,17 @@ sub Sync {
         }
         elsif ( IsHashRefWithData(\%UserContextFromLDAP) ) {
             # only change roles if we have context configurations
-            $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
-            $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 0;
+            $RolesFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
+            $RolesFromLDAP{ $SystemRolesByName{'Customer'} } = 0;
 
             if ($UserContextFromLDAP{IsAgent}) {
                 # add role "Agent User"
-                $RolePermissionsFromLDAP{ $SystemRolesByName{'Agent User'} } = 1;
+                $RolesFromLDAP{ $SystemRolesByName{'Agent User'} } = 1;
             }
 
             if ($UserContextFromLDAP{IsCustomer}) {
                 # add role "Customer"
-                $RolePermissionsFromLDAP{ $SystemRolesByName{'Customer'} } = 1;
+                $RolesFromLDAP{ $SystemRolesByName{'Customer'} } = 1;
             }
         }
     }
@@ -604,51 +604,37 @@ sub Sync {
     }
 
     # compare role permissions from ldap with current user role permissions and update if necessary
-    if (%RolePermissionsFromLDAP) {
+    if (%RolesFromLDAP) {
 
-        # get current user roles
-        my %UserRoles = map { $_ => 1 } $UserObject->RoleList(
+        # cleanup all user roles
+        my $Success = $RoleObject->RoleUserDelete(
             UserID => $UserID,
         );
+        if ( !$Success ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to cleanup role assignments of user \"$Param{User}\" (UserID: $UserID)!",
+            );
+        }
 
         ROLEID:
-        for my $RoleID ( sort keys %RolePermissionsFromLDAP ) {
-            if ( $RolePermissionsFromLDAP{$RoleID} && !$UserRoles{$RoleID} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'notice',
-                    Message  => "User: \"$Param{User}\" assigning role \"$SystemRoles{$RoleID}\"!",
-                );
+        foreach my $RoleID ( sort keys %RolesFromLDAP ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "User: \"$Param{User}\" assigning role \"$SystemRoles{$RoleID}\"!",
+            );
 
-                # assign role
-                my $Result = $RoleObject->RoleUserAdd(
-                    AssignUserID  => $UserID,
-                    RoleID        => $RoleID,
-                    UserID        => 1,
-                );
-                if ( !$Result ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Unable to assign role \"$SystemRoles{$RoleID}\" to user \"$Param{User}\" (UserID: $UserID)!",
-                    );
-                }
-            }
-            elsif ( !$RolePermissionsFromLDAP{$RoleID} && $UserRoles{$RoleID} ) {
+            # assign role
+            my $Result = $RoleObject->RoleUserAdd(
+                AssignUserID  => $UserID,
+                RoleID        => $RoleID,
+                UserID        => 1,
+            );
+            if ( !$Result ) {
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'notice',
-                    Message  => "User: \"$Param{User}\" revoking role \"$SystemRoles{$RoleID}\"!",
+                    Priority => 'error',
+                    Message  => "Unable to assign role \"$SystemRoles{$RoleID}\" to user \"$Param{User}\" (UserID: $UserID)!",
                 );
-
-                # remove role
-                my $Result = $RoleObject->RoleUserDelete(
-                    RoleID        => $RoleID,
-                    UserID        => $UserID,
-                );
-                if ( !$Result ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Unable to revoke role \"$SystemRoles{$RoleID}\" from user \"$Param{User}\" (UserID: $UserID)!",
-                    );
-                }
             }
         }
     }

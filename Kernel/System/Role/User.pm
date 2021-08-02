@@ -147,8 +147,8 @@ sub RoleUserList {
 remove a user from the role
 
     my $Success = $RoleObject->RoleUserDelete(
-        RoleID => 6,
-        UserID => 12,
+        RoleID => 6,       # required if UserID not given
+        UserID => 12,      # required if RoleID not given
     );
 
 =cut
@@ -157,20 +157,30 @@ sub RoleUserDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(RoleID UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
+    if ( !$Param{RoleID} && !$Param{UserID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need either RoleID or UserID or both!"
+        );
+        return;
+    }
+
+    my $SQL = 'DELETE FROM role_user WHERE 1=1 ';
+    
+    my @Bind;
+    if ( $Param{UserID} ) {
+        $SQL .= 'AND user_id = ?';
+        push @Bind, \$Param{UserID};
+    }
+    if ( $Param{RoleID} ) {
+        $SQL .= 'AND role_id = ?';
+        push @Bind, \$Param{RoleID};
     }
 
     # delete existing RoleUser relation
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL  => 'DELETE FROM role_user WHERE user_id = ? AND role_id = ?',
-        Bind => [ \$Param{UserID}, \$Param{RoleID} ],
+        SQL  => $SQL,
+        Bind => \@Bind,
     );
 
     # delete cache
@@ -180,12 +190,11 @@ sub RoleUserDelete {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Role.User',
-        ObjectID  => $Param{RoleID}.'::'.$Param{UserID},
+        ObjectID  => ($Param{RoleID} || 'ALL').'::'.($Param{UserID} || 'ALL'),
     );
 
     return 1;
 }
-
 
 1;
 
