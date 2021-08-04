@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-8-2 13:41+0000\n"
-"PO-Revision-Date: 2021-08-04 09:47+0000\n"
+"PO-Revision-Date: 2021-08-04 13:47+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -2121,7 +2121,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Queue"
-msgstr "Queue"
+msgstr "Team"
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Up"
@@ -3094,6 +3094,12 @@ msgid ""
 "[ \"RelevantObjectAttribut OR StaticValue\" ] } } } }. All attributes will "
 "be OR combined.\""
 msgstr ""
+"Definiert welches abhängige Objekt (z.B. Ticket) an Hand welchen Attributs "
+"zu einem Objekt (z.B. \"Kunde\") zugeordnet wird. Eine Anwendung sind die "
+"\"Tickets eines Kontakts\". Die Struktur ist \"{ \"RelevantObject\": { "
+"\"DependendObject\": { \"DependendObjectAttribut\": { \"SearchAttribut OR "
+"SearchStatic\": [ \"RelevantObjectAttribut OR StaticValue\" ] } } } }. Alle "
+"Attribute werden in einer ODER-kombinierten Suche verwendet."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -6106,15 +6112,15 @@ msgstr "Abgelehnt"
 
 #. manual entry from templates.pot.manual
 msgid "service provider"
-msgstr ""
+msgstr "Service Provider"
 
 #. manual entry from templates.pot.manual
 msgid "supplier/partner (external)"
-msgstr ""
+msgstr "Lieferant/Partner (extern)"
 
 #. manual entry from templates.pot.manual
 msgid "supplier/partner (internal)"
-msgstr ""
+msgstr "Lieferant/Partner (intern)"
 
 #. manual entry from templates.pot.manual
 msgid "suspended"
