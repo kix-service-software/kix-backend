@@ -36,7 +36,7 @@ When qr/added a template run for templateid (\d+)$/, sub {
       Content => {
             ImportExportTemplateRun  => {
                 Type               => 'import',
-                ImportFileContent  => 'file-content'
+                ImportFileContent  => 'some base64 encoded file-content'
             }
       },
    );

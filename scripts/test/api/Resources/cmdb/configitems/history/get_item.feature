@@ -1,4 +1,4 @@
-Feature: GET request to the /cmdb/configitems/history resource
+Feature: GET request to the /cmdb/configitems/:ConfigItemID/history/:HistoryID resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
@@ -7,6 +7,7 @@ Feature: GET request to the /cmdb/configitems/history resource
       
   Scenario: get an existing history
     Given a configitem
+    Then the response code is 201
     When I query the cmdb collection of configitem historys
     When I get this configitem history
     Then the response code is 200

@@ -115,32 +115,36 @@ sub Validate {
             $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
             $Charset =~ s/"|'//g;
             $Charset =~ s/(.+?);.*/$1/g;
-        }
-        my $Result = Kernel::API::Validator::CharsetValidator::Validate(
-            $Self, 
-            Attribute => 'Charset',
-            Data      => {
-                Charset => $Charset,
-            }
-        );
-
-        if ($Result->{Success}) {
-            # check MimeType part
-            my $MimeType = '';
-            if ( $ContentType =~ /^(\w+\/\w+)/i ) {
-                $MimeType = $1;
-                $MimeType =~ s/"|'//g;
-            }            
-            my $Result = Kernel::API::Validator::MimeTypeValidator::Validate(
+            my $Result = Kernel::API::Validator::CharsetValidator::Validate(
                 $Self, 
-                Attribute => 'MimeType',
+                Attribute => 'Charset',
                 Data      => {
-                    MimeType => $MimeType,
+                    Charset => $Charset,
                 }
-            );            
-            if ($Result->{Success}) {
-                $Valid = 1;
+            );
+            if (!$Result->{Success}) {
+                return $Self->_Error(
+                    Code    => 'Validator.Failed',
+                    Message => "Validation of attribute $Param{Attribute} ($Param{Data}->{$Param{Attribute}}) failed!",
+                );
             }
+        }
+
+        # check MimeType part
+        my $MimeType = '';
+        if ( $ContentType =~ /^(\w+\/\w+)/i ) {
+            $MimeType = $1;
+            $MimeType =~ s/"|'//g;
+        }
+        my $Result = Kernel::API::Validator::MimeTypeValidator::Validate(
+            $Self, 
+            Attribute => 'MimeType',
+            Data      => {
+                MimeType => $MimeType,
+            }
+        );            
+        if ($Result->{Success}) {
+            $Valid = 1;
         }
     }
     else {
@@ -153,11 +157,11 @@ sub Validate {
     if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => "Validation of attribute $Param{Attribute} failed!",
-        );        
+            Message => "Validation of attribute $Param{Attribute} ($Param{Data}->{$Param{Attribute}}) failed!",
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;

@@ -34,3 +34,4 @@ When qr/delete a session$/, sub {
       URL   => S->{API_URL}.'/system/sessions/'.S->{Token},
    );
 };
+

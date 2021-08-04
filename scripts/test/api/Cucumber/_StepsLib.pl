@@ -139,7 +139,10 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 
     foreach my $Row ( @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
-            C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+            if (!defined($Row->{$Attribute})) {
+                $Row->{$Attribute} = '-';
+                C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+            }
         }
         $Index++
     }
@@ -148,15 +151,21 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 #=======================work=================================
 Then qr/the response content is$/, sub {
 	print STDERR Dumper(S->{ResponseContent});
-	 my $Anzahl = @{S->{ResponseContent}->{Channel}};
-	print STDERR Dumper($Anzahl);
+    #print STDERR Dumper(S->{Response});
+
+};
+Then qr/the response content$/, sub {
+	#print STDERR Dumper(S->{ResponseContent});
+    print STDERR Dumper(S->{Response});
+};
+#=============================================================
+
+Then qr/the response content history is$/, sub {
+    S->{HistoryEntryID} = S->{ResponseContent}->{ConfigItemHistoryItem}->[0]->{HistoryEntryID};
+#    print STDERR "HistoryEntryIDxxx".Dumper(S->{HistoryEntryID});
 };
 
-
-
 1;
-
-
 
 
 =back

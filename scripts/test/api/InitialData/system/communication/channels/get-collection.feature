@@ -8,7 +8,7 @@
   Scenario: check is the existing channels are consistent with the delivery defaults
     When I query the collection of channels
     Then the response code is 200
-    And the response object is ChannelCollectionResponse
+#    And the response object is ChannelCollectionResponse
     Then the response contains 2 items of type "Channel"
     And the response contains the following items of type Channel
       | Name           | ValidID |

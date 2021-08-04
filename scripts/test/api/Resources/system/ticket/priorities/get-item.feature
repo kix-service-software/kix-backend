@@ -8,7 +8,7 @@ Feature: GET request to the /system/ticket/priorities/:PriorityID resource
   Scenario: get an existing ticket priority
     When I get the ticket priority with ID 3
     Then the response code is 200
-    And the response object is PriorityResponse
+#    And the response object is PriorityResponse
     And the attribute "Priority.Name" is "3 normal"
 
     

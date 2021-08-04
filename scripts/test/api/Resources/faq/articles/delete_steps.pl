@@ -39,7 +39,7 @@ When qr/delete all this faq articles$/, sub {
     for ($i=0;$i<@{S->{FAQArticleIDArray}};$i++){ 
         ( S->{Response}, S->{ResponseContent} ) = _Delete(
             Token => S->{Token},
-            URL   => S->{API_URL}.'/faq/articles'.S->{FAQArticleIDArray}->[$i],
+            URL   => S->{API_URL}.'/faq/articles/'.S->{FAQArticleIDArray}->[$i],
         );
     }
 

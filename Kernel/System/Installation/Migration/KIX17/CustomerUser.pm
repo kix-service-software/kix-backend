@@ -174,6 +174,9 @@ sub _AssignUser {
     );
 
     if ( !$UserID ) {
+        # add Customer context
+        $Param{User}->{is_customer} = 1;
+
         # create associated user
         $UserID = $Self->Insert(
             Table          => 'users',

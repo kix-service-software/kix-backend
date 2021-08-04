@@ -8,7 +8,7 @@
   Scenario: get the list of existing sendertypes
     When I query the collection of sendertypes
     Then the response code is 200
-    And the response object is SenderTypeCollectionResponse
+#    And the response object is SenderTypeCollectionResponse
 
   Scenario: get the list of existing sendertypes filtered
     When I query the collection of sendertypes with filter of system
@@ -27,7 +27,7 @@
   Scenario: get the list of existing sendertypes with limit
     When I query the collection of sendertypes with a limit of 1
     Then the response code is 200
-    And the response object is SenderTypeCollectionResponse
+#    And the response object is SenderTypeCollectionResponse
     And the response contains 1 items of type "SenderType"
     
       

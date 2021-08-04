@@ -26,11 +26,26 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
-When qr/I query the collection of faq articles\s*$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/faq/articles',
+When qr/added a config definitions$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/system/config/definitions',
+      Token   => S->{Token},
+      Content => {
+          SysConfigOptionDefinition => {
+              AccessLevel => "internal",
+              Name => "test",
+              Type => "String",
+              Description => "this is just a test option",
+              Default => "this is a test"
+          }
+
+      }
    );
 };
+
+
+
+
+

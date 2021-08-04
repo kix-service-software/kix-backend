@@ -8,6 +8,6 @@
   Scenario: get an existing sendertype
     When I get the sendertype with SenderTypeID 1
     Then the response code is 200
-    And the response object is SenderTypeResponse
+#    And the response object is SenderTypeResponse
     And the attribute "SenderType.Name" is "agent"
 

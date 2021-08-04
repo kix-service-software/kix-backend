@@ -8,7 +8,7 @@ Feature: GET request to the /system/ticket/ticketstates/:TicketStateID resource
   Scenario: get an existing ticketstate
     When I get the ticketstate with ID 3
     Then the response code is 200
-    And the response object is TicketStateResponse
+#    And the response object is TicketStateResponse
     And the attribute "TicketState.Name" is "pending reminder"
 
     

@@ -8,7 +8,7 @@ Feature: GET request to the /system/ticket/types resource
   Scenario: check is the existing tickettypes are consistent with the delivery defaults
     When I query the collection of tickettypes
     Then the response code is 200
-    And the response object is TicketTypeCollectionResponse
+#    And the response object is TicketTypeCollectionResponse
     Then the response contains 3 items of type "TicketType"
     Then the response contains the following items of type TicketType
       | Name                   |

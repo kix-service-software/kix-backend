@@ -32,5 +32,6 @@ When qr/I query the collection of roles$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/roles',
+      Sort  => 'Role.Name:textual'
    );
 };

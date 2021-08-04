@@ -981,14 +981,8 @@ sub ContactSearch {
 
             my @WhereParts;
             for my $Field ( qw(firstname lastname email title phone fax mobile street zip city country) ) {
-                if ( $Self->{CaseSensitive} ) {
-                    push(@WhereParts, "c.$Field LIKE ?");
-                    push(@Bind, \$Part);
-                }
-                else {
-                    push(@WhereParts, "LOWER(c.$Field) LIKE LOWER(?)");
-                    push(@Bind, \$Part);
-                }
+                push(@WhereParts, "$Self->{Lower}(c.$Field) LIKE $Self->{Lower}(?)");
+                push(@Bind, \$Part);
             }
             if (@WhereParts) {
                 $Where .= '(' . join( ' OR ', @WhereParts ) . ')';
@@ -1005,14 +999,8 @@ sub ContactSearch {
         $Email =~ s/\*/%/g;
         $Email =~ s/%%/%/g;
 
-        if ( $Self->{CaseSensitive} ) {
-            $Where .= "c.email LIKE ?";
-            push(@Bind, \$Email);
-        }
-        else {
-            $Where .= "LOWER(c.email) LIKE LOWER(?)";
-            push(@Bind, \$Email);
-        }
+        $Where .= "$Self->{Lower}(c.email) LIKE $Self->{Lower}(?)";
+        push(@Bind, \$Email);
     }
     elsif ( $Param{OrganisationID} ) {
         $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
@@ -1054,7 +1042,7 @@ sub ContactSearch {
             $Where .= " AND ";
         }
 
-        $Where .= "c.email = ?";
+        $Where .= "$Self->{Lower}(c.email) = $Self->{Lower}(?)";
         push(@Bind, \$Param{EmailEquals});
     }
     elsif ($Param{EmailIn}) {
@@ -1085,14 +1073,8 @@ sub ContactSearch {
             $Where .= " AND ";
         }
 
-        if ( $Self->{CaseSensitive} ) {
-            $Where .= "u.login LIKE ?";
-            push(@Bind, \$Login);
-        }
-        else {
-            $Where .= "LOWER(u.login) LIKE LOWER(?)";
-            push(@Bind, \$Login);
-        }
+        $Where .= "$Self->{Lower}(u.login) LIKE $Self->{Lower}(?)";
+        push(@Bind, \$Login);
     }
     elsif ($Param{LoginEquals}) {
         $Join = 'LEFT JOIN users u ON c.user_id = u.id';
@@ -1101,7 +1083,7 @@ sub ContactSearch {
             $Where .= " AND ";
         }
 
-        $Where .= "u.login = ?";
+        $Where .= "$Self->{Lower}(u.login) = $Self->{Lower}(?)";
         push(@Bind, \$Param{LoginEquals});
     }
 

@@ -11,3 +11,19 @@ Feature: POST request to the /auth resource
     And the response object is AuthResponse
     And the response contains a valid token
 
+  Scenario: authenticate with no valid password
+    Given I am an agent user with login "admin" and password "PasswOrd"
+    When I login
+    Then the response code is 401
+    And the response object is Error
+    And the error code is "SessionCreate.AuthFail"
+    And the error message is "Authorization not possible, please contact the system administrator."
+
+  Scenario: authenticate with no user and password
+    Given I am an agent user with login "" and password ""
+    When I login
+    Then the response code is 401
+    And the response object is Error
+    And the error code is "SessionCreate.AuthFail"
+    And the error message is "Need UserLogin or UserID!"
+

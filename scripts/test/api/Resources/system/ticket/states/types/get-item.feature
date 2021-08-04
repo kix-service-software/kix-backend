@@ -8,6 +8,6 @@ Feature: GET request to the /system/ticket/states/types/:TypeID resource
   Scenario: get an existing statetype
     When I get the statetype with ID 3
     Then the response code is 200
-    And the response object is StateTypeResponse
+#    And the response object is StateTypeResponse
     And the attribute "StateType.Name" is "closed"
     

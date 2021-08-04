@@ -32,6 +32,7 @@ When qr/I query the collection of organisations$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/organisations',
+      Sort  => 'Organisation.ID:numeric'
    );
 };
 

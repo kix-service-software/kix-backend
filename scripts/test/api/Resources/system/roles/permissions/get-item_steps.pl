@@ -32,7 +32,7 @@ require '_StepsLib.pl';
 When qr/I get this permission$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/roles/'.S->{RoleID}.'/permissions/'.S->{PermissionID},
+      URL   => S->{API_URL}.'/system/roles/'.S->{RoleID}.'/permissions/'.S->{PermissionID}
    );
 };
 

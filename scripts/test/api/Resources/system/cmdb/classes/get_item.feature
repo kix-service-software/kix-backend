@@ -8,7 +8,7 @@ Feature: GET request to the /system/cmdb/classes resource
   Scenario: get an existing class
     When I get the configitem class with ID 4
     Then the response code is 200
-    And the response object is ConfigItemClassResponse
+#    And the response object is ConfigItemClassResponse
     And the attribute "ConfigItemClass.Name" is "Computer"
 
 
