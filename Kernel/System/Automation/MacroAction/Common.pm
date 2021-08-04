@@ -269,6 +269,22 @@ sub ValidateConfig {
     return if (ref $Param{Config} ne 'HASH');
 
     foreach my $Option ( sort keys %{$Self->{Definition}->{Options}} ) {
+        if ( IsArrayRefWithData($Self->{Definition}->{Options}->{$Option}->{PossibleValues}) ) {
+            # check the value
+            if ( exists $Param{Config}->{$Option} ) {
+                my %PossibleValues = map { $_ => 1 } @{$Self->{Definition}->{Options}->{$Option}->{PossibleValues}};
+                foreach my $Value ( IsArrayRefWithData($Param{Config}->{$Option}) ? @{$Param{Config}->{$Option}} : [ $Param{Config}->{$Option} ] ) {
+                    if ( !$PossibleValues->{$Value} ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => "Invalid value for parameter \"$Option\"! Possible values: " . join(', ', @{$Self->{Definition}->{Options}->{$Option}->{PossibleValues}}),
+                        );
+                        return;
+                    }
+                }
+            }
+        }
+
         next if !$Self->{Definition}->{Options}->{$Option}->{Required};
 
         if ( !exists $Param{Config}->{$Option} ) {

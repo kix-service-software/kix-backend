@@ -662,7 +662,8 @@ sub MacroActionExecute {
 
     my $Success = $BackendObject->Run(
         %Param,
-        Config => \%Parameters
+        MacroType  => $Macro{Type},
+        Config     => \%Parameters
     );
 
     if ( !$Success ) {
@@ -734,6 +735,9 @@ sub _LoadMacroActionTypeBackend {
             );
             return;
         }
+
+        # give the macro action backend module it's own config to work with
+        $BackendObject->{ModuleConfig} = $Backends->{$Param{Name}};
 
         $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} = $BackendObject;
     }
