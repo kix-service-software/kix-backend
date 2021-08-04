@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-8-2 13:41+0000\n"
-"PO-Revision-Date: 2021-06-25 08:47+0000\n"
+"PO-Revision-Date: 2021-08-04 13:47+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
@@ -2281,7 +2281,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Comment"
-msgstr ""
+msgstr "Comment"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Company name which will be included in outgoing emails as an X-Header."
@@ -5560,7 +5560,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Contact"
-msgstr ""
+msgstr "Contact"
 
 #. manual entry from templates.pot.manual
 msgid "Contact Information"
