@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-8-2 13:41+0000\n"
-"PO-Revision-Date: 2021-07-05 13:47+0000\n"
+"PO-Revision-Date: 2021-08-04 09:47+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1380,6 +1380,10 @@ msgid ""
 "options otherwise the provided/calculated time stamp is used without "
 "modification."
 msgstr ""
+"(Optional) Wenn die Wartezeit geändert werden soll, um dem Beginn oder Ende ("
+"Begin-/End of Businessday BOB/EOB) der Servicezeit zu entsprechen, wählen "
+"Sie eine dieser Optionen. Wenn leer, wird der bereitgestellte/berechnete "
+"Zeitstempel unverändert verwendet."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid ""
@@ -1387,10 +1391,13 @@ msgid ""
 "will be set as pending time. Setting \"Pending Time Difference\" will "
 "overwrite this parameter. Used for pending states only."
 msgstr ""
+"(Optional) Definiert den Ziel-Wartezeitpunkt im Format JJJJ-MM-TT hh:mm:ss. "
+"Wird auch eine \"Wartezeit-Differenz\" angegeben, wird diese Differenz "
+"verwendet. Gilt nur für Warten-Status."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "Pending Date Time"
-msgstr ""
+msgstr "Wartezeitpunkt"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "Sets the state of a ticket."
@@ -1398,7 +1405,7 @@ msgstr "Setzt den Status eines Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "Target Time"
-msgstr ""
+msgstr "Zielzeit"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid "The name of the state to be set."
@@ -1569,19 +1576,19 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "Default value"
-msgstr ""
+msgstr "Vorgabewert"
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "This setting can not be changed."
-msgstr ""
+msgstr "Diese Einstellung kann nicht geändert werden."
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "This setting can not be deactivated."
-msgstr ""
+msgstr "Diese Einstellung kann nicht deaktiviert werden."
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "This setting is not active by default."
-msgstr ""
+msgstr "Diese Einstellung ist als Vorgabe inaktiv."
 
 #. Perl Module: Kernel/System/DynamicField/Driver/BaseText.pm
 msgid "This field is required."
@@ -2114,7 +2121,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Queue"
-msgstr "Team"
+msgstr "Queue"
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Up"
