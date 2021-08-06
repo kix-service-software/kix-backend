@@ -53,22 +53,23 @@ sub _UpdateDynamicFields {
             InternalField => 0,
         },
         'Type' => {
-            Config => "
----
-CountMin: '1'
-CountMax: '2'
-CountDefault: '1'
-DefaultValue:
-PossibleNone: '1'
-PossibleValues:
-   customer: customer
-   supplier/partner (external): supplier/partner (external)
-   supplier/partner (internal): supplier/partner (internal)
-   service provider: service provider
-TranslatableValues: '1'"
+            Config => {
+                CountMin => 1,
+                CountMax => 2,
+                CountDefault => 1,
+                DefaultValue => undef,
+                PossibleNone => 1,
+                PossibleValues => {
+                    'customer' => 'customer',
+                    'supplier/partner (external)' => 'supplier/partner (external)',
+                    'supplier/partner (internal)' => 'supplier/partner (internal)',
+                    'service provider' => 'service provider'
+                },
+                TranslatableValues => 1
+            }
         }
     );
-    
+
     my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -91,7 +92,7 @@ TranslatableValues: '1'"
         }
 
         if ( exists $DynamicFieldsToUpdate{$Name}->{InternalField} ) {
-            # we have to update the internal flag via SQL, because it's not part of DynamicFieldUpdate and shouldn't be 
+            # we have to update the internal flag via SQL, because it's not part of DynamicFieldUpdate and shouldn't be
             if ( !$DBObject->Do(
                 SQL => 'UPDATE dynamic_field SET internal_field = ?, change_time = current_timestamp, change_by = 1 WHERE id = ?',
                 Bind => [
@@ -131,7 +132,7 @@ TranslatableValues: '1'"
 
 sub _MigrateDynamicFieldData {
     my ( $Self, %Param ) = @_;
-    
+
     my $DBObject = $Kernel::OM->Get('DB');
 
     # get all current dynamic fields
