@@ -540,7 +540,7 @@ sub PrepareData {
         }
 
         foreach my $Parameter ( sort keys %Parameters ) {
-            
+
             # check requirement
             if ( $Parameters{$Parameter}->{Required} && !defined( $Data{$Parameter} ) ) {
                 $Result->{Success} = 0;
@@ -1660,7 +1660,7 @@ sub _ApplyFieldSelector {
 
                     # if we have already evaluated that condition, we can use the cache
                     next if exists $ConditionCache{$Item->{Condition}} && !$ConditionCache{$Item->{Condition}};
-                    
+
                     if ( !exists $ConditionCache{$Item->{Condition}} ) {
                         # check the condition
                         my %Tmp = ( $Object => \%{ $Param{Data}->{$Object} } );
@@ -1736,7 +1736,7 @@ sub _ApplyFieldSelector {
 
                             # if we have already evaluated that condition, we can use the cache
                             next FIELD if exists $ConditionCache{$Item->{Condition}} && !$ConditionCache{$Item->{Condition}};
-                            
+
                             if ( !exists $ConditionCache{$Item->{Condition}} ) {
                                 # check the condition
                                 my %Tmp = ( $Object => \%{ $ObjectItem } );
@@ -2250,15 +2250,16 @@ sub _ApplyObjectPermissions {
     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
     foreach my $Object ( sort keys %{$Param{Data}} ) {
-        my @ItemList = IsArrayRefWithData($Param{Data}->{$Object}) ? @{$Param{Data}->{$Object}} : ( $Param{Data}->{$Object} );
+        my @ItemList = IsArrayRef($Param{Data}->{$Object}) ? @{$Param{Data}->{$Object}} : ( $Param{Data}->{$Object} );
 
         my @NewItemList;
         my $IsFiltered = 0;
 
         ITEM:
         foreach my $Item ( @ItemList ) {
-            # we can't filter scalars
-            next ITEM if IsString($Item);
+
+            # we need a hash ref to filter
+            next ITEM if ( !IsHashRefWithData($Item) );
 
             my $ResultingPermission;
 
@@ -2564,7 +2565,7 @@ sub _CheckObjectPermission {
                     }
                 };
             }
-            
+
             if ( $Self->{RequestMethod} ne 'GET' ) {
 
                 $ResultingPermission = 0 if $ResultingPermission == -1;
@@ -2612,7 +2613,7 @@ sub _CheckObjectPermission {
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
-            
+
             if ( $ResultingPermission != -1 && ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
                 $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
 
@@ -2750,7 +2751,7 @@ sub _CheckPropertyPermission {
                         Condition  => $Condition,
                         Data       => $ObjectData
                     );
-        
+
                     # if we don't have a GET request and the condition doesn't match, we can ignore this permission
                     next PERMISSION if $Self->{RequestMethod} ne 'GET' && !$CheckResult;
                 }
@@ -2766,7 +2767,7 @@ sub _CheckPropertyPermission {
                 # init
                 $AttributePermissions{"$Object.$Attribute"}->{Value} = 0 if !exists $AttributePermissions{"$Object.$Attribute"};
                 $AttributePermissions{"$Object.$Attribute"}->{Value} |= $Permission->{Value};
-                
+
                 if ( $Self->{RequestMethod} eq 'GET' && $Permission->{ConditionFilter} ) {
                     # if we have a GET request, we have to store the condition filter to later handling
                     $AttributePermissions{"$Object.$Attribute"}->{Condition}       = $Condition;
@@ -2782,7 +2783,7 @@ sub _CheckPropertyPermission {
                 $AttributePermissions{$Attribute}->{Value} |= $AttributePermissions{'*.*'}->{Value} || 0;
             }
         }
-        
+
         my %SeenAttributes;
         foreach my $Attribute ( sort keys %AttributePermissions ) {
 
