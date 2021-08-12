@@ -246,5 +246,11 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Provider::Transport::MaxLength" Required="0" Valid="1">
+        <Description Translatable="1">Max allowed request size in bytes (overwrites default value (50MB) from provider config).</Description>
+        <Setting>
+            <String Regex="^\d*$">52428800</String>
+        </Setting>
+    </ConfigItem>
 
 </kix_config>
