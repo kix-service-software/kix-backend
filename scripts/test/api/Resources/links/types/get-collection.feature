@@ -8,6 +8,6 @@
   Scenario: get the list of existing link types 
     When I query the collection of link types
     Then the response code is 200
-    And the response object is LinkTypeCollectionResponse
+#    And the response object is LinkTypeCollectionResponse
 
 

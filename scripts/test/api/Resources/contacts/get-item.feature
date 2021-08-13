@@ -10,6 +10,7 @@
     Given a contact
     When I get this contact
     Then the response code is 200
+#    Then the response object is ContactPostPatchResponse
     And the attribute "Contact.Lastname" is "Mustermann"
     When I delete this contact
     Then the response code is 204

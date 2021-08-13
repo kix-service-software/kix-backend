@@ -61,12 +61,12 @@ sub _Replace {
         if ( $ObjectType eq 'Ticket' && (IsHashRefWithData($Param{Ticket}) || $Param{TicketID}) ) {
             $Object = $Param{Ticket};
             if ( !IsHashRefWithData($Object) && $Param{TicketID} ) {
-                my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet( 
+                my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                     TicketID      => $Param{TicketID},
                     DynamicFields => 1,
                 );
                 $Object = \%Ticket;
-            } 
+            }
         }
         elsif ( $ObjectType eq 'Contact' && ($Param{Data}->{ContactID} || $Param{Ticket}->{ContactID}) ) {
             my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
@@ -82,7 +82,7 @@ sub _Replace {
             );
             $Object = \%Organisation;
         }
-        
+
         if ( IsHashRefWithData($Object) ) {
 
             # Dropdown, Checkbox and MultipleSelect DynamicFields, can store values (keys) that are
@@ -92,12 +92,13 @@ sub _Replace {
             # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for select fields (multiselect, reference)
             # <KIX_TICKET_DynamicField_NameX_HTML> returns a special HTML display value (e.g. checklist) or default display value
             # <KIX_TICKET_DynamicField_NameX_Short> returns a short display value (e.g. checklist) or default display value
+            # <KIX_TICKET_DynamicField_NameX_ObjectValue> returns the raw value(s) - with position ("_0" at the end) a certain value can be used, wihtout the value with index 0 is used
 
             my %DynamicFields;
 
             # For systems with many Dynamic fields we do not want to load them all unless needed
             # Find what Dynamic Field Values are requested
-            while ( $Param{Text} =~ m/$Tag(\S+?)(_Value|_Key|_HTML|_Short)? $Self->{End}/gixms ) {
+            while ( $Param{Text} =~ m/$Tag(\S+?)(_Value|_Key|_HTML|_Short|_ObjectValue(_\d+)?)? $Self->{End}/gixms ) {
                 $DynamicFields{$1} = 1;
             }
 
@@ -120,6 +121,21 @@ sub _Replace {
 
                 # only prepare values of the requested ones
                 next DYNAMICFIELD if !$DynamicFields{ $DynamicFieldConfig->{Name} };
+
+                # "prepare" object value
+                my @Values;
+                if ( ref $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } eq 'ARRAY' ) {
+                    @Values = @{ $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } };
+                } else {
+                    @Values = ( $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } );
+                }
+                my $Index = 0;
+                for my $ObjectValue (@Values) {
+                    if ($Index == 0) {
+                        $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue' } = $ObjectValue;
+                    }
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue_' . $Index } = $ObjectValue;
+                }
 
                 # get the display values for each dynamic field
                 my $DisplayValueStrg = $DynamicFieldBackendObject->DisplayValueRender(

@@ -230,7 +230,7 @@ sub PluginAvailable {
     }
 
     my %Plugins = map {$_->{Product} => 1 } $Self->PluginList(Valid => 1);
-    
+
     return $Plugins{$Param{Plugin}};
 }
 
@@ -944,7 +944,7 @@ __OPERATIONS__
   Transport:
     Config:
       KeepAlive: ''
-      MaxLength: '10485760'
+      MaxLength: '52428800'
       RouteOperationMapping:
 __ROUTES__
     Type: HTTP::REST

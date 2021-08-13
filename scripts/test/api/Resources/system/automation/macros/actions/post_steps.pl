@@ -36,10 +36,9 @@ Given qr/a automation macro action$/, sub {
         MacroAction => {
             Comment => "some comment given action",
             MacroID => S->{MacroID},
-            Name => "new macro given action".rand(),
             Parameters => {
                 Body => "The text of the new article.",
-                Contact => 'test@nomail.com',
+                ContactEmailOrID => "mamu@example.org",
                 Priority => "5 very low",
                 State => "new",
                 Team => "Service Desk",
@@ -86,10 +85,9 @@ Given qr/(\d+) of automation  macro action$/, sub {
             MacroAction => {
                 Comment => $Comment,
                 MacroID => S->{MacroID},
-                Name => $Name,
                 Parameters => {
                     Body => "The text of the new article.",
-                    Contact => 'test@nomail.com',
+                    ContactEmailOrID => "mamu@example.org",
                     Priority => "5 very low",
                     State => "new",
                     Team => "Service Desk",
@@ -111,10 +109,9 @@ When qr/I create a automation macro action$/, sub {
         MacroAction => {
             Comment => "some comment create action".rand(),
             MacroID => S->{MacroID},
-            Name => "new macro create action".rand(),
             Parameters => {
                 Body => "The text of the new article.",
-                Contact => 'test@nomail.com',
+                ContactEmailOrID => "mamu@example.org",
                 Priority => "5 very low",
                 State => "new",
                 Team => "Service Desk",
@@ -126,4 +123,27 @@ When qr/I create a automation macro action$/, sub {
       }
    );
 };
+
+When qr/I create a automation macro action with no ContactEmailOrID$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/automation/macros/'.S->{MacroID}.'/actions',
+        Token   => S->{Token},
+        Content => {
+            MacroAction => {
+                Comment => "some comment create action".rand(),
+                MacroID => S->{MacroID},
+                Parameters => {
+                    Body => "The text of the new article.",
+                    Priority => "5 very low",
+                    State => "new",
+                    Team => "Service Desk",
+                    Title => "Test macro actions"
+                },
+                Type => "TicketCreate",
+                ValidID => 1
+            }
+        }
+    );
+};
+
 

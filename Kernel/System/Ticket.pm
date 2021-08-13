@@ -1343,6 +1343,11 @@ sub _TicketCacheClear {
         Type => "TicketSearch",
     );
 
+    # cleanup index cache
+    $CacheObject->CleanUp(
+        Type => "TicketIndex",
+    );
+
     return 1;
 }
 
@@ -4792,6 +4797,25 @@ sub TicketAccountTime {
     $Param{TimeUnit} =~ s/ //g;
     $Param{TimeUnit} =~ s/^(-?\d{1,10}\.\d\d).+?$/$1/g;
     chomp $Param{TimeUnit};
+
+    if ( !IsNumber($Param{TimeUnit}) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "TimeUnit is not a number!"
+        );
+        return;
+    }
+
+    if (
+        $Param{TimeUnit} >= 86400 ||
+        $Param{TimeUnit} <= -86400
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "TimeUnit has to be between -86400 and 86400!"
+        );
+        return;
+    }
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');

@@ -5,7 +5,7 @@ Feature: GET request to the /system/automation/macros/:MacroID/actions resource
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
-  Scenario: get the list of automation macros
+  Scenario: get the list of automation macros actions
     Given a automation macro without action
     Then the response code is 201   
     Given a automation macro action

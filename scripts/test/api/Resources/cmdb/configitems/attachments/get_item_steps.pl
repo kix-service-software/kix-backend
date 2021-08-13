@@ -28,10 +28,10 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I get the attachment with attachmentid (\d+)\s*$/, sub {
+When qr/I get the attachment with attachmentid (\d+)\s*$/, sub {        
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/cmdb/configitems/attachments/'.$1,
+      URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ResponseContent}->{ConfigItem}->{ConfigItemID}.'/versions/'.S->{ResponseContent}->{ConfigItem}->{LastVersionID}.'/attachments/'.$1,
    );
 };
 

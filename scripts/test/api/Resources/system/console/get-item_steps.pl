@@ -34,3 +34,10 @@ When qr/I get this console command "(.*?)"$/, sub {
       URL   => S->{API_URL}.'/system/console/'.$1,
    );
 };
+
+When qr/I get this console command "(.*?)" as root$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/system/console/'.$1,
+   );
+};

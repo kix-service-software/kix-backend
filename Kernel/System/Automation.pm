@@ -99,10 +99,13 @@ sub ExecuteJobsForEvent {
     my %JobList = $Self->JobList(
         Valid => 1
     );
-    foreach my $JobID ( sort keys %JobList ) {
+
+    # sort by names to enable simple ordering by user
+    foreach my $JobID ( sort { $JobList{$a} cmp $JobList{$b} } keys %JobList ) {
         my %Job = $Self->JobGet(
             ID => $JobID
         );
+
         # ignore jobs of non-relevant types
         next if $Job{Type} ne $Param{Type};
 
@@ -112,6 +115,7 @@ sub ExecuteJobsForEvent {
         );
 
         if ( $CanExecute ) {
+
             # execute the job in a new Automation instance
             my $AutomationObject = $Kernel::OM->GetModuleFor('Automation')->new(%{$Self});
 

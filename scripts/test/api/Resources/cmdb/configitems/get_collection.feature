@@ -70,9 +70,25 @@ Feature: GET request to the /cmdb/configitems resource
     And the response contains 8 items of type "ConfigItem"
     When delete all of configitems
     Then the response code is 204
-    And the response has no content    
-    
-     
+    And the response has no content
+
+  Scenario: get the list of existing configitems searchlimit
+    Given 80 of configitems
+    When I query the cmdb collection of configitems 55 searchlimit
+    Then the response code is 200
+    And the response contains 55 items of type "ConfigItem"
+    When delete all of configitems
+    Then the response code is 204
+    And the response has no content
+
+  Scenario: get the list of existing configitems searchlimit object
+    Given 80 of configitems
+    When I query the cmdb collection of configitems 35 searchlimit object
+    Then the response code is 200
+    And the response contains 35 items of type "ConfigItem"
+    When delete all of configitems
+    Then the response code is 204
+    And the response has no content
  
  
     

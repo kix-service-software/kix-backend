@@ -9,6 +9,7 @@
     Given 8 of organisations
     When I query the collection of organisations
     Then the response code is 200
+#    Then the response object is OrganisationCollectionResponse
     And the response contains the following items of type Organisation
     When delete all this organisations
     Then the response code is 204
