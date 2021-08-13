@@ -10,15 +10,27 @@
     Then the response code is 200
     Then the response contains 11 items of type "Notification"
     And the response contains the following items of type Notification
-      | Name                                   | ValidID |
-      | Agent - New Ticket Notification        | 1       |
-      | Agent - Reminder (if unlocked)         | 1       |
-      | Customer - New Ticket Receipt          | 1       |
-      | Agent - FUP Notification (if unlocked) | 1       |
-      | Agent - FUP Notification (if locked)   | 1       |
-      | Agent - Lock Timeout                   | 1       |
-      | Agent - Owner Assignment               | 1       |
-      | Agent - Responsible Assignment         | 1       |           
-      | Agent - New Note Notification          | 1       | 
-      | Agent - Ticket Move Notification       | 1       |
-      | Agent - Reminder (if locked)           | 1       |     
+      | Name                                     | ValidID |
+      | Agent - New Ticket Notification          | 1       |
+      | Agent - Reminder (if unlocked)           | 1       |
+      | Customer - New Ticket Receipt            | 1       |
+      | Agent - FUP Notification (if unlocked)   | 1       |
+      | Agent - FUP Notification (if locked)     | 1       |
+      | Agent - Lock Timeout                     | 1       |
+      | Agent - Owner Assignment                 | 1       |
+      | Agent - Responsible Assignment           | 1       |
+      | Agent - New Note Notification            | 1       |
+      | Agent - Ticket Move Notification         | 1       |
+      | Agent - Reminder (if locked)             | 1       |
+
+
+
+
+
+
+
+
+
+
+
+

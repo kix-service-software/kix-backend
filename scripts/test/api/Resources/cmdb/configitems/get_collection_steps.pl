@@ -35,6 +35,20 @@ When qr/I query the cmdb collection of configitems$/, sub {
    );
 };
 
+When qr/I query the cmdb collection of configitems (\d+) searchlimit$/, sub {        
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/cmdb/configitems?searchlimit='.$1,
+   );
+};
+
+When qr/I query the cmdb collection of configitems (\d+) searchlimit object$/, sub {        
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/cmdb/configitems?searchlimit=ConfigItem:'.$1,
+   );
+};
+
 When qr/I query the cmdb collection of configitems with filter of DeplStateID (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},

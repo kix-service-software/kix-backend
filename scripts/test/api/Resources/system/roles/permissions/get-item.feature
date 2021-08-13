@@ -10,7 +10,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions/:PermissionID reso
     Given a permission
     When I get this permission
     Then the response code is 200
-#    Then the response object is PermissionResponse
     When I delete this permission
     Then the response code is 204
     When I delete this role

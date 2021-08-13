@@ -497,13 +497,13 @@ sub WorkingTime {
             $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
             $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
             $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
-            
+
             my $Zone = $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} );
             if ($Zone) {
                 my $TimeZoneObject   = DateTime::TimeZone->new(
                     name => $Zone
                 );
-                $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds            
+                $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
                 $Param{StartTime} += $Zone;
                 $Param{StopTime}  += $Zone;
             }
@@ -886,8 +886,10 @@ sub DestinationTime {
         }
 
         if ( %TimeWorking ) {
+
             # get WorkingDay
             my $WorkingDay = $LDay{$WDay};
+
             # check for VacationDay
             if ( $TimeVacationDays->{$Month}->{$Day} ) {
                 $WorkingDay = $TimeVacationDays->{$Month}->{$Day};
@@ -895,8 +897,10 @@ sub DestinationTime {
             if ( $TimeVacationDaysOneTime->{$Year}->{$Month}->{$Day} ) {
                 $WorkingDay = $TimeVacationDaysOneTime->{$Year}->{$Month}->{$Day};
             }
+
             # Skip days without working hours
             if ( !$TimeWorking{$WorkingDay}->{-1}->{'DayWorkingTime'} ) {
+
                 # Set destination time to next day, 00:00:00
                 $DestinationTime = $Self->Date2SystemTime(
                     Year   => $Year,
@@ -919,6 +923,7 @@ sub DestinationTime {
                     if ( $TimeWorking{$WorkingDay}->{$WorkingHour} ) {
                         MINUTE:
                         for my $Min ( $Minute..59 ) {
+
                             # Working minute
                             if ( $TimeWorking{$WorkingDay}->{$WorkingHour}->{$Min} ) {
                                 if ( ($Param{Time} - $DiffWorkTime) > (60 - $Second) ) {
@@ -930,6 +935,7 @@ sub DestinationTime {
                                     last MINUTE;
                                 }
                             }
+
                             # Not working minute
                             else {
                                 $DiffDestTime += (60 - $Second);
@@ -958,6 +964,7 @@ sub DestinationTime {
         }
         # FALLBACK
         else {
+
             # Skip vacation days, or days without working hours, do not count.
             if (
                 $TimeVacationDays->{$Month}->{$Day}
@@ -1018,6 +1025,7 @@ sub DestinationTime {
         ) + 1;
 
         if ( !%TimeWorking ) {
+
             # Compensate for switching to/from daylight saving time
             # (day is shorter or longer than 24h)
             if ( $NewCTime != $CTime00 + 24 * 60 * 60 ) {
@@ -1047,7 +1055,7 @@ vacation day
         Year     => 2005,
         Month    => 7 || '07',
         Day      => 13,
-    );  
+    );
 
     $TimeObject->VacationCheck(
         Year     => 2005,
@@ -1136,7 +1144,7 @@ sub GetVacationDays {
     foreach my $Item ( @{$TimeVacationDays} ) {
         $Result->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
     }
-    
+
     return $Result;
 }
 
@@ -1167,7 +1175,7 @@ sub GetVacationDaysOneTime {
     foreach my $Item ( @{$TimeVacationDays} ) {
         $Result->{$Item->{Year}}->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
     }
-    
+
     return $Result;
 }
 
@@ -1242,6 +1250,7 @@ sub _GetTimeWorking {
         Key   => "TimeWorkingHours::Calendar" . $Param{Calendar},
         Value => \%TimeWorking,
         TTL   => 5 * 60,
+        Depends => ['SysConfig'] # delete also if config is changed (TimeWorkingHours)
     );
     return %TimeWorking;
 }

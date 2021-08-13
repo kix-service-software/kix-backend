@@ -28,9 +28,16 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I get this addressbook$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/addressbook/'.S->{ResponseContent}->{AddressID},
-   );
+When qr/I patch this config object definitions "(.*?)"\s*$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Patch(
+        Token => S->{Token},
+        URL   => S->{API_URL}.'/system/config/definitions/'.$1,
+        Content => {
+            SysConfigOptionDefinition => {
+                Description => "this is a test",
+                IsRequired => 1
+            }
+
+        }
+    );
 };

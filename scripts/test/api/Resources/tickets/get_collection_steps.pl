@@ -106,4 +106,22 @@ When qr/I query the collection of tickets with sorted by "(.*?)" limit (\d+) and
    );
 };
 
+When qr/I query the collection of tickets (\d+) searchlimit$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/tickets?searchlimit='.$1,
+#      Filter => '{"Ticket": {"AND": [{"Field": "StateID","Operator": "EQ","Value": "6","Not": true}]}}',
+   );
+};
+
+When qr/I query the collection of tickets (\d+) searchlimit object$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/tickets?searchlimit=Ticket:'.$1,
+#      Filter => '{"Ticket": {"AND": [{"Field": "StateID","Operator": "EQ","Value": "6","Not": true}]}}',
+   );
+};
+
+
+
 

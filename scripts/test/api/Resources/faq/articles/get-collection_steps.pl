@@ -35,6 +35,20 @@ When qr/I query the collection of faq articles\s*$/, sub {
    );
 };
 
+When qr/I query the collection of faq articles (\d+) searchlimit\s*$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/faq/articles?searchlimit='.$1,
+   );
+};
+
+When qr/I query the collection of faq articles (\d+) searchlimit object\s*$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/faq/articles?searchlimit=FAQArticle:'.$1,
+   );
+};
+
 When qr/I query the collection of faq articles with filter of (.*?)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},

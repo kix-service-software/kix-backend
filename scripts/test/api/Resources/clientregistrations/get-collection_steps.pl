@@ -31,14 +31,14 @@ require '_StepsLib.pl';
 When qr/I query the collection of clientregistration$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
    );
 };
 
 When qr/I query the collection of clientregistration with filter of "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
       Filter => '{"ClientRegistration": {"AND": [{"Field": "ClientID","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
    );
 };
@@ -46,7 +46,7 @@ When qr/I query the collection of clientregistration with filter of "(.*?)"$/, s
 When qr/I query the collection of clientregistration with filter contains of "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
       Filter => '{"ClientRegistration": {"AND": [{"Field": "ClientID","Operator": "CONTAINS","Value": "'.$1.'"}]}}',
    );
 };
@@ -54,7 +54,7 @@ When qr/I query the collection of clientregistration with filter contains of "(.
 When qr/I query the collection of clientregistration with filter end of "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
       Filter => '{"ClientRegistration": {"AND": [{"Field": "ClientID","Operator": "ENDSWITH","Value": "'.$1.'"}]}}',
    );
 };
@@ -62,7 +62,7 @@ When qr/I query the collection of clientregistration with filter end of "(.*?)"$
 When qr/I query the collection of clientregistration with limit (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
       Limit => $1,
    );
 };
@@ -70,7 +70,7 @@ When qr/I query the collection of clientregistration with limit (\d+)$/, sub {
 When qr/I query the collection of clientregistration with offset (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
       Offset => $1,
    );
 };
@@ -78,7 +78,7 @@ When qr/I query the collection of clientregistration with offset (\d+)$/, sub {
 When qr/I query the collection of clientregistration with limit (\d+) and offset (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
       Offset => $2,
       Limit  => $1,
    );
@@ -87,7 +87,7 @@ When qr/I query the collection of clientregistration with limit (\d+) and offset
 When qr/I query the collection of clientregistration with sorted by "(.*?)" limit (\d+) and offset (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/clientregistration',
+      URL   => S->{API_URL}.'/clientregistrations',
       Offset => $3,
       Limit  => $2,
       Sort => $1,

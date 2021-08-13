@@ -6,7 +6,6 @@
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
   Scenario: get the list of existing template runs
-#    Given 4 of template runs
-    When I query the collection of template runs 
+    When I query the collection of template templateid 1 runs
     Then the response code is 200
 

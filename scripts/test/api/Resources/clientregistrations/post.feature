@@ -8,6 +8,7 @@ Feature: POST request /clientregistration resource
   Scenario: added a clientregistration
     When added a clientregistration
     Then the response code is 201
+#    Then the response object is ClientRegistrationPostRequest
     When I delete this clientregistration
     Then the response code is 204
     And the response has no content

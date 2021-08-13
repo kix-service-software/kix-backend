@@ -8,6 +8,6 @@
   Scenario: get an existing channel
     When I get the channel with ChannelID 2
     Then the response code is 200
-    And the response object is ChannelResponse
+#    And the response object is ChannelResponse
     And the attribute "Channel.Name" is "email"
 

@@ -56,6 +56,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ContentTypeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Validator::ContentTypeValidator</Item>
+                <Item Key="Validates">ContentType</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Validator::Module###DeploymentStateValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>

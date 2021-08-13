@@ -33,18 +33,18 @@
     Then the response code is 200
     And the response contains 11 items of type "Notification"
     And the response contains the following items of type Notification
-      | Name                                   |
-      | Customer - New Ticket Receipt          |
-      | Agent - Ticket Move Notification       |
-      | Agent - Responsible Assignment         |
-      | Agent - Reminder (if unlocked)         |
-      | Agent - Reminder (if locked)           |
-      | Agent - Owner Assignment               |
-      | Agent - New Ticket Notification        |
-      | Agent - New Note Notification          |
-      | Agent - Lock Timeout                   |
-      | Agent - FUP Notification (if unlocked) |
-      | Agent - FUP Notification (if locked)   |
+      | Name                                     |
+      | Customer - New Ticket Receipt            |
+      | Agent - Ticket Move Notification         |
+      | Agent - Responsible Assignment           |
+      | Agent - Reminder (if unlocked)           |
+      | Agent - Reminder (if locked)             |
+      | Agent - Owner Assignment                 |
+      | Agent - New Ticket Notification          |
+      | Agent - New Note Notification            |
+      | Agent - Lock Timeout                     |
+      | Agent - FUP Notification (if unlocked)   |
+      | Agent - FUP Notification (if locked)     |
 
   Scenario: get the list of existing notifications with sorted and limit
     When I query the collection of notifications sorted by "Notification.-Name:textual" and with a limit of 4

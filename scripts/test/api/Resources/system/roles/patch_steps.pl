@@ -29,12 +29,6 @@ require '_StepsLib.pl';
 # feature specific steps 
 
 When qr/I update this role with$/, sub {
-   my %Properties;
-   foreach my $Row ( @{ C->data } ) {
-      foreach my $Attribute ( keys %{$Row}) {
-         $Properties{$Attribute} = $Row->{$Attribute};
-      }
-   }
 
    ( S->{Response}, S->{ResponseContent} ) = _Patch(
       URL     => S->{API_URL}.'/system/roles/'.S->{ResponseContent}->{RoleID},

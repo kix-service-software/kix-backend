@@ -1,15 +1,12 @@
-Feature: PATCH request to the /addressbook/:AddressID resource
+Feature: DELETE request to the /reporting/reportdefinitions/:ReportDefinitionID resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
-  Scenario: update a addressbook
-    Given a addressbook
-    When I update this addressbook
-    Then the response code is 200
-    When delete all this addressbooks
+  Scenario: delete this reportdefinition
+    Given a reportdefinition
+    When I delete this reportdefinition
     Then the response code is 204
     And the response has no content
-

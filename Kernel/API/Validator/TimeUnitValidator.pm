@@ -11,6 +11,8 @@ package Kernel::API::Validator::TimeUnitValidator;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::API::Validator::Common
 );
@@ -105,7 +107,13 @@ sub Validate {
 
         # TODO: only accept integer - for now
         # $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A -?\d+([.,]\d+)? \z}xms;
-        $Valid = $Param{Data}->{$Param{Attribute}} =~ m/^-?\d+$/;
+        $Valid = IsInteger($Param{Data}->{$Param{Attribute}});
+        if ($Valid) {
+            $Valid = (
+                $Param{Data}->{$Param{Attribute}} <= 86400 &&
+                $Param{Data}->{$Param{Attribute}} >= -86400
+            ) ? 1 : 0;
+        }
     }
     else {
         return $Self->_Error(
@@ -117,7 +125,7 @@ sub Validate {
     if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => "Validation of attribute $Param{Attribute} failed!",
+            Message => "Validation of attribute $Param{Attribute} failed (has to be an integer and between -86400 and 86400)!",
         );
     }
 

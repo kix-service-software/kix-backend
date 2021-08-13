@@ -12,6 +12,7 @@ Feature: GET request to the /watchers/:WatcherID resource
       | 1      |
     When I get a collection of watchers
     Then the response code is 200
+#    And the response object is WatcherCollectionResponse
     When I delete this watcher
     Then the response code is 204
     And the response has no content

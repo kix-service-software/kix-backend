@@ -11,6 +11,8 @@ package Kernel::API::Validator::MimeTypeValidator;
 use strict;
 use warnings;
 
+use MIME::Types;
+
 use base qw(
     Kernel::API::Validator::Common
 );
@@ -102,7 +104,8 @@ sub Validate {
 
     my $Valid;
     if ( $Param{Attribute} eq 'MimeType' ) {
-        $Valid = $Param{Data}->{$Param{Attribute}} =~ m{\A\w+\/\w+\z};
+        $Self->{MIMETypesObject} = MIME::Types->new() if !$Self->{MIMETypesObject};
+        $Valid = { map { $_ => 1 } $Self->{MIMETypesObject}->listTypes() }->{$Param{Data}->{$Param{Attribute}}};
     }
     else {
         return $Self->_Error(
@@ -114,11 +117,11 @@ sub Validate {
     if ( !$Valid ) {
         return $Self->_Error(
             Code    => 'Validator.Failed',
-            Message => "Validation of attribute $Param{Attribute} failed!",
+            Message => "Validation of attribute $Param{Attribute} ($Param{Data}->{$Param{Attribute}}) failed!",
         );        
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;

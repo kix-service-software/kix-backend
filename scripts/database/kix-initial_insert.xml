@@ -4257,7 +4257,7 @@ TranslatableValues: '1'
     </Insert>
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="internal_field">1</Data>
+        <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">RiskAssumptionRemark</Data>
         <Data Key="label" Type="Quote" Translatable="1">Risk Assumption Remark</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">TextArea</Data>
@@ -4277,7 +4277,7 @@ DefaultValue: ''
     </Insert>
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">3</Data>
-        <Data Key="internal_field">1</Data>
+        <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">MobileProcessingChecklist010</Data>
         <Data Key="label" Type="Quote" Translatable="1">Checklist 01</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">CheckList</Data>
@@ -4311,7 +4311,7 @@ DefaultValue: "[{\r\n    \"id\": \"100\",\r\n    \"title\": \"Announce shut off\
     </Insert>
     <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">4</Data>
-        <Data Key="internal_field">1</Data>
+        <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">MobileProcessingChecklist020</Data>
         <Data Key="label" Type="Quote" Translatable="1">Checklist 02</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">CheckList</Data>
@@ -4408,9 +4408,10 @@ CountDefault: '1'
 DefaultValue:
 PossibleNone: '1'
 PossibleValues:
-   customer: Customer
-   external supplier: External Supplier
-   internal supplier: Internal Supplier
+   customer: customer
+   supplier/partner (external): supplier/partner (external)
+   supplier/partner (internal): supplier/partner (internal)
+   service provider: service provider
 TranslatableValues: '1'
         ]]></Data>
         <Data Key="valid_id">1</Data>
@@ -4712,6 +4713,14 @@ DefaultValue:
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
+    <!-- assign type to initial organisation -->
+    <Insert Table="dynamic_field_value">
+        <Data Key="id" Type="AutoIncrement">1</Data>
+        <Data Key="field_id">8</Data>
+        <Data Key="object_id" Type="Quote">1</Data>
+        <Data Key="value_text" Type="Quote">service provider</Data>
     </Insert>
 
 <!-- \### DYNAMIC PERMISSION INSERT - DO NOT REMOVE THIS LINE!!! \### -->

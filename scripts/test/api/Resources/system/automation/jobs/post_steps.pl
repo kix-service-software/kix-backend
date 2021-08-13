@@ -28,19 +28,34 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-Given qr/a automation job$/, sub {
+Given qr/a automation job post$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/system/automation/jobs',
       Token   => S->{Token},
       Content => {
         Job => {
             Comment => "some comment only",
-            Name => "new job only",
+            Name => "new job only post",
             Type => "Ticket",
             ValidID => 1
         }
       }
    );
+};
+
+Given qr/a automation job$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/automation/jobs',
+        Token   => S->{Token},
+        Content => {
+            Job => {
+                Comment => "some comment only".rand(),
+                Name => "new job only".rand(),
+                Type => "Ticket",
+                ValidID => 1
+            }
+        }
+    );
 };
 
 Given qr/(\d+) of automation jobs$/, sub {

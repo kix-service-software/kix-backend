@@ -9,7 +9,7 @@
     Given a objecticon
     When I get the objecticon
     Then the response code is 200
-    And the response object is ObjectIconResponse
+#    And the response object is ObjectIconResponse
     And the attribute "ObjectIcon.Object" is "TicketType"
     When I delete this objecticon
     Then the response code is 204
