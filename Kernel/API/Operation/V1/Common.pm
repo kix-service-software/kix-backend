@@ -2276,7 +2276,7 @@ sub _ApplyObjectPermissions {
                     Filter             => $Permission->{ConditionFilter},
                     IsPermissionFilter => 1,
                 );
-                # if the filter doesn't match, we can go to the next permission
+
                 next PERMISSION if !IsHashRefWithData($Data{$Object});
 
                 $ResultingPermission = 0 if !defined $ResultingPermission;
@@ -2303,6 +2303,9 @@ sub _ApplyObjectPermissions {
                 elsif ( !$IsDeny && $PermissionCheck ) {
                     push @NewItemList, $Item;
                 }
+            }
+            else {
+                push @NewItemList, $Item;
             }
         }
         if ( $IsFiltered ) {
