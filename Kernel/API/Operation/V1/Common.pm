@@ -2266,6 +2266,9 @@ sub _ApplyObjectPermissions {
             PERMISSION:
             foreach my $Permission ( @{$Self->{RelevantObjectPermissions}} ) {
 
+                # ignore permission for another object type
+                next PERMISSION if ( !$Permission->{ConditionFilter}->{$Object} );
+
                 my %Data = (
                     $Object => \%{$Item}
                 );
