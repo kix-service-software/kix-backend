@@ -1424,7 +1424,7 @@ sub CheckResourcePermission {
             if ( !defined $RolePermission && $ParentTarget ) {
                 $RolePermission = $Self->{PermissionCache}->{$Param{UserID}}->{$ParentTarget}->{$RoleID};
                 $Self->{PermissionCache}->{$Param{UserID}}->{$Target}->{$RoleID} = $RolePermission;
-                $Self->_PermissionDebug($Self->{LevelIndent}, "no permissions found for role $RoleID on target $Target, using parent permission");
+                $Self->_PermissionDebug($Self->{LevelIndent}, "no permissions found for role \"$Self->{PermissionCheckRoleList}->{$RoleID}\" on target $Target, using parent permission");
             }
 
             # init the value
@@ -1521,7 +1521,7 @@ sub _CheckResourcePermissionForRole {
         if ( !$Kernel::OM->Get('Config')->Get('SecureMode') && $Param{UserID} == 1 );
 
     if ( $Self->{PermissionDebug} ) {
-        $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for role $Param{RoleID} on target $Param{Target}");
+        $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}");
     }
 
     if ( exists $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
@@ -1529,11 +1529,11 @@ sub _CheckResourcePermissionForRole {
         if ( IsArrayRefWithData($Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
             my $Granted = $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'denied';
             if ( $Self->{PermissionDebug} ) {
-                $Self->_PermissionDebug($Self->{LevelIndent}, "using cache for role $Param{RoleID} on target $Param{Target}: $Param{RequestedPermission} = $Granted");
+                $Self->_PermissionDebug($Self->{LevelIndent}, "using cache for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $Param{RequestedPermission} = $Granted");
             }
         }
         elsif ( $Self->{PermissionDebug} ) {
-            $Self->_PermissionDebug($Self->{LevelIndent}, "using cache for role $Param{RoleID} on target $Param{Target}: $Param{RequestedPermission} = denied by explicit DENY");
+            $Self->_PermissionDebug($Self->{LevelIndent}, "using cache for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $Param{RequestedPermission} = denied by explicit DENY");
         }
     }
 
@@ -1553,7 +1553,7 @@ sub _CheckResourcePermissionForRole {
         $RelevantPermissions{$ID} = $Permission;
     }
 
-    $Self->_PermissionDebug($Self->{LevelIndent}, "relevant permissions for role $Param{RoleID} on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
+    $Self->_PermissionDebug($Self->{LevelIndent}, "relevant permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
 
     # return if no relevant permissions exist
     if ( !IsHashRefWithData( \%RelevantPermissions ) ) {
@@ -1598,7 +1598,7 @@ sub _CheckResourcePermissionForRole {
             Format => 'Short'
             );
 
-        $Self->_PermissionDebug($Self->{LevelIndent}, "resulting permissions for role $Param{RoleID} on target $Param{Target}: $ResultingPermissionShort");
+        $Self->_PermissionDebug($Self->{LevelIndent}, "resulting permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $ResultingPermissionShort");
     }
 
     # check if we have a DENY

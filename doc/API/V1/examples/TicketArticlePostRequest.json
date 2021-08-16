@@ -1,6 +1,6 @@
 {
     "Article": {
-        "Attachment": [
+        "Attachments": [
             {
                 "Content": "base64encodedContentString",
                 "ContentType": "image/png",
