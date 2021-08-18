@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-8-16 05:17+0000\n"
+"POT-Creation-Date: 2021-8-18 07:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1384,6 +1384,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
 msgid "Remove selection"
+msgstr ""
+
+#. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
+msgid "%s rows"
 msgstr ""
 
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
@@ -3272,6 +3276,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Synchronisation"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Table"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
