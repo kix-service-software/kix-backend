@@ -162,6 +162,18 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###Table" Required="0" Valid="1">
+        <Description Translatable="1">DynamicField backend registration.</Description>
+        <Group>Framework</Group>
+        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Table</Item>
+                <Item Key="Module">Kernel::System::DynamicField::Driver::Table</Item>
+                <Item Key="ConfigDialog">AdminDynamicFieldTable</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="UpdateMultipleTickets::TicketSearchFoundThreshold" Required="1" Valid="1">
         <Description Translatable="1">Sets threshold for tickets found in transition action module. If more tickets are found no update action is performed.</Description>
         <Group>Framework</Group>
