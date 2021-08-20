@@ -375,7 +375,12 @@ sub MacroActionUpdate {
     }
 
     # set default value
-    $Param{Comment} ||= '';
+    $Param{Comment} //= $Param{Comment} || '';
+    $Param{MacroID} ||= $Data{MacroID};
+    $Param{Type}    ||= $Data{Type};
+    $Param{ValidID} ||= $Data{ValidID};
+    $Param{ResultVariables} //= $Data{ResultVariables};
+    $Param{Parameters}      //= $Data{Parameters};
 
     # check if update is required
     my $ChangeRequired;
@@ -390,9 +395,6 @@ sub MacroActionUpdate {
     }
 
     return 1 if !$ChangeRequired;
-
-    $Param{MacroID} ||= $Data{MacroID};
-    $Param{Type} ||= $Data{Type};
 
     # prepare Parameters as JSON
     my $Parameters;
