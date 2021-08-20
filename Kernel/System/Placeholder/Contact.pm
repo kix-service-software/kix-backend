@@ -81,7 +81,7 @@ sub _Replace {
     }
 
     # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # TODO: should have its own module - currently for CUSTOMERDATA placeholder and its cleanup
     # replace organisation placeholder
@@ -111,7 +111,7 @@ sub _Replace {
     }
 
     # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # TODO: deprecated - keep old placeholders for backward compatibility until refactoring
     # get customer data and replace it with <KIX_CUSTOMER_DATA_...
@@ -138,7 +138,7 @@ sub _Replace {
     }
 
     # cleanup
-    $Param{Text} =~ s/(?:$CustomerTag|$OldCustomerTag).+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/(?:$CustomerTag|$OldCustomerTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     return $Param{Text};
 }

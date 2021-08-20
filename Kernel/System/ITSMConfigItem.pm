@@ -604,7 +604,7 @@ sub ConfigItemUpdate {
     );
 
 
-    # trigger ConfigItemCreate
+    # trigger ConfigItemUpdate
     $Self->EventHandler(
         Event => 'ConfigItemUpdate',
         Data  => {
@@ -2108,6 +2108,48 @@ sub GetAttributeContentsByKey {
     }
 
     return \@RetArray;
+}
+
+=item GetAttributeContentsByKey()
+
+    Returns defintion first found, for a given attribute key.
+        GetAttributeDefByKey (
+            Key        => 'FQDN',
+            Definition => $XMLDefRef,
+        );
+=cut
+
+sub GetAttributeDefByKey {
+    my ( $Self, %Param ) = @_;
+
+    # check required params...
+    return
+        if (
+        !$Param{Definition} || ref( $Param{Definition} ) ne 'ARRAY' ||
+        !$Param{Key}
+        );
+
+    ITEM:
+    for my $Item ( @{ $Param{Definition} } ) {
+
+        if ( $Item->{Key} eq $Param{Key} ) {
+            return $Item;
+        }
+
+        next ITEM if ( !$Item->{Sub} );
+
+        # recurse if subsection available...
+        my $SubResult = $Self->GetAttributeDefByKey(
+            Key        => $Param{Key},
+            Definition => $Item->{Sub},
+        );
+
+        if ( $SubResult && ref($SubResult) eq 'HASH' ) {
+            return $SubResult;
+        }
+    }
+
+    return;
 }
 
 =item GetAttributeDataByType()
