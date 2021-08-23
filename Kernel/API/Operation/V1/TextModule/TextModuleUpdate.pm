@@ -175,7 +175,7 @@ sub Run {
         Category           => exists $TextModule->{Category} ? $TextModule->{Category} : $TextModuleData{Category},
         Language           => $TextModule->{Language} || $TextModuleData{Language},
         Subject            => exists $TextModule->{Subject} ? $TextModule->{Subject} : $TextModuleData{Subject},
-        Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : $TextModuleData{Keywords},
+        Keywords           => IsArrayRef($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : $TextModuleData{Keywords},
         Comment            => exists $TextModule->{Comment} ? $TextModule->{Comment} : $TextModuleData{Comment},
         ValidID            => $TextModule->{ValidID} || $TextModuleData{ValidID},        
         UserID             => $Self->{Authorization}->{UserID},

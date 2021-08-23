@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-8-2 13:41+0000\n"
+"POT-Creation-Date: 2021-8-20 08:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1386,6 +1386,10 @@ msgstr ""
 msgid "Remove selection"
 msgstr ""
 
+#. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
+msgid "%s rows"
+msgstr ""
+
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
 msgid "Maximum size is %s characters."
 msgstr ""
@@ -1672,6 +1676,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Enable API level caching."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Max allowed request size in bytes (overwrites default value (50MB) from provider config)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -3268,6 +3276,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Synchronisation"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Table"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml

@@ -623,7 +623,10 @@ sub MacroExecute {
 
     # clear result variable cache
     $Kernel::OM->Get('Cache')->CleanUp(
-        Type => Digest::MD5::md5_hex($Self->{JobID}.'::'.$Self->{RunID}.'::'.$Self->{MacroID})
+        Type => Digest::MD5::md5_hex(
+            ($Self->{JobID} ? $Self->{JobID} : '')
+            .'::'.($Self->{RunID} ? $Self->{RunID} : '')
+            .'::'.$Self->{MacroID})
     );
 
     my $Success = $BackendObject->Run(
@@ -637,7 +640,10 @@ sub MacroExecute {
 
     # remove result variable cache
     $Kernel::OM->Get('Cache')->CleanUp(
-        Type => Digest::MD5::md5_hex($Self->{JobID}.'::'.$Self->{RunID}.'::'.$Self->{MacroID})
+        Type => Digest::MD5::md5_hex(
+            ($Self->{JobID} ? $Self->{JobID} : '')
+            .'::'.($Self->{RunID} ? $Self->{RunID} : '')
+            .'::'.$Self->{MacroID})
     );
 
     # remove IDs from log reference

@@ -196,7 +196,7 @@ sub _Replace {
         }
 
         # cleanup
-        $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
     }
 
     return $Param{Text};
