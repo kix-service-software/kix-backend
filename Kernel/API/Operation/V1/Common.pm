@@ -766,9 +766,12 @@ sub _Success {
 
             $Self->_Debug($Self->{LevelIndent}, "applying object permissions");
 
-            $Self->_ApplyObjectPermissions(
+            my $Result = $Self->_ApplyObjectPermissions(
                 Data => \%Param,
             );
+            if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
+                return $Result;
+            }
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", $TimeDiff));
@@ -2249,6 +2252,8 @@ sub _ApplyObjectPermissions {
     # get the relevant permission for the current request method
     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
+    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permissions. using the following permissions: %s", Data::Dumper::Dumper($Self->{RelevantObjectPermissions})) );
+
     foreach my $Object ( sort keys %{$Param{Data}} ) {
         my @ItemList = IsArrayRef($Param{Data}->{$Object}) ? @{$Param{Data}->{$Object}} : ( $Param{Data}->{$Object} );
 
@@ -2261,17 +2266,21 @@ sub _ApplyObjectPermissions {
             # we need a hash ref to filter
             next ITEM if ( !IsHashRefWithData($Item) );
 
+            my $ObjectID = $Self->{OperationConfig}->{ObjectID} || 'ID';
+
             my $ResultingPermission;
 
             PERMISSION:
             foreach my $Permission ( @{$Self->{RelevantObjectPermissions}} ) {
 
                 # ignore permission for another object type
-                next PERMISSION if ( !$Permission->{ConditionFilter}->{$Object} );
+                next PERMISSION if ( !$Permission->{ConditionFilter}->{$Object} && !$Permission->{ConditionFilter}->{'*'} );
 
                 my %Data = (
                     $Object => \%{$Item}
                 );
+
+                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permission condition {%s} to object with ID %i", $Permission->{Condition}, $Item->{$ObjectID}) );
 
                 # check the condition
                 $Self->_ApplyFilter(
@@ -2315,6 +2324,7 @@ sub _ApplyObjectPermissions {
             # replace the item list in the response
             if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
                 $Param{Data}->{$Object} = \@NewItemList;
+                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("permission filtered result contains %i objects", scalar @NewItemList) );
             }
             else {
                 $Param{Data}->{$Object} = $NewItemList[0]
