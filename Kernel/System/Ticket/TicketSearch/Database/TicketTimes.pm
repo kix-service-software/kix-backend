@@ -106,8 +106,12 @@ sub Search {
     );
 
     if ( $Param{Search}->{Field} !~ /^(Create|Pending)/ ) {
-        # use original string value
-        $Value = "'".$Param{Search}->{Value}."'";
+        # convert back to timestamp (relative calculations have been done above)
+        $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $Value
+        );
+
+        $Value = "'$Value'";
     }
 
     my %OperatorMap = (
