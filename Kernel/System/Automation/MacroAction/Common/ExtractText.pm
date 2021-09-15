@@ -95,16 +95,18 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $Values = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText  => 0,
-        Text      => $Param{Config}->{RegEx},
-        Data      => {},
-        UserID    => $Param{UserID},
-        Translate => 0,
+    foreach my $Key (keys %{$Param{Config}}) {
+        $Param{Config}->{$Key} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            RichText  => 0,
+            Text      => $Param{Config}->{$Key},
+            Data      => {},
+            UserID    => $Param{UserID},
+            Translate => 0,
 
-        # FIXME: as common action, object id could be not a ticket!
-        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
-    );
+            # FIXME: as common action, object id could be not a ticket!
+            TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
+        );
+    }
 
     my $Text = $Param{Config}->{Text} || '';
 

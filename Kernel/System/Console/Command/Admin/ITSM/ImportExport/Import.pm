@@ -26,7 +26,7 @@ sub Configure {
     $Self->Description('The tool for importing config items');
     $Self->AddOption(
         Name        => 'template-number',
-        Description => "Specify a template number to be impoerted.",
+        Description => "Specify a template number to be imported.",
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,

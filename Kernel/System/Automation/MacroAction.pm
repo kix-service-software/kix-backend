@@ -387,7 +387,7 @@ sub MacroActionUpdate {
     KEY:
     for my $Key ( qw(MacroID Type Parameters ResultVariables Comment ValidID) ) {
 
-        next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
+        next KEY if defined $Data{$Key} && defined $Param{Key} && $Data{$Key} eq $Param{$Key};
 
         $ChangeRequired = 1;
 

@@ -129,6 +129,27 @@ sub ExecuteJobsForEvent {
     return 1;
 }
 
+=item LogDebug()
+
+Logs a debug message.
+
+Example:
+    my $Success = $Object->LogDebug(
+        Message  => '...',
+        UserID   => 123,
+    );
+
+=cut
+
+sub LogDebug {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->_Log(
+        %Param,
+        Priority => 'debug',
+    )
+}
+
 =item LogInfo()
 
 Logs an information message.
@@ -198,51 +219,50 @@ sub _Log {
         }
     }
 
-    my $JobID         = $Self->{JobID};
-    my $RunID         = $Self->{RunID};
-    my $MacroID       = $Self->{MacroID};
-    my $MacroActionID = $Self->{MacroActionID};
-    my $ObjectID      = $Self->{ObjectID};
+    my %Reference;
+    foreach my $ReferenceID ( qw(JobID RunID MacroID MacroActionID ObjectID) ) {
+        $Reference{$ReferenceID} = ($Param{Referrer} ? $Param{Referrer}->{$ReferenceID} : undef) || $Self->{$ReferenceID};
+    }
 
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?)',
         Bind => [
-            \$JobID, \$RunID, \$MacroID, \$MacroActionID, \$ObjectID, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
+            \$Reference{JobID}, \$Reference{RunID}, \$Reference{MacroID}, \$Reference{MacroActionID}, \$Reference{ObjectID}, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
         ],
     );
 
     # get job info
     my $JobInfo = '-';
-    if ( $JobID ) {
+    if ( $Reference{JobID} ) {
         my %Job = $Self->JobGet(
-            ID => $JobID
+            ID => $Reference{JobID}
         );
-        $JobInfo = "$Job{Name} ($JobID)";
+        $JobInfo = "$Job{Name} ($Reference{JobID})";
     }
 
     # get macro info
     my $MacroInfo = '-';
-    if ( $MacroID ) {
+    if ( $Reference{MacroID} ) {
         my %Macro = $Self->MacroGet(
-            ID => $MacroID
+            ID => $Reference{MacroID}
         );
-        $MacroInfo = "$Macro{Name} ($MacroID)";
+        $MacroInfo = "$Macro{Name} ($Reference{MacroID})";
     }
 
     # get macro info
     my $MacroActionInfo = '-';
-    if ( $MacroActionID ) {
+    if ( $Reference{MacroActionID} ) {
         my %MacroAction = $Self->MacroActionGet(
-            ID => $MacroActionID
+            ID => $Reference{MacroActionID}
         );
-        $MacroActionInfo = "$MacroAction{Type} ($MacroActionID)";
+        $MacroActionInfo = "$MacroAction{Type} ($Reference{MacroActionID})";
     }
 
     # log in system log
     $Kernel::OM->Get('Log')->Log(
         Priority => $Param{Priority},
-        Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $RunID || '', $MacroInfo, $MacroActionInfo),
+        Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $Reference{RunID} || '', $MacroInfo, $MacroActionInfo),
     );
 
     return 1;

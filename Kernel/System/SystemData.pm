@@ -59,36 +59,23 @@ sub new {
     return $Self;
 }
 
-=item SystemDataAdd()
+=item SystemDataSet()
 
-add new systemdata value
+set a systemdata value, replace an exising one. Value can be a scalar, a hashref or an arrayref
 
-Result is true if adding was OK, and false if it failed, for instance because
-the key already existed.
-
-If your keys contain '::' this will be used as a separator. This allows you to
-later for instance fetch all keys that start with 'SystemRegistration::' in
-one go, using SystemDataGetGroup().
-
-    my $Result = $SystemDataObject->SystemDataAdd(
+    my $Result = $SystemDataObject->SystemDataSet(
         Key    => 'SomeKey',
-        Value  => 'Some Value',
-        UserID => 123,
-    );
-
-    my $Result = $SystemDataObject->SystemDataAdd(
-        Key    => 'SystemRegistration::Version',
         Value  => 'Some Value',
         UserID => 123,
     );
 
 =cut
 
-sub SystemDataAdd {
+sub SystemDataSet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Key UserID)) {
+    for (qw(Key)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -106,14 +93,23 @@ sub SystemDataAdd {
     }
 
     # return if key does not already exists - then we can't do an update
-    my $Value = $Self->SystemDataGet( Key => $Param{Key} );
-    if ( defined $Value ) {
+    my $Result = $Self->SystemDataDelete( Key => $Param{Key} );
+    if ( !$Result ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can't add SystemData key '$Param{Key}', it already exists!",
+            Message  => "Can't delete existing key \"$Param{Key}\"!",
         );
         return;
     }
+
+    my $UserID = $Param{UserID} // 1;
+
+    # prepare the value
+    my $Value = $Kernel::OM->Get('JSON')->Encode(
+        Data => {
+            Value => $Param{Value}
+        }
+    );
 
     # store data
     return if !$Self->{DBObject}->Do(
@@ -122,7 +118,7 @@ sub SystemDataAdd {
                 (data_key, data_value, create_time, create_by, change_time, change_by)
             VALUES (?, ?, current_timestamp, ?, current_timestamp, ?)
             ',
-        Bind => [ \$Param{Key}, \$Param{Value}, \$Param{UserID}, \$Param{UserID} ],
+        Bind => [ \$Param{Key}, \$Value, \$UserID, \$UserID ],
     );
 
     # delete cache
@@ -188,6 +184,13 @@ sub SystemDataGet {
         $Value = $Data[0] // '';
     }
 
+    if ( $Value ) {
+        $Value = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Value
+        );
+        $Value = $Value->{Value};
+    }
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
@@ -199,155 +202,6 @@ sub SystemDataGet {
     return $Value;
 }
 
-=item SystemDataGroupGet()
-
-returns a hash of all keys starting with the Group.
-For instance the code below would return values for
-'SystemRegistration::UniqueID', 'SystemRegistration::UpdateID',
-and so on.
-
-    my %SystemData = $SystemDataObject->SystemDataGroupGet(
-        Group => 'SystemRegistration',
-    );
-
-returns
-
-    %SystemData = (
-        UniqueID => 'CDC782BE-E483-11E2-83DA-9FFD99890B3C',
-        UpdateID => 'D8F55850-E483-11E2-BD60-9FFD99890B3C'
-        ...
-    );
-
-=cut
-
-sub SystemDataGroupGet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{Group} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Group!"
-        );
-        return;
-    }
-
-    # check cache
-    my $CacheKey = 'SystemDataGetGroup::' . $Param{Group};
-    my $Cache    = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return %{$Cache} if $Cache;
-
-    # get like escape string needed for some databases (e.g. oracle)
-    my $LikeEscapeString = $Self->{DBObject}->GetDatabaseFunction('LikeEscapeString');
-
-    # prepare group name search
-    my $Group = $Param{Group};
-    $Group =~ s/\*/%/g;
-    $Group = $Self->{DBObject}->Quote( $Group, 'Like' );
-
-    return if !$Self->{DBObject}->Prepare(
-        SQL => "
-            SELECT data_key, data_value
-            FROM system_data
-            WHERE data_key LIKE '${Group}::%' $LikeEscapeString
-            ",
-    );
-
-    my %Result;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
-        $Data[0] =~ s/^${Group}:://;
-
-        $Result{ $Data[0] } = $Data[1];
-    }
-
-    # set cache
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \%Result,
-    );
-
-    return %Result;
-}
-
-=item SystemDataUpdate()
-
-update system data
-
-Returns true if update was succesful or false if otherwise - for instance
-if key did not exist.
-
-    my $Result = $SystemDataObject->SystemDataUpdate(
-        Key     => 'KIX Version',
-        Value   => 'Some New Value',
-        UserID  => 123,
-    );
-
-=cut
-
-sub SystemDataUpdate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(Key UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-    if ( !defined $Param{Value} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Value!"
-        );
-        return;
-    }
-
-    # return if key does not already exists - then we can't do an update
-    my $Value = $Self->SystemDataGet( Key => $Param{Key} );
-    if ( !defined $Value ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't update SystemData key '$Param{Key}', it does not exist!",
-        );
-        return;
-    }
-
-    # sql
-    return if !$Self->{DBObject}->Do(
-        SQL => '
-            UPDATE system_data
-            SET data_value = ?, change_time = current_timestamp, change_by = ?
-            WHERE data_key = ?
-            ',
-        Bind => [
-            \$Param{Value}, \$Param{UserID}, \$Param{Key},
-        ],
-    );
-
-    # delete cache entry
-    $Self->_SystemDataCacheKeyDelete(
-        Type => $Self->{CacheType},
-        Key  => $Param{Key},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'SystemData',
-        ObjectID  => $Param{Key},
-    );    
-
-    return 1;
-}
-
 =item SystemDataDelete()
 
 update system data
@@ -357,7 +211,6 @@ if key did not exist.
 
     $SystemDataObject->SystemDataDelete(
         Key    => 'KIX Version',
-        UserID => 123,
     );
 
 =cut
@@ -366,7 +219,7 @@ sub SystemDataDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Key UserID)) {
+    for (qw(Key)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -374,16 +227,6 @@ sub SystemDataDelete {
             );
             return;
         }
-    }
-
-    # return if key does not already exists - then we can't do a delete
-    my $Value = $Self->SystemDataGet( Key => $Param{Key} );
-    if ( !defined $Value ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't delete SystemData key '$Param{Key}', it does not exist!",
-        );
-        return;
     }
 
     # sql
