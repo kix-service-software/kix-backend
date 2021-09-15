@@ -1,0 +1,19 @@
+{
+    "Profile": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-05-29 13:13:09",
+            "ClientID": "id of client",
+            "CreateBy": 1,
+            "CreateTime": "2018-01-03 14:47:10",
+            "HasAccessToken": 0,
+            "ID": 2,
+            "Name": "OAuth2 Profile",
+            "Scope": "scope to request for access token",
+            "URLAuth": "https://authorization-server.com/auth",
+            "URLRedirect": "https://localhost/authcode",
+            "URLToken": "https://authorization-server.com/token",
+            "ValidID": 1
+        }
+    ]
+}

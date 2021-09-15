@@ -1,0 +1,9 @@
+  usage: Use this resourceType to represent a postonly collection of items
+  post:
+    is: [ hasRequestItem: { typeName: <<typeName>>PostRequest }, hasBadRequest, hasConflict ]
+    responses:
+      201:
+        description: The <<typeName>> has been created successfully.
+        body:
+          application/json:
+            type: <<typeName>>PostResponse

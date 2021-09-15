@@ -337,14 +337,12 @@ sub ValidateConfig {
 
     return if !$Self->SUPER::ValidateConfig(%Param);
 
-    if ( $Param{Config}->{AccountTime} ) {
+    if ( $Param{Config}->{AccountTime} && $Param{Config}->{AccountTime} !~ m/^(<|&lt;)KIX_.+>|\$\{\w+\}$/ ) {
         return 1 if (
             $Param{Config}->{AccountTime} =~ m/^-?\d+$/ &&
             $Param{Config}->{AccountTime} <= 86400 &&
             $Param{Config}->{AccountTime} >= -86400
         );
-
-        return 1 if ( $Param{Config}->{AccountTime} =~ m/^(<|&lt;)KIX_.+>$/);
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
