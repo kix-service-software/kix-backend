@@ -2879,7 +2879,7 @@
     <Column Name="macro_action_id" Required="false" Type="INTEGER"/>
     <Column Name="object_id" Required="false" Type="BIGINT"/>
     <Column Name="priority" Required="false" Size="20" Type="VARCHAR"/>
-    <Column Name="message" Required="false" Size="10000" Type="VARCHAR"/>
+    <Column Name="message" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Index Name="automation_log_job_id">

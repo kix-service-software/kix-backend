@@ -1623,7 +1623,7 @@ sub ConfigItemSearch {
 =item ConfigItemLookup()
 
 This method does a lookup for a configitem. If a configitem id is given,
-it returns the number of the configitem. If a configitem number is given,
+it returns the number of the configitem. If a configitem number or name is given,
 the appropriate id is returned.
 
     my $Number = $ConfigItemObject->ConfigItemLookup(
@@ -1634,28 +1634,35 @@ the appropriate id is returned.
         ConfigItemNumber => 1000001,
     );
 
+    my $ID = $ConfigItemObject->ConfigItemLookup(
+        Class          => 'Computer',       # optional
+        ConfigItemName => 'test',
+    );
+
 =cut
 
 sub ConfigItemLookup {
     my ( $Self, %Param ) = @_;
 
-    my ($Key) = grep { $Param{$_} } qw(ConfigItemID ConfigItemNumber);
+    my ($Key) = grep { $Param{$_} } qw(ConfigItemID ConfigItemNumber ConfigItemName);
 
     # check for needed stuff
     if ( !$Key ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ConfigItemID or ConfigItemNumber!',
+            Message  => 'Need ConfigItemID or ConfigItemNumber or ConfigItemName and ClassName!',
         );
         return;
     }
 
-    my $CacheKey = 'ConfigItemLookup::'.($Param{ConfigItemID}||'').'::'.($Param{ConfigItemNumber}||'');
+    my $CacheKey = 'ConfigItemLookup::'.($Param{ConfigItemID}||'').'::'.($Param{ConfigItemNumber}||'').'::'.($Param{Class}||'').'::'.($Param{ConfigItemName}||'');
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
+
+    my @BindArray = ( \$Param{$Key} );
 
     # set the appropriate SQL statement
     my $SQL = 'SELECT configitem_number FROM configitem WHERE id = ?';
@@ -1663,11 +1670,18 @@ sub ConfigItemLookup {
     if ( $Key eq 'ConfigItemNumber' ) {
         $SQL = 'SELECT id FROM configitem WHERE configitem_number = ?';
     }
+    if ( $Key eq 'ConfigItemName' && !$Param{Class} ) {
+        $SQL = 'SELECT id FROM configitem WHERE name = ?';
+    }
+    if ( $Key eq 'ConfigItemName' && $Param{Class} ) {
+        $SQL = 'SELECT ci.id FROM configitem ci, general_catalog gc WHERE gc.id = ci.class_id AND gc.general_catalog_class = \'ITSM::ConfigItem::Class\' AND ci.name = ? AND gc.name = ?';
+        push @BindArray, \$Param{Class};
+    }
 
     # fetch the requested value
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
-        Bind  => [ \$Param{$Key} ],
+        Bind  => \@BindArray,
         Limit => 1,
     );
 
@@ -1676,13 +1690,15 @@ sub ConfigItemLookup {
         $Value = $Row[0];
     }
 
-    # cache the result
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $Value,
-    );
+    if ( $Value ) {
+        # cache the result
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $Value,
+        );
+    }
 
     return $Value;
 }

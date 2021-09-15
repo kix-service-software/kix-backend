@@ -335,7 +335,8 @@ sub Update {
         }
 
         # determine source and target builds
-        if ( !defined $Param{SourceBuild} ) {
+        my $SourceBuild = $Param{SourceBuild};
+        if ( !defined $SourceBuild ) {
             # get current build number
             my $Content = $Kernel::OM->Get('Main')->FileRead(
                 Directory => $Home.'/config/installation',
@@ -343,21 +344,24 @@ sub Update {
                 DisableWarnings => 1,
             );
 
-            $Param{SourceBuild} = 0;
+            $SourceBuild = 0;
             if ( $Content ) {
-                $Param{SourceBuild} = $$Content;
+                $SourceBuild = $$Content;
             }
         }
-        if ( !defined $Param{TargetBuild} ) {
-            $Param{TargetBuild} = $PluginList{$UpdateItem->{Name}}->{BuildNumber};
+
+        my $TargetBuild = $Param{TargetBuild};
+        if ( !defined $TargetBuild ) {
+            $TargetBuild = $PluginList{$UpdateItem->{Name}}->{BuildNumber};
         }
 
         my $Failed = 0;
         my $LastBuild = 0;
         BUILDNUMBER:
         foreach my $NumericBuild (sort { $a <=> $b } keys %BuildList) {
-            next if $NumericBuild <= $Param{SourceBuild};
-            last if $NumericBuild > $Param{TargetBuild};
+
+            next if $NumericBuild <= $SourceBuild;
+            last if $NumericBuild > $TargetBuild;
 
             my $Result = $Self->_DoUpdate(
                 Name      => $UpdateItem->{Name},
@@ -382,7 +386,7 @@ sub Update {
             my $Result = $Kernel::OM->Get('Main')->FileWrite(
                 Directory => $Home.'/config/installation',
                 Filename  => $UpdateItem->{Name},
-                Content   => \($UpdateItem->{Name} eq 'framework' ? $Param{TargetBuild} : $PluginList{$UpdateItem->{Name}}->{BuildNumber}),
+                Content   => \($UpdateItem->{Name} eq 'framework' ? $TargetBuild : $PluginList{$UpdateItem->{Name}}->{BuildNumber}),
             );
         }
     }
