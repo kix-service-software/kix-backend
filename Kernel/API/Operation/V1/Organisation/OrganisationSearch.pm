@@ -84,7 +84,7 @@ perform OrganisationSearch Operation. This will return a Organisation list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my %OrgList = ();
+    my $OrgList;
 
     # TODO: filter search - currently not all properties are possible
     my %OrgSearch;
@@ -163,34 +163,34 @@ sub Run {
                 }
             }
 
-            if ( !%OrgList ) {
-                %OrgList = %SearchTypeResult;
+            if ( !defined $OrgList ) {
+                $OrgList = \%SearchTypeResult;
             } else {
 
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search
-                for my $Key ( keys %OrgList ) {
-                    delete $OrgList{$Key} if !exists $SearchTypeResult{$Key};
+                for my $Key ( keys %{$OrgList} ) {
+                    delete $OrgList->{$Key} if !exists $SearchTypeResult{$Key};
                 }
             }
         }
     } else {
 
         # get full organisation list
-        %OrgList = $Kernel::OM->Get('Organisation')->OrganisationSearch(
+        $OrgList = { $Kernel::OM->Get('Organisation')->OrganisationSearch(
             Valid  => 0,
-        );
+        ) };
     }
 
 
-    if (IsHashRefWithData(\%OrgList)) {
+    if (IsHashRefWithData($OrgList)) {
 
         # get already prepared Organisation data from OrganisationGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Organisation::OrganisationGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                OrganisationID => join(',', sort keys %OrgList),
+                OrganisationID => join(',', sort keys %{$OrgList}),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
