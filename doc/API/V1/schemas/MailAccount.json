@@ -46,6 +46,11 @@
       "type": "string",
       "readOnly": true
     },
+    "OAuth2_ProfileID": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "The ID of the oauth2 profile to use if type is kind of 'OAuth2'."
+    },
     "QueueID": {
       "type": "integer",
       "readOnly": true,
