@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-9-15 04:58+0000\n"
+"POT-Creation-Date: 2021-9-15 06:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -944,6 +944,22 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "Values"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "Assign a value to a macro variable."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "The value to assign."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "The variable to assign to."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "Value"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
@@ -3092,6 +3108,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Set Dynamic Field, which contains allocation for system monitoring acknowledge."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Set Variable"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
