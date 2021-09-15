@@ -176,8 +176,18 @@ sub SearchSQLGet {
     );
 
     if ( $Operators{ $Param{Operator} } ) {
+        my $SearchTerm = $Param{SearchTerm};
+
+        # calculate relative times
+        my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $SearchTerm
+        );
+        $SearchTerm = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $SystemTime
+        );
+
         my $SQL = " $Param{TableAlias}.value_date $Operators{$Param{Operator}} '";
-        $SQL .= $Kernel::OM->Get('DB')->Quote( $Param{SearchTerm} ) . "' ";
+        $SQL .= $Kernel::OM->Get('DB')->Quote( $SearchTerm ) . "' ";
         return $SQL;
     }
 

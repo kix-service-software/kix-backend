@@ -1268,7 +1268,7 @@ sub _ValidateFilter {
                 }
 
                 # check DATE value
-                if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
+                if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
@@ -1276,7 +1276,7 @@ sub _ValidateFilter {
                 }
 
                 # check DATETIME value
-                if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
+                if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
@@ -1433,9 +1433,9 @@ sub _ApplyFilter {
                                             $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                                                 String => $DatePart . ' 12:00:00',
                                             );
-                                            my ( $FilterDatePart, $FilterTimePart ) = split( /\s+/, $FilterValue );
+                                            my ( $FilterDatePart, $FilterTimePart, $Calculations ) = split( /\s+/, $FilterValue, 3 );
                                             $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                                                String => $FilterDatePart . ' 12:00:00',
+                                                String => $FilterDatePart . ' 12:00:00 ' . $Calculations,
                                             );
 
                                             # handle this as a numeric compare
