@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-9-15 13:54+0000\n"
-"PO-Revision-Date: 2021-08-04 13:47+0000\n"
+"PO-Revision-Date: 2021-09-16 17:01+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
@@ -414,7 +414,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Property"
-msgstr ""
+msgstr "Property"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Rack"
@@ -1259,7 +1259,7 @@ msgstr ""
 msgid "The mapping which asset attribute will set which ticket dynamic field."
 msgstr ""
 "The mapping which asset attribute will set which ticket dynamic field. "
-"Expected Format: \"<WriteToDFKey> - <AssetAttributeKey>\""
+"Expected Format: \"<WriteToDFKey> - <AssetAttributeKey>\"."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/FetchAssetAttributes.pm
 msgid "The name of the dynamic field which contains the relevant asset ID."
@@ -1999,7 +1999,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Queue"
-msgstr ""
+msgstr "Queue"
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Up"
@@ -5568,7 +5568,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Assigned Organisation"
-msgstr ""
+msgstr "Assigned Organisation"
 
 #. manual entry from templates.pot.manual
 msgid "Attachment"
