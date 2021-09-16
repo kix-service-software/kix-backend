@@ -73,7 +73,7 @@ sub _Replace {
     }
 
     # cleanup
-    $Param{Text} =~ s/(?:$Tag|$OldTag).+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/(?:$Tag|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # replcae first article placeholders
     $Tag = $Self->{Start} . 'KIX_FIRST_';
@@ -113,7 +113,7 @@ sub _Replace {
     }
 
     # cleanup all not needed <KIX_LAST_ tags
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # place last agent article placeholders
     $Tag = $Self->{Start} . 'KIX_AGENT_';
@@ -134,7 +134,7 @@ sub _Replace {
     }
 
     # cleanup all not needed <KIX_AGENT_ tags
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # replace last external article placeholders
     $Tag = $Self->{Start} . 'KIX_CUSTOMER_';
@@ -156,7 +156,7 @@ sub _Replace {
     }
 
     # cleanup all not needed <KIX_CUSTOMER_ tags
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     return $Param{Text};
 }
@@ -172,7 +172,7 @@ sub _ReplaceArticlePlaceholders {
             my $CharLength = $1;
             my $AttributeValue = $Param{Article}->{$Attribute};
             next if !defined $AttributeValue;
-            
+
             $AttributeValue =~ s/^(.{$CharLength}).*$/$1 [...]/;
 
             $Param{Text}    =~ s/$Tag\_.+?$Self->{End}/$AttributeValue/g;

@@ -87,7 +87,7 @@ sub ParameterDefinition {
         'MailAccountID' => {
             Type     => 'ARRAY',
             Required => 1
-            }
+        }
     };
 }
 

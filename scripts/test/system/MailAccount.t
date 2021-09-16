@@ -53,7 +53,7 @@ $Self->True(
 );
 $Self->True(
     $MailAccount{Password} eq 'SomePassword',
-    'MailAccountGet() - Login',
+    'MailAccountGet() - Password',
 );
 $Self->True(
     $MailAccount{Host} eq 'pop3.example.com',
@@ -63,10 +63,13 @@ $Self->True(
     $MailAccount{Type} eq 'POP3',
     'MailAccountGet() - Type',
 );
-
 $Self->True(
     $MailAccount{IMAPFolder} eq '',
     'MailAccountGet() - IMAPFolder',
+);
+$Self->True(
+    !defined($MailAccount{OAuth2_ProfileID}),
+    'MailAccountGet() - OAuth2_ProfileID',
 );
 
 my $MailAccountUpdate = $MailAccountObject->MailAccountUpdate(
@@ -98,7 +101,7 @@ $Self->True(
 );
 $Self->True(
     $MailAccount{Password} eq 'SomePassword2',
-    'MailAccountGet() - Login',
+    'MailAccountGet() - Password',
 );
 $Self->True(
     $MailAccount{Host} eq 'imap.example.com',
@@ -108,10 +111,13 @@ $Self->True(
     $MailAccount{Type} eq 'IMAP',
     'MailAccountGet() - Type',
 );
-
 $Self->True(
     $MailAccount{IMAPFolder} eq 'Bar',
     'MailAccountGet() - IMAPFolder',
+);
+$Self->True(
+    !defined($MailAccount{OAuth2_ProfileID}),
+    'MailAccountGet() - OAuth2_ProfileID',
 );
 
 my %List = $MailAccountObject->MailAccountList(
@@ -160,7 +166,7 @@ $Self->True(
 );
 $Self->True(
     $MailAccount{Password} eq 'SomePassword',
-    'MailAccountGet() - Login',
+    'MailAccountGet() - Password',
 );
 $Self->True(
     $MailAccount{Host} eq 'imap.example.com',
@@ -170,10 +176,13 @@ $Self->True(
     $MailAccount{Type} eq 'IMAPS',
     'MailAccountGet() - Type',
 );
-
 $Self->True(
     $MailAccount{IMAPFolder} eq 'Foo',
     'MailAccountGet() - IMAPFolder',
+);
+$Self->True(
+    !defined($MailAccount{OAuth2_ProfileID}),
+    'MailAccountGet() - OAuth2_ProfileID',
 );
 
 my $MailAccountUpdateIMAP = $MailAccountObject->MailAccountUpdate(
@@ -204,7 +213,7 @@ $Self->True(
 );
 $Self->True(
     $MailAccount{Password} eq 'SomePassword2',
-    'MailAccountGet() - Login',
+    'MailAccountGet() - Password',
 );
 $Self->True(
     $MailAccount{Host} eq 'imaps.example.com',
@@ -214,10 +223,13 @@ $Self->True(
     $MailAccount{Type} eq 'IMAPS',
     'MailAccountGet() - Type',
 );
-
 $Self->True(
     $MailAccount{IMAPFolder} eq 'INBOX',
     'MailAccountGet() - IMAPFolder fallback',
+);
+$Self->True(
+    !defined($MailAccount{OAuth2_ProfileID}),
+    'MailAccountGet() - OAuth2_ProfileID',
 );
 
 my $MailAccountDeleteIMAP = $MailAccountObject->MailAccountDelete(
@@ -227,6 +239,162 @@ my $MailAccountDeleteIMAP = $MailAccountObject->MailAccountDelete(
 $Self->True(
     $MailAccountDeleteIMAP,
     'MailAccountDelete() IMAP account',
+);
+
+my $OAuth2ProfileID1 = $Kernel::OM->Get('OAuth2')->ProfileAdd(
+    Name         => 'Profile1',
+    URLAuth      => 'URL Auth',
+    URLToken     => 'URL Token',
+    URLRedirect  => 'URL Redirect',
+    ClientID     => "ClientID",
+    ClientSecret => "ClientSecret",
+    Scope        => "Scope",
+    ValidID      => 1,
+    UserID       => 1,
+);
+
+$Self->True(
+    $OAuth2ProfileID1,
+    'ProfileAdd() for OAuth2 test profile 1',
+);
+
+my $OAuth2ProfileID2 = $Kernel::OM->Get('OAuth2')->ProfileAdd(
+    Name         => 'Profile2',
+    URLAuth      => 'URL Auth',
+    URLToken     => 'URL Token',
+    URLRedirect  => 'URL Redirect',
+    ClientID     => "ClientID",
+    ClientSecret => "ClientSecret",
+    Scope        => "Scope",
+    ValidID      => 1,
+    UserID       => 1,
+);
+
+$Self->True(
+    $OAuth2ProfileID2,
+    'ProfileAdd() for OAuth2 test profile 2',
+);
+
+my $MailAccountAddOAuth2 = $MailAccountObject->MailAccountAdd(
+    Login            => 'mail',
+    OAuth2_ProfileID => $OAuth2ProfileID1,
+    Host             => 'imap.example.com',
+    Type             => 'IMAPTLS_OAuth2',
+    ValidID          => 1,
+    Trusted          => 0,
+    IMAPFolder       => 'Foo',
+    DispatchingBy    => 'Queue',              # Queue|From
+    QueueID          => 1,
+    UserID           => 1,
+);
+
+$Self->True(
+    $MailAccountAddOAuth2,
+    'MailAccountAdd()',
+);
+
+%MailAccount = $MailAccountObject->MailAccountGet(
+    ID => $MailAccountAddOAuth2,
+);
+
+$Self->True(
+    $MailAccount{Login} eq 'mail',
+    'MailAccountGet() - Login',
+);
+$Self->True(
+    $MailAccount{Password} eq '-',
+    'MailAccountGet() - Password fallback/replacement for OAuth2',
+);
+$Self->True(
+    $MailAccount{Host} eq 'imap.example.com',
+    'MailAccountGet() - Host',
+);
+$Self->True(
+    $MailAccount{Type} eq 'IMAPTLS_OAuth2',
+    'MailAccountGet() - Type',
+);
+$Self->True(
+    $MailAccount{IMAPFolder} eq 'Foo',
+    'MailAccountGet() - IMAPFolder',
+);
+$Self->True(
+    $MailAccount{OAuth2_ProfileID} eq $OAuth2ProfileID1,
+    'MailAccountGet() - OAuth2_ProfileID',
+);
+
+my $MailAccountUpdateOAuth2 = $MailAccountObject->MailAccountUpdate(
+    ID               => $MailAccountAddOAuth2,
+    Login            => 'mail2',
+    OAuth2_ProfileID => $OAuth2ProfileID2,
+    Password         => 'SomePassword2',
+    Host             => 'imaps.example.com',
+    Type             => 'IMAPS_OAuth2',
+    ValidID          => 1,
+    Trusted          => 0,
+    DispatchingBy    => 'Queue',               # Queue|From
+    QueueID          => 1,
+    UserID           => 1,
+);
+
+$Self->True(
+    $MailAccountUpdateOAuth2,
+    'MailAccountUpdate()',
+);
+
+%MailAccount = $MailAccountObject->MailAccountGet(
+    ID => $MailAccountAddOAuth2,
+);
+
+$Self->True(
+    $MailAccount{Login} eq 'mail2',
+    'MailAccountGet() - Login',
+);
+$Self->True(
+    $MailAccount{Password} eq '-',
+    'MailAccountGet() - Password fallback/replacement for OAuth2',
+);
+$Self->True(
+    $MailAccount{Host} eq 'imaps.example.com',
+    'MailAccountGet() - Host',
+);
+$Self->True(
+    $MailAccount{Type} eq 'IMAPS_OAuth2',
+    'MailAccountGet() - Type',
+);
+$Self->True(
+    $MailAccount{IMAPFolder} eq 'INBOX',
+    'MailAccountGet() - IMAPFolder fallback',
+);
+$Self->True(
+    $MailAccount{OAuth2_ProfileID} eq $OAuth2ProfileID2,
+    'MailAccountGet() - OAuth2_ProfileID',
+);
+
+my $MailAccountDeleteOAuth2 = $MailAccountObject->MailAccountDelete(
+    ID => $MailAccountAddOAuth2,
+);
+
+$Self->True(
+    $MailAccountDeleteOAuth2,
+    'MailAccountDelete() OAuth2 account',
+);
+
+my $OAuth2ProfileDelete1 = $Kernel::OM->Get('OAuth2')->ProfileDelete(
+    ID => $OAuth2ProfileID1
+);
+
+$Self->True(
+    $OAuth2ProfileDelete1,
+    'ProfileDelete() for OAuth2 test profile 1',
+);
+
+my $OAuth2ProfileDelete2 = $Kernel::OM->Get('OAuth2')->ProfileDelete(
+    ID => $OAuth2ProfileID2
+);
+
+$Self->True(
+    $OAuth2ProfileDelete2,
+    'ProfileDelete() for OAuth2 test profile 2',
 );
 
 1;

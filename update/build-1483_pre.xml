@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="automation_log">
+        <ColumnChange NameOld="message" NameNew="message" Required="false" Size="1800000" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>

@@ -766,9 +766,12 @@ sub _Success {
 
             $Self->_Debug($Self->{LevelIndent}, "applying object permissions");
 
-            $Self->_ApplyObjectPermissions(
+            my $Result = $Self->_ApplyObjectPermissions(
                 Data => \%Param,
             );
+            if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
+                return $Result;
+            }
 
             my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", $TimeDiff));
@@ -1265,7 +1268,7 @@ sub _ValidateFilter {
                 }
 
                 # check DATE value
-                if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2}/ && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
+                if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
@@ -1273,7 +1276,7 @@ sub _ValidateFilter {
                 }
 
                 # check DATETIME value
-                if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ ) {
+                if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
@@ -1430,9 +1433,9 @@ sub _ApplyFilter {
                                             $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                                                 String => $DatePart . ' 12:00:00',
                                             );
-                                            my ( $FilterDatePart, $FilterTimePart ) = split( /\s+/, $FilterValue );
+                                            my ( $FilterDatePart, $FilterTimePart, $Calculations ) = split( /\s+/, $FilterValue, 3 );
                                             $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                                                String => $FilterDatePart . ' 12:00:00',
+                                                String => $FilterDatePart . ' 12:00:00 ' . $Calculations,
                                             );
 
                                             # handle this as a numeric compare
@@ -2249,6 +2252,8 @@ sub _ApplyObjectPermissions {
     # get the relevant permission for the current request method
     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
+    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permissions. using the following permissions: %s", Data::Dumper::Dumper($Self->{RelevantObjectPermissions})) );
+
     foreach my $Object ( sort keys %{$Param{Data}} ) {
         my @ItemList = IsArrayRef($Param{Data}->{$Object}) ? @{$Param{Data}->{$Object}} : ( $Param{Data}->{$Object} );
 
@@ -2261,14 +2266,21 @@ sub _ApplyObjectPermissions {
             # we need a hash ref to filter
             next ITEM if ( !IsHashRefWithData($Item) );
 
+            my $ObjectID = $Self->{OperationConfig}->{ObjectID} || 'ID';
+
             my $ResultingPermission;
 
             PERMISSION:
             foreach my $Permission ( @{$Self->{RelevantObjectPermissions}} ) {
 
+                # ignore permission for another object type
+                next PERMISSION if ( !$Permission->{ConditionFilter}->{$Object} && !$Permission->{ConditionFilter}->{'*'} );
+
                 my %Data = (
                     $Object => \%{$Item}
                 );
+
+                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permission condition {%s} to object with ID %i", $Permission->{Condition}, $Item->{$ObjectID}) );
 
                 # check the condition
                 $Self->_ApplyFilter(
@@ -2312,6 +2324,7 @@ sub _ApplyObjectPermissions {
             # replace the item list in the response
             if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
                 $Param{Data}->{$Object} = \@NewItemList;
+                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("permission filtered result contains %i objects", scalar @NewItemList) );
             }
             else {
                 $Param{Data}->{$Object} = $NewItemList[0]

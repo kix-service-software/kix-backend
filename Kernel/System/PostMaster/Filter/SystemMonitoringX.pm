@@ -127,7 +127,7 @@ sub Run {
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'debug',
-        Message  => 'SysMon Mail: Receipient relevant <$ReceipientOfInterest>.',
+        Message  => "SysMon Mail: Receipient relevant <$ReceipientOfInterest>.",
     );
 
     return 1 if !$ReceipientOfInterest;

@@ -514,9 +514,9 @@ sub ConvertDataToInternal {
     for my $RootKey ( sort keys %{$Data} ) {
 
         # get attribute definition
-        my $AttrDef = $Self->_GetAttributeDefByKey(
-            Key        => $RootKey,
-            Definition => $Param{Definition},
+        my %AttrDef = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeDefByKey(
+            Key           => $RootKey,
+            XMLDefinition => $Param{Definition},
         );
 
         if ( ref $Data->{$RootKey} eq 'ARRAY' ) {
@@ -524,7 +524,7 @@ sub ConvertDataToInternal {
             $NewXMLParts[0] = undef;
 
             for my $ArrayItem ( @{ $Data->{$RootKey} } ) {
-                if ( ref $ArrayItem eq 'HASH' && $AttrDef->{Input}->{Type} ne 'Attachment' ) {
+                if ( ref $ArrayItem eq 'HASH' && $AttrDef{Input}->{Type} ne 'Attachment' ) {
 
                     # extract the root key from the hash and assign it to content key
                     my $Content = delete $ArrayItem->{$RootKey};
@@ -540,15 +540,15 @@ sub ConvertDataToInternal {
                         %{$NewDataPart},
                     };
                 }
-                elsif ( ref $ArrayItem eq '' || $AttrDef->{Input}->{Type} eq 'Attachment' ) {
+                elsif ( ref $ArrayItem eq '' || $AttrDef{Input}->{Type} eq 'Attachment' ) {
                     my $Value = $ArrayItem;
 
                     # attribute type Attachment needs some special handling
-                    if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+                    if ($AttrDef{Input}->{Type} eq 'Attachment') {
                         # check if we have already created an instance of this type
-                        if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                        if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
                             # create module instance
-                            my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                            my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
                             my $Object = $Kernel::OM->Get($Module);
 
                             if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
@@ -557,12 +557,12 @@ sub ConvertDataToInternal {
                                     Message => "Unable to create instance of attribute type module for parameter $RootKey!",
                                 );
                             }
-                            $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                            $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
                         }
 
                         # check if we have a special handling method to prepare the value
-                        if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('InternalValuePrepare') ) {
-                            $Value = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->InternalValuePrepare(
+                        if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('InternalValuePrepare') ) {
+                            $Value = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->InternalValuePrepare(
                                 Value => $Value
                             );
                         }
@@ -584,13 +584,13 @@ sub ConvertDataToInternal {
             $NewXMLParts[0] = undef;
 
             # attribute type Attachment needs some special handling
-            if ($AttrDef->{Input}->{Type} eq 'Attachment') {
+            if ($AttrDef{Input}->{Type} eq 'Attachment') {
                 my $Value = $Data->{$RootKey};
 
                 # check if we have already created an instance of this type
-                if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
                     # create module instance
-                    my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                    my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
                     my $Object = $Kernel::OM->Get($Module);
 
                     if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
@@ -599,12 +599,12 @@ sub ConvertDataToInternal {
                             Message => "Unable to create instance of attribute type module for parameter $RootKey!",
                         );
                     }
-                    $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                    $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
                 }
 
                 # check if we have a special handling method to prepare the value
-                if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('InternalValuePrepare') ) {
-                    $Value = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->InternalValuePrepare(
+                if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('InternalValuePrepare') ) {
+                    $Value = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->InternalValuePrepare(
                         Value => $Value
                     );
                 }
@@ -690,17 +690,17 @@ sub ConvertDataToExternal {
         for my $RootHashKey ( sort keys %{$RootHash} ) {
 
             # get attribute definition
-            my $AttrDef = $Self->_GetAttributeDefByKey(
-                Key        => $RootHashKey,
-                Definition => $Param{Definition},
+            my %AttrDef = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeDefByKey(
+                Key           => $RootHashKey,
+                XMLDefinition => $Param{Definition},
             );
 
             my $AttributeName = $RootHashKey;
 
             # ignore attribute if user is logged in as Customer and attribute should not be visible
-            next if IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer' && !$AttrDef->{CustomerVisible};
+            next if IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer' && !$AttrDef{CustomerVisible};
 
-            if ( $AttrDef->{CountMax} && $AttrDef->{CountMax} > 1 ) {
+            if ( $AttrDef{CountMax} && $AttrDef{CountMax} > 1 ) {
 
                 # we have multiple items
                 my $Counter = 0;
@@ -713,7 +713,7 @@ sub ConvertDataToExternal {
                     $Content = delete $ArrayItem->{Content} || '';
 
                     # look if we have a sub structure
-                    if ( $AttrDef->{Sub} ) {
+                    if ( $AttrDef{Sub} ) {
                         $NewData->{$RootHashKey}->[$Counter]->{$RootHashKey} = $Content;
 
                         # start recursion
@@ -732,11 +732,11 @@ sub ConvertDataToExternal {
                     }
                     else {
                         # get display values if ForDisplay=! is given or attribute type is Attachment
-                        if ( $Param{ForDisplay} || $AttrDef->{Input}->{Type} eq 'Attachment' ) {
+                        if ( $Param{ForDisplay} || $AttrDef{Input}->{Type} eq 'Attachment' ) {
                             # check if we have already created an instance of this type
-                            if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                            if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
                                 # create module instance
-                                my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                                my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
                                 my $Object = $Kernel::OM->Get($Module);
 
                                 if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
@@ -745,13 +745,13 @@ sub ConvertDataToExternal {
                                         Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
                                     );
                                 }
-                                $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                                $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
                             }
 
                             # check if we have a special handling method to prepare the value
-                            if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ValueLookup') ) {
-                                $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ValueLookup(
-                                    Item  => $AttrDef,
+                            if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('ValueLookup') ) {
+                                $Content = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->ValueLookup(
+                                    Item  => \%AttrDef,
                                     Value => $Content
                                 );
                             }
@@ -775,11 +775,11 @@ sub ConvertDataToExternal {
                     $Content = delete $ArrayItem->{Content} || '';
 
                     # get display values if ForDisplay=! is given or attribute type is Attachment
-                    if ( $Param{ForDisplay} || ($AttrDef->{Input} && $AttrDef->{Input}->{Type} && $AttrDef->{Input}->{Type} eq 'Attachment') ) {
+                    if ( $Param{ForDisplay} || ($AttrDef{Input} && $AttrDef{Input}->{Type} && $AttrDef{Input}->{Type} eq 'Attachment') ) {
                         # check if we have already created an instance of this type
-                        if ( !$Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} ) {
+                        if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
                             # create module instance
-                            my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef->{Input}->{Type};
+                            my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
                             my $Object = $Kernel::OM->Get($Module);
 
                             if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
@@ -788,13 +788,13 @@ sub ConvertDataToExternal {
                                     Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
                                 );
                             }
-                            $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}} = $Object;
+                            $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
                         }
 
                         # check if we have a special handling method to prepare the value
-                        if ( $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->can('ValueLookup') ) {
-                            $Content = $Self->{AttributeTypeModules}->{$AttrDef->{Input}->{Type}}->ValueLookup(
-                                Item  => $AttrDef,
+                        if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('ValueLookup') ) {
+                            $Content = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->ValueLookup(
+                                Item  => \%AttrDef,
                                 Value => $Content
                             );
                         }
@@ -803,7 +803,7 @@ sub ConvertDataToExternal {
                     $NewData->{$RootHashKey} = $Content;
 
                     # look if we have a sub structure
-                    if ( $AttrDef->{Sub} ) {
+                    if ( $AttrDef{Sub} ) {
                         # start recursion
                         for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
 
@@ -838,40 +838,6 @@ sub ConvertDataToExternal {
 
     return $NewData;
 }
-
-sub _GetAttributeDefByKey {
-    my ( $Self, %Param ) = @_;
-
-    # check required params...
-    return
-        if (
-        !$Param{Definition} || ref( $Param{Definition} ) ne 'ARRAY' ||
-        !$Param{Key}
-        );
-
-    ITEM:
-    for my $Item ( @{ $Param{Definition} } ) {
-
-        if ( $Item->{Key} eq $Param{Key} ) {
-            return $Item;
-        }
-
-        next ITEM if ( !$Item->{Sub} );
-
-        # recurse if subsection available...
-        my $SubResult = $Self->_GetAttributeDefByKey(
-            Key        => $Param{Key},
-            Definition => $Item->{Sub},
-        );
-
-        if ( $SubResult && ref($SubResult) eq 'HASH' ) {
-            return $SubResult;
-        }
-    }
-
-    return;
-}
-
 
 =item _CheckDefinition()
 

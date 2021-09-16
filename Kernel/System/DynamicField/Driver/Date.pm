@@ -199,15 +199,24 @@ sub SearchSQLGet {
     );
 
     if ( $Operators{ $Param{Operator} } ) {
-        my $SQL = " $Param{TableAlias}.value_date $Operators{$Param{Operator}} '"
-            . $Kernel::OM->Get('DB')->Quote( $Param{SearchTerm} );
+        my $SearchTerm = $Param{SearchTerm};
 
         # Append hh:mm:ss if only the ISO date was supplied to get a full date-time string.
-        if ( $Param{SearchTerm} =~ m{\A \d{4}-\d{2}-\d{2}\z}xms ) {
-            $SQL .= " 00:00:00";
+        if ( $SearchTerm =~ m{\A \d{4}-\d{2}-\d{2}\z}xms ) {
+            $SearchTerm .= " 00:00:00";
         }
 
-        $SQL .= "' ";
+        # calculate relative times
+        my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            TimeStamp => $SearchTerm
+        );
+        $SearchTerm = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $SystemTime
+        );
+
+        my $SQL = " $Param{TableAlias}.value_date $Operators{$Param{Operator}} '";
+        $SQL .= $Kernel::OM->Get('DB')->Quote( $SearchTerm ) . "' ";
+
         return $SQL;
     }
 

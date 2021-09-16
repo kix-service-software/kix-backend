@@ -269,6 +269,22 @@ sub ValidateConfig {
     return if (ref $Param{Config} ne 'HASH');
 
     foreach my $Option ( sort keys %{$Self->{Definition}->{Options}} ) {
+        if ( IsArrayRefWithData($Self->{Definition}->{Options}->{$Option}->{PossibleValues}) ) {
+            # check the value
+            if ( exists $Param{Config}->{$Option} ) {
+                my %PossibleValues = map { $_ => 1 } @{$Self->{Definition}->{Options}->{$Option}->{PossibleValues}};
+                foreach my $Value ( IsArrayRefWithData($Param{Config}->{$Option}) ? @{$Param{Config}->{$Option}} : ( $Param{Config}->{$Option} ) ) {
+                    if ( !$PossibleValues{$Value} ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => "Invalid value \"$Value\" for parameter \"$Option\"! Possible values: " . join(', ', @{$Self->{Definition}->{Options}->{$Option}->{PossibleValues}}),
+                        );
+                        return;
+                    }
+                }
+            }
+        }
+
         next if !$Self->{Definition}->{Options}->{$Option}->{Required};
 
         if ( !exists $Param{Config}->{$Option} ) {
@@ -309,6 +325,12 @@ sub _CheckParams {
 
     if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
         for my $Option ( values %{$Definition{Options}}) {
+            # set default value if not given
+            if ( !exists $Param{Config}->{$Option->{Name}} && defined $Option->{DefaultValue} ) {
+                $Param{Config}->{$Option->{Name}} = $Option->{DefaultValue};
+            }
+
+            # check if the value is given, if required
             if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
