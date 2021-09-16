@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-9-15 13:54+0000\n"
-"PO-Revision-Date: 2021-08-13 10:47+0000\n"
-"Last-Translator: fkrahl <Frank.Krahl@cape-it.de>\n"
+"PO-Revision-Date: 2021-09-16 17:01+0000\n"
+"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -1117,7 +1117,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "Value"
-msgstr ""
+msgstr "Wert"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
@@ -3690,7 +3690,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Option"
-msgstr ""
+msgstr "Option"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Out Of Office Substitute"
