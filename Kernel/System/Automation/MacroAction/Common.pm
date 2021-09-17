@@ -277,7 +277,7 @@ sub ValidateConfig {
                     if ( !$PossibleValues{$Value} ) {
                         $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
-                            Message  => "Invalid value for parameter \"$Option\"! Possible values: " . join(', ', @{$Self->{Definition}->{Options}->{$Option}->{PossibleValues}}),
+                            Message  => "Invalid value \"$Value\" for parameter \"$Option\"! Possible values: " . join(', ', @{$Self->{Definition}->{Options}->{$Option}->{PossibleValues}}),
                         );
                         return;
                     }
@@ -325,6 +325,12 @@ sub _CheckParams {
 
     if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
         for my $Option ( values %{$Definition{Options}}) {
+            # set default value if not given
+            if ( !exists $Param{Config}->{$Option->{Name}} && defined $Option->{DefaultValue} ) {
+                $Param{Config}->{$Option->{Name}} = $Option->{DefaultValue};
+            }
+
+            # check if the value is given, if required
             if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',

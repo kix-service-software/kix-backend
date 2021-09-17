@@ -315,16 +315,21 @@ organisation id or number lookup
         Silent => 1, # optional, don't generate log entry if user was not found
     );
 
+    my $ID = $OrganisationObject->OrganisationLookup(
+        Name => 'some_organisation_name',
+        Silent => 1, # optional, don't generate log entry if user was not found
+    );
+
 =cut
 
 sub OrganisationLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{Number} && !$Param{ID} ) {
+    if ( !$Param{Number} && !$Param{Name} && !$Param{ID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Number or ID!'
+            Message  => 'Need Number, Name or ID!'
         );
         return;
     }
@@ -332,22 +337,23 @@ sub OrganisationLookup {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    if ( $Param{Number} ) {
+    # check cache
+    my $CacheKey = 'OrganisationLookup::'.($Param{ID}||'').'::'.($Param{Number}||'').'::'.($Param{Name}||'');
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
 
-        # check cache
-        my $CacheKey = 'OrganisationLookup::ID::' . $Param{Number};
-        my $Cache    = $Kernel::OM->Get('Cache')->Get(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-        return $Cache if $Cache;
+    if ( $Param{Number} || $Param{Name} ) {
 
         # build sql query
-        my $Number = lc $Param{Number};
+        my $What = lc($Param{Number} || $Param{Name});
+        my $Attribute = $Param{Number} ? 'number' : 'name';
 
         return if !$DBObject->Prepare(
-            SQL => "SELECT id FROM organisation WHERE $Self->{Lower}(number) = ?",
-            Bind  => [ \$Number ],
+            SQL => "SELECT id FROM organisation WHERE $Self->{Lower}($Attribute) = ?",
+            Bind  => [ \$What ],
             Limit => 1,
         );
 
@@ -361,7 +367,7 @@ sub OrganisationLookup {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "No ID found for organisation number '$Param{Number}'!",
+                    Message  => "No ID found for organisation $Attribute '$What'!",
                 );
             }
             return;
@@ -382,14 +388,6 @@ sub OrganisationLookup {
 
         # ignore non-numeric IDs
         return if $Param{ID} && $Param{ID} !~ /^\d+$/;
-
-        # check cache
-        my $CacheKey = 'OrganisationLookup::Number::' . $Param{ID};
-        my $Cache    = $Kernel::OM->Get('Cache')->Get(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-        return $Cache if $Cache;
 
         # build sql query
         return if !$DBObject->Prepare(

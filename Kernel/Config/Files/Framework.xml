@@ -1084,75 +1084,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::FirstArticleOnly" Required="1" Valid="1">
-        <Description Translatable="1">Defines whether EventHandler runs only for the first article in a ticket.</Description>
-        <Group>Framework</Group>
-        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1">Yes</Item>
-                <Item Key="0">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::CISearchPattern" Required="1" Valid="1">
-        <Description Translatable="1">Defines CI search pattern which is extracted from the ticket. Each regexp needs to return the search value in $1!. In ArticleCreate-Events only keys named like Article_* are considered (e.g. Article_Body), while TicketFreeText values are only considered in Ticketfreetext-Update events. However, you may define more than one Ticketfreetextfield for a regexp-match. In this case the different results are considered as different CI-searches, thus implementing some sort of OR (disjunction). If you want to use more than one regexp on a attribute just add a similar named key with the suffix _OR123 (see defaults).</Description>
-        <Group>Framework</Group>
-        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DynamicField_TicketFreeText1"></Item>
-                <Item Key="DynamicField_TicketFreeText2">(^.+)</Item>
-                <Item Key="DynamicField_TicketFreeText3"></Item>
-                <Item Key="DynamicField_TicketFreeText4"></Item>
-                <Item Key="DynamicField_TicketFreeText5">(^\d+\.\d+\.\d+\.\d+)</Item>
-                <Item Key="DynamicField_TicketFreeText6"></Item>
-                <Item Key="DynamicField_TicketFreeText7"></Item>
-                <Item Key="DynamicField_TicketFreeText8"></Item>
-                <Item Key="DynamicField_TicketFreeText9"></Item>
-                <Item Key="DynamicField_TicketFreeText10"></Item>
-                <Item Key="DynamicField_TicketFreeText11"></Item>
-                <Item Key="DynamicField_TicketFreeText12"></Item>
-                <Item Key="DynamicField_TicketFreeText13"></Item>
-                <Item Key="DynamicField_TicketFreeText14"></Item>
-                <Item Key="DynamicField_TicketFreeText15"></Item>
-                <Item Key="DynamicField_TicketFreeText16"></Item>
-                <Item Key="Article_Body">\s*Address:\s+(\d+\.\d+\.\d+\.\d+)\s*</Item>
-                <Item Key="Article_Body_OR1">\s*Host:\s+(.+)\s*</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::LinkType" Required="1" Valid="1">
-        <Description Translatable="1">Defines the link type which is used for the link creation.</Description>
-        <Group>Framework</Group>
-        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
-        <Setting>
-            <String Regex="">RelevantTo</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::CISearchInClassesPerRecipient" Required="0" Valid="1">
-        <Description Translatable="1">Restricts CI-classes which are searched for certain article to-address (comma separated).</Description>
-        <Group>Framework</Group>
-        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="nagios-service-mailbox@example.com">Computer</Item>
-                <Item Key="nagios-network-mailbox@example.com">Network</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::CISearchInClasses" Required="1" Valid="1">
-        <Description Translatable="1">Defines in which CI-classes which attributes need to match the search pattern (comma separated).</Description>
-        <Group>Framework</Group>
-        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Computer">NIC::IPAddress,FQDN</Item>
-                <!--<Item Key="Computer">NIC::IPAddress,FQDN,Number</Item> -->
-                <Item Key="Network">NetworkAddress</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="LinkObject::Type###AlternativeTo" Required="1" Valid="1">
         <Description Translatable="1">This setting defines the link type 'AlternativeTo'. If the source name and the target name contain the same value, the resulting link is a non-directional one. If the values are different, the resulting link is a directional link.</Description>
         <Group>Framework</Group>
@@ -1616,6 +1547,57 @@
                 -->
                 <Item Key="PossibleNone">1</Item>
                 <Item Key="ToolTip">Assign a preferred queue to this service</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###500-TicketAutoLinkConfigItem" Required="0" Valid="1">
+        <Description Translatable="1">Event handler which extracts asset info from articles or dynamic fields, attempts to find assets in order to automatically append them to a ticket dynamic field. If "FirstArticleOnly" is active (1), only the first article of the ticket is evaluated. "DynamicFieldName" specifies to which dynamic field (of type AssetReference) found assets are appended. Use TicketAutoLinkConfigItem::CISearchPattern, TicketAutoLinkConfigItem::CISearchInClassesPerRecipient and TicketAutoLinkConfigItem::CISearchInClasses for more configuration.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::TicketAutoLinkConfigItem</Item>
+                <Item Key="Event">(ArticleCreate|TicketDynamicFieldUpdate_SysMonXHost|TicketDynamicFieldUpdate_SysMonXAlias|TicketDynamicFieldUpdate_SysMonXAddress)</Item>
+                <Item Key="FirstArticleOnly">1</Item>
+                <Item Key="DynamicFieldName">AffectedAsset</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::CISearchPattern" Required="1" Valid="1">
+        <Description Translatable="1">Defines asset search pattern which is extracted from the ticket. Each regexp needs to return the search value in the first capture group - or the entire pattern. In ArticleCreate-Events only keys named like Article_* are considered (e.g. Article_Body), while dynamic field values are only considered in DF-Update events. However, you may define more than one dynamic field for a regexp-match. In this case the different results are considered as different CI-searches, thus implementing some sort of OR (disjunction). If you want to use more than one regexp on a attribute just add a similar named key with the suffix _OR123 (see defaults).</Description>
+        <Group>Framework</Group>
+        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Article_Body">\s*Address:\s+(\d+\.\d+\.\d+\.\d+)\s*</Item>
+                <Item Key="Article_Body_OR1">\s*Host:\s+(.+)\s*</Item>
+                <Item Key="DynamicField_SysMonXAlias">(^.+)</Item>
+                <Item Key="DynamicField_SysMonXHost">(^.+)</Item>
+                <Item Key="DynamicField_SysMonXAddress">(^\d+\.\d+\.\d+\.\d+)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::CISearchInClassesPerRecipient" Required="0" Valid="1">
+        <Description Translatable="1">If the triggering articles to-address is defined as key, only those asset classes mentioned in value will be searched. Multiple asset classes must be separated by comma.</Description>
+        <Group>Framework</Group>
+        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="sysmon-computer-mailbox@example.com">Computer</Item>
+                <Item Key="sysmon-hardware-mailbox@example.com">Hardware</Item>
+                <Item Key="sysmon-network-mailbox@example.com">Network</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketAutoLinkConfigItem::CISearchInClasses" Required="1" Valid="1">
+        <Description Translatable="1">Defines which attributes must match the found search patterns. Key contains a single asset class, e.g. 'Computer'. Value must contain multiple full attributes, e.g. 'SectionNetwork::NIC::IPAddress'. Multiple attributes must be separated by comma.</Description>
+        <Group>Framework</Group>
+        <SubGroup>TicketAutoLinkConfigItem</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Computer">SectionNetwork::NIC::IPAddress,SectionNetwork::FQDN</Item>
+                <Item Key="Hardware">SectionNetwork::NIC::IPAddress,SectionNetwork::FQDN</Item>
+                <Item Key="Network">NetworkAddress</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2725,6 +2707,14 @@
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
             <String Regex="" Type="Password">MailserverPassword</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="confidential" Name="SendmailModule::OAuth2_Profile" Required="0" Valid="0" ConfigLevel="200">
+        <Description Translatable="1">If any of the "OAuth2" mechanisms was selected as SendmailModule, the profile to use for OAuth2 must be specified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Sendmail</SubGroup>
+        <Setting>
+            <String Regex="">Profile1</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailBcc" Required="0" Valid="1" ConfigLevel="200">
@@ -8836,6 +8826,16 @@ You can log in via the following URL:
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Create Report</Item>
                 <Item Key="Module">Kernel::System::Automation::MacroAction::Common::CreateReport</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###VariableSet" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Set Variable</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::VariableSet</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -1204,6 +1204,42 @@ sub ConfigItemSearchExtended {
     # start xml version search
     if ( $RequiredSearch{XMLVersion} ) {
 
+        # prepare search values (i.e. relative date/datetime searches)
+        foreach my $What ( @{$Param{What} || []} ) {
+            KEY:
+            foreach my $Key ( keys %{$What||{}} ) {
+                # only look at the conditions with defined op (!LIKE)
+                next KEY if !IsHashRefWithData($What->{$Key});
+
+                # check if the value contains a date calculation and calculate the new timestamp if needed
+                foreach my $Op ( keys %{$What->{$Key}} ) {
+
+                    my $Value = $What->{$Key}->{$Op};
+
+                    next if $Value !~ /^((\d{4}-\d{2}-\d{2})(\s+\d{2}:\d{2}:\d{2})?(\s+([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/;
+
+                    my $IsDate = 0;
+                    if ( $2 && !$3 ) {
+                        $IsDate = 1;
+                        $Value = "$2 00:00:00 $4";
+                    }
+                    
+                    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                        String => $Value,
+                    );
+                    $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+                        SystemTime => $SystemTime,
+                    );
+
+                    if ( $IsDate ) {
+                        $Value = (split(/\s+/, $Value))[0];
+                    }
+
+                    $What->{$Key}->{$Op} = $Value;
+                }
+            }
+        }
+
         # search xml versions
         my $XMLVersionList = $Self->_XMLVersionSearch(%Param);
 
@@ -1528,18 +1564,28 @@ sub ConfigItemSearch {
 
         next TIMEPARAM if !$Param{$TimeParam};
 
-        if ( $Param{$TimeParam} !~ m{ \A \d\d\d\d-\d\d-\d\d \s \d\d:\d\d:\d\d \z }xms ) {
+        my $Value = $Param{$TimeParam};
+
+        # calculate relative times
+        my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $Value
+        );
+        if ( !$SystemTime ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Invalid date format found!",
+                Message  => "Invalid date format found in parameter $TimeParam!",
             );
             return;
         }
 
-        # quote
-        $Param{$TimeParam} = $Kernel::OM->Get('DB')->Quote( $Param{$TimeParam} );
+        $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $SystemTime
+        );
 
-        push @SQLWhere, "$TimeParams{ $TimeParam } '$Param{ $TimeParam }'";
+        # quote
+        $Value = $Kernel::OM->Get('DB')->Quote( $Value );
+
+        push @SQLWhere, "$TimeParams{ $TimeParam } '$Value'";
     }
 
     # create where string
@@ -1577,7 +1623,7 @@ sub ConfigItemSearch {
 =item ConfigItemLookup()
 
 This method does a lookup for a configitem. If a configitem id is given,
-it returns the number of the configitem. If a configitem number is given,
+it returns the number of the configitem. If a configitem number or name is given,
 the appropriate id is returned.
 
     my $Number = $ConfigItemObject->ConfigItemLookup(
@@ -1588,28 +1634,35 @@ the appropriate id is returned.
         ConfigItemNumber => 1000001,
     );
 
+    my $ID = $ConfigItemObject->ConfigItemLookup(
+        Class          => 'Computer',       # optional
+        ConfigItemName => 'test',
+    );
+
 =cut
 
 sub ConfigItemLookup {
     my ( $Self, %Param ) = @_;
 
-    my ($Key) = grep { $Param{$_} } qw(ConfigItemID ConfigItemNumber);
+    my ($Key) = grep { $Param{$_} } qw(ConfigItemID ConfigItemNumber ConfigItemName);
 
     # check for needed stuff
     if ( !$Key ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ConfigItemID or ConfigItemNumber!',
+            Message  => 'Need ConfigItemID or ConfigItemNumber or ConfigItemName and ClassName!',
         );
         return;
     }
 
-    my $CacheKey = 'ConfigItemLookup::'.($Param{ConfigItemID}||'').'::'.($Param{ConfigItemNumber}||'');
+    my $CacheKey = 'ConfigItemLookup::'.($Param{ConfigItemID}||'').'::'.($Param{ConfigItemNumber}||'').'::'.($Param{Class}||'').'::'.($Param{ConfigItemName}||'');
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
+
+    my @BindArray = ( \$Param{$Key} );
 
     # set the appropriate SQL statement
     my $SQL = 'SELECT configitem_number FROM configitem WHERE id = ?';
@@ -1617,11 +1670,18 @@ sub ConfigItemLookup {
     if ( $Key eq 'ConfigItemNumber' ) {
         $SQL = 'SELECT id FROM configitem WHERE configitem_number = ?';
     }
+    if ( $Key eq 'ConfigItemName' && !$Param{Class} ) {
+        $SQL = 'SELECT id FROM configitem WHERE name = ?';
+    }
+    if ( $Key eq 'ConfigItemName' && $Param{Class} ) {
+        $SQL = 'SELECT ci.id FROM configitem ci, general_catalog gc WHERE gc.id = ci.class_id AND gc.general_catalog_class = \'ITSM::ConfigItem::Class\' AND ci.name = ? AND gc.name = ?';
+        push @BindArray, \$Param{Class};
+    }
 
     # fetch the requested value
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
-        Bind  => [ \$Param{$Key} ],
+        Bind  => \@BindArray,
         Limit => 1,
     );
 
@@ -1630,13 +1690,15 @@ sub ConfigItemLookup {
         $Value = $Row[0];
     }
 
-    # cache the result
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $Value,
-    );
+    if ( $Value ) {
+        # cache the result
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $Value,
+        );
+    }
 
     return $Value;
 }
@@ -2110,12 +2172,13 @@ sub GetAttributeContentsByKey {
     return \@RetArray;
 }
 
-=item GetAttributeContentsByKey()
+
+=item GetAttributeDefByKey()
 
     Returns defintion first found, for a given attribute key.
-        GetAttributeDefByKey (
-            Key        => 'FQDN',
-            Definition => $XMLDefRef,
+        my %AttrDef = GetAttributeDefByKey (
+            Key           => 'FQDN',
+            XMLDefinition => $XMLDefRef,
         );
 =cut
 
@@ -2125,27 +2188,27 @@ sub GetAttributeDefByKey {
     # check required params...
     return
         if (
-        !$Param{Definition} || ref( $Param{Definition} ) ne 'ARRAY' ||
+        !$Param{XMLDefinition} || ref( $Param{XMLDefinition} ) ne 'ARRAY' ||
         !$Param{Key}
         );
 
     ITEM:
-    for my $Item ( @{ $Param{Definition} } ) {
+    for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         if ( $Item->{Key} eq $Param{Key} ) {
-            return $Item;
+            return %{$Item};
         }
 
         next ITEM if ( !$Item->{Sub} );
 
         # recurse if subsection available...
-        my $SubResult = $Self->GetAttributeDefByKey(
-            Key        => $Param{Key},
-            Definition => $Item->{Sub},
+        my %SubResult = $Self->GetAttributeDefByKey(
+            Key           => $Param{Key},
+            XMLDefinition => $Item->{Sub},
         );
 
-        if ( $SubResult && ref($SubResult) eq 'HASH' ) {
-            return $SubResult;
+        if ( IsHashRefWithData(\%SubResult) ) {
+            return %SubResult;
         }
     }
 

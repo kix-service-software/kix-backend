@@ -121,7 +121,29 @@ sub ExportSearchValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
-    return $Param{Value};
+
+    my $Value = $Param{Value};
+
+    # check and convert for date format like "2011-05-18"
+    if ( $Value =~ m{\A (\d{4} - \d{2} - \d{2} \z) }xms ) {
+        $Value = $1 . ' 00:00:00';
+    }
+
+    # convert the raw data to a system time format
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => $Value,
+    );
+
+    # convert it back to a standard time stamp
+    my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $SystemTime,
+    );
+
+    if ( $Param{Value} =~ m{\A (\d{4} - \d{2} - \d{2} \z) }xms ) {
+        $TimeStamp = (split(/\s+/, $TimeStamp))[0];
+    }
+
+    return $TimeStamp;
 }
 
 =item ExportValuePrepare()

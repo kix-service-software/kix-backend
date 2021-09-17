@@ -29,7 +29,7 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # add system data
 my $SystemDataNameRand0 = 'systemdata' . $Helper->GetRandomID();
 
-my $Success = $SystemDataObject->SystemDataAdd(
+my $Success = $SystemDataObject->SystemDataSet(
     Key    => $SystemDataNameRand0,
     Value  => $SystemDataNameRand0,
     UserID => 1,
@@ -37,19 +37,19 @@ my $Success = $SystemDataObject->SystemDataAdd(
 
 $Self->True(
     $Success,
-    "SystemDataAdd() - added '$SystemDataNameRand0'",
+    "SystemDataSet() - set '$SystemDataNameRand0'",
 );
 
 # another time, it should fail
-$Success = $SystemDataObject->SystemDataAdd(
+$Success = $SystemDataObject->SystemDataSet(
     Key    => $SystemDataNameRand0,
     Value  => $SystemDataNameRand0,
     UserID => 1,
 );
 
-$Self->False(
+$Self->True(
     $Success,
-    "SystemDataAdd() - can not add duplicate key '$SystemDataNameRand0'",
+    "SystemDataSet() - override '$SystemDataNameRand0'",
 );
 
 my $SystemData = $SystemDataObject->SystemDataGet( Key => $SystemDataNameRand0 );
@@ -59,15 +59,15 @@ $Self->True(
     'SystemDataGet() - value',
 );
 
-my $SystemDataUpdate = $SystemDataObject->SystemDataUpdate(
+my $SystemDataSet = $SystemDataObject->SystemDataSet(
     Key    => $SystemDataNameRand0,
     Value  => 'update' . $SystemDataNameRand0,
     UserID => 1,
 );
 
 $Self->True(
-    $SystemDataUpdate,
-    'SystemDataUpdate()',
+    $SystemDataSet,
+    'SystemDataSet() - update',
 );
 
 $SystemData = $SystemDataObject->SystemDataGet( Key => $SystemDataNameRand0 );
@@ -76,17 +76,6 @@ $Self->Is(
     $SystemData,
     'update' . $SystemDataNameRand0,
     'SystemDataGet() - after update',
-);
-
-$SystemDataUpdate = $SystemDataObject->SystemDataUpdate(
-    Key    => 'NonExisting' . $MainObject->GenerateRandomString(),
-    Value  => 'some value',
-    UserID => 1,
-);
-
-$Self->False(
-    $SystemDataUpdate,
-    'SystemDataUpdate() should not work on nonexisting value',
 );
 
 my $SystemDataDelete = $SystemDataObject->SystemDataDelete(
@@ -110,7 +99,7 @@ $Self->False(
 # add system data 1
 my $SystemDataNameRand1 = 'systemdata' . $Helper->GetRandomID();
 
-$Success = $SystemDataObject->SystemDataAdd(
+$Success = $SystemDataObject->SystemDataSet(
     Key    => $SystemDataNameRand1,
     Value  => '',
     UserID => 1,
@@ -118,7 +107,7 @@ $Success = $SystemDataObject->SystemDataAdd(
 
 $Self->True(
     $Success,
-    "SystemDataAdd() - added '$SystemDataNameRand1' value empty string",
+    "SystemDataSet() - set '$SystemDataNameRand1' value empty string",
 );
 
 $SystemData = $SystemDataObject->SystemDataGet( Key => $SystemDataNameRand1 );
@@ -130,7 +119,7 @@ $Self->Is(
 );
 
 # set to 0
-$Success = $SystemDataObject->SystemDataUpdate(
+$Success = $SystemDataObject->SystemDataSet(
     Key    => $SystemDataNameRand1,
     Value  => 0,
     UserID => 1,
@@ -138,7 +127,7 @@ $Success = $SystemDataObject->SystemDataUpdate(
 
 $Self->True(
     $Success,
-    "SystemDataAdd() - added '$SystemDataNameRand1' value empty string",
+    "SystemDataSet() - set '$SystemDataNameRand1' value 0",
 );
 
 $SystemData = $SystemDataObject->SystemDataGet( Key => $SystemDataNameRand1 );
@@ -149,14 +138,14 @@ $Self->IsDeeply(
     'SystemDataGet() - value - 0',
 );
 
-$SystemDataUpdate = $SystemDataObject->SystemDataUpdate(
+$SystemDataSet = $SystemDataObject->SystemDataSet(
     Key    => $SystemDataNameRand1,
     Value  => 'update',
     UserID => 1,
 );
 
 $Self->True(
-    $SystemDataUpdate,
+    $SystemDataSet,
     'SystemDataUpdate()',
 );
 
@@ -166,25 +155,6 @@ $Self->Is(
     $SystemData,
     'update',
     'SystemDataGet() - after update',
-);
-
-$SystemDataUpdate = $SystemDataObject->SystemDataUpdate(
-    Key    => $SystemDataNameRand1,
-    Value  => '',
-    UserID => 1,
-);
-
-$Self->True(
-    $SystemDataUpdate,
-    'SystemDataUpdate()',
-);
-
-$SystemData = $SystemDataObject->SystemDataGet( Key => $SystemDataNameRand1 );
-
-$Self->Is(
-    $SystemData,
-    '',
-    'SystemDataGet() - after update empty string',
 );
 
 $SystemDataDelete = $SystemDataObject->SystemDataDelete(
@@ -199,89 +169,57 @@ $Self->True(
 
 my $SystemDataGroupRand = 'systemdata' . $Helper->GetRandomID();
 
-my %Storage = (
+my %Hash = (
     Foo  => 'bar',
     Bar  => 'baz',
-    Beef => 'spam',
+    Beef => {
+        Alias => 'spam'
+    },
 );
 
-for my $Key ( sort keys %Storage ) {
-    my $Result = $SystemDataObject->SystemDataAdd(
-        Key    => $SystemDataGroupRand . '::' . $Key,
-        Value  => $Storage{$Key},
-        UserID => 1,
-    );
-    $Self->True(
-        $Result,
-        "SystemDataAdd: added key " . $SystemDataGroupRand . '::' . $Key,
-    );
-}
-
-my %Group = $SystemDataObject->SystemDataGroupGet(
-    Group  => $SystemDataGroupRand,
+my $Result = $SystemDataObject->SystemDataSet(
+    Key    => $SystemDataGroupRand,
+    Value  => \%Hash,
     UserID => 1,
 );
-
-for my $Key ( sort keys %Storage ) {
-    $Self->Is(
-        $Group{$Key},
-        $Storage{$Key},
-        "SystemDataGroupGet: test value for '$Key'.",
-    );
-}
-
-$Storage{Bar} = 'drinks';
-$SystemDataObject->SystemDataUpdate(
-    Key    => $SystemDataGroupRand . '::Bar',
-    Value  => $Storage{Bar},
-    UserID => 1,
+$Self->True(
+    $Result,
+    "SystemDataSet: set hash value",
 );
 
-%Group = $SystemDataObject->SystemDataGroupGet(
-    Group  => $SystemDataGroupRand,
-    UserID => 1,
+$SystemData = $SystemDataObject->SystemDataGet( Key => $SystemDataGroupRand );
+
+$Self->IsDeeply(
+    $SystemData,
+    \%Hash,
+    'SystemDataGet() - hash value',
 );
 
-for my $Key ( sort keys %Storage ) {
-    $Self->Is(
-        $Group{$Key},
-        $Storage{$Key},
-        "SystemDataGroupGet: test value for '$Key'.",
-    );
-}
-
-$SystemDataObject->SystemDataDelete(
-    Key    => $SystemDataGroupRand . '::Beef',
-    UserID => 1,
-);
-
-%Group = $SystemDataObject->SystemDataGroupGet(
-    Group  => $SystemDataGroupRand,
-    UserID => 1,
-);
-
-$Self->False(
-    $Group{Beef},
-    "Key 'Beef' deleted, GroupGet",
-);
-
-$Self->Is(
-    $Group{Foo},
+my @Array = (
     'bar',
-    "Key 'Foo' still there, GroupGet",
+    'baz',
+    {
+        Alias => 'spam'
+    }
 );
 
-for my $Key ( sort keys %Group ) {
-    my $Result = $SystemDataObject->SystemDataDelete(
-        Key    => $SystemDataGroupRand . '::' . $Key,
-        UserID => 1,
-    );
-    $Self->True(
-        $Result,
-        "SystemData: deleted key " . $SystemDataGroupRand . '::' . $Key,
-    );
-}
+$Result = $SystemDataObject->SystemDataSet(
+    Key    => $SystemDataGroupRand,
+    Value  => \@Array,
+    UserID => 1,
+);
+$Self->True(
+    $Result,
+    "SystemDataSet: set array value",
+);
 
+$SystemData = $SystemDataObject->SystemDataGet( Key => $SystemDataGroupRand );
+
+$Self->IsDeeply(
+    $SystemData,
+    \@Array,
+    'SystemDataGet() - array value',
+);
 # cleanup is done by RestoreDatabase
 
 1;

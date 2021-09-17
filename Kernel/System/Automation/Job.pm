@@ -1246,7 +1246,7 @@ sub JobRunLogList {
     return @{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
-        SQL  => 'SELECT id, job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by FROM automation_log WHERE run_id = ?',
+        SQL  => 'SELECT id, job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by FROM automation_log WHERE run_id = ? ORDER BY id',
         Bind => [ \$Param{RunID} ]
     );
 

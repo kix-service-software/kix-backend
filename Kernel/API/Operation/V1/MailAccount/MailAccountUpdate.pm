@@ -81,6 +81,12 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     my %BackendList = $Kernel::OM->Get('MailAccount')->MailAccountBackendList();
+    my @Types = sort keys %BackendList;
+
+    my %ProfileList = $Kernel::OM->Get('OAuth2')->ProfileList(
+        Valid  => 1,
+    );
+    my @Profiles = sort keys %ProfileList;
 
     return {
         'MailAccountID' => {
@@ -92,7 +98,11 @@ sub ParameterDefinition {
         },
         'MailAccount::Type' => {
             RequiresValueIfUsed => 1,
-            OneOf               => sort keys %BackendList,
+            OneOf               => \@Types,
+        },
+        'MailAccount::OAuth2_ProfileID' => {
+            RequiresValueIfUsed => 1,
+            OneOf               => \@Profiles,
         },
         'MailAccount::DispatchingBy' => {
             RequiresValueIfUsed => 1,
@@ -144,10 +154,10 @@ perform MailAccountUpdate Operation. This will return the updated TypeID.
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            MailAccountID  => 123,              # ID of the updated MailAccount 
+            MailAccountID  => 123,              # ID of the updated MailAccount
         },
     };
-   
+
 =cut
 
 sub Run {
@@ -179,18 +189,19 @@ sub Run {
 
     # update MailAccount
     my $Success = $Kernel::OM->Get('MailAccount')->MailAccountUpdate(
-        ID            => $Param{Data}->{MailAccountID},
-        Login         => $MailAccount->{Login} || $MailAccountData{Login},
-        Password      => $MailAccount->{Password} || $MailAccountData{Password},
-        Host          => $MailAccount->{Host} || $MailAccountData{Host},
-        Type          => $MailAccount->{Type} || $MailAccountData{Type},
-        IMAPFolder    => $MailAccount->{IMAPFolder} || $MailAccountData{IMAPFolder},
-        ValidID       => $MailAccount->{ValidID} || $MailAccountData{ValidID},
-        DispatchingBy => $MailAccount->{DispatchingBy} || $MailAccountData{DispatchingBy},
-        QueueID       => $MailAccount->{QueueID} || $MailAccountData{QueueID},
-        Trusted       => exists $MailAccount->{Trusted} ? $MailAccount->{Trusted} : $MailAccountData{Trusted},
-        Comment       => exists $MailAccount->{Comment} ? $MailAccount->{Comment} : $MailAccountData{Comment},
-        UserID        => $Self->{Authorization}->{UserID},
+        ID               => $Param{Data}->{MailAccountID},
+        Login            => $MailAccount->{Login} || $MailAccountData{Login},
+        Password         => $MailAccount->{Password} || $MailAccountData{Password},
+        OAuth2_ProfileID => exists $MailAccount->{OAuth2_ProfileID} ? $MailAccount->{OAuth2_ProfileID} : $MailAccountData{OAuth2_ProfileID},
+        Host             => $MailAccount->{Host} || $MailAccountData{Host},
+        Type             => $MailAccount->{Type} || $MailAccountData{Type},
+        IMAPFolder       => $MailAccount->{IMAPFolder} || $MailAccountData{IMAPFolder},
+        ValidID          => $MailAccount->{ValidID} || $MailAccountData{ValidID},
+        DispatchingBy    => $MailAccount->{DispatchingBy} || $MailAccountData{DispatchingBy},
+        QueueID          => $MailAccount->{QueueID} || $MailAccountData{QueueID},
+        Trusted          => exists $MailAccount->{Trusted} ? $MailAccount->{Trusted} : $MailAccountData{Trusted},
+        Comment          => exists $MailAccount->{Comment} ? $MailAccount->{Comment} : $MailAccountData{Comment},
+        UserID           => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -207,7 +218,7 @@ sub Run {
 
         if ( !$Success ) {
             my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
-                Type => 'error', 
+                Type => 'error',
                 What => 'Message',
             );
             return $Self->_Error(

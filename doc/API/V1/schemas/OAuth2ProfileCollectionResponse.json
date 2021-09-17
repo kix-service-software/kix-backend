@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "OAuth2ProfileCollectionResponse.json",
+  "type": "object",
+  "description": "A list of oauth2 profiles.",
+  "properties": {
+    "Profile": {
+      "type": "array",
+      "items": {
+        "$ref": "OAuth2Profile.json"
+      }
+    }
+  },
+  "required": [
+    "Profile"
+  ]
+}

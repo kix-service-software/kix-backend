@@ -621,12 +621,15 @@ sub MacroExecute {
     $BackendObject->{ObjectID}     = $Param{ObjectID};
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
 
+    my $CacheType = Digest::MD5::md5_hex(
+        ($Self->{JobID} ? $Self->{JobID} : '') . '::' .
+        ($Self->{RunID} ? $Self->{RunID} : '') . '::' .
+        $Self->{MacroID}
+    );
+
     # clear result variable cache
     $Kernel::OM->Get('Cache')->CleanUp(
-        Type => Digest::MD5::md5_hex(
-            ($Self->{JobID} ? $Self->{JobID} : '')
-            .'::'.($Self->{RunID} ? $Self->{RunID} : '')
-            .'::'.$Self->{MacroID})
+        Type => $CacheType
     );
 
     my $Success = $BackendObject->Run(
@@ -640,10 +643,7 @@ sub MacroExecute {
 
     # remove result variable cache
     $Kernel::OM->Get('Cache')->CleanUp(
-        Type => Digest::MD5::md5_hex(
-            ($Self->{JobID} ? $Self->{JobID} : '')
-            .'::'.($Self->{RunID} ? $Self->{RunID} : '')
-            .'::'.$Self->{MacroID})
+        Type => $CacheType
     );
 
     # remove IDs from log reference
@@ -710,6 +710,66 @@ sub _LoadMacroTypeBackend {
     }
 
     return $Self->{MacroTypeModules}->{$Param{Name}};
+}
+
+=item MacroLogList()
+
+returns a list of all logs items for a given macro
+
+    my @Logs = $AutomationObject->MacroLogList(
+        MacroID => 123
+    );
+
+=cut
+
+sub MacroLogList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(MacroID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # create cache key
+    my $CacheKey = 'MacroLogList::' . $Param{MacroID};
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+        SQL  => 'SELECT id, job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by FROM automation_log WHERE macro_id = ?',
+        Bind => [ \$Param{MacroID} ]
+    );
+
+    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+        Columns => [ 'ID', 'JobID', 'RunID', 'MacroID', 'MacroActionID', 'ObjectID', 'Priority', 'Message', 'CreateTime', 'CreateBy' ],
+    );
+
+    # data found...
+    my @Result;
+    if ( IsArrayRefWithData($Data) ) {
+        @Result = @{$Data};
+    }
+
+    # set cache
+    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \@Result,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return @Result;
 }
 
 1;

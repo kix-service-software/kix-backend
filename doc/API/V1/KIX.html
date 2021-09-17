@@ -28931,6 +28931,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "OAuth2_ProfileID" : {
+               "description" : "The ID of the oauth2 profile to use if type is kind of &#39;OAuth2&#39;.",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "QueueID" : {
                "description" : "The ID of the queue to dispatch to if DispatchingBy is &#39;Queue&#39;.",
                "type" : "integer",
@@ -29057,7 +29062,6 @@ pre code {
             "DispatchingBy",
             "Host",
             "Login",
-            "Password",
             "Type"
          ]
       }
@@ -29249,6 +29253,11 @@ pre code {
             },
             "Login" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "OAuth2_ProfileID" : {
+               "description" : "The ID of the oauth2 profile to use if type is kind of &#39;OAuth2&#39;.",
+               "type" : "integer",
                "readOnly" : true
             },
             "QueueID" : {
@@ -36593,7 +36602,729 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_logs__logfileid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_logs__logfileid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_objecticons" class="panel-title">[System] Object Icons</h3></div><div class="panel-body"><div class="top-resource-description"><p><strong>Please note</strong></p><p>The content is base64 encoded.</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_objecticons" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/objecticons</span> <span class="methods"><a href="#system_objecticons_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_objecticons_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_objecticons_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/objecticons</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_objecticons_get_request" data-toggle="tab">Request</a></li><li><a href="#system_objecticons_get_response" data-toggle="tab">Response</a></li><li><a href="#system_objecticons_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_objecticons_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_objecticons_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_objecticons_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="system_logs__logfileid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_logs__logfileid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_oauth2_authcode" class="panel-title">[System] OAuth2 - Authorization Code & State</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_oauth2_authcode" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/oauth2/authcode</span> <span class="methods"><a href="#system_oauth2_authcode_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_oauth2_authcode_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/oauth2/authcode</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_oauth2_authcode_post_request" data-toggle="tab">Request</a></li><li><a href="#system_oauth2_authcode_post_response" data-toggle="tab">Response</a></li><li><a href="#system_oauth2_authcode_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_oauth2_authcode_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2AuthCodePostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2AuthCodePostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The oauth2 authcode request object for code authorization.",
+   "type" : "object",
+   "properties" : {
+      "ProfileAuth" : {
+         "type" : "object",
+         "properties" : {
+            "Code" : {
+               "description" : "Authorization code provided by the authorization response.",
+               "type" : "string"
+            },
+            "State" : {
+               "description" : "State of the authorization request.",
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Code",
+            "State"
+         ]
+      }
+   },
+   "required" : [
+      "ProfileAuth"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ProfileAuth": {
+        "Code": "iLjCNtwdbGTF3WyBuJPeT3uJA8njrQEi",
+        "State": "mrgMqBWueEKYufTcLgQXeCYLzxHw6695"
+    }
+}</code></pre></div></div><div class="tab-pane" id="system_oauth2_authcode_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_authcode_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The OAuth2AuthCode has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2AuthCodePostResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2AuthCodePostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the authorized oauth2 profile.",
+   "type" : "object",
+   "properties" : {
+      "ProfileID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ProfileID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ProfileID": 42
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_authcode_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_authcode_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_oauth2_authcode_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_authcode_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_oauth2_profiles" class="panel-title">[System] OAuth2 - Profiles</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_oauth2_profiles" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/oauth2/profiles</span> <span class="methods"><a href="#system_oauth2_profiles_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_oauth2_profiles_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_oauth2_profiles_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/oauth2/profiles</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_oauth2_profiles_get_request" data-toggle="tab">Request</a></li><li><a href="#system_oauth2_profiles_get_response" data-toggle="tab">Response</a></li><li><a href="#system_oauth2_profiles_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_oauth2_profiles_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_oauth2_profiles_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2ProfileCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2ProfileCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of oauth2 profiles.",
+   "type" : "object",
+   "properties" : {
+      "Profile" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_OAuth2Profile_json"
+         }
+      }
+   },
+   "required" : [
+      "Profile"
+   ],
+   "definitions" : {
+      "_OAuth2Profile_json" : {
+         "$id" : "OAuth2Profile.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The oauth2 profile object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClientID" : {
+               "description" : "ID of the OAuth2 client.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HasAccessToken" : {
+               "description" : "Shows if profile has a valid access token (1 = yes, 0 = no).",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Scope" : {
+               "description" : "Scope to request for the OAuth2 token.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLAuth" : {
+               "description" : "Base URL for the OAuth2 authorization.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLRedirect" : {
+               "description" : "Base URL for redirects after OAuth2 authorization.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLToken" : {
+               "description" : "Base URL for requesting OAuth2 token.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "ClientID",
+            "CreateBy",
+            "CreateTime",
+            "HasAccessToken",
+            "ID",
+            "Name",
+            "Scope",
+            "URLAuth",
+            "URLToken",
+            "URLRedirect",
+            "ValidID"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Profile": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2019-05-29 13:13:09",
+            "ClientID": "id of client",
+            "CreateBy": 1,
+            "CreateTime": "2018-01-03 14:47:10",
+            "HasAccessToken": 0,
+            "ID": 2,
+            "Name": "OAuth2 Profile",
+            "Scope": "scope to request for access token",
+            "URLAuth": "https://authorization-server.com/auth",
+            "URLRedirect": "https://localhost/authcode",
+            "URLToken": "https://authorization-server.com/token",
+            "ValidID": 1
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_oauth2_profiles_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_oauth2_profiles_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/oauth2/profiles</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_oauth2_profiles_post_request" data-toggle="tab">Request</a></li><li><a href="#system_oauth2_profiles_post_response" data-toggle="tab">Response</a></li><li><a href="#system_oauth2_profiles_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_oauth2_profiles_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2ProfilePostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2ProfilePostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The oauth2 profile request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Profile" : {
+         "type" : "object",
+         "properties" : {
+            "ClientID" : {
+               "description" : "ID of the OAuth2 client.",
+               "type" : "string"
+            },
+            "ClientSecret" : {
+               "description" : "Secret of the OAuth2 client.",
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Scope" : {
+               "description" : "Scope to request for the OAuth2 token.",
+               "type" : "string"
+            },
+            "URLAuth" : {
+               "description" : "Base URL for the OAuth2 authorization.",
+               "type" : "string"
+            },
+            "URLRedirect" : {
+               "description" : "Base URL for redirects after OAuth2 authorization.",
+               "type" : "string"
+            },
+            "URLToken" : {
+               "description" : "Base URL for requesting OAuth2 token.",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ClientID",
+            "ClientSecret",
+            "Name",
+            "Scope",
+            "URLAuth",
+            "URLToken",
+            "URLRedirect",
+            "ValidID"
+         ]
+      }
+   },
+   "required" : [
+      "Profile"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Profile": {
+        "ClientID": "id of client",
+        "ClientSecret": "secret of client",
+        "Name": "OAuth2 Profile",
+        "Scope": "scope to request for access token",
+        "URLAuth": "https://authorization-server.com/auth",
+        "URLRedirect": "https://localhost/authcode",
+        "URLToken": "https://authorization-server.com/token",
+        "ValidID": 1
+    }
+}</code></pre></div></div><div class="tab-pane" id="system_oauth2_profiles_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The OAuth2Profile has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2ProfilePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2ProfilePostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created or updated oauth2 profile.",
+   "type" : "object",
+   "properties" : {
+      "ProfileID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ProfileID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ProfileID": 42
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_oauth2_profiles_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_oauth2_profiles__profileid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/oauth2/profiles</span><span class="uri">/{profileId}</span> <span class="methods"><a href="#system_oauth2_profiles__profileid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_oauth2_profiles__profileid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_oauth2_profiles__profileid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_oauth2_profiles__profileid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/oauth2/profiles</span><span class="uri">/{profileId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_oauth2_profiles__profileid__get_request" data-toggle="tab">Request</a></li><li><a href="#system_oauth2_profiles__profileid__get_response" data-toggle="tab">Response</a></li><li><a href="#system_oauth2_profiles__profileid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_oauth2_profiles__profileid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">profileId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_oauth2_profiles__profileid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2ProfileResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2ProfileResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a oauth2 profile GET request.",
+   "type" : "object",
+   "properties" : {
+      "Profile" : {
+         "$ref" : "#/definitions/_OAuth2Profile_json"
+      }
+   },
+   "required" : [
+      "Profile"
+   ],
+   "definitions" : {
+      "_OAuth2Profile_json" : {
+         "$id" : "OAuth2Profile.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The oauth2 profile object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClientID" : {
+               "description" : "ID of the OAuth2 client.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HasAccessToken" : {
+               "description" : "Shows if profile has a valid access token (1 = yes, 0 = no).",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Scope" : {
+               "description" : "Scope to request for the OAuth2 token.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLAuth" : {
+               "description" : "Base URL for the OAuth2 authorization.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLRedirect" : {
+               "description" : "Base URL for redirects after OAuth2 authorization.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLToken" : {
+               "description" : "Base URL for requesting OAuth2 token.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "ClientID",
+            "CreateBy",
+            "CreateTime",
+            "HasAccessToken",
+            "ID",
+            "Name",
+            "Scope",
+            "URLAuth",
+            "URLToken",
+            "URLRedirect",
+            "ValidID"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Profile": {
+        "ChangeBy": 1,
+        "ChangeTime": "2019-05-29 13:13:09",
+        "ClientID": "id of client",
+        "CreateBy": 1,
+        "CreateTime": "2018-01-03 14:47:10",
+        "HasAccessToken": 0,
+        "ID": 2,
+        "Name": "OAuth2 Profile",
+        "Scope": "scope to request for access token",
+        "URLAuth": "https://authorization-server.com/auth",
+        "URLRedirect": "https://localhost/authcode",
+        "URLToken": "https://authorization-server.com/token",
+        "ValidID": 1
+    }
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles__profileid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_oauth2_profiles__profileid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_oauth2_profiles__profileid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/oauth2/profiles</span><span class="uri">/{profileId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_oauth2_profiles__profileid__patch_request" data-toggle="tab">Request</a></li><li><a href="#system_oauth2_profiles__profileid__patch_response" data-toggle="tab">Response</a></li><li><a href="#system_oauth2_profiles__profileid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_oauth2_profiles__profileid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">profileId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2ProfilePatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2ProfilePatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The oauth2 profile request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Profile" : {
+         "type" : "object",
+         "properties" : {
+            "ClientID" : {
+               "description" : "ID of the OAuth2 client.",
+               "type" : "string"
+            },
+            "ClientSecret" : {
+               "description" : "Secret of the OAuth2 client.",
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Scope" : {
+               "description" : "Scope to request for the OAuth2 token.",
+               "type" : "string"
+            },
+            "URLAuth" : {
+               "description" : "Base URL for the OAuth2 authorization.",
+               "type" : "string"
+            },
+            "URLRedirect" : {
+               "description" : "Base URL for redirects after OAuth2 authorization.",
+               "type" : "string"
+            },
+            "URLToken" : {
+               "description" : "Base URL for requesting OAuth2 token.",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "Profile"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Profile": {
+        "Name": "New OAuth2 profile name",
+        "ValidID": 2
+    }
+}</code></pre></div></div><div class="tab-pane" id="system_oauth2_profiles__profileid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2ProfilePostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2ProfilePostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created or updated oauth2 profile.",
+   "type" : "object",
+   "properties" : {
+      "ProfileID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ProfileID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ProfileID": 42
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles__profileid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles__profileid__patch_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles__profileid__patch_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_oauth2_profiles__profileid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_oauth2_profiles__profileid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/oauth2/profiles</span><span class="uri">/{profileId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_oauth2_profiles__profileid__delete_request" data-toggle="tab">Request</a></li><li><a href="#system_oauth2_profiles__profileid__delete_response" data-toggle="tab">Response</a></li><li><a href="#system_oauth2_profiles__profileid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_oauth2_profiles__profileid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">profileId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="system_oauth2_profiles__profileid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="system_oauth2_profiles__profileid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles__profileid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_oauth2_profiles__profileid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_oauth2_profiles__profileid__authurl" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/oauth2/profiles/{profileId}</span><span class="uri">/authurl</span> <span class="methods"><a href="#system_oauth2_profiles__profileid__authurl_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_oauth2_profiles__profileid__authurl_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/oauth2/profiles/{profileId}</span><span class="uri">/authurl</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_oauth2_profiles__profileid__authurl_get_request" data-toggle="tab">Request</a></li><li><a href="#system_oauth2_profiles__profileid__authurl_get_response" data-toggle="tab">Response</a></li><li><a href="#system_oauth2_profiles__profileid__authurl_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_oauth2_profiles__profileid__authurl_get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">profileId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_oauth2_profiles__profileid__authurl_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__authurl_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: OAuth2ProfileAuthURLResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "OAuth2ProfileAuthURLResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A url for authorization of an oauth2 profile.",
+   "type" : "object",
+   "properties" : {
+      "AuthURL" : {
+         "type" : "string"
+      }
+   },
+   "required" : [
+      "AuthURL"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "AuthURL": "https://authorization-server.com/auth?state=mrgMqBWueEKYufTcLgQXeCYLzxHw6695"
+}</code></pre></div></div><h2 class="response-title" id="system_oauth2_profiles__profileid__authurl_get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_oauth2_profiles__profileid__authurl_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_oauth2_profiles__profileid__authurl_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_objecticons" class="panel-title">[System] Object Icons</h3></div><div class="panel-body"><div class="top-resource-description"><p><strong>Please note</strong></p><p>The content is base64 encoded.</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_objecticons" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/objecticons</span> <span class="methods"><a href="#system_objecticons_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_objecticons_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_objecticons_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/objecticons</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_objecticons_get_request" data-toggle="tab">Request</a></li><li><a href="#system_objecticons_get_response" data-toggle="tab">Response</a></li><li><a href="#system_objecticons_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_objecticons_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_objecticons_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_objecticons_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectIconCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "ObjectIconCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of object icons.",
@@ -45312,4 +46043,4 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#auth">Authentication</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#faq">FAQ</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#links">Links</a></li><li><a class="nav-resource" href="#organisations">Organisations</a></li><li><a class="nav-resource" href="#reporting">Reporting</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#tickets">Tickets</a></li><li><a class="nav-resource" href="#watchers">Watchers</a></li><li><a class="nav-resource" href="#system_automation">[System] Automation</a></li><li><a class="nav-resource" href="#system_cmdb">[System] CMDB</a></li><li><a class="nav-resource" href="#system_communication_channels">[System] Communication - Channels</a></li><li><a class="nav-resource" href="#system_communication_mailaccounts">[System] Communication - Mail Accounts</a></li><li><a class="nav-resource" href="#system_communication_mailfilters">[System] Communication - Mail Filters</a></li><li><a class="nav-resource" href="#system_communication_notifications">[System] Communication - Notifications</a></li><li><a class="nav-resource" href="#system_communication_sendertypes">[System] Communication - Sender Types</a></li><li><a class="nav-resource" href="#system_communication_systemaddresses">[System] Communication - System Addresses</a></li><li><a class="nav-resource" href="#system_config">[System] Config</a></li><li><a class="nav-resource" href="#system_console">[System] Console Command</a></li><li><a class="nav-resource" href="#system_faq">[System] FAQ</a></li><li><a class="nav-resource" href="#system_i18n">[System] i18n</a></li><li><a class="nav-resource" href="#system_importexport">[System] ImportExport</a></li><li><a class="nav-resource" href="#system_generalcatalog">[System] General Catalog</a></li><li><a class="nav-resource" href="#system_logs">[System] Logs</a></li><li><a class="nav-resource" href="#system_objecticons">[System] Object Icons</a></li><li><a class="nav-resource" href="#system_roles">[System] Roles & Permissions</a></li><li><a class="nav-resource" href="#system_sessions">[System] Sessions</a></li><li><a class="nav-resource" href="#system_textmodules">[System] Text Modules</a></li><li><a class="nav-resource" href="#system_ticket_locks">[System] Ticket Locks</a></li><li><a class="nav-resource" href="#system_ticket_priorities">[System] Ticket Priorities</a></li><li><a class="nav-resource" href="#system_ticket_queues">[System] Ticket Queues</a></li><li><a class="nav-resource" href="#system_ticket_states">[System] Ticket States</a></li><li><a class="nav-resource" href="#system_ticket_types">[System] Ticket Types</a></li><li><a class="nav-resource" href="#system_users">[System] Users</a></li><li><a class="nav-resource" href="#system_valid">[System] Valid</a></li></ul></div></div></div></div></body></html>
+}</code></pre></div></div></div><div class="tab-pane" id="system_valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#auth">Authentication</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#faq">FAQ</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#links">Links</a></li><li><a class="nav-resource" href="#organisations">Organisations</a></li><li><a class="nav-resource" href="#reporting">Reporting</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#tickets">Tickets</a></li><li><a class="nav-resource" href="#watchers">Watchers</a></li><li><a class="nav-resource" href="#system_automation">[System] Automation</a></li><li><a class="nav-resource" href="#system_cmdb">[System] CMDB</a></li><li><a class="nav-resource" href="#system_communication_channels">[System] Communication - Channels</a></li><li><a class="nav-resource" href="#system_communication_mailaccounts">[System] Communication - Mail Accounts</a></li><li><a class="nav-resource" href="#system_communication_mailfilters">[System] Communication - Mail Filters</a></li><li><a class="nav-resource" href="#system_communication_notifications">[System] Communication - Notifications</a></li><li><a class="nav-resource" href="#system_communication_sendertypes">[System] Communication - Sender Types</a></li><li><a class="nav-resource" href="#system_communication_systemaddresses">[System] Communication - System Addresses</a></li><li><a class="nav-resource" href="#system_config">[System] Config</a></li><li><a class="nav-resource" href="#system_console">[System] Console Command</a></li><li><a class="nav-resource" href="#system_faq">[System] FAQ</a></li><li><a class="nav-resource" href="#system_i18n">[System] i18n</a></li><li><a class="nav-resource" href="#system_importexport">[System] ImportExport</a></li><li><a class="nav-resource" href="#system_generalcatalog">[System] General Catalog</a></li><li><a class="nav-resource" href="#system_logs">[System] Logs</a></li><li><a class="nav-resource" href="#system_oauth2_authcode">[System] OAuth2 - Authorization Code & State</a></li><li><a class="nav-resource" href="#system_oauth2_profiles">[System] OAuth2 - Profiles</a></li><li><a class="nav-resource" href="#system_objecticons">[System] Object Icons</a></li><li><a class="nav-resource" href="#system_roles">[System] Roles & Permissions</a></li><li><a class="nav-resource" href="#system_sessions">[System] Sessions</a></li><li><a class="nav-resource" href="#system_textmodules">[System] Text Modules</a></li><li><a class="nav-resource" href="#system_ticket_locks">[System] Ticket Locks</a></li><li><a class="nav-resource" href="#system_ticket_priorities">[System] Ticket Priorities</a></li><li><a class="nav-resource" href="#system_ticket_queues">[System] Ticket Queues</a></li><li><a class="nav-resource" href="#system_ticket_states">[System] Ticket States</a></li><li><a class="nav-resource" href="#system_ticket_types">[System] Ticket Types</a></li><li><a class="nav-resource" href="#system_users">[System] Users</a></li><li><a class="nav-resource" href="#system_valid">[System] Valid</a></li></ul></div></div></div></div></body></html>
