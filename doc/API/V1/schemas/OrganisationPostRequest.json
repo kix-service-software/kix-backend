@@ -1,54 +1,96 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "OrganisationPostRequest.json",
-  "type": "object",
-  "description": "The organisation request object for creation.",
-  "properties": {
-    "Organisation": {
-      "type": "object",
-      "properties": {
-        "City": {
-          "type": "string"
-        },
-        "Comment": {
-          "type": "string"
-        },
-        "Country": {
-          "type": "string"
-        },
-        "DynamicFields": {
-          "type": "array",
-          "description": "list of dynamic field values to be set",
-          "items": {
-            "$ref": "DynamicFieldValueSetItem.json"
-          }
-        },
-        "Number": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Street": {
-          "type": "string"
-        },
-        "Url": {
-          "type": "string"
-        },
-        "ValidID": {
-          "type": "integer"
-        },
-        "Zip": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "Name",
-        "Number"
-      ]
-    }
-  },
-  "required": [
-    "Organisation"
-  ]
+   "$id" : "OrganisationPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The organisation request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Organisation" : {
+         "type" : "object",
+         "properties" : {
+            "City" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "Country" : {
+               "type" : "string"
+            },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Number" : {
+               "type" : "string"
+            },
+            "Street" : {
+               "type" : "string"
+            },
+            "Url" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            },
+            "Zip" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Name",
+            "Number"
+         ]
+      }
+   },
+   "required" : [
+      "Organisation"
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }

@@ -1,14 +1,39 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "TicketArticleAttachmentPostRequest.json",
-  "type": "object",
-  "description": "The ticket article attachment request object for creation.",
-  "properties": {
-    "Attachment": {
-      "$ref": "TicketArticleAttachmentPostItem.json"
-    }
-  },
-  "required": [
-    "Attachment"
-  ]
+   "$id" : "TicketArticleAttachmentPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ticket article attachment request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Attachment" : {
+         "$ref" : "#/definitions/_TicketArticleAttachmentPostItem_json"
+      }
+   },
+   "required" : [
+      "Attachment"
+   ],
+   "definitions" : {
+      "_TicketArticleAttachmentPostItem_json" : {
+         "$id" : "TicketArticleAttachmentPostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article attachment object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "base63 encoded file content",
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "Filename" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Content",
+            "ContentType",
+            "Filename"
+         ]
+      }
+   }
 }

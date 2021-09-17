@@ -1,14 +1,14 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "TicketArticlePostPatchResponse.json",
-    "type": "object",
-    "description": "The ID of the created or updated ticket article.",
-    "properties": {
-        "ArticleID": {
-            "type": "integer"
-        }
-    },
-    "required": [
-        "ArticleID"
-    ]
+   "$id" : "TicketArticlePostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created or updated ticket article.",
+   "type" : "object",
+   "properties" : {
+      "ArticleID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ArticleID"
+   ]
 }

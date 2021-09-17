@@ -1,14 +1,70 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "PriorityResponse.json",
-  "type": "object",
-  "description": "A response for a priority GET request.",
-  "properties": {
-    "Priority": {
-      "$ref": "Priority.json"
-    }
-  },
-  "required": [
-    "Priority"
-  ]
+   "$id" : "PriorityResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a priority GET request.",
+   "type" : "object",
+   "properties" : {
+      "Priority" : {
+         "$ref" : "#/definitions/_Priority_json"
+      }
+   },
+   "required" : [
+      "Priority"
+   ],
+   "definitions" : {
+      "_Priority_json" : {
+         "$id" : "Priority.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The priority object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
 }

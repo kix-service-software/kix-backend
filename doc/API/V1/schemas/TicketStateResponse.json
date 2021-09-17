@@ -1,14 +1,74 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "TicketStateResponse.json",
-  "type": "object",
-  "description": "A response for a ticket state GET request.",
-  "properties": {
-    "TicketState": {
-      "$ref": "TicketState.json"
-    }
-  },
-  "required": [
-    "TicketState"
-  ]
+   "$id" : "TicketStateResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a ticket state GET request.",
+   "type" : "object",
+   "properties" : {
+      "TicketState" : {
+         "$ref" : "#/definitions/_TicketState_json"
+      }
+   },
+   "required" : [
+      "TicketState"
+   ],
+   "definitions" : {
+      "_TicketState_json" : {
+         "$id" : "TicketState.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket state object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "TypeID",
+            "ValidID"
+         ]
+      }
+   }
 }

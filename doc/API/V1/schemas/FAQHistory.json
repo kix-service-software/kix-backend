@@ -1,28 +1,28 @@
 {
-   "$schema": "http://json-schema.org/draft-07/schema",
-   "$id": "FAQHistory.json",
-   "type": "object",
-   "description": "The FAQ history object.",
-   "properties": {
-      "ArticleID": {
-         "type": "integer",
-         "readOnly": true
+   "$id" : "FAQHistory.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The FAQ history object.",
+   "type" : "object",
+   "properties" : {
+      "ArticleID" : {
+         "type" : "integer",
+         "readOnly" : true
       },
-      "Created": {
-         "type": "string",
-         "readOnly": true
+      "Created" : {
+         "type" : "string",
+         "readOnly" : true
       },
-      "CreatedBy": {
-         "type": "integer",
-         "readOnly": true
+      "CreatedBy" : {
+         "type" : "integer",
+         "readOnly" : true
       },
-      "ID": {
-         "type": "integer",
-         "readOnly": true
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
       },
-      "Name": {
-         "type": "string",
-         "readOnly": true
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
       }
    },
    "required" : [

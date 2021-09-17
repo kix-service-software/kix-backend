@@ -1,34 +1,34 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "UserPatchRequest.json",
-  "type": "object",
-  "description": "The user request object for update.",
-  "properties": {
-    "User": {
-      "type": "object",
-      "properties": {
-        "IsAgent": {
-          "type": "integer"
-        },
-        "IsCustomer": {
-          "type": "integer"
-        },
-        "UserComment": {
-          "type": "string"
-        },
-        "UserLogin": {
-          "type": "string"
-        },
-        "UserPw": {
-          "type": "string"
-        },
-        "ValidID": {
-          "type": "integer"
-        }
+   "$id" : "UserPatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The user request object for update.",
+   "type" : "object",
+   "properties" : {
+      "User" : {
+         "type" : "object",
+         "properties" : {
+            "IsAgent" : {
+               "type" : "integer"
+            },
+            "IsCustomer" : {
+               "type" : "integer"
+            },
+            "UserComment" : {
+               "type" : "string"
+            },
+            "UserLogin" : {
+               "type" : "string"
+            },
+            "UserPw" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
       }
-    }
-  },
-  "required": [
-    "User"
-  ]
+   },
+   "required" : [
+      "User"
+   ]
 }

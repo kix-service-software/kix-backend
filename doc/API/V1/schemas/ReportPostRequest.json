@@ -1,40 +1,40 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "ReportPostRequest.json",
-    "type": "object",
-    "description": "The report definition request object for creation.",
-    "properties": {
-        "Report": {
-            "type": "object",
-            "properties": {
-                "DefinitionID": {
-                    "type": "integer"
-                },
-                "Config": {
-                    "type": "object",
-                    "properties": {
-                        "Parameters": {
-                            "type": "object"
-                        },
-                        "OutputFormats": {
-                            "type": "array",
-                            "item": {
-                                "type:": "string"
-                            }
-                        }
-                    },
-                    "required": [
-                        "OutputFormats"
-                    ]
-                }
+   "$id" : "ReportPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The report definition request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Report" : {
+         "type" : "object",
+         "properties" : {
+            "Config" : {
+               "type" : "object",
+               "properties" : {
+                  "OutputFormats" : {
+                     "type" : "array",
+                     "item" : {
+                        "type:" : "string"
+                     }
+                  },
+                  "Parameters" : {
+                     "type" : "object"
+                  }
+               },
+               "required" : [
+                  "OutputFormats"
+               ]
             },
-            "required": [
-                "DefinitionID",
-                "Config"
-            ]
-        }
-    },
-    "required": [
-        "Report"
-    ]
+            "DefinitionID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "DefinitionID",
+            "Config"
+         ]
+      }
+   },
+   "required" : [
+      "Report"
+   ]
 }

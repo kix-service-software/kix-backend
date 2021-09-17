@@ -1,17 +1,84 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "PermissionCollectionResponse.json",
-  "type": "object",
-  "description": "A list of permissions.",
-  "properties": {
-    "Permission": {
-      "type": "array",
-      "items": {
-        "$ref": "Permission.json"
+   "$id" : "PermissionCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of permissions.",
+   "type" : "object",
+   "properties" : {
+      "Permission" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_Permission_json"
+         }
       }
-    }
-  },
-  "required": [
-    "Permission"
-  ]  
+   },
+   "required" : [
+      "Permission"
+   ],
+   "definitions" : {
+      "_Permission_json" : {
+         "$id" : "Permission.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The permission object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IsRequired" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Target" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "description" : "bitmask, please see documentation for bit descriptions",
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Target",
+            "Value"
+         ]
+      }
+   }
 }

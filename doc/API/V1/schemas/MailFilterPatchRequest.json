@@ -1,72 +1,72 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "MailFilterPatchRequest.json",
-  "type": "object",
-  "description": "The mail filter request object for update.",
-  "properties": {
-    "MailFilter": {
-      "type": "object",
-      "properties": {
-        "Comment": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Match": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "Key": {
-                "type": "string",
-                "description": "relevant email or x-kix header"
-              },
-              "Value": {
-                "type": "string",
-                "description": "value of header, regular expression is possible"
-              },
-              "Not": {
-                "type": "integer",
-                "description": "to negate value"
-              }
+   "$id" : "MailFilterPatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The mail filter request object for update.",
+   "type" : "object",
+   "properties" : {
+      "MailFilter" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
             },
-            "required": [
-              "Key",
-              "Value"
-            ]
-          }
-        },
-        "Set": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "Key": {
-                "type": "string",
-                "description": "relevant x-kix header"
-              },
-              "Value": {
-                "type": "string",
-                "description": "value for header"
-              }
+            "Match" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Key" : {
+                        "description" : "relevant email or x-kix header",
+                        "type" : "string"
+                     },
+                     "Not" : {
+                        "description" : "to negate value",
+                        "type" : "integer"
+                     },
+                     "Value" : {
+                        "description" : "value of header, regular expression is possible",
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Key",
+                     "Value"
+                  ]
+               }
             },
-            "required": [
-              "Key",
-              "Value"
-            ]
-          }
-        },
-        "StopAfterMatch": {
-          "type": "integer"
-        },
-        "ValidID": {
-          "type": "integer"
-        }  
+            "Name" : {
+               "type" : "string"
+            },
+            "Set" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object",
+                  "properties" : {
+                     "Key" : {
+                        "description" : "relevant x-kix header",
+                        "type" : "string"
+                     },
+                     "Value" : {
+                        "description" : "value for header",
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "Key",
+                     "Value"
+                  ]
+               }
+            },
+            "StopAfterMatch" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
       }
-    }
-  },
-  "required": [
-    "MailFilter"
-  ]
+   },
+   "required" : [
+      "MailFilter"
+   ]
 }

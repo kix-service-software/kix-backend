@@ -1,59 +1,101 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "TicketPatchRequest.json",
-  "type": "object",
-  "description": "The ticket request object for update.",
-  "properties": {
-    "Ticket": {
-      "type": "object",
-      "properties": {
-        "ContactID": {
-          "type": "integer"
-        },
-        "DynamicFields": {
-          "type": "array",
-          "description": "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
-          "items": {
-            "$ref": "DynamicFieldValueSetItem.json"
-          }
-        },
-        "LockID": {
-          "type": "integer"
-        },
-        "OrganisationID": {
-          "type": "integer"
-        },
-        "OwnerID": {
-          "type": "integer"
-        },
-        "PendingTime": {
-          "type": "string"
-        },
-        "PriorityID": {
-          "type": "integer"
-        },
-        "QueueID": {
-          "type": "integer"
-        },
-        "ResponsibleID": {
-          "type": "integer"
-        },
-        "ServiceID": {
-          "type": "integer"
-        },
-        "StateID": {
-          "type": "integer"
-        },
-        "Title": {
-          "type": "string"
-        },
-        "TypeID": {
-          "type": "integer"
-        }
+   "$id" : "TicketPatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ticket request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Ticket" : {
+         "type" : "object",
+         "properties" : {
+            "ContactID" : {
+               "type" : "integer"
+            },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
+            "LockID" : {
+               "type" : "integer"
+            },
+            "OrganisationID" : {
+               "type" : "integer"
+            },
+            "OwnerID" : {
+               "type" : "integer"
+            },
+            "PendingTime" : {
+               "type" : "string"
+            },
+            "PriorityID" : {
+               "type" : "integer"
+            },
+            "QueueID" : {
+               "type" : "integer"
+            },
+            "ResponsibleID" : {
+               "type" : "integer"
+            },
+            "ServiceID" : {
+               "type" : "integer"
+            },
+            "StateID" : {
+               "type" : "integer"
+            },
+            "Title" : {
+               "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            }
+         }
       }
-    }
-  },
-  "required": [
-    "Ticket"
-  ]
+   },
+   "required" : [
+      "Ticket"
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }

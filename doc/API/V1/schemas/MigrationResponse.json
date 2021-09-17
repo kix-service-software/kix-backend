@@ -1,14 +1,60 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "MigrationResponse.json",
-  "type": "object",
-  "description": "A response for a migration GET request.",
-  "properties": {
-    "Migration": {
-      "$ref": "Migration.json"
-    }
-  },
-  "required": [
-    "Migration"
-  ]
+   "$id" : "MigrationResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a migration GET request.",
+   "type" : "object",
+   "properties" : {
+      "Migration" : {
+         "$ref" : "#/definitions/_Migration_json"
+      }
+   },
+   "required" : [
+      "Migration"
+   ],
+   "definitions" : {
+      "_Migration_json" : {
+         "$id" : "MigrationState.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The migration state object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "State" : {
+               "description" : "The content depends on the source of the migration.",
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "anyOf" : [
+                        {
+                           "type" : "object"
+                        },
+                        {
+                           "type" : "array"
+                        },
+                        {
+                           "type" : "string"
+                        },
+                        {
+                           "type" : "number"
+                        }
+                     ],
+                     "readOnly" : true
+                  }
+               },
+               "readOnly" : true
+            },
+            "Status" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Status"
+         ]
+      }
+   }
 }
