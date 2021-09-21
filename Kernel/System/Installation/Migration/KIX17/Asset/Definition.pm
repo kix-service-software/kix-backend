@@ -254,6 +254,9 @@ sub _MigrateBaselineReference {
     return \%Result;
 }
 
+# needed for definition eval
+sub Translatable { return @_ }
+
 1;
 
 =back
