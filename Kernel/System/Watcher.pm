@@ -61,7 +61,7 @@ sub new {
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
 
-    my $BackendList = $Kernel::OM->Get('Config')->{'Watcher::Backend'};
+    my $BackendList = $Kernel::OM->Get('Config')->Get('Watcher::Backend');
 
     # load backends
     foreach my $Backend ( sort keys %{$BackendList} ) {
@@ -259,9 +259,9 @@ sub WatcherAdd {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $WatcherID = $Row[0];
     }
-
+    
     # check if we have a backend for this object type and execute it
-    if ( $Self->{Backends}->{$Param{Object}} ) {
+    if ( $Self->{Backends}->{$Param{Object}} ) {                
         my$BackendResult = $Self->{Backends}->{$Param{Object}}->WatcherAdd(
             %Param, 
             WatcherID => $WatcherID
