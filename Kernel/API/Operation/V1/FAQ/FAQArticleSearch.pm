@@ -100,7 +100,7 @@ sub Run {
 
     my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
     my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
-    my @ArticleIDs;
+    my $ArticleIDs;
 
     # prepare search (dynamic fields are possible)
     my %FAQDFSearch;
@@ -187,33 +187,33 @@ sub Run {
                 }
             }
 
-            if ( !@ArticleIDs ) {
-                @ArticleIDs = @SearchTypeResult;
+            if ( !defined $ArticleIDs ) {
+                $ArticleIDs = \@SearchTypeResult;
             } else {
 
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search
-                @ArticleIDs = $Self->_GetCombinedList(
+                $ArticleIDs = $Self->_GetCombinedList(
                     ListA => \@SearchTypeResult,
-                    ListB => \@ArticleIDs
+                    ListB => $ArticleIDs
                 );
             }
         }
     } else {
 
         # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
-        @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
+        $ArticleIDs = [ $Kernel::OM->Get('FAQ')->FAQSearch(
             UserID   => $Self->{Authorization}->{UserID},
             Limit   => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
             ValidIDs => \@ValidIDs,
 
             # use ids of customer if given
             ArticleIDs => $CustomerFAQIDList
-        );
+        ) ];
     }
 
     # get already prepared FAQ data from FAQArticleGet operation
-    if (@ArticleIDs) {
+    if (IsArrayRefWithData($ArticleIDs) ) {
 
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
@@ -222,7 +222,7 @@ sub Run {
             OperationType            => 'V1::FAQ::FAQArticleGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                FAQArticleID => join( ',', sort @ArticleIDs ),
+                FAQArticleID => join( ',', sort @{$ArticleIDs} ),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
@@ -256,7 +256,7 @@ sub _GetCombinedList {
         $Union{$E}++ && $Isect{$E}++
     }
 
-    return $Param{Union} ? keys %Union : keys %Isect;
+    return $Param{Union} ? [ keys %Union ] : [ keys %Isect ];
 }
 
 1;

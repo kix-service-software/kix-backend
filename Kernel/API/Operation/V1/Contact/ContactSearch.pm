@@ -80,7 +80,7 @@ perform ContactSearch Operation. This will return a Contact ID list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    my %ContactList;
+    my $ContactList;
 
     # TODO: filter search - currently not all properties are possible
     my %ContactSearch;
@@ -171,33 +171,33 @@ sub Run {
                 }
             }
 
-            if ( !%ContactList ) {
-                %ContactList = %SearchTypeResult;
+            if ( !defined $ContactList ) {
+                $ContactList = \%SearchTypeResult;
             }
             else {
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search
-                foreach my $Key ( keys %ContactList ) {
-                    delete $ContactList{$Key} if !exists $SearchTypeResult{$Key};
+                foreach my $Key ( keys %{$ContactList} ) {
+                    delete $ContactList->{$Key} if !exists $SearchTypeResult{$Key};
                 }
             }
         }
     }
     else {
         # get contact list
-        %ContactList = $Kernel::OM->Get('Contact')->ContactList(
+        $ContactList = { $Kernel::OM->Get('Contact')->ContactList(
             Valid => 0
-        );
+        ) };
     }
 
-    if ( IsHashRefWithData( \%ContactList ) ) {
+    if ( IsHashRefWithData( $ContactList ) ) {
 
         # get already prepared Contact data from ContactGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Contact::ContactGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                ContactID => join( ',', sort keys %ContactList ),
+                ContactID => join( ',', sort keys %{$ContactList} ),
                 }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
