@@ -133,7 +133,6 @@ sub Search {
         }
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLJoin, 'LEFT OUTER JOIN '.$ArticleSearchTable.' art_left ON st.id = art_left.ticket_id' );
-            push( @SQLJoin, 'RIGHT OUTER JOIN '.$ArticleSearchTable.' art_right ON st.id = art_right.ticket_id' );
         } else {
             push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
         }
@@ -164,7 +163,6 @@ sub Search {
 
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLWhere, 'art_left.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
-            push( @SQLWhere, 'art_right.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
         } else {
             push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
         }
@@ -196,7 +194,6 @@ sub Search {
 
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLWhere, 'art_left.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
-            push( @SQLWhere, 'art_right.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
         } else {
             push( @SQLWhere, 'art.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
         }
@@ -240,19 +237,7 @@ sub Search {
                 $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art_left.customer_visible = 1)';
             }
             push( @SQLWhere, $FieldQuery );
-            
-            @Where = $Self->_prepareField(
-                Field          => 'art_right.' . $Field,
-                FieldValue     => $FieldValue,
-                IsStaticSearch => $IsStaticSearch
-            );
-            
-            $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
-            if ( $Param{UserType} eq 'Customer' ) {
-                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art_right.customer_visible = 1)';
-            }
 
-            push( @SQLWhere, $FieldQuery );
         } else {
             my @Where = $Self->_prepareField(
                 Field          => 'art.' . $Field,
