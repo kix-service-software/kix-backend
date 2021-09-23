@@ -318,6 +318,43 @@ sub EditFieldRender {
 
 }
 
+=item GetCacheDependencies()
+
+returns a list of cache dependencies.
+
+    my $Dependencies = $BackendObject->GetCacheDependencies(
+        DynamicFieldConfig => $DynamicFieldConfig      # complete config of the DynamicField
+    );
+
+    Returns
+
+    $Dependencies = [
+        CacheTypeA,
+        CacheTypeB
+    ]
+
+=cut
+
+sub GetCacheDependencies {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_CheckParams(%Param);
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    # call GetCacheDependencies on the specific backend
+    return $Self->{$DynamicFieldBackend}->GetCacheDependencies(%Param);
+}
+
 =item DisplayValueRender()
 
 creates value and title strings to be used in display masks. Supports HTML output
