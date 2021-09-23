@@ -104,6 +104,14 @@ sub SetPreferences {
         Type => $Self->{CacheType},
     );
 
+    # TODO: find another solution to delete caches depending on user language
+    # trigger special cache delete for cached transaltions/localisation
+    if ( $Param{Key} eq 'UserLanguage' ) {
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => 'UserLanguage',
+        );
+    }
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
@@ -204,6 +212,14 @@ sub DeletePreferences {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+
+    # TODO: find another solution to delete caches depending on user language
+    # trigger special cache delete for cached transaltions/localisation
+    if ( $Param{Key} eq 'UserLanguage' ) {
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => 'UserLanguage',
+        );
+    }
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(

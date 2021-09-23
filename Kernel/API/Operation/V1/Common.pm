@@ -3796,6 +3796,24 @@ sub _GetPrepareDynamicFieldValue {
         }
     }
 
+    # set language in layout object
+    my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+        UserID => $Self->{Authorization}->{UserID},
+    );
+    $Kernel::OM->ObjectParamAdd(
+        'Output::HTML::Layout' => {
+            UserLanguage => $Language,
+        },
+    );
+
+    # add cache dependencies
+    my $Dependencies = $Kernel::OM->Get('DynamicField::Backend')->GetCacheDependencies(
+        DynamicFieldConfig => $Param{Config}
+    );
+    if ( IsArrayRefWithData($Dependencies) ) {
+        $Self->AddCacheDependency(Type => join( ',', @{$Dependencies} ));
+    }
+
     # get prepared value
     my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
         DynamicFieldConfig => $Param{Config},
