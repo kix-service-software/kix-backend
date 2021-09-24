@@ -25,6 +25,7 @@
     </TableCreate>
 
     <TableCreate Name="oauth2_token">
+        <Column Name="id"          Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
         <Column Name="profile_id"  Required="true" Type="INTEGER"/>
         <Column Name="token_type"  Required="true" Type="VARCHAR" Size="20"/>
         <Column Name="token"       Required="true" Type="VARCHAR" Size="1800000"/>
