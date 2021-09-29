@@ -81,6 +81,11 @@ sub ParameterDefinition {
     my %BackendList = $Kernel::OM->Get('MailAccount')->MailAccountBackendList();
     my @Types = sort keys %BackendList;
 
+    my %ProfileList = $Kernel::OM->Get('OAuth2')->ProfileList(
+        Valid  => 1,
+    );
+    my @Profiles = sort keys %ProfileList;
+
     return {
         'MailAccount' => {
             Type     => 'HASH',
@@ -88,9 +93,13 @@ sub ParameterDefinition {
         },
         'MailAccount::Login' => {
             Required => 1
-        },            
+        },
         'MailAccount::Password' => {
-            Required => 1
+            RequiresValueIfUsed => 1
+        },
+        'MailAccount::OAuth2_ProfileID' => {
+            RequiresValueIfUsed => 1,
+            OneOf               => \@Profiles,
         },
         'MailAccount::Host' => {
             Required => 1
@@ -105,14 +114,14 @@ sub ParameterDefinition {
                 'Queue',
                 'From'
             ]
-        },            
+        },
         'MailAccount::Trusted' => {
             RequiresValueIfUsed => 1,
-            OneOf => [
+            OneOf               => [
                 0,
                 1
             ]
-        },            
+        },
     }
 }
 
@@ -139,7 +148,7 @@ perform MailAccountCreate Operation. This will return the created MailAccountID.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             MailAccountID  => '',                         # ID of the created MailAccount
@@ -160,22 +169,45 @@ sub Run {
         return $Self->_Error(
             Code    => 'BadRequest',
             Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
-        );        
+        );
+    }
+
+    # check for oauth2 type and profile
+    if (
+        $MailAccount->{Type}
+        && $MailAccount->{Type} =~ m/_OAuth2$/xmsi
+    ) {
+        if ( !$MailAccount->{OAuth2_ProfileID} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "A Profile is required if Type is kind of 'OAuth2'",
+            );
+        }
+    }
+    # check for password
+    else {
+        if ( !$MailAccount->{Password} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "A Password is required if Type is not kind of 'OAuth2'",
+            );
+        }
     }
 
     # create MailAccount
     my $MailAccountID = $Kernel::OM->Get('MailAccount')->MailAccountAdd(
-        Login         => $MailAccount->{Login},
-        Password      => $MailAccount->{Password},
-        Host          => $MailAccount->{Host},
-        Type          => $MailAccount->{Type},
-        IMAPFolder    => $MailAccount->{IMAPFolder} || '',
-        ValidID       => $MailAccount->{ValidID} || 1,
-        Trusted       => $MailAccount->{Trusted} || 0,
-        DispatchingBy => $MailAccount->{DispatchingBy},
-        QueueID       => $MailAccount->{QueueID} || '',
-        Comment       => $MailAccount->{Comment} || '',
-        UserID        => $Self->{Authorization}->{UserID},
+        Login            => $MailAccount->{Login},
+        Password         => $MailAccount->{Password},
+        OAuth2_ProfileID => $MailAccount->{OAuth2_ProfileID},
+        Host             => $MailAccount->{Host},
+        Type             => $MailAccount->{Type},
+        IMAPFolder       => $MailAccount->{IMAPFolder} || '',
+        ValidID          => $MailAccount->{ValidID} || 1,
+        Trusted          => $MailAccount->{Trusted} || 0,
+        DispatchingBy    => $MailAccount->{DispatchingBy},
+        QueueID          => $MailAccount->{QueueID} || '',
+        Comment          => $MailAccount->{Comment} || '',
+        UserID           => $Self->{Authorization}->{UserID},
     );
 
     if ( !$MailAccountID ) {
@@ -184,12 +216,12 @@ sub Run {
             Message => 'Could not create MailAccount, please contact the system administrator',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         MailAccountID => $MailAccountID,
-    );    
+    );
 }
 
 

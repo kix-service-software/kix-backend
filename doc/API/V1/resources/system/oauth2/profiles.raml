@@ -1,0 +1,13 @@
+  displayName: "[System] OAuth2 - Profiles"
+  description: !include ../../../descriptions/resources/system/oauth2/profiles.md
+  type: { collection: { typeName: OAuth2Profile } }
+  /{profileId}:
+    type: { item: { typeName: OAuth2Profile } }
+    uriParameters:
+      profileId:
+        displayName: ProfileID
+        type: integer
+    /authurl:
+      description: !include ../../../descriptions/resources/system/oauth2/profiles/authurl.md
+      type: { item-readonly: { typeName: OAuth2ProfileAuthURL } }
+

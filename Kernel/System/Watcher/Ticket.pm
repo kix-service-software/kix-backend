@@ -100,6 +100,8 @@ sub WatcherAdd {
  
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
+    $TicketObject->_TicketCacheClear( TicketID => $Param{ObjectID} );
+
     # add history
     $TicketObject->HistoryAdd(
         TicketID     => $Param{ObjectID},
@@ -160,6 +162,8 @@ sub WatcherDelete {
     );
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
+
+    $TicketObject->_TicketCacheClear( TicketID => $Param{ObjectID} );
 
     $TicketObject->HistoryAdd(
         TicketID     => $Param{ObjectID},

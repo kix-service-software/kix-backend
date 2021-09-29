@@ -271,6 +271,12 @@ sub DisplayKeyRender {
     return $Self->DisplayValueRender(%Param);
 }
 
+sub GetCacheDependencies {
+    my ( $Self, %Param ) = @_;
+
+    return;
+}
+
 1;
 
 =back

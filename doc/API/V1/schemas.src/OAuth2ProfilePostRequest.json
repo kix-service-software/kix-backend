@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "OAuth2ProfilePostRequest.json",
+  "type": "object",
+  "description": "The oauth2 profile request object for creation.",
+  "properties": {
+    "Profile": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string",
+          "description": "ID of the OAuth2 client."
+        },
+        "ClientSecret": {
+          "type": "string",
+          "description": "Secret of the OAuth2 client."
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Scope": {
+          "type": "string",
+          "description": "Scope to request for the OAuth2 token."
+        },
+        "URLAuth": {
+          "type": "string",
+          "description": "Base URL for the OAuth2 authorization."
+        },
+        "URLToken": {
+          "type": "string",
+          "description": "Base URL for requesting OAuth2 token."
+        },
+        "URLRedirect": {
+          "type": "string",
+          "description": "Base URL for redirects after OAuth2 authorization."
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ClientID",
+        "ClientSecret",
+        "Name",
+        "Scope",
+        "URLAuth",
+        "URLToken",
+        "URLRedirect",
+        "ValidID"
+      ]
+    }
+  },
+  "required": [
+    "Profile"
+  ]
+}

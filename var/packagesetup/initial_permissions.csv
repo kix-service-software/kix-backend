@@ -160,7 +160,7 @@
 "Report User";"Resource";"/reporting/reportdefinitions/1";;"x";;;
 "Report User";"Resource";"/reporting/reportdefinitions/2";;"x";;;
 "Report User";"Object";"/reporting/reports{}";;;;;
-"Report User";"Object";"/reporting/reports/*{}";;;;;
+"Report User";"Object";"/reporting/reports/*{Report.DefinitionID GT 0}";;;;;
 "Report User";"Object";"/reporting/reports{Report.DefinitionID IN [1,2]}";"x";"x";;;
 "Report User";"Object";"/reporting/reports/*{Report.DefinitionID IN [1,2]}";;"x";;;
 "Report Manager";"Resource";"/reporting";"x";"x";"x";"x";

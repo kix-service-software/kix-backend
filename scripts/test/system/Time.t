@@ -19,6 +19,8 @@ use vars (qw($Self));
 # get needed objects
 my $ConfigObject = $Kernel::OM->Get('Config');
 
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
 # set time zone to get correct references
 $ENV{TZ} = 'Europe/Berlin';
 
@@ -835,6 +837,118 @@ for my $Test (@Tests) {
         $TimeStamp,
         $Test->{TimeStamp},
         " $Test->{Name} SystemTime2TimeStamp()",
+    );
+}
+
+# calculation tests
+$ENV{TZ} = 'UTC';
+@Tests = (
+    {
+        Name       => '+1Y',
+        TimeStamp  => '1970-01-01 00:00:00 +1Y',
+        Result     => '1971-01-01 00:00:00',
+    },
+    {
+        Name       => '+1M',
+        TimeStamp  => '1970-01-01 00:00:00 +1M',
+        Result     => '1970-02-01 00:00:00',
+    },
+    {
+        Name       => '+1w',
+        TimeStamp  => '1970-01-01 00:00:00 +1w',
+        Result     => '1970-01-08 00:00:00',
+    },
+    {
+        Name       => '+1d',
+        TimeStamp  => '1970-01-01 00:00:00 +1d',
+        Result     => '1970-01-02 00:00:00',
+    },
+    {
+        Name       => '+1h',
+        TimeStamp  => '1970-01-01 00:00:00 +1h',
+        Result     => '1970-01-01 01:00:00',
+    },
+    {
+        Name       => '+1m',
+        TimeStamp  => '1970-01-01 00:00:00 +1m',
+        Result     => '1970-01-01 00:01:00',
+    },
+    {
+        Name       => '+1s',
+        TimeStamp  => '1970-01-01 00:00:00 +1s',
+        Result     => '1970-01-01 00:00:01',
+    },
+    {
+        Name       => '-1Y',
+        TimeStamp  => '1970-01-01 00:00:00 -1Y',
+        Result     => '1969-01-01 00:00:00',
+    },
+    {
+        Name       => '-1M',
+        TimeStamp  => '1970-01-01 00:00:00 -1M',
+        Result     => '1969-12-01 00:00:00',
+    },
+    {
+        Name       => '-1w',
+        TimeStamp  => '1970-01-01 00:00:00 -1w',
+        Result     => '1969-12-25 00:00:00',
+    },
+    {
+        Name       => '-1d',
+        TimeStamp  => '1970-01-01 00:00:00 -1d',
+        Result     => '1969-12-31 00:00:00',
+    },
+    {
+        Name       => '-1h',
+        TimeStamp  => '1970-01-01 00:00:00 -1h',
+        Result     => '1969-12-31 23:00:00',
+    },
+    {
+        Name       => '-1m',
+        TimeStamp  => '1970-01-01 00:00:00 -1m',
+        Result     => '1969-12-31 23:59:00',
+    },
+    {
+        Name       => '-1s',
+        TimeStamp  => '1970-01-01 00:00:00 -1s',
+        Result     => '1969-12-31 23:59:59',
+    },
+    {
+        Name       => 'NOW +1h',
+        TimeStamp  => '+1h',
+        FixedTimeSet => '1970-01-01 00:00:00',
+        Result     => '1970-01-01 01:00:00',
+    },
+    {
+        Name       => '+1Y -2M +3w -4d +5h -6m +7s',
+        TimeStamp  => '1970-01-01 00:00:00 +1Y -2M +3w -4d +5h -6m +7s',
+        Result     => '1970-11-18 04:54:07',
+    },
+    {
+        Name       => '+1Y -2M +3w -4d +5h -6m +7s -1Y +2M -3w +4d -5h +6m -7s +188s',
+        TimeStamp  => '1970-01-01 00:00:00 +1Y -2M +3w -4d +5h -6m +7s -1Y +2M -3w +4d -5h +6m -7s +188s',
+        Result     => '1970-01-01 00:03:08',
+    },
+    {
+        Name       => '+188',
+        TimeStamp  => '1970-01-01 00:00:00 +188',
+        Result     => '1970-01-01 00:03:08',
+    },
+);
+
+for my $Test (@Tests) {
+    if ( $Test->{FixedTimeSet} ) {
+        $Helper->FixedTimeSet(
+            $TimeObject->TimeStamp2SystemTime( String => $Test->{FixedTimeSet} ),
+        );
+    }
+
+    my $SystemTime = $TimeObject->TimeStamp2SystemTime( String => $Test->{TimeStamp});
+    my $Result = $TimeObject->TimeStamp2SystemTime( String => $Test->{Result} );
+    $Self->Is(
+        $SystemTime,
+        $Result,
+        " $Test->{Name} TimeStamp2SystemTime()",
     );
 }
 

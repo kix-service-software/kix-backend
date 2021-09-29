@@ -97,7 +97,7 @@ sub Run {
         ) if (!IsArrayRefWithData($CustomerCIIDList));
     }
 
-    my @ConfigItemList;
+    my $ConfigItemList;
 
     # prepare search if given
     my %SearchParam;
@@ -193,8 +193,8 @@ sub Run {
                 @SearchTypeResult = @{$SearchResult};
             }
 
-            if ( !@ConfigItemList ) {
-                @ConfigItemList = @SearchTypeResult;
+            if ( !defined $ConfigItemList ) {
+                $ConfigItemList = \@SearchTypeResult;
             }
             else {
 
@@ -202,10 +202,10 @@ sub Run {
                 # remove all IDs from type result that we don't have in this search
                 my %SearchTypeResultHash = map { $_ => 1 } @SearchTypeResult;
                 my @Result;
-                foreach my $ConfigItemID ( @ConfigItemList ) {
+                foreach my $ConfigItemID ( @{$ConfigItemList} ) {
                     push(@Result, $ConfigItemID) if $SearchTypeResultHash{$ConfigItemID};
                 }
-                @ConfigItemList = @Result;
+                $ConfigItemList = \@Result;
             }
         }
     }
@@ -218,16 +218,16 @@ sub Run {
             # use ids of customer if given
             ConfigItemIDs => $CustomerCIIDList
         );
-        @ConfigItemList = @{$SearchResult};
+        $ConfigItemList = $SearchResult;
     }
 
     # get already prepared CI data from ConfigItemGet operation
-    if ( IsArrayRefWithData(\@ConfigItemList) ) {
+    if ( IsArrayRefWithData($ConfigItemList) ) {
 
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data      => {
-                ConfigItemID => join(',', sort @ConfigItemList),
+                ConfigItemID => join(',', sort @{$ConfigItemList}),
             }
         );
 

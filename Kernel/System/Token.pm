@@ -319,7 +319,7 @@ sub RemoveToken {
 
 returns the payload of a given token, adding LastRequestTime
 
-    my $Payload = $TokenObject->ValidateToken(
+    my $Payload = $TokenObject->ExtractToken(
         Token => '1234567890123456',
     );
 

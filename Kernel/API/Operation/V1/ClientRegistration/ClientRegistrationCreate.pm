@@ -250,11 +250,17 @@ sub Run {
             my $Content = MIME::Base64::decode_base64($Item->{Content});
                         
             # fire & forget, not result handling at the moment
-            my $Result = $Kernel::OM->Get('Translation')->ImportPO(
+            my ($CountTotal, $CountOK) = $Kernel::OM->Get('Translation')->ImportPO(
                 Language => $Item->{Language},
                 Content  => $Content,
                 UserID   => $Self->{Authorization}->{UserID},
             );
+            if ( defined $CountTotal ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "Imported $CountOK/$CountTotal \"$Item->{Language}\" translations from client \"$ClientRegistration->{ClientID}\".",
+                );
+            }
         }
     }
 

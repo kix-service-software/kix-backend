@@ -1697,6 +1697,28 @@ sub SetPreferences {
     return $PreferencesObject->SetPreferences(%Param);
 }
 
+=item GetUserLanguage()
+
+get user preferences
+
+    my $Language = $UserObject->GetUserLanguage(
+        UserID => 123,
+    );
+
+=cut
+
+sub GetUserLanguage {
+    my ( $Self, %Param ) = @_;
+
+    return if (!$Param{UserID});
+
+    my %Preferences = $Self->GetPreferences(
+        UserID => $Param{UserID},
+    );
+
+    return $Preferences{UserLanguage};
+}
+
 =item GetPreferences()
 
 get user preferences

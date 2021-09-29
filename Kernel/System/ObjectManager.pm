@@ -17,6 +17,7 @@ use Carp qw(carp confess);
 use Scalar::Util qw(weaken);
 
 use base qw(
+    Kernel::System::AsynchronousExecutor
     Kernel::System::PerfLog
 );
 
@@ -706,7 +707,11 @@ sub DESTROY {
     local $Kernel::OM = $Self;
 
     # send outstanding notifications to registered clients
-    $Self->Get('ClientRegistration')->NotificationSend();
+    $Self->AsyncCall(
+        ObjectName               => $Self->GetModuleFor('ClientRegistration'),
+        FunctionName             => 'NotificationSend',
+        MaximumParallelInstances => 1,
+    );
 
     # discard all objects
     $Self->ObjectsDiscard();

@@ -1695,10 +1695,31 @@ sub _ImportXMLDataMerge {
                 return if !$MergeOk;
             }
 
-            # When the data point is not part of the input definition,
+            # when the data point is not part of the input definition,
             # then do not overwrite the previous setting.
-            # False values are OK.
-            next COUNTER if !exists $Param{XMLData2D}->{$Key};
+            if (!exists $Param{XMLData2D}->{$Key}) {
+                if ( $Item->{Sub} ) {
+
+                    # if there is no (old) value and neither children - remove it and use position for next
+                    if (
+                        !IsArrayRefWithData($XMLData->{ $Item->{Key} }) ||
+                        !IsHashRefWithData($XMLData->{ $Item->{Key} }->[ $Counter - $Offset ])
+                    ) {
+                        # empty container added during sub-handling above - remove it
+                        splice(@{$XMLData->{ $Item->{Key} }}, ($Counter - $Offset), 1);
+                        $Offset++;
+                    }
+
+                    # if last counter and only positon 0 with "undef" is contained, remove it
+                    if (
+                        $Counter == $Item->{CountMax} && $XMLData->{ $Item->{Key} } &&
+                        scalar(@{$XMLData->{ $Item->{Key} }}) == 1
+                    ) {
+                        delete %{$XMLData}{ $Item->{Key} };
+                    }
+                }
+                next COUNTER;
+            }
 
             # handling if an empty field is imported
             if (!defined $Param{XMLData2D}->{$Key} || $Param{XMLData2D}->{$Key} eq '') {

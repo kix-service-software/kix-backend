@@ -16,6 +16,7 @@ use warnings;
 use Time::Local;
 use DateTime;
 use DateTime::TimeZone;
+use Date::Pcalc qw(Add_Delta_YMDHMS);
 
 use Kernel::System::VariableCheck qw( :all );
 
@@ -198,6 +199,22 @@ converts a given time stamp to local system time.
         String => '2004-08-14 22:45:00',
     );
 
+simple calculations using time units can be used to calculate a relative point in time. 
+supported units: Y(years),M(months),w(weeks),d(days),h(hours),m(minutes),s(seconds).
+
+    my $SystemTime = $TimeObject->TimeStamp2SystemTime(
+        String => '2004-08-14 22:45:00 +1w',
+    );
+
+    my $SystemTime = $TimeObject->TimeStamp2SystemTime(
+        String => '2004-08-14 22:45:00 -1w -2d +7h',
+    );
+
+if no timestamp is used in the calculation, the current system time will be used
+    my $SystemTime = $TimeObject->TimeStamp2SystemTime(
+        String => '+1w',
+    );
+
 =cut
 
 sub TimeStamp2SystemTime {
@@ -213,9 +230,21 @@ sub TimeStamp2SystemTime {
     }
 
     my $SystemTime = 0;
+    my $TimeStamp;
+
+    my @Parts = split(/\s+/, $Param{String});
+
+    if ( $Parts[0] !~ /^[+-]\d+[YMwdhms]?/ ) {
+        # we have a real timestamp
+        $TimeStamp = (shift @Parts) . ' ' . (shift @Parts);
+    }
+    else {
+        # we have to use NOW as TimeStamp
+        $TimeStamp = $Self->CurrentTimestamp();
+    }
 
     # match iso date format
-    if ( $Param{String} =~ /(\d{4})-(\d{1,2})-(\d{1,2})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/ ) {
+    if ( $TimeStamp =~ /(\d{4})-(\d{1,2})-(\d{1,2})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/ ) {
         $SystemTime = $Self->Date2SystemTime(
             Year   => $1,
             Month  => $2,
@@ -227,7 +256,7 @@ sub TimeStamp2SystemTime {
     }
 
     # match iso date format (wrong format)
-    elsif ( $Param{String} =~ /(\d{1,2})-(\d{1,2})-(\d{4})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/ ) {
+    elsif ( $TimeStamp =~ /(\d{1,2})-(\d{1,2})-(\d{4})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/ ) {
         $SystemTime = $Self->Date2SystemTime(
             Year   => $3,
             Month  => $2,
@@ -239,7 +268,7 @@ sub TimeStamp2SystemTime {
     }
 
     # match euro time format
-    elsif ( $Param{String} =~ /(\d{1,2})\.(\d{1,2})\.(\d{4})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/ ) {
+    elsif ( $TimeStamp =~ /(\d{1,2})\.(\d{1,2})\.(\d{4})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/ ) {
         $SystemTime = $Self->Date2SystemTime(
             Year   => $3,
             Month  => $2,
@@ -252,7 +281,7 @@ sub TimeStamp2SystemTime {
 
     # match yyyy-mm-ddThh:mm:ss+tt:zz time format
     elsif (
-        $Param{String}
+        $TimeStamp
         =~ /(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})(\+|\-)((\d{1,2}):(\d{1,2}))/i
         )
     {
@@ -268,7 +297,7 @@ sub TimeStamp2SystemTime {
 
     # match mail time format
     elsif (
-        $Param{String}
+        $TimeStamp
         =~ /((...),\s+|)(\d{1,2})\s(...)\s(\d{4})\s(\d{1,2}):(\d{1,2}):(\d{1,2})\s((\+|\-)(\d{2})(\d{2})|...)/
         )
     {
@@ -301,7 +330,7 @@ sub TimeStamp2SystemTime {
         ) + $DiffTime + $Self->{TimeSecDiff};
     }
     elsif (    # match yyyy-mm-ddThh:mm:ssZ
-        $Param{String} =~ /(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})Z$/
+        $TimeStamp =~ /(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})Z$/
         )
     {
         $SystemTime = $Self->Date2SystemTime(
@@ -319,6 +348,42 @@ sub TimeStamp2SystemTime {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid Date '$Param{String}'!",
+        );
+    }
+
+    # do calculations if we have to
+    if ( @Parts ) {
+        my %Diffs = map { $_ => 0 } qw(Y M w d h m s);
+        CALC:
+        foreach my $Calc ( @Parts ) {
+            if ( $Calc !~ /^([+-])(\d+)([YMwdhms])?$/ ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid timestamp calculation '$Calc'!",
+                );
+                next CALC;
+            }
+            my ( $Operator, $Diff, $Unit ) = ( $1, $2, $3 );
+            $Unit = 's' if !$Unit;
+
+            eval "\$Diffs{\$Unit} = $Diffs{$Unit} $Operator $Diff";
+        }
+
+        # add one year to the current timestamp
+        my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $Self->SystemTime2Date(
+            SystemTime => $SystemTime
+        );
+        ($Year,$Month,$Day, $Hour,$Min,$Sec) = Add_Delta_YMDHMS(
+            $Year,$Month,$Day,$Hour,$Min,$Sec, 
+            $Diffs{Y},$Diffs{M},$Diffs{w}*7 + $Diffs{d},$Diffs{h},$Diffs{m},$Diffs{s}
+        );
+        $SystemTime = $Self->Date2SystemTime(
+            Year   => $Year,
+            Month  => $Month,
+            Day    => $Day,
+            Hour   => $Hour,
+            Minute => $Min,
+            Second => $Sec,
         );
     }
 
