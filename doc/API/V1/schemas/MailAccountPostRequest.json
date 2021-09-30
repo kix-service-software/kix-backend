@@ -47,7 +47,6 @@
         "DispatchingBy",
         "Host",
         "Login",
-        "Password",
         "Type"
       ]
     }

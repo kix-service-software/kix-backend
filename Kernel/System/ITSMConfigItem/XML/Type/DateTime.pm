@@ -121,7 +121,18 @@ sub ExportSearchValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
-    return $Param{Value};
+
+    # convert the raw data to a system time format
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => $Param{Value},
+    );
+
+    # convert it back to a standard time stamp
+    my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $SystemTime,
+    );
+
+    return $TimeStamp;
 }
 
 =item ExportValuePrepare()

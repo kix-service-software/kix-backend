@@ -1,0 +1,12 @@
+{
+    "Profile": {
+        "ClientID": "id of client",
+        "ClientSecret": "secret of client",
+        "Name": "OAuth2 Profile",
+        "Scope": "scope to request for access token",
+        "URLAuth": "https://authorization-server.com/auth",
+        "URLRedirect": "https://localhost/authcode",
+        "URLToken": "https://authorization-server.com/token",
+        "ValidID": 1
+    }
+}

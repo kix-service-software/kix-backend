@@ -261,7 +261,7 @@
                 <Item Key="Module">Kernel::API::Validator::StateValidator</Item>
                 <Item Key="Validates">State,StateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(TicketStateGet|NotificationCreate|NotificationUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(TicketStateGet|NotificationCreate|NotificationUpdate|AuthCodeProcess)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -316,7 +316,7 @@
                 <Item Key="Module">Kernel::API::Validator::UserValidator</Item>
                 <Item Key="Validates">Owner,OwnerID,Responsible,ResponsibleID,UserID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(UserGet|NotificationCreate|NotificationUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(UserGet|NotificationCreate|NotificationUpdate|ConfigItemVersionCreate|ConfigItemCreate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

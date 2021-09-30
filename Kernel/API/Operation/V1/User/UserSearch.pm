@@ -94,7 +94,7 @@ perform UserSearch Operation. This will return a User ID list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    my %UserList;
+    my $UserList;
 
     # TODO: filter search - currently only UserLogin and Search are possible search parameter
     my %UserSearch;
@@ -200,31 +200,31 @@ sub Run {
                 }
             }
 
-            if ( !%UserList ) {
-                %UserList = %SearchTypeResult;
+            if ( !defined $UserList ) {
+                $UserList = \%SearchTypeResult;
             }
             else {
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search
-                foreach my $Key ( keys %UserList ) {
-                    delete $UserList{$Key} if !exists $SearchTypeResult{$Key};
+                foreach my $Key ( keys %{$UserList} ) {
+                    delete $UserList->{$Key} if !exists $SearchTypeResult{$Key};
                 }
             }
         }
     }
     else {
         # perform User search without any search params
-        %UserList = $Kernel::OM->Get('User')->UserList(
+        $UserList = { $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
             Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
             Valid => 0
-        );
+        ) };
     }
 
-    if (IsHashRefWithData(\%UserList)) {
+    if (IsHashRefWithData($UserList)) {
 
         # check requested permissions (AND combined)
-        my @GetUserIDs = sort keys %UserList;
+        my @GetUserIDs = sort keys %{$UserList};
         if( $Param{Data} && $Param{Data}->{requiredPermission} ) {
             my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission});
 

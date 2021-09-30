@@ -191,6 +191,7 @@ LogFile                                                                       = 
 MailAccount                                                                   = Kernel::System::MailAccount
 Main                                                                          = Kernel::System::Main
 NotificationEvent                                                             = Kernel::System::NotificationEvent
+OAuth2                                                                        = Kernel::System::OAuth2
 ObjectIcon                                                                    = Kernel::System::ObjectIcon
 ObjectManager                                                                 = Kernel::System::ObjectManager
 Organisation                                                                  = Kernel::System::Organisation

@@ -593,6 +593,17 @@ sub NotificationEvent {
 
 =item ReplacePlaceHolder()
     just a wrapper for external access to sub _Replace
+
+    my $ReplacedString = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+        RichText  => 0,                                         # if html qouting is needed
+        Text      => 'title of ticket: <KIX_TICKET_Title>',     # the relevant string to replace
+        Data      => {},                                        # some additional data some placeholder modules look into
+        UserID    => 1,
+        Translate => 0,                                         # optional - if not given 1 is used
+        TicketID  => 1,                                         # optional - used to replace ticket placeholders, else Data should be used
+        ReplaceNotFound => ''                                   # optional - string which is used if placeholder could not resolved - default is '-'
+    );
+
 =cut
 
 sub ReplacePlaceHolder {
@@ -606,7 +617,8 @@ sub ReplacePlaceHolder {
         }
     }
 
-    $Param{Translate} = $Param{Translate} // 1;
+    $Param{Translate} //= 1;
+    $Param{ReplaceNotFound} //= '-';
 
     if ( $Param{Translate} && (!defined $Param{Language} || !$Param{Language}) ) {
         $Param{Language}

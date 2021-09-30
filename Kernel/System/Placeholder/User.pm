@@ -68,7 +68,7 @@ sub _Replace {
     }
 
     # cleanup
-    $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # replace responsible placeholder
     $Tag  = $Self->{Start} . 'KIX_RESPONSIBLE_';
@@ -86,7 +86,7 @@ sub _Replace {
     }
 
     # cleanup
-    $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # replace current agent placeholders
     $Tag = $Self->{Start} . 'KIX_CURRENT_';
@@ -103,7 +103,7 @@ sub _Replace {
     }
 
     # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
+    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     return $Param{Text};
 }

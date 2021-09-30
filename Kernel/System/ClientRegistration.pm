@@ -206,6 +206,12 @@ sub ClientRegistrationAdd {
 
         return;
     }
+    else {
+        $Self->{LogObject}->Log(
+            Priority => 'info',
+            Message  => "Client \"$Param{ClientID}\" registered.",
+        );
+    }
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
@@ -291,6 +297,11 @@ sub ClientRegistrationDelete {
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM client_registration WHERE client_id = ?',
         Bind => [ \$Param{ClientID} ],
+    );
+
+    $Self->{LogObject}->Log(
+        Priority => 'info',
+        Message  => "Client registration for \"$Param{ClientID}\" deleted.",
     );
 
     # delete cache

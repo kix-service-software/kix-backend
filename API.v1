@@ -123,6 +123,13 @@
 /system/migration                                                                          | POST             | V1::Migration::MigrationCreate                   |
 /system/migration/:MigrationID                                                             | DELETE           | V1::Migration::MigrationDelete                   |
 /system/migration/:MigrationID                                                             | GET              | V1::Migration::MigrationGet                      |
+/system/oauth2/authcode                                                                    | POST             | V1::OAuth2::AuthCodeProcess                      |
+/system/oauth2/profiles                                                                    | GET              | V1::OAuth2::ProfileSearch                        |
+/system/oauth2/profiles                                                                    | POST             | V1::OAuth2::ProfileCreate                        |
+/system/oauth2/profiles/:ProfileID                                                         | DELETE           | V1::OAuth2::ProfileDelete                        |
+/system/oauth2/profiles/:ProfileID                                                         | GET              | V1::OAuth2::ProfileGet                           |
+/system/oauth2/profiles/:ProfileID                                                         | PATCH            | V1::OAuth2::ProfileUpdate                        |
+/system/oauth2/profiles/:ProfileID/authurl                                                 | GET              | V1::OAuth2::ProfileGetAuthURL                    |
 /system/objecticons                                                                        | GET              | V1::ObjectIcon::ObjectIconSearch                 |
 /system/objecticons                                                                        | POST             | V1::ObjectIcon::ObjectIconCreate                 |
 /system/objecticons/:ObjectIconID                                                          | DELETE           | V1::ObjectIcon::ObjectIconDelete                 |

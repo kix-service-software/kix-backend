@@ -375,14 +375,19 @@ sub MacroActionUpdate {
     }
 
     # set default value
-    $Param{Comment} ||= '';
+    $Param{Comment} //= $Param{Comment} || '';
+    $Param{MacroID} ||= $Data{MacroID};
+    $Param{Type}    ||= $Data{Type};
+    $Param{ValidID} ||= $Data{ValidID};
+    $Param{ResultVariables} //= $Data{ResultVariables};
+    $Param{Parameters}      //= $Data{Parameters};
 
     # check if update is required
     my $ChangeRequired;
     KEY:
     for my $Key ( qw(MacroID Type Parameters ResultVariables Comment ValidID) ) {
 
-        next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
+        next KEY if defined $Data{$Key} && defined $Param{Key} && $Data{$Key} eq $Param{$Key};
 
         $ChangeRequired = 1;
 
@@ -390,9 +395,6 @@ sub MacroActionUpdate {
     }
 
     return 1 if !$ChangeRequired;
-
-    $Param{MacroID} ||= $Data{MacroID};
-    $Param{Type} ||= $Data{Type};
 
     # prepare Parameters as JSON
     my $Parameters;
@@ -662,7 +664,8 @@ sub MacroActionExecute {
 
     my $Success = $BackendObject->Run(
         %Param,
-        Config => \%Parameters
+        MacroType  => $Macro{Type},
+        Config     => \%Parameters
     );
 
     if ( !$Success ) {
@@ -734,6 +737,9 @@ sub _LoadMacroActionTypeBackend {
             );
             return;
         }
+
+        # give the macro action backend module it's own config to work with
+        $BackendObject->{ModuleConfig} = $Backends->{$Param{Name}};
 
         $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} = $BackendObject;
     }

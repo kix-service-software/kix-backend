@@ -14,6 +14,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
@@ -53,24 +55,14 @@ sub Run {
             return $Self->ExitCodeError();
         }
 
-        my $Output = "$Option = ";
-
-        if ( ref($Value) eq 'ARRAY' ) {
-            for ( @{$Value} ) {
-                $Output .= "$_;";
-            }
-            $Output .= "\n";
-        }
-        elsif ( ref($Value) eq 'HASH' ) {
-            for my $SubKey ( sort keys %{$Value} ) {
-                $Output .= "$SubKey=$Value->{$SubKey};";
-            }
-            $Output .= "\n";
+        if ( IsHashRef($Value) || IsArrayRef($Value) ) {
+            my $Dump = $Kernel::OM->Get('Main')->Dump($Value);
+            $Dump =~ s/^(.*?) = //g;
+            print "$Option = ".$Dump;
         }
         else {
-            $Output .= $Value . "\n";
+            print "$Option = $Value\n";
         }
-        print $Output;
     }
 
     return $Self->ExitCodeOk();

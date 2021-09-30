@@ -289,9 +289,9 @@ sub _GetVisibleAttachments {
                 next if $RootHashKey eq 'TagKey' || !IsArrayRefWithData($RootHash->{$RootHashKey});
 
                 # get attribute definition 
-                my $AttrDef = $Self->_GetAttributeDefByKey(
-                    Key        => $RootHashKey,
-                    Definition => $Param{Definition},
+                my %AttrDef = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeDefByKey(
+                    Key           => $RootHashKey,
+                    XMLDefinition => $Param{Definition},
                 );
 
                 ARRAYITEM:
@@ -299,12 +299,12 @@ sub _GetVisibleAttachments {
                     next ARRAYITEM if !defined $ArrayItem || !IsHashRefWithData($ArrayItem);
 
                     # only attachments with content (AttachmentID) are relevant
-                    if ( $AttrDef->{Input}->{Type} && $AttrDef->{Input}->{Type} eq 'Attachment' && $ArrayItem->{Content}) {
-                        $VisibleAttachments{$ArrayItem->{Content}} = $AttrDef->{CustomerVisible} || 0;
+                    if ( $AttrDef{Input}->{Type} && $AttrDef{Input}->{Type} eq 'Attachment' && $ArrayItem->{Content}) {
+                        $VisibleAttachments{$ArrayItem->{Content}} = $AttrDef{CustomerVisible} || 0;
                     }
 
                     # look if we have a sub structure
-                    if ( $AttrDef->{Sub} ) {
+                    if ( $AttrDef{Sub} ) {
                         delete $ArrayItem->{TagKey};
 
                         # start recursion

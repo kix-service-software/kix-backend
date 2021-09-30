@@ -108,36 +108,8 @@ sub new {
         $Self->{UserTimeZone}   = '';
     }
 
-    # Determine the language to use based on the browser setting, if there
-    #   is none yet.
-    if ( !$Self->{UserLanguage} ) {
-        my @BrowserLanguages = split /\s*,\s*/, $Self->{Lang} || $ENV{HTTP_ACCEPT_LANGUAGE} || '';
-        my %Data = %{ $ConfigObject->Get('DefaultUsedLanguages') };
-        LANGUAGE:
-        for my $BrowserLang (@BrowserLanguages) {
-            for my $Language ( reverse sort keys %Data ) {
-
-                # check xx_XX and xx-XX type
-                my $LanguageOtherType = $Language;
-                $LanguageOtherType =~ s/_/-/;
-                if ( $BrowserLang =~ /^($Language|$LanguageOtherType)/i ) {
-                    $Self->{UserLanguage} = $Language;
-                    last LANGUAGE;
-                }
-            }
-            if ( !$Self->{UserLanguage} ) {
-                for my $Language ( reverse sort keys %Data ) {
-
-                    # If Browser requests 'vi', also offer 'vi_VI' even though we don't have 'vi'
-                    if ( $Language =~ m/^$BrowserLang/smxi ) {
-                        $Self->{UserLanguage} = $Language;
-                        last LANGUAGE;
-                    }
-                }
-            }
-        }
-        $Self->{UserLanguage} ||= $ConfigObject->Get('DefaultLanguage') || 'en';
-    }
+    # get user language if not already given.
+    $Self->{UserLanguage} ||= $ConfigObject->Get('DefaultLanguage') || 'de';
 
     # create language object
     if ( !$Self->{LanguageObject} ) {

@@ -65,7 +65,7 @@ sub GetSupportedAttributes {
             'CreatedQueueID',
             'CreatedPriorityID',
             'CloseTime',
-            'ChangeTime',            
+            'ChangeTime',
         ]
     };
 }
@@ -123,8 +123,20 @@ sub Search {
     if ( $Param{Search}->{Field} =~ /(Change|Close)Time/ ) {
 
         # convert to unix time
-        my $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $Param{Search}->{Value},
+        );
+
+        if ( !$SystemTime ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid search value \"$Param{Search}->{Value}\" for $Param{Search}->{Field}!",
+            );
+            return;
+        }
+
+        my $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $SystemTime,
         );
 
         my %OperatorMap = (
@@ -159,12 +171,12 @@ sub Search {
                     push( @SQLWhere, 'th_left.state_id IN ('.(join(', ', sort @List)).')' );
                     push( @SQLWhere, 'th_right.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th_right.state_id IN ('.(join(', ', sort @List)).')' );
-                    push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
-                    push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
+                    push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."'" );
+                    push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."'" );
                 } else {
                     push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)).')' );
-                    push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Param{Search}->{Value}."'" );
+                    push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."'" );
                 }
             }
         }
