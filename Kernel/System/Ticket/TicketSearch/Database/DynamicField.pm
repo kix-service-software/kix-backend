@@ -164,6 +164,7 @@ sub Search {
         if ( $Param{BoolOperator} eq 'OR') {
             if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
                 push( @SQLJoin, "LEFT OUTER JOIN article artdfjoin_left ON st.id = artdfjoin_left.ticket_id");
+                # FIXME: maybe unnecessary?
                 push( @SQLJoin, "RIGHT OUTER JOIN article artdfjoin_right ON st.id = artdfjoin_right.ticket_id");
                 $Self->{ModuleData}->{ArticleTableJoined} = 1;
             }

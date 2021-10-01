@@ -1284,6 +1284,13 @@ sub ValueLookup {
     return \@Keys;
 }
 
+sub GetCacheDependencies {
+    my ( $Self, %Param ) = @_;
+
+    # return "UserLanguage" because of prepared DF display values (localisation)
+    return ['UserLanguage'];
+}
+
 1;
 
 =back

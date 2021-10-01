@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-8-2 13:41+0000\n"
-"PO-Revision-Date: 2021-08-04 13:47+0000\n"
-"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
+"POT-Creation-Date: 2021-9-15 13:54+0000\n"
+"PO-Revision-Date: 2021-09-27 15:47+0000\n"
+"Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -1103,6 +1103,22 @@ msgstr ""
 msgid "Values"
 msgstr "Werte"
 
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "Assign a value to a macro variable."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "The value to assign."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "The variable to assign to."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
+msgid "Value"
+msgstr "Wert"
+
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
 "(Optional) The channel of the new article. \"note\" will be used if omitted."
@@ -1187,7 +1203,7 @@ msgstr "Bcc"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Body"
-msgstr "Nachrichteninhalt"
+msgstr "Artikeltext"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Cc"
@@ -1658,6 +1674,10 @@ msgstr "Baumauswahl anzeigen"
 msgid "Remove selection"
 msgstr "Auswahl entfernen"
 
+#. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
+msgid "%s rows"
+msgstr ""
+
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
 msgid "Maximum size is %s characters."
 msgstr "Maximale Länge ist %s Zeichen."
@@ -2007,6 +2027,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Enable API level caching."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid ""
+"Max allowed request size in bytes (overwrites default value (50MB) from "
+"provider config)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -2440,7 +2466,7 @@ msgstr "Der Name Ihres Unternehmens für die Verwendung im KIX-Mail-Header."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Conditional"
-msgstr "Bedingungen"
+msgstr "Bedingung"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2528,19 +2554,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines CI search pattern which is extracted from the ticket. Each regexp "
-"needs to return the search value in $1!. In ArticleCreate-Events only keys "
-"named like Article_* are considered (e.g. Article_Body), while "
-"TicketFreeText values are only considered in Ticketfreetext-Update events. "
-"However, you may define more than one Ticketfreetextfield for a regexp-"
-"match. In this case the different results are considered as different CI-"
-"searches, thus implementing some sort of OR (disjunction). If you want to "
-"use more than one regexp on a attribute just add a similar named key with "
-"the suffix _OR123 (see defaults)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines CI-attributes for CI-Classes which are not forwarded."
 msgstr ""
 
@@ -2590,6 +2603,19 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
+"Defines asset search pattern which is extracted from the ticket. Each regexp "
+"needs to return the search value in the first capture group - or the entire "
+"pattern. In ArticleCreate-Events only keys named like Article_* are "
+"considered (e.g. Article_Body), while dynamic field values are only "
+"considered in DF-Update events. However, you may define more than one "
+"dynamic field for a regexp-match. In this case the different results are "
+"considered as different CI-searches, thus implementing some sort of OR "
+"(disjunction). If you want to use more than one regexp on a attribute just "
+"add a similar named key with the suffix _OR123 (see defaults)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
 "Defines channel which are forwarded if added to tickets in Fwd-Queues (note-"
 "report will NOT be considered!)."
 msgstr ""
@@ -2625,12 +2651,6 @@ msgid ""
 "Defines if the previously valid token should be accepted for authentication. "
 "This is slightly less secure but gives users 30 seconds more time to enter "
 "their one-time password."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines in which CI-classes which attributes need to match the search "
-"pattern (comma separated)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2861,10 +2881,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the link type which is used for the link creation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Defines the log module for the system. \"File\" writes all messages in a "
 "given logfile, \"SysLog\" uses the syslog daemon of the system, e.g. syslogd."
@@ -3076,7 +3092,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Defines whether EventHandler runs only for the first article in a ticket."
+"Defines which attributes must match the found search patterns. Key contains "
+"a single asset class, e.g. 'Computer'. Value must contain multiple full "
+"attributes, e.g. 'SectionNetwork::NIC::IPAddress'. Multiple attributes must "
+"be separated by comma."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3216,6 +3235,18 @@ msgstr "Englisch"
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Event Based"
 msgstr "Eventgesteuert"
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"Event handler which extracts asset info from articles or dynamic fields, "
+"attempts to find assets in order to automatically append them to a ticket "
+"dynamic field. If \"FirstArticleOnly\" is active (1), only the first article "
+"of the ticket is evaluated. \"DynamicFieldName\" specifies to which dynamic "
+"field (of type AssetReference) found assets are appended. Use "
+"TicketAutoLinkConfigItem::CISearchPattern, TicketAutoLinkConfigItem::"
+"CISearchInClassesPerRecipient and TicketAutoLinkConfigItem::"
+"CISearchInClasses for more configuration."
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Excel"
@@ -3367,6 +3398,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
+"If any of the \"OAuth2\" mechanisms was selected as SendmailModule, the "
+"profile to use for OAuth2 must be specified."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
 "If any of the \"SMTP\" mechanisms was selected as SendmailModule, and "
 "authentication to the mail server is needed, a password must be specified."
 msgstr ""
@@ -3450,6 +3487,13 @@ msgid ""
 "If the automatically set state is a pending state, the pending offset time "
 "can be defined here (business minutes). Key must be the same as in "
 "NextStateSet."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"If the triggering articles to-address is defined as key, only those asset "
+"classes mentioned in value will be searched. Multiple asset classes must be "
+"separated by comma."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3546,7 +3590,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Loop"
-msgstr ""
+msgstr "Schleife"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3646,7 +3690,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Option"
-msgstr ""
+msgstr "Option"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Out Of Office Substitute"
@@ -3773,12 +3817,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Restricts CI-classes which are searched for certain article to-address "
-"(comma separated)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
 "Run file based generic agent jobs (Note: module name need needs to be "
 "specified in -configuration-module param e.g. \"Kernel::System::Automation"
 "\")."
@@ -3822,6 +3860,10 @@ msgstr ""
 msgid ""
 "Set Dynamic Field, which contains allocation for system monitoring "
 "acknowledge."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Set Variable"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4071,6 +4113,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Synchronisation"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Table"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -5688,12 +5734,6 @@ msgid ""
 "When tickets are merged, a note will be added automatically to the ticket "
 "which is no longer active. Here you can define the subject of this note "
 "(this subject cannot be changed by the agent)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Workflowmodule which links the ticket to related CIs - event handler "
-"supports only following events: ArticleCreate, TicketFreeTextUpdate."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

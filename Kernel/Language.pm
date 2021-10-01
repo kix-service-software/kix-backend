@@ -122,13 +122,13 @@ sub new {
     # set date format
     # date formats (%A=WeekDay;%B=LongMonth;%T=Time;%D=Day;%M=Month;%Y=Year;)
     if ($Self->{UserLanguage} =~ m/^de/) {
-        $Self->{DateFormat}          = '%D.%M.%Y %T';
+        $Self->{DateFormat}          = '%D.%M.%Y, %T';
         $Self->{DateFormatLong}      = '%T - %D.%M.%Y';
         $Self->{DateFormatShort}     = '%D.%M.%Y';
         $Self->{DateInputFormat}     = '%D.%M.%Y';
         $Self->{DateInputFormatLong} = '%D.%M.%Y - %T';
     } else {
-        $Self->{DateFormat}          = '%M/%D/%Y %T';
+        $Self->{DateFormat}          = '%M/%D/%Y, %T';
         $Self->{DateFormatLong}      = '%T - %M/%D/%Y';
         $Self->{DateFormatShort}     = '%M/%D/%Y';
         $Self->{DateInputFormat}     = '%M/%D/%Y';
@@ -325,11 +325,29 @@ sub FormatTimeString {
             SystemTime => $TimeStamp,
         );
 
+        # add AM/PM if necessary
+        # FIXME: use strftime from POSFIX with "$h:$m $p" or for "%r" long format
+        #   --> locally it does not "print" the AM/PM - so we use the following code for now
+        my $Part = '';
+        if ($Self->{UserLanguage} !~ m/^de/) {
+            if ($h >= 12) {
+                if ($h >= 12) {
+                    $h -= 12;
+                }
+                $Part = ' PM';
+            } else {
+                if ($h == 0) {
+                    $h = 12;
+                }
+                $Part = ' AM';
+            }
+        }
+
         if ($Short) {
-            $ReturnString =~ s/\%T/$h:$m/g;
+            $ReturnString =~ s/\%T/$h:$m$Part/g;
         }
         else {
-            $ReturnString =~ s/\%T/$h:$m:$s/g;
+            $ReturnString =~ s/\%T/$h:$m:$s$Part/g;
         }
         $ReturnString =~ s/\%D/$D/g;
         $ReturnString =~ s/\%M/$M/g;
