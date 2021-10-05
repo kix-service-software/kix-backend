@@ -66,6 +66,8 @@ sub new {
     $Self->{CacheType} = 'ClientRegistration';
 
     $Self->{DisableClientNotifications} = $Param{DisableClientNotifications};
+
+    $Self->{NotificationCount} = 0;
     
     return $Self;
 }
@@ -357,7 +359,25 @@ sub NotifyClients {
         NoStatsUpdate => 1,
     );
 
+    $Self->{NotificationCount}++;
+
     return 1;
+}
+
+=item NotificationCount()
+
+return the number of outstanding client notifications
+
+    my $Count = $ClientRegistrationObject->NotificationCount();
+
+=cut
+
+sub NotificationCount {
+    my ( $Self, %Param ) = @_;
+
+    return 0 if $Self->{DisableClientNotifications};
+
+    return $Self->{NotificationCount};
 }
 
 =item NotificationSend()
