@@ -16,7 +16,6 @@ Output::Template::Document                                                    = 
 Output::Template::Plugin                                                      = Kernel::Output::Template::Plugin
 Output::Template::Plugin::KIX                                                 = Kernel::Output::Template::Plugin::KIX
 Output::Template::Provider                                                    = Kernel::Output::Template::Provider
-AddressBook                                                                   = Kernel::System::AddressBook
 API::DebugLog                                                                 = Kernel::System::API::DebugLog
 API::Webservice                                                               = Kernel::System::API::Webservice
 API::WebserviceHistory                                                        = Kernel::System::API::WebserviceHistory
