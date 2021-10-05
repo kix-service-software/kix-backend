@@ -707,8 +707,8 @@ sub DESTROY {
     local $Kernel::OM = $Self;
 
     # send outstanding notifications to registered clients
-    if ( $Kernel::OM->Get('ClientRegistration')->NotificationCount() > 0) {
-        if ( $Kernel::OM->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
+    if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
+        if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
             $Self->AsyncCall(
                 ObjectName               => $Self->GetModuleFor('ClientRegistration'),
                 FunctionName             => 'NotificationSend',
@@ -716,7 +716,7 @@ sub DESTROY {
             );
         }
         else {
-            $Self->GetModuleFor('ClientRegistration')->NotificationSend();
+            $Self->Get('ClientRegistration')->NotificationSend();
         }
     }
 
