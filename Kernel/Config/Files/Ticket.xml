@@ -2973,17 +2973,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###AddToAddressBook" Required="0" Valid="1">
-        <Description Translatable="1">Creates a new address book entry if necessary.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::AddToAddressBook</Item>
-                <Item Key="Event">(ArticleCreate)</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###200-CreateFAQEntry" Required="0" Valid="0">
         <Description Translatable="1">Enables creation of a FAQ entry from currently created article.</Description>
         <Group>Ticket</Group>

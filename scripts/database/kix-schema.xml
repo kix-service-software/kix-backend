@@ -36,19 +36,6 @@
     <Column Name="change_time" Required="true" Type="DATE"/>
 </Table>
 
-<!-- addressbook - all email addresses used in communication and not contained in customer user backends -->
-<Table Name="addressbook">
-    <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
-    <Column Name="email" Required="true" Type="VARCHAR" Size="255"/>
-    <Column Name="email_lower" Required="true" Type="VARCHAR" Size="255"/>
-    <Index Name="addressbook_email">
-        <IndexColumn Name="email"/>
-    </Index>
-    <Index Name="addressbook_email_lower">
-        <IndexColumn Name="email_lower"/>
-    </Index>
-</Table>
-
 <!-- valid - all valid states -->
 <Table Name="valid">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
