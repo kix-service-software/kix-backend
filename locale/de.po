@@ -1264,8 +1264,8 @@ msgstr ""
 "Organisation an einem Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
-msgid "The ID or email of the contact to be set."
-msgstr "Die ID oder E-Mail Adresse des Kontakes, der gesetzt werden soll."
+msgid "The ID or email (or Login of the corresponding user) of the contact to be set."
+msgstr "Die ID oder E-Mail Adresse (oder Login des zugehörigen Nutzers) des Kontakes, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Append"
