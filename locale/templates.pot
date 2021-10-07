@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-10-1 05:48+0000\n"
+"POT-Creation-Date: 2021-10-7 05:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3852,10 +3852,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create new linked person on create new Article or Update Owner."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Creates a new address book entry if necessary."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
