@@ -1174,7 +1174,7 @@ msgid ""
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
-msgid "The ID or email of the contact to be set."
+msgid "The ID or email (or Login of the corresponding user) of the contact to be set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
