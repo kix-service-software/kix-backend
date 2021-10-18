@@ -971,6 +971,13 @@ sub ContactSearch {
     if ( $Param{Search} ) {
 
         my @Parts = split /\+/, $Param{Search}, 6;
+
+        # allow phone numbers with + (e.g. +49123456789*, also single leading * should be ingored)
+        if ($Param{Search} =~ m/^\*?\+/) {
+            $Parts[1] =  "+$Parts[1]";
+            shift(@Parts);
+        }
+
         for my $Part (@Parts) {
             $Part =~ s/\*/%/g;
             $Part =~ s/%%/%/g;
