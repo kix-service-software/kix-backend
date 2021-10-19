@@ -453,6 +453,11 @@ sub UserAdd {
         PW        => $Param{UserPw}
     );
 
+    # generate personal access token
+    $Self->TokenGenerate(
+        UserID => $UserID,
+    );
+
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
@@ -544,6 +549,17 @@ sub UserUpdate {
             PW        => $Param{UserPw}
         );
     }
+
+    # generate token, if it doen't exist
+    my %Preferences = $Self->GetPreferences(
+        UserID => $Param{UserID},
+    );
+    if (!IsHashRefWithData(\%Preferences) || !$Preferences{UserToken} ) {
+        $Self->TokenGenerate(
+            UserID => $Param{UserID},
+        );
+    };
+
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(

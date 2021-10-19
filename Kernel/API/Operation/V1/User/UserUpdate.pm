@@ -100,7 +100,11 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => [ 0, 1 ]
         },
-        }
+        'User::ExecGenerateToken' => {
+            RequiresValueIfUsed => 1,
+            OneOf => [ 0, 1 ]
+        },
+    }
 }
 
 =item Run()
@@ -175,6 +179,13 @@ sub Run {
     if ( !$Success ) {
         return $Self->_Error(
             Code => 'Object.UnableToUpdate',
+        );
+    }
+
+    # create access token
+    if ( $User->{ExecGenerateToken} ) {
+        my $Success = $Kernel::OM->Get('User')->TokenGenerate(
+            UserID => $UserData{UserID}
         );
     }
 
