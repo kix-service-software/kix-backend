@@ -166,6 +166,13 @@ sub Run {
         );
     }
 
+    # create access token
+    if ( $User->{ExecGenerateToken} ) {
+        my $Success = $Kernel::OM->Get('User')->TokenGenerate(
+            UserID => $Self->{Authorization}->{UserID}
+        );
+    }
+
     return $Self->_Success(
         UserID => $UserData{UserID},
     );
