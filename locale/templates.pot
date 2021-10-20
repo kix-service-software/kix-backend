@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-10-19 11:09+0000\n"
+"POT-Creation-Date: 2021-10-20 04:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2327,7 +2327,7 @@ msgid "Defines the forbidden file extensions for file uploads (attachments) as R
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the fully qualified domain name of the system. This setting is used as a variable, KIX_CONFIG_FQDN which is found in all forms of messaging used by the application, to build links to the tickets within your system."
+msgid "Defines the fully qualified domain names of the system. This setting is used as a variable, \"&lt;KIX_CONFIG_FQDN&gt;\" (refers to \"Frontend\" value) which is found in all forms of messaging used by the application, e.g. to build links to the tickets within your system."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
