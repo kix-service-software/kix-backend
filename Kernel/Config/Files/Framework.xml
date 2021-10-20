@@ -8688,12 +8688,26 @@ You can log in via the following URL:
     </ConfigItem>
 
     <!-- links for user manuals -->
+    <ConfigItem AccessLevel="internal" Name="KIX::SelfServiceManual" Required="0" Valid="1">
+        <Description Translatable="1">Link to the self service portal manual.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Manuals</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="de">https://docs.kixdesk.com/display/KSSPC/Einleitung</Item>
+                <Item Key="en">https://docs.kixdesk.com/kix18SelfServicePortalEN/manual/introduction</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="KIX::UserManual" Required="0" Valid="1">
         <Description Translatable="1">Link to the user manual.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
-            <String Regex="">https://kixdesk.com/dokumentation.html</String>
+            <Hash>
+                <Item Key="de">https://docs.kixdesk.com/display/K1ACU/Einleitung</Item>
+                <Item Key="en">https://docs.kixdesk.com/kix18UserManualEN/kix-start/introduction</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="KIX::AdminManual" Required="0" Valid="1">
@@ -8701,7 +8715,10 @@ You can log in via the following URL:
         <Group>Framework</Group>
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
-            <String Regex="">https://kixdesk.com/dokumentation.html</String>
+            <Hash>
+                <Item Key="de">https://docs.kixdesk.com/display/K1AD/Einleitung</Item>
+                <Item Key="en">https://docs.kixdesk.com/kix18AdminManualEN/kix-start/introduction</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 
