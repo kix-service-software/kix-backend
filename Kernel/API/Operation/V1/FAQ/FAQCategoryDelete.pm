@@ -11,8 +11,6 @@ package Kernel::API::Operation::V1::FAQ::FAQCategoryDelete;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
     Kernel::API::Operation::V1::FAQ::Common
 );
@@ -42,7 +40,7 @@ sub new {
     my ( $Type, %Param ) = @_;
 
     my $Self = {};
-    bless( $Self, $Type );
+    bless $Self, $Type;
 
     # check needed objects
     for my $Needed (qw( DebuggerObject WebserviceID )) {
@@ -106,37 +104,124 @@ perform FAQCategoryDelete Operation. This will return the deleted FAQCategoryID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # start loop
-    foreach my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
+    my $FAQObject = $Kernel::OM->Get('FAQ');
 
-        my @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
-            CategoryIDs => [ $FAQCategoryID ],
-            UserID      => $Self->{Authorization}->{UserID},
+    my $CategoryTree = $FAQObject->CategoryTreeList(
+        Valid  => 0,
+        UserID => $Self->{Authorization}->{UserID},
+    );
+
+    my %Checked    = ();
+    my $ArticleErr = 0;
+    my $DeleteErr  = 0;
+
+    for my $FAQCategoryID ( @{$Param{Data}->{FAQCategoryID}} ) {
+        next if !$CategoryTree->{$FAQCategoryID};
+
+        $Self->_CheckCategory(
+            ParentID => $FAQCategoryID,
+            Checked  => \%Checked
         );
 
-        if ( @ArticleIDs ) {
-            return $Self->_Error(
-                Code    => 'Object.DependingObjectExists',
-                Message => 'Cannot delete FAQCategory. At least one article is assigned to this category.',
-            );
+        if ( $Checked{$FAQCategoryID}->{ArticleErr} ) {
+            $ArticleErr = 1;
         }
-
-        # delete FAQCategory
-        my $Success = $Kernel::OM->Get('FAQ')->CategoryDelete(
-            CategoryID => $FAQCategoryID,
-            UserID     => $Self->{Authorization}->{UserID},
-        );
-
-        if ( !$Success ) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete FAQCategory, please contact the system administrator',
-            );
+        if ( $Checked{$FAQCategoryID}->{DeleteErr} ) {
+            $DeleteErr = 1;
         }
     }
 
     # return result
+    if ( $ArticleErr ) {
+        return $Self->_Error(
+            Code    => 'Object.DependingObjectExists',
+            Message => 'Cannot delete FAQCategory. At least one article is assigned to this category.'
+        );
+    }
+    elsif ( $DeleteErr ) {
+        return $Self->_Error(
+            Code    => 'Object.UnableToDelete',
+            Message => 'Could not delete FAQCategory, please contact the system administrator',
+        );
+    }
+
     return $Self->_Success();
+}
+
+sub _CheckCategory {
+    my ($Self, %Param) = @_;
+
+    my $FAQObject = $Kernel::OM->Get('FAQ');
+
+    return if !$Param{ParentID};
+    return if !$Param{Checked};
+    return if ref $Param{Checked} ne 'HASH';
+
+    my $ParentID = $Param{ParentID};
+
+    if ( $Param{Checked}->{$ParentID} ) {
+        return $Param{Checked}->{$ParentID};
+    }
+
+    $Param{Checked}->{$ParentID} = {
+        ArticleErr => 0,
+        DeleteErr  => 0
+    };
+
+    # get sub category list
+    my $CategoryIDs = $FAQObject->CategorySubCategoryIDList(
+        ParentID => $ParentID,
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+
+    my $ArticleErr = 0;
+    my $DeleteErr  = 0;
+    if ( scalar @{ $CategoryIDs } ) {
+        for my $ID ( @{ $CategoryIDs } ) {
+            $Self->_CheckCategory(
+                Checked  => $Param{Checked},
+                ParentID => $ID,
+            );
+
+            if ( $Param{Checked}->{$ID}->{ArticleErr} ) {
+                $ArticleErr = 1;
+            }
+            if ( $Param{Checked}->{$ID}->{DeleteErr} ) {
+                $DeleteErr = 1;
+            }
+        }
+    }
+
+    if (
+        $ArticleErr
+        || $DeleteErr
+    ) {
+        $Param{Checked}->{$ParentID}->{ArticleErr} = $ArticleErr;
+        $Param{Checked}->{$ParentID}->{DeleteErr}  = $DeleteErr;
+        return %Param;
+    }
+
+    my @ArticleIDs = $FAQObject->FAQSearch(
+        CategoryIDs => [ $ParentID ],
+        UserID      => $Self->{Authorization}->{UserID},
+    );
+
+    if ( scalar @ArticleIDs ) {
+        $Param{Checked}->{$ParentID}->{ArticleErr} = 1;
+        return %Param;
+    }
+
+    my $Success = $FAQObject->CategoryDelete(
+        CategoryID => $ParentID,
+        UserID     => $Self->{Authorization}->{UserID},
+    );
+
+    if ( !$Success ) {
+        $Param{Checked}->{$ParentID}->{DeleteErr} = 1;
+        return %Param;
+    }
+
+    return %Param;
 }
 
 1;
