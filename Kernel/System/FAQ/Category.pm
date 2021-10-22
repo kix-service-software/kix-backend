@@ -261,6 +261,11 @@ sub CategoryDelete {
         Bind => [ \$Param{CategoryID} ],
     );
 
+    # clear cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
