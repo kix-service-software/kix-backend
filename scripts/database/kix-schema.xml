@@ -2904,7 +2904,7 @@
     <Column Name="run_id" Required="false" Type="INTEGER"/>
     <Column Name="macro_id" Required="false" Type="INTEGER"/>
     <Column Name="macro_action_id" Required="false" Type="INTEGER"/>
-    <Column Name="object_id" Required="false" Type="BIGINT"/>
+    <Column Name="object_id" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="priority" Required="false" Size="20" Type="VARCHAR"/>
     <Column Name="message" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
