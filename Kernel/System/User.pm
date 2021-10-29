@@ -463,6 +463,11 @@ sub UserAdd {
         Type => $Self->{CacheType},
     );
 
+    # assign basic roles depending on context
+    $Self->_AssignRolesByContext(
+        UserID => $UserID
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
@@ -560,10 +565,14 @@ sub UserUpdate {
         );
     };
 
-
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # assign basic roles depending on context
+    $Self->_AssignRolesByContext(
+        UserID => $Param{UserID}
     );
 
     # push client callback event
@@ -1885,6 +1894,84 @@ sub TokenCheck {
 
     # return false if token is invalid
     return;
+}
+
+sub _AssignRolesByContext {
+    my ( $Self, %Param ) = @_;
+
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID!'
+        );
+        return;
+    }
+
+    my %User = $Self->GetUserData(
+        UserID => $Param{UserID}
+    );
+    return if !%User;
+
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    # get system roles and create lookup
+    my %SystemRoles = $RoleObject->RoleList(Valid => 1);
+    my %SystemRolesReverse = reverse %SystemRoles;
+
+    # get user roles
+    my %UserRoleList = map {$_ => 1} ( $Self->RoleList(
+        UserID => $Param{UserID},
+        Valid  => 1,
+    ) );
+    my %UserRoleListCurrent = %UserRoleList;
+
+    $UserRoleList{ $SystemRolesReverse{'Agent User'} } = ( $User{IsAgent} && $SystemRolesReverse{'Agent User'} ) ? 1 : 0;
+    $UserRoleList{ $SystemRolesReverse{'Customer'} } = ( $User{IsCustomer} && $SystemRolesReverse{'Customer'} ) ? 1 : 0;
+
+    ROLEID:
+    foreach my $RoleID ( sort keys %UserRoleList ) {
+        if ( $UserRoleList{$RoleID} && !$UserRoleListCurrent{$RoleID} ) {
+            # assign role
+            my $Result = $RoleObject->RoleUserAdd(
+                AssignUserID  => $Param{UserID},
+                RoleID        => $RoleID,
+                UserID        => 1,
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "User: '$User{UserLogin}' unable to assign role \"$SystemRoles{$RoleID}\"!",
+                );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "User: '$User{UserLogin}' assigned role \"$SystemRoles{$RoleID}\"!",
+                );
+            }
+        }
+        elsif ( !$UserRoleList{$RoleID} && $UserRoleListCurrent{$RoleID} ) {
+            # revoke role
+            my $Result = $RoleObject->RoleUserDelete(
+                UserID => $Param{UserID},
+                RoleID => $RoleID,
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "User: '$User{UserLogin}' unable to revoke role \"$SystemRoles{$RoleID}\"!",
+                );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "User: '$User{UserLogin}' revoked role \"$SystemRoles{$RoleID}\"!",
+                );
+            }
+        }
+    }
+
+    return 1;
 }
 
 sub _PermissionDebug {
