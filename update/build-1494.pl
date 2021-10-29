@@ -32,9 +32,9 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 use vars qw(%INC);
 
 # add filter to notifaction for new ticket
-_addFilterToNewCustomerTicket();
+_AddFilterAndChangeSubject();
 
-sub _addFilterToNewCustomerTicket {
+sub _AddFilterAndChangeSubject {
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -53,7 +53,6 @@ sub _addFilterToNewCustomerTicket {
         for my $Filter ( @{ $Notification{Filter}->{AND} } ) {
             $FoundFilter = 1 if ( IsHashRefWithData($Filter) && $Filter->{Field} eq 'SenderTypeID');
         }
-
         if (!$FoundFilter) {
             my $SenderTypeID = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
                 SenderType => 'external'
@@ -67,14 +66,25 @@ sub _addFilterToNewCustomerTicket {
                         $SenderTypeID
                     ]
                 });
-
-                $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
-                    ID => $Notification{ID},
-                    %Notification,
-                    UserID => 1
-                )
             }
         }
+
+        if (IsHashRefWithData($Notification{Message})) {
+            for my $LanguageHashRef ( values %{ $Notification{Message} } ) {
+                if (
+                    IsHashRefWithData($LanguageHashRef) &&
+                    $LanguageHashRef->{Subject}
+                ) {
+                    $LanguageHashRef->{Subject} =~ s/<KIX_CUSTOMER_Subject_?\d*>/<KIX_TICKET_Title>/;
+                }
+            }
+        }
+
+        $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
+            ID => $Notification{ID},
+            %Notification,
+            UserID => 1
+        )
     }
 
     return 1;
