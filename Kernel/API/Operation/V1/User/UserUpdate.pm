@@ -127,7 +127,7 @@ perform UserUpdate Operation. This will return the updated UserID.
         Success         => 1,                       # 0 or 1
         Message    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            UserID  => '',                          # UserID 
+            UserID  => '',                          # UserID
             Error => {                              # should not return errors
                     Code    => 'User.Create.Code'
                     Message => 'Error Description'
