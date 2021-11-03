@@ -1,43 +1,43 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "Lock.json",
-  "type": "object",
-  "description": "The ticket lock object.",
-  "properties": {
-    "ChangeBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "ChangeTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CreateBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Name": {
-      "type": "string"
-    },
-    "ValidID": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "ChangeBy",
-    "ChangeTime",
-    "CreateBy",
-    "CreateTime",
-    "ID",
-    "Name",
-    "ValidID"
-  ]
+   "$id" : "Lock.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ticket lock object.",
+   "type" : "object",
+   "properties" : {
+      "ChangeBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ChangeTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string"
+      },
+      "ValidID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "ID",
+      "Name",
+      "ValidID"
+   ]
 }

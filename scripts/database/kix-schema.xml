@@ -36,19 +36,6 @@
     <Column Name="change_time" Required="true" Type="DATE"/>
 </Table>
 
-<!-- addressbook - all email addresses used in communication and not contained in customer user backends -->
-<Table Name="addressbook">
-    <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
-    <Column Name="email" Required="true" Type="VARCHAR" Size="255"/>
-    <Column Name="email_lower" Required="true" Type="VARCHAR" Size="255"/>
-    <Index Name="addressbook_email">
-        <IndexColumn Name="email"/>
-    </Index>
-    <Index Name="addressbook_email_lower">
-        <IndexColumn Name="email_lower"/>
-    </Index>
-</Table>
-
 <!-- valid - all valid states -->
 <Table Name="valid">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
@@ -871,9 +858,9 @@
     <Column Name="article_sender_type_id" Required="true" Type="SMALLINT"/>
     <Column Name="a_from" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_reply_to" Required="false" Size="500" Type="VARCHAR"/>
-    <Column Name="a_to" Required="false" Size="3800" Type="VARCHAR"/>
-    <Column Name="a_cc" Required="false" Size="3800" Type="VARCHAR"/>
-    <Column Name="a_bcc" Required="false" Size="3800" Type="VARCHAR"/>
+    <Column Name="a_to" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="a_cc" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="a_bcc" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="a_subject" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_message_id" Required="false" Size="3800" Type="VARCHAR"/>
     <Column Name="a_message_id_md5" Required="false" Size="32" Type="VARCHAR"/>
@@ -2917,7 +2904,7 @@
     <Column Name="run_id" Required="false" Type="INTEGER"/>
     <Column Name="macro_id" Required="false" Type="INTEGER"/>
     <Column Name="macro_action_id" Required="false" Type="INTEGER"/>
-    <Column Name="object_id" Required="false" Type="BIGINT"/>
+    <Column Name="object_id" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="priority" Required="false" Size="20" Type="VARCHAR"/>
     <Column Name="message" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

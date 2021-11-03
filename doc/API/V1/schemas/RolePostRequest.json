@@ -1,41 +1,72 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "RolePostRequest.json",
-  "type": "object",
-  "description": "The role request object for creation.",
-  "properties": {
-    "Role": {
-      "type": "object",
-      "properties": {
-        "Comment": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },         
-        "Permissions": {
-          "type": "array",
-          "item": {
-            "$ref": "PermissionPostItem.json"
-          }
-        },    
-        "UserIDs": {
-          "type": "array",
-          "item": {
-            "type": "integer"
-          }
-        },    
-        "ValidID": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "Name",
-        "ValidID"
-      ]
-    }
-  },
-  "required": [
-    "Role"
-  ]
+   "$id" : "RolePostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The role request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Role" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Permissions" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_PermissionPostItem_json"
+               }
+            },
+            "UserIDs" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "integer"
+               }
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "ValidID"
+         ]
+      }
+   },
+   "required" : [
+      "Role"
+   ],
+   "definitions" : {
+      "_PermissionPostItem_json" : {
+         "$id" : "PermissionPostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The permission item object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "IsRequired" : {
+               "type" : "integer"
+            },
+            "Target" : {
+               "type" : "string"
+            },
+            "TypeID" : {
+               "type" : "integer"
+            },
+            "Value" : {
+               "description" : "bitmask, please see documentation for bit descriptions",
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Target",
+            "TypeID",
+            "Value"
+         ]
+      }
+   }
 }

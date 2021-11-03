@@ -1,17 +1,39 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "SenderTypeCollectionResponse.json",
-  "type": "object",
-  "description": "A list of sender types.",
-  "properties": {
-    "SenderType": {
-      "type": "array",
-      "items": {
-        "$ref": "SenderType.json"
+   "$id" : "SenderTypeCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of sender types.",
+   "type" : "object",
+   "properties" : {
+      "SenderType" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_SenderType_json"
+         }
       }
-    }
-  },
-  "required": [
-    "SenderType"
-  ]
+   },
+   "required" : [
+      "SenderType"
+   ],
+   "definitions" : {
+      "_SenderType_json" : {
+         "$id" : "SenderType.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The sender type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   }
 }

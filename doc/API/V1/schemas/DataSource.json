@@ -1,54 +1,54 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "DataSource.json",
-    "type": "object",
-    "description": "The report data source object.",
-    "properties": {
-        "Description": {
-            "type": "string",
-            "readOnly": true
-        },
-        "DisplayName": {
-            "type": "string",
-            "readOnly": true
-        },
-        "Name": {
-            "type": "string",
-            "readOnly": true
-        },
-        "Options": {
-            "type": "object",
-            "patternProperties": {
-                "^[a-zA-Z]+$": {
-                    "type": "object",
-                    "properties": {
-                        "Description": {
-                            "type": "string",
-                            "readOnly": true
-                        },
-                        "Label": {
-                            "type": "string",
-                            "readOnly": true
-                        },
-                        "Name": {
-                            "type": "string",
-                            "readOnly": true
-                        },
-                        "Required": {
-                            "type": "integer",
-                            "readOnly": true
-                        }
-                    },
-                    "required": [
-                        "Label",
-                        "Name"
-                    ]
-                }
+   "$id" : "DataSource.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The report data source object.",
+   "type" : "object",
+   "properties" : {
+      "Description" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "DisplayName" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Options" : {
+         "type" : "object",
+         "patternProperties" : {
+            "^[a-zA-Z]+$" : {
+               "type" : "object",
+               "properties" : {
+                  "Description" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Label" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Name" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Required" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "Label",
+                  "Name"
+               ]
             }
-        }
-    },
-    "required": [
-        "Description",
-        "Name"
-    ]
+         }
+      }
+   },
+   "required" : [
+      "Description",
+      "Name"
+   ]
 }

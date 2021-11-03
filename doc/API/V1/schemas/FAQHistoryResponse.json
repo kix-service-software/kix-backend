@@ -1,14 +1,51 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "FAQHistoryResponse.json",
-  "type": "object",
-  "description": "A response for a execution FAQ history GET request.",
-  "properties": {
-    "FAQHistory": {
-      "$ref": "FAQHistory.json"
-    }
-  },
-  "required": [
-    "FAQHistory"
-  ]  
+   "$id" : "FAQHistoryResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a execution FAQ history GET request.",
+   "type" : "object",
+   "properties" : {
+      "FAQHistory" : {
+         "$ref" : "#/definitions/_FAQHistory_json"
+      }
+   },
+   "required" : [
+      "FAQHistory"
+   ],
+   "definitions" : {
+      "_FAQHistory_json" : {
+         "$id" : "FAQHistory.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ history object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Created",
+            "CreatedBy",
+            "ID",
+            "Name"
+         ]
+      }
+   }
 }

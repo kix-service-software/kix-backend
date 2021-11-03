@@ -1,14 +1,14 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "LinkPostResponse.json",
-  "type": "object",
-  "description": "The ID of the created link.",
-  "properties": {
-    "LinkID": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "LinkID"
-  ]
+   "$id" : "LinkPostResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created link.",
+   "type" : "object",
+   "properties" : {
+      "LinkID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "LinkID"
+   ]
 }

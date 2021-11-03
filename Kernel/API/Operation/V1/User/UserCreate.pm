@@ -124,10 +124,10 @@ perform UserCreate Operation. This will return the created UserLogin.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            UserID  => '',                          # UserID 
+            UserID  => '',                          # UserID
         },
     };
 
@@ -189,38 +189,6 @@ sub Run {
     if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
 
         foreach my $RoleID ( @{ $User->{RoleIDs} } ) {
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::User::UserRoleIDCreate',
-                Data          => {
-                    UserID => $UserID,
-                    RoleID => $RoleID,
-                }
-            );
-
-            if ( !$Result->{Success} ) {
-                return $Self->_Error(
-                    %{$Result},
-                )
-            }
-        }
-    }
-
-    # auto assign customer role
-    if ( $User->{IsCustomer} ) {
-
-        # get RoleID from Role "Customer"
-        my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
-            Role => "Customer",
-        );
-
-        my $RoleIDFound = 0;
-        if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
-            if ( grep( /^$RoleID/, @{ $User->{RoleIDs} } ) ) {
-                $RoleIDFound = 1;
-            }
-        }
-
-        if ( !$RoleIDFound ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserRoleIDCreate',
                 Data          => {

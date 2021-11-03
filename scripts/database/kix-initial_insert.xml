@@ -1449,6 +1449,10 @@
     <Insert Table="notification_event">
         <Data Key="id" Type="AutoIncrement">11</Data>
         <Data Key="name" Type="Quote" Translatable="1">Customer - New Ticket Receipt</Data>
+        <Data Key="filter" Type="Quote"><![CDATA[
+{ "AND": [
+    { "Field": "SenderTypeID", "Operator": "IN", "Value": [3] }
+]}]]></Data>
         <Data Key="valid_id">1</Data>
         <Data Key="comments" Type="Quote"></Data>
         <Data Key="create_by">1</Data>

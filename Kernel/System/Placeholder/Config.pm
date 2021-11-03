@@ -51,12 +51,31 @@ sub _Replace {
     my $Tag = $Self->{Start} . 'KIX_CONFIG_';
     $Param{Text} =~ s{$Tag(.+?)$Self->{End}}{
         my $Replace = '';
+        my $Key     = $1;
         # Mask secret config options.
-        if ($1 =~ m{(Password|Pw)\d*$}smxi) {
+        if ($Key =~ m{(Password|Pw)\d*$}smxi) {
             $Replace = 'xxx';
         }
         else {
-            $Replace = $ConfigObject->Get($1) // '';
+            # special handling for FQDN
+            if ($Key =~ m/FQDN_?(.*)/ ) {
+                my $FQDNConfig = $ConfigObject->Get('FQDN') // '';
+                if ( IsHashRefWithData($FQDNConfig) ) {
+                    if ( $Key eq 'FQDN' ) {
+                        $Replace = $FQDNConfig->{Frontend} || '';
+                    } elsif ($1) {
+                        $Replace = $FQDNConfig->{$1} || '';
+                    }
+                }
+            } else {
+                $Replace = $ConfigObject->Get($Key) // '';
+                # TODO: handle ref values
+                # if ( IsHashRefWithData($Replace) || IsArrayRefWithData($Replace) ) {
+                #     $Replace = $Kernel::OM->Get('JSON')->Encode(
+                #         Data => $Replace
+                #     );
+                # }
+            }
         }
         $Replace;
     }egx;

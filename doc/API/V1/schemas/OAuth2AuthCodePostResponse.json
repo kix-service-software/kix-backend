@@ -1,14 +1,14 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "OAuth2AuthCodePostPatchResponse.json",
-  "type": "object",
-  "description": "The ID of the authorized oauth2 profile.",
-  "properties": {
-    "ProfileID": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "ProfileID"
-  ]
+   "$id" : "OAuth2AuthCodePostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the authorized oauth2 profile.",
+   "type" : "object",
+   "properties" : {
+      "ProfileID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ProfileID"
+   ]
 }

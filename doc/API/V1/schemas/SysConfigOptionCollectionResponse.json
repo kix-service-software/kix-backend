@@ -1,17 +1,78 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "SysConfigOptionCollectionResponse.json",
-  "type": "object",
-  "description": "A list of SysConfig option value.",
-  "properties": {
-    "SysConfigOption": {
-      "type": "array",
-      "items": {
-        "$ref": "SysConfigOption.json"
+   "$id" : "SysConfigOptionCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of SysConfig option value.",
+   "type" : "object",
+   "properties" : {
+      "SysConfigOption" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_SysConfigOption_json"
+         }
       }
-    }
-  },
-  "required": [
-    "SysConfigOption"
-  ]
+   },
+   "required" : [
+      "SysConfigOption"
+   ],
+   "definitions" : {
+      "_SysConfigOption_json" : {
+         "$id" : "SysConfigOption.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The SysConfig option object.",
+         "type" : "object",
+         "properties" : {
+            "AccessLevel" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Context" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "ContextMetadata" : {
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ReadOnly" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Name"
+         ]
+      }
+   }
 }

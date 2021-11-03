@@ -1,22 +1,22 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ConfigItemClassDefinitionPostRequest.json",
-  "type": "object",
-  "description": "The config item class definition request object for creation.",
-  "properties": {
-    "ConfigItemClassDefinition": {
-      "type": "object",
-      "properties": {
-        "DefinitionString": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "DefinitionString"
-      ]
-    }
-  },
-  "required": [
-    "ConfigItemClassDefinition"
-  ]
+   "$id" : "ConfigItemClassDefinitionPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The config item class definition request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItemClassDefinition" : {
+         "type" : "object",
+         "properties" : {
+            "DefinitionString" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "DefinitionString"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItemClassDefinition"
+   ]
 }

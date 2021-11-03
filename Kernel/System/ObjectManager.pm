@@ -268,6 +268,20 @@ sub GetModuleFor {
     return $Self->{ObjectMap}->{$Alias};
 }
 
+=item GetMatchingAliases()
+
+Returns a list of module aliases matching a given regex
+
+    my @MatchingAliases = $Kernel::OM->GetMatchingAliases('DB::.*?');
+
+=cut
+
+sub GetMatchingAliases {
+    my ( $Self, $Pattern ) = @_;
+
+    return grep /^$Pattern/, keys %{$Self->{ObjectMap} || {}};
+}
+
 sub _ObjectBuild {
     my ( $Self, %Param ) = @_;
 
@@ -707,11 +721,18 @@ sub DESTROY {
     local $Kernel::OM = $Self;
 
     # send outstanding notifications to registered clients
-    $Self->AsyncCall(
-        ObjectName               => $Self->GetModuleFor('ClientRegistration'),
-        FunctionName             => 'NotificationSend',
-        MaximumParallelInstances => 1,
-    );
+    if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
+        if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
+            $Self->AsyncCall(
+                ObjectName               => $Self->GetModuleFor('ClientRegistration'),
+                FunctionName             => 'NotificationSend',
+                MaximumParallelInstances => 1,
+            );
+        }
+        else {
+            $Self->Get('ClientRegistration')->NotificationSend();
+        }
+    }
 
     # discard all objects
     $Self->ObjectsDiscard();

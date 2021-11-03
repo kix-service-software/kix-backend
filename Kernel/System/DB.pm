@@ -123,7 +123,7 @@ sub new {
 
     # load backend module
     if ( $Self->{'DB::Type'} ) {
-        my $GenericModule = 'Kernel::System::DB::' . $Self->{'DB::Type'};
+        my $GenericModule = $Kernel::OM->GetModuleFor('DB::' . $Self->{'DB::Type'});
         return if !$Kernel::OM->Get('Main')->Require($GenericModule);
         $Self->{Backend} = $GenericModule->new( %{$Self} );
 
@@ -134,7 +134,7 @@ sub new {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => 'Unknown database type! Set option Database::Type in '
-                . 'Kernel/Config.pm to (mysql|postgresql|oracle|db2|mssql).',
+                . 'Kernel/Config.pm to (mysql|postgresql|oracle|mssql).',
         );
         return;
     }

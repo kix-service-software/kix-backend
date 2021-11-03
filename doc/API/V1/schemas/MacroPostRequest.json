@@ -1,39 +1,75 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "MacroPostRequest.json",
-  "type": "object",
-  "description": "The macro request object for creation.",
-  "properties": {
-    "Macro": {
-      "type": "object",
-      "properties": {
-        "Actions": {
-          "type": "array",
-          "item": {
-            "$ref": "MacroActionPostItem.json"
-          }
-        },
-        "Comment": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Type": {
-          "type": "string",
-          "description": ""
-        },
-        "ValidID": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "Name",
-        "Type"
-      ]
-    }
-  },
-  "required": [
-    "Macro"
-  ]
+   "$id" : "MacroPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The macro request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Macro" : {
+         "type" : "object",
+         "properties" : {
+            "Actions" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_MacroActionPostItem_json"
+               }
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "Macro"
+   ],
+   "definitions" : {
+      "_MacroActionPostItem_json" : {
+         "$id" : "MacroActionPostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro action object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "MacroID" : {
+               "description" : "ID of the corresponding macro.",
+               "type" : "integer"
+            },
+            "Parameters" : {
+               "description" : "",
+               "type" : "object"
+            },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "MacroID",
+            "Type"
+         ]
+      }
+   }
 }

@@ -51,7 +51,7 @@ sub Describe {
     $Self->AddOption(
         Name        => 'ContactEmailOrID',
         Label       => Kernel::Language::Translatable('Contact'),
-        Description => Kernel::Language::Translatable('The ID or email of the contact to be set.'),
+        Description => Kernel::Language::Translatable('The ID or email (or Login of the corresponding user) of the contact to be set.'),
         Required    => 1,
     );
 
@@ -110,10 +110,24 @@ sub Run {
         );
     }
 
+    if ( !$ContactID ) {
+        # try to find a contact with this user login
+        my $UserID = $Kernel::OM->Get('User')->UserLookup(
+           UserLogin => $Contact,
+           Silent    => 1,
+        );
+        if ( $UserID ) {
+            $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                UserID => $UserID,
+                Silent => 1
+            );
+        }
+    }
+
     if (!$ContactID) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - no contact found with \"$Param{Config}->{ContactEmailOrID}\"",
+            Message  => "Couldn't update ticket $Param{TicketID} - no contact found with \"$Contact\" (\"$Param{Config}->{ContactEmailOrID}\")",
             UserID   => $Param{UserID}
         );
         return;

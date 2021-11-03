@@ -113,15 +113,6 @@ sub Run {
     my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
 
     foreach my $Value ( @ValueList ) {
-        if ( $Value !~ /^\d+$/ ) {
-            $Kernel::OM->Get('Automation')->LogError(
-                Referrer => $Self,
-                Message  => "Loop value \"$Value\" isn't numeric! It will be skipped because it can't be used as ObjectID for the macro to be executed.",
-                UserID   => $Param{UserID}
-            );
-            next;
-        }
-
         if ( $Param{Config}->{LoopVariable} ) {
             $Self->SetResult(Name => $Param{Config}->{LoopVariable}, Value => $Value);
         }
