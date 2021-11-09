@@ -2378,7 +2378,7 @@
             <Hash>
                 <Item Key="Frontend">your-frontend-host.example.com</Item>
                 <Item Key="Backend">your-backend-host.example.com</Item>
-                <Item Key="CustomerFrontend">your-customer-frontend-host.example.com</Item>
+                <Item Key="SSP">your-ssp-host.example.com</Item>
             </Hash>
         </Setting>
     </ConfigItem>
