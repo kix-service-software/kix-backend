@@ -912,6 +912,9 @@ sub _MessageIDCreate {
     my ( $Self, %Param ) = @_;
 
     my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
 
     return '<' . time() . '.' . rand(999999) . '@' . $FQDN . '>';
 }

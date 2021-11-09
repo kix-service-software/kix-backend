@@ -16,6 +16,8 @@ use MIME::Base64 qw(encode_base64);
 
 use parent qw(Kernel::System::Email::SMTP);
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::Log',
@@ -31,7 +33,11 @@ sub Check {
 
     # get config data
     my %ConfigData = ();
-    $ConfigData{FQDN}           = $ConfigObject->Get('FQDN');
+    my $FQDN = $ConfigObject->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
+    $ConfigData{FQDN}           = $FQDN;
     $ConfigData{Host}           = $ConfigObject->Get('SendmailModule::Host');
     $ConfigData{SMTPPort}       = $ConfigObject->Get('SendmailModule::Port');
     $ConfigData{AuthUser}       = $ConfigObject->Get('SendmailModule::AuthUser');
