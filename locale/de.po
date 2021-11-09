@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-3 13:34+0000\n"
-"PO-Revision-Date: 2021-09-27 15:47+0000\n"
+"PO-Revision-Date: 2021-11-09 13:48+0000\n"
 "Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -5675,7 +5675,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Title updated: Old: \"%s\", New: \"%s\""
-msgstr "Titel aktualisiert: Alt: \"% s\", Neu: \"% s\""
+msgstr "Titel aktualisiert: Alt: \"%s\", Neu: \"%s\""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Transport selection for ticket notifications."
