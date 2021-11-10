@@ -188,7 +188,16 @@ sub Run {
     # assign roles
     if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
 
+        my %UserRoleList = map { $_ => 1 } $Kernel::OM->Get('User')->RoleList(
+            RoleID => 1,
+            UserID => $UserID,
+        );
+
+        ROLEID:
         foreach my $RoleID ( @{ $User->{RoleIDs} } ) {
+            # check if this RoleID is already assigned to the new user (done by the core)
+            next ROLEID if $UserRoleList{$RoleID};
+
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserRoleIDCreate',
                 Data          => {
