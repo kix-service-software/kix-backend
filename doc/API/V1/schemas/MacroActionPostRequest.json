@@ -1,42 +1,42 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "MacroActionPostRequest.json",
-  "type": "object",
-  "description": "The macro action request object for creation.",
-  "properties": {
-    "MacroAction": {
-      "type": "object",
-      "properties": {
-        "Comment": {
-          "type": "string"
-        },
-        "MacroID": {
-          "type": "integer",
-          "description": "ID of the corresponding macro."
-        },
-        "Parameters": {
-          "type": "object",
-          "description": ""
-        },
-        "ResultVariables": {
-          "type": "object",
-          "description": "An optional mapping of named results of the macro action and their variable names."
-        },
-        "Type": {
-          "type": "string",
-          "description": ""
-        },
-        "ValidID": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "MacroID",
-        "Type"
-      ]
-    }
-  },
-  "required": [
-    "MacroAction"
-  ]
+   "$id" : "MacroActionPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The macro action request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "MacroAction" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "MacroID" : {
+               "description" : "ID of the corresponding macro.",
+               "type" : "integer"
+            },
+            "Parameters" : {
+               "description" : "",
+               "type" : "object"
+            },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
+            "Type" : {
+               "description" : "",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "MacroID",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "MacroAction"
+   ]
 }

@@ -1,17 +1,73 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "GeneralCatalogItemCollectionResponse.json",
-  "type": "object",
-  "description": "A list of GeneralCatalog items.",
-  "properties": {
-    "GeneralCatalogItem": {
-      "type": "array",
-      "items": {
-        "$ref": "GeneralCatalogItem.json"
+   "$id" : "GeneralCatalogItemCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of GeneralCatalog items.",
+   "type" : "object",
+   "properties" : {
+      "GeneralCatalogItem" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_GeneralCatalogItem_json"
+         }
       }
-    }
-  },
-  "required": [
-    "GeneralCatalogItem"
-  ]
+   },
+   "required" : [
+      "GeneralCatalogItem"
+   ],
+   "definitions" : {
+      "_GeneralCatalogItem_json" : {
+         "$id" : "GeneralCatalogItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The GeneralCatalog item object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ItemID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "Class",
+            "CreateBy",
+            "CreateTime",
+            "ItemID",
+            "Name",
+            "ValidID"
+         ]
+      }
+   }
 }

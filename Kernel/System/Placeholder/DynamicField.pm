@@ -81,6 +81,9 @@ sub _Replace {
                 DynamicFields => 1,
             );
             $Object = \%Organisation;
+
+            # use right tag, but with backward compatibility
+            $Tag = $Self->{Start} . 'KIX_(?:ORG|'.uc($ObjectType).')_DynamicField_';
         }
 
         if ( IsHashRefWithData($Object) ) {

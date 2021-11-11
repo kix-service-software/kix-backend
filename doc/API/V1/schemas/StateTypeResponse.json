@@ -1,14 +1,36 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "StateTypeResponse.json",
-  "type": "object",
-  "description": "A response for a state type GET request.",
-  "properties": {
-    "StateType": {
-      "$ref": "StateType.json"
-    }
-  },
-  "required": [
-    "StateType"
-  ]
+   "$id" : "StateTypeResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a state type GET request.",
+   "type" : "object",
+   "properties" : {
+      "StateType" : {
+         "$ref" : "#/definitions/_StateType_json"
+      }
+   },
+   "required" : [
+      "StateType"
+   ],
+   "definitions" : {
+      "_StateType_json" : {
+         "$id" : "StateType.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The state type object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "Name"
+         ]
+      }
+   }
 }

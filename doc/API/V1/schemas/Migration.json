@@ -1,36 +1,44 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "MigrationState.json",
-  "type": "object",
-  "description": "The migration state object.",
-  "properties": {
-    "ID": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Status": {
-      "type": "string",
-      "readOnly": true
-    },
-    "State": {
-      "type": "object",
-      "readOnly": true,
-      "description": "The content depends on the source of the migration.",
-      "patternProperties": {
-        "^[a-zA-Z]+$": {
-          "anyOf": [
-              { "type": "object" },
-              { "type": "array" },
-              { "type": "string" },
-              { "type": "number" }
-          ],
-          "readOnly": true
-        }
+   "$id" : "MigrationState.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The migration state object.",
+   "type" : "object",
+   "properties" : {
+      "ID" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "State" : {
+         "description" : "The content depends on the source of the migration.",
+         "type" : "object",
+         "patternProperties" : {
+            "^[a-zA-Z]+$" : {
+               "anyOf" : [
+                  {
+                     "type" : "object"
+                  },
+                  {
+                     "type" : "array"
+                  },
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "number"
+                  }
+               ],
+               "readOnly" : true
+            }
+         },
+         "readOnly" : true
+      },
+      "Status" : {
+         "type" : "string",
+         "readOnly" : true
       }
-    }
-  },
-  "required": [
-    "ID",
-    "Status"
-  ]
+   },
+   "required" : [
+      "ID",
+      "Status"
+   ]
 }

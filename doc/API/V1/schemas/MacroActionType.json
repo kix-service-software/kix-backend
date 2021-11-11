@@ -1,68 +1,68 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "MacroActionType.json",
-    "type": "object",
-    "description": "The macro action type object.",
-    "properties": {
-        "Description": {
-            "type": "string",
-            "readOnly": true
-        },
-        "DisplayName": {
-            "type": "string",
-            "readOnly": true
-        },
-        "MacroType": {
-            "type": "string",
-            "readOnly": true
-        },
-        "Name": {
-            "type": "string",
-            "readOnly": true
-        },
-        "Options": {
-            "type": "object",
-            "patternProperties": {
-                "^[a-zA-Z]+$": {
-                    "type": "object",
-                    "properties": {
-                        "Description": {
-                            "type": "string",
-                            "readOnly": true
-                        },
-                        "Label": {
-                            "type": "string",
-                            "readOnly": true
-                        },
-                        "Name": {
-                            "type": "string",
-                            "readOnly": true
-                        },
-                        "Required": {
-                            "type": "integer",
-                            "readOnly": true
-                        }
-                    },
-                    "required": [
-                        "Label",
-                        "Name"
-                    ]
-                }
+   "$id" : "MacroActionType.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The macro action type object.",
+   "type" : "object",
+   "properties" : {
+      "Description" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "DisplayName" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "MacroType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Name" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Options" : {
+         "type" : "object",
+         "patternProperties" : {
+            "^[a-zA-Z]+$" : {
+               "type" : "object",
+               "properties" : {
+                  "Description" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Label" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Name" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Required" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "Label",
+                  "Name"
+               ]
             }
-        },
-        "Results": {
-            "type": "object",
-            "patternProperties": {
-                "^[a-zA-Z]+$": {
-                    "type": "string",
-                    "readOnly": true
-                }
+         }
+      },
+      "Results" : {
+         "type" : "object",
+         "patternProperties" : {
+            "^[a-zA-Z]+$" : {
+               "type" : "string",
+               "readOnly" : true
             }
-        }
-    },
-    "required": [
-        "Description",
-        "MacroType",
-        "Name"
-    ]
+         }
+      }
+   },
+   "required" : [
+      "Description",
+      "MacroType",
+      "Name"
+   ]
 }

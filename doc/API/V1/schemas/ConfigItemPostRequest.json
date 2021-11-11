@@ -1,33 +1,84 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ConfigItemPostRequest.json",
-  "type": "object",
-  "description": "The config item object for creation.",
-  "properties": {
-    "ConfigItem": {
-      "type": "object",
-      "properties": {
-        "ClassID": {
-          "type": "integer"
-        },    
-        "Version": {
-          "type": "object",
-          "$ref": "ConfigItemVersionPostItem.json"
-        },
-        "Images": {
-          "type": "array",
-          "item": {
-            "$ref": "ConfigItemImagePostItem.json"
-          }
-        }
+   "$id" : "ConfigItemPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The config item object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItem" : {
+         "type" : "object",
+         "properties" : {
+            "ClassID" : {
+               "type" : "integer"
+            },
+            "Images" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_ConfigItemImagePostItem_json"
+               }
+            },
+            "Version" : {
+               "$ref" : "#/definitions/_ConfigItemVersionPostItem_json"
+            }
+         },
+         "required" : [
+            "ClassID",
+            "Version"
+         ]
+      }
+   },
+   "required" : [
+      "ConfigItem"
+   ],
+   "definitions" : {
+      "_ConfigItemImagePostItem_json" : {
+         "$id" : "ConfigItemImagePostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item image request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Content" : {
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "Filename" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Content",
+            "ContentType",
+            "Filename"
+         ]
       },
-      "required": [
-        "ClassID",
-        "Version"
-      ]
-    }
-  },
-  "required": [
-    "ConfigItem"
-  ]
+      "_ConfigItemVersionPostItem_json" : {
+         "$id" : "ConfigItemVersionPostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item version request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Data" : {
+               "type" : "object"
+            },
+            "DeplStateID" : {
+               "type" : "integer"
+            },
+            "InciStateID" : {
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Name",
+            "DeplStateID",
+            "InciStateID"
+         ]
+      }
+   }
 }

@@ -1,17 +1,73 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "SystemAddressCollectionResponse.json",
-  "type": "object",
-  "description": "A list of system addresses.",
-  "properties": {
-    "SystemAddress": {
-      "type": "array",
-      "items": {
-        "$ref": "SystemAddress.json"
+   "$id" : "SystemAddressCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of system addresses.",
+   "type" : "object",
+   "properties" : {
+      "SystemAddress" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_SystemAddress_json"
+         }
       }
-    }
-  },
-  "required": [
-    "SystemAddress"
-  ]
+   },
+   "required" : [
+      "SystemAddress"
+   ],
+   "definitions" : {
+      "_SystemAddress_json" : {
+         "$id" : "SystemAddress.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The system address object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Realname" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "Realname",
+            "ValidID"
+         ]
+      }
+   }
 }

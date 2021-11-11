@@ -92,7 +92,6 @@ sub GetAPIWebServiceDefinition {
         InitOrder => 1
     );
 
-
     # add framework itself as the first element
     unshift @Plugins, { Directory => $Home };
 

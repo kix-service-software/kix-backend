@@ -17,6 +17,8 @@ use POSIX;
 use ExtUtils::MakeMaker;
 use Sys::Hostname::Long;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'DB',
@@ -359,11 +361,16 @@ sub KIXInfoGet {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
+    my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
+
     # collect KIX data
     my %EnvData = (
         Version         => $ConfigObject->Get('Version'),
         Home            => $ConfigObject->Get('Home'),
-        Host            => $ConfigObject->Get('FQDN'),
+        Host            => $FQDN,
         Product         => $ConfigObject->Get('Product'),
         SystemID        => $ConfigObject->Get('SystemID'),
         DefaultLanguage => $ConfigObject->Get('DefaultLanguage'),

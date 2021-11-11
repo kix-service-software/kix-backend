@@ -228,7 +228,7 @@
                 <Item Key="Module">Kernel::API::Validator::ReportValidator</Item>
                 <Item Key="Validates">ReportID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">ReportGet</Item>
+                <Item Key="IgnoreOperationRegEx">(ReportGet|ReportDelete)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

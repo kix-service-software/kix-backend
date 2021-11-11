@@ -1,17 +1,72 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ConfigItemClassDefinitionCollectionResponse.json",
-  "type": "object",
-  "description": "A list of config item class definitions.",
-  "properties": {
-    "ConfigItemClassDefinition": {
-      "type": "array",
-      "items": {
-        "$ref": "ConfigItemClassDefinition.json"
+   "$id" : "ConfigItemClassDefinitionCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of config item class definitions.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItemClassDefinition" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
+         }
       }
-    }
-  },
-  "required": [
-    "ConfigItemClassDefinition"
-  ]  
+   },
+   "required" : [
+      "ConfigItemClassDefinition"
+   ],
+   "definitions" : {
+      "_ConfigItemClassDefinition_json" : {
+         "$id" : "ConfigItemClassDefinition.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The config item class definition object.",
+         "type" : "object",
+         "properties" : {
+            "Class" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Definition" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "object"
+               },
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DefinitionString" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Version" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Class",
+            "ClassID",
+            "CreateBy",
+            "CreateTime",
+            "Definition",
+            "DefinitionID",
+            "DefinitionString",
+            "Version"
+         ]
+      }
+   }
 }

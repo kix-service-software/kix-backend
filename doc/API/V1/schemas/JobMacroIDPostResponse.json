@@ -1,14 +1,14 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "JobMacroIDPostResponse.json",
-  "type": "object",
-  "description": "A response for a job - macro ID POST request.",
-  "properties": {
-    "MacroID": {
-        "type": "integer"
-    }
-  },
-  "required": [
-    "MacroID"
-  ]
+   "$id" : "JobMacroIDPostResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a job - macro ID POST request.",
+   "type" : "object",
+   "properties" : {
+      "MacroID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "MacroID"
+   ]
 }

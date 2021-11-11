@@ -100,6 +100,16 @@ sub _Error {
     };
 }
 
+sub _Debug {
+    my ( $Self, $Indent, $Message ) = @_;
+
+    return if ( !$Kernel::OM->Get('Config')->Get('API::Debug') );
+
+    $Indent ||= '';
+
+    printf STDERR "(%5i) %-15s%s %s\n", $$, "[API]", $Indent, "$Message";
+}
+
 1;
 
 

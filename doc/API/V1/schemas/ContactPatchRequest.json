@@ -1,75 +1,117 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ContactPatchRequest.json",
-  "type": "object",
-  "description": "The contact request object for update.",
-  "properties": {
-    "Contact": {
-      "type": "object",
-      "properties": {
-        "AssignedUserID": {
-          "description": "Id of an user, but should not be already in use for another contact.",
-          "type": "integer"
-        },
-        "City": {
-          "type": "string"
-        },
-        "Comment": {
-          "type": "string"
-        },
-        "Country": {
-          "type": "string"
-        },
-        "DynamicFields": {
-          "type": "array",
-          "description": "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
-          "items": {
-            "$ref": "DynamicFieldValueSetItem.json"
-          }
-        },
-        "Email": {
-          "type": "string"
-        },
-        "Fax": {
-          "type": "string"
-        },
-        "Firstname": {
-          "type": "string"
-        },
-        "Lastname": {
-          "type": "string"
-        },
-        "Mobile": {
-          "type": "string"
-        },
-        "OrganisationIDs": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        },
-        "Phone": {
-          "type": "string"
-        },
-        "PrimaryOrganisationID": {
-          "type": "integer"
-        },
-        "Street": {
-          "type": "string"
-        },
-        "Title": {
-          "type": "string"
-        },
-        "Zip": {
-          "type": "string"
-        },
-        "ValidID": {
-          "type": "integer"
-        }
+   "$id" : "ContactPatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The contact request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Contact" : {
+         "type" : "object",
+         "properties" : {
+            "AssignedUserID" : {
+               "description" : "Id of an user, but should not be already in use for another contact.",
+               "type" : "integer"
+            },
+            "City" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "Country" : {
+               "type" : "string"
+            },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set (if no new value given, an already exiting value will be unchanged)",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
+            "Email" : {
+               "type" : "string"
+            },
+            "Fax" : {
+               "type" : "string"
+            },
+            "Firstname" : {
+               "type" : "string"
+            },
+            "Lastname" : {
+               "type" : "string"
+            },
+            "Mobile" : {
+               "type" : "string"
+            },
+            "OrganisationIDs" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
+               }
+            },
+            "Phone" : {
+               "type" : "string"
+            },
+            "PrimaryOrganisationID" : {
+               "type" : "integer"
+            },
+            "Street" : {
+               "type" : "string"
+            },
+            "Title" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            },
+            "Zip" : {
+               "type" : "string"
+            }
+         }
       }
-    }
-  },
-  "required": [
-    "Contact"
-  ]
+   },
+   "required" : [
+      "Contact"
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }

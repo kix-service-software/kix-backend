@@ -1,14 +1,14 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ReportDefinitionPostPatchResponse.json",
-  "type": "object",
-  "description": "The ID of the created or updated report definition.",
-  "properties": {
-    "ReportDefinitionID": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "ReportDefinitionID"
-  ]
+   "$id" : "ReportDefinitionPostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created or updated report definition.",
+   "type" : "object",
+   "properties" : {
+      "ReportDefinitionID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ReportDefinitionID"
+   ]
 }

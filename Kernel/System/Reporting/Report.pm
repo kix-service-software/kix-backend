@@ -358,7 +358,7 @@ sub ReportList {
     
     my @Bind;
     if ( $Param{DefinitionID} ) {
-        $SQL .= 'AND definition_id = ?';
+        $SQL .= ' AND definition_id = ?';
         push @Bind, \$Param{DefinitionID};
     }
 

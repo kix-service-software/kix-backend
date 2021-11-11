@@ -268,6 +268,20 @@ sub GetModuleFor {
     return $Self->{ObjectMap}->{$Alias};
 }
 
+=item GetMatchingAliases()
+
+Returns a list of module aliases matching a given regex
+
+    my @MatchingAliases = $Kernel::OM->GetMatchingAliases('DB::.*?');
+
+=cut
+
+sub GetMatchingAliases {
+    my ( $Self, $Pattern ) = @_;
+
+    return grep /^$Pattern/, keys %{$Self->{ObjectMap} || {}};
+}
+
 sub _ObjectBuild {
     my ( $Self, %Param ) = @_;
 

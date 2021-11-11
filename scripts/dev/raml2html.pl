@@ -193,16 +193,14 @@ if ( -d "$Options{SchemaDirectory}" ) {
     # copy all bundled schema files that exist in the schema source directory to the relevant directory
     print "\ncopying bundled schema files to corresponding directories\n";
     foreach my $Directory ( @{$Options{SourceDirectory}} ) {
+        chdir "$TmpDir/schemas\n";
         my $TargetDirectory;
         if ( $Directory !~ /^\// ) { 
-            chdir "$Cwd/$Directory/$Options{SchemaDirectory}";
             $TargetDirectory = "$Cwd/$Directory/schemas";
         }
         else {
-            chdir "$Directory/$Options{SchemaDirectory}";
             $TargetDirectory = "$Directory/schemas";
         }
-
         if ( -d "$TargetDirectory" && !rmtree("$TargetDirectory") ) {
             print STDERR "ERROR: Unable to remove directory $TargetDirectory.\n";
             next;
@@ -211,12 +209,14 @@ if ( -d "$Options{SchemaDirectory}" ) {
             print STDERR "ERROR: Unable to create directory $TargetDirectory.\n";
             next;
         }
+
         my $Count = 0;
         my $Total = 0;
-        foreach my $File ( glob("*.json") ) {
+        foreach my $File ( glob("$TmpDir/schemas/*.json") ) {
+            my $Filename = basename $File;
             $Total++;
-            if ( !copy($File, "$TargetDirectory/$File") ) {
-                print STDERR "ERROR: Unable to copy bundled schema $File to $TargetDirectory.\n";
+            if ( !copy($File, "$TargetDirectory/$Filename") ) {
+                print STDERR "ERROR: Unable to copy bundled schema $Filename to $TargetDirectory.\n";
             }
             $Count++;
         }

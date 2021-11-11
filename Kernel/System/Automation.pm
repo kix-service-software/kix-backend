@@ -224,11 +224,18 @@ sub _Log {
         $Reference{$ReferenceID} = ($Param{Referrer} ? $Param{Referrer}->{$ReferenceID} : undef) || $Self->{$ReferenceID};
     }
 
+    my $ObjectID = $Reference{ObjectID};
+    if ( ref $ObjectID ) {
+        $ObjectID = $Kernel::OM->Get('JSON')->Encode(
+            Data => $ObjectID
+        );
+    }
+
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?)',
         Bind => [
-            \$Reference{JobID}, \$Reference{RunID}, \$Reference{MacroID}, \$Reference{MacroActionID}, \$Reference{ObjectID}, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
+            \$Reference{JobID}, \$Reference{RunID}, \$Reference{MacroID}, \$Reference{MacroActionID}, \$ObjectID, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
         ],
     );
 

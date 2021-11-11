@@ -27,7 +27,7 @@ our @ObjectDependencies = (
 
 =item Describe()
 
-describe what is supported and what is required 
+describe what is supported and what is required
 
 =cut
 
@@ -72,7 +72,7 @@ sub Run {
 
     # map state to statetype
     my %StateTypes = map { $_->{id} => $_->{name} } @{$StateTypeData};
-    my %States = map { $_->{id} => $StateTypes{$_->{type_id}} } @{$StateData}; 
+    my %States = map { $_->{id} => $StateTypes{$_->{type_id}} } @{$StateData};
 
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
@@ -309,8 +309,11 @@ sub _MigrateAttachments {
     }
 
     my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
 
-    # extract 
+    # extract
     my %FAQItem = %{$Param{Item}};
     my %InlineAttachments;
     foreach my $Field ( qw(f_field1 f_field2 f_field3 f_field4 f_field5 f_field6) ) {
@@ -344,7 +347,7 @@ sub _MigrateAttachments {
         $Item->{content_id}   = $InlineAttachments{$Item->{id}} ? "<$InlineAttachments{$Item->{id}}>" : '';
         $Item->{content_type} = split(/\s+;/, $Item->{content_type}, 1);
         delete $Item->{inlineattachment};
-        
+
         # insert row
         my $ID = $Self->Insert(
             Table          => 'faq_attachment',
