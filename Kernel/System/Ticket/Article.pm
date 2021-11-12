@@ -391,6 +391,9 @@ sub ArticleCreate {
             my $Time      = $Kernel::OM->Get('Time')->SystemTime();
             my $Random    = rand 999999;
             my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
+            if (IsHashRefWithData($FQDN)) {
+                $FQDN = $FQDN->{Backend}
+            }
             $Param{MessageID} = "<$Time.$Random\@$FQDN>";
         }
     } else {
@@ -2149,6 +2152,9 @@ sub ArticleBounce {
     my $Time         = $Kernel::OM->Get('Time')->SystemTime();
     my $Random       = rand 999999;
     my $FQDN         = $Kernel::OM->Get('Config')->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
     my $NewMessageID = "<$Time.$Random.0\@$FQDN>";
     my $Email        = $Self->ArticlePlain( ArticleID => $Param{ArticleID} );
 

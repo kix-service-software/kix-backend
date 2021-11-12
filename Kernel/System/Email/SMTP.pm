@@ -15,6 +15,8 @@ use warnings;
 
 use Net::SMTP;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'DB',
@@ -47,7 +49,11 @@ sub Check {
     my $ConfigObject = $Kernel::OM->Get('Config');
 
     # get config data
-    $Self->{FQDN}     = $ConfigObject->Get('FQDN');
+    my $FQDN = $ConfigObject->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
+    $Self->{FQDN}     = $FQDN;
     $Self->{MailHost} = $ConfigObject->Get('SendmailModule::Host')
         || die "No SendmailModule::Host found in Kernel/Config.pm";
     $Self->{SMTPPort} = $ConfigObject->Get('SendmailModule::Port');

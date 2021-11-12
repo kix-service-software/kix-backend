@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-9-15 13:54+0000\n"
-"PO-Revision-Date: 2021-09-27 15:47+0000\n"
+"POT-Creation-Date: 2021-11-3 13:34+0000\n"
+"PO-Revision-Date: 2021-11-09 13:48+0000\n"
 "Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1264,8 +1264,12 @@ msgstr ""
 "Organisation an einem Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
-msgid "The ID or email (or Login of the corresponding user) of the contact to be set."
-msgstr "Die ID oder E-Mail Adresse (oder Login des zugehörigen Nutzers) des Kontakes, der gesetzt werden soll."
+msgid ""
+"The ID or email (or Login of the corresponding user) of the contact to be "
+"set."
+msgstr ""
+"Die ID oder E-Mail Adresse (oder Login des zugehörigen Nutzers) des "
+"Kontakes, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Append"
@@ -2849,9 +2853,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Defines the fully qualified domain name of the system. This setting is used "
-"as a variable, KIX_CONFIG_FQDN which is found in all forms of messaging used "
-"by the application, to build links to the tickets within your system."
+"Defines the fully qualified domain names of the system. This setting is used "
+"as a variable, \"&lt;KIX_CONFIG_FQDN&gt;\" (refers to \"Frontend\" value) "
+"which is found in all forms of messaging used by the application, e.g. to "
+"build links to the tickets within your system."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3563,6 +3568,10 @@ msgid "Link to the admin manual."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Link to the self service portal manual."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Link to the user manual."
 msgstr ""
 
@@ -3848,6 +3857,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Selects the cache backend to use."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Send all client notifications asynchronously through the daemon."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4836,10 +4849,6 @@ msgid "Create new linked person on create new Article or Update Owner."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Creates a new address book entry if necessary."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Customizable stop words for fulltext index. These words will be removed from "
 "the search index."
@@ -5666,7 +5675,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Title updated: Old: \"%s\", New: \"%s\""
-msgstr "Titel aktualisiert: Alt: \"% s\", Neu: \"% s\""
+msgstr "Titel aktualisiert: Alt: \"%s\", Neu: \"%s\""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Transport selection for ticket notifications."

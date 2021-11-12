@@ -11,6 +11,8 @@ package Kernel::System::Ticket::Event::CreateFAQEntry;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'Encode',
@@ -233,12 +235,16 @@ sub Run {
                     last;
                 }
             }
+            my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
+            if (IsHashRefWithData($FQDN)) {
+                $FQDN = $FQDN->{Backend}
+            }
             $FAQComment =
                 $Self->{LayoutObject}->{LanguageObject}->Translate("FAQ Item suggested in source ticket:")
                 . "<br /><br />"
                 . "<a href=\""
                 . $Self->{ConfigObject}->Get('HttpType') . "://"
-                . $Self->{ConfigObject}->Get('FQDN') . "/"
+                . $FQDN . "/"
                 . $Self->{ConfigObject}->Get('ScriptAlias')
                 . "/index.pl?Action=AgentTicketZoom&TicketID=" . $Param{Data}->{TicketID}
                 . "&ArticleID=" . $Param{Data}->{ArticleID}
