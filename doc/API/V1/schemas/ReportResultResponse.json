@@ -1,14 +1,64 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ReportResultResponse.json",
-  "type": "object",
-  "description": "A response for a report result GET request.",
-  "properties": {
-    "ReportResult": {
-      "$ref": "ReportResult.json"
-    }
-  },
-  "required": [
-    "ReportResult"
-  ]
+   "$id" : "ReportResultResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a report result GET request.",
+   "type" : "object",
+   "properties" : {
+      "ReportResult" : {
+         "$ref" : "#/definitions/_ReportResult_json"
+      }
+   },
+   "required" : [
+      "ReportResult"
+   ],
+   "definitions" : {
+      "_ReportResult_json" : {
+         "$id" : "ReportResult.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The report result object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "added via include \"Content\" (base64 encoded)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentSize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Format" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ReportID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "Format",
+            "ID",
+            "ReportID"
+         ]
+      }
+   }
 }

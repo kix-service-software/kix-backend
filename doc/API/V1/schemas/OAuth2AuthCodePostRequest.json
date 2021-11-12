@@ -1,28 +1,28 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "OAuth2AuthCodePostRequest.json",
-  "type": "object",
-  "description": "The oauth2 authcode request object for code authorization.",
-  "properties": {
-    "ProfileAuth": {
-      "type": "object",
-      "properties": {
-        "Code": {
-          "type": "string",
-          "description": "Authorization code provided by the authorization response."
-        },
-        "State": {
-          "type": "string",
-          "description": "State of the authorization request."
-        }
-      },
-      "required": [
-        "Code",
-        "State"
-      ]
-    }
-  },
-  "required": [
-    "ProfileAuth"
-  ]
+   "$id" : "OAuth2AuthCodePostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The oauth2 authcode request object for code authorization.",
+   "type" : "object",
+   "properties" : {
+      "ProfileAuth" : {
+         "type" : "object",
+         "properties" : {
+            "Code" : {
+               "description" : "Authorization code provided by the authorization response.",
+               "type" : "string"
+            },
+            "State" : {
+               "description" : "State of the authorization request.",
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Code",
+            "State"
+         ]
+      }
+   },
+   "required" : [
+      "ProfileAuth"
+   ]
 }

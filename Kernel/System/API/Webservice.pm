@@ -192,6 +192,47 @@ sub WebserviceAdd {
     return $ID;
 }
 
+=item WebserviceLookup()
+
+get id for webservice name
+
+    my $WebserviceID = $WebserviceObject->WebserviceLookup(
+        Name => '...',
+    );
+
+get name for webservice id
+
+    my $WebserviceName = $WebserviceObject->WebserviceLookup(
+        ID => '...',
+    );
+
+=cut
+
+sub WebserviceLookup {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} && !$Param{ID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name or ID!',
+        );
+        return;
+    }
+
+    # get webservice list
+    my $WebserviceList = $Self->WebserviceList(
+        Valid => 0,
+    );
+
+    return $WebserviceList->{ $Param{ID} } if $Param{ID};
+
+    # create reverse list
+    my %WebserviceListReverse = reverse %{$WebserviceList};
+
+    return $WebserviceListReverse{ $Param{Name} };
+}
+
 =item WebserviceGet()
 
 get Webservices attributes

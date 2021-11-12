@@ -55,6 +55,10 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    $Self->{Debug} = $Kernel::OM->Get('Config')->Get('API::Debug');
+    $Self->{LogRequestContent}  = $Kernel::OM->Get('Config')->Get('API::Debug::LogRequestContent');
+    $Self->{LogResponseContent} = $Kernel::OM->Get('Config')->Get('API::Debug::LogResponseContent');
+
     return $Self;
 }
 
@@ -187,6 +191,11 @@ sub Run {
 
     # read request content
     my $FunctionResult = $Self->{TransportObject}->ProviderProcessRequest();
+
+    if ( $Self->{Debug} && $Self->{LogRequestContent} ) {
+        use Data::Dumper;
+        $Self->_Debug('', "Request Data: ".Data::Dumper::Dumper($FunctionResult->{Data}));
+    }
 
     # If the request was not processed correctly, send error to client.
     if ( !$FunctionResult->{Success} ) {
@@ -367,6 +376,11 @@ sub Run {
             $Data->{Resources} = \@ChildResources;
         }
 
+        if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
+            use Data::Dumper;
+            $Self->_Debug('', "Response Data: ".Data::Dumper::Dumper($Data));
+        }
+
         my $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
             Success => 1,
             Data    => $Data,
@@ -427,6 +441,11 @@ sub Run {
     my $FunctionResultOperation = $OperationObject->Run(
         Data => $DataIn,
     );
+
+    if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
+        use Data::Dumper;
+        $Self->_Debug('', "Response Data: ".Data::Dumper::Dumper($FunctionResultOperation->{Data}));
+    }
 
     if ( !$FunctionResultOperation->{Success} ) {
 

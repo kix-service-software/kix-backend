@@ -236,6 +236,12 @@ sub _DoFulltextSearch {
 
             # split on AND
             my @AndCombinedGroups = split( /\+|\&/, $OrCombined );
+
+            # allow phone numbers with + (e.g. +49123456789)
+            if ($OrCombined =~ m/^\+/) {
+                $AndCombinedGroups[1] =  "+$AndCombinedGroups[1]";
+                shift(@AndCombinedGroups);
+            }
             for my $AndSearchString (@AndCombinedGroups) {
 
                 $AndSearchString = $AndSearchString . '*';

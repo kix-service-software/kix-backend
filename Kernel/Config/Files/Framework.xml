@@ -2370,12 +2370,16 @@
             <String Regex="^\d+$">10</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="FQDN" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the fully qualified domain name of the system. This setting is used as a variable, KIX_CONFIG_FQDN which is found in all forms of messaging used by the application, to build links to the tickets within your system.</Description>
+    <ConfigItem AccessLevel="external" Name="FQDN" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the fully qualified domain names of the system. This setting is used as a variable, "&lt;KIX_CONFIG_FQDN&gt;" (refers to "Frontend" value) which is found in all forms of messaging used by the application, e.g. to build links to the tickets within your system.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
         <Setting>
-            <String Regex="">yourhost.example.com</String>
+            <Hash>
+                <Item Key="Frontend">your-frontend-host.example.com</Item>
+                <Item Key="Backend">your-backend-host.example.com</Item>
+                <Item Key="SSP">your-ssp-host.example.com</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="NodeID" Required="0" Valid="0" ConfigLevel="200">
@@ -8688,12 +8692,26 @@ You can log in via the following URL:
     </ConfigItem>
 
     <!-- links for user manuals -->
+    <ConfigItem AccessLevel="internal" Name="KIX::SelfServiceManual" Required="0" Valid="1">
+        <Description Translatable="1">Link to the self service portal manual.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Frontend::Manuals</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="de">https://docs.kixdesk.com/display/KSSPC/Einleitung</Item>
+                <Item Key="en">https://docs.kixdesk.com/kix18SelfServicePortalEN/manual/introduction</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="KIX::UserManual" Required="0" Valid="1">
         <Description Translatable="1">Link to the user manual.</Description>
         <Group>Framework</Group>
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
-            <String Regex="">https://kixdesk.com/dokumentation.html</String>
+            <Hash>
+                <Item Key="de">https://docs.kixdesk.com/display/K1ACU/Einleitung</Item>
+                <Item Key="en">https://docs.kixdesk.com/kix18UserManualEN/kix-start/introduction</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="KIX::AdminManual" Required="0" Valid="1">
@@ -8701,7 +8719,10 @@ You can log in via the following URL:
         <Group>Framework</Group>
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
-            <String Regex="">https://kixdesk.com/dokumentation.html</String>
+            <Hash>
+                <Item Key="de">https://docs.kixdesk.com/display/K1AD/Einleitung</Item>
+                <Item Key="en">https://docs.kixdesk.com/kix18AdminManualEN/kix-start/introduction</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 

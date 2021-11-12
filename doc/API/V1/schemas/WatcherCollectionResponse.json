@@ -1,17 +1,71 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "WatcherCollectionResponse.json",
-  "type": "object",
-  "description": "A list of watchers.",
-  "properties": {
-    "Watcher": {
-      "type": "array",
-      "items": {
-        "$ref": "Watcher.json"
+   "$id" : "WatcherCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of watchers.",
+   "type" : "object",
+   "properties" : {
+      "Watcher" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_Watcher_json"
+         }
       }
-    }
-  },
-  "required": [
-    "Watcher"
-  ]
+   },
+   "required" : [
+      "Watcher"
+   ],
+   "definitions" : {
+      "_Watcher_json" : {
+         "$id" : "Watcher.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The watcher object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Object" : {
+               "description" : "The type of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "description" : "The ID of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Object",
+            "ObjectID",
+            "UserID"
+         ]
+      }
+   }
 }

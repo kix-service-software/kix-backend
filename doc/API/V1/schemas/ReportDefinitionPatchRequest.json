@@ -1,97 +1,97 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "ReportDefinitionPostRequest.json",
-    "type": "object",
-    "description": "The report definition request object for creation.",
-    "properties": {
-        "ReportDefinition": {
-            "type": "object",
-            "properties": {
-                "Comment": {
-                    "type": "string"
-                },
-                "Config": {
-                    "type": "object",
-                    "properties": {
-                        "Parameters": {
-                            "type": "array",
-                            "item": {
-                                "type": "object",
-                                "patternProperties": {
-                                    "^[a-zA-Z]+$": {
-                                        "type": "object",
-                                        "properties": {
-                                            "DataType": {
-                                                "type": "string",
-                                                "readOnly": true
-                                            },
-                                            "Default": {
-                                                "anyOf": [
-                                                    {
-                                                        "type": "object"
-                                                    },
-                                                    {
-                                                        "type": "string"
-                                                    },
-                                                    {
-                                                        "type": "number"
-                                                    },
-                                                    {
-                                                        "type": "null"
-                                                    }
-                                                ],
-                                                "readOnly": true
-                                            },
-                                            "Description": {
-                                                "type": "string"
-                                            },
-                                            "Label": {
-                                                "type": "string"
-                                            },
-                                            "Required": {
-                                                "type": "integer"
-                                            },
-                                            "Type": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "Label",
-                                            "DataType"
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        "DataSource": {
-                            "type": "object"
-                        },
-                        "OutputFormats": {
-                            "type": "object"
-                        },
-                        "Title": {
-                            "type": "string"
+   "$id" : "ReportDefinitionPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The report definition request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "ReportDefinition" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Config" : {
+               "type" : "object",
+               "properties" : {
+                  "DataSource" : {
+                     "type" : "object"
+                  },
+                  "OutputFormats" : {
+                     "type" : "object"
+                  },
+                  "Parameters" : {
+                     "type" : "array",
+                     "item" : {
+                        "type" : "object",
+                        "patternProperties" : {
+                           "^[a-zA-Z]+$" : {
+                              "type" : "object",
+                              "properties" : {
+                                 "DataType" : {
+                                    "type" : "string",
+                                    "readOnly" : true
+                                 },
+                                 "Default" : {
+                                    "anyOf" : [
+                                       {
+                                          "type" : "object"
+                                       },
+                                       {
+                                          "type" : "string"
+                                       },
+                                       {
+                                          "type" : "number"
+                                       },
+                                       {
+                                          "type" : "null"
+                                       }
+                                    ],
+                                    "readOnly" : true
+                                 },
+                                 "Description" : {
+                                    "type" : "string"
+                                 },
+                                 "Label" : {
+                                    "type" : "string"
+                                 },
+                                 "Required" : {
+                                    "type" : "integer"
+                                 },
+                                 "Type" : {
+                                    "type" : "string"
+                                 }
+                              },
+                              "required" : [
+                                 "Label",
+                                 "DataType"
+                              ]
+                           }
                         }
-                    },
-                    "required": [
-                        "DataSource"
-                    ]
-                },
-                "Name": {
-                    "type": "string",
-                    "readOnly": true
-                },
-                "DataSource": {
-                    "type": "string",
-                    "description": "The data source to use."
-                },
-                "ValidID": {
-                    "type": "integer"
-                }
+                     }
+                  },
+                  "Title" : {
+                     "type" : "string"
+                  }
+               },
+               "required" : [
+                  "DataSource"
+               ]
+            },
+            "DataSource" : {
+               "description" : "The data source to use.",
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer"
             }
-        }
-    },
-    "required": [
-        "ReportDefinition"
-    ]
+         }
+      }
+   },
+   "required" : [
+      "ReportDefinition"
+   ]
 }

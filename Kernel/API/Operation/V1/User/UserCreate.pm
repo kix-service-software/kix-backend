@@ -124,10 +124,10 @@ perform UserCreate Operation. This will return the created UserLogin.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            UserID  => '',                          # UserID 
+            UserID  => '',                          # UserID
         },
     };
 
@@ -188,39 +188,16 @@ sub Run {
     # assign roles
     if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
 
-        foreach my $RoleID ( @{ $User->{RoleIDs} } ) {
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::User::UserRoleIDCreate',
-                Data          => {
-                    UserID => $UserID,
-                    RoleID => $RoleID,
-                }
-            );
-
-            if ( !$Result->{Success} ) {
-                return $Self->_Error(
-                    %{$Result},
-                )
-            }
-        }
-    }
-
-    # auto assign customer role
-    if ( $User->{IsCustomer} ) {
-
-        # get RoleID from Role "Customer"
-        my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
-            Role => "Customer",
+        my %UserRoleList = map { $_ => 1 } $Kernel::OM->Get('User')->RoleList(
+            RoleID => 1,
+            UserID => $UserID,
         );
 
-        my $RoleIDFound = 0;
-        if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
-            if ( grep( /^$RoleID/, @{ $User->{RoleIDs} } ) ) {
-                $RoleIDFound = 1;
-            }
-        }
+        ROLEID:
+        foreach my $RoleID ( @{ $User->{RoleIDs} } ) {
+            # check if this RoleID is already assigned to the new user (done by the core)
+            next ROLEID if $UserRoleList{$RoleID};
 
-        if ( !$RoleIDFound ) {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserRoleIDCreate',
                 Data          => {

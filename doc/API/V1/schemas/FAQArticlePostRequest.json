@@ -1,89 +1,161 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "FAQArticlePostRequest.json",
-    "type": "object",
-    "description": "The FAQ article request object for create.",
-    "properties": {
-        "FAQArticle": {
-            "type": "object",
-            "properties": {
-                "Approved": {
-                    "type": "integer"
-                },
-                "ApprovalOff": {
-                    "type": "integer",
-                    "description": "if set to 1 approval is ignored"
-                },
-                "Attachments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "FAQAttachmentPostItem.json"
-                    }
-                },
-                "CategoryID": {
-                    "type": "integer"
-                },
-                "ContentType": {
-                    "type": "string"
-                },
-                "CustomerVisible": {
-                    "type": "integer"
-                },
-                "DynamicFields": {
-                  "type": "array",
-                  "description": "list of dynamic field values to be set",
-                  "items": {
-                    "$ref": "DynamicFieldValueSetItem.json"
-                  }
-                },
-                "Field1": {
-                    "type": "string",
-                    "description": "symptom"
-                },
-                "Field2": {
-                    "type": "string",
-                    "description": "problem"
-                },
-                "Field3": {
-                    "type": "string",
-                    "description": "solution"
-                },
-                "Field4": {
-                    "type": "string"
-                },
-                "Field5": {
-                    "type": "string"
-                },
-                "Field6": {
-                    "type": "string",
-                    "description": "comment"
-                },
-                "Keywords": {
-                    "type": "array",
-                    "item": {
-                        "type": "string"
-                    }
-                },
-                "Language": {
-                    "type": "string"
-                },
-                "Number": {
-                    "type": "string"
-                },
-                "Title": {
-                    "type": "string"
-                },
-                "ValidID": {
-                    "type": "integer"
-                }
+   "$id" : "FAQArticlePostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The FAQ article request object for create.",
+   "type" : "object",
+   "properties" : {
+      "FAQArticle" : {
+         "type" : "object",
+         "properties" : {
+            "ApprovalOff" : {
+               "description" : "if set to 1 approval is ignored",
+               "type" : "integer"
             },
-            "required": [
-                "CategoryID",
-                "Title"
-            ]
-        }
-    },
-    "required": [
-        "FAQArticle"
-    ]
+            "Approved" : {
+               "type" : "integer"
+            },
+            "Attachments" : {
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_FAQAttachmentPostItem_json"
+               }
+            },
+            "CategoryID" : {
+               "type" : "integer"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "CustomerVisible" : {
+               "type" : "integer"
+            },
+            "DynamicFields" : {
+               "description" : "list of dynamic field values to be set",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValueSetItem_json"
+               }
+            },
+            "Field1" : {
+               "description" : "symptom",
+               "type" : "string"
+            },
+            "Field2" : {
+               "description" : "problem",
+               "type" : "string"
+            },
+            "Field3" : {
+               "description" : "solution",
+               "type" : "string"
+            },
+            "Field4" : {
+               "type" : "string"
+            },
+            "Field5" : {
+               "type" : "string"
+            },
+            "Field6" : {
+               "description" : "comment",
+               "type" : "string"
+            },
+            "Keywords" : {
+               "type" : "array",
+               "item" : {
+                  "type" : "string"
+               }
+            },
+            "Language" : {
+               "type" : "string"
+            },
+            "Number" : {
+               "type" : "string"
+            },
+            "Title" : {
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "CategoryID",
+            "Title"
+         ]
+      }
+   },
+   "required" : [
+      "FAQArticle"
+   ],
+   "definitions" : {
+      "_DynamicFieldValueSetItem_json" : {
+         "$id" : "DynamicFieldValueSetItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object to set it for an object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the name of the relevant dynamic field",
+               "type" : "string"
+            },
+            "Value" : {
+               "description" : "value type depends on the dynamic field (can also be an array of value type)",
+               "anyOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "array",
+                     "items" : {
+                        "anyOf" : [
+                           {
+                              "type" : "string"
+                           },
+                           {
+                              "type" : "integer"
+                           }
+                        ]
+                     }
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      },
+      "_FAQAttachmentPostItem_json" : {
+         "$id" : "FAQAttachmentPostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The FAQ attachment request object for creation.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "base64 encoded file ontent string",
+               "type" : "string"
+            },
+            "ContentType" : {
+               "type" : "string"
+            },
+            "CustomerVisible" : {
+               "type" : "integer"
+            },
+            "Filename" : {
+               "type" : "string"
+            },
+            "Inline" : {
+               "description" : " if attachment is an inline attachment of a text field property (e.g. \"Field1\") or 0 if not",
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Content",
+            "ContentType",
+            "Filename"
+         ]
+      }
+   }
 }

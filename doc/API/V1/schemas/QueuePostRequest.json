@@ -1,53 +1,53 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "QueuePostRequest.json",
-  "type": "object",
-  "description": "The queue request object for creation.",
-  "properties": {
-    "Queue": {
-      "type": "object",
-      "properties": {
-        "Calendar": {
-          "type": "string"
-        },
-        "Comment": {
-          "type": "string"
-        },
-        "DefaultSignKey": {
-          "type": "integer"
-        },
-        "FollowUpID": {
-          "type": "integer"
-        },
-        "FollowUpLock": {
-          "type": "integer"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "ParentID": {
-          "type": "integer"
-        },
-        "Signature": {
-          "type": "string"
-        },
-        "SystemAddressID": {
-          "type": "integer"
-        },
-        "UnlockTimeout": {
-          "type": "integer"
-        },
-        "ValidID": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "Name",
-        "ValidID"
-      ]
-    }
-  },
-  "required": [
-    "Queue"
-  ]
+   "$id" : "QueuePostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The queue request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "Queue" : {
+         "type" : "object",
+         "properties" : {
+            "Calendar" : {
+               "type" : "string"
+            },
+            "Comment" : {
+               "type" : "string"
+            },
+            "DefaultSignKey" : {
+               "type" : "integer"
+            },
+            "FollowUpID" : {
+               "type" : "integer"
+            },
+            "FollowUpLock" : {
+               "type" : "integer"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ParentID" : {
+               "type" : "integer"
+            },
+            "Signature" : {
+               "type" : "string"
+            },
+            "SystemAddressID" : {
+               "type" : "integer"
+            },
+            "UnlockTimeout" : {
+               "type" : "integer"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Name",
+            "ValidID"
+         ]
+      }
+   },
+   "required" : [
+      "Queue"
+   ]
 }

@@ -1,17 +1,100 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "OAuth2ProfileCollectionResponse.json",
-  "type": "object",
-  "description": "A list of oauth2 profiles.",
-  "properties": {
-    "Profile": {
-      "type": "array",
-      "items": {
-        "$ref": "OAuth2Profile.json"
+   "$id" : "OAuth2ProfileCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of oauth2 profiles.",
+   "type" : "object",
+   "properties" : {
+      "Profile" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_OAuth2Profile_json"
+         }
       }
-    }
-  },
-  "required": [
-    "Profile"
-  ]
+   },
+   "required" : [
+      "Profile"
+   ],
+   "definitions" : {
+      "_OAuth2Profile_json" : {
+         "$id" : "OAuth2Profile.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The oauth2 profile object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClientID" : {
+               "description" : "ID of the OAuth2 client.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HasAccessToken" : {
+               "description" : "Shows if profile has a valid access token (1 = yes, 0 = no).",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Scope" : {
+               "description" : "Scope to request for the OAuth2 token.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLAuth" : {
+               "description" : "Base URL for the OAuth2 authorization.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLRedirect" : {
+               "description" : "Base URL for redirects after OAuth2 authorization.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "URLToken" : {
+               "description" : "Base URL for requesting OAuth2 token.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "ClientID",
+            "CreateBy",
+            "CreateTime",
+            "HasAccessToken",
+            "ID",
+            "Name",
+            "Scope",
+            "URLAuth",
+            "URLToken",
+            "URLRedirect",
+            "ValidID"
+         ]
+      }
+   }
 }

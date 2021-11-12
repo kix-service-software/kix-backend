@@ -1,17 +1,44 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "UserPreferenceCollectionResponse.json",
-  "type": "object",
-  "description": "A list of user preferences.",
-  "properties": {
-    "UserPreference": {
-      "type": "array",
-      "items": {
-        "$ref": "UserPreference.json"
+   "$id" : "UserPreferenceCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of user preferences.",
+   "type" : "object",
+   "properties" : {
+      "UserPreference" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_UserPreference_json"
+         }
       }
-    }
-  },
-  "required": [
-    "UserPreference"
-  ]
+   },
+   "required" : [
+      "UserPreference"
+   ],
+   "definitions" : {
+      "_UserPreference_json" : {
+         "$id" : "UserPreference.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The user preference object.",
+         "type" : "object",
+         "properties" : {
+            "ID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ID",
+            "UserID",
+            "Value"
+         ]
+      }
+   }
 }

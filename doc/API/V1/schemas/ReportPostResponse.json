@@ -1,14 +1,14 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ReportPostResponse.json",
-  "type": "object",
-  "description": "The ID of the created report.",
-  "properties": {
-    "ReportID": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "ReportID"
-  ]
+   "$id" : "ReportPostResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created report.",
+   "type" : "object",
+   "properties" : {
+      "ReportID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ReportID"
+   ]
 }

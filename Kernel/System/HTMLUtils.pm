@@ -18,6 +18,8 @@ use utf8;
 use MIME::Base64;
 use HTML::Truncate;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'Encode',
@@ -1209,6 +1211,9 @@ sub EmbeddedImagesExtract {
     }
 
     my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
     ${ $Param{DocumentRef} } =~ s{(src=")(data:image/)(png|gif|jpg|jpeg|bmp)(;base64,)(.+?)(")}{
 
         my $Base64String = $5;

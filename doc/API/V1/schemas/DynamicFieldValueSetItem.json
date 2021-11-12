@@ -1,40 +1,40 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "DynamicFieldValueSetItem.json",
-  "type": "object",
-  "description": "The dynamic field value object to set it for an object.",
-  "properties": {
-    "Name": {
-      "type": "string",
-      "description": "the name of the relevant dynamic field"
-    },
-    "Value": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "integer"
-        },
-        {
-          "type":"array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              }
-            ]
-          }
-        }
-      ],
-      "description": "value type depends on the dynamic field (can also be an array of value type)"
-    }
-  },
-  "required": [
-    "Name",
-    "Value"
-  ]
+   "$id" : "DynamicFieldValueSetItem.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The dynamic field value object to set it for an object.",
+   "type" : "object",
+   "properties" : {
+      "Name" : {
+         "description" : "the name of the relevant dynamic field",
+         "type" : "string"
+      },
+      "Value" : {
+         "description" : "value type depends on the dynamic field (can also be an array of value type)",
+         "anyOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "array",
+               "items" : {
+                  "anyOf" : [
+                     {
+                        "type" : "string"
+                     },
+                     {
+                        "type" : "integer"
+                     }
+                  ]
+               }
+            }
+         ]
+      }
+   },
+   "required" : [
+      "Name",
+      "Value"
+   ]
 }

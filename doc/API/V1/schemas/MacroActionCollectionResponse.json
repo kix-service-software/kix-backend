@@ -1,17 +1,81 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "MacroActionCollectionResponse.json",
-  "type": "object",
-  "description": "A list of macro actions.",
-  "properties": {
-    "MacroAction": {
-      "type": "array",
-      "items": {
-        "$ref": "MacroAction.json"
+   "$id" : "MacroActionCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of macro actions.",
+   "type" : "object",
+   "properties" : {
+      "MacroAction" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_MacroAction_json"
+         }
       }
-    }
-  },
-  "required": [
-    "MacroAction"
-  ]
+   },
+   "required" : [
+      "MacroAction"
+   ],
+   "definitions" : {
+      "_MacroAction_json" : {
+         "$id" : "MacroAction.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro action object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MacroID" : {
+               "description" : "ID of the corresponding macro.",
+               "type" : "integer"
+            },
+            "Parameters" : {
+               "description" : "",
+               "type" : "object"
+            },
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "MacroID",
+            "Type",
+            "ValidID"
+         ]
+      }
+   }
 }

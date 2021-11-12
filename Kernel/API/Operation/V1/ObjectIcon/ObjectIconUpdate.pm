@@ -141,8 +141,8 @@ sub Run {
     
     # check if ObjectIcon exists
     my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
-        Object   => $ObjectIcon->{Object},
-        ObjectID => $ObjectIcon->{ObjectID},        
+        Object   => $ObjectIcon->{Object} || $ObjectIconData{Object},
+        ObjectID => $ObjectIcon->{ObjectID} || $ObjectIconData{ObjectID},        
     );
 
     if ( IsArrayRefWithData($ObjectIconList) && $ObjectIconList->[0] != $Param{Data}->{ObjectIconID} ) {

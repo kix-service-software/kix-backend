@@ -29,6 +29,8 @@ use Kernel::System::UnitTest::Helper;
 
 use Kernel::System::UnitTest::AllureAdapter;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'DB',
@@ -153,13 +155,13 @@ sub Run {
     # use a plugin as base
     if ( $Param{Plugin} ) {
         my @PluginList = $Kernel::OM->Get('Installation')->PluginList();
-        my %Plugins = map { $_->{Product} => $_ } @PluginList; 
+        my %Plugins = map { $_->{Product} => $_ } @PluginList;
         if ( !$Plugins{$Param{Plugin}} ) {
             print STDERR "Plugin doesn't exist!\n";
             return;
         }
         $Home = $Plugins{$Param{Plugin}}->{Directory};
-    } 
+    }
 
     my $Directory = "$Home/scripts/test";
 
@@ -285,7 +287,11 @@ sub Run {
     );
     my %OSInfo = $Kernel::OM->Get('Environment')->OSInfoGet();
     $ResultSummary{Product} = $Product;
-    $ResultSummary{Host} = $Kernel::OM->Get('Config')->Get('FQDN');
+    my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
+    $ResultSummary{Host} = $FQDN;
     $ResultSummary{Perl} = sprintf "%vd", $^V;
     $ResultSummary{OS} = $OSInfo{OS};
     $ResultSummary{Vendor} = $OSInfo{OSName};
@@ -378,7 +384,7 @@ sub _PrintHeadlineStart {
         $Self->{Content} .= "<tr><td nowrap style='width:60px;text-align:right'>$FileCount/$FileTotal</td>";
         $Self->{Content} .= "<td nowrap style='width:500px'>$Name</td><td>";
     }
-    
+
     if ($Self->{Output}->{ASCII}) {
         printf("(%4i/%i) %s ", $FileCount, $FileTotal, $Name);
     }
@@ -422,7 +428,7 @@ sub _PrintHeadlineEnd {
         $Self->{Content} .= "<td style='width:50px;color:$Color'>$Result</td>\n";
         $Self->{Content} .= "</tr>\n";
     }
-    
+
     if ($Self->{Output}->{ASCII}) {
         if ($Self->{Pretty} || $Self->{Verbose}) {
             print {$Self->{OriginalSTDOUT}} "\n";
@@ -467,7 +473,7 @@ sub _PrintSummary {
         print "<tr><td>Test FAILED:</td><td>$ResultSummary{TestNotOk}</td></tr>\n";
         print "</table><br>\n";
     }
-    
+
     if ($Self->{Output}->{ASCII}) {
         print "=====================================================================\n";
         print " Product:     $ResultSummary{Product}\n";
@@ -544,7 +550,7 @@ sub _Print {
         $Self->_ResetSelfOutputBuffer;
         $Self->{StartTime} = int(time() * 1000);
     }
-        
+
     my $PrintName = $Name;
     if (length $PrintName > 1000) {
         $PrintName = substr($PrintName, 0, 1000) . "...";
@@ -570,7 +576,7 @@ sub _Print {
                 $Self->{Content} .= "<span style='color:green;cursor:pointer' title='($Self->{TestCount}) OK: $TestStep'>&#x25FC</span>";
             }
         }
-        
+
         if ($Self->{Output}->{ASCII}) {
             if ($Self->{Verbose}) {
                 print {$Self->{OriginalSTDOUT}} " " . $Self->_Color('green', "\n OK") . " $Self->{TestCount} - $PrintName\n";
@@ -596,7 +602,7 @@ sub _Print {
                 $Self->{Content} .= "<span style='color:red;cursor:pointer' title='($Self->{TestCount}) FAILED: $TestStep'>&#x25FC</span>";
             }
         }
-        
+
         if ($Self->{Output}->{ASCII}) {
             if ($Self->{Verbose}) {
                 print {$Self->{OriginalSTDOUT}} "\n";
@@ -648,7 +654,7 @@ sub _Color {
         }
         $Self->{CurrentColor} = $Color;
     }
-    
+
     if ($Self->{Output}->{ASCII} ) {
         return $Text if !$Self->{ANSI};
         return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');

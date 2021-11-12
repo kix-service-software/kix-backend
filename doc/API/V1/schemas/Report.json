@@ -1,59 +1,109 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "Report.json",
-  "type": "object",
-  "description": "The report object.",
-  "properties": {
-    "Config": {
-        "type": "object",
-        "properties": {
-            "Parameters": {
-                "type": "object",
-                "readOnly": true
+   "$id" : "Report.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The report object.",
+   "type" : "object",
+   "properties" : {
+      "Config" : {
+         "type" : "object",
+         "properties" : {
+            "OutputFormats" : {
+               "type" : "array",
+               "item" : {
+                  "readOnly" : true,
+                  "type:" : "string"
+               },
+               "readOnly" : true
             },
-            "OutputFormats": {
-                "type": "array",
-                "readOnly": true,
-                "item": {
-                    "type:": "string",
-                    "readOnly": true
-                }
+            "Parameters" : {
+               "type" : "object",
+               "readOnly" : true
             }
-        },
-        "required": [
+         },
+         "required" : [
             "OutputFormats"
-        ]
-    },
-    "CreateBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "DefinitionID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "ID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Results": {
-      "type": "array",
-      "description": "added via include \"Results\"",
-      "readOnly": true,
-      "item": {
-          "$ref": "ReportResult.json"
+         ]
+      },
+      "CreateBy" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "CreateTime" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "DefinitionID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "ID" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "Results" : {
+         "description" : "added via include \"Results\"",
+         "type" : "array",
+         "item" : {
+            "$ref" : "#/definitions/_ReportResult_json"
+         },
+         "readOnly" : true
       }
-    }
-  },
-  "required": [
-    "CreateBy",
-    "CreateTime",
-    "DefinitionID",
-    "ID",
-    "Config"
-  ]
+   },
+   "required" : [
+      "CreateBy",
+      "CreateTime",
+      "DefinitionID",
+      "ID",
+      "Config"
+   ],
+   "definitions" : {
+      "_ReportResult_json" : {
+         "$id" : "ReportResult.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The report result object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "added via include \"Content\" (base64 encoded)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentSize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Format" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ReportID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "Format",
+            "ID",
+            "ReportID"
+         ]
+      }
+   }
 }

@@ -161,15 +161,29 @@ sub Run {
                 }
 
                 if ( $SearchType eq 'OR' ) {
-                    # perform search for every attribute
-                    my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                        %SearchParam,
-                        UserID  => $Self->{Authorization}->{UserID},
-                        Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+                    my $SearchResult;
 
-                        # use ids of customer if given
-                        ConfigItemIDs => $CustomerCIIDList
-                    );
+                    # special search attribute AssignedContact handling
+                    if ($Field eq 'AssignedContact') {
+                        # result are only for NOT customer context else it is always empty
+                        # --> do not include ids for other contacts
+                        if ($Self->{Authorization}->{UserType} ne 'Customer') {
+                            $SearchResult = $Self->_GetContactAssignedConfigItems(
+                                ContactID => $SearchParam{AssignedContact}
+                            );
+                        }
+                    } else {
+
+                        # perform search for every attribute
+                        $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                            %SearchParam,
+                            UserID  => $Self->{Authorization}->{UserID},
+                            Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+
+                            # use ids of customer if given
+                            ConfigItemIDs => $CustomerCIIDList
+                        );
+                    }
 
                     # merge results
                     my @MergeResult = keys %{{map {($_ => 1)} (@SearchTypeResult, @{$SearchResult})}};
@@ -181,16 +195,33 @@ sub Run {
             }
 
             if ( $SearchType eq 'AND' ) {
-                # perform ConfigItem search
-                my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                    %SearchParam,
-                    UserID  => $Self->{Authorization}->{UserID},
-                    Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
 
-                    # use ids of customer if given
-                    ConfigItemIDs => $CustomerCIIDList
-                );
-                @SearchTypeResult = @{$SearchResult};
+                # special search attribute AssignedContact handling
+                my $SkipAndSearch = 0;
+                if (exists $SearchParam{AssignedContact} && $Self->{Authorization}->{UserType} ne 'Customer') {
+                    $CustomerCIIDList = $Self->_GetContactAssignedConfigItems(
+                        ContactID => $SearchParam{AssignedContact}
+                    );
+
+                    # skip and search if no id are found (AND can not be fulfilled)
+                    if (!IsArrayRefWithData($CustomerCIIDList)) {
+                        $SkipAndSearch = 1;
+                    }
+                }
+
+                if (!$SkipAndSearch) {
+
+                    # perform ConfigItem search
+                    my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                        %SearchParam,
+                        UserID  => $Self->{Authorization}->{UserID},
+                        Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+
+                        # use ids of customer if given
+                        ConfigItemIDs => $CustomerCIIDList
+                    );
+                    @SearchTypeResult = @{$SearchResult};
+                }
             }
 
             if ( !defined $ConfigItemList ) {
@@ -251,6 +282,37 @@ sub Run {
     return $Self->_Success(
         ConfigItem => [],
     );
+}
+
+sub _GetContactAssignedConfigItems {
+    my ( $Self, %Param ) = @_;
+
+    my $IDList;
+    if ($Param{ContactID}) {
+
+        # get contact and user data
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+            ID            => $Param{ContactID},
+            DynamicFields => 1
+        );
+        if (!$ContactData{User} && $ContactData{AssignedUserID}) {
+            my %User = $Kernel::OM->Get('User')->GetUserData(
+                UserID => $ContactData{AssignedUserID},
+            );
+            $ContactData{User} = IsHashRefWithData(\%User) ? \%User : undef;
+        }
+
+        # get object relevant ids
+        if ( IsHashRefWithData(\%ContactData) ) {
+            $IDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
+                ObjectType => 'Contact',
+                Object     => \%ContactData,
+                UserID     => $Self->{Authorization}->{UserID}
+            );
+        }
+    }
+
+    return $IDList;
 }
 
 1;

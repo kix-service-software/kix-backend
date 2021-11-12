@@ -1,24 +1,28 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "TicketArticleFlagPatchRequest.json",
-  "type": "object",
-  "description": "The ticket article flag request object for update.",
-  "properties": {
-    "ArticleFlag": {
-      "properties": {
-        "Value": {
-          "oneOf": [
-            {"type": "string"},
-            {"type": "integer"}
-          ]
-        }
-      },
-      "required": [
-        "Value"
-      ]
-    }
-  },
-  "required": [
-    "ArticleFlag"
-  ]
+   "$id" : "TicketArticleFlagPatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ticket article flag request object for update.",
+   "type" : "object",
+   "properties" : {
+      "ArticleFlag" : {
+         "properties" : {
+            "Value" : {
+               "oneOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Value"
+         ]
+      }
+   },
+   "required" : [
+      "ArticleFlag"
+   ]
 }

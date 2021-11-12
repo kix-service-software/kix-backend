@@ -1,17 +1,73 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "DataSourceCollectionResponse.json",
-  "type": "object",
-  "description": "A list of data sources.",
-  "properties": {
-    "DataSource": {
-      "type": "array",
-      "items": {
-        "$ref": "DataSource.json"
+   "$id" : "DataSourceCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of data sources.",
+   "type" : "object",
+   "properties" : {
+      "DataSource" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_DataSource_json"
+         }
       }
-    }
-  },
-  "required": [
-    "DataSource"
-  ]
+   },
+   "required" : [
+      "DataSource"
+   ],
+   "definitions" : {
+      "_DataSource_json" : {
+         "$id" : "DataSource.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The report data source object.",
+         "type" : "object",
+         "properties" : {
+            "Description" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayName" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Options" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "object",
+                     "properties" : {
+                        "Description" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Label" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Name" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Required" : {
+                           "type" : "integer",
+                           "readOnly" : true
+                        }
+                     },
+                     "required" : [
+                        "Label",
+                        "Name"
+                     ]
+                  }
+               }
+            }
+         },
+         "required" : [
+            "Description",
+            "Name"
+         ]
+      }
+   }
 }

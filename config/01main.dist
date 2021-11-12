@@ -15,5 +15,5 @@ DatabaseDSN  => "DBI:Pg:dbname=<KIX_CONFIG_Database>;host=<KIX_CONFIG_DatabaseHo
 # ---------------------------------------------------- #
 CheckMXRecord => 0,
 SecureMode    => 1,
-FQDN          => '__FQDN__',
+FQDN          => { Frontend => '__FQDN__', Backend => '__FQDN__', SSP => '__FQDN__' },
 Home          => '/opt/kix18',

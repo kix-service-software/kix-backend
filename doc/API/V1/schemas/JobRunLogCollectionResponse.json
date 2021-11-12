@@ -1,17 +1,96 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "JobRunLogCollectionResponse.json",
-  "type": "object",
-  "description": "A list of job run logs.",
-  "properties": {
-    "JobRunLog": {
-      "type": "array",
-      "items": {
-        "$ref": "JobRunLog.json"
+   "$id" : "JobRunLogCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of job run logs.",
+   "type" : "object",
+   "properties" : {
+      "JobRunLog" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_JobRunLog_json"
+         }
       }
-    }
-  },
-  "required": [
-    "JobRunLog"
-  ]  
+   },
+   "required" : [
+      "JobRunLog"
+   ],
+   "definitions" : {
+      "_JobRunLog_json" : {
+         "$id" : "JobRun.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The job run object.",
+         "type" : "object",
+         "properties" : {
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "JobID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MacroActionID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "MacroID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Message" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "anyOf" : [
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ],
+               "readOnly" : true
+            },
+            "Priority" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "RunID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "JobID",
+            "Priority",
+            "RunID"
+         ]
+      }
+   }
 }

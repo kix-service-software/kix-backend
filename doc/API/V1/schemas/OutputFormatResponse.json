@@ -1,14 +1,70 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "OutputFormatResponse.json",
-  "type": "object",
-  "description": "A response for a output format GET request.",
-  "properties": {
-    "OutputFormat": {
-      "$ref": "OutputFormat.json"
-    }
-  },
-  "required": [
-    "OutputFormat"
-  ]
+   "$id" : "OutputFormatResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a output format GET request.",
+   "type" : "object",
+   "properties" : {
+      "OutputFormat" : {
+         "$ref" : "#/definitions/_OutputFormat_json"
+      }
+   },
+   "required" : [
+      "OutputFormat"
+   ],
+   "definitions" : {
+      "_OutputFormat_json" : {
+         "$id" : "OutputFormat.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The output format object.",
+         "type" : "object",
+         "properties" : {
+            "Description" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayName" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Options" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "object",
+                     "properties" : {
+                        "Description" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Label" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Name" : {
+                           "type" : "string",
+                           "readOnly" : true
+                        },
+                        "Required" : {
+                           "type" : "integer",
+                           "readOnly" : true
+                        }
+                     },
+                     "required" : [
+                        "Label",
+                        "Name"
+                     ]
+                  }
+               }
+            }
+         },
+         "required" : [
+            "Description",
+            "Name"
+         ]
+      }
+   }
 }

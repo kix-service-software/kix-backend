@@ -770,42 +770,72 @@ sub _ReplaceResultVariables {
     else {
         foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
             if ( $Param{Data} =~ /^\s*\$\{\Q$Variable\E(\|(.*?))?\}\s*$/ ) {
-                # variable is an assignment, we can replace it with the actual value (i.e. Object)
                 my $Filter = $2;
+                # variable is an assignment, we can replace it with the actual value (i.e. Object)
                 $Param{Data} = $Self->{MacroResults}->{$Variable};
-                if ( $Filter && $Filter eq 'JSON' && IsStringWithData($Param{Data}) ) {
-                    $Param{Data} = $Kernel::OM->Get('JSON')->Encode(
-                        Data => $Param{Data}
-                    );
-                    $Param{Data} =~ s/^"//;
-                    $Param{Data} =~ s/"$//;
-                }
-                elsif ( $Filter && $Filter eq 'base64' ) {
-                    $Param{Data} = MIME::Base64::encode_base64($Param{Data});
-                    $Param{Data} =~ s/\n//g;
-                }
+                $Param{Data} = $Self->_ExecuteVariableFilters(
+                    Data   => $Param{Data},
+                    Filter => $Filter,
+                );
             }
             elsif ( $Param{Data} =~ /\$\{\Q$Variable\E(\|(.*?))?\}/ ) {
+                my $Filter = $2;
                 # variable is part of a string, we have to do a string replace
-                my $Filter = $2 || '';
                 my $Value = $Self->{MacroResults}->{$Variable};
-                if ( $Filter && $Filter eq 'JSON' ) {
-                    $Value = $Kernel::OM->Get('JSON')->Encode(
-                        Data => $Value
-                    );
-                    $Value =~ s/^"//;
-                    $Value =~ s/"$//;
-                }
-                elsif ( $Filter && $Filter eq 'base64' ) {
-                    $Value = MIME::Base64::encode_base64($Value);
-                    $Value =~ s/\n//g;
-                }
+                $Value = $Self->_ExecuteVariableFilters(
+                    Data   => $Value,
+                    Filter => $Filter,
+                );
                 $Param{Data} =~ s/\$\{\Q$Variable\E(\|$Filter)?\}/$Value/gmx;
             }
         }
     }
 
     return $Param{Data};
+}
+
+sub _ExecuteVariableFilters {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Data} if !$Param{Filter};
+
+    my @Filters = split(/\|/, $Param{Filter});
+
+    my $Value = $Param{Data};
+
+    foreach my $Filter ( @Filters ) {
+        next if !$Filter;
+
+        if ( $Filter =~ /^(JSON|ToJSON)$/ ) {
+            $Value = $Kernel::OM->Get('JSON')->Encode(
+                Data => $Value
+            );
+            $Value =~ s/^"//;
+            $Value =~ s/"$//;
+        }
+        elsif ( $Filter =~ /^FromJSON(\((.*?)\))?/ && IsStringWithData($Value) ) {
+            my $JqExpression = $2;
+            if ( $JqExpression ) {
+                $JqExpression =~ s/\s+::\s+/|/g;
+                my $Result = `echo '$Value' | jq '$JqExpression'`;
+                chomp $Result;
+                $Value = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $Result
+                );
+            }
+            else {
+                $Value = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $Value
+                );
+            }
+        }
+        elsif ( $Filter eq 'base64' ) {
+            $Value = MIME::Base64::encode_base64($Value);
+            $Value =~ s/\n//g;
+        }
+    }
+
+    return $Value;
 }
 
 1;

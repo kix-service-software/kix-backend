@@ -1,17 +1,265 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ReportDefinitionCollectionResponse.json",
-  "type": "object",
-  "description": "A list of report definitions.",
-  "properties": {
-    "ReportDefinition": {
-      "type": "array",
-      "items": {
-        "$ref": "ReportDefinition.json"
+   "$id" : "ReportDefinitionCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of report definitions.",
+   "type" : "object",
+   "properties" : {
+      "ReportDefinition" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_ReportDefinition_json"
+         }
       }
-    }
-  },
-  "required": [
-    "ReportDefinition"
-  ]
+   },
+   "required" : [
+      "ReportDefinition"
+   ],
+   "definitions" : {
+      "_ReportDefinition_json" : {
+         "$id" : "ReportDefinition.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The report definition object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Config" : {
+               "type" : "object",
+               "properties" : {
+                  "DataSource" : {
+                     "type" : "object",
+                     "readOnly" : true
+                  },
+                  "OutputFormats" : {
+                     "type" : "object",
+                     "readOnly" : true
+                  },
+                  "Parameters" : {
+                     "type" : "array",
+                     "item" : {
+                        "type" : "object",
+                        "patternProperties" : {
+                           "^[a-zA-Z]+$" : {
+                              "type" : "object",
+                              "properties" : {
+                                 "DataType" : {
+                                    "type" : "string",
+                                    "readOnly" : true
+                                 },
+                                 "Default" : {
+                                    "anyOf" : [
+                                       {
+                                          "type" : "object"
+                                       },
+                                       {
+                                          "type" : "string"
+                                       },
+                                       {
+                                          "type" : "number"
+                                       },
+                                       {
+                                          "type" : "null"
+                                       }
+                                    ],
+                                    "readOnly" : true
+                                 },
+                                 "Description" : {
+                                    "type" : "string",
+                                    "readOnly" : true
+                                 },
+                                 "Label" : {
+                                    "type" : "string",
+                                    "readOnly" : true
+                                 },
+                                 "Required" : {
+                                    "type" : "integer",
+                                    "readOnly" : true
+                                 },
+                                 "Type" : {
+                                    "type" : "string",
+                                    "readOnly" : true
+                                 }
+                              },
+                              "required" : [
+                                 "Label",
+                                 "DataType"
+                              ],
+                              "readOnly" : true
+                           }
+                        }
+                     }
+                  },
+                  "Title" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "DataSource"
+               ],
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DataSource" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Reports" : {
+               "description" : "added via include \"Reports\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_Report_json"
+               },
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Name",
+            "DataSource",
+            "Config",
+            "ValidID"
+         ]
+      },
+      "_ReportResult_json" : {
+         "$id" : "ReportResult.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The report result object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "added via include \"Content\" (base64 encoded)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentSize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Format" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ReportID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "Format",
+            "ID",
+            "ReportID"
+         ]
+      },
+      "_Report_json" : {
+         "$id" : "Report.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The report object.",
+         "type" : "object",
+         "properties" : {
+            "Config" : {
+               "type" : "object",
+               "properties" : {
+                  "OutputFormats" : {
+                     "type" : "array",
+                     "item" : {
+                        "readOnly" : true,
+                        "type:" : "string"
+                     },
+                     "readOnly" : true
+                  },
+                  "Parameters" : {
+                     "type" : "object",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "OutputFormats"
+               ]
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DefinitionID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Results" : {
+               "description" : "added via include \"Results\"",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_ReportResult_json"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "CreateBy",
+            "CreateTime",
+            "DefinitionID",
+            "ID",
+            "Config"
+         ]
+      }
+   }
 }

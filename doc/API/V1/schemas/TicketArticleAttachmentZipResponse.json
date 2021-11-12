@@ -1,42 +1,42 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "TicketArticleAttachmentZipResponse.json",
-  "type": "object",
-  "description": "A response for a ticket article attachments as zip GET request.",
-  "properties": {
-    "Attachment": {
-      "properties": {
-        "Content": {
-          "type": "string",
-          "readOnly": true,
-          "description": "added via include \"Content\" (base64 encoded zip content)"
-        },
-        "ContentType": {
-            "type": "string",
-            "readOnly": true
-        },
-        "Filename": {
-            "type": "string",
-            "readOnly": true
-        },
-        "Filesize": {
-            "type": "string",
-            "readOnly": true
-        },
-        "FilesizeRaw": {
-            "type": "integer",
-            "readOnly": true
-        }
-      },
-      "required" : [
-        "ContentType",
-        "Filename",
-        "Filesize",
-        "FilesizeRaw"
-      ]
-    }
-  },
-  "required": [
-    "Attachment"
-  ]
+   "$id" : "TicketArticleAttachmentZipResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a ticket article attachments as zip GET request.",
+   "type" : "object",
+   "properties" : {
+      "Attachment" : {
+         "properties" : {
+            "Content" : {
+               "description" : "added via include \"Content\" (base64 encoded zip content)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ContentType",
+            "Filename",
+            "Filesize",
+            "FilesizeRaw"
+         ]
+      }
+   },
+   "required" : [
+      "Attachment"
+   ]
 }
