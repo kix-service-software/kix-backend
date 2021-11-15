@@ -277,6 +277,18 @@ sub GetCacheDependencies {
     return;
 }
 
+sub ExportConfigPrepare {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Config};
+}
+
+sub ImportConfigPrepare {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Config};
+}
+
 1;
 
 =back

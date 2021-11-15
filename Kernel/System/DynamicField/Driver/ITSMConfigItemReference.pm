@@ -1281,6 +1281,83 @@ sub ColumnFilterValuesGet {
     return $ColumnFilterValues;
 }
 
+sub ExportConfigPrepare {
+    my ( $Self, %Param ) = @_;
+    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
+
+    if ( 
+        $Param{Config}->{DeploymentStates}
+        || $Param{Config}->{ITSMConfigItemClasses}
+    ) {
+        KEY:
+        for my $Key ( qw(DeploymentStates ITSMConfigItemClasses) ) {
+            next KEY if !$Param{Config}->{$Key};
+            my @Names;
+
+            ITEM:
+            for my $ItemID ( @{$Param{Config}->{$Key}} ) {
+                next ITEM if !$ItemID;
+
+                if ( $ItemID !~ m/^\d+$/ ) {
+                    push(@Names, $ItemID);
+                    next ITEM;
+                }
+                my $ItemDataRef = $GeneralCatalogObject->ItemGet(
+                    ItemID => $ItemID
+                );
+
+                next ITEM if !$ItemDataRef;
+
+                push(@Names, $ItemDataRef->{Name});
+            }
+
+            if ( scalar(@Names) ) {
+                $Param{Config}->{$Key} = \@Names;
+            } else {
+                delete $Param{Config}->{$Key};
+            }
+        }
+    }
+
+    return $Param{Config};
+}
+
+sub ImportConfigPrepare {
+    my ( $Self, %Param ) = @_;
+    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
+
+    if ( 
+        $Param{Config}->{DeploymentStates}
+        || $Param{Config}->{ITSMConfigItemClasses}
+    ) {
+        KEY:
+        for my $Key ( qw(DeploymentStates ITSMConfigItemClasses) ) {
+            next KEY if !$Param{Config}->{$Key};
+            my @IDs;
+
+            ITEM:
+            for my $ItemName ( @{$Param{Config}->{$Key}} ) {
+                my $ItemDataRef = GeneralCatalogObject->ItemGet(
+                    Class => 'ITSM::ConfigItem::' . ($Key eq 'DeploymentStates' ? 'DeploymentState' : 'Class'),
+                    Name  => $ItemName,
+                );
+
+                next ITEM if !$ItemDataRef;
+
+                push(@IDs, $ItemDataRef->{Name});
+            }
+
+            if ( scalar(@IDs) ) {
+                $Param{Config}->{$Key} = \@IDs;
+            } else {
+                delete $Param{Config}->{$Key};
+            }
+        }
+    }
+
+    return $Param{Config};
+}
+
 sub _ExportXMLSearchDataPrepare {
     my ( $Self, %Param ) = @_;
 

@@ -580,6 +580,13 @@ get DynamicField list ordered by the the "Field Order" field in the DB
         ObjectType => 'Ticket',
         ObjectType => ['Ticket', 'Article'],
 
+        # field  type (optional) as STRING or as ARRAYREF
+        FieldType => 'Text',
+        FieldType => [
+            'Text', 'Textarea', 'Date', 'DateTime', 'ITSMConfigItemReference', 
+            'Multiselect', 'CheckList', 'TicketReference', 'Dropdown', ...
+        ],
+
         ResultType => 'HASH',   # optional, 'ARRAY' or 'HASH', defaults to 'ARRAY'
 
         FieldFilter => {        # optional, only active fields (non 0) will be returned
@@ -618,7 +625,10 @@ sub DynamicFieldList {
     # to store fieldIDs whitelist
     my %AllowedFieldIDs;
 
-    if ( defined $Param{FieldFilter} && ref $Param{FieldFilter} eq 'HASH' ) {
+    if ( 
+        defined $Param{FieldFilter} 
+        && ref $Param{FieldFilter} eq 'HASH' 
+    ) {
 
         # fill the fieldIDs whitelist
         FIELDNAME:
@@ -642,10 +652,19 @@ sub DynamicFieldList {
     # set cache key object type component depending on the ObjectType parameter
     my $ObjectType = 'All';
     if ( IsArrayRefWithData( $Param{ObjectType} ) ) {
-        $ObjectType = join '_', sort @{ $Param{ObjectType} };
+        $ObjectType = join( '_', sort @{ $Param{ObjectType} } );
     }
     elsif ( IsStringWithData( $Param{ObjectType} ) ) {
         $ObjectType = $Param{ObjectType};
+    }
+
+    # set cache key field type component depending on the FieldType parameter
+    my $FieldType = 'All';
+    if ( IsArrayRefWithData( $Param{FieldType} ) ) {
+        $FieldType = join( '_', sort @{ $Param{FieldType} } );
+    }
+    elsif ( IsStringWithData( $Param{FieldType} ) ) {
+        $FieldType = $Param{FieldType};
     }
 
     my $ResultType = $Param{ResultType} || 'ARRAY';
@@ -658,6 +677,8 @@ sub DynamicFieldList {
         . $Valid
         . '::ObjectType::'
         . $ObjectType
+        . '::FieldType::'
+        . $FieldType
         . '::ResultType::'
         . $ResultType;
     my $Cache = $CacheObject->Get(
@@ -727,7 +748,10 @@ sub DynamicFieldList {
             $SQL .= ' WHERE valid_id IN (' . join ', ', $ValidObject->ValidIDsGet() . ')';
 
             if ( $Param{ObjectType} ) {
-                if ( IsStringWithData( $Param{ObjectType} ) && $Param{ObjectType} ne 'All' ) {
+                if ( 
+                    IsStringWithData( $Param{ObjectType} ) 
+                    && $Param{ObjectType} ne 'All' 
+                ) {
                     $SQL .=
                         " AND object_type = '"
                         . $DBObject->Quote( $Param{ObjectType} ) . "'";
@@ -738,6 +762,25 @@ sub DynamicFieldList {
                         map "'" . $DBObject->Quote($_) . "'",
                         @{ $Param{ObjectType} };
                     $SQL .= " AND object_type IN ($ObjectTypeString)";
+
+                }
+            }
+
+            if ( $Param{FieldType} ) {
+                if ( 
+                    IsStringWithData( $Param{FieldType} )
+                    && $Param{FieldType} ne 'All' 
+                ) {
+                    $SQL .=
+                        " AND field_type = '"
+                        . $DBObject->Quote( $Param{FieldType} ) . "'";
+                }
+                elsif ( IsArrayRefWithData( $Param{FieldType} ) ) {
+                    my $FieldTypeString =
+                        join ',',
+                        map "'" . $DBObject->Quote($_) . "'",
+                        @{ $Param{FieldType} };
+                    $SQL .= " AND field_type IN ($FieldTypeString)";
 
                 }
             }
@@ -755,6 +798,21 @@ sub DynamicFieldList {
                         map "'" . $DBObject->Quote($_) . "'",
                         @{ $Param{ObjectType} };
                     $SQL .= " WHERE object_type IN ($ObjectTypeString)";
+                }
+            }
+
+            if ( $Param{FieldType} ) {
+                if ( IsStringWithData( $Param{FieldType} ) && $Param{FieldType} ne 'All' ) {
+                    $SQL .=
+                        " WHERE field_type = '"
+                        . $DBObject->Quote( $Param{FieldType} ) . "'";
+                }
+                elsif ( IsArrayRefWithData( $Param{FieldType} ) ) {
+                    my $FieldTypeString =
+                        join ',',
+                        map "'" . $DBObject->Quote($_) . "'",
+                        @{ $Param{FieldType} };
+                    $SQL .= " WHERE field_type IN ($FieldTypeString)";
                 }
             }
         }

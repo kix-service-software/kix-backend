@@ -11,8 +11,6 @@ package Kernel::System::Reporting::ReportDefinition;
 use strict;
 use warnings;
 
-use Hash::Flatten;
-
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -551,8 +549,8 @@ sub ReportDefinitionValidateParameters {
     my %Parameters = map { $_->{Name} => $_ } @{$Param{Config}->{Parameters} || []};
 
     # check if we have a parameter in the data source config which is not defined in the parameters config
-    my $FlatConfig = Hash::Flatten::flatten(
-        $Param{Config}->{DataSource}
+    my $FlatConfig = $Kernel::OM->Get('Main')->Flatten(
+        Data => $Param{Config}->{DataSource}
     );
     foreach my $Key ( keys %{$FlatConfig} ) {
         next if $FlatConfig->{$Key} !~ /\$\{Parameters.(\w+)\}/;
