@@ -223,16 +223,32 @@ sub Run {
 
     if ( !$Param{PermissionCheckOnly} ) {
 
-        # validate data
-        my $ValidatorResult = $Self->{ValidatorObject}->Validate(
-            %Param
-        );
+        my $DoValidate = 1;
 
-        if ( !$ValidatorResult->{Success} ) {
-
-            return $Self->_Error(
-                %{$ValidatorResult},
+        my $DoNotValidate = $Kernel::OM->Get('Config')->Get('API::Validator::DisableForResource');
+        if ( IsHashRefWithData($DoNotValidate)) {
+            PATTERN:
+            foreach my $Key ( keys %{$DoNotValidate} ) {
+                foreach my $Pattern ( @{$DoNotValidate->{$Key}} ) {
+                    if ( $Self->{RequestURI} =~ /^$Pattern$/ ) {
+                        $DoValidate = 0;
+                        last PATTERN;
+                    }
+                }
+            }
+        }
+        if ( $DoValidate ) {
+            # validate data
+            my $ValidatorResult = $Self->{ValidatorObject}->Validate(
+                %Param
             );
+
+            if ( !$ValidatorResult->{Success} ) {
+
+                return $Self->_Error(
+                    %{$ValidatorResult},
+                );
+            }
         }
     }
 
