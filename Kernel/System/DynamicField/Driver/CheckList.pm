@@ -188,9 +188,11 @@ sub HTMLDisplayValueRender {
                 . '<tbody>';
 
             for my $Item (@{$Items}) {
+                my $ItemValue = $Item->{Value};
+                $ItemValue =~ s/\n/<br \/>/g;
                 $Value .= '<tr>'
                     . '<td style="padding:10px 15px;">' . $Item->{Title} . '</td>'
-                    . '<td style="padding:10px 15px;">' . $Item->{Value} . '</td>'
+                    . '<td style="padding:10px 15px;">' . $ItemValue . '</td>'
                     . '</tr>';
             }
 
