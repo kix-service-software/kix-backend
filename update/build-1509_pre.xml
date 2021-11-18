@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="dynamic_field_value">
+        <ColumnChange NameOld="value_text" NameNew="value_text" Type="VARCHAR" Size="1800000"/>
+    </TableAlter>
+
+</database>
