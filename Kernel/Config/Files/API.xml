@@ -20,6 +20,26 @@
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Debug::LogRequestContent" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable API request data debugging.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Debug::LogResponseContent" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable API response data debugging.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Parallelity" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines how many threads should be used for parallel tasks. Enter 0 to deactivate.</Description>
         <Group>API</Group>

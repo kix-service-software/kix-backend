@@ -17,6 +17,8 @@ use File::Path qw(rmtree);
 
 use Kernel::System::SysConfig;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'DB',
@@ -349,8 +351,8 @@ Returns the ID and Name of the new role
         Name => '...',
         Permissions => {
             Resource => [
-                { 
-                    Target => '/tickets', 
+                {
+                    Target => '/tickets',
                     Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
                 }
             ]
@@ -450,6 +452,9 @@ sub GetTestHTTPHostname {
     return $Host if $Host;
 
     my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
+    if (IsHashRefWithData($FQDN)) {
+        $FQDN = $FQDN->{Backend}
+    }
 
     # try to resolve fqdn host
     if ( $FQDN ne 'yourhost.example.com' && gethostbyname($FQDN) ) {
@@ -682,7 +687,7 @@ sub DESTROY {
 
             $Self->{UnitTestObject}->True( $Success, "Set test role $TestRole to invalid" );
         }
-    }    
+    }
 }
 
 =item ConfigSettingChange()
@@ -774,12 +779,12 @@ mock a webserver
 #     my ( $Self, %Param ) = @_;
 
 #     use Test::Fake::HTTPD;
- 
+
 #     my $httpd = Test::Fake::HTTPD->new(
 #         timeout     => 5,
 #         daemon_args => { },
 #     );
-    
+
 #     $httpd->run(sub {
 #         my $req = shift;
 #         print STDERR Data::Dumper::Dumper($req);

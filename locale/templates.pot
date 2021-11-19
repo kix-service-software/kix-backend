@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-11-3 13:34+0000\n"
+"POT-Creation-Date: 2021-11-18 11:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1692,6 +1692,14 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Enable API level caching."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Enable API request data debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Enable API response data debugging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml

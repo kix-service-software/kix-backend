@@ -204,7 +204,11 @@ sub Stop {
             # send INT signal to running daemon
             kill 2, $RunningDaemonPID;
         }
+
     }
+
+    # wait for the main process to stop
+    while ( $RunningDaemonPID && kill 0, $RunningDaemonPID ) { sleep 1 }
 
     # cleanup
     $CacheObject->Delete(
@@ -432,7 +436,7 @@ sub _RunModule {
 sub _StopChildren {
     my (%Param) = @_;
 
-    print STDOUT "Stopping child processes...";
+    print STDOUT "Stopping child processes...\n";
 
     # send all daemon processes a stop signal
     MODULE:
@@ -470,10 +474,7 @@ sub _StopChildren {
             else {
 
                 $ProcessesStillRunning = 1;
-
-                if ($Debug) {
-                    print STDOUT "Waiting to stop $Module with PID $DaemonModules{$Module}->{PID}\n";
-                }
+                print STDOUT "Waiting to stop $DaemonModules{$Module}->{Name} with PID $DaemonModules{$Module}->{PID}\n";
             }
         }
 

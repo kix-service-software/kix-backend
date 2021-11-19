@@ -10,7 +10,6 @@ package Kernel::API::Operation::V1::Common;
 
 use strict;
 use warnings;
-use Hash::Flatten;
 use File::Basename;
 use Data::Sorting qw(:arrays);
 use Storable;
@@ -505,11 +504,9 @@ sub PrepareData {
 
         if ( grep( /::/, keys %Parameters ) ) {
 
-            my $FlatData = Hash::Flatten::flatten(
-                $Param{Data},
-                {
-                    HashDelimiter => '::',
-                }
+            my $FlatData = $Kernel::OM->Get('Main')->Flatten(
+                Data          => $Param{Data},
+                HashDelimiter => '::',
             );
 
             # add pseudo entries for substructures for requirement checking
@@ -2159,11 +2156,20 @@ sub _ExpandObject {
         }
     }
 
-    my @Data;
-    if ( IsArrayRefWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
-        @Data = @{ $Param{Data}->{ $Param{AttributeToExpand} } };
+    my $Data = $Param{Data};
+
+    if ( $Param{AttributeToExpand} =~ /[.:]/ ) {
+        # we need to flatten the data
+        $Data = $Kernel::OM->Get('Main')->Flatten(
+            Data => $Data
+        );
     }
-    elsif ( IsHashRefWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
+
+    my @Array;
+    if ( IsArrayRefWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
+        @Array = @{ $Data->{ $Param{AttributeToExpand} } };
+    }
+    elsif ( IsHashRefWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
 
         # hashref isn't possible
         return $Self->_Error(
@@ -2171,10 +2177,10 @@ sub _ExpandObject {
             Message => "Expanding a hash is not possible!",
         );
     }
-    elsif ( IsStringWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
+    elsif ( IsStringWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
 
         # convert scalar into our data array for further use
-        @Data = ( $Param{Data}->{ $Param{AttributeToExpand} } );
+        @Array = ( $Data->{ $Param{AttributeToExpand} } );
     }
     else {
         # no data available to expand
@@ -2198,7 +2204,7 @@ sub _ExpandObject {
 
     # add primary ObjectID to params
     my %ExecData = (
-        "$OperationConfig->{ObjectID}" => join( ',', sort @Data )
+        "$OperationConfig->{ObjectID}" => join( ',', sort @Array )
     );
 
     if ( $Param{ExpanderConfig}->{AddParams} ) {
@@ -2210,7 +2216,7 @@ sub _ExpandObject {
             if ( !$SourceAttr ) {
                 $SourceAttr = $TargetAttr;
             }
-            $ExecData{$TargetAttr} = $Param{Data}->{$SourceAttr},
+            $ExecData{$TargetAttr} = $Data->{$SourceAttr},
         }
     }
 
@@ -2225,17 +2231,39 @@ sub _ExpandObject {
     # extract the relevant data from result
     my $ResultData = $Result->{Data}->{ ( ( keys %{ $Result->{Data} } )[0] ) };
 
-    if ( ref( $Param{Data}->{ $Param{AttributeToExpand} } ) eq 'ARRAY' ) {
-        if ( IsArrayRefWithData($ResultData) ) {
-            $Param{Data}->{ $Param{AttributeToExpand} } = $ResultData;
+    my $StoreTo = $Param{ExpanderConfig}->{StoreTo} || $Param{AttributeToExpand};
+
+    if ( $Param{AttributeToExpand} =~ /[.:]/ ) {
+        # we need to flatten the result data
+        $ResultData = $Kernel::OM->Get('Main')->Flatten(
+            Data => $ResultData
+        );
+
+        # merge the two flat hashes
+        foreach my $Key ( keys %{$ResultData} ) {
+            $Data->{$StoreTo.'.'.$Key} = $ResultData->{$Key}
         }
-        else {
-            $Param{Data}->{ $Param{AttributeToExpand} } = [$ResultData];
-        }
+        
+        # reverse the flatten
+        $Data = $Kernel::OM->Get('Main')->Unflatten(
+            Data => $Data
+        );
     }
     else {
-        $Param{Data}->{ $Param{AttributeToExpand} } = $ResultData;
+        if ( ref( $Data->{ $StoreTo } ) eq 'ARRAY' ) {
+            if ( IsArrayRefWithData($ResultData) ) {
+                $Data->{ $StoreTo } = $ResultData;
+            }
+            else {
+                $Data->{ $StoreTo } = [$ResultData];
+            }
+        }
+        else {
+            $Data->{ $StoreTo } = $ResultData;
+        }
     }
+
+    %{$Param{Data}} = %{$Data};
 
     return $Self->_Success();
 }
@@ -2841,12 +2869,8 @@ sub _CheckPropertyPermission {
             }
             else {
                 # we need a flat data structure to easily find the attributes
-                my $FlatData = Hash::Flatten::flatten(
-                    $Param{Data},
-                    {
-                        HashDelimiter  => '.',
-                        ArrayDelimiter => ':'
-                    }
+                my $FlatData = $Kernel::OM->Get('Main')->Flatten(
+                    Data => $Param{Data},
                 );
 
                 # check if the attribute exists in the Data hash
@@ -3117,12 +3141,8 @@ sub _ReplaceVariablesInPermission {
         }
 
         # get the relevant attribute
-        my $FlatData = Hash::Flatten::flatten(
-            \%User,
-            {
-                HashDelimiter  => '.',
-                ArrayDelimiter => ':'
-            }
+        my $FlatData = $Kernel::OM->Get('Main')->Flatten(
+            Data => \%User,
         );
 
         $Result = $FlatData->{$Attribute};
