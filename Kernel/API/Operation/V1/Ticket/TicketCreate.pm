@@ -312,29 +312,36 @@ sub _TicketCreate {
         $OrgID = $Ticket->{OrganisationID};
     }
 
-    # get database object
-    my $UserObject = $Kernel::OM->Get('User');
-
+    # force owner / responsible if executing user is in customer context
     my $OwnerID;
-    if ( $Ticket->{Owner} && !$Ticket->{OwnerID} ) {
-        my %OwnerData = $UserObject->GetUserData(
-            User => $Ticket->{Owner},
-        );
-        $OwnerID = $OwnerData{UserID};
-    }
-    elsif ( defined $Ticket->{OwnerID} ) {
-        $OwnerID = $Ticket->{OwnerID};
-    }
-
     my $ResponsibleID;
-    if ( $Ticket->{Responsible} && !$Ticket->{ResponsibleID} ) {
-        my %ResponsibleData = $UserObject->GetUserData(
-            User => $Ticket->{Responsible},
-        );
-        $ResponsibleID = $ResponsibleData{UserID};
+    if ( $Self->{Authorization}->{UserType} eq 'Agent' ) {
+        # get database object
+        my $UserObject = $Kernel::OM->Get('User');
+
+        if ( $Ticket->{Owner} && !$Ticket->{OwnerID} ) {
+            my %OwnerData = $UserObject->GetUserData(
+                User => $Ticket->{Owner},
+            );
+            $OwnerID = $OwnerData{UserID};
+        }
+        elsif ( defined $Ticket->{OwnerID} ) {
+            $OwnerID = $Ticket->{OwnerID};
+        }
+
+        if ( $Ticket->{Responsible} && !$Ticket->{ResponsibleID} ) {
+            my %ResponsibleData = $UserObject->GetUserData(
+                User => $Ticket->{Responsible},
+            );
+            $ResponsibleID = $ResponsibleData{UserID};
+        }
+        elsif ( defined $Ticket->{ResponsibleID} ) {
+            $ResponsibleID = $Ticket->{ResponsibleID};
+        }
     }
-    elsif ( defined $Ticket->{ResponsibleID} ) {
-        $ResponsibleID = $Ticket->{ResponsibleID};
+    elsif ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
+        $OwnerID = 1;
+        $ResponsibleID = 1;
     }
 
     # get ticket object
