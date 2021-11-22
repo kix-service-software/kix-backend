@@ -108,7 +108,6 @@
         <SubGroup>GeneralCatalog::Preferences</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::Output::HTML::GeneralCatalogPreferences::Generic</Item>
                 <Item Key="Class">ITSM::Core::IncidentState</Item>
                 <Item Key="Label" Translatable="1">Incident State Type</Item>
                 <Item Key="Desc" Translatable="1">Incident State Type.</Item>
@@ -120,7 +119,6 @@
                     </Hash>
                 </Item>
                 <Item Key="PrefKey">Functionality</Item>
-                <Item Key="Block">Option</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -241,7 +239,6 @@
         <SubGroup>GeneralCatalog::Preferences</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::Output::HTML::GeneralCatalogPreferences::Generic</Item>
                 <Item Key="Class">ITSM::ConfigItem::DeploymentState</Item>
                 <Item Key="Label">Deployment State Type</Item>
                 <Item Key="Desc">Deployment State Type.</Item>
@@ -253,23 +250,6 @@
                     </Hash>
                 </Item>
                 <Item Key="PrefKey">Functionality</Item>
-                <Item Key="Block">Option</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="GeneralCatalogPreferences###DeploymentStatesColors" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the deployment states color in the preferences view of the agent interface.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GeneralCatalog::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::GeneralCatalogPreferences::Generic</Item>
-                <Item Key="Class">ITSM::ConfigItem::DeploymentState</Item>
-                <Item Key="Label">Deployment State Color</Item>
-                <Item Key="Desc">Deployment State Color.</Item>
-                <Item Key="Data"></Item>
-                <Item Key="PrefKey">Color</Item>
-                <Item Key="Block">ColorPicker</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -301,22 +281,6 @@
                 <Item Key="global">global</Item>
                 <Item Key="class">class</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="GeneralCatalogPreferences###Comment2" Required="0" Valid="0">
-        <Description Translatable="1">Parameters for the example comment 2 of the general catalog attributes.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>GeneralCatalog::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::GeneralCatalogPreferences::Generic</Item>
-                <Item Key="Label">Comment2</Item>
-                <Item Key="Desc">Define the general catalog comment 2.</Item>
-                <Item Key="Block">TextArea</Item>
-                <Item Key="Cols">50</Item>
-                <Item Key="Rows">5</Item>
-                <Item Key="PrefKey">Comment2</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::CustomModules###030-CustomModule" Required="0" Valid="1">

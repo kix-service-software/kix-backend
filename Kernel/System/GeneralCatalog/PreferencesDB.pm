@@ -132,7 +132,7 @@ sub GeneralCatalogPreferencesGet {
         }
     }
 
-    # check if queue preferences are available
+    # check if preferences are available
     if ( !$Kernel::OM->Get('Config')->Get('GeneralCatalogPreferences') ) {
         return;
     }
@@ -153,11 +153,50 @@ sub GeneralCatalogPreferencesGet {
     return %Data;
 }
 
+
+=item GeneralCatalogPreferencesDelete()
+
+Deletes Preferences for an item
+
+    my $Success = $PreferencesObject->GeneralCatalogPreferencesDelete(
+        ItemID => 123,
+        Key    => 'SomeKey'    # optional, without all entries are deleted
+    );
+
+=cut
+
+sub GeneralCatalogPreferencesDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ItemID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    my $Where = "$Self->{PreferencesTableGcID} = ?";
+    my @Bind = (\$Param{ItemID});
+
+    if ($Param{Key}) {
+        $Where .= " AND $Self->{PreferencesTableKey} = ?";
+        push(@Bind, \$Param{Key});
+    }
+
+    # delete preferences
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => "DELETE FROM $Self->{PreferencesTable} WHERE $Where",
+        Bind => \@Bind,
+    );
+
+    return 1;
+}
+
 1;
-
-
-
-
 
 =back
 

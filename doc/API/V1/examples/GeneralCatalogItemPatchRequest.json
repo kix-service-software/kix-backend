@@ -1,6 +1,12 @@
 {
     "GeneralCatalogItem": {
-        "Name": "Laptop",
-        "ValidID": 1
+        "Name": "ProductionNew",
+        "ValidID": 1,
+        "Preferences": [
+            {
+                "Name":	"Functionality",
+                "Value": "preproductive"
+            }
+        ]
     }
 }

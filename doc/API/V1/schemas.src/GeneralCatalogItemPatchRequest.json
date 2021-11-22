@@ -9,12 +9,18 @@
       "properties": {
         "Class": {
           "type": "string"
-        },        
+        },
         "Comment": {
           "type": "string"
         },
         "Name": {
           "type": "string"
+        },
+        "Preferences": {
+          "type": "array",
+          "item": {
+            "$ref": "GeneralCatalogItemPreferencePostItem.json"
+          }
         },
         "ValidID": {
           "type": "integer"

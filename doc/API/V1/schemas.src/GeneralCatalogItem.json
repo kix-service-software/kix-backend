@@ -36,6 +36,14 @@
       "type": "string",
       "readOnly": true
     },
+    "Preferences": {
+      "type": "array",
+      "description": "preferences of this item",
+      "readOnly": true,
+      "item": {
+        "$ref": "GeneralCatalogItemPreference.json"
+      }
+    },
     "ValidID": {
       "type": "integer",
       "readOnly": true
@@ -49,6 +57,7 @@
     "CreateTime",
     "ItemID",
     "Name",
+    "Preferences",
     "ValidID"
   ]
 }

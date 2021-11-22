@@ -299,14 +299,18 @@ sub ItemList {
 get item attributes
 
     my $ItemDataRef = $GeneralCatalogObject->ItemGet(
-        ItemID => 3,
+        ItemID        => 3,
+        NoPreferences => 1,       # not required -> 0|1 (default 0)
+                                  # returns data without preferences
     );
 
     or
 
     my $ItemDataRef = $GeneralCatalogObject->ItemGet(
-        Class => 'ITSM::Service::Type',
-        Name  => 'Underpinning Contract',
+        Class         => 'ITSM::Service::Type',
+        Name          => 'Underpinning Contract',
+        NoPreferences => 1,       # not required -> 0|1 (default 0)
+                                  # returns data without preferences
     );
 
 returns
@@ -342,11 +346,13 @@ sub ItemGet {
         . 'create_time, create_by, change_time, change_by FROM general_catalog WHERE ';
     my @BIND;
 
+    $Param{NoPreferences} ||= 0;
+
     # add options to sql string
     if ( $Param{Class} && $Param{Name} ne '' ) {
 
         # check if result is already cached
-        my $CacheKey = 'ItemGet::Class::' . $Param{Class} . '::' . $Param{Name};
+        my $CacheKey = 'ItemGet::Class::' . $Param{Class} . '::' . $Param{Name} . '::' . $Param{NoPreferences};
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -360,7 +366,7 @@ sub ItemGet {
     else {
 
         # check if result is already cached
-        my $CacheKey = 'ItemGet::ItemID::' . $Param{ItemID};
+        my $CacheKey = 'ItemGet::ItemID::' . $Param{ItemID} . '::' . $Param{NoPreferences};
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -403,24 +409,26 @@ sub ItemGet {
     }
 
     # get general catalog preferences
-    my %Preferences = $Self->GeneralCatalogPreferencesGet( ItemID => $ItemData{ItemID} );
+    if(!$Param{NoPreferences}) {
+        my %Preferences = $Self->GeneralCatalogPreferencesGet( ItemID => $ItemData{ItemID} );
 
-    # merge hash
-    if (%Preferences) {
-        %ItemData = ( %ItemData, %Preferences );
+        # merge hash
+        if (%Preferences) {
+            %ItemData = ( %ItemData, %Preferences );
+        }
     }
 
     # cache the result
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
-        Key   => 'ItemGet::Class::' . $ItemData{Class} . '::' . $ItemData{Name},
+        Key   => 'ItemGet::Class::' . $ItemData{Class} . '::' . $ItemData{Name} . '::' . $Param{NoPreferences},
         Value => \%ItemData,
     );
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
-        Key   => 'ItemGet::ItemID::' . $ItemData{ItemID},
+        Key   => 'ItemGet::ItemID::' . $ItemData{ItemID} . '::' . $Param{NoPreferences},
         Value => \%ItemData,
     );
 
@@ -713,7 +721,7 @@ sub GeneralCatalogPreferencesSet {
 
 get GeneralCatalog preferences
 
-    my %Preferences = $QueueObject->GeneralCatalogPreferencesGet(
+    my %Preferences = $GeneralCatalogObject->GeneralCatalogPreferencesGet(
         ItemID => 123,
     );
 
@@ -725,6 +733,21 @@ sub GeneralCatalogPreferencesGet {
     return $Self->{PreferencesObject}->GeneralCatalogPreferencesGet(@_);
 }
 
+=item GeneralCatalogPreferencesDelete()
+
+delete all GeneralCatalog preferences
+
+    my $Success = $GeneralCatalogObject->GeneralCatalogPreferencesDelete(
+        ItemID => 123,
+    );
+
+=cut
+
+sub GeneralCatalogPreferencesDelete {
+    my $Self = shift;
+
+    return $Self->{PreferencesObject}->GeneralCatalogPreferencesDelete(@_);
+}
 
 sub GeneralCatalogItemDelete {
     my ( $Self, %Param ) = @_;
@@ -740,13 +763,18 @@ sub GeneralCatalogItemDelete {
         }
     }
 
+    # delete all preferences
+    $Self->GeneralCatalogPreferencesDelete(
+        ItemID => $Param{GeneralCatalogItemID},
+    );
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(
         SQL  => 'DELETE FROM general_catalog WHERE id = ?',
         Bind => [ \$Param{GeneralCatalogItemID} ],
     );
-   
+
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
@@ -763,12 +791,7 @@ sub GeneralCatalogItemDelete {
 
 }
 
-
 1;
-
-
-
-
 
 =back
 
