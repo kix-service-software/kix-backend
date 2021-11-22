@@ -13,6 +13,8 @@ package Kernel::System::GeneralCatalog;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'Cache',
@@ -692,6 +694,61 @@ sub ItemUpdate {
     );
 
     return 1;
+}
+
+=item ItemLookup()
+
+get id or name for an item
+
+    my $Item = $GeneralCatalogObject->ItemLookup( ItemID => $ItemID );
+
+    my $ItemID = $GeneralCatalogObject->ItemLookup( Class => $Class, Name => $Name );
+
+=cut
+
+sub ItemLookup {
+    my ( $Self, %Param ) = @_;
+    my $ReturnData;
+    my $What;
+
+    # check needed stuff
+    if ( (!$Param{Class} || !$Param{Name}) && !$Param{ItemID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Class and Name or ItemID!',
+        );
+        return;
+    }
+
+    if ( !$Param{ItemID} ) {
+
+        # get (already cached) item list
+        my $ItemList = $Self->ItemList(
+            Class => $Param{Class},
+            Valid => 0,
+        );
+        my %ItemListReverse = reverse %{$ItemList||{}};
+        $ReturnData = $ItemListReverse{$Param{Name}};
+        $What = "class \"$Param{Class}\" and name \"$Param{Name}\"";
+    }
+    else {
+        my $Item = $Self->ItemGet(
+            ItemID => $Param{ItemID}
+        );
+        $ReturnData = IsHashRefWithData($Item) ? $Item->{Name} : '';
+        $What = "ID $Param{ItemID}";
+    }
+
+    # check if data exists
+    if ( !defined $ReturnData ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No item for $What found!",
+        );
+        return;
+    }
+
+    return $ReturnData;
 }
 
 =item GeneralCatalogPreferencesSet()
