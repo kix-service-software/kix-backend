@@ -61,10 +61,11 @@ sub Run {
         $Preferences{$Item->{user_id}}->{$Item->{preferences_key}} = $Item->{preferences_value};
     }
 
-    my %ChangeByMapping;
+    my %UserReferenceMapping;
 
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
+    # migrate as long as there are users to migrate
     foreach my $Item ( @{$SourceData} ) {
         my %Contact;
 
@@ -97,21 +98,16 @@ sub Run {
             ],
         );
 
-        # some special handling if the login already exists
-        if ( $ID ) {
-            $Item->{login} = 'Migration-'.$Item->{login}; 
-            # do the lookup again
-            goto LOOKUP;
-        }
-
         # insert row
         if ( !$ID ) {
+            my $CreateBy = $Item->{create_by};
             my $ChangeBy = $Item->{change_by};
 
             $Item->{is_agent}    = 1;
             $Item->{is_customer} = 1;
             $Item->{comments}    = $Preferences{$Item->{id}}->{UserComment};
             $Item->{pw}        //= '';
+            $Item->{create_by}   = 1;        # set to user_id that exists for sure to prevent ring deps
             $Item->{change_by}   = 1;        # set to user_id that exists for sure to prevent ring deps
 
             $ID = $Self->Insert(
@@ -122,7 +118,10 @@ sub Run {
             );
 
             # build the mapping for later
-            $ChangeByMapping{$ID} = $ChangeBy;
+            $UserReferenceMapping{$ID} = {
+                change_by => $ChangeBy,
+                create_by => $CreateBy,
+            };
         }
 
         if ( $ID ) {
@@ -141,26 +140,67 @@ sub Run {
                 );
             }
 
-            # create associated contact
-            $Success = $Kernel::OM->Get('Contact')->ContactAdd(
-                AssignedUserID => $ID,
-                Firstname      => $Contact{first_name},
-                Lastname       => $Contact{last_name},
-                Title          => $Contact{title},
-                Phone          => $Contact{UserPhone},
-                Mobile         => $Contact{UserMobile},
-                Email          => $Contact{UserEmail},
-                ValidID        => 1,
-                UserID         => 1,
+            # check if there already is a contact
+            my $ContactID = $Self->Lookup(
+                Table        => 'contact',
+                PrimaryKey   => 'id',
+                Item         => {
+                    'firstname' => $Contact{first_name},
+                    'lastname'  => $Contact{last_name},
+                    'email'     => $Contact{UserEmail},
+                },
+                RelevantAttr => [
+                    'firstname',
+                    'lastname',
+                    'email'
+                ]
             );
-            if ( !$Success ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to create contact for user $ID!"
+
+            if ( !$ContactID ) {
+                # create associated contact
+                $Success = $Kernel::OM->Get('Contact')->ContactAdd(
+                    AssignedUserID => $ID,
+                    Firstname      => $Contact{first_name},
+                    Lastname       => $Contact{last_name},
+                    Title          => $Contact{title},
+                    Phone          => $Contact{UserPhone},
+                    Mobile         => $Contact{UserMobile},
+                    Email          => $Contact{UserEmail},
+                    ValidID        => 1,
+                    UserID         => 1,
                 );
+                if ( !$Success ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to create contact for user $ID!"
+                    );
+                }
+            }
+            else {
+                # assign contact if not already assigned
+                my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+                    ID => $ContactID
+                );
+                if ( !$Contact{AssignedUserID} ) {
+                    $Self->Update(
+                        Table      => 'contact',
+                        PrimaryKey => 'id',
+                        Item       => {
+                            id      => $ContactID,
+                            user_id => $ID,
+                        },
+                    );
+                }
+                else {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Found matching contact $ContactID but it's already assigned to a different user ID $Contact{AssignedUserID}!"
+                    );
+                }
             }
 
             # assign role
+            ROLE:
             foreach my $Role ( 'Agent User', 'Customer' ) {
                 my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
                     Role => $Role
@@ -190,20 +230,24 @@ sub Run {
         }
     }
 
-    if ( %ChangeByMapping ) {
-        foreach my $ID ( sort keys %ChangeByMapping ) {
-            my $MappedID = $Self->GetOIDMapping(
-                ObjectType     => 'users',
-                SourceObjectID => $ChangeByMapping{$ID}
+    if ( %UserReferenceMapping ) {
+        foreach my $ID ( sort keys %UserReferenceMapping ) {
+            my %Item = (
+                id => $ID,
             );
+            foreach my $RefAttr ( sort keys %{$UserReferenceMapping{$ID}} ) {
+                my $MappedID = $Self->GetOIDMapping(
+                    ObjectType     => 'users',
+                    SourceObjectID => $UserReferenceMapping{$ID}->{$RefAttr},
+                );
+                $Item{$RefAttr} = $MappedID;
+            }
 
+            # update the references
             $Self->Update(
                 Table      => 'users',
                 PrimaryKey => 'id',
-                Item       => {
-                    id        => $ID,
-                    change_by => $MappedID
-                },
+                Item       => \%Item,
             );
         }
     }
