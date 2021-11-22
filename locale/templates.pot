@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-11-22 06:56+0000\n"
+"POT-Creation-Date: 2021-11-22 08:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3651,15 +3651,7 @@ msgid "Overloads (redefines) existing functions in Kernel::System::ITSMConfigIte
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Parameters for the deployment states color in the preferences view of the agent interface."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Parameters for the deployment states in the preferences view of the agent interface."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Parameters for the example comment 2 of the general catalog attributes."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
