@@ -48,8 +48,10 @@ sub new {
 get LogFile
 
     my %LogFile = $LogFileObject->LogFileGet(
-        ID        => '...'           # required
-        NoContent => 0|1             # optional
+        ID         => '...'           # required
+        NoContent  => 0|1             # optional
+        Tail       => 123,            # optional, only return the number of tail lines
+        Categories => [...]           # optional, filter log categories (works together with tail)
     );
 
 =cut
@@ -117,7 +119,7 @@ sub LogFileGet {
         }
     }
 
-    if ( !$Param{NoContent} ) {
+    if ( !$Param{NoContent} && !$Param{Tail} ) {
         my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location => $LogDir.'/'.$LogFileList{$Param{ID}},
         );
@@ -131,6 +133,15 @@ sub LogFileGet {
         }
 
         $LogFile{Content} = $$Content;
+    }
+    elsif ( $Param{Tail} ) {
+        if ( IsArrayRefWithData($Param{Categories}) ) {
+            my $Categories = join('|', @{$Param{Categories}});
+            $LogFile{Content} = `grep -E '\\[$Categories\\]' $LogDir/$LogFileList{$Param{ID}} | tail -n $Param{Tail}`;
+        }
+        else {
+            $LogFile{Content} = `tail -n $Param{Tail} $LogDir/$LogFileList{$Param{ID}}`;
+        }
     }
 
     return %LogFile;
