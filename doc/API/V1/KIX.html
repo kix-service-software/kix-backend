@@ -35710,7 +35710,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_importexport_templates__templateid__runs_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_importexport_templates__templateid__runs_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_generalcatalog" class="panel-title">[System] General Catalog</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_generalcatalog" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/generalcatalog</span> <span class="methods"><a href="#system_generalcatalog_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_generalcatalog_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_generalcatalog_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/generalcatalog</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_generalcatalog_get_request" data-toggle="tab">Request</a></li><li><a href="#system_generalcatalog_get_response" data-toggle="tab">Response</a></li><li><a href="#system_generalcatalog_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_generalcatalog_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_generalcatalog_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_generalcatalog_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: GeneralCatalogItemCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="system_importexport_templates__templateid__runs_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_importexport_templates__templateid__runs_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_generalcatalog" class="panel-title">[System] General Catalog</h3></div><div class="panel-body"><div class="top-resource-description"><h4 id="general-catalog-items">General Catalog Items</h4><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Preferences</code></td><td>Adds a list of existing preferences of this item.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_generalcatalog" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/generalcatalog</span> <span class="methods"><a href="#system_generalcatalog_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_generalcatalog_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_generalcatalog_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/generalcatalog</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_generalcatalog_get_request" data-toggle="tab">Request</a></li><li><a href="#system_generalcatalog_get_response" data-toggle="tab">Response</a></li><li><a href="#system_generalcatalog_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_generalcatalog_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_generalcatalog_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_generalcatalog_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: GeneralCatalogItemCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "GeneralCatalogItemCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of GeneralCatalog items.",
@@ -35727,6 +35727,33 @@ pre code {
       "GeneralCatalogItem"
    ],
    "definitions" : {
+      "_GeneralCatalogItemPreference_json" : {
+         "$id" : "GeneralCatalogItemPreference.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The GeneralCatalog item preference object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "type" : "String",
+               "readOnly" : true
+            },
+            "Value" : {
+               "oneOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  }
+               ],
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      },
       "_GeneralCatalogItem_json" : {
          "$id" : "GeneralCatalogItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -35765,6 +35792,14 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Preferences" : {
+               "description" : "preferences of this item",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_GeneralCatalogItemPreference_json"
+               },
+               "readOnly" : true
+            },
             "ValidID" : {
                "type" : "integer",
                "readOnly" : true
@@ -35778,6 +35813,7 @@ pre code {
             "CreateTime",
             "ItemID",
             "Name",
+            "Preferences",
             "ValidID"
          ]
       }
@@ -35860,6 +35896,12 @@ pre code {
             "Name" : {
                "type" : "string"
             },
+            "Preferences" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_GeneralCatalogItemPreferencePostItem_json"
+               }
+            },
             "ValidID" : {
                "type" : "integer"
             }
@@ -35872,7 +35914,38 @@ pre code {
    },
    "required" : [
       "GeneralCatalogItem"
-   ]
+   ],
+   "definitions" : {
+      "_GeneralCatalogItemPreferencePostItem_json" : {
+         "$id" : "GeneralCatalogItemPreferencePostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The GeneralCatalogItemPreference item for creation.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the preference key name",
+               "type" : "string"
+            },
+            "Value" : {
+               "oneOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "GeneralCatalogItem": {
@@ -35956,6 +36029,33 @@ pre code {
       "GeneralCatalogItem"
    ],
    "definitions" : {
+      "_GeneralCatalogItemPreference_json" : {
+         "$id" : "GeneralCatalogItemPreference.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The GeneralCatalog item preference object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "type" : "String",
+               "readOnly" : true
+            },
+            "Value" : {
+               "oneOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  }
+               ],
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      },
       "_GeneralCatalogItem_json" : {
          "$id" : "GeneralCatalogItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -35994,6 +36094,14 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "Preferences" : {
+               "description" : "preferences of this item",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_GeneralCatalogItemPreference_json"
+               },
+               "readOnly" : true
+            },
             "ValidID" : {
                "type" : "integer",
                "readOnly" : true
@@ -36007,6 +36115,7 @@ pre code {
             "CreateTime",
             "ItemID",
             "Name",
+            "Preferences",
             "ValidID"
          ]
       }
@@ -36015,13 +36124,19 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "GeneralCatalogItem": {
         "ChangeBy": 1,
-        "ChangeTime": "2019-05-09 15:27:10",
-        "Class": "ITSM::ConfigItem::Class",
+        "ChangeTime": "2021-05-31 07:59:34",
+        "Class": "ITSM::ConfigItem::DeploymentState",
         "Comment": "",
         "CreateBy": 1,
-        "CreateTime": "2019-05-09 15:27:10",
-        "ItemID": 22,
-        "Name": "Computer",
+        "CreateTime": "2021-05-31 07:59:34",
+        "ItemID": 16,
+        "Name": "Production",
+        "Preferences": [
+            {
+                "Name": "Functionality",
+                "Value": "productive"
+            }
+        ],
         "ValidID": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="system_generalcatalog__generalcatalogitemid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -36065,6 +36180,12 @@ pre code {
             "Name" : {
                "type" : "string"
             },
+            "Preferences" : {
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_GeneralCatalogItemPreferencePostItem_json"
+               }
+            },
             "ValidID" : {
                "type" : "integer"
             }
@@ -36073,12 +36194,49 @@ pre code {
    },
    "required" : [
       "GeneralCatalogItem"
-   ]
+   ],
+   "definitions" : {
+      "_GeneralCatalogItemPreferencePostItem_json" : {
+         "$id" : "GeneralCatalogItemPreferencePostItem.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The GeneralCatalogItemPreference item for creation.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "description" : "the preference key name",
+               "type" : "string"
+            },
+            "Value" : {
+               "oneOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  },
+                  {
+                     "type" : "null"
+                  }
+               ]
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      }
+   }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "GeneralCatalogItem": {
-        "Name": "Laptop",
-        "ValidID": 1
+        "Name": "ProductionNew",
+        "ValidID": 1,
+        "Preferences": [
+            {
+                "Name":	"Functionality",
+                "Value": "preproductive"
+            }
+        ]
     }
 }</code></pre></div></div><div class="tab-pane" id="system_generalcatalog__generalcatalogitemid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_generalcatalog__generalcatalogitemid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: GeneralCatalogItemPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "GeneralCatalogItemPostPatchResponse.json",
