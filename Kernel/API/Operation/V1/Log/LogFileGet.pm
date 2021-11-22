@@ -124,14 +124,17 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my @LogFileList;
+    my @Categories = split(',', $Param{Data}->{Categories});
 
     # start loop
     foreach my $LogFileID ( @{$Param{Data}->{LogFileID}} ) {
 
         # get the LogFile data
         my %LogFileData = $Kernel::OM->Get('LogFile')->LogFileGet(
-            ID        => $LogFileID,
-            NoContent => $Param{Data}->{include}->{Content} ? 0 : 1
+            ID         => $LogFileID,
+            NoContent  => $Param{Data}->{include}->{Content} ? 0 : 1,
+            Tail       => $Param{Data}->{Tail},
+            Categories => \@Categories
         );
 
         if ( !%LogFileData ) {
