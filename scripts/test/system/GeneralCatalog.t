@@ -1058,6 +1058,45 @@ for my $Class (@ExistingClasses) {
     $TestCount++;
 }
 
+# ------------------------------------------------------------ #
+# Lookup test
+# ------------------------------------------------------------ #
+
+my $ClassName = 'UnitTest::TestClass' . $Helper->GetRandomID();
+
+my $ItemID = $GeneralCatalogObject->ItemAdd(
+    Class         => $ClassName,
+    Name          => 'Dummy',
+    Functionality => '',
+    ValidID       => 1,
+    UserID        => 1,
+);
+
+my $Lookup = $GeneralCatalogObject->ItemLookup(
+    ItemID => $ItemID
+);
+
+$TestCount++;
+
+$Self->Is(
+    $Lookup,
+    'Dummy',
+    "Test $TestCount: ItemLookup() - by ItemID",
+);
+
+$Lookup = $GeneralCatalogObject->ItemLookup(
+    Class => $ClassName,
+    Name  => 'Dummy',
+);
+
+$TestCount++;
+
+$Self->Is(
+    $Lookup,
+    $ItemID,
+    "Test $TestCount: ItemLookup() - by Class and Name",
+);
+
 # restore original general catalog permission preferences setting
 $ConfigObject->Set(
     Key   => 'GeneralCatalogPreferences###Permissions',
