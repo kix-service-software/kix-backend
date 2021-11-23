@@ -68,7 +68,7 @@ sub Run {
             SourceObjectID => $Item->{id}
         );
         if ( $MappedID ) {
-            $Self->UpdateProgress($Param{Type}, 'Error');
+            $Self->UpdateProgress($Param{Type}, 'Ignore');
             next;
         }
 

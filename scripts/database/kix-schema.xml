@@ -2479,7 +2479,7 @@
     <Column Name="category"    Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="text"        Required="false" Type="VARCHAR" Size="65535"/>
     <Column Name="language"    Required="false" Type="VARCHAR" Size="8"/>
-    <Column Name="keywords"    Required="false" Type="VARCHAR" Size="200"/>
+    <Column Name="keywords"    Required="false" Type="VARCHAR" Size="3800"/>
     <Column Name="comment"     Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="subject"     Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="f_agent"     Required="false" Type="INTEGER" Default="0"/>
