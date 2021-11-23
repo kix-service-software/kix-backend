@@ -33,45 +33,6 @@ Kernel::API::Operation::V1::Ticket::HistoryGet - API Ticket Get Operation backen
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation::V1->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    # Get mapping of history types to readable strings
-    my %HistoryTypes;
-    my %HistoryTypeConfig = %{ $Kernel::OM->Get('Config')->Get('Ticket::Frontend::HistoryTypes') // {} };
-    foreach my $Entry ( sort keys %HistoryTypeConfig ) {
-        %HistoryTypes = (
-            %HistoryTypes,
-            %{ $HistoryTypeConfig{$Entry} },
-        );
-    }
-    $Self->{HistoryTypes} = \%HistoryTypes;
-
-    return $Self;
-}
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation

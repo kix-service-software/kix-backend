@@ -57,12 +57,12 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
-print STDERR "Type: $Type\n";
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get($Type);
+    $Type =~ /^.*?::(V1::.*?)$/;
+    print STDERR "Match: $1\n";
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::'.$1);
 
     return $Self;
 }
-
 =item RunOperation()
 
 initialize and run the current operation

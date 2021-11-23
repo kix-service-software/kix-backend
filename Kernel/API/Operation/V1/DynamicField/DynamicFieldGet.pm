@@ -33,37 +33,6 @@ Kernel::API::Operation::V1::DynamicField::DynamicFieldGet - API DynamicField Get
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::DynamicField::DynamicFieldGet->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::DynamicField::DynamicFieldGet');
-
-    return $Self;
-}
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
