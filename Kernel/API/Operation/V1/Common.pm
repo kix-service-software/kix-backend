@@ -32,6 +32,37 @@ Kernel::API::Operation::V1::Common - Base class for all Operations
 
 =cut
 
+=item new()
+
+usually, you want to create an instance of this
+by using Kernel::API::Operation->new();
+
+=cut
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    my $Self = {};
+    bless( $Self, $Type );
+
+    # check needed objects
+    for my $Needed ( qw(WebserviceID) ) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
+        }
+
+        $Self->{$Needed} = $Param{$Needed};
+    }
+
+print STDERR "Type: $Type\n";
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get($Type);
+
+    return $Self;
+}
+
 =item RunOperation()
 
 initialize and run the current operation
