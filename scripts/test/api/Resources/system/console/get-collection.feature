@@ -101,7 +101,7 @@
      Then the response code is 200
      And the response contains the following items of type ConsoleCommand
        | Command                                                                | Description                                                        |
-       | Console::Command::Admin::Installation::GenerateAPIWebServiceDefinition | Generate a WebService definition file for the application REST API |
+       | Console::Command::Admin::Installation::GenerateAPIWebServiceDefinition | Generate a web service definition file for the application REST API |
 
    Scenario: get the list of existing console command filter
      When I query the collection of console with filter command "Console::Command::Admin::Installation::ListPlugins"

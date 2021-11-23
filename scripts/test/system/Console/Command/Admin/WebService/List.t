@@ -31,12 +31,8 @@ my $WebserviceObject = $Kernel::OM->Get('GenericInterface::Webservice');
 my $WebServiceID = $WebserviceObject->WebserviceAdd(
     Name   => $WebService,
     Config => {
-        Debugger => {
-            DebugThreshold => 'debug',
-        },
         Provider => {
             Transport => {
-                Type => '',
             },
         },
     },

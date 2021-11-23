@@ -12,17 +12,19 @@ use strict;
 use warnings;
 
 use URI::Escape;
+use Time::HiRes qw(time);
 
 use Kernel::System::VariableCheck (qw(IsHashRefWithData IsInteger));
 
 our @ObjectDependencies = (
     'Config',
     'Log',
-    'API::Webservice',
+    'Webservice',
 );
 
 use base qw(
     Kernel::API::Common
+    Kernel::API::Provider::REST
 );
 
 =head1 NAME
@@ -76,6 +78,8 @@ web service.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    $Self->{RequestStartTime} = time();
+
     #
     # First, we need to locate the desired webservice and load its configuration data.
     #
@@ -95,10 +99,11 @@ sub Run {
         return;    # bail out without Transport, plack will generate 500 Error
     }
 
-    $WebserviceName = URI::Escape::uri_unescape($WebserviceName);
+    # store the webservice name for easy use
+    $Self->{WebserviceName} = URI::Escape::uri_unescape($WebserviceName);
 
-    $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
-        Name => $WebserviceName,
+    $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
+        Name => $Self->{WebserviceName},
     );
 
     if ( !IsHashRefWithData($Webservice) ) {
@@ -122,187 +127,60 @@ sub Run {
         return;    # bail out, this will generate 500 Error
     }
 
-    my $WebserviceID = $Webservice->{ID};
+    # store the configs for easy use
+    $Self->{ProviderConfig}  = $Webservice->{Config}->{Provider};
+    $Self->{TransportConfig} = $Self->{ProviderConfig}->{Transport}->{Config};
 
-    #
-    # Create a debugger instance which will log the details of this
-    #   communication entry.
-    #
-
-    my $DebuggerModule = $Kernel::OM->GetModuleFor('API::Debugger');
-    if ( !$Kernel::OM->Get('Main')->Require($DebuggerModule) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message => "Can't load module $DebuggerModule",
-        );
-        return;    # bail out, this will generate 500 Error
-    }
-    $Self->{DebuggerObject} = $DebuggerModule->new(
-        DebuggerConfig    => $Webservice->{Config}->{Debugger},
-        WebserviceID      => $WebserviceID,
-        CommunicationType => 'Provider',
-        RemoteIP          => $ENV{REMOTE_ADDR},
-    );
-
-    if ( ref $Self->{DebuggerObject} ne $DebuggerModule ) {
-
-        return;    # bail out without Transport, plack will generate 500 Error
-    }
-
-    $Self->{DebuggerObject}->Debug(
-        Summary => 'Communication sequence started',
-        Data    => \%ENV,
-    );
-
-    #
-    # Create the network transport backend and read the network request.
-    #
-
-    my $ProviderConfig = $Webservice->{Config}->{Provider};
-
-    # use max lenght from config
+    # use max length from config
     my $LengthFromConfig = $Kernel::OM->Get('Config')->Get('API::Provider::Transport::MaxLength');
-    if (IsInteger($LengthFromConfig) && $LengthFromConfig > 0) {
-        $ProviderConfig->{Transport}->{Config}->{MaxLength} = $LengthFromConfig;
-    }
-
-    my $TransportModule = $Kernel::OM->GetModuleFor('API::Transport');
-    if ( !$Kernel::OM->Get('Main')->Require($TransportModule) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message => "Can't load module $TransportModule",
-        );
-        return;    # bail out, this will generate 500 Error
-    }
-    $Self->{TransportObject} = $TransportModule->new(
-        DebuggerObject  => $Self->{DebuggerObject},
-        TransportConfig => $ProviderConfig->{Transport},
-    );
-
-    # bail out if transport init failed
-    if ( ref $Self->{TransportObject} ne $TransportModule ) {
-
-        return $Self->Error(
-            Code    => 'Provider.InternalError',
-            Message => 'TransportObject could not be initialized',
-            Data    => $Self->{TransportObject},
-        );
+    if (IsInteger($LengthFromConfig) && $LengthFromConfig) {
+        $Self->{TransportConfig}->{Config}->{MaxLength} = $LengthFromConfig;
     }
 
     # read request content
-    my $FunctionResult = $Self->{TransportObject}->ProviderProcessRequest();
+    my $ProcessedRequest = $Self->ProcessRequest();
 
     if ( $Self->{Debug} && $Self->{LogRequestContent} ) {
         use Data::Dumper;
-        $Self->_Debug('', "Request Data: ".Data::Dumper::Dumper($FunctionResult->{Data}));
+        $Self->_Debug('', "Request Data: ".Data::Dumper::Dumper($ProcessedRequest->{Data}));
     }
 
     # If the request was not processed correctly, send error to client.
-    if ( !$FunctionResult->{Success} ) {
+    if ( !$ProcessedRequest->{Success} ) {
 
         return $Self->_GenerateErrorResponse(
-            %{$FunctionResult},
+            %{$ProcessedRequest},
         );
     }
 
-    # save FunctionResult for later use
-    my %ProcessRequestResult = %{$FunctionResult};
-
-    my $Operation = $FunctionResult->{Operation};
-    my $DataIn    = $FunctionResult->{Data};
-
-    if ( $Operation ) {
-        $Self->{DebuggerObject}->Debug(
-            Summary => "Detected operation '$Operation'",
-        );
-    }
+    # save for later use
+    $Self->{RequestMethod} = $ProcessedRequest->{RequestMethod};
 
     # check authorization if needed
     my $Authorization;
-    if ( !$ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ) {
-        $FunctionResult = $Self->{TransportObject}->ProviderCheckAuthorization();
+    if ( !$Self->{ProviderConfig}->{Operation}->{$ProcessedRequest->{Operation}}->{NoAuthorizationNeeded} ) {
+        my $AuthorizationResult = $Self->CheckAuthorization();
 
-        if ( $ProcessRequestResult{RequestMethod} ne 'OPTIONS' && !$FunctionResult->{Success} ) {
+        if ( $ProcessedRequest->{RequestMethod} ne 'OPTIONS' && !$AuthorizationResult->{Success} ) {
             return $Self->_GenerateErrorResponse(
-                %{$FunctionResult},
+                %{$AuthorizationResult},
             );
         }
         else {
-            $Authorization = $FunctionResult->{Data}->{Authorization};
+            $Authorization = $AuthorizationResult->{Data}->{Authorization};
         }
-    }
-
-    #
-    # Map the incoming data based on the configured mapping
-    #
-
-    $Self->{DebuggerObject}->Debug(
-        Summary => "Incoming data before mapping",
-        Data    => $DataIn,
-    );
-
-    # decide if mapping needs to be used or not
-    if (
-        $Operation && IsHashRefWithData( $ProviderConfig->{Operation}->{$Operation}->{MappingInbound} )
-        )
-    {
-        my $MappingModule = $Kernel::OM->GetModuleFor('API::Mapping');
-        if ( !$Kernel::OM->Get('Main')->Require($MappingModule) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message => "Can't load module $MappingModule",
-            );
-            return;    # bail out, this will generate 500 Error
-        }
-        my $MappingInObject = $MappingModule->new(
-            DebuggerObject => $Self->{DebuggerObject},
-            Operation      => $Operation,
-            OperationType  => $ProviderConfig->{Operation}->{$Operation}->{Type},
-            MappingConfig  => $ProviderConfig->{Operation}->{$Operation}->{MappingInbound},
-        );
-
-        # if mapping init failed, bail out
-        if ( ref $MappingInObject ne $MappingModule ) {
-            my $ErrorResponse = $Self->_Error(
-                Code    => 'Provider.InternalError',
-                Message => 'MappingIn could not be initialized',
-                Data    => $MappingInObject,
-            );
-
-            return $Self->_GenerateErrorResponse(
-                %{$ErrorResponse},
-            );
-        }
-
-        $FunctionResult = $MappingInObject->Map(
-            Data => $DataIn,
-        );
-
-        if ( !$FunctionResult->{Success} ) {
-
-            return $Self->_GenerateErrorResponse(
-                %{$FunctionResult},
-            );
-        }
-
-        $DataIn = $FunctionResult->{Data};
-
-        $Self->{DebuggerObject}->Debug(
-            Summary => "Incoming data after mapping",
-            Data    => $DataIn,
-        );
     }
 
     # check if we have to respond to an OPTIONS request instead of executing the operation
-    if ( $ProcessRequestResult{RequestMethod} && $ProcessRequestResult{RequestMethod} eq 'OPTIONS' ) {
+    if ( $Self->{RequestMethod} && $Self->{RequestMethod} eq 'OPTIONS' ) {
         my $Data;
 
         # add information about each available method
         METHOD:
-        foreach my $Method ( sort keys %{$ProcessRequestResult{AvailableMethods}} ) {
+        foreach my $Method ( sort keys %{$ProcessedRequest->{AvailableMethods}} ) {
 
             # create an operation object for each allowed method and ask it for options
-            my $Operation = $ProcessRequestResult{AvailableMethods}->{$Method}->{Operation};
+            my $Operation = $ProcessedRequest->{AvailableMethods}->{$Method}->{Operation};
 
             my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
             if ( !$Kernel::OM->Get('Main')->Require($OperationModule) ) {
@@ -314,17 +192,16 @@ sub Run {
             }
 
             my $OperationObject = $OperationModule->new(
-                DebuggerObject          => $Self->{DebuggerObject},
                 APIVersion              => $Webservice->{Config}->{APIVersion},
-                Operation               => $Operation,
-                OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
-                WebserviceID            => $WebserviceID,
-                AvailableMethods        => $ProcessRequestResult{AvailableMethods},
-                OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
-                ParentMethodOperationMapping => $ProcessRequestResult{ParentMethodOperationMapping},
+                Operation               => $ProcessedRequest->{Operation},
+                OperationType           => $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type},
+                WebserviceID            => $Webservice->{ID},
+                AvailableMethods        => $ProcessedRequest->{AvailableMethods},
+                OperationRouteMapping   => $ProcessedRequest->{ResourceOperationRouteMapping},
+                ParentMethodOperationMapping => $ProcessedRequest->{ParentMethodOperationMapping},
                 RequestMethod           => $Method,
-                CurrentRoute            => $ProcessRequestResult{Route},
-                RequestURI              => $ProcessRequestResult{RequestURI},
+                CurrentRoute            => $ProcessedRequest->{Route},
+                RequestURI              => $ProcessedRequest->{RequestURI},
                 Authorization           => $Authorization,
             );
 
@@ -340,9 +217,9 @@ sub Run {
             else {
                 # don't execute GET operation on collections
                 # (atm we simply check if the OperationType ends with 'Search', that will cover all critical collections so far)
-                if ( $ProviderConfig->{Operation}->{$Operation}->{Type} !~ /Search$/ || $Method ne 'GET' ) {
+                if ( $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type} !~ /Search$/ || $Method ne 'GET' ) {
                     my $OperationResult = $OperationObject->Run(
-                        Data                => $FunctionResult->{Data},
+                        Data                => $ProcessedRequest->{Data},
                         PermissionCheckOnly => 1
                     );
                     if ( !$OperationResult->{Success} ) {
@@ -362,16 +239,16 @@ sub Run {
 
                 $Data->{Methods}->{$Method} = {
                     %OptionsData,
-                    Route               => $ProcessRequestResult{AvailableMethods}->{$Method}->{Route},
-                    AuthorizationNeeded => $ProviderConfig->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
+                    Route               => $ProcessedRequest->{AvailableMethods}->{$Method}->{Route},
+                    AuthorizationNeeded => $Self->{ProviderConfig}->{Operation}->{$Operation}->{NoAuthorizationNeeded} ? 0 : 1,
                 }
             }
         }
 
         # add information about sub-resources
-        my $CurrentRoute = $ProcessRequestResult{Route};
+        my $CurrentRoute = $ProcessedRequest->{Route};
         $CurrentRoute = '' if $CurrentRoute eq '/';
-        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessRequestResult{ResourceOperationRouteMapping}});
+        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessedRequest->{ResourceOperationRouteMapping}});
         if ( @ChildResources ) {
             $Data->{Resources} = \@ChildResources;
         }
@@ -391,11 +268,11 @@ sub Run {
             }
         );
 
-        if ( !$FunctionResult->{Success} ) {
+        if ( !$GeneratedResponse->{Success} ) {
             $Self->_Error(
                 Code    => 'Provider.InternalError',
                 Message => 'Response could not be sent',
-                Data    => $FunctionResult->{ErrorMessage},
+                Data    => $GeneratedResponse->{ErrorMessage},
             );
         }
 
@@ -415,19 +292,18 @@ sub Run {
     }
 
     my $OperationObject = $OperationModule->new(
-        DebuggerObject          => $Self->{DebuggerObject},
-        APIVersion              => $Webservice->{Config}->{APIVersion},
-        Operation               => $Operation,
-        OperationType           => $ProviderConfig->{Operation}->{$Operation}->{Type},
-        WebserviceID            => $WebserviceID,
-        AvailableMethods        => $ProcessRequestResult{AvailableMethods},
-        OperationRouteMapping   => $ProcessRequestResult{ResourceOperationRouteMapping},
-        ParentMethodOperationMapping => $ProcessRequestResult{ParentMethodOperationMapping},
-        AvailableMethods        => $ProcessRequestResult{AvailableMethods},
-        RequestMethod           => $ProcessRequestResult{RequestMethod},
-        CurrentRoute            => $ProcessRequestResult{Route},
-        RequestURI              => $ProcessRequestResult{RequestURI},
-        Authorization           => $Authorization,
+        APIVersion                   => $Webservice->{Config}->{APIVersion},
+        Operation                    => $ProcessedRequest->{Operation},
+        OperationType                => $Self->{ProviderConfig}->{Operation}->{$ProcessedRequest->{Operation}}->{Type},
+        WebserviceID                 => $Webservice->{ID},
+        AvailableMethods             => $ProcessedRequest->{AvailableMethods},
+        OperationRouteMapping        => $ProcessedRequest->{ResourceOperationRouteMapping},
+        ParentMethodOperationMapping => $ProcessedRequest->{ParentMethodOperationMapping},
+        AvailableMethods             => $ProcessedRequest->{AvailableMethods},
+        RequestMethod                => $ProcessedRequest->{RequestMethod},
+        CurrentRoute                 => $ProcessedRequest->{Route},
+        RequestURI                   => $ProcessedRequest->{RequestURI},
+        Authorization                => $Authorization,
     );
 
     # if operation init failed, bail out
@@ -438,8 +314,8 @@ sub Run {
     }
 
     # execute the actual operation
-    my $FunctionResultOperation = $OperationObject->Run(
-        Data => $DataIn,
+    my $OperationResult = $OperationObject->Run(
+        Data => $ProcessedRequest->{Data},
     );
 
     if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
@@ -447,76 +323,10 @@ sub Run {
         $Self->_Debug('', "Response Data: ".Data::Dumper::Dumper($FunctionResultOperation->{Data}));
     }
 
-    if ( !$FunctionResultOperation->{Success} ) {
+    if ( !$OperationResult->{Success} ) {
 
         return $Self->_GenerateErrorResponse(
-            %{$FunctionResultOperation},
-        );
-    }
-
-    #
-    # Map the outgoing data based on configured mapping.
-    #
-
-    my $DataOut = $FunctionResultOperation->{Data};
-
-    $Self->{DebuggerObject}->Debug(
-        Summary => "Outgoing data before mapping",
-        Data    => $DataOut,
-    );
-
-    # decide if mapping needs to be used or not
-    if (
-        IsHashRefWithData(
-            $ProviderConfig->{Operation}->{$Operation}->{MappingOutbound}
-        )
-        )
-    {
-        my $MappingModule = $Kernel::OM->GetModuleFor('API::Mapping');
-        if ( !$Kernel::OM->Get('Main')->Require($MappingModule) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message => "Can't load module $MappingModule",
-            );
-            return;    # bail out, this will generate 500 Error
-        }
-        my $MappingOutObject = $MappingModule->new(
-            DebuggerObject => $Self->{DebuggerObject},
-            Operation      => $Operation,
-            OperationType  => $ProviderConfig->{Operation}->{$Operation}->{Type},
-            MappingConfig =>
-                $ProviderConfig->{Operation}->{$Operation}->{MappingOutbound},
-        );
-
-        # if mapping init failed, bail out
-        if ( ref $MappingOutObject ne $MappingModule ) {
-            my $ErrorResponse = $Self->_Error(
-                Code    => 'Provider.InternalError',
-                Message => 'MappingOut could not be initialized',
-                Data    => $MappingOutObject,
-            );
-
-            return $Self->_GenerateErrorResponse(
-                %{$ErrorResponse}
-            );
-        }
-
-        $FunctionResult = $MappingOutObject->Map(
-            Data => $DataOut,
-        );
-
-        if ( !$FunctionResult->{Success} ) {
-
-            return $Self->_GenerateErrorResponse(
-                %{$FunctionResult},
-            );
-        }
-
-        $DataOut = $FunctionResult->{Data};
-
-        $Self->{DebuggerObject}->Debug(
-            Summary => "Outgoing data after mapping",
-            Data    => $DataOut,
+            %{$OperationResult},
         );
     }
 
@@ -524,16 +334,16 @@ sub Run {
     # Generate the actual response
     #
 
-    $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
+    my $GeneratedResponse = $Self->GenerateResponse(
         Success => 1,
-        %{$FunctionResultOperation},
+        %{$OperationResult},
     );
 
-    if ( !$FunctionResult->{Success} ) {
+    if ( !$GeneratedResponse->{Success} ) {
         $Self->_Error(
             Code    => 'Provider.InternalError',
             Message => 'Response could not be sent',
-            Data    => $FunctionResult->{ErrorMessage},
+            Data    => $GeneratedResponse->{ErrorMessage},
         );
     }
 
@@ -554,9 +364,9 @@ returns an error message to the client.
 sub _GenerateErrorResponse {
     my ( $Self, %Param ) = @_;
 
-    my $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
+    my $FunctionResult = $Self->GenerateResponse(
         %Param,
-        Success      => 0,
+        Success => 0,
     );
 
     return;

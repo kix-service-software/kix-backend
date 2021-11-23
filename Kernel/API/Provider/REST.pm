@@ -6,28 +6,23 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Transport::HTTP::REST;
+package Kernel::API::Provider::REST;
 
 use strict;
 use warnings;
 
 use HTTP::Status;
-use MIME::Base64;
-use REST::Client;
 use URI::Escape;
+use Time::HiRes qw(time);
 
 use Kernel::Config;
 use Kernel::System::VariableCheck qw(:all);
-
-use base qw(
-    Kernel::API::Transport::HTTP::Common
-);
 
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Transport::REST - API network transport interface for HTTP::REST
+Kernel::API::Provider::REST - API network transport interface for HTTP::REST
 
 =head1 SYNOPSIS
 
@@ -37,29 +32,66 @@ Kernel::API::Transport::REST - API network transport interface for HTTP::REST
 
 =cut
 
-=item new()
+=item CheckAuthorization()
 
-usually, you want to create an instance of this
-by using Kernel::API::Transport->new();
+Checks the incoming web service request for authorization header and validates token.
+
+The HTTP code is set accordingly
+- 403 unauthorized
+- 500 if no authorization header is given
+
+    my $Result = $ProviderObject->CheckAuthorization();
+
+    $Result = {
+        Success      => 1,   # 0 or 1
+        HTTPError    => ...
+        ErrorMessage => '',  # in case of error
+    };
 
 =cut
 
-sub new {
-    my ( $Type, %Param ) = @_;
+sub CheckAuthorization {
+    my ( $Self, %Param ) = @_;
 
-    # allocate new hash for object
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(DebuggerObject TransportConfig)) {
-        $Self->{$Needed} = $Param{$Needed} || die "Got no $Needed!";
+    # check authentication header
+    my $cgi = CGI->new;
+    my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
+        
+    if ( !$Headers{HTTP_AUTHORIZATION} ) {
+        return $Self->_Error(
+            Code => 'Authorization.NoHeader'
+        );
     }
 
-    return $Self;
+    my %Authorization = split(/\s+/, $Headers{HTTP_AUTHORIZATION});
+
+    if ( !$Authorization{Token} ) {
+        return $Self->_Error(
+            Code => 'Authorization.NoToken'
+        );
+    }
+
+    my $ValidatedToken = $Kernel::OM->Get('Token')->ValidateToken(
+        Token => $Authorization{Token},
+    );
+
+    if ( !IsHashRefWithData($ValidatedToken) ) {
+        return $Self->_Error(
+            Code => 'Unauthorized'
+        );
+    }
+
+    return $Self->_Success(
+        Data    => {
+            Authorization => {
+                Token => $Authorization{Token},
+                %{$ValidatedToken},
+            }
+        }
+    );    
 }
 
-=item ProviderProcessRequest()
+=item ProcessRequest()
 
 Process an incoming web service request. This function has to read the request data
 from from the web server process.
@@ -70,7 +102,7 @@ No outbound communication is done here, except from continue requests.
 
 In case of an error, the resulting http error code and message are remembered for the response.
 
-    my $Result = $TransportObject->ProviderProcessRequest();
+    my $Result = $ProviderObject->ProcessRequest();
 
     $Result = {
         Success      => 1,                  # 0 or 1
@@ -84,7 +116,7 @@ In case of an error, the resulting http error code and message are remembered fo
 
 =cut
 
-sub ProviderProcessRequest {
+sub ProcessRequest {
     my ( $Self, %Param ) = @_;
 
     # check transport config
@@ -94,17 +126,10 @@ sub ProviderProcessRequest {
             Message => 'REST Transport: Have no TransportConfig',
         );
     }
-    if ( !IsHashRefWithData( $Self->{TransportConfig}->{Config} ) ) {
-        return $Self->_Error(
-            Code    => 'Transport.REST.NoTransportConfig',
-            Message => 'REST Transport: Have no Config',
-        );
-    }
 
-    my $Config = $Self->{TransportConfig}->{Config};
-    $Self->{KeepAlive} = $Config->{KeepAlive} || 0;
+    $Self->{KeepAlive} = $Self->{TransportConfig}->{KeepAlive} || 0;
 
-    if ( !IsHashRefWithData( $Config->{RouteOperationMapping} ) ) {
+    if ( !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping} ) ) {
         return $Self->_Error(
             Code    => 'Transport.REST.NoRouteOperationMapping',
             Message => "HTTP::REST Can't find RouteOperationMapping in Config",
@@ -169,11 +194,11 @@ sub ProviderProcessRequest {
 
     my $RequestMethod = $ENV{'REQUEST_METHOD'} || 'OPTIONS';
     ROUTE:
-    for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+    for my $CurrentOperation ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
 
-        next ROUTE if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
+        next ROUTE if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} );
 
-        my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
+        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} };
 
         if ( $RequestMethod ne 'OPTIONS' && IsArrayRefWithData( $RouteMapping{RequestMethod} ) ) {
             next ROUTE if !grep { $RequestMethod eq $_ } @{ $RouteMapping{RequestMethod} };
@@ -231,7 +256,7 @@ sub ProviderProcessRequest {
         foreach my $URIParam ( keys %{$PossibleOperations{$Route}->{URIParams}} ) {
             $BaseRoute =~ s/:$URIParam//g;
         }
-        # replace multiple slashes and the training slash
+        # replace multiple slashes and the trailing slash
         $BaseRoute =~ s/\/+/\//g;
         $BaseRoute =~ s/\/$//g;
     }
@@ -239,11 +264,11 @@ sub ProviderProcessRequest {
     # TODO: the following code is nearly identical to the code used in Operation::V1::Common, method ExecOperation -> should be generalized
     # determine all the allowed methods
     my %AvailableMethods;
-    for my $CurrentOperation ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+    for my $CurrentOperation ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
 
-        next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$CurrentOperation} );
+        next if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} );
 
-        my %RouteMapping = %{ $Config->{RouteOperationMapping}->{$CurrentOperation} };
+        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} };
         my $RouteRegEx = $RouteMapping{Route};
         $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
 
@@ -283,20 +308,20 @@ sub ProviderProcessRequest {
     my %ResourceOperationRouteMapping = (
         $Operation => $CurrentRoute
     );
-    for my $Op ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+    for my $Op ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
         # ignore invalid config
-        next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$Op} );
+        next if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$Op} );
         # ignore non-search or -get operations
         next if $Op !~ /(Search|Get)$/;
         # ignore anything that has nothing to do with the current Ops route
-        if ( $CurrentRoute ne '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
+        if ( $CurrentRoute ne '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
             next;
         }
-        elsif ( $CurrentRoute eq '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
+        elsif ( $CurrentRoute eq '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
             next;
         }
 
-        $ResourceOperationRouteMapping{$Op} = $Config->{RouteOperationMapping}->{$Op}->{Route};
+        $ResourceOperationRouteMapping{$Op} = $Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route};
     }
 
     # determine parent mapping as well
@@ -306,19 +331,19 @@ sub ProviderProcessRequest {
 
     my %ParentMethodOperationMapping;
     if ( $ParentObjectRoute ) {
-        for my $Op ( sort keys %{ $Config->{RouteOperationMapping} } ) {
+        for my $Op ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
             # ignore invalid config
-            next if !IsHashRefWithData( $Config->{RouteOperationMapping}->{$Op} );
+            next if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$Op} );
 
             # ignore anything that has nothing to do with the parent Ops route
-            if ( $ParentObjectRoute ne '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute\/$/ ) {
+            if ( $ParentObjectRoute ne '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute\/$/ ) {
                 next;
             }
-            elsif ( $ParentObjectRoute eq '/' && "$Config->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute[:a-zA-Z_]+$\//g ) {
+            elsif ( $ParentObjectRoute eq '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute[:a-zA-Z_]+$\//g ) {
                 next;
             }
 
-            my $Method = $Config->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
+            my $Method = $Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
             $ParentMethodOperationMapping{$Method} = $Op;
         }
     }
@@ -354,7 +379,7 @@ sub ProviderProcessRequest {
     }
 
     # request bigger than allowed
-    if ( IsInteger( $Config->{MaxLength} ) && $Length > $Config->{MaxLength} ) {
+    if ( IsInteger( $Self->{TransportConfig}->{MaxLength} ) && $Length > $Self->{TransportConfig}->{MaxLength} ) {
         return $Self->_Error(
             Code    => 'Transport.REST.RequestTooBig',
             Message => HTTP::Status::status_message(413),
@@ -387,12 +412,6 @@ sub ProviderProcessRequest {
     else {
         $EncodeObject->EncodeInput( \$Content );
     }
-
-    # send received data to debugger
-    $Self->{DebuggerObject}->Debug(
-        Summary => 'Received data by provider from remote system',
-        Data    => $Content,
-    );
 
     my $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
         Data => $Content,
@@ -432,18 +451,18 @@ sub ProviderProcessRequest {
 
     # all ok - return data
     return $Self->_Success(
-        Route          => $CurrentRoute,
-        RequestURI     => $RequestURI,
-        Operation      => $Operation,
-        AvailableMethods => \%AvailableMethods,
-        RequestMethod  => $RequestMethod,
+        Route                         => $CurrentRoute,
+        RequestURI                    => $RequestURI,
+        Operation                     => $Operation,
+        AvailableMethods              => \%AvailableMethods,
+        RequestMethod                 => $RequestMethod,
         ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
-        ParentMethodOperationMapping => \%ParentMethodOperationMapping,
-        Data           => $ReturnData,
+        ParentMethodOperationMapping  => \%ParentMethodOperationMapping,
+        Data                          => $ReturnData,
     );
 }
 
-=item ProviderGenerateResponse()
+=item GenerateResponse()
 
 Generates response for an incoming web service request.
 
@@ -455,7 +474,7 @@ The HTTP code is set accordingly
 - 4xx for http errors
 - 500 for content syntax errors
 
-    my $Result = $TransportObject->ProviderGenerateResponse(
+    my $Result = $TransportObject->GenerateResponse(
         Success  => 1
         Code     => ...     # optional
         Message  => ...     # optional
@@ -471,7 +490,7 @@ The HTTP code is set accordingly
 
 =cut
 
-sub ProviderGenerateResponse {
+sub GenerateResponse {
     my ( $Self, %Param ) = @_;
     my $MappedCode;
     my $MappedMessage;
@@ -571,407 +590,6 @@ sub ProviderGenerateResponse {
     );
 }
 
-=item RequesterPerformRequest()
-
-Prepare data payload as XML structure, generate an outgoing web service request,
-receive the response and return its data.
-
-    my $Result = $TransportObject->RequesterPerformRequest(
-        Operation => 'remote_op', # name of remote operation to perform
-        Data      => {            # data payload for request
-            ...
-        },
-    );
-
-    $Result = {
-        Success      => 1,        # 0 or 1
-        Message => '',       # in case of error
-        Data         => {
-            ...
-        },
-    };
-
-=cut
-
-sub RequesterPerformRequest {
-    my ( $Self, %Param ) = @_;
-
-    # check transport config
-    if ( !IsHashRefWithData( $Self->{TransportConfig} ) ) {
-        return $Self->_Error(
-            Code    => 'Transport.REST.NoTransportConfig',
-            Message => 'REST Transport: Have no TransportConfig',
-        );
-    }
-    if ( !IsHashRefWithData( $Self->{TransportConfig}->{Config} ) ) {
-        return $Self->_Error(
-            Code    => 'Transport.REST.NoTransportConfig',
-            Message => 'REST Transport: Have no Config',
-        );
-    }
-    my $Config = $Self->{TransportConfig}->{Config};
-
-    NEEDED:
-    for my $Needed (qw(Host DefaultCommand)) {
-        next NEEDED if IsStringWithData( $Config->{$Needed} );
-
-        return $Self->_Error(
-            Code    => 'Transport.REST.TransportConfigInvalid',
-            Message => "REST Transport: Have no $Needed in config",
-        );
-    }
-
-    # check data param
-    if ( defined $Param{Data} && ref $Param{Data} ne 'HASH' ) {
-        return $Self->_Error(
-            Code    => 'Transport.REST.DataMissing',
-            Message => 'REST Transport: Invalid Data',
-        );
-    }
-
-    # check operation param
-    if ( !IsStringWithData( $Param{Operation} ) ) {
-        return $Self->_Error(
-            Code    => 'Transport.REST.DataMissing',
-            Message => 'REST Transport: Need Operation',
-        );
-    }
-
-    # create header container
-    # and add proper content type
-    my $Headers = { 'Content-Type' => 'application/json; charset=UTF-8' };
-
-    if ( IsHashRefWithData( $Config->{Authentication} ) ) {
-
-        # basic authentication
-        if (
-            IsStringWithData( $Config->{Authentication}->{Type} )
-            && $Config->{Authentication}->{Type} eq 'BasicAuth'
-            )
-        {
-            my $User = $Config->{Authentication}->{User};
-            my $Password = $Config->{Authentication}->{Password} || '';
-
-            if ( IsStringWithData($User) ) {
-                my $EncodedCredentials = encode_base64("$User:$Password");
-                $Headers->{Authorization} = 'Basic ' . $EncodedCredentials;
-            }
-        }
-    }
-
-    # set up a REST session
-    my $RestClient = REST::Client->new(
-        {
-            host => $Config->{Host},
-        }
-    );
-
-    if ( !$RestClient ) {
-
-        my $Message = "Error while creating REST client from 'REST::Client'.";
-
-        # log to debugger
-        $Self->{DebuggerObject}->Error(
-            Summary => $Message,
-        );
-        return $Self->_Error(
-            Code    => 'Transport.REST.InternalError',
-            Message => $Message,
-        );
-    }
-
-    # add X509 options if configured
-    if ( IsHashRefWithData( $Config->{X509} ) ) {
-
-        # use X509 options
-        if (
-            IsStringWithData( $Config->{X509}->{UseX509} )
-            && $Config->{X509}->{UseX509} eq 'Yes'
-            )
-        {
-            #X509 client authentication
-            $RestClient->setCert( $Config->{X509}->{X509CertFile} );
-            $RestClient->setKey( $Config->{X509}->{X509KeyFile} );
-
-            #add a CA to verify server certificates
-            if ( IsStringWithData( $Config->{X509}->{X509CAFile} ) ) {
-                $RestClient->setCa( $Config->{X509}->{X509CAFile} );
-            }
-        }
-    }
-
-    my $RestCommand = $Config->{DefaultCommand};
-    if ( IsStringWithData( $Config->{InvokerControllerMapping}->{ $Param{Operation} }->{Command} ) )
-    {
-        $RestCommand = $Config->{InvokerControllerMapping}->{ $Param{Operation} }->{Command};
-    }
-
-    $RestCommand = uc $RestCommand;
-
-    if ( !grep { $_ eq $RestCommand } qw(GET POST PUT PATCH DELETE HEAD OPTIONS CONNECT TRACE) ) {
-
-        my $Message = "'$RestCommand' is not a valid REST command.";
-
-        # log to debugger
-        $Self->{DebuggerObject}->Error(
-            Summary => $Message,
-        );
-        return $Self->_Error(
-            Code    => 'Transport.REST.InvalidMethod',
-            Message => $Message,
-        );
-    }
-
-    if (
-        !IsHashRefWithData( $Config->{InvokerControllerMapping} )
-        || !IsHashRefWithData( $Config->{InvokerControllerMapping}->{ $Param{Operation} } )
-        || !IsStringWithData(
-            $Config->{InvokerControllerMapping}->{ $Param{Operation} }->{Controller}
-        )
-        )
-    {
-        my $Message = "REST Transport: Have no Invoker <-> Controller mapping for Invoker '$Param{Operation}'.";
-
-        # log to debugger
-        $Self->{DebuggerObject}->Error(
-            Summary => $Message,
-        );
-        return $Self->_Error(
-            Code    => 'Transport.REST.NoInvokerControllerMapping',
-            Message => $Message,
-        );
-    }
-
-    my @RequestParam;
-    my $Controller = $Config->{InvokerControllerMapping}->{ $Param{Operation} }->{Controller};
-
-    # remove any query parameters that might be in the config
-    # For example, from the controller: /Ticket/:TicketID/?:UserLogin&:Password
-    #     controller must remain  /Ticket/:TicketID/
-    $Controller =~ s{([^?]+)(.+)?}{$1};
-
-    # remember the query parameters e.g. ?:UserLogin&:Password
-    my $QueryParamsStr = $2 || '';
-
-    my @ParamsToDelete;
-
-    # replace any URI params with their actual value
-    #    for example: from /Ticket/:TicketID/:Other
-    #    to /Ticket/1/2 (considering that $Param{Data} contains TicketID = 1 and Other = 2)
-    for my $ParamName ( sort keys %{ $Param{Data} } ) {
-        if ( $Controller =~ m{:$ParamName(?=/|\?|$)}msx ) {
-            my $ParamValue = $Param{Data}->{$ParamName};
-            $ParamValue = URI::Escape::uri_escape_utf8($ParamValue);
-            $Controller =~ s{:$ParamName(?=/|\?|$)}{$ParamValue}msxg;
-            push @ParamsToDelete, $ParamName;
-        }
-    }
-
-    $Self->{DebuggerObject}->Debug(
-        Summary => "URI after interpolating URI params from outgoing data",
-        Data    => $Controller,
-    );
-
-    if ($QueryParamsStr) {
-
-        # replace any query params with their actual value
-        #    for example: from ?UserLogin:UserLogin&Password=:Password
-        #    to ?UserLogin=user&Password=secret
-        #    (considering that $Param{Data} contains UserLogin = 'user' and Password = 'secret')
-        my $ReplaceFlag;
-        for my $ParamName ( sort keys %{ $Param{Data} } ) {
-            if ( $QueryParamsStr =~ m{:$ParamName(?=&|$)}msx ) {
-                my $ParamValue = $Param{Data}->{$ParamName};
-                $ParamValue = URI::Escape::uri_escape_utf8($ParamValue);
-                $QueryParamsStr =~ s{:$ParamName(?=&|$)}{$ParamValue}msxg;
-                push @ParamsToDelete, $ParamName;
-                $ReplaceFlag = 1;
-            }
-        }
-
-        # append query params in the URI
-        if ($ReplaceFlag) {
-            $Controller .= $QueryParamsStr;
-
-            $Self->{DebuggerObject}->Debug(
-                Summary => "URI after interpolating Query params from outgoing data",
-                Data    => $Controller,
-            );
-        }
-    }
-
-    # remove already used params
-    for my $ParamName (@ParamsToDelete) {
-        delete $Param{Data}->{$ParamName};
-    }
-
-    # get JSON and Encode object
-    my $JSONObject   = $Kernel::OM->Get('JSON');
-    my $EncodeObject = $Kernel::OM->Get('Encode');
-
-    my $Body;
-    if ( IsHashRefWithData( $Param{Data} ) ) {
-
-        # POST, PUT and PATCH can have Data in the Body
-        if (
-            $RestCommand eq 'POST'
-            || $RestCommand eq 'PUT'
-            || $RestCommand eq 'PATCH'
-            )
-        {
-            $Self->{DebuggerObject}->Debug(
-                Summary => "Remaining outgoing data to be sent",
-                Data    => $Param{Data},
-            );
-
-            $Param{Data} = $JSONObject->Encode(
-                Data => $Param{Data},
-            );
-
-            # make sure data is correctly encoded
-            $EncodeObject->EncodeOutput( \$Param{Data} );
-        }
-
-        # whereas GET and the others just have a the data added to the Query URI.
-        else {
-            my $QueryParams = $RestClient->buildQuery(
-                %{ $Param{Data} }
-            );
-
-            # check if controller already have a  question mark '?'
-            if ( $Controller =~ m{\?}msx ) {
-
-                # replace question mark '?' by an ampersand '&'
-                $QueryParams =~ s{\A\?}{&};
-            }
-
-            $Controller .= $QueryParams;
-
-            $Self->{DebuggerObject}->Debug(
-                Summary => "URI after adding Query params from outgoing data",
-                Data    => $Controller,
-            );
-
-            $Self->{DebuggerObject}->Debug(
-                Summary => "Remaining outgoing data to be sent",
-                Data    => "No data is sent in the request body as $RestCommand command sets all"
-                    . " Data as query params",
-            );
-        }
-    }
-    push @RequestParam, $Controller;
-
-    if ( IsStringWithData( $Param{Data} ) ) {
-        $Body = $Param{Data};
-        push @RequestParam, $Body;
-    }
-
-    # add headers to request
-    push @RequestParam, $Headers;
-
-    $RestClient->$RestCommand(@RequestParam);
-
-    my $ResponseCode = $RestClient->responseCode();
-    my $ResponseError;
-    my $Message = "Error while performing REST '$RestCommand' request to Controller '$Controller' on Host '"
-        . $Config->{Host} . "'.";
-
-    if ( !IsStringWithData($ResponseCode) ) {
-        $ResponseError = $Message;
-    }
-
-    if ( $ResponseCode !~ m{ \A 20 \d \z }xms ) {
-        $ResponseError = $Message . " Response code '$ResponseCode'.";
-    }
-
-    if ($ResponseError) {
-
-        # log to debugger
-        $Self->{DebuggerObject}->Error(
-            Summary => $ResponseError,
-        );
-        return $Self->_Error(
-            Code    => $ResponseCode,
-            Message => $ResponseError,
-        );
-    }
-
-    my $ResponseContent = $RestClient->responseContent();
-    if ( !IsStringWithData($ResponseContent) ) {
-
-        my $ResponseError = $Message . ' No content provided.';
-
-        # log to debugger
-        $Self->{DebuggerObject}->Error(
-            Summary => $ResponseError,
-        );
-        return $Self->_Error(
-            Code    => 'Transport.REST.NoContent',
-            Message => $ResponseError,
-        );
-    }
-
-    my $SizeExeeded = 0;
-    {
-        my $MaxSize
-            = $Kernel::OM->Get('Config')->Get('API::Operation::ResponseLoggingMaxSize') || 200;
-        $MaxSize = $MaxSize * 1024;
-        use bytes;
-
-        my $ByteSize = length($ResponseContent);
-
-        if ( $ByteSize < $MaxSize ) {
-            $Self->{DebuggerObject}->Debug(
-                Summary => 'JSON data received from remote system',
-                Data    => $ResponseContent,
-            );
-        }
-        else {
-            $SizeExeeded = 1;
-            $Self->{DebuggerObject}->Debug(
-                Summary => "JSON data received from remote system was too large for logging",
-                Data =>
-                    'See SysConfig option API::Operation::ResponseLoggingMaxSize to change the maximum.',
-            );
-        }
-    }
-
-    # send processed data to debugger
-    $Self->{DebuggerObject}->Debug(
-        Summary => 'JSON data received from remote system',
-        Data    => $ResponseContent,
-    );
-
-    $ResponseContent = $EncodeObject->Convert2CharsetInternal(
-        Text => $ResponseContent,
-        From => 'utf-8',
-    );
-
-    # to convert the data into a hash, use the JSON module
-    my $Result = $JSONObject->Decode(
-        Data => $ResponseContent,
-    );
-
-    if ( !$Result ) {
-        my $ResponseError = $Message . ' Error while parsing JSON data.';
-
-        # log to debugger
-        $Self->{DebuggerObject}->Error(
-            Summary => $ResponseError,
-        );
-        return $Self->_Error(
-            Code    => 'Transport.REST.InvalidJSON',
-            Message => $ResponseError,
-        );
-    }
-
-    # all OK - return result
-    return $Self->_Success(
-        Data        => $Result || undef,
-        SizeExeeded => $SizeExeeded,
-    );
-}
-
 =begin Internal:
 
 =item _Output()
@@ -1007,69 +625,70 @@ sub _Output {
     my $Success = 1;
     my $Message;
 
-    if ( IsHashRefWithData($Param{Content}) ) {
-        $Param{Content} = $Kernel::OM->Get('JSON')->Encode(
-            Data => $Param{Content},
+    my $Content = $Param{Content};
+    if ( IsHashRefWithData($Content) ) {
+        $Content = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Content,
         );
 
-        if ( !$Param{Content} ) {
-            $Param{HTTPCode} = 500;
-            $Param{Content}  = '
-{
-    "Code": "Transport.REST.InternalError",
-    "Message": "Error while encoding return JSON structure."
-}';
+        if ( !$Content ) {
             $Success         = 0;
-            $Message         = 'Error while encoding return JSON structure.';
+            $Param{HTTPCode} = 500;
+            $Content = {
+                Code    => "Transport.REST.InternalError",
+                Message => "Error while encoding return JSON structure."
+            };
         }
     }
 
     # check params
     if ( defined $Param{HTTPCode} && !IsInteger( $Param{HTTPCode} ) ) {
-        $Param{HTTPCode} = 500;
-        $Param{Content}  = '
-{
-    "Code": "Transport.REST.InternalError",
-    "Message": "Invalid internal HTTPCode"
-}';
         $Success         = 0;
-        $Message         = 'Invalid internal HTTPCode';
-    }
-    elsif ( defined $Param{Content} && !IsString( $Param{Content} ) ) {
         $Param{HTTPCode} = 500;
-        $Param{Content}  = '
-{
-    "Code": "Transport.REST.InternalError",
-    "Message": "Invalid Content"
-}';
-        $Success         = 0;
-        $Message         = 'Invalid Content';
+        $Content  = {
+            Code    => "Transport.REST.InternalError",
+            Message => "Invalid internal HTTPCode"
+        };
     }
 
     # prepare protocol
     my $Protocol = defined $ENV{SERVER_PROTOCOL} ? $ENV{SERVER_PROTOCOL} : 'HTTP/1.0';
 
     # prepare data
-    $Param{Content}  ||= '';
+    $Content         ||= '';
     $Param{HTTPCode} ||= 500;
     my $ContentType =  'application/json';
 
-    # calculate content length (based on the bytes length not on the characters length)
-    my $ContentLength = bytes::length( $Param{Content} );
+    # adjust HTTP code
+    my $HTTPCode = $Param{HTTPCode};
+    if ( $Param{HTTPCode} eq 200 && !$Content ) {
+        $HTTPCode = 204;        # No Content
+    }
 
-    # log to debugger
-    my $DebugLevel;
-    if ( $Param{HTTPCode} =~ /^2/ ) {
-        $DebugLevel = 'debug';
+    my $StatusMessage = HTTP::Status::status_message( $HTTPCode );
+
+    # log error message
+    if ( $HTTPCode !~ /^2/ ) {
+        printf STDERR "\nAPI ERROR: ProcessID: %i Time: %s\n\n%11s: %s\n%11s: %s\n%11s: %i ms\n%11s: %s\n%11s: %s\n%11s: %s\n\n", 
+            $$, 
+            $Kernel::OM->Get('Time')->CurrentTimestamp(), 
+            'Method', $Self->{RequestMethod},
+            'Resource', $ENV{REQUEST_URI},
+            'Duration', (time() - $Self->{RequestStartTime}) * 1000,
+            'HTTPStatus', $HTTPCode.' '.$StatusMessage,
+            'Code', IsHashRefWithData($Content) ? $Content->{Code} : $Param{Content}->{Code}, 
+            'Message', IsHashRefWithData($Content) ? $Content->{Message} : $Param{Content}->{Message};
     }
-    else {
-        $DebugLevel = 'error';
+
+    # finally 
+    if ( $Param{HTTPCode} == 500 && IsHashRefWithData($Content) ) {
+        $Param{Content} = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{Content},
+        );
     }
-    $Self->{DebuggerObject}->DebugLog(
-        DebugLevel => $DebugLevel,
-        Summary    => "Returning provider data to remote system (HTTP Code: $Param{HTTPCode})",
-        Data       => $Param{Content},
-    );
+
+    # calculate content length (based on the bytes length not on the characters length)
+    my $ContentLength = bytes::length( $Content );
 
     # set keep-alive
     my $Connection = $Self->{KeepAlive} ? 'Keep-Alive' : 'close';
@@ -1086,14 +705,7 @@ sub _Output {
     # reproducible, and not tested in this solution).
     binmode STDOUT, ':utf8';    ## no critic
 
-    # adjust HTTP code
-    my $HTTPCode = $Param{HTTPCode};
-    if ( $Param{HTTPCode} eq 200 && !$Param{Content} ) {
-        $HTTPCode = 204;        # No Content
-    }
-
     # print data to http - '\r' is required according to HTTP RFCs
-    my $StatusMessage = HTTP::Status::status_message( $HTTPCode );
     print STDOUT "Status: $HTTPCode $StatusMessage\r\n";
     print STDOUT "Content-Type: $ContentType; charset=UTF-8\r\n";
     print STDOUT "Content-Length: $ContentLength\r\n";
@@ -1107,7 +719,7 @@ sub _Output {
     }
 
     print STDOUT "\r\n";
-    print STDOUT $Param{Content};
+    print STDOUT $Content;
 
     if ($Success) {
         return $Self->_Success(
@@ -1119,6 +731,64 @@ sub _Output {
         Code    => $Param{HTTPCode},
         Message => $Message,
     );
+}
+
+=item _MapReturnCode()
+
+Take return code from request processing.
+Map the internal return code to transport specific response
+
+    my $MappedCode = $TransportObject->_MapReturnCode(
+        Transport => 'REST'        # the specific transport to map to
+        Code      => 'Code'        # texttual return code
+    );
+
+    $Result = ...
+
+=cut
+
+sub _MapReturnCode {
+    my ( $Self, %Param ) = @_;
+
+    # check needed params
+    if ( !IsString( $Param{Code} ) ) {
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => 'Need Code!',
+        );
+    }
+    if ( !IsString( $Param{Transport} ) ) {
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => 'Need Transport!',
+        );
+    }
+
+    # get mapping
+    my $Mapping = $Kernel::OM->Get('Config')->Get('API::Transport::ReturnCodeMapping');
+    if ( !IsHashRefWithData($Mapping) ) {
+        return $Self->_Error(
+            Code    => 'Transport.InternalError',
+            Message => 'No ReturnCodeMapping config!',
+        );        
+    }
+
+    if ( !IsHashRefWithData($Mapping->{$Param{Transport}}) ) {
+        # we don't have a mapping for the given transport, so just return the given code without mapping
+        return $Param{Code};
+    }
+    my $TransportMapping = $Mapping->{$Param{Transport}};
+
+    # get map entry
+    my ($MappedCode, $MappedMessage) = split(/:/, $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'});
+    
+    # override defualt message from mapping if we have some special message
+    if ( !$MappedMessage || $Param{Message} ) {
+        $MappedMessage = $Param{Message} || ''; 
+    }
+
+    # return
+    return "$MappedCode:$MappedMessage";
 }
 
 1;

@@ -25,9 +25,9 @@ $Kernel::OM->ObjectParamAdd(
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # add web service to be used (empty config)
-my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('Webservice');
 $Self->Is(
-    'API::Webservice',
+    'Webservice',
     ref $WebserviceObject,
     "Create web service object",
 );

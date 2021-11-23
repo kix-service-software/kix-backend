@@ -20,10 +20,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Generate a WebService definition file for the application REST API');
+    $Self->Description('Generate a web service definition file for the application REST API');
     $Self->AddOption(
         Name        => 'api-version',
-        Description => "The version of REST API webservice to generate (i.e. v1).",
+        Description => "The version of REST API web service to generate (i.e. v1).",
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/^.*$/smx,
@@ -43,7 +43,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Generating WebService definition file...</yellow>\n");
+    $Self->Print("<yellow>Generating web service definition file for \"".$Self->GetOption('api-version')."\"...</yellow>\n");
 
     my $Version    = $Self->GetOption('api-version');
     my $OutputFile = $Self->GetOption('output-file');
