@@ -254,7 +254,7 @@
     <Insert Table="roles">
         <Data Key="id" Type="AutoIncrement">17</Data>
         <Data Key="name" Type="Quote" Translatable="1">Ticket Agent (Servicedesk)</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">allows basic ticket access, but requires team specific roles</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows working on tickets in team "Servicedesk", but requires role "Ticket Agent (w/o teams)" in order to grant access</Data>
         <Data Key="usage_context">1</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>

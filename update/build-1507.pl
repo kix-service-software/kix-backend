@@ -48,7 +48,7 @@ sub _CreateRoles {
         },
         {
             Name => 'Ticket Agent (Servicedesk)',
-            Comment => Kernel::Language::Translatable('allows basic ticket access, but requires team specific roles'),
+            Comment => Kernel::Language::Translatable('allows working on tickets in team "Servicedesk", but requires role "Ticket Agent (w/o teams)" in order to grant access'),
             UsageContext => 1,
         },
     );
@@ -99,6 +99,108 @@ sub _CreateRoles {
         {
             Role   => 'Ticket Agent (w/o teams)',
             Type   => 'Resource',
+            Target => '/tickets',
+            Value  => Kernel::System::Role::Permission::PERMISSION_CRUD
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/ticket/*',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/ticket',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/ticket/locks',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/ticket/priorities',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/ticket/queues',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/ticket/states',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/ticket/types',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/communication',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/communication/*',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/communication/channels',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/communication/sendertypes',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/communication/systemaddresses',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/organisations',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/contacts',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/links',
+            Value  => Kernel::System::Role::Permission::PERMISSION_CRUD
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
+            Target => '/system/textmodules',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+        },
+        {
+            Role   => 'Ticket Agent (w/o teams)',
+            Type   => 'Resource',
             Target => '/system/ticket/queues/*',
             Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
         },
@@ -114,52 +216,9 @@ sub _CreateRoles {
             Target => '/tickets/*{Ticket.QueueID GT 0}',
             Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
         },
-        {
-            Role     => 'Ticket Agent (w/o teams)',
-            CopyFrom => 'Ticket Agent',
-        },
     );
 
-    # handle CopyFrom at first
-    foreach my $NewPermission (@NewPermissions) {
-        next if !$NewPermission->{CopyFrom};
-
-        my $RoleID = $RoleList{$NewPermission->{CopyFrom}};
-        if (!$RoleID) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Unable to find role "' . $NewPermission->{CopyFrom} . '" to copy permissions from!'
-            );
-            next;
-        }
-
-        # we found a CopyFrom
-        my @PermissionList = $RoleObject->PermissionList(
-            RoleID => $RoleID
-        );
-        next if !@PermissionList;
-
-        PERMISSION:
-        foreach my $PermissionID ( @PermissionList ) {
-            my %Permission = $RoleObject->PermissionGet(
-                ID => $PermissionID
-            );
-            next PERMISSION if !%Permission;
-            
-            # add permission to NewPermissions array
-            push @NewPermissions, {
-                Role   => $NewPermission->{Role},
-                TypeID => $Permission{TypeID},
-                Target => $Permission{Target},
-                Value  => $Permission{Value},
-            };
-        }
-    }
-
     foreach my $Permission (@NewPermissions) {
-        # ignore the CopyFroms
-        next if $Permission->{CopyFrom};
-
         my $RoleID = $RoleList{$Permission->{Role}};
         if (!$RoleID) {
             $Kernel::OM->Get('Log')->Log(
