@@ -12,26 +12,13 @@ use utf8;
 
 use vars (qw($Self));
 
-use Kernel::API::Debugger;
 use Kernel::API::Validator::MacroValidator;
 
 # get Macro object
 my $AutomationObject = $Kernel::OM->Get('Automation');
 
-my $DebuggerObject = Kernel::API::Debugger->new(
-    DebuggerConfig   => {
-        DebugThreshold  => 'debug',
-        TestMode        => 1,
-    },
-    WebserviceID      => 1,
-    CommunicationType => 'Provider',
-    RemoteIP          => 'localhost',
-);
-
 # get validator object
-my $ValidatorObject = Kernel::API::Validator::MacroValidator->new(
-    DebuggerObject => $DebuggerObject
-);
+my $ValidatorObject = Kernel::API::Validator::MacroValidator->new();
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(

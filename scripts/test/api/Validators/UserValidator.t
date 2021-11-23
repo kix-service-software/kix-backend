@@ -12,23 +12,10 @@ use utf8;
 
 use vars (qw($Self));
 
-use Kernel::API::Debugger;
 use Kernel::API::Validator::UserValidator;
 
-my $DebuggerObject = Kernel::API::Debugger->new(
-    DebuggerConfig   => {
-        DebugThreshold  => 'debug',
-        TestMode        => 1,
-    },
-    WebserviceID      => 1,
-    CommunicationType => 'Provider',
-    RemoteIP          => 'localhost',
-);
-
 # get validator object
-my $ValidatorObject = Kernel::API::Validator::UserValidator->new(
-    DebuggerObject => $DebuggerObject
-);
+my $ValidatorObject = Kernel::API::Validator::UserValidator->new();
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(

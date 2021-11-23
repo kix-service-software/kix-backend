@@ -13,8 +13,7 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $WebserviceObject        = $Kernel::OM->Get('API::Webservice');
-my $WebserviceHistoryObject = $Kernel::OM->Get('API::WebserviceHistory');
+my $WebserviceObject = $Kernel::OM->Get('Webservice');
 
 my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
@@ -28,13 +27,8 @@ my @Tests = (
             Config => {
                 Name        => 'Nagios',
                 Description => 'Connector to send and receive date from Nagios.',
-                Debugger    => {
-                    DebugThreshold => 'debug',
-                    TestMode       => 1,
-                },
                 Provider => {
                     Transport => {
-                        Type   => 'HTTP::SOAP',
                         Config => {
                             NameSpace  => '',
                             SOAPAction => '',
@@ -981,39 +975,6 @@ for my $Test (@Tests) {
         "$Test->{Name} - WebserviceGet() with Name parameter result",
     );
 
-    # history check
-    my @History = $WebserviceHistoryObject->WebserviceHistoryList(
-        WebserviceID => $WebserviceID,
-        UserID       => 1,
-    );
-    $Self->Is(
-        scalar @History,
-        $Test->{HistoryCount},
-        "$Test->{Name} - WebserviceHistoryList()",
-    );
-
-    COUNT:
-    for my $Count ( 0 .. 1 ) {
-        next COUNT if !$History[$Count];
-        my $WebserviceHistoryGet = $WebserviceHistoryObject->WebserviceHistoryGet(
-            ID => $History[$Count],
-        );
-        if ( $Count == 1 ) {
-            $Self->IsDeeply(
-                $WebserviceHistoryGet->{Config},
-                $Test->{Add}->{Config},
-                "$Test->{Name} - WebserviceHistoryGet() - Config",
-            );
-        }
-        else {
-            $Self->IsDeeply(
-                $WebserviceHistoryGet->{Config},
-                $Test->{Update}->{Config},
-                "$Test->{Name} - WebserviceHistoryGet() - Config",
-            );
-        }
-    }
-
     # verify if cache was also updated
     if ( $Test->{SuccessUpdate} ) {
         my $WebserviceUpdateFromCache = $WebserviceObject->WebserviceGet(
@@ -1041,15 +1002,6 @@ for my $WebserviceID (@WebserviceIDs) {
     $Self->True(
         scalar $WebserviceList->{$WebserviceID},
         "WebserviceList() from DB found Webservice $WebserviceID",
-    );
-
-    my @WebserviceHistoryList = $WebserviceHistoryObject->WebserviceHistoryList(
-        WebserviceID => $WebserviceID,
-    );
-
-    $Self->True(
-        scalar @WebserviceHistoryList > 0,
-        "WebserviceHistoryList() found entries for Webservice $WebserviceID",
     );
 }
 
@@ -1088,23 +1040,6 @@ for my $WebserviceID (@WebserviceIDs) {
     $Self->False(
         scalar $WebserviceList->{$WebserviceID},
         "WebserviceList() did not find webservice $WebserviceID",
-    );
-
-    my @WebserviceHistoryList = $WebserviceHistoryObject->WebserviceHistoryList(
-        WebserviceID => $WebserviceID,
-    );
-
-    $Self->False(
-        scalar @WebserviceHistoryList,
-        "WebserviceHistoryList() from DB found entries for Webservice $WebserviceID",
-    );
-    my @History = $WebserviceHistoryObject->WebserviceHistoryList(
-        WebserviceID => $WebserviceID,
-        UserID       => 1,
-    );
-    $Self->False(
-        scalar @History,
-        'WebserviceHistoryList()',
     );
 }
 

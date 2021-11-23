@@ -278,10 +278,7 @@ sub _PrepareRedisKey {
         return $Param{Key};
     }
 
-    my $Key = $Param{Key};
-    $Kernel::OM->Get('Encode')->EncodeOutput( \$Key );
-    $Key = Digest::MD5::md5_hex($Key);
-    return $Key;
+    return Digest::MD5::md5_hex($Param{Key});
 }
 
 =item _RedisCall()

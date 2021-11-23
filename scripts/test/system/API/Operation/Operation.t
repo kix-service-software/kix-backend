@@ -12,7 +12,6 @@ use utf8;
 
 use vars (qw($Self));
 
-use Kernel::API::Debugger;
 use Kernel::API::Operation;
 
 # get helper object
@@ -23,15 +22,6 @@ $Kernel::OM->ObjectParamAdd(
     },
 );
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
-
-my $DebuggerObject = Kernel::API::Debugger->new(
-    DebuggerConfig => {
-        DebugThreshold => 'debug',
-        TestMode       => 1,
-    },
-    WebserviceID      => 1,
-    CommunicationType => 'Provider',
-);
 
 # create object with false options
 my $OperationObject;
@@ -46,7 +36,6 @@ $Self->IsNot(
 
 # provide empty operation
 $OperationObject = Kernel::API::Operation->new(
-    DebuggerObject => $DebuggerObject,
     WebserviceID   => 1,
     OperationType  => {},
 );
@@ -58,7 +47,6 @@ $Self->IsNot(
 
 # provide incorrect operation
 $OperationObject = Kernel::API::Operation->new(
-    DebuggerObject => $DebuggerObject,
     WebserviceID   => 1,
     OperationType  => 'Test::ThisIsCertainlyNotBeingUsed',
 );
@@ -70,7 +58,6 @@ $Self->IsNot(
 
 # provide no WebserviceID
 $OperationObject = Kernel::API::Operation->new(
-    DebuggerObject => $DebuggerObject,
     OperationType  => 'Test::Test',
 );
 $Self->IsNot(
@@ -81,7 +68,6 @@ $Self->IsNot(
 
 # create object
 $OperationObject = Kernel::API::Operation->new(
-    DebuggerObject => $DebuggerObject,
     WebserviceID   => 1,
     Operation      => 'Test',
     OperationType  => 'Test::Test',

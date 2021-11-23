@@ -53,22 +53,9 @@ systems.
 
 create an object.
 
-    use Kernel::API::Debugger;
     use Kernel::API::Operation;
 
-    my $DebuggerObject = Kernel::API::Debugger->new(
-        DebuggerConfig   => {
-            DebugThreshold => 'debug',
-            TestMode       => 0,           # optional, in testing mode the data will not be written to the DB
-            # ...
-        },
-        WebserviceID      => 12,
-        CommunicationType => Provider, # Requester or Provider
-        RemoteIP          => 192.168.1.1, # optional
-    );
-
     my $OperationObject = Kernel::API::Operation->new(
-        DebuggerObject  => $DebuggerObject,
         Operation       => 'TicketCreate',                # the name of the operation in the web service
         OperationType   => 'V1::Ticket::TicketCreate',    # the local operation backend to use
         WebserviceID    => $WebserviceID,                 # ID of the currently used web service
@@ -86,7 +73,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject Operation OperationType OperationRouteMapping ParentMethodOperationMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
+    for my $Needed (qw(Operation OperationType OperationRouteMapping ParentMethodOperationMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
             return $Self->_Error(

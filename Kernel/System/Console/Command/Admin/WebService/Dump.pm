@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'API::Webservice',
+    'Webservice',
     'Main',
     'YAML',
 );
@@ -45,7 +45,7 @@ sub Configure {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    my $WebServiceList = $Kernel::OM->Get('API::Webservice')->WebserviceList();
+    my $WebServiceList = $Kernel::OM->Get('Webservice')->WebserviceList();
     my %WebServiceListReverse = reverse %{$WebServiceList};
 
     my $WebServiceName = $Self->GetOption('name');
@@ -63,7 +63,7 @@ sub Run {
     $Self->Print("<yellow>Dumping web service...</yellow>\n");
 
     my $WebService =
-        $Kernel::OM->Get('API::Webservice')->WebserviceGet(
+        $Kernel::OM->Get('Webservice')->WebserviceGet(
         ID => $Self->{WebServiceID},
         );
 

@@ -34,6 +34,25 @@ Kernel::API::Validator::Common - Base class for validators
 
 =cut
 
+=item new()
+
+create an object.
+
+    use Kernel::API::Validator;
+
+    my $ValidatorObject = Kernel::API::Validator::XYZValidator->new();
+
+=cut
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    my $Self = {};
+    bless( $Self, $Type );
+
+    return $Self;
+}
+
 =item Validate()
 
 validate a attribute in the data hash

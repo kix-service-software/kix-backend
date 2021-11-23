@@ -16,7 +16,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'API::Webservice',
+    'Webservice',
     'Main',
     'YAML',
 );
@@ -51,7 +51,7 @@ sub PreRun {
         die "Source file $SourcePath does not exist / is not readable.\n";
     }
 
-    my $List             = $Kernel::OM->Get('API::Webservice')->WebserviceList();
+    my $List             = $Kernel::OM->Get('Webservice')->WebserviceList();
     my %WebServiceLookup = reverse %{$List};
 
     my $Name = $Self->GetOption('name');
@@ -65,7 +65,7 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Creating web service...</yellow>\n");
+    $Self->Print("<yellow>Creating web service \"".$Self->GetOption('name')."\"...</yellow>\n");
 
     # read config
     my $Content = $Kernel::OM->Get('Main')->FileRead(
@@ -84,7 +84,7 @@ sub Run {
     }
 
     # add new web service
-    my $ID = $Kernel::OM->Get('API::Webservice')->WebserviceAdd(
+    my $ID = $Kernel::OM->Get('Webservice')->WebserviceAdd(
         Name    => $Self->GetOption('name'),
         Config  => $Config,
         ValidID => 1,
