@@ -43,7 +43,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
+    for my $Needed (qw(WebserviceID)) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'Operation.InternalError',

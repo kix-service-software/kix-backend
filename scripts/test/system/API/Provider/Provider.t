@@ -205,7 +205,7 @@ if ( $ConfigObject->Get('UnitTestPlackServerPort') ) {
 }
 
 # get objects
-my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
+my $WebserviceObject = $Kernel::OM->Get('Webservice');
 my $ProviderObject   = $Kernel::OM->Get('API::Provider');
 
 for my $Test (@Tests) {

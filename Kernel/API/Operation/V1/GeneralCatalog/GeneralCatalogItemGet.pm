@@ -47,7 +47,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
+    for my $Needed (qw(WebserviceID)) {
         if ( !$Param{$Needed} ) {
             return $Self->_Error(
                 Code    => 'Operation.InternalError',
@@ -88,7 +88,7 @@ sub ParameterDefinition {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -129,15 +129,48 @@ sub Run {
     # start loop
     foreach my $GeneralCatalogItemID ( @{$Param{Data}->{GeneralCatalogItemID}} ) {
 
-	    # get the GeneralCatalogItem data
-	    my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-	        ItemID => $GeneralCatalogItemID,
-	    );
+        # get the GeneralCatalogItem data
+        my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+            ItemID => $GeneralCatalogItemID,
+            NoPreferences => $Param{Data}->{include}->{Preferences} ? 0 : 1
+        );
 
-        if ( !$ItemData ) {         
+        if ( !$ItemData ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
+        }
+
+        # add known preferences
+        if ($Param{Data}->{include}->{Preferences}) {
+            $ItemData->{Preferences} = [];
+
+            # get knwon preferences
+            my $PreferenceConfigs = $Kernel::OM->Get('Config')->Get('GeneralCatalogPreferences');
+            if (IsHashRefWithData($PreferenceConfigs)) {
+                for my $Pref ( values %{$PreferenceConfigs} ) {
+                    if (
+                        IsHashRefWithData($Pref) &&
+                        $Pref->{Class} && $Pref->{Class} eq $ItemData->{Class} &&
+                        $Pref->{PrefKey} && $ItemData->{ $Pref->{PrefKey} }
+                    ) {
+                        push(
+                            @{$ItemData->{Preferences}},
+                            {
+                                Name  => $Pref->{PrefKey},
+                                Value => $ItemData->{ $Pref->{PrefKey} }
+                            }
+                        );
+                    }
+                }
+            }
+        }
+
+        # remove possible unecessary attributes ((unknown) preferences)
+        for my $Attr ( keys %{$ItemData} ) {
+            if ($Attr !~ m/^(ChangeBy|ChangeTime|Class|Comment|CreateBy|CreateTime|ItemID|Name|ValidID|Preferences)$/) {
+                delete($ItemData->{$Attr});
+            }
         }
 
         # add
@@ -147,7 +180,7 @@ sub Run {
     if ( scalar(@GeneralCatalogList) == 1 ) {
         return $Self->_Success(
             GeneralCatalogItem => $GeneralCatalogList[0],
-        );    
+        );
     }
 
     # return result

@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
 
+    <ConfigItem AccessLevel="internal" Name="API::Validator::DisableForResource###Default" Required="0" Valid="1">
+        <Description Translatable="1">Disable API validator for specific resources. Use RegEx.</Description>
+        <Setting>
+            <Array>
+                <Item>\/system\/config\/Authentication###.*?</Item>
+            </Array>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ArticleValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
@@ -273,6 +282,17 @@
                 <Item Key="Validates">Type,TypeID</Item>
                 <Item Key="ConsiderOperationRegEx">(TicketStateCreate|TicketStateUpdate)</Item>
                 <Item Key="IgnoreOperationRegEx">(PermissionCreate|PermissionUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###SystemAddressValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Validator::SystemAddressValidator</Item>
+                <Item Key="Validates">SystemAddressID</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">SystemAddressGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>

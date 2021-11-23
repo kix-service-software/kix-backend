@@ -1604,7 +1604,7 @@
         <Data Key="notification_id">11</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject_64>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_TICKET_Title>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Thank you for your message. We will take care of it as soon as possible.</p><br/><br/><p>Your request is handled under number&nbsp;[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;].</p><br/><br/><p>--&nbsp;</p><br/><br/><p>&nbsp;</p>]]></Data>
     </Insert>
 
@@ -1694,7 +1694,7 @@
         <Data Key="notification_id">11</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject_64>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_TICKET_Title>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Vielen Dank f&uuml;r Ihre Nachricht. Wir werden Ihr Anliegen so schnell wie m&ouml;glich bearbeiten.</p><br/><br/><p>Ihre Anfrage wird unter der Vorgangsnummer&nbsp;[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;] gef&uuml;hrt.</p><br/><br/><p>--&nbsp;</p>]]></Data>
     </Insert>
 

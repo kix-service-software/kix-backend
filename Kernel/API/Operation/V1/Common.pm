@@ -291,7 +291,7 @@ sub Init {
     }
 
     # get webservice configuration
-    my $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
+    my $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
         ID => $Param{WebserviceID},
     );
 
@@ -944,11 +944,6 @@ sub _Error {
         );
     }
 
-    $Self->{DebuggerObject}->Error(
-        Summary => $Param{Code},
-        Data    => $Message,
-    );
-
     # return structure
     return {
         Success => 0,
@@ -987,7 +982,7 @@ sub ExecOperation {
     }
 
     # get webservice config
-    my $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
+    my $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
         ID => $Self->{WebserviceID},
     );
     if ( !IsHashRefWithData($Webservice) ) {
@@ -1009,7 +1004,7 @@ sub ExecOperation {
     my $CurrentRoute = $RequestURI;
     $RequestURI =~ s/:(\w*)/$Param{Data}->{$1}/egx;
 
-    # TODO: the following code is nearly identical to the code used in Transport::REST, method ProviderProcessRequest -> should be generalized
+    # TODO: the following code is nearly identical to the code used in Transport::REST, method ProcessRequest -> should be generalized
     # maybe another solution to execute operations / API calls is needed
 
     # determine available methods
@@ -1085,7 +1080,6 @@ sub ExecOperation {
     }
 
     my $OperationObject = $OperationModule->new(
-        DebuggerObject           => $Self->{DebuggerObject},
         Operation                => (split(/::/, $Param{OperationType}))[-1],
         OperationType            => $Param{OperationType},
         WebserviceID             => $Self->{WebserviceID},

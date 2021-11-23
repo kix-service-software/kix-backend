@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::API::Webservice;
+package Kernel::System::Webservice;
 
 use strict;
 use warnings;
@@ -17,8 +17,6 @@ our @ObjectDependencies = (
     'Config',
     'Cache',
     'DB',
-    'API::DebugLog',
-    'API::WebserviceHistory',
     'Log',
     'Main',
     'Time',
@@ -46,7 +44,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $WebserviceObject = $Kernel::OM->Get('API::Webservice');
+    my $WebserviceObject = $Kernel::OM->Get('Webservice');
 
 =cut
 
@@ -99,20 +97,6 @@ sub WebserviceAdd {
     }
 
     # check config internals
-    if ( !IsHashRefWithData( $Param{Config}->{Debugger} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config Debugger should be a non empty hash reference!",
-        );
-        return;
-    }
-    if ( !IsStringWithData( $Param{Config}->{Debugger}->{DebugThreshold} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config Debugger DebugThreshold should be a non empty string!",
-        );
-        return;
-    }
     if ( !defined $Param{Config}->{Provider} && !defined $Param{Config}->{Requester} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -120,24 +104,22 @@ sub WebserviceAdd {
         );
         return;
     }
-    for my $CommunicationType (qw(Provider Requester)) {
-        if ( defined $Param{Config}->{$CommunicationType} ) {
-            if ( !IsHashRefWithData( $Param{Config}->{$CommunicationType} ) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Webservice Config $CommunicationType should be a non empty hash"
-                        . " reference!",
-                );
-                return;
-            }
-            if ( !IsHashRefWithData( $Param{Config}->{$CommunicationType}->{Transport} ) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Webservice Config $CommunicationType Transport should be a"
-                        . " non empty hash reference!",
-                );
-                return;
-            }
+    if ( defined $Param{Config}->{Provider} ) {
+        if ( !IsHashRefWithData( $Param{Config}->{Provider} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config Provider should be a non empty hash"
+                    . " reference!",
+            );
+            return;
+        }
+        if ( !IsHashRefWithData( $Param{Config}->{Provider}->{Transport} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config Provider Transport should be a"
+                    . " non empty hash reference!",
+            );
+            return;
         }
     }
 
@@ -177,16 +159,6 @@ sub WebserviceAdd {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => 'Webservice',
-    );
-
-    # get webservice history object
-    my $WebserviceHistoryObject = $Kernel::OM->Get('API::WebserviceHistory');
-
-    # add history
-    return if !$WebserviceHistoryObject->WebserviceHistoryAdd(
-        WebserviceID => $ID,
-        Config       => $Param{Config},
-        UserID       => $Param{UserID},
     );
 
     return $ID;
@@ -326,7 +298,7 @@ sub WebserviceGet {
 
     # get the cache TTL (in seconds)
     my $CacheTTL = int(
-        $Kernel::OM->Get('Config')->Get('API::WebserviceConfig::CacheTTL')
+        $Kernel::OM->Get('Config')->Get('WebserviceConfig::CacheTTL')
             || 3600
     );
 
@@ -381,45 +353,29 @@ sub WebserviceUpdate {
     }
 
     # check config internals
-    if ( !IsHashRefWithData( $Param{Config}->{Debugger} ) ) {
+    if ( !defined $Param{Config}->{Provider} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Webservice Config Debugger should be a non empty hash reference!",
+            Message  => "Webservice Config Provider should be defined!",
         );
         return;
     }
-    if ( !IsStringWithData( $Param{Config}->{Debugger}->{DebugThreshold} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config Debugger DebugThreshold should be a non empty string!",
-        );
-        return;
-    }
-    if ( !defined $Param{Config}->{Provider} && !defined $Param{Config}->{Requester} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config Provider or Requester should be defined!",
-        );
-        return;
-    }
-    for my $CommunicationType (qw(Provider Requester)) {
-        if ( defined $Param{Config}->{$CommunicationType} ) {
-            if ( !IsHashRefWithData( $Param{Config}->{$CommunicationType} ) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Webservice Config $CommunicationType should be a non empty hash"
-                        . " reference!",
-                );
-                return;
-            }
-            if ( !IsHashRefWithData( $Param{Config}->{$CommunicationType}->{Transport} ) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Webservice Config $CommunicationType Transport should be a"
-                        . " non empty hash reference!",
-                );
-                return;
-            }
+    if ( defined $Param{Config}->{Provider} ) {
+        if ( !IsHashRefWithData( $Param{Config}->{Provider} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config Provider should be a non empty hash"
+                    . " reference!",
+            );
+            return;
+        }
+        if ( !IsHashRefWithData( $Param{Config}->{Provider}->{Transport} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config Provider Transport should be a"
+                    . " non empty hash reference!",
+            );
+            return;
         }
     }
 
@@ -465,16 +421,6 @@ sub WebserviceUpdate {
         Type => 'Webservice',
     );
 
-    # get webservice history object
-    my $WebserviceHistoryObject = $Kernel::OM->Get('API::WebserviceHistory');
-
-    # add history
-    return if !$WebserviceHistoryObject->WebserviceHistoryAdd(
-        WebserviceID => $Param{ID},
-        Config       => $Param{Config},
-        UserID       => $Param{UserID},
-    );
-
     return 1;
 }
 
@@ -510,24 +456,6 @@ sub WebserviceDelete {
         ID => $Param{ID},
     );
     return if !IsHashRefWithData($Webservice);
-
-    # get webservice history object
-    my $WebserviceHistoryObject = $Kernel::OM->Get('API::WebserviceHistory');
-
-    # delete history
-    return if !$WebserviceHistoryObject->WebserviceHistoryDelete(
-        WebserviceID => $Param{ID},
-        UserID       => $Param{UserID},
-    );
-
-    # get debug log object
-    my $DebugLogObject = $Kernel::OM->Get('API::DebugLog');
-
-    # delete debugging data for webservice
-    return if !$DebugLogObject->LogDelete(
-        WebserviceID   => $Param{ID},
-        NoErrorIfEmpty => 1,
-    );
 
     # delete web service
     return if !$Kernel::OM->Get('DB')->Do(
@@ -597,7 +525,7 @@ sub WebserviceList {
 
     # get the cache TTL (in seconds)
     my $CacheTTL = int(
-        $Kernel::OM->Get('Config')->Get('API::WebserviceConfig::CacheTTL')
+        $Kernel::OM->Get('Config')->Get('WebserviceConfig::CacheTTL')
             || 3600
     );
 

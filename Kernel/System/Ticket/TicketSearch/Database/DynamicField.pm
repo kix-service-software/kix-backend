@@ -116,8 +116,11 @@ sub Search {
         # get all configured dynamic fields
         my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet();
         if ( !IsArrayRefWithData($DynamicFieldList) ) {
-            # we don't have any DFs
-            return;
+            # we don't have any  DFs
+            return {
+                SQLJoin  => [],
+                SQLWhere => [],
+            };
         }
         $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
     }
@@ -132,10 +135,14 @@ sub Search {
 
     if ( !IsHashRefWithData($DynamicFieldConfig) ) {
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unknown DynamicField '$DFName'!",
+            Priority => 'notice',
+            Message  => "DynamicField '$DFName' doesn't exist or is disabled. Ignoring it.",
         );
-        return;
+        # return empty result
+        return {
+            SQLJoin  => [],
+            SQLWhere => [],
+        };
     }
 
     my $Value = $Param{Search}->{Value};
