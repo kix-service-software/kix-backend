@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-11-23 11:11+0000\n"
+"POT-Creation-Date: 2021-11-23 12:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1667,19 +1667,7 @@ msgid "allows working on tickets in team \"Servicedesk\", but requires role \"Ti
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid "API module registration for the invoker layer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "API module registration for the mapping layer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "API module registration for the transport layer."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1696,10 +1684,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Defines how many threads should be used for parallel tasks. Enter 0 to deactivate."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines the maximum size in KiloByte of API responses that get logged to the gi_debugger_entry_content table."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1720,10 +1704,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Max allowed request size in bytes (overwrites default value (50MB) from provider config)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "Performs the configured action for each event (as an Invoker) for each configured Webservice."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Contact.xml
