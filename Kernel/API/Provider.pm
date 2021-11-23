@@ -258,7 +258,7 @@ sub Run {
             $Self->_Debug('', "Response Data: ".Data::Dumper::Dumper($Data));
         }
 
-        my $FunctionResult = $Self->{TransportObject}->ProviderGenerateResponse(
+        my $GeneratedResponse = $Self->{TransportObject}->ProviderGenerateResponse(
             Success => 1,
             Data    => $Data,
             Additional => {
@@ -320,7 +320,7 @@ sub Run {
 
     if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
         use Data::Dumper;
-        $Self->_Debug('', "Response Data: ".Data::Dumper::Dumper($FunctionResultOperation->{Data}));
+        $Self->_Debug('', "Response Data: ".Data::Dumper::Dumper($OperationResult->{Data}));
     }
 
     if ( !$OperationResult->{Success} ) {
