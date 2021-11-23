@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-11-22 17:12+0000\n"
+"POT-Creation-Date: 2021-11-23 10:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1660,6 +1660,10 @@ msgstr ""
 
 #. Perl Module: update/build-1507.pl
 msgid "allows basic ticket access, but requires team specific roles"
+msgstr ""
+
+#. Perl Module: update/build-1507.pl
+msgid "allows working on tickets in team \"Servicedesk\", but requires role \"Ticket Agent (w/o teams)\" in order to grant access"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
