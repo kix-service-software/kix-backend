@@ -14,12 +14,13 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Config',
     'Cache',
+    'ClientRegistration',
+    'Config',
     'DB',
+    'JSON',
     'Log',
-    'User',
-    'Valid',
+    'Main',
 );
 
 =head1 NAME
@@ -464,26 +465,34 @@ sub JobDelete {
         return;
     }
 
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
     # delete runs
-    return if !$Kernel::OM->Get('DB')->Prepare(
+    return if !$DBObject->Do(
         SQL  => 'DELETE FROM job_run WHERE job_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete exec plan assignments
-    return if !$Kernel::OM->Get('DB')->Prepare(
+    return if !$DBObject->Do(
         SQL  => 'DELETE FROM job_exec_plan WHERE job_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete macro assignments
-    return if !$Kernel::OM->Get('DB')->Prepare(
+    return if !$DBObject->Do(
         SQL  => 'DELETE FROM job_macro WHERE job_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
+    # delete log entries
+    return if !$Self->LogDelete(
+        JobID => $Param{ID},
+    );
+
     # remove from database
-    return if !$Kernel::OM->Get('DB')->Prepare(
+    return if !$DBObject->Do(
         SQL  => 'DELETE FROM job WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
@@ -1058,7 +1067,7 @@ sub JobExecute {
     );
 
     # push client callback event
-    $Kernel::OM->Get('Kernel::System::ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Job.JobRun',
         ObjectID  => $Param{ID}.'::'.$RunID,
@@ -1083,7 +1092,7 @@ sub JobRunList {
     # check needed stuff
     for (qw(JobID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1095,24 +1104,24 @@ sub JobRunList {
     my $CacheKey = 'JobRunList::' . $Param{JobID};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => 'SELECT id, state_id FROM job_run WHERE job_id = ?',
         Bind => [ \$Param{JobID} ]
     );
 
     my %Result;
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{$Row[0]} = $Row[1];
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
@@ -1149,7 +1158,7 @@ sub JobRunGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need ID!'
         );
@@ -1158,13 +1167,13 @@ sub JobRunGet {
 
     # check cache
     my $CacheKey = 'JobRunGet::' . $Param{ID};
-    my $Cache    = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
     
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL   => "SELECT id, job_id, filter, state_id, start_time, end_time, create_by FROM job_run WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -1172,7 +1181,7 @@ sub JobRunGet {
     my %Result;
 
     # fetch the result
-    while ( my @Row = $Kernel::OM->Get('Kernel::System::DB')->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
             ID          => $Row[0],
             JobID       => $Row[1],
@@ -1185,7 +1194,7 @@ sub JobRunGet {
 
         if ( $Result{Filter} ) {
             # decode JSON
-            $Result{Filter} = $Kernel::OM->Get('Kernel::System::JSON')->Decode(
+            $Result{Filter} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Filter}
             );
         }
@@ -1193,7 +1202,7 @@ sub JobRunGet {
 
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "JobRun with ID $Param{ID} not found!",
         );
@@ -1201,7 +1210,7 @@ sub JobRunGet {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -1227,7 +1236,7 @@ sub JobRunLogList {
     # check needed stuff
     for (qw(RunID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
             );
@@ -1239,18 +1248,18 @@ sub JobRunLogList {
     my $CacheKey = 'JobRunLogList::' . $Param{RunID};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => 'SELECT id, job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by FROM automation_log WHERE run_id = ? ORDER BY id',
         Bind => [ \$Param{RunID} ]
     );
 
-    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'ID', 'JobID', 'RunID', 'MacroID', 'MacroActionID', 'ObjectID', 'Priority', 'Message', 'CreateTime', 'CreateBy' ],
     );
 
@@ -1261,7 +1270,7 @@ sub JobRunLogList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \@Result,
@@ -1303,17 +1312,17 @@ sub JobRunStateList {
     my $CacheKey = 'JobRunStateList';
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare( 
         SQL  => 'SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM job_run_state'
     );
 
-    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'ID', 'Name', 'Comment', 'ValidID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ],
     );
 
@@ -1324,7 +1333,7 @@ sub JobRunStateList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%Result,
