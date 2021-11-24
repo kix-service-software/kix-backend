@@ -58,7 +58,6 @@ sub new {
     }
 
     $Type =~ /^.*?::(V1::.*?)$/;
-    print STDERR "Match: $1\n";
     $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::'.$1);
 
     return $Self;
