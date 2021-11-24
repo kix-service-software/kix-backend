@@ -258,7 +258,7 @@ sub Run {
             $Self->_Debug('', "Response Data: ".Data::Dumper::Dumper($Data));
         }
 
-        my $GeneratedResponse = $Self->{TransportObject}->ProviderGenerateResponse(
+        my $GeneratedResponse = $Self->GenerateResponse(
             Success => 1,
             Data    => $Data,
             Additional => {
