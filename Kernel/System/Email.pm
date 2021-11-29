@@ -177,6 +177,15 @@ sub Send {
         $Param{'Reply-To'} = $Param{ReplyTo};
     }
 
+    my @ExtractedImages;
+    # extract images as cid 
+    if ( $Kernel::OM->Get('Config')->Get('SendmailEmbeddedImages') eq 'cid' ) {
+        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
+            DocumentRef    => \$Param{Body},
+            AttachmentsRef => \@ExtractedImages,
+        );
+    }
+
     # get sign options for inline
     if ( $Param{Sign} && $Param{Sign}->{SubType} && $Param{Sign}->{SubType} eq 'Inline' ) {
 
@@ -350,12 +359,12 @@ sub Send {
     }
 
     # add attachments to email
-    if ( $Param{Attachment} ) {
+    if ( $Param{Attachment} || @ExtractedImages ) {
         my $Count    = 0;
         my $PartType = '';
         my @NewAttachments;
         ATTACHMENT:
-        for my $Upload ( @{ $Param{Attachment} } ) {
+        for my $Upload ( (@{ $Param{Attachment}}, @ExtractedImages) ) {
 
             # ignore attachment if no content is given
             next ATTACHMENT if !defined $Upload->{Content};
