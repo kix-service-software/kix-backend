@@ -93,6 +93,7 @@
                 <Item Key="Object.NotFound">404:The requested item cannot be found.</Item>
                 <Item Key="Object.Invalid">404:The requested item cannot be found or is invalid.</Item>
                 <Item Key="Object.UnableToCreate">400:Could not create item, please contact the system administrator.</Item>
+                <Item Key="Object.UnableToDuplicate">400:Item created, but could not duplicate complete structure, please contact the system administrator.</Item>
                 <Item Key="Object.UnableToUpdate">400:Could not update item, please contact the system administrator.</Item>
                 <Item Key="Object.UnableToDelete">400:Could not delete item, please contact the system administrator.</Item>
                 <Item Key="Object.ExecFailed">500</Item>
