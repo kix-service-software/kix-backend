@@ -219,6 +219,7 @@
 /cmdb/configitems/:ConfigItemID/versions                                                   | POST             | V1::CMDB::ConfigItemVersionCreate                |
 /cmdb/configitems/:ConfigItemID/versions/:VersionID                                        | GET              | V1::CMDB::ConfigItemVersionGet                   |
 /cmdb/configitems/:ConfigItemID/versions/:VersionID/attachments/:AttachmentID              | GET              | V1::CMDB::ConfigItemAttachmentGet                |
+/cmdb/configitems/:ConfigItemID/graph                                                      | POST             | V1::CMDB::ConfigItemGraphCreate                  |
 /contacts                                                                                  | GET              | V1::Contact::ContactSearch                       |
 /contacts                                                                                  | POST             | V1::Contact::ContactCreate                       |
 /contacts/:ContactID                                                                       | DELETE           | V1::Contact::ContactDelete                       |
