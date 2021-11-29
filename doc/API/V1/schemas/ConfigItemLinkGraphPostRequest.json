@@ -1,0 +1,28 @@
+{
+   "$id" : "ConfigItemLinkGraphPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The post request for a config item link graph.",
+   "type" : "object",
+   "properties" : {
+      "ConfigItemLinkGraphConfig" : {
+         "type" : "object",
+         "properties" : {
+            "MaxDepth" : {
+               "type" : "integer"
+            },
+            "RelevantClasses" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               }
+            },
+            "RelevantLinkTypes" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               }
+            }
+         }
+      }
+   }
+}

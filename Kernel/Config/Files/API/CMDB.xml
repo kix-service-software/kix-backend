@@ -312,4 +312,17 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::CMDB::ConfigItemGraphCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ConfigItemGraphCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemGraphCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">ConfigItemGraphPostRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemGraphPostResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>

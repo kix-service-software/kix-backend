@@ -85,16 +85,14 @@ perform Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # get config item data
-    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
-        ConfigItemID => $Param{Data}->{ConfigItemID}
+    # check if ConfigItem exists
+    my $Exist = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
-    # check if ConfigItem exists
-    if ( !$ConfigItem ) {
+    if (!$Exist) {
         return $Self->_Error(
-            Code    => 'ParentObject.NotFound',
-            Message => "Could not get data for ConfigItem $Param{Data}->{ConfigItemID}",
+            Code => 'ParentObject.NotFound',
         );
     }
        

@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::CMDB::ConfigItemImageCreate;
+package Kernel::API::Operation::V1::CMDB::ConfigItemGraphCreate;
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::CMDB::ConfigItemImageCreate - API ConfigItemImage Create Operation backend
+Kernel::API::Operation::V1::CMDB::ConfigItemGraphCreate - API ConfigItemGraph Create Operation backend
 
 =head1 SYNOPSIS
 
@@ -54,41 +54,30 @@ sub ParameterDefinition {
         'ConfigItemID' => {
             Required => 1,
         },
-        'Image' => {
-            Required => 1,
-            Type     => 'HASH'
-        },
-        'Image::Filename' => {
-            Required => 1,
-        },
-        'Image::ContentType' => {
-            Required => 1,
-        },
-        'Image::Content' => {
-            Required => 1,
-        },
     }
 }
 
 =item Run()
 
-perform ConfigItemImageCreate Operation. This will return the created VersionID.
+perform ConfigItemGraphCreate Operation. This will return the created graph.
 
     my $Result = $OperationObject->Run(
         Data => {
             ConfigItemID => 123,
-            Image => {
-                ...                                
+            ConfigItemLinkGraphConfig  => {
+                ...
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            VersionID  => '',                       # VersionID 
+            Graph  => {
+                ...
+            },
         },
     };
 
@@ -97,41 +86,42 @@ perform ConfigItemImageCreate Operation. This will return the created VersionID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check if ConfigItem exists
+    # get config item data
     my $Exist = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
-        ConfigItemID => $Param{Data}->{ConfigItemID},
+        ConfigItemID => $Param{Data}->{ConfigItemID}
     );
 
-    if (!$Exist) {
+    # check if ConfigItem exists
+    if ( !$Exist ) {
         return $Self->_Error(
             Code => 'ParentObject.NotFound',
         );
     }
 
-    # isolate and trim Image parameter
-    my $Image = $Self->_Trim(
-        Data => $Param{Data}->{Image}
-    );
+    # isolate and trim GraphConfig parameter
+    my $GraphConfig;
+    if ( $Param{Data}->{ConfigItemLinkGraphConfig} ) {
+        $GraphConfig = $Self->_Trim(
+            Data => $Param{Data}->{ConfigItemLinkGraphConfig}
+        );
+    }
 
     # everything is ok, let's create the image
-    my $ImageID = $Kernel::OM->Get('ITSMConfigItem')->ImageAdd(
+    my $Graph = $Kernel::OM->Get('ITSMConfigItem')->GenerateLinkGraph(
         ConfigItemID => $Param{Data}->{ConfigItemID},
-        Filename     => $Image->{Filename},
-        Content      => $Image->{Content},
-        ContentType  => $Image->{ContentType},
-        Comment      => $Image->{Comment},
+        Config       => $GraphConfig,
         UserID       => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$ImageID ) {
+    if ( !$Graph ) {
         return $Self->_Error(
             Code => 'Object.UnableToCreate',
         );
     }
 
     return $Self->_Success(
-        Code      => 'Object.Created',
-        ImageID => $ImageID,
+        Code  => 'Object.Created',
+        Graph => $Graph,
     )
 }
 

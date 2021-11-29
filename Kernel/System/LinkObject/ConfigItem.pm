@@ -446,7 +446,7 @@ sub LinkAddPost {
     my $Object = $Param{TargetObject} || $Param{SourceObject};
 
     # recalculate the current incident state of this CI
-    $Kernel::OM->Get('ITSMConfigItem')->CurInciStateRecalc(
+    $Kernel::OM->Get('ITSMConfigItem')->RecalculateCurrentIncidentState(
         ConfigItemID => $Param{Key},
     );
 
@@ -547,7 +547,7 @@ sub LinkDeletePost {
     my $Object = $Param{TargetObject} || $Param{SourceObject};
 
     # recalculate the current incident state of this CI
-    $Kernel::OM->Get('ITSMConfigItem')->CurInciStateRecalc(
+    $Kernel::OM->Get('ITSMConfigItem')->RecalculateCurrentIncidentState(
         ConfigItemID => $Param{Key},
     );
 

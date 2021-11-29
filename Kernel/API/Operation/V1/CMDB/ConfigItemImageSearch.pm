@@ -84,13 +84,13 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
+    my $Exist = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
-    if (!IsHashRefWithData($ConfigItem)) {
+    if (!$Exist) {
         return $Self->_Error(
-            Code => 'ParentObject.NotFound'
+            Code => 'ParentObject.NotFound',
         );
     }
     
