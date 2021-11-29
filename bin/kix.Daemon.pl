@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Getopt::Long;
+use Getopt::Long qw(GetOptions);
 use File::Basename;
 use Sys::Hostname;
 use FindBin qw($RealBin);
@@ -21,7 +21,7 @@ use lib dirname($RealBin);
 use lib dirname($RealBin) . '/Kernel/cpan-lib';
 use lib dirname($RealBin) . '/plugins';
 
-use File::Path qw();
+use File::Path qw(rmtree);
 use Time::HiRes qw(sleep);
 use Fcntl qw(:flock);
 
@@ -79,7 +79,6 @@ if ( !@ARGV || $Options{Help} ) {
 
 # to wait until all daemon stops (in seconds)
 my $DaemonStopWait = 30;
-my $ForceStop;
 
 # the child processes
 my %DaemonModules;
@@ -110,10 +109,6 @@ if ( $Options{Debug} ) {
 
 my $Command = $ARGV[0];
 
-if ( $Options{Force} ) {
-    $ForceStop = 1;
-}
-
 # check for action
 if ( lc $Command eq 'start' ) {
     exit 1 if !Start();
@@ -134,7 +129,7 @@ else {
 
 sub PrintUsage {
     my $UsageText = "Usage:\n";
-    $UsageText .= " kix.Daemon.pl [--debug=<SchedulerModules>] [--force] [--no-daemonize] <ACTION>\n";
+    $UsageText .= " kix.Daemon.pl <ACTION> [--debug=<SchedulerModules>] [--force] [--no-daemonize]\n";
     $UsageText .= "\nActions:\n";
     $UsageText .= sprintf " %-30s - %s", 'start', 'Starts the daemon process' . "\n";
     $UsageText .= sprintf " %-30s - %s", 'stop', 'Stops the daemon process' . "\n";
@@ -145,7 +140,10 @@ sub PrintUsage {
     $UsageText .= " Debug information is stored in the daemon log files localed under: $LogDir\n";
     $UsageText .= "\n kix.Daemon.pl start --debug=all|SchedulerTaskWorker,SchedulerCronTaskManager,...\n\n";
     $UsageText
-        .= "\n Forced stop reduces the time the main daemon waits other daemons to stop from normal 30 seconds to 5.\n";
+        .= "\n A forced start cleans up everything a previous daemon crash or stop might have left before starting the daemon.\n";
+    $UsageText .= "\n kix.Daemon.pl start --force\n\n";
+    $UsageText
+        .= "\n A forced stop reduces the time the main daemon waits other daemons to stop from normal 30 seconds to 5.\n";
     $UsageText .= "\n kix.Daemon.pl stop --force\n\n";
     print STDOUT "$UsageText\n";
 
@@ -153,6 +151,7 @@ sub PrintUsage {
 }
 
 sub Start {
+
     if ( !$Options{NoDaemon} ) {
         # create a fork of the current process
         # parent gets the PID of the child
@@ -164,6 +163,19 @@ sub Start {
 
         # close parent gracefully
         exit 0 if $DaemonPID;
+    }
+
+    if ( $Options{Force} ) {
+        print "Executing forced start of daemon...\n";
+        # kill processes
+        my $PID = _ReadPID();
+        if ( $PID ) {
+            # stop the running daemon
+            Stop();
+            # cleanup the pid directory
+            my $Directory = dirname($PIDFile) . '/Daemon';
+            rmtree($Directory) or die "Cannot cleanup '$Directory' : $!";
+        }
     }
 
     # lock PID
@@ -195,7 +207,7 @@ sub Stop {
 
     if ($RunningDaemonPID) {
 
-        if ($ForceStop) {
+        if ($Options{Force}) {
 
             # send TERM signal to running daemon
             kill 15, $RunningDaemonPID;
@@ -675,10 +687,26 @@ sub _LogFilesCleanup {
     return 1;
 }
 
+sub _ReadPID {
+    my $PID;
+    if ( -e $PIDFile ) {
+
+        # read existing PID file
+        open my $FH, '<', $PIDFile;    ## no critic
+
+        # try to get a exclusive of the pid file, if fails daemon is already running
+        if ( !flock( $FH, LOCK_SH | LOCK_NB ) ) {
+            close $FH;
+            return;
+        }
+
+        $PID = do { local $/; <$FH> };
+        close $FH;
+    }
+    return $PID;
+}
+
 exit 0;
-
-
-
 
 =back
 
