@@ -1285,7 +1285,7 @@ sub ExportConfigPrepare {
     my ( $Self, %Param ) = @_;
     my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
-    if ( 
+    if (
         $Param{Config}->{DeploymentStates}
         || $Param{Config}->{ITSMConfigItemClasses}
     ) {
@@ -1326,7 +1326,7 @@ sub ImportConfigPrepare {
     my ( $Self, %Param ) = @_;
     my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
-    if ( 
+    if (
         $Param{Config}->{DeploymentStates}
         || $Param{Config}->{ITSMConfigItemClasses}
     ) {
@@ -1337,7 +1337,7 @@ sub ImportConfigPrepare {
 
             ITEM:
             for my $ItemName ( @{$Param{Config}->{$Key}} ) {
-                my $ItemDataRef = GeneralCatalogObject->ItemGet(
+                my $ItemDataRef = $GeneralCatalogObject->ItemGet(
                     Class => 'ITSM::ConfigItem::' . ($Key eq 'DeploymentStates' ? 'DeploymentState' : 'Class'),
                     Name  => $ItemName,
                 );
