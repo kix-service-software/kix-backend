@@ -103,7 +103,7 @@ sub Auth {
     if ( !$Pw ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User authentication without Pw!!! (REMOTE_ADDR: $RemoteAddr)",
+            Message  => "User: $User authentication without Pw!!! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")",
         );
         return;
     }
@@ -131,7 +131,7 @@ sub Auth {
     if ( defined($AuthResult) && $AuthResult == 1 ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User authentication ok (REMOTE_ADDR: $RemoteAddr).",
+            Message  => "User: $User authentication ok (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")",
         );
         return $User;
     }
@@ -140,7 +140,7 @@ sub Auth {
     else {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User authentication with wrong Pw!!! (REMOTE_ADDR: $RemoteAddr)"
+            Message  => "User: $User authentication with wrong Pw!!! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")"
         );
         return;
     }
