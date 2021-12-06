@@ -1936,6 +1936,7 @@ sub RecalculateCurrentIncidentState {
     );
 
     # calculate the new CI incident state for each configured linktype
+    my $LinkTypeCounter = 0;
     LINKTYPE:
     for my $LinkType ( sort keys %{$IncidentLinkTypeDirection} ) {
 
@@ -1953,7 +1954,6 @@ sub RecalculateCurrentIncidentState {
                 ConfigItemID         => $ConfigItemID,
                 LinkType             => $LinkType,
                 Direction            => $LinkDirection,
-                NumberOfLinkTypes    => scalar keys %{$IncidentLinkTypeDirection},
                 ScannedConfigItemIDs => \%ScannedConfigItemIDs,
                 Simulate             => $Param{Simulate},
             );
@@ -1965,13 +1965,11 @@ sub RecalculateCurrentIncidentState {
             # extract incident state type
             my $InciStateType = $ScannedConfigItemIDs{$ConfigItemID}->{Type};
 
-            #next CONFIGITEMID if $InciStateType eq 'incident';
-
             # if nothing has been set already or if the currently set incident state is 'operational'
             # ('operational' can always be overwritten)
             if (
                 !$NewConfigItemIncidentState{$ConfigItemID}
-                || $NewConfigItemIncidentState{$ConfigItemID} eq 'operational'
+                || $NewConfigItemIncidentState{$ConfigItemID}->{Type} eq 'operational'
                 )
             {
                 $NewConfigItemIncidentState{$ConfigItemID}->{Type} = $InciStateType;
@@ -3103,7 +3101,7 @@ sub _FindInciConfigItems {
 
             # Direction must ALWAYS be 'Both' here as we need to include
             # all linked CIs that could influence this one!
-            Direction => 'Both',
+            Direction => $Param{IncidentLinkTypeDirection}->{$LinkType}, #'Both',
 
             UserID => 1,
         );
@@ -3187,22 +3185,16 @@ sub _FindWarnConfigItems {
 # ignore already scanned ids (infinite loop protection)
 # it is ok that a config item is investigated as many times as there are configured link types * number of incident config iteems
     if (
-        $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}
-        && $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}
-        >= ( $Param{NumberOfLinkTypes} * $IncidentCount )
+        $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}
+        && $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}
+        >= $IncidentCount
         )
     {
         return;
     }
 
-    # KIX4OTRS-capeIT
-    $Self->{Direction} =
-        $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CILinkDirection') || 'Both';
-
-    # EO KIX4OTRS-capeIT
-
     # increase the visit counter
-    $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}++;
+    $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}++;
 
     # find all linked config items
     my %LinkedConfigItemIDs = $Kernel::OM->Get('LinkObject')->LinkKeyList(
@@ -3217,13 +3209,11 @@ sub _FindWarnConfigItems {
 
     CONFIGITEMID:
     for my $ConfigItemID ( sort keys %LinkedConfigItemIDs ) {
-
         # start recursion
         $Self->_FindWarnConfigItems(
             ConfigItemID         => $ConfigItemID,
             LinkType             => $Param{LinkType},
             Direction            => $Param{Direction},
-            NumberOfLinkTypes    => $Param{NumberOfLinkTypes},
             ScannedConfigItemIDs => $Param{ScannedConfigItemIDs},
             Simulate             => $Param{Simulate},
         );
