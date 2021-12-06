@@ -520,7 +520,7 @@ sub Run {
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
         Cc               => $GetParam{Cc},
-        Subject          => $GetParam{Subject},
+        Subject          => $GetParam{'X-KIX-FollowUp-Subject'} || $GetParam{Subject},
         MessageID        => $GetParam{'Message-ID'},
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},

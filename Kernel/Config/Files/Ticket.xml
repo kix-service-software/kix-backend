@@ -2279,6 +2279,7 @@
                 <Item>X-KIX-FollowUp-Type</Item>
                 <Item>X-KIX-FollowUp-SenderType</Item>
                 <Item>X-KIX-FollowUp-Channel</Item>
+                <Item>X-KIX-FollowUp-Subject</Item>
                 <Item>X-KIX-FollowUp-DynamicField-PlanBegin</Item>
                 <Item>X-KIX-FollowUp-DynamicField-PlanEnd</Item>
                 <Item>X-KIX-FollowUp-DynamicField-PlannedEffort</Item>
@@ -2295,7 +2296,7 @@
                 <Item>X-KIX-FollowUp-DynamicField-AffectedAsset</Item>
                 <Item>X-KIX-FollowUp-DynamicField-WorkOrder</Item>
                 <Item>X-KIX-BodyDecrypted</Item>
-                <Item>X-KIX-TicketTemplate</Item>
+                <Item>X-KIX-Subject</Item>
             </Array>
         </Setting>
     </ConfigItem>
