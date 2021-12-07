@@ -2524,7 +2524,7 @@
         <IndexColumn Name="category"/>
     </Index>
     <Index Name="text_module_keywords">
-        <IndexColumn Name="keywords"/>
+        <IndexColumn Name="keywords" Size="100"/>
     </Index>
     <Index Name="text_module_language">
         <IndexColumn Name="language"/>
