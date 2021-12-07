@@ -448,8 +448,15 @@ sub _TicketCreate {
         || $Param->{GetParam}->{'X-KIX-SenderType'};
     $Param->{GetParam}->{'X-KIX-Channel'} = $Self->{Config}->{CreateChannel}
         || $Param->{GetParam}->{'X-KIX-Channel'};
-    $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
-        || $Param->{GetParam}->{'X-KIX-Queue'};
+    if($Param->{GetParam}->{'X-KIX-Queue'}  ne ''){
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "X-KIX-Queue is already set to " . $Param->{GetParam}->{'X-KIX-Queue'},
+        );
+    }else{
+        $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
+            || $Param->{GetParam}->{'X-KIX-Queue'};
+    }        
     $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState}
         || $Param->{GetParam}->{'X-KIX-State'};
     $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType}
