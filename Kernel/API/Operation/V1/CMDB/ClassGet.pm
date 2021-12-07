@@ -33,34 +33,6 @@ Kernel::API::Operation::V1::CMDB::ClassGet - API ClassGet Operation backend
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation::V1->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    return $Self;
-}
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -157,62 +129,12 @@ sub Run {
         # include ConfigItemStats if requested
         if ( $Param{Data}->{include}->{ConfigItemStats} ) {
 
-            # execute CI searches
-            my %ConfigItemStats;
-
-            # search pre-productive CIs
-            my $Response = $Self->ExecOperation(
-                OperationType => 'V1::GeneralCatalog::GeneralCatalogItemSearch',
-                Data          => {
-                    search => {
-                        GeneralCatalogItem => {
-                            AND => [
-                                {
-                                    Field    => 'Class',
-                                    Operator => 'EQ',
-                                    Value    => 'ITSM::ConfigItem::DeploymentState'
-                                },
-                                {
-                                    Field    => 'Functionality',
-                                    Operator => 'IN',
-                                    Value    => [ 'preproductive', 'productive' ]
-                                }
-                                ]
-                            }
-                        }
-                    }
-            );
+            my $Response = $Self->_GetConfigItemStats(ClassID => $ClassID);
 
             if ( !IsHashRefWithData($Response) || !$Response->{Success} ) {
                 return $Response;
             }
-
-            my @PreProductiveDeplStateIDs;
-            my @ProductiveDeplStateIDs;
-            foreach my $Item ( @{ $Response->{Data}->{GeneralCatalogItem} } ) {
-                if ( $Item->{Functionality} && $Item->{Functionality} eq 'preproductive' ) {
-                    push( @PreProductiveDeplStateIDs, $Item->{ItemID} );
-                }
-                elsif ( $Item->{Functionality} && $Item->{Functionality} eq 'productive' ) {
-                    push( @ProductiveDeplStateIDs, $Item->{ItemID} );
-                }
-            }
-
-            my $PreProductiveList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
-                ClassIDs     => [$ClassID],
-                DeplStateIDs => \@PreProductiveDeplStateIDs,
-                UserID       => $Self->{Authorization}->{UserID},
-            );
-            $ConfigItemStats{PreProductiveCount} = @{$PreProductiveList};
-
-            my $ProductiveList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
-                ClassIDs     => [$ClassID],
-                DeplStateIDs => \@ProductiveDeplStateIDs,
-                UserID       => $Self->{Authorization}->{UserID},
-            );
-            $ConfigItemStats{ProductiveCount} = @{$ProductiveList};
-
-            $Class{ConfigItemStats} = \%ConfigItemStats;
+            $Class{ConfigItemStats} = $Response->{Stats};
 
             # inform API caching about a new dependency
             $Self->AddCacheDependency( Type => 'ITSMConfigurationManagement' );
@@ -238,6 +160,134 @@ sub Run {
     return $Self->_Success(
         ConfigItemClass => \@ClassList,
     );
+}
+
+sub _GetConfigItemStats {
+    my ( $Self, %Param ) = @_;
+
+    my %Stats;
+    # search pre-/productive CIs - use API modules to consider permissions
+    # get relevant deployment states
+    my $Response = $Self->ExecOperation(
+        OperationType => 'V1::GeneralCatalog::GeneralCatalogItemSearch',
+        IgnoreInclude => 1, # ignore "hereditary" includes (ConfigItemStats) to use own include
+        Data          => {
+            include => 'Preferences',
+            filter => {
+                GeneralCatalogItem => {
+                    AND => [
+                        {
+                            Field    => 'Class',
+                            Operator => 'EQ',
+                            Value    => 'ITSM::ConfigItem::DeploymentState'
+                        },
+                        {
+                            Field    => 'Preferences.Name',
+                            Operator => 'EQ',
+                            Value    => 'Functionality'
+                        },
+                        {
+                            Field    => 'Preferences.Value',
+                            Operator => 'IN',
+                            Value    => [ 'preproductive', 'productive' ]
+                        }
+                    ]
+                }
+            }
+        }
+    );
+
+    if ( !IsHashRefWithData($Response) || !$Response->{Success} ) {
+        return $Response;
+    }
+
+    my @PreProductiveDeplStateIDs;
+    my @ProductiveDeplStateIDs;
+    foreach my $Item ( @{ $Response->{Data}->{GeneralCatalogItem} } ) {
+        if ( IsArrayRefWithData($Item->{Preferences}) ) {
+            for my $Pref ( @{ $Item->{Preferences} } ) {
+                if (
+                    IsHashRefWithData($Pref) &&
+                    $Pref->{Name} && $Pref->{Name} eq 'Functionality' &&
+                    $Pref->{Value}
+                ) {
+                    if ( $Pref->{Value} eq 'preproductive' ) {
+                        push( @PreProductiveDeplStateIDs, $Item->{ItemID} );
+                        last;
+                    } elsif ( $Pref->{Value} eq 'productive' ) {
+                        push( @ProductiveDeplStateIDs, $Item->{ItemID} );
+                        last;
+                    }
+                }
+            }
+        }
+    }
+
+    # search pre-/productive CIs
+    if (IsArrayRefWithData(\@PreProductiveDeplStateIDs)) {
+        my $PreProductiveResponse = $Self->ExecOperation(
+            OperationType => 'V1::CMDB::ConfigItemSearch',
+            Data          => {
+                search => {
+                    ConfigItem => {
+                        AND => [
+                            {
+                                Field    => 'ClassID',
+                                Operator => 'IN',
+                                Value    => [$Param{ClassID}]
+                            },
+                            {
+                                Field    => 'DeplStateIDs',
+                                Operator => 'IN',
+                                Value    => \@PreProductiveDeplStateIDs
+                            }
+                        ]
+                    }
+                }
+            }
+        );
+        if ( !IsHashRefWithData($PreProductiveResponse) || !$PreProductiveResponse->{Success} ) {
+            return $PreProductiveResponse;
+        }
+        $Stats{PreProductiveCount} = @{ $PreProductiveResponse->{Data}->{ConfigItem} };
+    } else {
+        $Stats{PreProductiveCount} = 0;
+    }
+
+    if (IsArrayRefWithData(\@ProductiveDeplStateIDs)) {
+        my $ProductiveResponse = $Self->ExecOperation(
+            OperationType => 'V1::CMDB::ConfigItemSearch',
+            Data          => {
+                search => {
+                    ConfigItem => {
+                        AND => [
+                            {
+                                Field    => 'ClassIDs',
+                                Operator => 'IN',
+                                Value    => [$Param{ClassID}]
+                            },
+                            {
+                                Field    => 'DeplStateIDs',
+                                Operator => 'IN',
+                                Value    => \@ProductiveDeplStateIDs
+                            }
+                        ]
+                    }
+                }
+            }
+        );
+        if ( !IsHashRefWithData($ProductiveResponse) || !$ProductiveResponse->{Success} ) {
+            return $ProductiveResponse;
+        }
+        $Stats{ProductiveCount} = @{ $ProductiveResponse->{Data}->{ConfigItem} };
+    } else {
+        $Stats{ProductiveCount} = 0;
+    }
+
+    return {
+        Success => 1,
+        Stats =>\%Stats
+    }
 }
 
 1;

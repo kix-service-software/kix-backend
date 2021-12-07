@@ -1253,10 +1253,7 @@ sub LinkListWithData {
     for my $Object ( sort keys %{$LinkList} ) {
 
         # check if backend object can be loaded
-        if (
-            !$Kernel::OM->Get('Main')->Require( 'LinkObject::' . $Object )
-            )
-        {
+        if ( !$Kernel::OM->Get('Main')->Require( $Kernel::OM->GetModuleFor('LinkObject::' . $Object) ) ) {
             delete $LinkList->{$Object};
             next OBJECT;
         }

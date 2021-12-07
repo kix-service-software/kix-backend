@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::GeneralCatalog::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -30,36 +30,6 @@ Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemUpdate - API Gener
 =over 4
 
 =cut
-
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw( DebuggerObject WebserviceID )) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::GeneralCatalogItemUpdate');
-
-    return $Self;
-}
 
 =item ParameterDefinition()
 
@@ -87,7 +57,7 @@ sub ParameterDefinition {
         'GeneralCatalogItem' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -103,20 +73,26 @@ perform GeneralCatalogItemUpdate Operation. This will return the updated General
                 Name          => 'Item Name',               # (optional)
                 ValidID       => 1,                         # (optional)
                 Comment       => 'Comment',                 # (optional)
+                Preferences   => [                          # (optional)
+                    {
+                        Name => 'pref name',
+                        Vaule => 'some value'
+                    }
+                ]
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            GeneralCatalogItemID  => 123,       # ID of the updated GeneralCatalogItem 
+            GeneralCatalogItemID  => 123,       # ID of the updated GeneralCatalogItem
         },
     };
-   
+
 =cut
 
 
@@ -128,7 +104,7 @@ sub Run {
         Data => $Param{Data}->{GeneralCatalogItem}
     );
 
-    # check if GeneralCatalog exists 
+    # check if GeneralCatalog exists
     my $GeneralCatalogData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID => $Param{Data}->{GeneralCatalogItemID},
     );
@@ -139,14 +115,28 @@ sub Run {
         );
     }
 
+    my $Class = $GeneralCatalogItem->{Class} || $GeneralCatalogData->{Class};
+    if ( IsArrayRefWithData( $GeneralCatalogItem->{Preferences} ) ) {
+        my $Result = $Self->_CheckPreferences(
+            Preferences => $GeneralCatalogItem->{Preferences},
+            Class       => $Class
+        );
+        if (!$Result->{Success}) {
+            return $Self->_Error(
+                Code    => $Result->{Code} || 'Object.UnableToUpdate',
+                Message => $Result->{Message} || 'Preferences config check failed.',
+            );
+        }
+    }
+
     # update GeneralCatalog
     my $Success = $Kernel::OM->Get('GeneralCatalog')->ItemUpdate(
-        ItemID   => $Param{Data}->{GeneralCatalogItemID},    
-        Class    => $GeneralCatalogItem->{Class} || $GeneralCatalogData->{Class},
+        ItemID   => $Param{Data}->{GeneralCatalogItemID},
+        Class    => $Class,
         Name     => $GeneralCatalogItem->{Name} || $GeneralCatalogData->{Name},
         Comment  => exists $GeneralCatalogItem->{Comment} ? $GeneralCatalogItem->{Comment} : $GeneralCatalogData->{Comment},
         ValidID  => $GeneralCatalogItem->{ValidID} || $GeneralCatalogData->{ValidID},
-        UserID   => $Self->{Authorization}->{UserID},                        
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -155,10 +145,19 @@ sub Run {
         );
     }
 
-    # return result    
+    # set known preferences
+    if ( IsArrayRefWithData( $GeneralCatalogItem->{Preferences} ) ) {
+        $Self->_SetPreferences(
+            Preferences => $GeneralCatalogItem->{Preferences},
+            Class       => $Class,
+            ItemID      => $Param{Data}->{GeneralCatalogItemID}
+        );
+    }
+
+    # return result
     return $Self->_Success(
         GeneralCatalogItemID => 0 + $Param{Data}->{GeneralCatalogItemID},
-    );    
+    );
 }
 
 1;

@@ -38,22 +38,9 @@ Kernel::API::Validator - API data validation interface
 
 create an object.
 
-    use Kernel::API::Debugger;
     use Kernel::API::Validator;
 
-    my $DebuggerObject = Kernel::API::Debugger->new(
-        DebuggerConfig   => {
-            DebugThreshold  => 'debug',
-            TestMode        => 0,           # optional, in testing mode the data will not be written to the DB
-            # ...
-        },
-        WebserviceID      => 12,
-        CommunicationType => Requester, # Requester or Provider
-        RemoteIP          => 192.168.1.1, # optional
-    );
-    my $ValidatorObject = Kernel::API::Validator->new(
-        DebuggerObject => $DebuggerObject,
-    );
+    my $ValidatorObject = Kernel::API::Validator->new();
 
 =cut
 
@@ -62,13 +49,6 @@ sub new {
 
     my $Self = {};
     bless( $Self, $Type );
-
-    for my $Needed (qw( DebuggerObject)) {
-        $Self->{$Needed} = $Param{$Needed} || return $Self->_Error(
-            Code    => 'Validator.InternalError',
-            Message => "Got no $Needed!",
-        );
-    }
 
     # init all validators
     my $ValidatorList = $Kernel::OM->Get('Config')->Get('API::Validator::Module');

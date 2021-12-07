@@ -342,7 +342,7 @@ sub Run {
     my $NewTn    = $TicketObject->TicketCreateNumber();
     my $TicketID = $TicketObject->TicketCreate(
         TN              => $NewTn,
-        Title           => $GetParam{Subject},
+        Title           => $GetParam{'X-KIX-Subject'} || $GetParam{Subject},
         QueueID         => $QueueID,
         Lock            => $GetParam{'X-KIX-Lock'} || 'unlock',
         Priority        => $Priority,
@@ -592,7 +592,7 @@ sub Run {
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
         Cc               => $GetParam{Cc},
-        Subject          => $GetParam{Subject},
+        Subject          => $GetParam{'X-KIX-Subject'} || $GetParam{Subject},
         MessageID        => $GetParam{'Message-ID'},
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableDrop Name="api_debugger_entry_content"/>
+    <TableDrop Name="api_debugger_entry"/>
+
+</database>

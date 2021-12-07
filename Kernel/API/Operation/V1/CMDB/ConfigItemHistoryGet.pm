@@ -33,34 +33,6 @@ Kernel::API::Operation::V1::CMDB::ConfigItemHistoryGet - API ConfigItemHistoryGe
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation::V1->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    return $Self;
-}
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -121,11 +93,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check if ConfigItem exists
-    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
+    my $Exist = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
         ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
-    if (!IsHashRefWithData($ConfigItem)) {
+    if (!$Exist) {
         return $Self->_Error(
             Code => 'ParentObject.NotFound',
         );

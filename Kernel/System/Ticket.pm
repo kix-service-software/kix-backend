@@ -960,10 +960,10 @@ sub TicketSubjectClean {
     $Subject =~ s/(?<!\d)\Q$Param{TicketNumber}\E(?!\d)\s*//g;
 
     # remove leading number with configured "RE:\s" or "RE[\d+]:\s" e. g. "RE: " or "RE[4]: "
-    $Subject =~ s/^($TicketSubjectRe(\[\d+\])?:\s)+//i;
+    $Subject =~ s/^($TicketSubjectRe(\[\d+\])?:\s?)+//i;
 
     # remove leading number with configured "Fwd:\s" or "Fwd[\d+]:\s" e. g. "Fwd: " or "Fwd[4]: "
-    $Subject =~ s/^($TicketSubjectFwd(\[\d+\])?:\s)+//i;
+    $Subject =~ s/^($TicketSubjectFwd(\[\d+\])?:\s?)+//i;
 
     # trim white space at the beginning or end
     $Subject =~ s/(^\s+|\s+$)//;

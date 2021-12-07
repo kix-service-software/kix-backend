@@ -29,34 +29,6 @@ Kernel::API::Operation::DynamicField::DynamicFieldObjectTypeSearch - API Dynamic
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation->new();
-
-=cut
-
-sub new {
-    my ( $ObjectType, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $ObjectType );
-
-    # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    return $Self;
-}
-
 =item Run()
 
 perform DynamicFieldObjectTypeSearch Operation. This will return a list of DynamicField ObjectTypes.

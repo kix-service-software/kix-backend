@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::API::Operation::V1::Common
+    Kernel::API::Operation::V1::GeneralCatalog::Common
 );
 
 our $ObjectManagerDisabled = 1;
@@ -30,34 +30,6 @@ Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemCreate - API Gener
 =over 4
 
 =cut
-
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw( DebuggerObject WebserviceID )) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    return $Self;
-}
 
 =item ParameterDefinition()
 
@@ -88,7 +60,7 @@ sub ParameterDefinition {
         },
         'GeneralCatalogItem::Name' => {
             Required => 1
-        },                             
+        }
     }
 }
 
@@ -98,18 +70,24 @@ perform GeneralCatalogItemCreate Operation. This will return the created General
 
     my $Result = $OperationObject->Run(
         Data => {
-            GeneralCatalogItem  => {                
-                Class   => 'ITSM::Service::Type',
-                Name    => 'Item Name',
-                ValidID => 1,
-                Comment => 'Comment',              # (optional)
+            GeneralCatalogItem  => {
+                Class       => 'ITSM::Service::Type',
+                Name        => 'Item Name',
+                ValidID     => 1,
+                Comment     => 'Comment',              # (optional)
+                Preferences => [                       # (optional)
+                    {
+                        Name => 'pref name',
+                        Vaule => 'some value'
+                    }
+                ]
             },
         },
     );
 
     $Result = {
         Success => 1,                       # 0 or 1
-        Code    => '',                      # 
+        Code    => '',                      #
         Message => '',                      # in case of error
         Data    => {                        # result data payload after Operation
             GeneralCatalogItemID  => '',    # ID of the created GeneralCatalogItem
@@ -126,17 +104,30 @@ sub Run {
         Data => $Param{Data}->{GeneralCatalogItem}
     );
 
+    if ( IsArrayRefWithData( $GeneralCatalogItem->{Preferences} ) ) {
+        my $Result = $Self->_CheckPreferences(
+            Preferences => $GeneralCatalogItem->{Preferences},
+            Class       => $GeneralCatalogItem->{Class}
+        );
+        if (!$Result->{Success}) {
+            return $Self->_Error(
+                Code    => $Result->{Code} || 'Object.UnableToCreate',
+                Message => $Result->{Message} || 'Preferences config check failed.',
+            );
+        }
+    }
+
     my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => $GeneralCatalogItem->{Class},
     );
 
     foreach my $Item ( keys %$ItemList ) {
-    	if ( $ItemList->{$Item} eq $GeneralCatalogItem->{Name} ) {
-	        return $Self->_Error(
+        if ( $ItemList->{$Item} eq $GeneralCatalogItem->{Name} ) {
+            return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => "Cannot create GeneralCatalog item. GeneralCatalog item with the name '$GeneralCatalogItem->{Name}' already exists.",
-	        );    		
-    	}
+            );
+        }
     }
 
     # create GeneralCatalog
@@ -145,7 +136,7 @@ sub Run {
         Name     => $GeneralCatalogItem->{Name},
         Comment  => $GeneralCatalogItem->{Comment} || '',
         ValidID  => $GeneralCatalogItem->{ValidID} || 1,
-        UserID   => $Self->{Authorization}->{UserID},              
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$GeneralCatalogItemID ) {
@@ -154,14 +145,22 @@ sub Run {
             Message => 'Could not create GeneralCatalog item, please contact the system administrator',
         );
     }
-    
-    # return result    
+
+    # set known preferences
+    if ( IsArrayRefWithData( $GeneralCatalogItem->{Preferences} ) ) {
+        $Self->_SetPreferences(
+            Preferences => $GeneralCatalogItem->{Preferences},
+            Class       => $GeneralCatalogItem->{Class},
+            ItemID      => $GeneralCatalogItemID
+        );
+    }
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         GeneralCatalogItemID => $GeneralCatalogItemID,
-    );    
+    );
 }
-
 
 1;
 

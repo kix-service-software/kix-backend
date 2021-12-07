@@ -240,6 +240,28 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <Insert Table="roles">
+        <Data Key="id" Type="AutoIncrement">16</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Ticket Agent (w/o teams)</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows basic ticket access, but requires team specific roles</Data>
+        <Data Key="usage_context">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="roles">
+        <Data Key="id" Type="AutoIncrement">17</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Ticket Agent (Servicedesk)</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows working on tickets in team "Servicedesk", but requires role "Ticket Agent (w/o teams)" in order to grant access</Data>
+        <Data Key="usage_context">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
 
 <!-- role_user -->
     <!-- assign role "Superuser" to admin -->
@@ -1582,7 +1604,7 @@
         <Data Key="notification_id">11</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject_64>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_TICKET_Title>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Thank you for your message. We will take care of it as soon as possible.</p><br/><br/><p>Your request is handled under number&nbsp;[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;].</p><br/><br/><p>--&nbsp;</p><br/><br/><p>&nbsp;</p>]]></Data>
     </Insert>
 
@@ -1672,7 +1694,7 @@
         <Data Key="notification_id">11</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_CUSTOMER_Subject_64>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Re: <KIX_TICKET_Title>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Vielen Dank f&uuml;r Ihre Nachricht. Wir werden Ihr Anliegen so schnell wie m&ouml;glich bearbeiten.</p><br/><br/><p>Ihre Anfrage wird unter der Vorgangsnummer&nbsp;[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;] gef&uuml;hrt.</p><br/><br/><p>--&nbsp;</p>]]></Data>
     </Insert>
 
@@ -5223,6 +5245,236 @@ DefaultValue:
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/textmodules]]></Data>
     <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
+    <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/locks]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/priorities]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/states]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/types]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/communication]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/communication/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/communication/channels]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/communication/sendertypes]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/communication/systemaddresses]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/organisations]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
+    <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/textmodules]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
+    <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.QueueID GT 0}]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">17</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues/1]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">17</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues/2]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">17</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.QueueID IN [1,2]}]]></Data>
+    <Data Key="value">15</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>

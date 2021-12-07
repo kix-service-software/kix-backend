@@ -19,12 +19,9 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'Config',
-    'Cache',
     'DB',
+    'JSON',
     'Log',
-    'User',
-    'Valid',
 );
 
 =head1 NAME
@@ -270,6 +267,72 @@ sub _Log {
     $Kernel::OM->Get('Log')->Log(
         Priority => $Param{Priority},
         Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $Reference{RunID} || '', $MacroInfo, $MacroActionInfo),
+    );
+
+    return 1;
+}
+
+=item LogDelete()
+
+Delete entries of the log
+
+Example:
+    my $Success = $Object->LogDelete(
+        JobID         => 123,               # JobID, RunID, MacroID, or MacroActionID is needed
+        RunID         => 123,
+        MacroID       => 123,
+        MacroActionID => 123,
+    );
+
+=cut
+
+sub LogDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check params
+    if (
+        !$Param{JobID}
+        && !$Param{RunID}
+        && !$Param{MacroID}
+        && !$Param{MacroActionID}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need JobID, RunID, MacroID, or MacroActionID!",
+        );
+        return;
+    }
+
+    # prepare mapping of references
+    my %ReferenceMap  = (
+        'JobID'         => 'job_id',
+        'RunID'         => 'run_id',
+        'MacroID'       => 'macro_id',
+        'MacroActionID' => 'macro_action_id'
+    );
+
+    # init params
+    my $SQL  = 'DELETE FROM automation_log WHERE ';
+    my @Bind = ();
+
+    # prepare reference data
+    my @WhereClauses = ();
+    for my $Reference ( qw(JobID RunID MacroID MacroActionID) ) {
+        if ( $Param{ $Reference } ) {
+            my $WhereClause = $ReferenceMap{ $Reference } . ' = ?';
+
+            push( @WhereClauses, $WhereClause );
+            push( @Bind, \$Param{ $Reference } );
+        }
+    }
+
+    # prepare statement
+    $SQL .= join( ' AND ', @WhereClauses );
+
+    # execute statement
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => $SQL,
+        Bind => \@Bind,
     );
 
     return 1;

@@ -12,6 +12,33 @@
       "GeneralCatalogItem"
    ],
    "definitions" : {
+      "_GeneralCatalogItemPreference_json" : {
+         "$id" : "GeneralCatalogItemPreference.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The GeneralCatalog item preference object.",
+         "type" : "object",
+         "properties" : {
+            "Name" : {
+               "type" : "String",
+               "readOnly" : true
+            },
+            "Value" : {
+               "oneOf" : [
+                  {
+                     "type" : "string"
+                  },
+                  {
+                     "type" : "integer"
+                  }
+               ],
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Name",
+            "Value"
+         ]
+      },
       "_GeneralCatalogItem_json" : {
          "$id" : "GeneralCatalogItem.json",
          "$schema" : "http://json-schema.org/draft-07/schema",
@@ -50,6 +77,14 @@
                "type" : "string",
                "readOnly" : true
             },
+            "Preferences" : {
+               "description" : "preferences of this item",
+               "type" : "array",
+               "item" : {
+                  "$ref" : "#/definitions/_GeneralCatalogItemPreference_json"
+               },
+               "readOnly" : true
+            },
             "ValidID" : {
                "type" : "integer",
                "readOnly" : true
@@ -63,6 +98,7 @@
             "CreateTime",
             "ItemID",
             "Name",
+            "Preferences",
             "ValidID"
          ]
       }

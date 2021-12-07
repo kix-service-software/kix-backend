@@ -136,10 +136,12 @@ sub Decode {
     # use eval here, as JSON::XS->decode() dies when providing a malformed JSON string
     if ( !eval { $Scalar = $JSONObject->decode( $Param{Data} ) } ) {
 
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Decoding the JSON string failed: ' . $@,
-        );
+        if ( !$Param{Silence} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Decoding the JSON string failed: ' . $@,
+            );
+        }
 
         return;
     }

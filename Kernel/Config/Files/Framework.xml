@@ -2764,6 +2764,17 @@
             <String Regex="">base64</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="SendmailEmbeddedImages" Required="0" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">How to handle embedded images in email body.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Sendmail</SubGroup>
+        <Setting>
+            <Option SelectedID="cid">
+                <Item Key="cid" Translatable="1">CID</Item>
+                <Item Key="inline" Translatable="1">Inline</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TokenCheckRemoteIP" Required="1" Valid="1">
         <Description Translatable="1">Turns on the remote ip address check. It should be set to "No" if the application is used, for example, via a proxy farm or a dialup connection, because the remote ip address is mostly different for the requests.</Description>
         <Group>Framework</Group>
@@ -7565,6 +7576,7 @@ You can log in via the following URL:
                     "Enabled": 0,
                     "Name": "Foreign Database",
                     "Module": "Kernel::System::Auth::DB",
+                    "UsageContext": "Customer",
                     "Config": {
                         "DSN": "DBI:mysql:database=customerdb;host=customerdbhost",
                         "Type": "mysql",

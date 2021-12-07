@@ -63,7 +63,7 @@ sub Auth {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
-                "User: No \$ENV{REMOTE_USER} or \$ENV{HTTP_REMOTE_USER} !(REMOTE_ADDR: $RemoteAddr).",
+                "User: No \$ENV{REMOTE_USER} or \$ENV{HTTP_REMOTE_USER} !(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
         );
         return;
     }
@@ -90,7 +90,7 @@ sub Auth {
     # log
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message  => "User: $User authentication ok (REMOTE_ADDR: $RemoteAddr).",
+        Message  => "User: $User authentication ok (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
     );
 
     return $User;
