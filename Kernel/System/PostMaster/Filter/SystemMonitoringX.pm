@@ -449,14 +449,23 @@ sub _TicketCreate {
     $Param->{GetParam}->{'X-KIX-Channel'} = $Self->{Config}->{CreateChannel}
         || $Param->{GetParam}->{'X-KIX-Channel'};
     if($Param->{GetParam}->{'X-KIX-Queue'}  ne ''){
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'debug',
-            Message  => "X-KIX-Queue is already set to " . $Param->{GetParam}->{'X-KIX-Queue'},
-        );
+        my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
+        if( $QueueObject->NameExistsCheck( Name =>  $Param->{GetParam}->{'X-KIX-Queue'},)){
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "X-KIX-Queue is already set to " . $Param->{GetParam}->{'X-KIX-Queue'},
+            );
+        }else{
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "X-KIX-Queue set to " . $Param->{GetParam}->{'X-KIX-Queue'} . " but the Queue was not found, using standard " . $Self->{Config}->{CreateTicketQueue},
+            );
+            $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue};
+        }
     }else{
         $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
             || $Param->{GetParam}->{'X-KIX-Queue'};
-    }        
+    }    
     $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState}
         || $Param->{GetParam}->{'X-KIX-State'};
     $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType}
