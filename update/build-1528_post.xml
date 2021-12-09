@@ -170,4 +170,8 @@
         </ForeignKeyCreate>
     </TableAlter>
 
+    <TableAlter Name="migration">
+        <ColumnAdd Name="additional_data" Required="false" Size="1800000" Type="VARCHAR"/>
+    </TableAlter>
+
 </database>

@@ -170,6 +170,11 @@ sub Run {
                     SourceTicketID => $Item->{id},
                 );
 
+                $Self->_MigrateTimeUnits(
+                    TicketID       => $ID,
+                    SourceTicketID => $Item->{id},
+                );
+
                 $Result = 'OK';
             }
             else {
@@ -728,6 +733,102 @@ sub _MigrateHistory {
         else {
             $Result{Error}++;
         }
+    }
+
+    return %Result;
+}
+
+sub _MigrateTimeUnits {
+    my ( $Self, %Param ) = @_;
+    my %Result;
+
+    # check needed params
+    for my $Needed (qw(TicketID SourceTicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # get source data
+    my $SourceData = $Self->GetSourceData(
+        Type       => 'time_accounting', 
+        Where      => "ticket_id = $Param{SourceTicketID}", 
+        References => {
+            'ticket_id'  => 'ticket',
+            'article_id' => 'article',
+            'create_by'  => 'users',
+            'change_by'  => 'users',
+        },
+        NoProgress => 1,
+    );
+
+    # bail out if we don't have something to todo
+    return %Result if !IsArrayRefWithData($SourceData);
+
+    foreach my $Item ( @{$SourceData} ) {
+
+        # check if this object is already mapped
+        my $MappedID = $Self->GetOIDMapping(
+            ObjectType     => 'time_accounting',
+            SourceObjectID => $Item->{id},
+        );
+        next if $MappedID;
+
+        # check if this item already exists (i.e. some initial data)
+        my $ID = $Self->Lookup(
+            Table        => 'time_accounting',
+            PrimaryKey   => 'id',
+            Item         => $Item,
+            RelevantAttr => [
+                'ticket_id',
+                'article_id',
+                'create_by'
+            ]
+        );
+
+        # insert row
+        if ( !$ID ) {
+            my %KIXTTAData;
+            foreach my $Key ( qw(description reference_1 reference_2 reference_3 reference_4 flag) ) {
+                if ( $Item->{$Key} ) {
+                    $KIXTTAData{$Key} = $Item->{$Key};
+                }
+            }
+
+            $ID = $Self->Insert(
+                Table          => 'time_accounting',
+                PrimaryKey     => 'id',
+                Item           => $Item,
+                AutoPrimaryKey => 1,
+                SourceObjectID => $Item->{id},
+                AdditionalData => IsHashRefWithData(\%KIXTTAData) ? \%KIXTTAData : undef,
+            );
+        }
+
+        if ( $ID ) {
+            $Result{OK}++;
+        }
+        else {
+            $Result{Error}++;
+        }
+    }
+
+    # update accounted_time
+    my $Success = $Kernel::OM->Get('DB')->Do(
+        SQL  => 'UPDATE ticket SET accounted_time = (SELECT sum(time_unit) FROM time_accounting WHERE ticket_id = ?) WHERE id = ?',
+        Bind => [
+            \$Param{TicketID}, \$Param{TicketID}
+        ]
+    );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "Unable to update \"accounted_time\" of ticket ID $Param{TicketID}"
+        );
     }
 
     return %Result;
