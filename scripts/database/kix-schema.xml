@@ -2980,6 +2980,7 @@
     <Column Name="object_type" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="object_id" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="source_object_id" Required="false" Size="255" Type="VARCHAR"/>
+    <Column Name="additional_data" Required="false" Size="1800000" Type="VARCHAR"/>
     <Index Name="migration_sourceid_otype_soid">
         <IndexColumn Name="source_id"/>
         <IndexColumn Name="object_type"/>

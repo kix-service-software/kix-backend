@@ -272,14 +272,16 @@ sub Insert {
                 $Self->CreateOIDMapping(
                     ObjectType     => $Param{Table},
                     ObjectID       => $ID,
-                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID}
+                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID},
+                    AdditionalData => $Param{AdditionalData},
                 );
             }
             else {
                 $Self->ReplaceOIDMapping(
                     ObjectType     => $Param{Table},
                     ObjectID       => $ID,
-                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID}
+                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID},
+                    AdditionalData => $Param{AdditionalData},
                 );
             }
         }
@@ -609,11 +611,18 @@ sub CreateOIDMapping {
         }
     }
 
+    my $AdditionalData;
+    if ( IsHashRefWithData($Param{AdditionalData}) ) {
+        $AdditionalData = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{AdditionalData}
+        );
+    }
+
     # save the mapping
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'INSERT INTO migration (source, source_id, object_type, object_id, source_object_id) VALUES (?,?,?,?,?)',
+        SQL  => 'INSERT INTO migration (source, source_id, object_type, object_id, source_object_id, additional_data) VALUES (?,?,?,?,?,?)',
         Bind => [
-            \$Self->{Source}, \$Self->{SourceID}, \$Param{ObjectType}, \$Param{ObjectID}, \$Param{SourceObjectID},
+            \$Self->{Source}, \$Self->{SourceID}, \$Param{ObjectType}, \$Param{ObjectID}, \$Param{SourceObjectID}, \$AdditionalData
         ]
     );
     if ( !$Result ) {
@@ -641,12 +650,19 @@ sub ReplaceOIDMapping {
         }
     }
 
+    my $AdditionalData;
+    if ( IsHashRefWithData($Param{AdditionalData}) ) {
+        $AdditionalData = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{AdditionalData}
+        );
+    }
+
     # save the mapping
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'UPDATE migration SET object_id = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
+        SQL  => 'UPDATE migration SET object_id = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ? AND additional_data = ?',
         Bind => [
             \$Param{ObjectID}, \$Self->{Source}, \$Self->{SourceID}, 
-            \$Param{ObjectType}, \$Param{SourceObjectID},
+            \$Param{ObjectType}, \$Param{SourceObjectID}, \$AdditionalData
         ]
     );
     if ( !$Result ) {
