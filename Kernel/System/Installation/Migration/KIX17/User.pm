@@ -144,6 +144,7 @@ sub Run {
             my $ContactID = $Self->Lookup(
                 Table        => 'contact',
                 PrimaryKey   => 'id',
+                IgnoreCase   => 1,
                 Item         => {
                     'firstname' => $Contact{first_name},
                     'lastname'  => $Contact{last_name},

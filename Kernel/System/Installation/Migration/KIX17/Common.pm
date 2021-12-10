@@ -381,7 +381,7 @@ sub Lookup {
 
     my $Mapping = $Self->{Mapping}->{$Param{Table}} || $Self->Describe()->{Mapping} || {};
 
-    # prepare insert statement
+    # prepare select statement
     my @Bind;
     my @Where;
     foreach my $Attr ( @{$Param{RelevantAttr}} ) {
@@ -390,8 +390,12 @@ sub Lookup {
 
         # map value if defined
         $Value = $Mapping->{$Value} if $Mapping->{$Value};
+
+        # should we search case insensitive ?
+        $Value = $Param{IgnoreCase} ? lc($Value) : $Value;
+
         push @Bind, \$Value;
-        push @Where, "$Attr = ?";
+        push @Where, $Param{IgnoreCase} ? "lower($Attr) = ?" : "$Attr = ?";
     }
     my $SQL = "SELECT $Param{PrimaryKey} FROM $Param{Table} WHERE " . join(' AND ', @Where);
 
