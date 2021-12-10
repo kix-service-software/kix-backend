@@ -139,39 +139,36 @@ To get more information about the parameters please check fetchmail man pages fo
 sub Fetch {
     my ( $Self, %Param ) = @_;
 
-    # set possible locations for fetchmail bin
-    my @PossibleLocations = (
-        '/usr/bin/fetchmail',
-        '/usr/sbin/fetchmail',
-        '/usr/local/bin/fetchmail',
-        '/opt/local/bin/fetchmail',
-    );
+    my $FetchMailBin = '/usr/local/bin/fetchmail.sh';
 
-    # get SysConfig setting as a fall-back
-    my $ConfigLocation = $Kernel::OM->Get('Config')->Get('Fetchmail::Bin') || '';
-
-    # check if setting is defined and valid
-    if ( $ConfigLocation && $ConfigLocation =~ m{[/|\w]+ fetchmail\z}msx ) {
-        push @PossibleLocations, $ConfigLocation;
-    }
-
-    my $FetchMailBin;
-
-    # set FetMail bin
-    LOCATION:
-    for my $Location (@PossibleLocations) {
-        if ( -e $Location ) {
-            $FetchMailBin = $Location;
-            last LOCATION
-        }
-    }
-
-    if ( !$FetchMailBin ) {
+    if ( ! -e $FetchMailBin ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "FetchMail bin was not found",
+            Message  => "$FetchMailBin doesn't exist or can't be executed!",
         );
         return
+    }
+
+    # prepare fetchmail.rc and procmail.rc if defined
+    FILE:
+    foreach my $File ( qw(fetchmail.rc procmail.rc) ) {
+        my $Content = $Kernel::OM->Get('Config')->Get('Fetchmail::'.$File);
+        next FILE if !$Content;
+
+        # save file
+        my $Success = $Kernel::OM->Get('Main')->FileWrite(
+            Directory => '/tmp',
+            Filename  => $File,
+            Content   => \$Content,
+            Permission => '700'
+        );
+        if ( !$Success ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Couldn't write $File!",
+            );
+            return
+        }
     }
 
     my %ParamLookup = (
@@ -256,7 +253,7 @@ sub Fetch {
     );
 
     # define base command
-    my $Command = "$FetchMailBin -a";
+    my $Command = "$FetchMailBin";
 
     OPTION:
     for my $Option ( sort keys %Param ) {
@@ -287,10 +284,13 @@ sub Fetch {
     };
 
     my $ErrorMessage;
+    my $Output;
     my $ExitCode;
 
     if ($ProcessID) {
-
+        while (<$OUTFH>) {
+            $Output .= $_;
+        }
         while (<$ERRFH>) {
             $ErrorMessage .= $_;
         }
