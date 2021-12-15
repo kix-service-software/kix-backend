@@ -50,10 +50,10 @@ define parameter preparation and check for this operation
 =cut
 
 sub ParameterDefinition {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
 
     return {
-        'TicketID' => {
+        'TicketID'  => {
             Required => 1
         },
         'HistoryID' => {
@@ -107,7 +107,18 @@ one or more ticket entries in one call.
 =cut
 
 sub Run {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
+
+    # Get mapping of history types to readable strings
+    my %HistoryTypes;
+    my %HistoryTypeConfig = %{ $Kernel::OM->Get('Config')->Get('Ticket::Frontend::HistoryTypes') // {} };
+    foreach my $Entry ( sort keys %HistoryTypeConfig ) {
+        %HistoryTypes = (
+            %HistoryTypes,
+            %{ $HistoryTypeConfig{$Entry} },
+        );
+    }
+    $Self->{HistoryTypes} = \%HistoryTypes;
 
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
@@ -116,21 +127,21 @@ sub Run {
         TicketID => $Param{Data}->{TicketID},
         UserID   => $Self->{Authorization}->{UserID},
     );
-    my %HistoryHash = map { $_->{HistoryID} => $_ } @HistoryList;
+    my %HistoryHash = map {$_->{HistoryID} => $_} @HistoryList;
 
     my @HistoryItemList;
 
     # start loop
-    for my $HistoryID ( sort @{$Param{Data}->{HistoryID}} ) {
+    for my $HistoryID (sort @{$Param{Data}->{HistoryID}}) {
 
         my $HistoryItem = $HistoryHash{$HistoryID};
 
         # replace text if needed
-        if ( $HistoryItem->{Name} && $HistoryItem->{Name} =~ m/^%%/x ) {
+        if ($HistoryItem->{Name} && $HistoryItem->{Name} =~ m/^%%/x) {
             $HistoryItem->{Name} =~ s/^%%//xg;
-            my @Values = split( /%%/x, $HistoryItem->{Name} );
+            my @Values = split(/%%/x, $HistoryItem->{Name});
             $HistoryItem->{Name} = $Kernel::OM->Get('Language')->Translate(
-                $Self->{HistoryTypes}->{ $HistoryItem->{HistoryType} },
+                $Self->{HistoryTypes}->{ $HistoryItem->{HistoryType} } // substr('%s::' x scalar(@Values), 0, -2),
                 @Values,
             );
 
@@ -144,7 +155,7 @@ sub Run {
         push(@HistoryItemList, $HistoryItem);
     }
 
-    if ( scalar(@HistoryItemList) == 1 ) {
+    if (scalar(@HistoryItemList) == 1) {
         return $Self->_Success(
             History => $HistoryItemList[0],
         );
