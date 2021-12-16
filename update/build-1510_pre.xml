@@ -2,7 +2,11 @@
 <database Name="kix">
 
     <TableAlter Name="text_module">
+        <IndexDrop Name="text_module_keywords">
         <ColumnChange NameOld="keywords" NameNew="keywords" Required="false" Size="3800" Type="VARCHAR"/>
+        <Index Name="text_module_keywords">
+            <IndexColumn Name="keywords" Size="100"/>
+        </Index>
     </TableAlter>
 
 </database>
