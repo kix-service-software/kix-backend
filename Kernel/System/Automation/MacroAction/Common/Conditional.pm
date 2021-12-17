@@ -114,6 +114,14 @@ sub Run {
             UserID   => $Param{UserID}
         );
     }
+    if ( $@ ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "An error occured while evaluating the logical expression ($@)!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
 
     return 1;
 }

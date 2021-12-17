@@ -1,0 +1,12 @@
+{
+    "ConfigItemLinkGraphConfig": {
+        "MaxDepth": 3,
+        "RelevantLinkTypes": [
+            "DependsOn"
+        ],
+        "RelevantClasses": [
+            "Computer",
+            "Hardware"
+        ]
+    }
+}

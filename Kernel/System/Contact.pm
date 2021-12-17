@@ -492,16 +492,21 @@ contact id, email oder user id lookup
         Silent => 1, # optional, don't generate log entry if user was not found
     );
 
+    my $ID = $ContactObject->ContactLookup(
+        UserLogin => 'some_login',
+        Silent    => 1, # optional, don't generate log entry if user was not found
+    );
+
 =cut
 
 sub ContactLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if (!$Param{Email} && !$Param{ID} && !$Param{UserID}) {
+    if (!$Param{Email} && !$Param{ID} && !$Param{UserID} && !$Param{UserLogin}) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Email, ID of contact or UserID!'
+            Message  => 'Need Email, ID of contact or UserID or UserLogin!'
         );
         return;
     }
@@ -630,6 +635,48 @@ sub ContactLookup {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No ID found for assigned user id '$Param{UserID}'!",
+                );
+            }
+            return;
+        }
+
+        # set cache
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $ID,
+        );
+
+        return $ID;
+    }
+    elsif ($Param{UserLogin}){
+
+        # check cache
+        my $CacheKey = 'ContactLookup::UserLogin::' . $Param{UserLogin};
+        my $Cache    = $Kernel::OM->Get('Cache')->Get(
+            Type => $Self->{CacheType},
+            Key  => $CacheKey,
+        );
+        return $Cache if $Cache;
+
+        return if !$DBObject->Prepare(
+            SQL => "SELECT c.id FROM contact c, users u WHERE u.id = c.user_id AND u.login = ?",
+            Bind  => [ \$Param{UserLogin} ],
+            Limit => 1,
+        );
+
+        # fetch the result
+        my $ID;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $ID = $Row[0];
+        }
+
+        if ( !$ID ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No ID found for assigned user login '$Param{UserLogin}'!",
                 );
             }
             return;

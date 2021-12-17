@@ -87,6 +87,9 @@ sub new {
             }
 
             $Config->{BackendObject} = $Config->{Module}->new(Config => $Config->{Config});
+            
+            # set global config in module
+            $Config->{BackendObject}->{Config} = $Config;
 
             if ( IsArrayRefWithData($Config->{Sync}) ) {
                 foreach my $SyncConfig ( @{$Config->{Sync}} ) {
@@ -173,6 +176,7 @@ sub Auth {
         foreach my $Config ( @{$Self->{AuthConfig}->{$AuthReg}} ) {
         
             next CONFIG if !$Config->{Enabled} || !$Config->{BackendObject};
+            next CONFIG if defined $Config->{UsageContext} && $Config->{UsageContext} ne $Param{UsageContext};
 
             # check auth backend
             $User = $Config->{BackendObject}->Auth(%Param);

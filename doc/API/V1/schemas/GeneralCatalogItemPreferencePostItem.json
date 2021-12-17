@@ -1,0 +1,29 @@
+{
+   "$id" : "GeneralCatalogItemPreferencePostItem.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The GeneralCatalogItemPreference item for creation.",
+   "type" : "object",
+   "properties" : {
+      "Name" : {
+         "description" : "the preference key name",
+         "type" : "string"
+      },
+      "Value" : {
+         "oneOf" : [
+            {
+               "type" : "string"
+            },
+            {
+               "type" : "integer"
+            },
+            {
+               "type" : "null"
+            }
+         ]
+      }
+   },
+   "required" : [
+      "Name",
+      "Value"
+   ]
+}

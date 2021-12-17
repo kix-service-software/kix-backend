@@ -38,21 +38,23 @@ if ( $Options{Help} ) {
 }
 
 my %RoleList = (
-    'Superuser'              => 1,
-    'System Admin'           => 2,
-    'Agent User'             => 3,
-    'Ticket Reader'          => 4,
-    'Ticket Agent'           => 5,
-    'Webform Ticket Creator' => 6,
-    'FAQ Reader'             => 7,
-    'FAQ Editor'             => 8,
-    'CMDB Reader'            => 9,
-    'CMDB Maintainer'        => 10,
-    'Customer Reader'        => 11,
-    'Customer Manager'       => 12,
-    'Customer'               => 13,
-    'Report User'            => 14,
-    'Report Manager'         => 15,
+    'Superuser'                  => 1,
+    'System Admin'               => 2,
+    'Agent User'                 => 3,
+    'Ticket Reader'              => 4,
+    'Ticket Agent'               => 5,
+    'Webform Ticket Creator'     => 6,
+    'FAQ Reader'                 => 7,
+    'FAQ Editor'                 => 8,
+    'CMDB Reader'                => 9,
+    'CMDB Maintainer'            => 10,
+    'Customer Reader'            => 11,
+    'Customer Manager'           => 12,
+    'Customer'                   => 13,
+    'Report User'                => 14,
+    'Report Manager'             => 15,
+    'Ticket Agent (w/o teams)'   => 16,
+    'Ticket Agent (Servicedesk)' => 17,
 );
 
 my %PermissionTypeList = (

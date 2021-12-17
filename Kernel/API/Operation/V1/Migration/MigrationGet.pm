@@ -31,37 +31,6 @@ Kernel::API::Operation::V1::Migration::MigrationGet - API Migration Get Operatio
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation::V1::Migration::MigrationGet->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::Migration::MigrationGet');
-
-    return $Self;
-}
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation

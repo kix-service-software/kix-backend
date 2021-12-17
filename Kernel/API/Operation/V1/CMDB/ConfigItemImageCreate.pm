@@ -31,34 +31,6 @@ Kernel::API::Operation::V1::CMDB::ConfigItemImageCreate - API ConfigItemImage Cr
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw( DebuggerObject WebserviceID )) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    return $Self;
-}
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -125,13 +97,12 @@ perform ConfigItemImageCreate Operation. This will return the created VersionID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # get config item data
-    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
-        ConfigItemID => $Param{Data}->{ConfigItemID}
+    # check if ConfigItem exists
+    my $Exist = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+        ConfigItemID => $Param{Data}->{ConfigItemID},
     );
 
-    # check if ConfigItem exists
-    if ( !$ConfigItem ) {
+    if (!$Exist) {
         return $Self->_Error(
             Code => 'ParentObject.NotFound',
         );

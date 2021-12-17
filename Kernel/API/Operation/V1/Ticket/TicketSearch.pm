@@ -29,37 +29,6 @@ Kernel::API::Operation::V1::Ticket::TicketSearch - API Ticket Search Operation b
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation::V1->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return {
-                Success      => 0,
-                ErrorMessage => "Got no $Needed!",
-            };
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TicketSearch');
-
-    return $Self;
-}
-
 =item Run()
 
 perform TicketSearch Operation. This will return a ticket list.

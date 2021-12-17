@@ -697,8 +697,8 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="ticket_id" Required="true" Type="BIGINT"/>
     <Column Name="queue_id" Required="true" Type="INTEGER"/>
-    <Column Name="lock_id" Required="true" Type="INTEGER"/>
-    <Column Name="state_id" Required="true" Type="INTEGER"/>
+    <Column Name="lock_id" Required="true" Type="SMALLINT"/>
+    <Column Name="state_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time_unix" Required="true" Type="BIGINT"/>
     <Index Name="ticket_index_ticket_id">
         <IndexColumn Name="ticket_id"/>
@@ -742,7 +742,7 @@
 <Table Name="watcher">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="object" Required="true" Size="50" Type="VARCHAR"/>
-    <Column Name="object_id" Required="true" Type="INTEGER"/>
+    <Column Name="object_id" Required="true" Type="BIGINT"/>
     <Column Name="user_id" Required="true" Type="INTEGER"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
@@ -1173,6 +1173,9 @@
     <Unique Name="organisation_name">
         <UniqueColumn Name="name"/>
     </Unique>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
@@ -1647,44 +1650,6 @@
     </ForeignKey>
 </Table>
 
-<!-- api_debugger_entry -->
-<Table Name="api_debugger_entry">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
-    <Column Name="communication_id" Required="true" Size="32" Type="VARCHAR"/>
-    <Column Name="communication_type" Required="true" Size="50" Type="VARCHAR"/>
-    <Column Name="remote_ip" Required="false" Size="50" Type="VARCHAR"/>
-    <Column Name="webservice_id" Required="true" Type="INTEGER"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Unique Name="api_debugger_entry_communication_id">
-        <UniqueColumn Name="communication_id"/>
-    </Unique>
-    <Index Name="api_debugger_entry_create_time">
-        <IndexColumn Name="create_time"/>
-    </Index>
-    <ForeignKey ForeignTable="api_webservice_config">
-        <Reference Local="webservice_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- api_debugger_entry_content -->
-<Table Name="api_debugger_entry_content">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
-    <Column Name="api_debugger_entry_id" Required="true" Type="BIGINT"/>
-    <Column Name="debug_level" Required="true" Size="50" Type="VARCHAR"/>
-    <Column Name="subject" Required="true" Size="255" Type="VARCHAR"/>
-    <Column Name="content" Required="false" Type="LONGBLOB"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Index Name="api_debugger_entry_content_create_time">
-        <IndexColumn Name="create_time"/>
-    </Index>
-    <Index Name="api_debugger_entry_content_debug_level">
-        <IndexColumn Name="debug_level"/>
-    </Index>
-    <ForeignKey ForeignTable="api_debugger_entry">
-        <Reference Local="api_debugger_entry_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <Table Name="smime_signer_cert_relations">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="cert_hash" Required="true" Size="8" Type="VARCHAR"/>
@@ -1708,7 +1673,7 @@
     <!-- the current object to link to (e. g. ticket or article ID) -->
     <Column Name="object_id" Required="true" Type="BIGINT"/>
     <!-- for value we have different field types to store data, can be extended in future -->
-    <Column Name="value_text" Required="false" Type="VARCHAR" Size="3800" />
+    <Column Name="value_text" Required="false" Type="VARCHAR" Size="1800000"/>
     <Column Name="value_date" Required="false" Type="DATE" />
     <Column Name="value_int" Required="false" Type="BIGINT" />
 
@@ -1978,6 +1943,10 @@
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id" />
     </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="created_by" Foreign="id"/>
+        <Reference Local="changed_by" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="faq_item">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
@@ -1986,7 +1955,7 @@
     <Column Name="f_name" Required="true" Size="200" Type="VARCHAR" />
     <Column Name="language" Required="true" Size="8" Type="VARCHAR" />
     <Column Name="visibility" Required="true" Size="20" Type="VARCHAR" />
-    <Column Name="category_id" Required="true" Type="SMALLINT" />
+    <Column Name="category_id" Required="true" Type="INTEGER" />
     <Column Name="approved" Required="true" Default="1" Type="SMALLINT" />
     <Column Name="valid_id" Required="true" Default="1" Type="SMALLINT" />
     <Column Name="content_type" Required="true" Default="text/html" Size="250" Type="VARCHAR" />
@@ -2013,8 +1982,15 @@
     <Index Name="faq_item_valid_id">
         <IndexColumn Name="valid_id" />
     </Index>
+    <ForeignKey ForeignTable="faq_category">
+        <Reference Local="category_id" Foreign="id" />
+    </ForeignKey>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id" />
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="created_by" Foreign="id"/>
+        <Reference Local="changed_by" Foreign="id"/>
     </ForeignKey>
 </Table>
 <Table Name="faq_history">
@@ -2028,10 +2004,17 @@
     <Index Name="faq_history_item_id">
         <IndexColumn Name="item_id" />
     </Index>
+    <ForeignKey ForeignTable="faq_item">
+        <Reference Local="item_id" Foreign="id" />
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="created_by" Foreign="id"/>
+        <Reference Local="changed_by" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="faq_attachment">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
-    <Column Name="faq_id" Required="true" Type="BIGINT" />
+    <Column Name="faq_id" Required="true" Type="INTEGER" />
     <Column Name="filename" Required="false" Size="250" Type="VARCHAR" />
     <Column Name="content_size" Required="false" Size="30" Type="VARCHAR" />
     <Column Name="content_type" Required="false" Size="250" Type="VARCHAR" />
@@ -2045,6 +2028,13 @@
     <Index Name="faq_attachment_faq_id">
         <IndexColumn Name="faq_id" />
     </Index>
+    <ForeignKey ForeignTable="faq_item">
+        <Reference Local="faq_id" Foreign="id" />
+    </ForeignKey>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="created_by" Foreign="id"/>
+        <Reference Local="changed_by" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="faq_voting">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
@@ -2057,6 +2047,9 @@
     <Index Name="faq_voting_item_id">
         <IndexColumn Name="item_id" />
     </Index>
+    <ForeignKey ForeignTable="faq_item">
+        <Reference Local="item_id" Foreign="id" />
+    </ForeignKey>
 </Table>
 <Table Name="faq_log">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
@@ -2068,6 +2061,9 @@
     <Index Name="faq_log_item_id">
         <IndexColumn Name="item_id" />
     </Index>
+    <ForeignKey ForeignTable="faq_item">
+        <Reference Local="item_id" Foreign="id" />
+    </ForeignKey>
 </Table>
 
 <!-- general catalog -->
@@ -2085,6 +2081,9 @@
         <UniqueColumn Name="general_catalog_class" />
         <UniqueColumn Name="name" />
     </Unique>
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id" />
         <Reference Local="change_by" Foreign="id" />
@@ -2115,6 +2114,9 @@
     <Column Name="create_by" Required="false" Type="INTEGER" />
     <Column Name="change_time" Required="false" Type="DATE" />
     <Column Name="change_by" Required="false" Type="INTEGER" />
+    <ForeignKey ForeignTable="valid">
+        <Reference Local="valid_id" Foreign="id"/>
+    </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id" />
         <Reference Local="change_by" Foreign="id" />
@@ -2128,6 +2130,9 @@
     <Index Name="imexport_object_template_id">
         <IndexColumn Name="template_id" />
     </Index>
+    <ForeignKey ForeignTable="imexport_template">
+        <Reference Local="template_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="imexport_format">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
@@ -2137,6 +2142,9 @@
     <Index Name="imexport_format_template_id">
         <IndexColumn Name="template_id" />
     </Index>
+    <ForeignKey ForeignTable="imexport_template">
+        <Reference Local="template_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="imexport_mapping">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
@@ -2145,6 +2153,9 @@
     <Index Name="imexport_mapping_template_id">
         <IndexColumn Name="template_id" />
     </Index>
+    <ForeignKey ForeignTable="imexport_template">
+        <Reference Local="template_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="imexport_mapping_object">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
@@ -2154,6 +2165,9 @@
     <Index Name="imexport_mapping_object_mapping_id">
         <IndexColumn Name="mapping_id" />
     </Index>
+    <ForeignKey ForeignTable="imexport_mapping">
+        <Reference Local="mapping_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="imexport_mapping_format">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
@@ -2163,6 +2177,9 @@
     <Index Name="imexport_mapping_format_mapping_id">
         <IndexColumn Name="mapping_id" />
     </Index>
+    <ForeignKey ForeignTable="imexport_mapping">
+        <Reference Local="mapping_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <Table Name="imexport_search">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
@@ -2172,6 +2189,9 @@
     <Index Name="imexport_search_template_id">
         <IndexColumn Name="template_id" />
     </Index>
+    <ForeignKey ForeignTable="imexport_template">
+        <Reference Local="template_id" Foreign="id"/>
+    </ForeignKey>
 </Table>
 <!-- import run -->
 <Table Name="imexport_template_run">
@@ -2377,6 +2397,10 @@
     <Index Name="index_attachment_directory_backend">
         <IndexColumn Name="storage_backend"/>
     </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id" />
+        <Reference Local="change_by" Foreign="id" />
+    </ForeignKey>
 </Table>
 <Table Name="attachment_dir_preferences">
     <Column Name="attachment_directory_id" Required="true" Type="INTEGER"/>
@@ -2417,6 +2441,9 @@
         <UniqueColumn Name="article_key"/>
         <UniqueColumn Name="create_by"/>
     </Unique>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id" />
+    </ForeignKey>
 </Table>
 <Table Name="kix_dep_dynamic_field">
     <Column Name="id"               Required="true" Type="INTEGER" PrimaryKey="true"/>
@@ -2479,7 +2506,7 @@
     <Column Name="category"    Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="text"        Required="false" Type="VARCHAR" Size="65535"/>
     <Column Name="language"    Required="false" Type="VARCHAR" Size="8"/>
-    <Column Name="keywords"    Required="false" Type="VARCHAR" Size="200"/>
+    <Column Name="keywords"    Required="false" Type="VARCHAR" Size="3800"/>
     <Column Name="comment"     Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="subject"     Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="f_agent"     Required="false" Type="INTEGER" Default="0"/>
@@ -2497,11 +2524,15 @@
         <IndexColumn Name="category"/>
     </Index>
     <Index Name="text_module_keywords">
-        <IndexColumn Name="keywords"/>
+        <IndexColumn Name="keywords" Size="100"/>
     </Index>
     <Index Name="text_module_language">
         <IndexColumn Name="language"/>
     </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id" />
+        <Reference Local="change_by" Foreign="id" />
+    </ForeignKey>
 </Table>
 <Table Name="kix_ticket_template">
     <Column Name="id"          Required="true" Type="INTEGER"  PrimaryKey="true" AutoIncrement="true"/>
@@ -2613,6 +2644,10 @@
     <Index Name="object_icon_object_id">
         <IndexColumn Name="object_id"/>
     </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id" />
+        <Reference Local="change_by" Foreign="id" />
+    </ForeignKey>
 </Table>
 
 <!-- translation - the base texts for translations -->
@@ -2636,6 +2671,10 @@
     <Index Name="translation_pattern_value_md5">
         <IndexColumn Name="value_md5"/>
     </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id" />
+        <Reference Local="change_by" Foreign="id" />
+    </ForeignKey>
 </Table>
 
 <!-- translation_language - translations -->
@@ -2659,6 +2698,10 @@
         <IndexColumn Name="pattern_id"/>
         <IndexColumn Name="language"/>
     </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="create_by" Foreign="id" />
+        <Reference Local="change_by" Foreign="id" />
+    </ForeignKey>
 </Table>
 
 <Table Name="sysconfig">
@@ -2684,6 +2727,7 @@
     <Column Name="change_by" Required="true" Type="INTEGER" />
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>
+        <Reference Local="default_valid_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
@@ -2918,6 +2962,12 @@
     <Index Name="automation_log_macro_id">
         <IndexColumn Name="macro_id"/>
     </Index>
+    <ForeignKey ForeignTable="job">
+        <Reference Local="job_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="job_run">
+        <Reference Local="run_id" Foreign="id"/>
+    </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
     </ForeignKey>
@@ -2930,6 +2980,7 @@
     <Column Name="object_type" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="object_id" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="source_object_id" Required="false" Size="255" Type="VARCHAR"/>
+    <Column Name="additional_data" Required="false" Size="1800000" Type="VARCHAR"/>
     <Index Name="migration_sourceid_otype_soid">
         <IndexColumn Name="source_id"/>
         <IndexColumn Name="object_type"/>

@@ -31,37 +31,6 @@ Kernel::API::Operation::V1::TextModule::TextModuleUpdate - API TextModule Create
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw( DebuggerObject WebserviceID )) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::TextModuleUpdate');
-
-    return $Self;
-}
-
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation

@@ -1,0 +1,151 @@
+{
+    "Graph": {
+        "Config": {
+            "MaxDepth": 3,
+            "RelevantClasses": [
+                "Computer",
+                "Hardware"
+            ],
+            "RelevantLinkTypes": [
+                "DependsOn"
+            ]
+        },
+        "CreateTimUnix": 1635784627,
+        "Links": [
+            {
+                "LinkType": "DependsOn",
+                "SourceName": "Depends on",
+                "SourceNodeID": "0xf567aa9bda1a4e1ba12310c7736385da",
+                "TargetName": "Required for",
+                "TargetNodeID": "0x6ab145693b574629b6e06a39b9f80052"
+            },
+            {
+                "LinkType": "DependsOn",
+                "SourceName": "Depends on",
+                "SourceNodeID": "0x6ab145693b574629b6e06a39b9f80052",
+                "TargetName": "Required for",
+                "TargetNodeID": "0x46dc98279b074032b70d9ae4c1936271"
+            },
+            {
+                "LinkType": "DependsOn",
+                "SourceName": "Depends on",
+                "SourceNodeID": "0x6ab145693b574629b6e06a39b9f80052",
+                "TargetName": "Required for",
+                "TargetNodeID": "0xc191c06d65dc4758b475466ab262daec"
+            }
+        ],
+        "Nodes": [
+            {
+                "NodeID": "0xf567aa9bda1a4e1ba12310c7736385da",
+                "Object": {
+                    "ChangeBy": 1,
+                    "ChangeTime": "2021-11-01 16:01:40",
+                    "Class": "Computer",
+                    "ClassID": "4",
+                    "ConfigItemID": 11,
+                    "CreateBy": 1,
+                    "CreateTime": "2021-11-01 16:01:40",
+                    "CurDeplState": "Production",
+                    "CurDeplStateID": 16,
+                    "CurDeplStateType": "productive",
+                    "CurInciState": "Operational",
+                    "CurInciStateID": 1,
+                    "CurInciStateType": "operational",
+                    "LastVersionID": 11,
+                    "Name": "test1",
+                    "Number": "174000001"
+                },
+                "ObjectType": "ConfigItem"
+            },
+            {
+                "NodeID": "0x6ab145693b574629b6e06a39b9f80052",
+                "Object": {
+                    "Access": 0,
+                    "Class": "Computer",
+                    "ClassID": "4",
+                    "ConfigItemID": "12",
+                    "CreateBy": 1,
+                    "CreateTime": "2021-11-01 16:01:48",
+                    "CurDeplState": "Production",
+                    "CurDeplStateID": 16,
+                    "CurDeplStateType": "productive",
+                    "CurInciState": "Operational",
+                    "CurInciStateID": 1,
+                    "CurInciStateType": "operational",
+                    "DefinitionID": 9,
+                    "DeplState": "Production",
+                    "DeplStateID": 16,
+                    "DeplStateType": "productive",
+                    "InciState": "Operational",
+                    "InciStateID": 1,
+                    "InciStateType": "operational",
+                    "LastVersionID": 12,
+                    "Name": "test2",
+                    "Number": "174000002",
+                    "VersionID": "12"
+                },
+                "ObjectType": "ConfigItem"
+            },
+            {
+                "NodeID": "0x46dc98279b074032b70d9ae4c1936271",
+                "Object": {
+                    "Access": 0,
+                    "Class": "Computer",
+                    "ClassID": "4",
+                    "ConfigItemID": "13",
+                    "CreateBy": 1,
+                    "CreateTime": "2021-11-01 16:01:55",
+                    "CurDeplState": "Production",
+                    "CurDeplStateID": 16,
+                    "CurDeplStateType": "productive",
+                    "CurInciState": "Operational",
+                    "CurInciStateID": 1,
+                    "CurInciStateType": "operational",
+                    "DefinitionID": 9,
+                    "DeplState": "Production",
+                    "DeplStateID": 16,
+                    "DeplStateType": "productive",
+                    "InciState": "Operational",
+                    "InciStateID": 1,
+                    "InciStateType": "operational",
+                    "LastVersionID": 13,
+                    "Name": "test3",
+                    "Number": "174000003",
+                    "VersionID": "13"
+                },
+                "ObjectType": "ConfigItem"
+            },
+            {
+                "NodeID": "0xc191c06d65dc4758b475466ab262daec",
+                "Object": {
+                    "Access": 0,
+                    "Class": "Computer",
+                    "ClassID": "4",
+                    "ConfigItemID": "14",
+                    "CreateBy": 1,
+                    "CreateTime": "2021-11-01 16:02:03",
+                    "CurDeplState": "Production",
+                    "CurDeplStateID": 16,
+                    "CurDeplStateType": "productive",
+                    "CurInciState": "Operational",
+                    "CurInciStateID": 1,
+                    "CurInciStateType": "operational",
+                    "DefinitionID": 9,
+                    "DeplState": "Production",
+                    "DeplStateID": 16,
+                    "DeplStateType": "productive",
+                    "InciState": "Operational",
+                    "InciStateID": 1,
+                    "InciStateType": "operational",
+                    "LastVersionID": 14,
+                    "Name": "test4",
+                    "Number": "174000004",
+                    "VersionID": "14"
+                },
+                "ObjectType": "ConfigItem"
+            }
+        ],
+        "Type": "ConfigItemLinkGraph",
+        "UserID": 1
+    }
+}

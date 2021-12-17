@@ -9,6 +9,9 @@
         configItemId:
           displayName: ConfigItemID
           type: integer
+      /graph:
+        description: !include ../descriptions/resources/cmdb/configitems/graph.md
+        type: { item-postonly: { typeName: ConfigItemLinkGraph } }
       /history:
         description: !include ../descriptions/resources/cmdb/configitems/history.md
         type: { collection-readonly: { typeName: ConfigItemHistory } }

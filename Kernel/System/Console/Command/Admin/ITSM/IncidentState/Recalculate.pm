@@ -55,7 +55,7 @@ sub Run {
     CONFIGITEM:
     for my $ConfigItemID ( @{$ConfigItemsIDsRef} ) {
 
-        my $Success = $Kernel::OM->Get('ITSMConfigItem')->CurInciStateRecalc(
+        my $Success = $Kernel::OM->Get('ITSMConfigItem')->RecalculateCurrentIncidentState(
             ConfigItemID => $ConfigItemID,
         );
 

@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ConfigItemLinkGraphPostResponse.json",
+    "type": "object",
+    "description": "The created graph.",
+    "properties": {
+        "Graph": {
+            "type": "object",
+            "properties": {
+                "CreateTimeUnix": {
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "Links": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "LinkType": {
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "SourceNodeID": {
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "TargetNodeID": {
+                                "type": "string",
+                                "readOnly": true
+                            }
+                        }
+                    }
+                },
+                "Nodes": {
+                    "type": "array",
+                    "readOnly": true,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "Config": {
+                                "type": "object",
+                                "readOnly": true
+                            },
+                            "NodeID": {
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "ObjectType": {
+                                "type": "string",
+                                "readOnly": true
+                            },
+                            "Object": {
+                                "type": "object",
+                                "readOnly": true
+                            }
+                        }
+                    }
+                },
+                "Type": {
+                    "type": "string",
+                    "readOnly": true
+                },
+                "UserID": {
+                    "type": "integer",
+                    "readOnly": true
+                }
+            },
+            "required": [
+                "CreateTimeUnix",
+                "Type",
+                "UserID"
+            ]
+        }
+    },
+    "required": [
+        "Graph"
+    ]
+}

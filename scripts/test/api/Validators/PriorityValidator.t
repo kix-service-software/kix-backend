@@ -12,23 +12,10 @@ use utf8;
 
 use vars (qw($Self));
 
-use Kernel::API::Debugger;
 use Kernel::API::Validator::PriorityValidator;
 
-my $DebuggerObject = Kernel::API::Debugger->new(
-    DebuggerConfig   => {
-        DebugThreshold  => 'debug',
-        TestMode        => 1,
-    },
-    WebserviceID      => 1,
-    CommunicationType => 'Provider',
-    RemoteIP          => 'localhost',
-);
-
 # get validator object
-my $ValidatorObject = Kernel::API::Validator::PriorityValidator->new(
-    DebuggerObject => $DebuggerObject
-);
+my $ValidatorObject = Kernel::API::Validator::PriorityValidator->new();
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(

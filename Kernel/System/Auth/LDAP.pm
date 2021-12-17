@@ -115,7 +115,7 @@ sub Auth {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: '$Param{User}' tried to authenticate with Pw: '$Param{Pw}' "
-                . "(REMOTE_ADDR: $RemoteAddr)",
+                . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")",
         );
     }
 
@@ -191,7 +191,7 @@ sub Auth {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: $Param{User} authentication failed, no LDAP entry found!"
-                . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr).",
+                . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
         );
 
         # take down session
@@ -250,7 +250,7 @@ sub Auth {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "User: $Param{User} authentication failed, no LDAP group entry found"
-                    . "GroupDN='$Self->{GroupDN}', Filter='$Filter2'! (REMOTE_ADDR: $RemoteAddr).",
+                    . "GroupDN='$Self->{GroupDN}', Filter='$Filter2'! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
             );
 
             # take down session
@@ -272,7 +272,7 @@ sub Auth {
             Priority => 'notice',
             Message  => "User: $Param{User} ($UserDN) authentication failed: '"
                 . $Result->error()
-                . "' (REMOTE_ADDR: $RemoteAddr).",
+                . "' (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
         );
 
         # take down session
@@ -293,7 +293,7 @@ sub Auth {
     # login note
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message  => "User: $Param{User} ($UserDN) authentication ok (REMOTE_ADDR: $RemoteAddr).",
+        Message  => "User: $Param{User} ($UserDN) authentication ok (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
     );
 
     # take down session
