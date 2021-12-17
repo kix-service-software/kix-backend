@@ -1955,7 +1955,7 @@
     <Column Name="f_name" Required="true" Size="200" Type="VARCHAR" />
     <Column Name="language" Required="true" Size="8" Type="VARCHAR" />
     <Column Name="visibility" Required="true" Size="20" Type="VARCHAR" />
-    <Column Name="category_id" Required="true" Type="SMALLINT" />
+    <Column Name="category_id" Required="true" Type="INTEGER" />
     <Column Name="approved" Required="true" Default="1" Type="SMALLINT" />
     <Column Name="valid_id" Required="true" Default="1" Type="SMALLINT" />
     <Column Name="content_type" Required="true" Default="text/html" Size="250" Type="VARCHAR" />
