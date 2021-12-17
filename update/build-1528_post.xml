@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="ticket_index">
+        <ColumnChange NameOld="lock_id" NameNew="lock_id" Required="true" Type="SMALLINT"/>
+        <ColumnChange NameOld="state_id" NameNew="state_id" Required="true" Type="SMALLINT"/>
+    </TableAlter>
+
+    <TableAlter Name="watcher">
+        <ColumnChange NameOld="object_id" NameNew="object_id" Required="true" Type="BIGINT"/>
+    </TableAlter>
+
+    <TableAlter Name="organisation">
+        <ForeignKeyCreate ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="faq_category">
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="created_by" Foreign="id"/>
+            <Reference Local="changed_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="faq_item">
+        <ColumnChange NameOld="category_id" NameNew="category_id" Required="true" Type="INTEGER"/>
+        <ForeignKeyCreate ForeignTable="faq_category">
+            <Reference Local="category_id" Foreign="id"/>
+        </ForeignKeyCreate>
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="created_by" Foreign="id"/>
+            <Reference Local="changed_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="faq_history">
+        <ForeignKeyCreate ForeignTable="faq_item">
+            <Reference Local="item_id" Foreign="id"/>
+        </ForeignKeyCreate>
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="created_by" Foreign="id"/>
+            <Reference Local="changed_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="faq_attachment">
+        <ColumnChange NameOld="faq_id" NameNew="faq_id" Required="true" Type="INTEGER"/>
+        <ForeignKeyCreate ForeignTable="faq_item">
+            <Reference Local="faq_id" Foreign="id"/>
+        </ForeignKeyCreate>
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="created_by" Foreign="id"/>
+            <Reference Local="changed_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="faq_voting">
+        <ForeignKeyCreate ForeignTable="faq_item">
+            <Reference Local="item_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="faq_log">
+        <ForeignKeyCreate ForeignTable="faq_item">
+            <Reference Local="item_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="general_catalog">
+        <ForeignKeyCreate ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="imexport_template">
+        <ForeignKeyCreate ForeignTable="valid">
+            <Reference Local="valid_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="imexport_object">
+        <ForeignKeyCreate ForeignTable="imexport_template">
+            <Reference Local="template_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="imexport_format">
+        <ForeignKeyCreate ForeignTable="imexport_template">
+            <Reference Local="template_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="imexport_mapping">
+        <ForeignKeyCreate ForeignTable="imexport_template">
+            <Reference Local="template_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="imexport_mapping_object">
+        <ForeignKeyCreate ForeignTable="imexport_mapping">
+            <Reference Local="mapping_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="imexport_mapping_format">
+        <ForeignKeyCreate ForeignTable="imexport_mapping">
+            <Reference Local="mapping_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="imexport_search">
+        <ForeignKeyCreate ForeignTable="imexport_template">
+            <Reference Local="template_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="attachment_directory">
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="kix_article_flag">
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="text_module">
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="object_icon">
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="translation_pattern">
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="translation_language">
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="sysconfig">
+        <ForeignKeyCreate ForeignTable="valid">
+            <Reference Local="default_valid_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="automation_log">
+        <ForeignKeyCreate ForeignTable="job">
+            <Reference Local="job_id" Foreign="id"/>
+        </ForeignKeyCreate>
+        <ForeignKeyCreate ForeignTable="job_run">
+            <Reference Local="run_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="migration">
+        <ColumnAdd Name="additional_data" Required="false" Size="1800000" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>

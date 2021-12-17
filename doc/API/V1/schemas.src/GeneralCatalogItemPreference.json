@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "GeneralCatalogItemPreference.json",
+  "type": "object",
+  "description": "The GeneralCatalog item preference object.",
+  "properties": {
+    "Name": {
+      "type": "String",
+      "readOnly": true
+    },
+    "Value": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "integer"}
+      ],
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Name",
+    "Value"
+  ]
+}

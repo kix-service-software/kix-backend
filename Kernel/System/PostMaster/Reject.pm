@@ -71,7 +71,7 @@ sub Run {
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
         Cc               => $GetParam{Cc},
-        Subject          => $GetParam{Subject},
+        Subject          => $GetParam{'X-KIX-Subject'} || $GetParam{Subject},
         MessageID        => $GetParam{'Message-ID'},
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},
@@ -135,7 +135,7 @@ sub Run {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
         my $Key = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
-        
+
         if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
 
             # get dynamic field config

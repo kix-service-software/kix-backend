@@ -33,37 +33,6 @@ Kernel::API::Operation::V1::Log::LogFileGet - API LogFile Get Operation backend
 
 =cut
 
-=item new()
-
-usually, you want to create an instance of this
-by using Kernel::API::Operation->new();
-
-=cut
-
-sub new {
-    my ( $Type, %Param ) = @_;
-
-    my $Self = {};
-    bless( $Self, $Type );
-
-    # check needed objects
-    for my $Needed (qw(DebuggerObject WebserviceID)) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'Operation.InternalError',
-                Message => "Got no $Needed!"
-            );
-        }
-
-        $Self->{$Needed} = $Param{$Needed};
-    }
-
-    # get config for this screen
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::V1::LogFile::LogFileGet');
-
-    return $Self;
-}
-
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -124,14 +93,17 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my @LogFileList;
+    my @Categories = split(',', $Param{Data}->{Categories});
 
     # start loop
     foreach my $LogFileID ( @{$Param{Data}->{LogFileID}} ) {
 
         # get the LogFile data
         my %LogFileData = $Kernel::OM->Get('LogFile')->LogFileGet(
-            ID        => $LogFileID,
-            NoContent => $Param{Data}->{include}->{Content} ? 0 : 1
+            ID         => $LogFileID,
+            NoContent  => $Param{Data}->{include}->{Content} ? 0 : 1,
+            Tail       => $Param{Data}->{Tail},
+            Categories => \@Categories
         );
 
         if ( !%LogFileData ) {

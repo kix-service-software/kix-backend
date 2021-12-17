@@ -10,7 +10,6 @@ package Kernel::API::Operation::V1::Common;
 
 use strict;
 use warnings;
-use Hash::Flatten;
 use File::Basename;
 use Data::Sorting qw(:arrays);
 use Storable;
@@ -33,6 +32,36 @@ Kernel::API::Operation::V1::Common - Base class for all Operations
 
 =cut
 
+=item new()
+
+usually, you want to create an instance of this
+by using Kernel::API::Operation->new();
+
+=cut
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    my $Self = {};
+    bless( $Self, $Type );
+
+    # check needed objects
+    for my $Needed ( qw(WebserviceID) ) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'Operation.InternalError',
+                Message => "Got no $Needed!"
+            );
+        }
+
+        $Self->{$Needed} = $Param{$Needed};
+    }
+
+    $Type =~ /^.*?::(V1::.*?)$/;
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::'.$1);
+
+    return $Self;
+}
 =item RunOperation()
 
 initialize and run the current operation
@@ -292,7 +321,7 @@ sub Init {
     }
 
     # get webservice configuration
-    my $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
+    my $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
         ID => $Param{WebserviceID},
     );
 
@@ -505,11 +534,9 @@ sub PrepareData {
 
         if ( grep( /::/, keys %Parameters ) ) {
 
-            my $FlatData = Hash::Flatten::flatten(
-                $Param{Data},
-                {
-                    HashDelimiter => '::',
-                }
+            my $FlatData = $Kernel::OM->Get('Main')->Flatten(
+                Data          => $Param{Data},
+                HashDelimiter => '::',
             );
 
             # add pseudo entries for substructures for requirement checking
@@ -947,11 +974,6 @@ sub _Error {
         );
     }
 
-    $Self->{DebuggerObject}->Error(
-        Summary => $Param{Code},
-        Data    => $Message,
-    );
-
     # return structure
     return {
         Success => 0,
@@ -990,7 +1012,7 @@ sub ExecOperation {
     }
 
     # get webservice config
-    my $Webservice = $Kernel::OM->Get('API::Webservice')->WebserviceGet(
+    my $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
         ID => $Self->{WebserviceID},
     );
     if ( !IsHashRefWithData($Webservice) ) {
@@ -1012,7 +1034,7 @@ sub ExecOperation {
     my $CurrentRoute = $RequestURI;
     $RequestURI =~ s/:(\w*)/$Param{Data}->{$1}/egx;
 
-    # TODO: the following code is nearly identical to the code used in Transport::REST, method ProviderProcessRequest -> should be generalized
+    # TODO: the following code is nearly identical to the code used in Transport::REST, method ProcessRequest -> should be generalized
     # maybe another solution to execute operations / API calls is needed
 
     # determine available methods
@@ -1088,7 +1110,6 @@ sub ExecOperation {
     }
 
     my $OperationObject = $OperationModule->new(
-        DebuggerObject           => $Self->{DebuggerObject},
         Operation                => (split(/::/, $Param{OperationType}))[-1],
         OperationType            => $Param{OperationType},
         WebserviceID             => $Self->{WebserviceID},
@@ -2159,11 +2180,20 @@ sub _ExpandObject {
         }
     }
 
-    my @Data;
-    if ( IsArrayRefWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
-        @Data = @{ $Param{Data}->{ $Param{AttributeToExpand} } };
+    my $Data = $Param{Data};
+
+    if ( $Param{AttributeToExpand} =~ /[.:]/ ) {
+        # we need to flatten the data
+        $Data = $Kernel::OM->Get('Main')->Flatten(
+            Data => $Data
+        );
     }
-    elsif ( IsHashRefWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
+
+    my @Array;
+    if ( IsArrayRefWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
+        @Array = @{ $Data->{ $Param{AttributeToExpand} } };
+    }
+    elsif ( IsHashRefWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
 
         # hashref isn't possible
         return $Self->_Error(
@@ -2171,10 +2201,10 @@ sub _ExpandObject {
             Message => "Expanding a hash is not possible!",
         );
     }
-    elsif ( IsStringWithData( $Param{Data}->{ $Param{AttributeToExpand} } ) ) {
+    elsif ( IsStringWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
 
         # convert scalar into our data array for further use
-        @Data = ( $Param{Data}->{ $Param{AttributeToExpand} } );
+        @Array = ( $Data->{ $Param{AttributeToExpand} } );
     }
     else {
         # no data available to expand
@@ -2198,7 +2228,7 @@ sub _ExpandObject {
 
     # add primary ObjectID to params
     my %ExecData = (
-        "$OperationConfig->{ObjectID}" => join( ',', sort @Data )
+        "$OperationConfig->{ObjectID}" => join( ',', sort @Array )
     );
 
     if ( $Param{ExpanderConfig}->{AddParams} ) {
@@ -2210,7 +2240,7 @@ sub _ExpandObject {
             if ( !$SourceAttr ) {
                 $SourceAttr = $TargetAttr;
             }
-            $ExecData{$TargetAttr} = $Param{Data}->{$SourceAttr},
+            $ExecData{$TargetAttr} = $Data->{$SourceAttr},
         }
     }
 
@@ -2225,17 +2255,39 @@ sub _ExpandObject {
     # extract the relevant data from result
     my $ResultData = $Result->{Data}->{ ( ( keys %{ $Result->{Data} } )[0] ) };
 
-    if ( ref( $Param{Data}->{ $Param{AttributeToExpand} } ) eq 'ARRAY' ) {
-        if ( IsArrayRefWithData($ResultData) ) {
-            $Param{Data}->{ $Param{AttributeToExpand} } = $ResultData;
+    my $StoreTo = $Param{ExpanderConfig}->{StoreTo} || $Param{AttributeToExpand};
+
+    if ( $Param{AttributeToExpand} =~ /[.:]/ ) {
+        # we need to flatten the result data
+        $ResultData = $Kernel::OM->Get('Main')->Flatten(
+            Data => $ResultData
+        );
+
+        # merge the two flat hashes
+        foreach my $Key ( keys %{$ResultData} ) {
+            $Data->{$StoreTo.'.'.$Key} = $ResultData->{$Key}
         }
-        else {
-            $Param{Data}->{ $Param{AttributeToExpand} } = [$ResultData];
-        }
+        
+        # reverse the flatten
+        $Data = $Kernel::OM->Get('Main')->Unflatten(
+            Data => $Data
+        );
     }
     else {
-        $Param{Data}->{ $Param{AttributeToExpand} } = $ResultData;
+        if ( ref( $Data->{ $StoreTo } ) eq 'ARRAY' ) {
+            if ( IsArrayRefWithData($ResultData) ) {
+                $Data->{ $StoreTo } = $ResultData;
+            }
+            else {
+                $Data->{ $StoreTo } = [$ResultData];
+            }
+        }
+        else {
+            $Data->{ $StoreTo } = $ResultData;
+        }
     }
+
+    %{$Param{Data}} = %{$Data};
 
     return $Self->_Success();
 }
@@ -2841,12 +2893,8 @@ sub _CheckPropertyPermission {
             }
             else {
                 # we need a flat data structure to easily find the attributes
-                my $FlatData = Hash::Flatten::flatten(
-                    $Param{Data},
-                    {
-                        HashDelimiter  => '.',
-                        ArrayDelimiter => ':'
-                    }
+                my $FlatData = $Kernel::OM->Get('Main')->Flatten(
+                    Data => $Param{Data},
                 );
 
                 # check if the attribute exists in the Data hash
@@ -3117,12 +3165,8 @@ sub _ReplaceVariablesInPermission {
         }
 
         # get the relevant attribute
-        my $FlatData = Hash::Flatten::flatten(
-            \%User,
-            {
-                HashDelimiter  => '.',
-                ArrayDelimiter => ':'
-            }
+        my $FlatData = $Kernel::OM->Get('Main')->Flatten(
+            Data => \%User,
         );
 
         $Result = $FlatData->{$Attribute};

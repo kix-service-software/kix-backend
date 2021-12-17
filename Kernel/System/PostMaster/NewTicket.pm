@@ -13,6 +13,8 @@ package Kernel::System::PostMaster::NewTicket;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'Contact',
@@ -342,7 +344,7 @@ sub Run {
     my $NewTn    = $TicketObject->TicketCreateNumber();
     my $TicketID = $TicketObject->TicketCreate(
         TN              => $NewTn,
-        Title           => $GetParam{Subject},
+        Title           => $GetParam{'X-KIX-Subject'} || $GetParam{Subject},
         QueueID         => $QueueID,
         Lock            => $GetParam{'X-KIX-Lock'} || 'unlock',
         Priority        => $Priority,
@@ -592,7 +594,7 @@ sub Run {
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
         Cc               => $GetParam{Cc},
-        Subject          => $GetParam{Subject},
+        Subject          => $GetParam{'X-KIX-Subject'} || $GetParam{Subject},
         MessageID        => $GetParam{'Message-ID'},
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},
@@ -652,7 +654,7 @@ sub Run {
         Valid      => 1,
         ResultType => 'HASH',
         ObjectType => 'Article',
-        );
+    );
 
     # set dynamic fields for Article object type
     DYNAMICFIELDID:
@@ -739,6 +741,32 @@ sub Run {
             ArticleID          => $ArticleID,
             UserID             => $Param{InmailUserID},
         );
+    }
+
+    # run extensions
+    my $Extensions = $ConfigObject->Get('Postmaster::NewTicketExtension');
+    if (IsHashRefWithData($Extensions)) {
+        for my $Extension ( sort keys %{$Extensions} ) {
+            next if (!IsHashRefWithData($Extensions->{$Extension}) || !$Extensions->{$Extension}->{Module});
+
+            if ( !$Kernel::OM->Get('Main')->Require($Extensions->{$Extension}->{Module}) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "NewTicket extension module $Extensions->{$Extension}->{Module} not found!"
+                );
+                next;
+            }
+            my $ExtensionObject = $Extensions->{$Extension}->{Module}->new( %{$Self} );
+
+            # if the extension constructor failed, it returns an error hash, skip
+            next if ( ref $ExtensionObject ne $Extensions->{$Extension}->{Module} );
+
+            $ExtensionObject->Run(
+                %Param,
+                TicketID  => $TicketID,
+                ArticleID => $ArticleID
+            );
+        }
     }
 
     return $TicketID;

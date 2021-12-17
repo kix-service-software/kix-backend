@@ -1161,7 +1161,7 @@ sub VersionAdd {
     }
 
     # recalculate the current incident state of all linked config items
-    $Self->CurInciStateRecalc(
+    $Self->RecalculateCurrentIncidentState(
         ConfigItemID => $Param{ConfigItemID},
     );
 

@@ -13,8 +13,6 @@ use warnings;
 
 use utf8;
 
-use Hash::Flatten;
-
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -203,8 +201,8 @@ sub SetResult {
 
     # include all data of an object as separate values
     if ( IsHashRefWithData($Param{Value}) || IsObject($Param{Value}, $Kernel::OM->GetModuleFor('Automation::Helper::Object')) ) {
-        my $FlatData = Hash::Flatten::flatten(
-            $Param{Value}
+        my $FlatData = $Kernel::OM->Get('Main')->Flatten(
+            Data => $Param{Value}
         );
         if ( IsHashRefWithData($FlatData) ) {
             # combine with existing results

@@ -57,16 +57,14 @@ my $App = CGI::Emulate::PSGI->handler(
         $ENV{SCRIPT_NAME} = 'api';
 
         eval {
-
             # Reload files in @INC that have changed since the last request.
             Module::Refresh->refresh();
         };
         warn $@ if $@;
 
-        my $Profile;
-        if ( $ENV{NYTPROF} && $ENV{REQUEST_URI} =~ /NYTProf=([\w-]+)/ ) {
-            $Profile = 1;
-            DB::enable_profile("nytprof-$1.out")
+        if ( $ENV{NYTPROF} ) {
+            print STDERR "!!!PROFILING ENABLED!!! ($ENV{NYTPROF})\n";
+            DB::enable_profile()
         }
 
         # run the request
@@ -77,7 +75,7 @@ my $App = CGI::Emulate::PSGI->handler(
             warn $@;
         }
 
-        if ($Profile) {
+        if ( $ENV{NYTPROF} ) {
             DB::finish_profile();
         }
     },

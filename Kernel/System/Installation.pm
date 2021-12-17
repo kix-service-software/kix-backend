@@ -936,9 +936,6 @@ sub _GenerateWebServiceYAML {
     }
 
     my $Template = "---
-Debugger:
-  DebugThreshold: error
-  TestMode: 0
 Description: KIX Core API
 FrameworkVersion: __VERSION__
 Provider:
@@ -950,11 +947,6 @@ __OPERATIONS__
       MaxLength: '52428800'
       RouteOperationMapping:
 __ROUTES__
-    Type: HTTP::REST
-RemoteSystem: ''
-Requester:
-  Transport:
-    Type: ''
 ";
 
     my $Operations = '';

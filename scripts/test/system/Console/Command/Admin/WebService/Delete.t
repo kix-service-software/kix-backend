@@ -28,12 +28,8 @@ my $WebService = 'webservice' . $Helper->GetRandomID();
 my $WebServiceID = $Kernel::OM->Get('GenericInterface::Webservice')->WebserviceAdd(
     Name   => $WebService,
     Config => {
-        Debugger => {
-            DebugThreshold => 'debug',
-        },
         Provider => {
             Transport => {
-                Type => '',
             },
         },
     },

@@ -246,7 +246,7 @@ sub TicketSearch {
         %Param
     );
     if ( !$PermissionSQL ) {
-        return;                    
+        return;
     }
     $SQLDef{SQLWhere} .= ' '.$PermissionSQL;
 
@@ -256,10 +256,6 @@ sub TicketSearch {
             SQLPartsDef => \@SQLPartsDef,
             %Param,
         );
-        if ( !%Result ) {
-            # return in case of error 
-            return;
-        }
         foreach my $SQLPart ( @SQLPartsDef ) {
             next if !$Result{$SQLPart->{Name}};
             $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}.$Result{$SQLPart->{Name}};
@@ -271,7 +267,7 @@ sub TicketSearch {
         my %Result = $Self->_CreateOrderBySQL(
             Sort => $Param{Sort},
         );
-        if ( !%Result ) {
+        if ( !IsHashRef(\%Result) ) {
             # return in case of error 
             return;
         }
@@ -450,7 +446,7 @@ sub _CreateAttributeSQL {
                 Priority => 'error',
                 Message  => "Invalid Search for $BoolOperator!",
             );
-            return;            
+            return;
         }
 
         my %SQLDefBoolOperator;
@@ -477,14 +473,14 @@ sub _CreateAttributeSQL {
                     Priority => 'error',
                     Message  => "Unable to search for attribute $Search->{Field}. Don't know how to handle it!",
                 );
-                return;            
+                return;
             }
 
             # execute attribute module to prepare SQL
             my $Result = $AttributeModule->Search(
                 UserID       => $Param{UserID},
                 UserType     => $Param{UserType},
-                BoolOperator => $BoolOperator,            
+                BoolOperator => $BoolOperator,
                 Search       => $Search,
             );
 
@@ -524,7 +520,7 @@ sub _CreateAttributeSQL {
                 $JoinOperator = " $BoolOperator "
             }
             $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinPreFix}.(join($JoinOperator, @{$SQLDefBoolOperator{$SQLPart->{Name}}})).$SQLPart->{JoinPostFix};
-        }        
+        }
     }
 
     return %SQLDef;

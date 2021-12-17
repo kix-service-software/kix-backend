@@ -58,10 +58,10 @@ sub _Success {
 =item _Error()
 
 Take error parameters from request processing.
-Error message is written to debugger, written to environment for response.
+Error message is written to STDERR.
 Error is generated to be passed to provider/requester.
 
-    my $Result = $TransportObject->_Error(
+    my $Result = $Object->_Error(
         Code       => 'Code'        # error code (textual)
         Message    => 'Message',    # error message
         Additional => {             # optional information that can be used in transport backend
@@ -87,11 +87,6 @@ sub _Error {
             Message   => 'Need Code!',
         );
     }
-
-    # log to debugger
-    $Self->{DebuggerObject}->Error(
-        Summary => $Param{Code}.': '.($Param{Message} || ''),
-    );
     
     # return to provider/requester
     return {

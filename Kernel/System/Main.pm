@@ -15,6 +15,7 @@ use warnings;
 
 use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
+use Hash::Flatten;
 use File::stat;
 use Unicode::Normalize;
 use List::Util qw();
@@ -851,6 +852,80 @@ sub Dump {
     $Data::Dumper::Indent = 1;
 
     return $Result;
+}
+
+=item Flatten()
+
+flatten a hash
+
+    my $FlatHashRef = $MainObject->Flatten(
+        Data => $SomeHashRef,
+    );
+
+    my $FlatHashRef = $MainObject->Flatten(
+        Data           => $SomeHashRef,
+        ArrayDelimiter => '#',        # optional, default ":"
+        HashDelimiter  => '->',       # optional, default "."
+    );
+
+=cut
+
+sub Flatten {
+    my ( $Self, %Param ) = @_;
+
+    # check needed data
+    if ( !defined $Param{Data} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Data in Flatten()!"
+        );
+        return;
+    }
+
+    return Hash::Flatten::flatten(
+        $Param{Data},
+        {
+            HashDelimiter  => $Param{HashDelimiter} || '.',
+            ArrayDelimiter => $Param{ArrayDelimiter} || ':'
+        }
+    );
+}
+
+=item Unflatten()
+
+unflatten a hash
+
+    my $HashRef = $MainObject->Unflatten(
+        Data => $SomeFlatHashRef,
+    );
+
+    my $HashRef = $MainObject->Unflatten(
+        Data           => $SomeFlatHashRef,
+        ArrayDelimiter => '#',        # optional, default ":"
+        HashDelimiter  => '->',       # optional, default "."
+    );
+
+=cut
+
+sub Unflatten {
+    my ( $Self, %Param ) = @_;
+
+    # check needed data
+    if ( !defined $Param{Data} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Data in Unflatten()!"
+        );
+        return;
+    }
+
+    return Hash::Flatten::unflatten(
+        $Param{Data},
+        {
+            HashDelimiter  => $Param{HashDelimiter} || '.',
+            ArrayDelimiter => $Param{ArrayDelimiter} || ':'
+        }
+    );
 }
 
 =item DirectoryRead()

@@ -1015,7 +1015,7 @@ sub _RebuildFromFile {
         );
 
         # check if we have to extend an existing option (only types Hash and Array can be extended at the moment) 
-        if ( $OptionRaw->{Extend} ) {
+        if ( $OptionRaw->{Extend} && !$OptionRaw->{Extended} ) {
             # check if the option to extend exists
             if ( !$AllOptions{ $OptionRaw->{Name} } ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -1030,6 +1030,9 @@ sub _RebuildFromFile {
                 Value  => $AllOptions{ $Option{Name} }->{Default},
                 Extend => $DefaultValue,
             );
+
+            # we've done that already
+            $OptionRaw->{Extended} = 1;
         }
 
         # check if this is a new option

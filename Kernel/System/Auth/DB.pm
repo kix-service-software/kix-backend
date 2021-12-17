@@ -245,7 +245,7 @@ sub Auth {
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User authentication ok (Method: $Method, REMOTE_ADDR: $RemoteAddr).",
+            Message  => "User: $User authentication ok (Method: $Method, REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
         );
         return $User;
     }
@@ -255,7 +255,7 @@ sub Auth {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
-                "User: $User authentication with wrong Pw!!! (Method: $Method, REMOTE_ADDR: $RemoteAddr)"
+                "User: $User authentication with wrong Pw!!! (Method: $Method, REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")"
         );
         return;
     }
@@ -264,7 +264,7 @@ sub Auth {
     else {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User doesn't exist or is invalid!!! (REMOTE_ADDR: $RemoteAddr)"
+            Message  => "User: $User doesn't exist or is invalid!!! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")"
         );
         return;
     }

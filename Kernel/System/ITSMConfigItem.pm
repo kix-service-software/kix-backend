@@ -25,6 +25,7 @@ use Kernel::System::ITSMConfigItem::XML;
 use Kernel::System::VariableCheck qw(:all);
 
 use Storable;
+use Digest::MD5 qw(md5_hex);
 
 use vars qw(@ISA);
 
@@ -1858,17 +1859,22 @@ sub UniqueNameCheck {
     return \@Duplicates;
 }
 
-=item CurInciStateRecalc()
+=item RecalculateCurrentIncidentState()
 
 recalculates the current incident state of this config item and all linked config items
 
-    my $Success = $ConfigItemObject->CurInciStateRecalc(
+    my $NewConfigItemInciStateHashRef = $ConfigItemObject->RecalculateCurrentIncidentState(
         ConfigItemID => 123,
+        Simulate     => {                   # optional, don't update the config items
+            1 => 'Warning',
+            2 => 'Incident',
+            3 => 'Incident',
+        },
     );
 
 =cut
 
-sub CurInciStateRecalc {
+sub RecalculateCurrentIncidentState {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1878,6 +1884,35 @@ sub CurInciStateRecalc {
             Message  => 'Need ConfigItemID!',
         );
         return;
+    }
+
+    # get the incident state lists
+    if ( !IsHashRefWithData($Self->{IncidentStateList}) ) {
+        foreach my $Type ( qw(operational warning incident) ) {
+            my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+                Class       => 'ITSM::Core::IncidentState',
+                Preferences => {
+                    Functionality => $Type,
+                },
+            );
+            $Self->{IncidentStateList} //= {};
+            %{$Self->{IncidentStateList}} = (
+                %{$Self->{IncidentStateList}},
+                %{$ItemList},
+            );
+
+            my %StateListReverse = reverse %{$ItemList};
+
+            $Self->{RelevantIncidentStateIDForType}->{$Type} = $StateListReverse{ (sort keys %StateListReverse)[0] };
+            
+            $Self->{IncidentState2TypeMapping} //= {};
+            %{$Self->{IncidentState2TypeMapping}} = (
+                %{$Self->{IncidentState2TypeMapping}},
+                map { $_ => $Type } keys %StateListReverse,
+            );
+        }
+
+        $Self->{IncidentStateListReverse} = { reverse %{$Self->{IncidentStateList}} };
     }
 
     # get incident link types and directions from config
@@ -1890,14 +1925,18 @@ sub CurInciStateRecalc {
     # remember the scanned config items
     my %ScannedConfigItemIDs;
 
+    my $Simulate = $Param{Simulate} || {};
+
     # find all config items with an incident state
     $Self->_FindInciConfigItems(
         ConfigItemID              => $Param{ConfigItemID},
         IncidentLinkTypeDirection => $IncidentLinkTypeDirection,
         ScannedConfigItemIDs      => \%ScannedConfigItemIDs,
+        Simulate                  => $Param{Simulate},
     );
 
     # calculate the new CI incident state for each configured linktype
+    my $LinkTypeCounter = 0;
     LINKTYPE:
     for my $LinkType ( sort keys %{$IncidentLinkTypeDirection} ) {
 
@@ -1915,8 +1954,8 @@ sub CurInciStateRecalc {
                 ConfigItemID         => $ConfigItemID,
                 LinkType             => $LinkType,
                 Direction            => $LinkDirection,
-                NumberOfLinkTypes    => scalar keys %{$IncidentLinkTypeDirection},
                 ScannedConfigItemIDs => \%ScannedConfigItemIDs,
+                Simulate             => $Param{Simulate},
             );
         }
 
@@ -1926,44 +1965,45 @@ sub CurInciStateRecalc {
             # extract incident state type
             my $InciStateType = $ScannedConfigItemIDs{$ConfigItemID}->{Type};
 
-            next CONFIGITEMID if $InciStateType eq 'incident';
-
             # if nothing has been set already or if the currently set incident state is 'operational'
             # ('operational' can always be overwritten)
             if (
                 !$NewConfigItemIncidentState{$ConfigItemID}
-                || $NewConfigItemIncidentState{$ConfigItemID} eq 'operational'
+                || $NewConfigItemIncidentState{$ConfigItemID}->{Type} eq 'operational'
                 )
             {
-                $NewConfigItemIncidentState{$ConfigItemID} = $InciStateType;
+                $NewConfigItemIncidentState{$ConfigItemID}->{Type} = $InciStateType;
             }
         }
     }
 
-    # get the incident state list of warnings
-    my $WarnStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-        Class       => 'ITSM::Core::IncidentState',
-        Preferences => {
-            Functionality => 'warning',
-        },
+    # get the incident state IDs
+    my $StateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+        Class => 'ITSM::Core::IncidentState',
     );
-    my %ReverseWarnStateList = reverse %{$WarnStateList};
-    my @SortedWarnList       = sort keys %ReverseWarnStateList;
-    my $WarningStateID       = $ReverseWarnStateList{Warning} || $ReverseWarnStateList{ $SortedWarnList[0] };
-    my $CacheObject          = $Kernel::OM->Get('Cache');
+
+    my $CacheObject = $Kernel::OM->Get('Cache');
 
     # set the new current incident state for CIs
     CONFIGITEMID:
     for my $ConfigItemID ( sort keys %NewConfigItemIncidentState ) {
 
         # get new incident state type (can only be 'operational' or 'warning')
-        my $InciStateType = $NewConfigItemIncidentState{$ConfigItemID};
+        my $InciStateType = $NewConfigItemIncidentState{$ConfigItemID}->{Type};
 
         # get last version
-        my $LastVersion = $Self->VersionGet(
-            ConfigItemID => $ConfigItemID,
-            XMLDataGet   => 0,
-        );
+        my $LastVersion;
+        if ( $Param{Simulate} && $Param{Simulate}->{$ConfigItemID} ) {
+            $LastVersion->{InciStateType} = $Self->{IncidentState2TypeMapping}->{$Param{Simulate}->{$ConfigItemID}};
+            $LastVersion->{InciStateID}   = $Self->{IncidentStateListReverse}->{$Param{Simulate}->{$ConfigItemID}};
+        }
+        else {
+            # read the last actual version without cache
+            $LastVersion = $Self->VersionGet(
+                ConfigItemID => $ConfigItemID,
+                XMLDataGet   => 0,
+            );
+        }
 
         my $CurInciStateID;
         if ( $InciStateType eq 'warning' ) {
@@ -1972,62 +2012,70 @@ sub CurInciStateRecalc {
             # then we do not want to change it to warning
             next CONFIGITEMID if $LastVersion->{InciStateType} eq 'incident';
 
-            $CurInciStateID = $WarningStateID;
+            $CurInciStateID = $Self->{RelevantIncidentStateIDForType}->{warning};
         }
         elsif ( $InciStateType eq 'operational' ) {
             $CurInciStateID = $LastVersion->{InciStateID};
         }
+        elsif ( $InciStateType eq 'incident' ) {
+            $CurInciStateID = $LastVersion->{InciStateID};
+        }
 
-        # update current incident state
-        $Kernel::OM->Get('DB')->Do(
-            SQL  => 'UPDATE configitem SET cur_inci_state_id = ? WHERE id = ?',
-            Bind => [ \$CurInciStateID, \$ConfigItemID ],
-        );
+        $NewConfigItemIncidentState{$ConfigItemID}->{State} = $Self->{IncidentStateList}->{$CurInciStateID};
 
-        # delete the cache
-        my $CacheKey = 'ConfigItemGet::ConfigItemID::' . $ConfigItemID;
-        $CacheObject->Delete(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
+        # update config items if we don't just simulate
+        if ( !$Param{Simulate} ) {
+            # update current incident state
+            $Kernel::OM->Get('DB')->Do(
+                SQL  => 'UPDATE configitem SET cur_inci_state_id = ? WHERE id = ?',
+                Bind => [ \$CurInciStateID, \$ConfigItemID ],
+            );
 
-        # delete affected caches for ConfigItemID
-        $CacheKey = 'VersionGet::ConfigItemID::' . $ConfigItemID . '::XMLData::';
-        for my $XMLData (qw(0 1)) {
+            # delete the cache
+            my $CacheKey = 'ConfigItemGet::ConfigItemID::' . $ConfigItemID;
             $CacheObject->Delete(
                 Type => $Self->{CacheType},
-                Key  => $CacheKey . $XMLData,
+                Key  => $CacheKey,
             );
-        }
-        $CacheObject->Delete(
-            Type => $Self->{CacheType},
-            Key  => 'VersionNameGet::ConfigItemID::' . $ConfigItemID,
-        );
 
-        # delete affected caches for last version
-        my $VersionList = $Self->VersionList(
-            ConfigItemID => $ConfigItemID,
-        );
-        my $VersionID = $VersionList->[-1];
-        $CacheKey = 'VersionGet::VersionID::' . $VersionID . '::XMLData::';
-        for my $XMLData (qw(0 1)) {
+            # delete affected caches for ConfigItemID
+            $CacheKey = 'VersionGet::ConfigItemID::' . $ConfigItemID . '::XMLData::';
+            for my $XMLData (qw(0 1)) {
+                $CacheObject->Delete(
+                    Type => $Self->{CacheType},
+                    Key  => $CacheKey . $XMLData,
+                );
+            }
             $CacheObject->Delete(
                 Type => $Self->{CacheType},
-                Key  => $CacheKey . $XMLData,
+                Key  => 'VersionNameGet::ConfigItemID::' . $ConfigItemID,
+            );
+
+            # delete affected caches for last version
+            my $VersionList = $Self->VersionList(
+                ConfigItemID => $ConfigItemID,
+            );
+            my $VersionID = $VersionList->[-1];
+            $CacheKey = 'VersionGet::VersionID::' . $VersionID . '::XMLData::';
+            for my $XMLData (qw(0 1)) {
+                $CacheObject->Delete(
+                    Type => $Self->{CacheType},
+                    Key  => $CacheKey . $XMLData,
+                );
+            }
+            $CacheObject->Delete(
+                Type => $Self->{CacheType},
+                Key  => 'VersionNameGet::VersionID::' . $VersionID,
+            );
+
+            # clear cache
+            $Kernel::OM->Get('Cache')->CleanUp(
+                Type => $Self->{CacheType},
             );
         }
-        $CacheObject->Delete(
-            Type => $Self->{CacheType},
-            Key  => 'VersionNameGet::VersionID::' . $VersionID,
-        );
     }
 
-    # clear cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-
-    return 1;
+    return \%NewConfigItemIncidentState;
 }
 
 # KIX4OTRS-capeIT
@@ -2778,6 +2826,164 @@ sub GetAssignedConfigItemsForObject {
     return \@AssignedCIIDs;
 }
 
+=item GenerateLinkGraph()
+
+Generate a link graph for the given CI. 
+
+    my $Graph = $ConfigItemObject->GenerateLinkGraph(
+        ConfigItemID => 1234,
+        Config       => {
+            MaxDepth          => 3,           # optional, default: 1,
+            RelevantLinkTypes => [],          # optional, default: all available
+            RelevantClasses   => [],          # optional, default: all available
+        },
+        UserID       => 1,
+    );
+
+=cut
+
+sub GenerateLinkGraph {
+    my ( $Self, %Param ) = @_;
+
+    # check for needed stuff
+    for ( qw(ConfigItemID UserID) ) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    $Param{Depth} //= 0;
+
+    # simply return if we've reached the depth limit
+    return if IsHashRefWithData($Param{Config}) && $Param{Config}->{MaxDepth} && $Param{Depth} > $Param{Config}->{MaxDepth};
+
+    # initialize the graph 
+    my %Graph = (
+        CreateTimUnix => $Kernel::OM->Get('Time')->SystemTime(),
+        Type          => 'ConfigItemLinkGraph',
+        UserID        => $Param{UserID},
+        Config        => $Param{Config},
+        Nodes         => [],
+        Links         => [],
+    );
+
+    # add the CI itself
+    my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
+        ConfigItemID => $Param{ConfigItemID},
+    );
+
+    # init
+    if ( !$Param{Depth} ) {
+        $Param{ParentNodeID} = Digest::MD5::md5_hex($ConfigItem->{Class}.$ConfigItem->{ConfigItemID});
+
+        $Self->{LinkTypeList} = { $Kernel::OM->Get('LinkObject')->TypeList() };
+        $Self->{DiscoveredLinks} = {};
+        $Self->{DiscoveredNodes} = {};
+    }
+
+    push @{$Graph{Nodes}}, {
+        NodeID     => $Param{ParentNodeID},
+        ObjectType => 'ConfigItem',
+        Object     => $ConfigItem,
+    };
+    $Self->{DiscoveredNodes}->{$Param{ConfigItemID}} = $Param{ParentNodeID};
+
+    # # check the cache
+    # my $CacheKey = 'ConfigItemLinkGraph::'.$Param{ConfigItemID}.'::'.$Param{UserID}.'::'.$Kernel::OM->Get('Main')->Dump(
+    #     $Param{Config}||{},
+    #     'ascii+noindent'
+    # );
+    # my $Cache = $Kernel::OM->Get('Cache')->Get(
+    #     Type => $Self->{CacheType},
+    #     Key  => $CacheKey,
+    # );
+    # return $Cache if $Cache;
+
+    # prepare some lookups
+    my %RelevantLinkTypes = map { $_ => 1 } @{$Param{Config}->{RelevantLinkTypes} || []};
+    my %RelevantClasses   = map { $_ => 1 } @{$Param{Config}->{RelevantClasses} || []};
+
+    # get all linked objects for the given CI
+    my $LinkList = $Kernel::OM->Get('LinkObject')->LinkListWithData(
+        Object    => 'ConfigItem',
+        Key       => $Param{ConfigItemID},
+        Object2   => 'ConfigItem',
+        Direction => 'Both',
+        UserID    => $Param{UserID},
+    );
+
+    LINKTYPE:
+    foreach my $LinkType ( keys %{$LinkList->{ConfigItem}||{}} ) {
+        # ignore this link type if not relevant according to graph config
+        next LINKTYPE if IsHashRefWithData(\%RelevantLinkTypes) && !$RelevantLinkTypes{$LinkType};
+
+        LINKDIRECTION:
+        foreach my $LinkDirection ( sort keys %{$LinkList->{ConfigItem}->{$LinkType}} ) {
+            CONFIGITEM:
+            foreach my $ConfigItemID ( sort keys %{$LinkList->{ConfigItem}->{$LinkType}->{$LinkDirection}}) {
+                my $ConfigItem = $LinkList->{ConfigItem}->{$LinkType}->{$LinkDirection}->{$ConfigItemID};
+        
+                # ignore this config item if its class if not relevant according to graph config
+                next CONFIGITEM if IsHashRefWithData(\%RelevantClasses) && !$RelevantClasses{$ConfigItem->{Class}};
+
+                my $NodeID = $Self->{DiscoveredNodes}->{$ConfigItemID};
+                if ( !$NodeID ) {
+                    $NodeID = Digest::MD5::md5_hex($ConfigItem->{Class}.$ConfigItem->{ConfigItemID});
+                }
+
+                my $SourceNodeID = $LinkDirection eq 'Source' ? $NodeID : ($Param{ParentNodeID}||'');
+                my $TargetNodeID = $LinkDirection eq 'Target' ? $NodeID : ($Param{ParentNodeID}||'');
+
+                if ( $Param{ParentNodeID} && !$Self->{DiscoveredLinks}->{$LinkType.'::'.$SourceNodeID.'::'.$TargetNodeID} ) {
+                    push @{$Graph{Links}}, {
+                        LinkType     => $LinkType,
+                        SourceNodeID => $SourceNodeID,
+                        TargetNodeID => $TargetNodeID,
+                        SourceName   => IsHashRefWithData($Self->{LinkTypeList}) ? $Self->{LinkTypeList}->{$LinkType}->{SourceName} : undef,
+                        TargetName   => IsHashRefWithData($Self->{LinkTypeList}) ? $Self->{LinkTypeList}->{$LinkType}->{TargetName} : undef,
+                    };
+                }
+
+                # save this discovered link for later
+                $Self->{DiscoveredLinks}->{$LinkType.'::'.$SourceNodeID.'::'.$TargetNodeID} = 1;
+
+                next CONFIGITEM if $Self->{DiscoveredNodes}->{$ConfigItemID};
+
+                # generate graph for linked object
+                my $SubGraph = $Self->GenerateLinkGraph(
+                    ParentNodeID       => $NodeID,
+                    ConfigItemID       => $ConfigItemID,
+                    ParentConfigItemID => $Param{ConfigItemID},
+                    Config             => $Param{Config},
+                    UserID             => $Param{UserID},
+                    Depth              => $Param{Depth} + 1,
+                );
+                next CONFIGITEM if !IsHashRefWithData($SubGraph);
+
+                # integrate the result into our existing graph data
+                push @{$Graph{Nodes}}, @{$SubGraph->{Nodes}||[]};
+                push @{$Graph{Links}}, @{$SubGraph->{Links}||[]};
+            }
+        }
+    }
+
+    # if ( IsHashRefWithData(\%Graph) ) {
+    #     # cache the result
+    #     $Kernel::OM->Get('Cache')->Set(
+    #         Type  => $Self->{CacheType},
+    #         TTL   => $Self->{CacheTTL},
+    #         Key   => $CacheKey,
+    #         Value => \%Graph,
+    #     );
+    # }
+
+    return \%Graph;
+}
+
 =begin Internal:
 
 =item _GetXMLSearchDataForAssignedCIs()
@@ -2853,7 +3059,12 @@ find all config items with an incident state
     $ConfigItemObject->_FindInciConfigItems(
         ConfigItemID              => $ConfigItemID,
         IncidentLinkTypeDirection => $IncidentLinkTypeDirection,
-        ScannedConfigItemIDs     => \%ScannedConfigItemIDs,
+        ScannedConfigItemIDs      => \%ScannedConfigItemIDs,
+        Simulate                  => {                          # optional
+            1  => 'warning',
+            3  => 'incident',
+            99 => 'incident',
+        }
     );
 
 =cut
@@ -2868,6 +3079,9 @@ sub _FindInciConfigItems {
     return if $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} };
 
     $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{Type} = 'operational';
+    if ( IsHashRefWithData($Param{Simulate}) && $Param{Simulate}->{$Param{ConfigItemID}} ) {
+        $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{Type} = $Self->{IncidentState2TypeMapping}->{$Param{Simulate}->{$Param{ConfigItemID}}};
+    }
 
     # add own config item id to list of linked config items
     my %ConfigItemIDs = (
@@ -2887,7 +3101,7 @@ sub _FindInciConfigItems {
 
             # Direction must ALWAYS be 'Both' here as we need to include
             # all linked CIs that could influence this one!
-            Direction => 'Both',
+            Direction => $Param{IncidentLinkTypeDirection}->{$LinkType}, #'Both',
 
             UserID => 1,
         );
@@ -2900,10 +3114,19 @@ sub _FindInciConfigItems {
     for my $ConfigItemID ( sort keys %ConfigItemIDs ) {
 
         # get config item data
-        my $ConfigItem = $Self->ConfigItemGet(
-            ConfigItemID => $ConfigItemID,
-            Cache        => 0,
-        );
+        my $ConfigItem = {};
+
+        if ( IsHashRefWithData($Param{Simulate}) && $Param{Simulate}->{$ConfigItemID} ) {
+            # honor the simulation
+            $ConfigItem->{CurInciStateType} = $Param{Simulate}->{$ConfigItemID};
+        }
+        else {
+            # read the actual CI uncached
+            $ConfigItem = $Self->ConfigItemGet(
+                ConfigItemID => $ConfigItemID,
+                Cache        => 0,
+            );
+        }
 
         # set incident state
         if ( $ConfigItem->{CurInciStateType} eq 'incident' ) {
@@ -2916,6 +3139,7 @@ sub _FindInciConfigItems {
             ConfigItemID              => $ConfigItemID,
             IncidentLinkTypeDirection => $Param{IncidentLinkTypeDirection},
             ScannedConfigItemIDs      => $Param{ScannedConfigItemIDs},
+            Simulate                  => $Param{Simulate},
         );
     }
 
@@ -2932,6 +3156,11 @@ find all config items with a warning
         Direction            => $LinkDirection,
         NumberOfLinkTypes    => 2,
         ScannedConfigItemIDs => $ScannedConfigItemIDs,
+        Simulate                  => {                          # optional
+            1  => 'warning',
+            3  => 'incident',
+            99 => 'incident',
+        }
     );
 
 =cut
@@ -2956,22 +3185,16 @@ sub _FindWarnConfigItems {
 # ignore already scanned ids (infinite loop protection)
 # it is ok that a config item is investigated as many times as there are configured link types * number of incident config iteems
     if (
-        $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}
-        && $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}
-        >= ( $Param{NumberOfLinkTypes} * $IncidentCount )
+        $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}
+        && $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}
+        >= $IncidentCount
         )
     {
         return;
     }
 
-    # KIX4OTRS-capeIT
-    $Self->{Direction} =
-        $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CILinkDirection') || 'Both';
-
-    # EO KIX4OTRS-capeIT
-
     # increase the visit counter
-    $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}++;
+    $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}++;
 
     # find all linked config items
     my %LinkedConfigItemIDs = $Kernel::OM->Get('LinkObject')->LinkKeyList(
@@ -2986,14 +3209,13 @@ sub _FindWarnConfigItems {
 
     CONFIGITEMID:
     for my $ConfigItemID ( sort keys %LinkedConfigItemIDs ) {
-
         # start recursion
         $Self->_FindWarnConfigItems(
             ConfigItemID         => $ConfigItemID,
             LinkType             => $Param{LinkType},
             Direction            => $Param{Direction},
-            NumberOfLinkTypes    => $Param{NumberOfLinkTypes},
             ScannedConfigItemIDs => $Param{ScannedConfigItemIDs},
+            Simulate             => $Param{Simulate},
         );
 
         next CONFIGITEMID

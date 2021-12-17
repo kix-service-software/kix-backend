@@ -2764,6 +2764,17 @@
             <String Regex="">base64</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="SendmailEmbeddedImages" Required="0" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">How to handle embedded images in email body.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Sendmail</SubGroup>
+        <Setting>
+            <Option SelectedID="cid">
+                <Item Key="cid" Translatable="1">CID</Item>
+                <Item Key="inline" Translatable="1">Inline</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TokenCheckRemoteIP" Required="1" Valid="1">
         <Description Translatable="1">Turns on the remote ip address check. It should be set to "No" if the application is used, for example, via a proxy farm or a dialup connection, because the remote ip address is mostly different for the requests.</Description>
         <Group>Framework</Group>
@@ -7565,6 +7576,7 @@ You can log in via the following URL:
                     "Enabled": 0,
                     "Name": "Foreign Database",
                     "Module": "Kernel::System::Auth::DB",
+                    "UsageContext": "Customer",
                     "Config": {
                         "DSN": "DBI:mysql:database=customerdb;host=customerdbhost",
                         "Type": "mysql",
@@ -8262,12 +8274,22 @@ You can log in via the following URL:
             <String Regex="" Translatable="1">We are performing scheduled maintenance. Login is temporarily not available.</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Fetchmail::Bin" Required="0" Valid="0">
-        <Description Translatable="1">Defines the fall-back path to open fetchmail binary. Note: The name of the binary needs to be 'fetchmail', if it is different please use a symbolic link.</Description>
+    <ConfigItem AccessLevel="internal" Name="Fetchmail::fetchmail.rc" Required="0" Valid="0">
+        <Description Translatable="1">Defines the fetchmail.rc to be used. The rc file will be generated in /tmp. The local mailbox user must be "kix". Use /usr/local/bin/procmail.sh as the MDA.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Fetchmail</SubGroup>
         <Setting>
-            <String Regex="[/|\w]+fetchmail$" Check="File">/usr/bin/fetchmail</String>
+            <TextArea># KIX fetchmail.rc
+            </TextArea>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Fetchmail::procmail.rc" Required="0" Valid="0">
+        <Description Translatable="1">Defines the procmail.rc to be used. The rc file will be generated in /tmp.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Fetchmail</SubGroup>
+        <Setting>
+            <TextArea># KIX procmail.rc
+            </TextArea>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ImportExport::FormatBackendRegistration###CSV" Required="0" Valid="1">
