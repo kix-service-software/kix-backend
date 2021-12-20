@@ -232,7 +232,7 @@ sub _GetConfigItemStats {
                     ConfigItem => {
                         AND => [
                             {
-                                Field    => 'ClassID',
+                                Field    => 'ClassIDs',
                                 Operator => 'IN',
                                 Value    => [$Param{ClassID}]
                             },

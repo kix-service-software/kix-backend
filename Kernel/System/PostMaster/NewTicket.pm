@@ -13,6 +13,8 @@ package Kernel::System::PostMaster::NewTicket;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'Contact',
@@ -652,7 +654,7 @@ sub Run {
         Valid      => 1,
         ResultType => 'HASH',
         ObjectType => 'Article',
-        );
+    );
 
     # set dynamic fields for Article object type
     DYNAMICFIELDID:
@@ -739,6 +741,32 @@ sub Run {
             ArticleID          => $ArticleID,
             UserID             => $Param{InmailUserID},
         );
+    }
+
+    # run extensions
+    my $Extensions = $ConfigObject->Get('Postmaster::NewTicketExtension');
+    if (IsHashRefWithData($Extensions)) {
+        for my $Extension ( sort keys %{$Extensions} ) {
+            next if (!IsHashRefWithData($Extensions->{$Extension}) || !$Extensions->{$Extension}->{Module});
+
+            if ( !$Kernel::OM->Get('Main')->Require($Extensions->{$Extension}->{Module}) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "NewTicket extension module $Extensions->{$Extension}->{Module} not found!"
+                );
+                next;
+            }
+            my $ExtensionObject = $Extensions->{$Extension}->{Module}->new( %{$Self} );
+
+            # if the extension constructor failed, it returns an error hash, skip
+            next if ( ref $ExtensionObject ne $Extensions->{$Extension}->{Module} );
+
+            $ExtensionObject->Run(
+                %Param,
+                TicketID  => $TicketID,
+                ArticleID => $ArticleID
+            );
+        }
     }
 
     return $TicketID;

@@ -377,7 +377,9 @@ sub _MigrateXMLData {
         next if $MappedID;
 
         # set new AssetID
-        $Item->{xml_type} = "ITSM::ConfigItem::$Param{ClassID}";
+        my @TypeParts = split(/::/, $Item->{xml_type});
+        pop @TypeParts;
+        $Item->{xml_type} = join('::', @TypeParts) . '::' . $Param{ClassID};
         $Item->{xml_key}  = $Param{VersionID};
 
         # check if this item already exists (i.e. some initial data)

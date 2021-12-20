@@ -107,6 +107,7 @@ sub Run {
         my $ID = $Self->Lookup(
             Table        => 'contact',
             PrimaryKey   => 'id',
+            IgnoreCase   => 1,
             Item         => $Item,
             RelevantAttr => [
                 'firstname',

@@ -272,14 +272,16 @@ sub Insert {
                 $Self->CreateOIDMapping(
                     ObjectType     => $Param{Table},
                     ObjectID       => $ID,
-                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID}
+                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID},
+                    AdditionalData => $Param{AdditionalData},
                 );
             }
             else {
                 $Self->ReplaceOIDMapping(
                     ObjectType     => $Param{Table},
                     ObjectID       => $ID,
-                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID}
+                    SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID},
+                    AdditionalData => $Param{AdditionalData},
                 );
             }
         }
@@ -379,7 +381,7 @@ sub Lookup {
 
     my $Mapping = $Self->{Mapping}->{$Param{Table}} || $Self->Describe()->{Mapping} || {};
 
-    # prepare insert statement
+    # prepare select statement
     my @Bind;
     my @Where;
     foreach my $Attr ( @{$Param{RelevantAttr}} ) {
@@ -388,8 +390,12 @@ sub Lookup {
 
         # map value if defined
         $Value = $Mapping->{$Value} if $Mapping->{$Value};
+
+        # should we search case insensitive ?
+        $Value = $Param{IgnoreCase} ? lc($Value) : $Value;
+
         push @Bind, \$Value;
-        push @Where, "$Attr = ?";
+        push @Where, $Param{IgnoreCase} ? "lower($Attr) = ?" : "$Attr = ?";
     }
     my $SQL = "SELECT $Param{PrimaryKey} FROM $Param{Table} WHERE " . join(' AND ', @Where);
 
@@ -609,11 +615,18 @@ sub CreateOIDMapping {
         }
     }
 
+    my $AdditionalData;
+    if ( IsHashRefWithData($Param{AdditionalData}) ) {
+        $AdditionalData = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{AdditionalData}
+        );
+    }
+
     # save the mapping
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'INSERT INTO migration (source, source_id, object_type, object_id, source_object_id) VALUES (?,?,?,?,?)',
+        SQL  => 'INSERT INTO migration (source, source_id, object_type, object_id, source_object_id, additional_data) VALUES (?,?,?,?,?,?)',
         Bind => [
-            \$Self->{Source}, \$Self->{SourceID}, \$Param{ObjectType}, \$Param{ObjectID}, \$Param{SourceObjectID},
+            \$Self->{Source}, \$Self->{SourceID}, \$Param{ObjectType}, \$Param{ObjectID}, \$Param{SourceObjectID}, \$AdditionalData
         ]
     );
     if ( !$Result ) {
@@ -641,12 +654,19 @@ sub ReplaceOIDMapping {
         }
     }
 
+    my $AdditionalData;
+    if ( IsHashRefWithData($Param{AdditionalData}) ) {
+        $AdditionalData = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{AdditionalData}
+        );
+    }
+
     # save the mapping
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'UPDATE migration SET object_id = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
+        SQL  => 'UPDATE migration SET object_id = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ? AND additional_data = ?',
         Bind => [
             \$Param{ObjectID}, \$Self->{Source}, \$Self->{SourceID}, 
-            \$Param{ObjectType}, \$Param{SourceObjectID},
+            \$Param{ObjectType}, \$Param{SourceObjectID}, \$AdditionalData
         ]
     );
     if ( !$Result ) {

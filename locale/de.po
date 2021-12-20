@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-3 13:34+0000\n"
+"POT-Creation-Date: 2021-12-7 06:46+0000\n"
 "PO-Revision-Date: 2021-11-09 13:48+0000\n"
 "Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -571,6 +571,14 @@ msgstr "Ticket"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent"
 msgstr "Ticket Agent"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket Agent (Servicedesk)"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket Agent (w/o teams)"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
@@ -1979,21 +1987,19 @@ msgstr "Systemservice"
 msgid "System State"
 msgstr "Systemstatus"
 
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "API module registration for the invoker layer."
+#. Perl Module: update/build-1507.pl
+msgid "allows basic ticket access, but requires team specific roles"
 msgstr ""
 
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "API module registration for the mapping layer."
+#. Perl Module: update/build-1507.pl
+msgid ""
+"allows working on tickets in team \"Servicedesk\", but requires role "
+"\"Ticket Agent (w/o teams)\" in order to grant access"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
 msgstr "API Modulregistrierung für Operation-Layer."
-
-#. SysConfig: Kernel/Config/Files/API.xml
-msgid "API module registration for the transport layer."
-msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
@@ -2020,12 +2026,6 @@ msgstr ""
 "\"0\" zum Deaktivieren eintragen."
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid ""
-"Defines the maximum size in KiloByte of API responses that get logged to the "
-"gi_debugger_entry_content table."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API.xml
 msgid "Enable API debugging."
 msgstr ""
 
@@ -2034,15 +2034,17 @@ msgid "Enable API level caching."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid ""
-"Max allowed request size in bytes (overwrites default value (50MB) from "
-"provider config)."
+msgid "Enable API request data debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Enable API response data debugging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
-"Performs the configured action for each event (as an Invoker) for each "
-"configured Webservice."
+"Max allowed request size in bytes (overwrites default value (50MB) from "
+"provider config)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Contact.xml
@@ -2160,6 +2162,10 @@ msgstr "Aufsteigend"
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "API module registration for the validator layer."
 msgstr "API-Modul-Registrierung für Validator-Layer."
+
+#. SysConfig: Kernel/Config/Files/API/Validators.xml
+msgid "Disable API validator for specific resources. Use RegEx."
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Cache Time To Leave for FAQ items."
@@ -2404,6 +2410,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Basic settings for FAQ edit workflow."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "CID"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3333,6 +3343,10 @@ msgid "Hourly"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "How to handle embedded images in email body."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "If \"Sendmail\" was selected as SendmailModule, the location of the sendmail "
 "binary and the needed options must be specified."
@@ -3510,6 +3524,10 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
 msgstr "Beinhaltet"
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Inline"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Input"
@@ -4460,11 +4478,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
-"ConfigItem link direction for propagating of warning/error incident states."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid ""
 "Defines for which object type in which configitem class in which configitem "
 "attributes will be searched with which object attributes values "
 "(SearchAttributes) or static values (SearchStatic). Configitem attributes "
@@ -4544,18 +4557,8 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
-"Parameters for the deployment states color in the preferences view of the "
-"agent interface."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid ""
 "Parameters for the deployment states in the preferences view of the agent "
 "interface."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Parameters for the example comment 2 of the general catalog attributes."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml

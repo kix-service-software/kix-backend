@@ -24,6 +24,7 @@
     </TableAlter>
 
     <TableAlter Name="faq_item">
+        <ColumnChange NameOld="category_id" NameNew="category_id" Required="true" Type="INTEGER"/>
         <ForeignKeyCreate ForeignTable="faq_category">
             <Reference Local="category_id" Foreign="id"/>
         </ForeignKeyCreate>
@@ -168,6 +169,10 @@
         <ForeignKeyCreate ForeignTable="job_run">
             <Reference Local="run_id" Foreign="id"/>
         </ForeignKeyCreate>
+    </TableAlter>
+
+    <TableAlter Name="migration">
+        <ColumnAdd Name="additional_data" Required="false" Size="1800000" Type="VARCHAR"/>
     </TableAlter>
 
 </database>

@@ -8274,12 +8274,22 @@ You can log in via the following URL:
             <String Regex="" Translatable="1">We are performing scheduled maintenance. Login is temporarily not available.</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Fetchmail::Bin" Required="0" Valid="0">
-        <Description Translatable="1">Defines the fall-back path to open fetchmail binary. Note: The name of the binary needs to be 'fetchmail', if it is different please use a symbolic link.</Description>
+    <ConfigItem AccessLevel="internal" Name="Fetchmail::fetchmail.rc" Required="0" Valid="0">
+        <Description Translatable="1">Defines the fetchmail.rc to be used. The rc file will be generated in /tmp. The local mailbox user must be "kix". Use /usr/local/bin/procmail.sh as the MDA.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Fetchmail</SubGroup>
         <Setting>
-            <String Regex="[/|\w]+fetchmail$" Check="File">/usr/bin/fetchmail</String>
+            <TextArea># KIX fetchmail.rc
+            </TextArea>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Fetchmail::procmail.rc" Required="0" Valid="0">
+        <Description Translatable="1">Defines the procmail.rc to be used. The rc file will be generated in /tmp.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Fetchmail</SubGroup>
+        <Setting>
+            <TextArea># KIX procmail.rc
+            </TextArea>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ImportExport::FormatBackendRegistration###CSV" Required="0" Valid="1">

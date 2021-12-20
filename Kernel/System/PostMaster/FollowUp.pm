@@ -13,6 +13,8 @@ package Kernel::System::PostMaster::FollowUp;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     # KIX4OTRS-capeIT
@@ -278,18 +280,6 @@ sub Run {
         );
         if ( $Self->{Debug} > 0 ) {
             print "Service: ".$GetParam{'X-KIX-FollowUp-Service'}."\n";
-        }
-    }
-
-    # set ticket sla
-    if ( $GetParam{'X-KIX-FollowUp-SLA'} ) {
-        $TicketObject->TicketSLASet(
-            SLA      => $GetParam{'X-KIX-FollowUp-SLA'},
-            TicketID => $Param{TicketID},
-            UserID   => $Param{InmailUserID},
-        );
-        if ( $Self->{Debug} > 0 ) {
-            print "SLA: ".$GetParam{'X-KIX-FollowUp-SLA'}."\n";
         }
     }
 
@@ -633,6 +623,32 @@ sub Run {
                     print "TicketKey$Count: " . $GetParam{$Key} . "\n";
                 }
             }
+        }
+    }
+
+    # run extensions
+    my $Extensions = $ConfigObject->Get('Postmaster::FollowUpExtension');
+    if (IsHashRefWithData($Extensions)) {
+        for my $Extension ( sort keys %{$Extensions} ) {
+            next if (!IsHashRefWithData($Extensions->{$Extension}) || !$Extensions->{$Extension}->{Module});
+
+            if ( !$Kernel::OM->Get('Main')->Require($Extensions->{$Extension}->{Module}) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "FollowUp extension module $Extensions->{$Extension}->{Module} not found!"
+                );
+                next;
+            }
+            my $ExtensionObject = $Extensions->{$Extension}->{Module}->new( %{$Self} );
+
+            # if the extension constructor failed, it returns an error hash, skip
+            next if ( ref $ExtensionObject ne $Extensions->{$Extension}->{Module} );
+
+            $ExtensionObject->Run(
+                %Param,
+                TicketID  => $Param{TicketID},
+                ArticleID => $ArticleID
+            );
         }
     }
 
