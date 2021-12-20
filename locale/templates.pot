@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2021-12-16 11:27+0000\n"
+"POT-Creation-Date: 2021-12-20 06:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2327,7 +2327,7 @@ msgid "Defines the default the number of seconds (from current time) to re-sched
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the fall-back path to open fetchmail binary. Note: The name of the binary needs to be 'fetchmail', if it is different please use a symbolic link."
+msgid "Defines the fetchmail.rc to be used. The rc file will be generated in /tmp. The local mailbox user must be \"kix\". Use /usr/local/bin/procmail.sh as the MDA."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2460,6 +2460,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the path to open ssl binary. It may need a HOME env ($ENV{HOME} = '/var/lib/wwwrun';)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines the procmail.rc to be used. The rc file will be generated in /tmp."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
