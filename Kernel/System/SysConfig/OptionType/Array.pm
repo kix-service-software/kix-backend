@@ -91,10 +91,14 @@ Extends the given value with the extension
 sub Extend {
     my ( $Self, %Param ) = @_;
 
-    my @Value = (
-        @{$Param{Value}},
-        @{$Param{Extend}}
-    );
+    # merge without duplicates
+    my @Value = @{$Param{Value}||[]};
+    my %ExistingValues = map { $_ => 1 } @Value;
+
+    foreach my $Extend ( @{$Param{Extend}||[]} ) {
+        next if $ExistingValues{$Extend};
+        push @Value, $Extend;
+    }
 
     return \@Value;
 }
