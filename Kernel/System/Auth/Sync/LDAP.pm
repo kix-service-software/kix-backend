@@ -32,8 +32,7 @@ sub new {
     bless( $Self, $Type );
 
     # Debug 0=off 1=on
-    $Self->{Debug} = 0;
-
+    $Self->{Debug}                        = $Param{Config}->{Debug} || 0;
     $Self->{Die}                          = $Param{Config}->{Die} || 1;
     $Self->{Host}                         = $Param{Config}->{Host} || '';
     $Self->{BaseDN}                       = $Param{Config}->{BaseDN} || '';
@@ -579,21 +578,6 @@ sub Sync {
                 Priority => 'error',
                 Message  => "Unable to update usage context of user \"$Param{User}\" (UserID: $UserID)!",
             );
-        }
-        elsif ( IsHashRefWithData(\%UserContextFromLDAP) ) {
-            # only change roles if we have context configurations
-            $RolesFromLDAP{ $SystemRolesByName{'Agent User'} } = 0;
-            $RolesFromLDAP{ $SystemRolesByName{'Customer'} } = 0;
-
-            if ($UserContextFromLDAP{IsAgent}) {
-                # add role "Agent User"
-                $RolesFromLDAP{ $SystemRolesByName{'Agent User'} } = 1;
-            }
-
-            if ($UserContextFromLDAP{IsCustomer}) {
-                # add role "Customer"
-                $RolesFromLDAP{ $SystemRolesByName{'Customer'} } = 1;
-            }
         }
     }
     else {

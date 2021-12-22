@@ -30,8 +30,7 @@ sub new {
     bless( $Self, $Type );
 
     # Debug 0=off 1=on
-    $Self->{Debug} = 0;
-
+    $Self->{Debug}        = $Param{Config}->{Debug} || 0;
     $Self->{Die}          = $Param{Config}->{Die} // 1;
     $Self->{Host}         = $Param{Config}->{Host} || '';
     $Self->{BaseDN}       = $Param{Config}->{BaseDN} || '';
@@ -39,6 +38,7 @@ sub new {
     $Self->{SearchUserDN} = $Param{Config}->{SearchUserDN} || '';
     $Self->{SearchUserPw} = $Param{Config}->{SearchUserPw} || '';
     $Self->{GroupDN}      = $Param{Config}->{GroupDN} || '';
+    $Self->{AuthAttr}     = $Param{Config}->{AuthAttr} || $Self->{UID};     # optional Auth attribute
     $Self->{AccessAttr}   = $Param{Config}->{AccessAttr} || 'memberUid';
     $Self->{UserAttr}     = $Param{Config}->{UserAttr} || 'DN';
     $Self->{DestCharset}  = $Param{Config}->{Charset} || 'utf-8';
@@ -105,13 +105,13 @@ sub Auth {
         if ( $Self->{Debug} > 0 ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "User: ($Param{User}) added $Self->{UserSuffix} to username!",
+                Message  => "User: ($Param{User}) added $Self->{UserSuffix} to username! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")",
             );
         }
     }
 
     # just in case for debug!
-    if ( $Self->{Debug} > 0 ) {
+    if ( $Self->{Debug} > 2 ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "User: '$Param{User}' tried to authenticate with Pw: '$Param{Pw}' "
@@ -128,7 +128,7 @@ sub Auth {
         else {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Can't connect to $Self->{Host}: $@",
+                Message  => "Can't connect to $Self->{Host}: $@" . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
             );
             return;
         }
@@ -146,14 +146,14 @@ sub Auth {
     if ( $Result->code() ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'First bind failed! ' . $Result->error(),
+            Message  => 'First bind failed! ' . $Result->error() . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
         );
         $LDAP->disconnect();
         return;
     }
 
     # user quote
-    my $Filter = "($Self->{UID}=" . escape_filter_value( $Param{User} ) . ')';
+    my $Filter = "($Self->{AuthAttr}=" . escape_filter_value( $Param{User} ) . ')';
 
     # prepare filter
     if ( $Self->{AlwaysFilter} ) {
@@ -169,7 +169,7 @@ sub Auth {
     if ( $Result->code() ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Search failed! ' . $Result->error(),
+            Message  => "Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
         );
         $LDAP->unbind();
         $LDAP->disconnect();
@@ -190,7 +190,7 @@ sub Auth {
         # failed login note
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $Param{User} authentication failed, no LDAP entry found!"
+            Message  => "User: $Param{User} authentication failed, no LDAP entry found! "
                 . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
         );
 
@@ -217,7 +217,7 @@ sub Auth {
             $Filter2 = "($Self->{AccessAttr}=" . escape_filter_value($UserDN) . ')';
         }
         else {
-            $Filter2 = "($Self->{AccessAttr}=" . escape_filter_value( $Param{User} ) . ')';
+            $Filter2 = "($Self->{AccessAttr}=" . escape_filter_value( $User ) . ')';
         }
         my $Result2 = $LDAP->search(
             base   => $Self->{GroupDN},
@@ -228,7 +228,7 @@ sub Auth {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Search failed! base='$Self->{GroupDN}', filter='$Filter2', "
-                    . $Result2->error(),
+                    . $Result2->error() . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
             );
 
             # take down session
@@ -249,7 +249,7 @@ sub Auth {
             # failed login note
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "User: $Param{User} authentication failed, no LDAP group entry found"
+                Message  => "User: $Param{User} authentication failed, no LDAP group entry found "
                     . "GroupDN='$Self->{GroupDN}', Filter='$Filter2'! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
             );
 
@@ -280,15 +280,6 @@ sub Auth {
         $LDAP->disconnect();
         return;
     }
-
-    # maybe check if pw is expired
-    # if () {
-    #     $Kernel::OM->Get('Log')->Log(
-    #         Priority => 'info',
-    #         Message  => "Password is expired!",
-    #     );
-    #     return;
-    # }
 
     # login note
     $Kernel::OM->Get('Log')->Log(
