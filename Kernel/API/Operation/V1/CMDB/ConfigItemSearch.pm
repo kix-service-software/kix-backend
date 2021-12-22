@@ -181,16 +181,16 @@ sub Run {
                     }
                 }
 
-                if (!$SkipAndSearch) {
-
+                if (!$SkipAndSearch) {     
+                                   
                     # perform ConfigItem search
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
                         UserID  => $Self->{Authorization}->{UserID},
                         Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
 
-                        # use ids of customer if given
-                        ConfigItemIDs => $CustomerCIIDList
+                        # use ids of customer if given and result from OR search
+                        ConfigItemIDs => \( @{ $ConfigItemList }, $CustomerCIIDList )
                     );
                     @SearchTypeResult = @{$SearchResult};
                 }
