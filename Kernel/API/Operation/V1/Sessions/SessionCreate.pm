@@ -106,7 +106,7 @@ sub Run {
         );
         if ( $User ) {
             $UserID = $Kernel::OM->Get('User')->UserLookup(
-                UserLogin => $Param{Data}->{UserLogin},
+                UserLogin => $User,
             );
 
             # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
