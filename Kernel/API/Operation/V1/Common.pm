@@ -2244,18 +2244,18 @@ sub _ExpandObject {
         }
     }
 
+    my $StoreTo = $Param{ExpanderConfig}->{StoreTo} || $Param{AttributeToExpand};
+
     my $Result = $Self->ExecOperation(
         OperationType => $Param{ExpanderConfig}->{Operation},
         Data          => \%ExecData,
     );
     if ( !IsHashRefWithData($Result) || !$Result->{Success} ) {
-        return $Result;
+        $Result->{Data}->{$StoreTo} = IsArrayRef($Data->{$Param{AttributeToExpand}}) ? [] : undef;
     }
 
     # extract the relevant data from result
     my $ResultData = $Result->{Data}->{ ( ( keys %{ $Result->{Data} } )[0] ) };
-
-    my $StoreTo = $Param{ExpanderConfig}->{StoreTo} || $Param{AttributeToExpand};
 
     if ( $Param{AttributeToExpand} =~ /[.:]/ ) {
         # we need to flatten the result data
@@ -2274,16 +2274,16 @@ sub _ExpandObject {
         );
     }
     else {
-        if ( ref( $Data->{ $StoreTo } ) eq 'ARRAY' ) {
-            if ( IsArrayRefWithData($ResultData) ) {
-                $Data->{ $StoreTo } = $ResultData;
+        if ( IsArrayRef($Data->{$Param{AttributeToExpand}}) ) {
+            if ( IsArrayRef($ResultData) ) {
+                $Data->{$StoreTo} = $ResultData;
             }
             else {
-                $Data->{ $StoreTo } = [$ResultData];
+                $Data->{$StoreTo} = [$ResultData];
             }
         }
         else {
-            $Data->{ $StoreTo } = $ResultData;
+            $Data->{$StoreTo} = $ResultData;
         }
     }
 

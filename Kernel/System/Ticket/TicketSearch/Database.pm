@@ -256,6 +256,10 @@ sub TicketSearch {
             SQLPartsDef => \@SQLPartsDef,
             %Param,
         );
+        if ( !%Result ) {
+            # return in case of error 
+            return;
+        }
         foreach my $SQLPart ( @SQLPartsDef ) {
             next if !$Result{$SQLPart->{Name}};
             $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}.$Result{$SQLPart->{Name}};
