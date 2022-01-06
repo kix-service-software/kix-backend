@@ -52,7 +52,15 @@ sub Run {
         # do ticket auto jobs
         @TicketIDs = $TicketObject->TicketSearch(
             Result   => 'ARRAY',
-            StateIDs => [@PendingAutoStateIDs],
+            Search => {
+                AND => [
+                    {
+                        Field    => 'StateIDs',
+                        Operator => 'IN',
+                        Value    => \@PendingAutoStateIDs,
+                    }
+                ]
+            },
             UserID   => 1,
         );
 
@@ -122,7 +130,15 @@ sub Run {
     # do ticket reminder notification jobs
     @TicketIDs = $TicketObject->TicketSearch(
         Result    => 'ARRAY',
-        StateType => 'pending reminder',
+        Search => {
+            AND => [
+                {
+                    Field    => 'StateType',
+                    Operator => 'EQ',
+                    Value    => 'pending reminder',
+                }
+            ]
+        },
         UserID    => 1,
     );
 
