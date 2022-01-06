@@ -158,17 +158,19 @@ sub Run {
 
     # check authorization if needed
     my $Authorization;
-    if ( !$Self->{ProviderConfig}->{Operation}->{$ProcessedRequest->{Operation}}->{NoAuthorizationNeeded} ) {
-        my $AuthorizationResult = $Self->CheckAuthorization();
+    my $AuthorizationResult = $Self->CheckAuthorization();
 
-        if ( $ProcessedRequest->{RequestMethod} ne 'OPTIONS' && !$AuthorizationResult->{Success} ) {
-            return $Self->_GenerateErrorResponse(
-                %{$AuthorizationResult},
-            );
-        }
-        else {
-            $Authorization = $AuthorizationResult->{Data}->{Authorization};
-        }
+    if (
+        $ProcessedRequest->{RequestMethod} ne 'OPTIONS' &&
+        !$AuthorizationResult->{Success} &&
+        !$Self->{ProviderConfig}->{Operation}->{$ProcessedRequest->{Operation}}->{NoAuthorizationNeeded}
+    ) {
+        return $Self->_GenerateErrorResponse(
+            %{$AuthorizationResult},
+        );
+    }
+    else {
+        $Authorization = $AuthorizationResult->{Data}->{Authorization};
     }
 
     # check if we have to respond to an OPTIONS request instead of executing the operation
