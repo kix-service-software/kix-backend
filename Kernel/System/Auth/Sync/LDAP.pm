@@ -570,6 +570,7 @@ sub Sync {
         my $Result = $UserObject->UserUpdate(
             %User,
             %UserContextFromLDAP,
+            ValidID      => ($UserContextFromLDAP{IsCustomer} || $UserContextFromLDAP{IsAgent}) ? 1 : 0,
             ChangeUserID => 1,
         );
 
@@ -592,7 +593,8 @@ sub Sync {
 
         # cleanup all user roles
         my $Success = $RoleObject->RoleUserDelete(
-            UserID => $UserID,
+            UserID             => $UserID,
+            IgnoreContextRoles => 1,
         );
         if ( !$Success ) {
             $Kernel::OM->Get('Log')->Log(
@@ -603,6 +605,8 @@ sub Sync {
 
         ROLEID:
         foreach my $RoleID ( sort keys %RolesFromLDAP ) {
+            next ROLEID if !$RolesFromLDAP{$RoleID};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "User: \"$Param{User}\" assigning role \"$SystemRoles{$RoleID}\"!",
