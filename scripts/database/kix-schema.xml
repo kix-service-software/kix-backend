@@ -1170,9 +1170,6 @@
     <Unique Name="organisation_number">
         <UniqueColumn Name="number"/>
     </Unique>
-    <Unique Name="organisation_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>
     </ForeignKey>

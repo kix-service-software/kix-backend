@@ -105,17 +105,6 @@ sub Run {
             Message => 'Cannot create organisation. Another organisation with same number already exists.',
         );
     }
-
-    # check Name exists
-    %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
-        Name => $Organisation->{Name},
-    );
-    if ( %OrganisationSearch ) {
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => 'Cannot create organisation. Another organisation with the name already exists.',
-        );
-    }
     
     # create Organisation
     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
