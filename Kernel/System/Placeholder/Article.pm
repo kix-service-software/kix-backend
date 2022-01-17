@@ -164,7 +164,7 @@ sub _Replace {
 sub _ReplaceArticlePlaceholders {
     my ( $Self, %Param ) = @_;
 
-    # replace <KIX_$Param{Tag}_Subject/Body[]> tags
+    # replace <KIX_$Param{Tag}_Subject/Body_xx> tags
     for my $Attribute ( qw(Subject Body) ) {
         my $Tag = $Param{Tag} . $Attribute;
 
