@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-7 06:46+0000\n"
-"PO-Revision-Date: 2021-11-09 13:48+0000\n"
-"Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
+"PO-Revision-Date: 2022-01-17 15:48+0000\n"
+"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -1999,7 +1999,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
-msgstr "API Modulregistrierung für Operation-Layer."
+msgstr "API-Modulregistrierung für die Operationsschicht."
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
@@ -2161,7 +2161,7 @@ msgstr "Aufsteigend"
 
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "API module registration for the validator layer."
-msgstr "API-Modul-Registrierung für Validator-Layer."
+msgstr "API-Modulregistrierung für die Validator-Schicht."
 
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "Disable API validator for specific resources. Use RegEx."
@@ -3183,7 +3183,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField backend registration."
-msgstr ""
+msgstr "DynamicField Backend Registrierung."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField object registration."
@@ -3523,7 +3523,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
-msgstr "Beinhaltet"
+msgstr "Includes"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Inline"
@@ -5409,7 +5409,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Registration of a macro action type for automation."
-msgstr ""
+msgstr "Registrierung eines Makroaktionstyps für die Automatisierung."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Registration of a macro type for automation."
