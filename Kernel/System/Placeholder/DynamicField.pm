@@ -159,7 +159,7 @@ sub _Replace {
                     Value              => $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
                 );
 
-                if (IsHashRefWithData($DisplayKeyStrg) && $DisplayKeyStrg->{Value}) {
+                if (IsHashRefWithData($DisplayKeyStrg) && defined $DisplayKeyStrg->{Value} && $DisplayKeyStrg->{Value} ne '') {
                     $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key' }
                         = $DisplayKeyStrg->{Value} ;
                 } elsif (IsHashRefWithData($DisplayValueStrg)) {
