@@ -16,6 +16,7 @@ use Storable;
 
 BEGIN { $SIG{ __WARN__} = sub { return if $_[0] =~ /in cleanup/ }; }
 
+use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -1437,7 +1438,7 @@ sub _ApplyFilter {
                                     }
 
                                     my @FieldValues = ($FieldValue);
-                                    if ( IsArrayRefWithData($FieldValue) ) {
+                                    if ( IsArrayRef($FieldValue) ) {
                                         @FieldValues = @{$FieldValue}
                                     }
 
