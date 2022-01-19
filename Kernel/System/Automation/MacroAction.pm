@@ -546,6 +546,11 @@ sub MacroActionDelete {
         return;
     }
 
+    # delete log entries
+    return if !$Self->LogDelete(
+        MacroActionID => $Param{ID},
+    );
+
     # get database object
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM macro_action WHERE id = ?',
@@ -644,7 +649,11 @@ sub MacroActionExecute {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
 
-    $Self->{MacroResults} //= {};
+    # fallback if not already known
+    $Self->{MacroResults} //= {
+        RootObjectID => $Self->{RootObjectID},
+        ObjectID     => $Param{ObjectID}
+    };
 
     # we need the result variables and macro results for the assignments
     $BackendObject->{MacroResults} = $Self->{MacroResults};
