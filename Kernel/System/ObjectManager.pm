@@ -724,9 +724,8 @@ sub DESTROY {
     if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
         if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
             $Self->AsyncCall(
-                ObjectName               => $Self->GetModuleFor('ClientRegistration'),
-                FunctionName             => 'NotificationSend',
-                MaximumParallelInstances => 1,
+                ObjectName   => $Self->GetModuleFor('ClientRegistration'),
+                FunctionName => 'NotificationSend',
             );
         }
         else {

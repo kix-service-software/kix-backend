@@ -187,7 +187,15 @@ sub Run {
         %Param,
     );
 
-   # trigger async rebuild of fulltext index
+    # trigger async rebuild of ticket index
+    $Self->AsyncCall(
+        ObjectName               => $Kernel::OM->GetModuleFor('Ticket'),
+        FunctionName             => 'TicketIndexRebuild',
+        FunctionParams           => {},
+        MaximumParallelInstances => 1,
+    );
+
+    # trigger async rebuild of fulltext index
     $Self->AsyncCall(
         ObjectName               => $Kernel::OM->GetModuleFor('Ticket'),
         FunctionName             => 'TicketFulltextIndexRebuild',
