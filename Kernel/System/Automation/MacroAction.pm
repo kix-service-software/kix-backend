@@ -768,25 +768,29 @@ sub _ReplaceResultVariables {
         }
     }
     else {
-        foreach my $Variable ( keys %{$Self->{MacroResults}} ) {
-            if ( $Param{Data} =~ /^\s*\$\{\Q$Variable\E(\|(.*?))?\}\s*$/ ) {
-                my $Filter = $2;
-                # variable is an assignment, we can replace it with the actual value (i.e. Object)
-                $Param{Data} = $Self->{MacroResults}->{$Variable};
-                $Param{Data} = $Self->_ExecuteVariableFilters(
-                    Data   => $Param{Data},
-                    Filter => $Filter,
-                );
-            }
-            elsif ( $Param{Data} =~ /\$\{\Q$Variable\E(\|(.*?))?\}/ ) {
-                my $Filter = $2;
-                # variable is part of a string, we have to do a string replace
-                my $Value = $Self->{MacroResults}->{$Variable};
+        while ( $Param{Data} =~ /^(.*?)(\$\{(.*?)(\|(.*?))?\})(.*?)$/xms ) {
+            my $Leading    = $1;
+            my $Expression = $2;
+            my $Variable   = $3;
+            my $Filter     = $4;
+            my $Trailing   = $6;
+
+            my $Value = $Self->_ResolveVariableValue(
+                Variable => $Variable
+            );
+            if ( $Filter ) {
                 $Value = $Self->_ExecuteVariableFilters(
                     Data   => $Value,
                     Filter => $Filter,
                 );
-                $Param{Data} =~ s/\$\{\Q$Variable\E(\|$Filter)?\}/$Value/gmx;
+            }
+            if ( $Leading || $Trailing ) {
+                # variable is part of a string, we have to do a string replace
+                $Param{Data} =~ s/\Q$Expression\E/$Value/gmx;
+            }
+            else {
+                # variable is an assignment, we can replace it with the actual value (i.e. Object)
+                $Param{Data} = $Value;
             }
         }
     }
@@ -836,6 +840,54 @@ sub _ExecuteVariableFilters {
     }
 
     return $Value;
+}
+
+sub _ResolveVariableValue {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Variable)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # return udnef if we have no data to work through
+    return if exists $Param{Data} && !$Param{Data};
+
+    my $Data = $Param{Data};
+    if ( !exists $Param{Data} ) {
+        $Data = $Self->{MacroResults};
+    }
+
+    my @Parts = split( /\./, $Param{Variable});
+    my $Attribute = shift @Parts;
+    my $ArrayIndex;
+
+    if ( $Attribute =~ /(.*?):(\d+)/ ) {
+        $Attribute = $1;
+        $ArrayIndex = $2;
+    }
+
+    # get the value of $Attribute
+    $Data = $Data->{$Attribute};
+
+    if ( defined $ArrayIndex && IsArrayRef($Data) ) {
+        $Data = $Data->[$ArrayIndex];
+    }
+
+    if ( @Parts ) {
+        return $Self->_ResolveVariableValue(
+            Variable => join('.', @Parts),
+            Data     => $Data,
+        );
+    }
+
+    return $Data;
 }
 
 1;
