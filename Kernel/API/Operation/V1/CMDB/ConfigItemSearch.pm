@@ -189,18 +189,16 @@ sub Run {
 
                 if (!$SkipAndSearch) {
 
+                    # use ids of customer and result from OR search if given
+                    # check for undef "refs" to prevent implicit undef to array-ref conversion (see below "!defiend")
+                    my @KnownIDs = ( @{ $ConfigItemList || [] }, @{ $CustomerCIIDList || [] } );
+
                     # perform ConfigItem search
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
-                        UserID  => $Self->{Authorization}->{UserID},
-                        Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-
-                        # use ids of customer and result from OR search if given
-                        # check for undef "refs" to prevent implicit undef to array-ref conversion (see below "!defiend")
-                        ConfigItemIDs => \(
-                            @{ $ConfigItemList || [] },
-                            @{ $CustomerCIIDList || [] }
-                        )
+                        UserID        => $Self->{Authorization}->{UserID},
+                        Limit         => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+                        ConfigItemIDs => \@KnownIDs
                     );
                     @SearchTypeResult = @{$SearchResult};
                 }
