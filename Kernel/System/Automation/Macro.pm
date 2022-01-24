@@ -463,15 +463,15 @@ sub MacroDelete {
         return;
     }
 
-    # delete macro actions
-    return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'DELETE FROM macro_action WHERE macro_id = ?',
-        Bind => [ \$Param{ID} ],
-    );
-
     # delete relations with Jobs
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_macro WHERE macro_id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
+    # delete macro actions
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => 'DELETE FROM macro_action WHERE macro_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
