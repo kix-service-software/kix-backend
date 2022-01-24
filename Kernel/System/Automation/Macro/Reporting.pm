@@ -67,13 +67,18 @@ sub Run {
         }
     }
 
-    
+    # FIXME: use given instance
+    my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
+
     # execute all macro action given in the execution order attribute
     foreach my $MacroActionID ( @{$Param{ExecOrder}} ) {
-        my $Result = $Kernel::OM->Get('Automation')->MacroActionExecute(
+        my $Result = $AutomationObject->MacroActionExecute(
             ID       => $MacroActionID,
             ObjectID => $Param{ObjectID},
             UserID   => $Param{UserID},
+
+            # FIXME: add instance if job was triggerd by event (ExecuteJobsForEvent)
+            AutomationInstance => $Param{AutomationInstance}
         );
         # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here
     }
