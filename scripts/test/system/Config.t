@@ -13,6 +13,7 @@ use warnings;
 use utf8;
 
 use vars (qw($Self));
+use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
 my $ConfigObject = $Kernel::OM->Get('Config');
@@ -38,9 +39,6 @@ $Self->True(
     $Home,
     'check for configuration setting "Home"',
 );
-
-# loads the defaults values
-$ConfigObject->LoadDefaults();
 
 # obtains the default home path
 my $DefaultHome = $ConfigObject->Get('Home');
@@ -69,46 +67,50 @@ $Self->IsNot(
     'Test Set() with "Home" - new path differs from the default.',
 );
 
-# loads the defaults values
-$ConfigObject->LoadDefaults();
-
-# obtains the default home path
-$NewHome = $ConfigObject->Get('Home');
-
-# checks that the default value obtained before is equivalent to the current
-$Self->Is(
-    $NewHome,
-    $DefaultHome,
-    'Test LoadDefaults() - both paths are equivalent.',
+# check FQDN config
+my $FQDN = {
+    Frontend => 'some-frontend',
+    Backend  => 'some-backend'
+};
+$ConfigObject->Set(
+    Key   => 'FQDN',
+    Value => $FQDN
 );
-
-# makes sure that the current path is different from the one we set before loading the defaults
-$Self->IsNot(
-    $NewHome,
-    $DummyPath,
-    'Test LoadDefaults() with "Home" - new path differs from the dummy.',
+my $NewFQDN = $ConfigObject->Get('FQDN');
+$Self->True(
+    IsHashRefWithData($NewFQDN) || 0,
+    'FQDN config test - is hash ref'
 );
-
-$DefaultHome = $NewHome;
-
-# loads the config values
-$ConfigObject->Load();
-
-# obtains the current home path
-$NewHome = $ConfigObject->Get('Home');
-
-# checks that the config value obtained before is equivalent to the current
 $Self->Is(
-    $NewHome,
-    $Home,
-    'Test Load() - both paths are equivalent.',
+    $NewFQDN->{Frontend},
+    $FQDN->{Frontend},
+    'FQDN config test - frontend value'
+);
+# check FQDN replacement in config
+$ConfigObject->Set(
+    Key   => 'NotificationSenderEmail',
+    Value => 'kix@<KIX_CONFIG_FQDN>'
+);
+my $SenderMail = $ConfigObject->Get('NotificationSenderEmail');
+$Self->Is(
+    $SenderMail,
+    'kix@' . $FQDN->{Frontend},
+    'FQDN config test - sender mail value (frontend)'
+);
+$ConfigObject->Set(
+    Key   => 'NotificationSenderEmail',
+    Value => 'kix@<KIX_CONFIG_FQDN_Backend>'
+);
+$SenderMail = $ConfigObject->Get('NotificationSenderEmail');
+$Self->Is(
+    $SenderMail,
+    'kix@' . $FQDN->{Backend},
+    'FQDN config test - sender mail value (backend)'
 );
 
 # restore to the previous state is done by RestoreDatabase
 
 1;
-
-
 
 =back
 
