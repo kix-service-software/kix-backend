@@ -1069,9 +1069,15 @@ sub DisplayValueRender {
             XMLDataGet   => 0,
         );
 
-        my $EntryValue = $Param{DynamicFieldConfig}->{Config}->{DisplayPattern} || '<CI_Name>';
+        my $EntryValue = $Param{DisplayPattern} || $Param{DynamicFieldConfig}->{Config}->{DisplayPattern} || '<CI_Number> - <CI_Name>';
         while ($EntryValue =~ m/<CI_([^>]+)>/) {
             my $Replace = $ConfigItem->{$1} || '';
+            if ($1 eq 'Number') {
+                my $Hook = $Kernel::OM->Get('Config')->Get('ITSMConfigItem::Hook');
+                if ($Hook) {
+                    $Replace = $Hook . $Replace;
+                }
+            }
             $EntryValue =~ s/<CI_$1>/$Replace/g;
         }
 
@@ -1089,51 +1095,6 @@ sub DisplayValueRender {
                 Text => $EntryTitle,
                 Max => $Param{TitleMaxChars} || '',
             );
-
-            # set field link form config
-            my $HasLink = 0;
-            if (
-                $Param{LayoutObject} && $Param{LayoutObject}->{UserType}
-                && $Param{LayoutObject}->{UserType} eq 'User'
-                && $Param{DynamicFieldConfig}->{Config}->{AgentLink}
-                )
-            {
-                $EntryValue
-                    = '<a href="'
-                    . $Param{DynamicFieldConfig}->{Config}->{AgentLink}
-                    . '" title="'
-                    . $EntryTitle
-                    . '" target="_blank" class="DynamicFieldLink">'
-                    . $EntryValue . '</a>';
-                $HasLink = 1;
-            }
-            elsif (
-                $Param{LayoutObject} && $Param{LayoutObject}->{UserType}
-                && $Param{LayoutObject}->{UserType} eq 'Customer'
-                && $Param{DynamicFieldConfig}->{Config}->{CustomerLink}
-                )
-            {
-                $EntryValue
-                    = '<a href="'
-                    . $Param{DynamicFieldConfig}->{Config}->{CustomerLink}
-                    . '" title="'
-                    . $EntryTitle
-                    . '" target="_blank" class="DynamicFieldLink">'
-                    . $EntryValue . '</a>';
-                $HasLink = 1;
-            }
-            if ($HasLink) {
-                while ($EntryValue =~ m/<CI_([^>]+)>/) {
-                    my $Replace = $Param{LayoutObject}->LinkEncode($ConfigItem->{$1}) || '';
-                    $EntryValue =~ s/<CI_$1>/$Replace/g;
-                }
-
-                # Replace <SessionID>
-                if ( $EntryValue =~ /<SessionID>/ ) {
-                    my $Replace = $Param{LayoutObject}->{SessionID};
-                    $EntryValue =~ s/<SessionID>/$Replace/g;
-                }
-            }
         }
         else {
             if ( $Param{ValueMaxChars} && length($EntryValue) > $Param{ValueMaxChars} ) {
@@ -1165,6 +1126,15 @@ sub DisplayValueRender {
     };
 
     return $Data;
+}
+
+sub ShortDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->DisplayValueRender(
+        %Param,
+        DisplayPattern => '<CI_Name>'
+    );
 }
 
 sub StatsFieldParameterBuild {
