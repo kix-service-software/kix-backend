@@ -94,7 +94,7 @@ sub LoadLocalConfig {
                     print STDERR "ERROR: config file \"$File\" has errors. Aborting\n";
                     die;
                 }
-                
+
                 %FileConfig = ( %FileConfig, %Hash );
             }
             else {
@@ -218,7 +218,7 @@ sub ReadOnlyList {
 sub Exists {
     my ( $Self, $What ) = @_;
 
-    if ( !defined $Self->{Config}->{$What} && !$Self->{SysConfigLoaded} ) {        
+    if ( !defined $Self->{Config}->{$What} && !$Self->{SysConfigLoaded} ) {
         # Config hash has not been loaded yet, just do it
         $Self->LoadSysConfig();
     }
@@ -241,8 +241,23 @@ sub Get {
     }
 
     # replace config variables in value
-    if ( defined $Self->{Config}->{$What} ) {
-        $Self->{Config}->{$What} =~ s/\<KIX_CONFIG_(.+?)\>/$Self->{Config}->{$1}/g;
+    if ( defined $Self->{Config}->{$What} && IsStringWithData($Self->{Config}->{$What}) ) {
+
+        # special handling for FQDN
+        if ($Self->{Config}->{$What} =~ m/\<KIX_CONFIG_FQDN_?(.*?)\>/ ) {
+            my $FQDNConfig = $Self->{Config}->{FQDN} // '';
+            if ( IsHashRefWithData($FQDNConfig) ) {
+                if ($1) {
+                    my $Replace = $FQDNConfig->{$1} || '';
+                    $Self->{Config}->{$What} =~ s/\<KIX_CONFIG_FQDN_$1\>/$Replace/g;
+                } else {
+                    my $Replace = $FQDNConfig->{Frontend} || '';
+                    $Self->{Config}->{$What} =~ s/\<KIX_CONFIG_FQDN\>/$Replace/g;
+                }
+            }
+        } else {
+            $Self->{Config}->{$What} =~ s/\<KIX_CONFIG_(.+?)\>/$Self->{Config}->{$1}/g;
+        }
     }
 
     return $Self->{Config}->{$What};

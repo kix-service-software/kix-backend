@@ -138,6 +138,7 @@ sub _Replace {
                         $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue' } = $ObjectValue;
                     }
                     $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue_' . $Index } = $ObjectValue;
+                    $Index++;
                 }
 
                 # get the display values for each dynamic field
