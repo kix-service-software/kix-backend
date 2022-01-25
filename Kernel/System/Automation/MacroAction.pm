@@ -826,21 +826,17 @@ sub _ExecuteVariableFilters {
             $Value =~ s/^"//;
             $Value =~ s/"$//;
         }
-        elsif ( $Filter =~ /^FromJSON(\((.*?)\))?/ && IsStringWithData($Value) ) {
+        elsif ( $Filter =~ /^FromJSON$/ && IsStringWithData($Value) ) {
+            $Value = $Kernel::OM->Get('JSON')->Decode(
+                Data => $Value
+            );
+        }
+        elsif ( $Filter =~ /^jq((.*?))$/ && IsStringWithData($Value) ) {
             my $JqExpression = $2;
-            if ( $JqExpression ) {
-                $JqExpression =~ s/\s+::\s+/|/g;
-                my $Result = `echo '$Value' | jq '$JqExpression'`;
-                chomp $Result;
-                $Value = $Kernel::OM->Get('JSON')->Decode(
-                    Data => $Result
-                );
-            }
-            else {
-                $Value = $Kernel::OM->Get('JSON')->Decode(
-                    Data => $Value
-                );
-            }
+            $JqExpression =~ s/\s+::\s+/|/g;
+            $JqExpression =~ s/&quot;/"/g;
+            $Value = `echo '$Value' | jq -r '$JqExpression'`;
+            chomp $Value;
         }
         elsif ( $Filter eq 'base64' ) {
             $Value = MIME::Base64::encode_base64($Value);
@@ -865,7 +861,7 @@ sub _ResolveVariableValue {
         }
     }
 
-    # return udnef if we have no data to work through
+    # return undef if we have no data to work through
     return if exists $Param{Data} && !$Param{Data};
 
     my $Data = $Param{Data};
