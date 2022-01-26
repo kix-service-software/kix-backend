@@ -110,34 +110,38 @@ sub Run {
         );
     }
 
-    # check if job with the same name already exists
-    if ( $Job->{Name} ) {
-        my $JobID = $Kernel::OM->Get('Automation')->JobLookup(
-            Name => $Job->{Name},
+    # do not update if only Exec is given
+    if ( scalar(keys %{$Job}) > 1 || !$Job->{Exec} ) {
+
+        # check if job with the same name already exists
+        if ( $Job->{Name} ) {
+            my $JobID = $Kernel::OM->Get('Automation')->JobLookup(
+                Name => $Job->{Name},
+            );
+            if ( $JobID && $JobID != $Param{Data}->{JobID} ) {
+                return $Self->_Error(
+                    Code    => 'Object.AlreadyExists',
+                    Message => "Cannot update job. Another job with the same name '$Job->{Name}' already exists.",
+                );
+            }
+        }
+
+        # update Job
+        my $Success = $Kernel::OM->Get('Automation')->JobUpdate(
+            ID       => $Param{Data}->{JobID},
+            Type     => $Job->{Type} || $JobData{Type},
+            Name     => $Job->{Name} || $JobData{Name},
+            Filter   => exists $Job->{Filter} ? $Job->{Filter} : $JobData{Filter},
+            Comment  => exists $Job->{Comment} ? $Job->{Comment} : $JobData{Comment},
+            ValidID  => exists $Job->{ValidID} ? $Job->{ValidID} : $JobData{ValidID},
+            UserID   => $Self->{Authorization}->{UserID},
         );
-        if ( $JobID && $JobID != $Param{Data}->{JobID} ) {
+
+        if ( !$Success ) {
             return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => "Cannot update job. Another job with the same name '$Job->{Name}' already exists.",
+                Code => 'Object.UnableToUpdate',
             );
         }
-    }
-
-    # update Job
-    my $Success = $Kernel::OM->Get('Automation')->JobUpdate(
-        ID       => $Param{Data}->{JobID},
-        Type     => $Job->{Type} || $JobData{Type},
-        Name     => $Job->{Name} || $JobData{Name},
-        Filter   => exists $Job->{Filter} ? $Job->{Filter} : $JobData{Filter},
-        Comment  => exists $Job->{Comment} ? $Job->{Comment} : $JobData{Comment},
-        ValidID  => exists $Job->{ValidID} ? $Job->{ValidID} : $JobData{ValidID},
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code => 'Object.UnableToUpdate',
-        );
     }
 
     if ( $Job->{Exec} ) {
