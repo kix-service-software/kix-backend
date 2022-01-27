@@ -150,39 +150,49 @@ sub Run {
         );
     }
 
-    if ( $MailAccount->{DispatchingBy} eq 'Queue' && !$MailAccount->{QueueID} ) {
-        return $Self->_Error(
-            Code    => 'BadRequest',
-            Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
-        );
-    }
+    # do not update if only ExecFetch is given
+    if ( scalar(keys %{$MailAccount}) > 1 || !$MailAccount->{ExecFetch} ) {
 
-    # update MailAccount
-    my $Success = $Kernel::OM->Get('MailAccount')->MailAccountUpdate(
-        ID               => $Param{Data}->{MailAccountID},
-        Login            => $MailAccount->{Login} || $MailAccountData{Login},
-        Password         => $MailAccount->{Password} || $MailAccountData{Password},
-        OAuth2_ProfileID => exists $MailAccount->{OAuth2_ProfileID} ? $MailAccount->{OAuth2_ProfileID} : $MailAccountData{OAuth2_ProfileID},
-        Host             => $MailAccount->{Host} || $MailAccountData{Host},
-        Type             => $MailAccount->{Type} || $MailAccountData{Type},
-        IMAPFolder       => $MailAccount->{IMAPFolder} || $MailAccountData{IMAPFolder},
-        ValidID          => $MailAccount->{ValidID} || $MailAccountData{ValidID},
-        DispatchingBy    => $MailAccount->{DispatchingBy} || $MailAccountData{DispatchingBy},
-        QueueID          => $MailAccount->{QueueID} || $MailAccountData{QueueID},
-        Trusted          => exists $MailAccount->{Trusted} ? $MailAccount->{Trusted} : $MailAccountData{Trusted},
-        Comment          => exists $MailAccount->{Comment} ? $MailAccount->{Comment} : $MailAccountData{Comment},
-        UserID           => $Self->{Authorization}->{UserID},
-    );
+        if ( $MailAccount->{DispatchingBy} eq 'Queue' && !$MailAccount->{QueueID} ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "A QueueID is required if DispatchingBy is set to 'Queue'",
+            );
+        }
 
-    if ( !$Success ) {
-        return $Self->_Error(
-            Code => 'Object.UnableToUpdate',
+        # update MailAccount
+        my $Success = $Kernel::OM->Get('MailAccount')->MailAccountUpdate(
+            ID               => $Param{Data}->{MailAccountID},
+            Login            => $MailAccount->{Login} || $MailAccountData{Login},
+            Password         => $MailAccount->{Password} || $MailAccountData{Password},
+            OAuth2_ProfileID => exists $MailAccount->{OAuth2_ProfileID} ? $MailAccount->{OAuth2_ProfileID} : $MailAccountData{OAuth2_ProfileID},
+            Host             => $MailAccount->{Host} || $MailAccountData{Host},
+            Type             => $MailAccount->{Type} || $MailAccountData{Type},
+            IMAPFolder       => $MailAccount->{IMAPFolder} || $MailAccountData{IMAPFolder},
+            ValidID          => $MailAccount->{ValidID} || $MailAccountData{ValidID},
+            DispatchingBy    => $MailAccount->{DispatchingBy} || $MailAccountData{DispatchingBy},
+            QueueID          => $MailAccount->{QueueID} || $MailAccountData{QueueID},
+            Trusted          => exists $MailAccount->{Trusted} ? $MailAccount->{Trusted} : $MailAccountData{Trusted},
+            Comment          => exists $MailAccount->{Comment} ? $MailAccount->{Comment} : $MailAccountData{Comment},
+            UserID           => $Self->{Authorization}->{UserID},
         );
+
+        if ( !$Success ) {
+            return $Self->_Error(
+                Code => 'Object.UnableToUpdate',
+            );
+        }
     }
 
     if ( $MailAccount->{ExecFetch} ) {
+
+        # get possible updated data
+        my %UpdatedMailAccountData = $Kernel::OM->Get('MailAccount')->MailAccountGet(
+            ID     => $Param{Data}->{MailAccountID},
+            UserID => $Self->{Authorization}->{UserID},
+        );
         my $Success = $Kernel::OM->Get('MailAccount')->MailAccountFetch(
-            %MailAccountData,
+            %UpdatedMailAccountData,
             UserID => 1,
         );
 
