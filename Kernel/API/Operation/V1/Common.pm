@@ -3800,6 +3800,17 @@ sub _SetDynamicFieldValue {
         Value              => $Param{Value},
         UserID             => $Param{UserID},
     );
+    if ( !$Success ) {
+        # get the last error log entry as the message
+        my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => $Message,
+        );
+    }
 
     return $Self->_Success();
 }
