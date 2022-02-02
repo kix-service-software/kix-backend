@@ -128,7 +128,8 @@ sub Run {
 
         if ($Param{Data}->{include}->{DynamicFields}) {
             $FAQArticle{DynamicFields} = $Self->_GetDynamicFields(
-                FAQArticleID => $FAQArticle{ID}
+                FAQArticleID => $FAQArticle{ID},
+                Data         => $Param{Data},
             );
         }
 
@@ -182,8 +183,9 @@ sub _GetDynamicFields {
 
         if ($Value) {
             my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
-                Config => $DynamicFieldConfig,
-                Value  => $Value
+                Config          => $DynamicFieldConfig,
+                Value           => $Value,
+                NoDisplayValues => [ split(',', $Param{Data}->{NoDynamicFieldDisplayValues}||'') ]
             );
 
             if (IsHashRefWithData($PreparedValue)) {

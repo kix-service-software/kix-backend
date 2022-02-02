@@ -169,8 +169,9 @@ sub Run {
             OperationType            => 'V1::Contact::ContactGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                ContactID => join( ',', sort keys %{$ContactList} ),
-                }
+                ContactID                   => join( ',', sort keys %{$ContactList} ),
+                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
+            }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;

@@ -132,8 +132,9 @@ sub Run {
                             next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
 
                             my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
-                                Config => $DynamicFieldConfig,
-                                Value  => $OrganisationData{$Attribute}
+                                Config          => $DynamicFieldConfig,
+                                Value           => $OrganisationData{$Attribute},
+                                NoDisplayValues => [ split(',', $Param{Data}->{NoDynamicFieldDisplayValues}||'') ]
                             );
 
                             if (IsHashRefWithData($PreparedValue)) {
