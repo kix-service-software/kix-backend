@@ -106,6 +106,9 @@ sub Encode {
     $JSONEncoded =~ s/\x{2028}/\\u2028/xmsg;
     $JSONEncoded =~ s/\x{2029}/\\u2029/xmsg;
 
+    # Special handling for unicode ampersand (\u0026),
+    $JSONEncoded =~ s/\x{0026}/\\u0026/xmsg;
+
     return $JSONEncoded;
 }
 
