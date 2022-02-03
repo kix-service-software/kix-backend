@@ -162,7 +162,8 @@ sub Run {
             OperationType            => 'V1::Organisation::OrganisationGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                OrganisationID => join(',', sort keys %{$OrgList}),
+                OrganisationID              => join(',', sort keys %{$OrgList}),
+                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

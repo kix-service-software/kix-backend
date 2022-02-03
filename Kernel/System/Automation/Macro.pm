@@ -463,16 +463,21 @@ sub MacroDelete {
         return;
     }
 
+    # delete relations with Jobs
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => 'DELETE FROM job_macro WHERE macro_id = ?',
+        Bind => [ \$Param{ID} ],
+    );
+
     # delete macro actions
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM macro_action WHERE macro_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
-    # delete relations with Jobs
-    return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'DELETE FROM job_macro WHERE macro_id = ?',
-        Bind => [ \$Param{ID} ],
+    # delete log entries
+    return if !$Self->LogDelete(
+        MacroID => $Param{ID},
     );
 
     # delete macro
@@ -573,13 +578,21 @@ sub MacroExecute {
     # add IDs for log reference
     if ( $Self->{MacroID} ) {
         push @{$Self->{ParentMacroID}}, $Self->{MacroID};
-    }
-    else {
-        $Self->{MacroResults} = {};
+    } else {
+        $Self->{MacroResults} = {
+            RootObjectID => $Param{RootObjectID} || $Param{ObjectID}
+        };
     }
 
-    $Self->{MacroID}  = $Param{ID};
+    $Self->{MacroID} = $Param{ID};
+
+    # set possible new id e.g. if we are a sub macro
     $Self->{ObjectID} = $Param{ObjectID};
+    my $OrgObjectID;
+    if ($Self->{MacroResults}->{ObjectID} != $Param{ObjectID}) {
+        $OrgObjectID = $Self->{MacroResults}->{ObjectID};
+        $Self->{MacroResults}->{ObjectID} = $Param{ObjectID};
+    }
 
     # keep root object id
     $Self->{RootObjectID} = $Param{RootObjectID} || $Param{ObjectID};
@@ -645,6 +658,11 @@ sub MacroExecute {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $CacheType
     );
+
+    # reset id e.g. if we are a sub macro and now finished
+    if ($OrgObjectID) {
+        $Self->{MacroResults}->{ObjectID} = $OrgObjectID;
+    }
 
     # remove IDs from log reference
     $Self->{MacroID} = pop @{$Self->{ParentMacroID}};
@@ -746,7 +764,7 @@ sub MacroLogList {
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare( 
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
         SQL  => 'SELECT id, job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by FROM automation_log WHERE macro_id = ?',
         Bind => [ \$Param{MacroID} ]
     );

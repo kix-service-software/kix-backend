@@ -41,48 +41,6 @@ Example:
 
 =cut
 
-sub _CheckParams {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(Config UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
-            return;
-        }
-    }
-
-    return if !$Self->SUPER::_CheckParams(%Param);
-    
-    if ( $Param{TicketID} ) {
-        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-            TicketID => $Param{TicketID},
-        );
-
-        if (!%Ticket) {
-            $Kernel::OM->Get('Automation')->LogError(
-                Referrer => $Self,
-                Message  => "Couldn't update ticket $Param{TicketID} - ticket not found!",
-                UserID   => $Param{UserID}
-            );
-            return;
-        }
-    }
-
-    if (ref $Param{Config} ne 'HASH') {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Config is no object!",
-        );
-        return;
-    }
-
-    return 1;
-}
-
 sub _ConvertScalar2ArrayRef {
     my ( $Self, %Param ) = @_;
 

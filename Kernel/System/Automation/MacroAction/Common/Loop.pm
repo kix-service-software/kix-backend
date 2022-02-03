@@ -122,7 +122,7 @@ sub Run {
             ObjectID => $Value,
             UserID   => $Param{UserID},
 
-            # keep (or overwrite) root object id
+            # keep root object id
             RootObjectID => $Self->{RootObjectID} || $Param{ObjectID}
         );
     }

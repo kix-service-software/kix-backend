@@ -146,11 +146,17 @@ sub Run {
                         }
                     } else {
 
+                        # only consider limit if no AND is given
+                        my $Limit;
+                        if ( !IsArrayRefWithData($Self->{Search}->{ConfigItem}->{AND}) ) {
+                            $Limit = $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'};
+                        }
+
                         # perform search for every attribute
                         $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                             %SearchParam,
                             UserID  => $Self->{Authorization}->{UserID},
-                            Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+                            Limit   => $Limit,
 
                             # use ids of customer if given
                             ConfigItemIDs => $CustomerCIIDList
@@ -183,23 +189,25 @@ sub Run {
 
                 if (!$SkipAndSearch) {
 
+                    # use ids of customer and result from OR search if given
+                    # check for undef "refs" to prevent implicit undef to array-ref conversion (see below "!defiend")
+                    my @KnownIDs = ( @{ $ConfigItemList || [] }, @{ $CustomerCIIDList || [] } );
+
                     # perform ConfigItem search
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
-                        UserID  => $Self->{Authorization}->{UserID},
-                        Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-
-                        # use ids of customer if given
-                        ConfigItemIDs => $CustomerCIIDList
+                        UserID        => $Self->{Authorization}->{UserID},
+                        Limit         => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+                        ConfigItemIDs => \@KnownIDs
                     );
                     @SearchTypeResult = @{$SearchResult};
                 }
             }
 
+            # if no search already done, use first result (also empty list for AND combination!)
             if ( !defined $ConfigItemList ) {
                 $ConfigItemList = \@SearchTypeResult;
-            }
-            else {
+            } else {
 
                 # combine both results by AND
                 # remove all IDs from type result that we don't have in this search

@@ -490,7 +490,7 @@ sub _MapAttributeValue {
                 if ( !IsArrayRefWithData($Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}) ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
-                        Message  => "Unable to lookup $LookupTypeMapping{TypeMapping} row with $LookupAttributeMapping{$TypeMapping} \"$Param{Item}->{xml_content_value}'\"!"
+                        Message  => "Unable to lookup $LookupTypeMapping{$TypeMapping} row with $LookupAttributeMapping{$TypeMapping} \"$Param{Item}->{xml_content_value}\"!"
                     );
                     return;
                 }

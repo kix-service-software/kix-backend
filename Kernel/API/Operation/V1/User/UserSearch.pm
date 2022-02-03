@@ -57,6 +57,17 @@ sub Run {
     my ( $Self, %Param ) = @_;
     my $UserList;
 
+    my %SupportedRequiredPermission = (
+        TicketRead => {
+            Target => '/tickets',
+            Permission => 'READ'
+        },
+        TicketCreate => {
+            Target => '/tickets',
+            Permission => 'CREATE'
+        }
+    );
+
     # TODO: filter search - currently only UserLogin and Search are possible search parameter
     my %UserSearch;
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
@@ -189,16 +200,17 @@ sub Run {
         if( $Param{Data} && $Param{Data}->{requiredPermission} ) {
             my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission});
 
+            PERMISSION:
             for my $Permission (@Permissions) {
-                next if (!$Self->{RequiredPermission} || !$Self->{RequiredPermission}->{$Permission});
+                next PERMISSION if !$SupportedRequiredPermission{$Permission};
 
                 my @AllowedUserIDs;
                 for my $UserID (@GetUserIDs) {
 
                     my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                         UserID              => $UserID,
-                        Target              => $Self->{RequiredPermission}->{$Permission}->{Target},
-                        RequestedPermission => $Self->{RequiredPermission}->{$Permission}->{Permission},
+                        Target              => $SupportedRequiredPermission{$Permission}->{Target},
+                        RequestedPermission => $SupportedRequiredPermission{$Permission}->{Permission},
                         UsageContext        => $Self->{Authorization}->{UserType}
                     );
 

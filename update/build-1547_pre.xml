@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableDrop Name="generic_agent_jobs"/>
+    <TableDrop Name="package_repository"/>
+    <TableDrop Name="smime_signer_cert_relations"/>
+    <TableDrop Name="pm_process"/>
+    <TableDrop Name="pm_activity"/>
+    <TableDrop Name="pm_activity_dialog"/>
+    <TableDrop Name="pm_transition"/>
+    <TableDrop Name="pm_transition_action"/>
+    <TableDrop Name="pm_entity_sync"/>
+    <TableDrop Name="cip_allocate"/>
+    <TableDrop Name="kix_dep_dynamic_field_prefs"/>
+    <TableDrop Name="kix_dep_dynamic_field"/>
+    <TableDrop Name="kix_file_watcher"/>
+    <TableDrop Name="kix_ticket_template_prefs"/>
+    <TableDrop Name="kix_ticket_template"/>
+    <TableDrop Name="kix_link_graph"/>
+    <TableDrop Name="kix_ticket_checklist"/>
+    <TableDrop Name="overlay_agent"/>
+    <TableDrop Name="customer_portal_group"/>
+    <TableDrop Name="web_upload_cache"/>
+
+</database>

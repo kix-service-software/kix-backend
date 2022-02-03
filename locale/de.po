@@ -4683,6 +4683,37 @@ msgid ""
 "is changed."
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
+msgid ""
+"Defines a list of Ticket Dynamic Fields which are evaluated by the "
+"KIXMobileApp. The lists consists of dynamic field names (e.g. "
+"'MobileProcessingState') or regular expressions matching dynamic field names "
+"(e.g. 'MobileProcessingChecklist.*')."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
+msgid ""
+"Defines the initial setting of the position reporting behavior of "
+"the KIX Field Agent app when the user first logs into the app on a device. "
+"The app-specific setting applies to further use."
+msgstr ""
+"Definiert, welche Mindeständerungen der Position für die Meldung einer "
+"neuer Position des Nutzers der KIX Field Agent App benötigt werden. "
+"Die Entfernung wird in Metern angegeben. Der Wert muss in natürlichen "
+"Zahlen größer Null angegeben werden. Ungültige Einstellungen führen dazu, "
+"dass die App einen Standardwert verwendet."
+
+#. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
+msgid ""
+"Defines the minimum position changes required to report a new position "
+"for the user of the KIX Field Agent App. The distance is given in meters. "
+"The value must be given in natural numbers greater than zero. Invalid "
+"settings cause the app to use a default value."
+msgstr ""
+"Definiert die anfängliche Einstellung des Positionsmeldeverhaltens der "
+"KIX Field Agent-App bei der ersten Anmeldung des Benutzers in der App auf "
+"einem Gerät. Für die weitere Nutzung gilt die App-spezifische Einstellung."
+
 #. SysConfig: Kernel/Config/Files/Migration/KIX17.xml
 msgid "Object handler registration for data migration."
 msgstr ""
@@ -4885,14 +4916,6 @@ msgstr ""
 msgid ""
 "Defines Queue, TicketType and new TicketType for "
 "TicketQueueMoveWorkflowTickettype."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Defines a list of Ticket Dynamic Fields which are evaluated by the "
-"KIXMobileApp. The lists consists of dynamic field names (e.g. "
-"'MobileProcessingState') or regular expressions matching dynamic field names "
-"(e.g. 'MobileProcessingChecklist.*')."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

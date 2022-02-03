@@ -312,8 +312,9 @@ sub _GetTicketData {
                     next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
 
                     my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
-                        Config => $DynamicFieldConfig,
-                        Value  => $TicketRaw{$Attribute}
+                        Config          => $DynamicFieldConfig,
+                        Value           => $TicketRaw{$Attribute},
+                        NoDisplayValues => [ split(',', $Param{Data}->{NoDynamicFieldDisplayValues}||'') ]
                     );
 
                     if (IsHashRefWithData($PreparedValue)) {
