@@ -249,8 +249,7 @@ sub Search {
             if ( $Param{UserType} eq 'Customer' ) {
                 $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art.customer_visible = 1)';
             }
-
-            push( @SQLWhere, '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art.customer_visible = 1)' );
+            push( @SQLWhere, $FieldQuery );
         }
     }
 
