@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-2-3 14:22+0000\n"
-"PO-Revision-Date: 2022-01-20 09:44+0000\n"
+"PO-Revision-Date: 2022-02-04 14:44+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -180,7 +180,7 @@ msgstr "Customer Reader"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer Response :: reopen from pending"
-msgstr ""
+msgstr "Customer Response - reopen from pending"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer removed ticket."
@@ -215,6 +215,8 @@ msgid ""
 "Event based Execution Plan for Job \"Customer Response :: reopen from pending"
 "\""
 msgstr ""
+"Event-basierter Ausführungsplan für Job \"Customer Response :: reopen from "
+"pending\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -453,6 +455,7 @@ msgstr "Rack"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Reopens ticket from pending by customer response."
 msgstr ""
+"Setzt ein wartendes Ticket auf \"offen\" wenn eine Kundenantwort eintrifft."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Repair"
@@ -600,7 +603,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent (w/o teams)"
-msgstr ""
+msgstr "Ticket Agent (ohne Teamberechtigung)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
@@ -1134,15 +1137,15 @@ msgstr "Werte"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "Assign a value to a macro variable."
-msgstr ""
+msgstr "Einer Macro-Variable einen Wert zuweisen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "The value to assign."
-msgstr ""
+msgstr "Zuzuweisender Wert."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "The variable to assign to."
-msgstr ""
+msgstr "Variablenname für Zuweisung."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "Value"
@@ -1621,7 +1624,7 @@ msgstr "Der Name des Typs, der gesetzt wird."
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "Configuration Options Reference"
-msgstr ""
+msgstr "Verweis auf Konfigurationsoptionen"
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "Default value"
@@ -1709,7 +1712,7 @@ msgstr "Auswahl entfernen"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
 msgid "%s rows"
-msgstr ""
+msgstr "%s Zeilen"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
 msgid "Maximum size is %s characters."
