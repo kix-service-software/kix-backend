@@ -652,7 +652,8 @@ sub MacroActionExecute {
     # fallback if not already known
     $Self->{MacroResults} //= {
         RootObjectID => $Self->{RootObjectID},
-        ObjectID     => $Param{ObjectID}
+        ObjectID     => $Param{ObjectID},
+        Event        => $Self->{Event},
     };
 
     # we need the result variables and macro results for the assignments
@@ -661,6 +662,9 @@ sub MacroActionExecute {
 
     # add root object id
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
+
+    # add event data
+    $BackendObject->{Event} = $Self->{Event};
 
     my %Parameters = %{$MacroAction{Parameters} || {}};
 
