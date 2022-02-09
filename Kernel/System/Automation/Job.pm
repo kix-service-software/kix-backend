@@ -1021,6 +1021,7 @@ sub JobExecute {
                         my $Result = $Self->MacroExecute(
                             ID        => $MacroID,
                             ObjectID  => $ObjectID,
+                            Event     => $Param{Data},
                             UserID    => $Param{UserID},
                         );
 
