@@ -126,7 +126,6 @@
 "Superuser";"Property";"/*{}";"x";"x";"x";"x";
 "Customer";"Resource";"/auth";"x";;;;
 "Customer";"Resource";"/cmdb";;"x";;;
-"Customer";"Resource";"/contacts";"x";"x";;;
 "Customer";"Resource";"/faq";;"x";;;
 "Customer";"Resource";"/faq/*";;;;;
 "Customer";"Resource";"/faq/articles";;"x";;;
