@@ -423,7 +423,6 @@ sub NotificationSend {
             EventList => \@EventList,
             ClientIDs => \@ClientIDs
         },
-        MaximumParallelInstances => 1,
     );
 
     # delete the cached events we sent
@@ -468,7 +467,7 @@ sub NotificationSendWorker {
     if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
         $Self->{LogObject}->Log( 
             Priority => 'debug',
-            Message  => "Sending client notifications: ".Data::Dumper::Dumper(\%Param)
+            Message  => "[ClientNotification] sending client notifications: ".Data::Dumper::Dumper(\%Param)
         );
     }
 
@@ -546,7 +545,28 @@ sub _NotificationSendToClient {
         Data => $Param{EventList},
     );
     $Request->content($JSON);
+    if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
+        $Self->{LogObject}->Log( 
+            Priority => 'debug',
+            Message  => "[ClientNotification] executing request to client: ".$Request->as_string()
+        );
+        $Self->{LogObject}->Log( 
+            Priority => 'debug',
+            Message  => "[ClientNotification] LWP object: ".Data::Dumper::Dumper($Self->{UserAgent})
+        );
+        $Self->{LogObject}->Log( 
+            Priority => 'debug',
+            Message  => "[ClientNotification] ENV: ".Data::Dumper::Dumper(\%ENV)
+        );
+    }
     my $Response = $Self->{UserAgent}->request($Request);
+
+    if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
+        $Self->{LogObject}->Log( 
+            Priority => 'debug',
+            Message  => "[ClientNotification] client response: ".$Response->as_string()
+        );
+    }
 
     if ( !$Response->is_success ) {
         $Kernel::OM->Get('Log')->Log(

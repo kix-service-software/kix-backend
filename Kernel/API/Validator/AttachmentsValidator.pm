@@ -64,79 +64,70 @@ sub Validate {
     }
 
     my $Found;
-    if ( $Param{Attribute} eq 'Attachments' ) {
-        # check if array ref
-        if ( IsArrayRefWithData($Param{Data}->{$Param{Attribute}}) ) {
-            my $ConfigObject = $Kernel::OM->Get('Config');
+    if ( $Param{Attribute} eq 'Attachments' && IsHashRefWithData($Param{Data}->{$Param{Attribute}}) ) {
+        my $ConfigObject = $Kernel::OM->Get('Config');
 
-            my $ForbiddenExtensions   = $ConfigObject->Get('FileUpload::ForbiddenExtensions');
-            my $ForbiddenContentTypes = $ConfigObject->Get('FileUpload::ForbiddenContentTypes');
-            my $AllowedExtensions     = $ConfigObject->Get('FileUpload::AllowedExtensions');
-            my $AllowedContentTypes   = $ConfigObject->Get('FileUpload::AllowedContentTypes');
+        my $ForbiddenExtensions   = $ConfigObject->Get('FileUpload::ForbiddenExtensions');
+        my $ForbiddenContentTypes = $ConfigObject->Get('FileUpload::ForbiddenContentTypes');
+        my $AllowedExtensions     = $ConfigObject->Get('FileUpload::AllowedExtensions');
+        my $AllowedContentTypes   = $ConfigObject->Get('FileUpload::AllowedContentTypes');
 
-            $Found = 1;
-            # check each attachment
-            ATTACHMENT:
-            foreach my $Attachment ( @{$Param{Data}->{$Param{Attribute}}} ) {
-                if ( !IsHashRefWithData($Attachment) ) {
-                    $Found = 0;
-                    last ATTACHMENT;    
+        $Found = 1;
+
+        my $Attachment = $Param{Data}->{$Param{Attribute}};
+        foreach my $Needed ( qw(ContentType Filename) ) {
+            if ( !$Attachment->{$Needed} ) {
+                $Found = 0;
+                last ATTACHMENT;
+            }
+
+            # check allowed size
+            if ( $Attachment->{Content} && bytes::length($Attachment->{Content}) > $ConfigObject->Get('FileUpload::MaxAllowedSize') ) {
+                return $Self->_Error(
+                    Code    => 'Validator.Failed',
+                    Message => "Size of attachment exceeds maximum allowed size (attachment: $Attachment->{Filename})!",
+                );
+            }
+
+            # check forbidden file extension
+            if ( $ForbiddenExtensions && $Attachment->{Filename} =~ /$ForbiddenExtensions/ ) {
+                return $Self->_Error(
+                    Code    => 'Validator.Failed',
+                    Message => "Forbidden file type (attachment: $Attachment->{Filename})!",
+                );
+            }
+
+            # check forbidden content type
+            if ( $ForbiddenContentTypes && $Attachment->{ContentType} =~ /$ForbiddenContentTypes/ ) {
+                return $Self->_Error(
+                    Code    => 'Validator.Failed',
+                    Message => "Forbidden content type (attachment: $Attachment->{Filename})!",
+                );
+            }
+
+            # check allowed file extension
+            if ( $AllowedExtensions && $Attachment->{Filename} !~ /$AllowedExtensions/ ) {
+                # check allowed content type as fallback
+                if ( $AllowedContentTypes && $Attachment->{ContentType} !~ /$AllowedContentTypes/ ) {
+                    return $Self->_Error(
+                        Code    => 'Validator.Failed',
+                        Message => "Content type not allowed (attachment: $Attachment->{Filename})!",
+                    );
                 }
-                foreach my $Needed ( qw(ContentType Filename) ) {
-                    if ( !$Attachment->{$Needed} ) {
-                        $Found = 0;
-                        last ATTACHMENT;
-                    }
-
-                    # check allowed size
-                    if ( $Attachment->{Content} && bytes::length($Attachment->{Content}) > $ConfigObject->Get('FileUpload::MaxAllowedSize') ) {
-                        return $Self->_Error(
-                            Code    => 'Validator.Failed',
-                            Message => "Size of attachment exceeds maximum allowed size (attachment: $Attachment->{Filename})!",
-                        );                        
-                    }
-
-                    # check forbidden file extension 
-                    if ( $ForbiddenExtensions && $Attachment->{Filename} =~ /$ForbiddenExtensions/ ) {
-                        return $Self->_Error(
-                            Code    => 'Validator.Failed',
-                            Message => "Forbidden file type (attachment: $Attachment->{Filename})!",
-                        );                        
-                    }
-
-                    # check forbidden content type
-                    if ( $ForbiddenContentTypes && $Attachment->{ContentType} =~ /$ForbiddenContentTypes/ ) {
-                        return $Self->_Error(
-                            Code    => 'Validator.Failed',
-                            Message => "Forbidden content type (attachment: $Attachment->{Filename})!",
-                        );                        
-                    }
-
-                    # check allowed file extension 
-                    if ( $AllowedExtensions && $Attachment->{Filename} !~ /$AllowedExtensions/ ) {
-                        # check allowed content type as fallback
-                        if ( $AllowedContentTypes && $Attachment->{ContentType} !~ /$AllowedContentTypes/ ) {
-                            return $Self->_Error(
-                                Code    => 'Validator.Failed',
-                                Message => "Content type not allowed (attachment: $Attachment->{Filename})!",
-                            );                        
-                        }
-                        elsif ( !$AllowedContentTypes ) {
-                            return $Self->_Error(
-                                Code    => 'Validator.Failed',
-                                Message => "File type not allowed (attachment: $Attachment->{Filename})!",
-                            );                        
-                        }
-                    }
-
-                    # check allowed content type 
-                    if ( $AllowedContentTypes && $Attachment->{ContentType} !~ /$AllowedContentTypes/ ) {
-                        return $Self->_Error(
-                            Code    => 'Validator.Failed',
-                            Message => "File type not allowed (attachment: $Attachment->{Filename})!",
-                        );                        
-                    }
+                elsif ( !$AllowedContentTypes ) {
+                    return $Self->_Error(
+                        Code    => 'Validator.Failed',
+                        Message => "File type not allowed (attachment: $Attachment->{Filename})!",
+                    );
                 }
+            }
+
+            # check allowed content type
+            if ( $AllowedContentTypes && $Attachment->{ContentType} !~ /$AllowedContentTypes/ ) {
+                return $Self->_Error(
+                    Code    => 'Validator.Failed',
+                    Message => "File type not allowed (attachment: $Attachment->{Filename})!",
+                );
             }
         }
     }
@@ -151,10 +142,10 @@ sub Validate {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => "Validation of attribute $Param{Attribute} failed (wrong structure or missing required values) !",
-        );        
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;

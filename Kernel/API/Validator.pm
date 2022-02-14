@@ -126,7 +126,7 @@ sub Validate {
 
         # ignore placeholder values
         next if $Param{Data}->{$Attribute} =~ m/^<KIX_.+>$/;
-        if ($Param{Data}->{$Attribute} =~ m/^0$|^[1-9]\d*$/) {
+        if ($Param{Data}->{$Attribute} =~ m/^0$|^[1-9]\d{1,19}$/ ) {
             $Param{Data}->{$Attribute} = 0 + $Param{Data}->{$Attribute};
         }
 
@@ -177,15 +177,22 @@ sub _ValidateAttribute {
         Success => 1,
     };
 
+    my @Values = IsArrayRef($Param{Data}->{$Param{Attribute}}) ? @{$Param{Data}->{$Param{Attribute}}} : ( $Param{Data}->{$Param{Attribute}} );
+
     VALIDATOR:
     foreach my $Validator ( @{$Self->{Validators}->{$Param{Attribute}}} ) {
-        my $ValidatorResult = $Validator->Validate(
-            %Param,
-        );
+        foreach my $Value ( @Values ) {
+            my $ValidatorResult = $Validator->Validate(
+                Attribute => $Param{Attribute},
+                Data      => {
+                    $Param{Attribute} => $Value
+                }
+            );
 
-        if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {
-            $Result = $ValidatorResult;
-            last VALIDATOR;
+            if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {
+                $Result = $ValidatorResult;
+                last VALIDATOR;
+            }
         }
     }
 

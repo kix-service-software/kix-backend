@@ -193,50 +193,11 @@ sub SetResult {
         return;
     }
     
-    $Self->{Results} //= {};
+    $Self->{MacroResults} //= {};
 
     my $VariableName = $Self->{ResultVariables}->{$Param{Name}} || $Param{Name};
 
-    $Self->{Results}->{$VariableName} = $Param{Value};
-
-    # include all data of an object as separate values
-    if ( IsHashRefWithData($Param{Value}) || IsObject($Param{Value}, $Kernel::OM->GetModuleFor('Automation::Helper::Object')) ) {
-        my $FlatData = $Kernel::OM->Get('Main')->Flatten(
-            Data => $Param{Value}
-        );
-        if ( IsHashRefWithData($FlatData) ) {
-            # combine with existing results
-            my %TmpHash = map { $VariableName.'.'.$_ => $FlatData->{$_} } keys %{$FlatData};
-            $Self->{Results} = {
-                %{$Self->{Results}},
-                %TmpHash,
-            };
-        }
-
-        foreach my $Key ( keys %{$Param{Value}} ) {
-            $Self->SetResult(
-                Name  => $VariableName.'.'.$Key,
-                Value => $Param{Value}->{$Key},
-            )
-        }
-    }
-    elsif ( IsArrayRefWithData($Param{Value}) ) {
-        my $Index = 0;
-        foreach my $Item ( @{$Param{Value}} ) {
-            $Self->SetResult(
-                Name  => $VariableName.':'.$Index++,
-                Value => $Item,
-            )
-        }
-    }
-
-    # merge results
-    if (IsHashRefWithData($Self->{Results})) {
-        %{$Self->{MacroResults}} = (
-            %{$Self->{MacroResults}},
-            %{$Self->{Results}}
-        );
-    }
+    $Self->{MacroResults}->{$VariableName} = $Param{Value};
 
     return 1;
 }

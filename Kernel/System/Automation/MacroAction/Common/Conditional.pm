@@ -111,7 +111,10 @@ sub Run {
         my $Result = $AutomationObject->MacroExecute(
             ID       => $Param{Config}->{MacroID},
             ObjectID => $Param{ObjectID},
-            UserID   => $Param{UserID}
+            UserID   => $Param{UserID},
+
+            # keep root object id
+            RootObjectID => $Self->{RootObjectID} || $Param{ObjectID}
         );
     }
     if ( $@ ) {

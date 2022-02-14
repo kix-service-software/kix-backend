@@ -1116,7 +1116,7 @@ sub DisplayKeyRender {
     my @Keys;
     VALUEITEM:
     for my $Item (@Values) {
-        next VALUEITEM if !$Item;
+        next VALUEITEM if !defined $Item;
 
         push @Keys, $Item;
     }

@@ -53,12 +53,14 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get source data
-    my $SourceData = $Self->GetSourceData(Type => 'faq_category');
+    my $SourceData = $Self->GetSourceData(Type => 'faq_category', OrderBy => 'id');
 
     # bail out if we don't have something to todo
     return if !IsArrayRefWithData($SourceData);
 
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
+
+    my %CategoryReferenceMapping;
 
     foreach my $Item ( @{$SourceData} ) {
 
@@ -84,12 +86,19 @@ sub Run {
 
         # insert row
         if ( !$ID ) {
+            my $ParentID = $Item->{parent_id};
+
             $ID = $Self->Insert(
                 Table          => 'faq_category',
                 PrimaryKey     => 'id',
                 Item           => $Item,
                 AutoPrimaryKey => 1,
             );
+
+            # build the mapping for later
+            $CategoryReferenceMapping{$ID} = {
+                parent_id => $ParentID,
+            };
         }
 
         if ( $ID ) {
@@ -99,6 +108,33 @@ sub Run {
             $Self->UpdateProgress($Param{Type}, 'Error');
         }
     }
+
+    if ( %CategoryReferenceMapping ) {
+        foreach my $ID ( sort keys %CategoryReferenceMapping ) {
+            my %Item = (
+                id => $ID,
+            );
+            foreach my $RefAttr ( sort keys %{$CategoryReferenceMapping{$ID}} ) {
+                next if !$CategoryReferenceMapping{$ID}->{$RefAttr};
+
+                my $MappedID = $Self->GetOIDMapping(
+                    ObjectType     => 'faq_category',
+                    SourceObjectID => $CategoryReferenceMapping{$ID}->{$RefAttr},
+                );
+                $Item{$RefAttr} = $MappedID;
+            }
+
+            next if keys %Item == 1;
+
+            # update the references
+            $Self->Update(
+                Table      => 'faq_category',
+                PrimaryKey => 'id',
+                Item       => \%Item,
+            );
+        }
+    }
+
 
     return 1;
 }

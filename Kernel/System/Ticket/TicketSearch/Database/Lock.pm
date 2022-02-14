@@ -14,6 +14,7 @@ use warnings;
 use base qw(
     Kernel::System::Ticket::TicketSearch::Database::Common
 );
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Config',
@@ -49,10 +50,10 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Search => [ 
-            'LockID' 
+        Search => [
+            'LockID'
         ],
-        Sort   => [ 
+        Sort   => [
             'LockID '
         ]
     };
@@ -86,6 +87,10 @@ sub Search {
         return;
     }
 
+    if (IsArrayRefWithData($Param{Search}->{Value})) {
+        $Param{Search}->{Operator} = 'IN';
+    }
+
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, 'st.ticket_lock_id = '.$Param{Search}->{Value} );
     }
@@ -102,7 +107,7 @@ sub Search {
 
     return {
         SQLWhere => \@SQLWhere,
-    };        
+    };
 }
 
 
@@ -131,7 +136,7 @@ sub Sort {
         SQLOrderBy => [
             'st.ticket_lock_id'
         ],
-    };       
+    };
 }
 
 1;

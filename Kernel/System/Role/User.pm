@@ -147,8 +147,9 @@ sub RoleUserList {
 remove a user from the role
 
     my $Success = $RoleObject->RoleUserDelete(
-        RoleID => 6,       # required if UserID not given
-        UserID => 12,      # required if RoleID not given
+        RoleID => 6,                    # required if UserID not given
+        UserID => 12,                   # required if RoleID not given
+        IgnoreContextRoles => 1,        # optional, don't delete the base roles assigned by the user context
     );
 
 =cut
@@ -166,6 +167,10 @@ sub RoleUserDelete {
     }
 
     my $SQL = 'DELETE FROM role_user WHERE 1=1 ';
+
+    if ( $Param{IgnoreContextRoles} ) {
+        $SQL .= 'AND role_id NOT IN (SELECT id FROM roles WHERE name IN (\'Customer\', \'Agent User\')) ';
+    }
     
     my @Bind;
     if ( $Param{UserID} ) {
