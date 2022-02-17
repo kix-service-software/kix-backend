@@ -1448,7 +1448,11 @@ sub _ApplyFilter {
 
                                     my @FieldValues = ($FieldValue);
                                     if ( IsArrayRef($FieldValue) ) {
-                                        @FieldValues = @{$FieldValue}
+                                        if (IsArrayRefWithData($FieldValue)) {
+                                            @FieldValues = @{$FieldValue}
+                                        } else {
+                                            @FieldValues = (undef);
+                                        }
                                     }
 
                                     # handle multiple FieldValues (array)
