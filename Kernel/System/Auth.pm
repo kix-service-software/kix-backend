@@ -280,7 +280,7 @@ sub Auth {
 
         # remember failed logins
         my $UserID = $UserObject->UserLookup(
-            UserLogin => $User,
+            UserLogin => $Param{User},
         );
 
         return if !$UserID;
