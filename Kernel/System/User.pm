@@ -1718,6 +1718,13 @@ sub SetPreferences {
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User.UserPreference',
+        ObjectID  => $Param{UserID} . '::' . $Param{Key},
+    );
+
     # set preferences
     return $PreferencesObject->SetPreferences(%Param);
 }
