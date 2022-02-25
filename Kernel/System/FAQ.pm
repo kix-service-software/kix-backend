@@ -88,7 +88,7 @@ sub new {
     # currently there are no FAQ event modules but is needed to initialize otherwise errors are
     #     log due to searching undefined setting into ConfigObject.
     $Self->EventHandlerInit(
-        Config => '',
+        Config => 'FAQ::EventModulePost',
     );
 
     return $Self;

@@ -580,7 +580,8 @@ sub MacroExecute {
         push @{$Self->{ParentMacroID}}, $Self->{MacroID};
     } else {
         $Self->{MacroResults} = {
-            RootObjectID => $Param{RootObjectID} || $Param{ObjectID}
+            RootObjectID => $Param{RootObjectID} || $Param{ObjectID},
+            Event        => $Param{Event} || {},
         };
     }
 
@@ -596,6 +597,9 @@ sub MacroExecute {
 
     # keep root object id
     $Self->{RootObjectID} = $Param{RootObjectID} || $Param{ObjectID};
+
+    # keep event data
+    $Self->{Event} = $Param{Event} || {};
 
     # get Macro data
     my %Macro = $Self->MacroGet(
@@ -633,6 +637,7 @@ sub MacroExecute {
     $BackendObject->{MacroID}      = $Param{ID};
     $BackendObject->{ObjectID}     = $Param{ObjectID};
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
+    $BackendObject->{Event}        = $Self->{Event};
 
     my $CacheType = Digest::MD5::md5_hex(
         ($Self->{JobID} ? $Self->{JobID} : '') . '::' .

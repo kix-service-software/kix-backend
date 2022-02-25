@@ -1429,9 +1429,18 @@ sub _ApplyFilter {
                                         $FilterValue = exists( $ObjectItem->{$1} ) ? $ObjectItem->{$1} : undef;
                                     }
                                     elsif ($FilterValue) {
+                                        if(
+                                            IsStringWithData($FilterValue) &&
+                                            grep {$FilterItem->{Operator} eq $_} qw(CONTAINS STARTSWITH ENDSWITH LIKE)
+                                        ) {
+                                            # make non word characters literal to prevent invalid regex (e.g. only opened brackets "[some*test" ==> "\[some*test")
+                                            $FilterValue =~ s/([^\w\s\*\\])/\\$1/g;
+                                            # remove possible unnecessary added backslash
+                                            $FilterValue =~ s/\\\\/\\/g;
 
-                                        # replace wildcards with valid RegEx in FilterValue
-                                        $FilterValue =~ s/\*/.*?/g;
+                                            # replace wildcards with valid RegEx in FilterValue
+                                            $FilterValue =~ s/\*/.*?/g;
+                                        }
                                     }
                                     else {
                                         $FilterValue = undef;
@@ -1439,7 +1448,11 @@ sub _ApplyFilter {
 
                                     my @FieldValues = ($FieldValue);
                                     if ( IsArrayRef($FieldValue) ) {
-                                        @FieldValues = @{$FieldValue}
+                                        if (IsArrayRefWithData($FieldValue)) {
+                                            @FieldValues = @{$FieldValue}
+                                        } else {
+                                            @FieldValues = (undef);
+                                        }
                                     }
 
                                     # handle multiple FieldValues (array)
@@ -2268,7 +2281,7 @@ sub _ExpandObject {
         foreach my $Key ( keys %{$ResultData} ) {
             $Data->{$StoreTo.'.'.$Key} = $ResultData->{$Key}
         }
-        
+
         # reverse the flatten
         $Data = $Kernel::OM->Get('Main')->Unflatten(
             Data => $Data

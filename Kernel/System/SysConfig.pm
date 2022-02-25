@@ -849,6 +849,9 @@ sub Rebuild {
     # This is the sorted configuration XML entry list that we must populate here.
     $Self->{XMLConfig} = [];
     
+    my %HandledKeys;
+    my %AllOptions = $Self->OptionGetAll();
+
     foreach my $Directory ( @Directories ) {
 
         $Kernel::OM->Get('Log')->Log(
@@ -887,8 +890,26 @@ sub Rebuild {
             $Data{$File} = $XMLObject->XMLin($ConfigFile);
         }
 
-        my $Result = $Self->_RebuildFromFile(
+        my %RebuiltKeys = $Self->_RebuildFromFile(
             Data => \%Data,
+        );
+        %HandledKeys = (
+            %HandledKeys,
+            %RebuiltKeys
+        );
+    }
+
+    # cleanup all no-longer existing options
+    my @OptionList = $Self->OptionList();
+    foreach my $Name ( @OptionList ) {
+        next if $HandledKeys{$Name};
+
+        # keep options with context
+        next if IsHashRefWithData($AllOptions{$Name}) && $AllOptions{$Name}->{Context};
+
+        # delete DB entry
+        $Self->OptionDelete(
+            Name => $Name
         );
     }
 
@@ -1041,7 +1062,6 @@ sub _RebuildFromFile {
             );
         }
         else {
-
             # we have to update the option
             my $Result = $Self->OptionUpdate(
                 %{ $AllOptions{ $Option{Name} } },
@@ -1053,21 +1073,7 @@ sub _RebuildFromFile {
         $Count++;
     }
 
-    # cleanup all no-longer existing options
-    my @OptionList = $Self->OptionList();
-    foreach my $Name ( @OptionList ) {
-        next if $ExistingKeys{$Name};
-
-        # keep options with context
-        next if IsHashRefWithData($AllOptions{$Name}) && $AllOptions{$Name}->{Context};
-
-        # delete DB entry
-        $Self->OptionDelete(
-            Name => $Name
-        );
-    }
-
-    return 1;
+    return %ExistingKeys;
 }
 
 1;

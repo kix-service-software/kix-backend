@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-7 06:46+0000\n"
-"PO-Revision-Date: 2021-11-09 13:48+0000\n"
-"Last-Translator: rbo <Rene.Boehm@cape-it.de>\n"
+"POT-Creation-Date: 2022-2-3 14:22+0000\n"
+"PO-Revision-Date: 2022-02-04 14:44+0000\n"
+"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.4\n"
+"X-Generator: Weblate 4.10.1\n"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
@@ -179,6 +179,10 @@ msgid "Customer Reader"
 msgstr "Customer Reader"
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer Response :: reopen from pending"
+msgstr "Customer Response - reopen from pending"
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer removed ticket."
 msgstr "Kunde/Anwender entfernte das Ticket."
 
@@ -205,6 +209,14 @@ msgstr "Embedded"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Enterprise Licence"
 msgstr "Enterprise Lizenz"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid ""
+"Event based Execution Plan for Job \"Customer Response :: reopen from pending"
+"\""
+msgstr ""
+"Event-basierter Ausführungsplan für Job \"Customer Response :: reopen from "
+"pending\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -301,8 +313,16 @@ msgid "Laptop"
 msgstr "Laptop"
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Macro for Job \"Customer Response :: reopen from pending\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr "Macro für Job \"KIX Field Agent - Mobile Processing Rejected\""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "MacroAction for Job \"Customer Response :: reopen from pending\""
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
@@ -431,6 +451,11 @@ msgstr "Eigenschaft"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Rack"
 msgstr "Rack"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Reopens ticket from pending by customer response."
+msgstr ""
+"Setzt ein wartendes Ticket auf \"offen\" wenn eine Kundenantwort eintrifft."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Repair"
@@ -578,7 +603,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent (w/o teams)"
-msgstr ""
+msgstr "Ticket Agent (ohne Teamberechtigung)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
@@ -965,8 +990,7 @@ msgstr ""
 msgid "The logical expression to evaluate."
 msgstr ""
 "Fügen Sie einen logischen Ausdruck ein. Wenn dieser zutrifft, werden die "
-"folgenden Macro-Actions ausgeführt. Im Admin-Handbuch finden Sie "
-"detailiertere Informationen."
+"folgenden Macro-Actions ausgeführt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Create a report from a report definition."
@@ -1113,15 +1137,15 @@ msgstr "Werte"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "Assign a value to a macro variable."
-msgstr ""
+msgstr "Einer Macro-Variable einen Wert zuweisen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "The value to assign."
-msgstr ""
+msgstr "Zuzuweisender Wert."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "The variable to assign to."
-msgstr ""
+msgstr "Variablenname für Zuweisung."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
 msgid "Value"
@@ -1600,7 +1624,7 @@ msgstr "Der Name des Typs, der gesetzt wird."
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "Configuration Options Reference"
-msgstr ""
+msgstr "Verweis auf Konfigurationsoptionen"
 
 #. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
 msgid "Default value"
@@ -1688,7 +1712,7 @@ msgstr "Auswahl entfernen"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
 msgid "%s rows"
-msgstr ""
+msgstr "%s Zeilen"
 
 #. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
 msgid "Maximum size is %s characters."
@@ -1999,7 +2023,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
-msgstr "API Modulregistrierung für Operation-Layer."
+msgstr "API-Modulregistrierung für die Operationsschicht."
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
@@ -2161,7 +2185,7 @@ msgstr "Aufsteigend"
 
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "API module registration for the validator layer."
-msgstr "API-Modul-Registrierung für Validator-Layer."
+msgstr "API-Modulregistrierung für die Validator-Schicht."
 
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "Disable API validator for specific resources. Use RegEx."
@@ -2844,9 +2868,9 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Defines the fall-back path to open fetchmail binary. Note: The name of the "
-"binary needs to be 'fetchmail', if it is different please use a symbolic "
-"link."
+"Defines the fetchmail.rc to be used. The rc file will be generated in /tmp. "
+"The local mailbox user must be \"kix\". Use /usr/local/bin/procmail.sh as "
+"the MDA."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3032,6 +3056,11 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"Defines the procmail.rc to be used. The rc file will be generated in /tmp."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the redis server to connect."
 msgstr ""
 
@@ -3183,7 +3212,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField backend registration."
-msgstr ""
+msgstr "DynamicField Backend Registrierung."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField object registration."
@@ -3523,7 +3552,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
-msgstr "Beinhaltet"
+msgstr "Includes"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Inline"
@@ -3531,7 +3560,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Input"
-msgstr ""
+msgstr "Eingabe"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "International Workers' Day"
@@ -4694,26 +4723,26 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
 msgid ""
-"Defines the initial setting of the position reporting behavior of "
-"the KIX Field Agent app when the user first logs into the app on a device. "
-"The app-specific setting applies to further use."
+"Defines the initial setting of the position reporting behavior of the KIX "
+"Field Agent app when the user first logs into the app on a device. The app-"
+"specific setting applies to further use."
 msgstr ""
-"Definiert, welche Mindeständerungen der Position für die Meldung einer "
-"neuer Position des Nutzers der KIX Field Agent App benötigt werden. "
-"Die Entfernung wird in Metern angegeben. Der Wert muss in natürlichen "
-"Zahlen größer Null angegeben werden. Ungültige Einstellungen führen dazu, "
-"dass die App einen Standardwert verwendet."
+"Definiert, welche Mindeständerungen der Position für die Meldung einer neuer "
+"Position des Nutzers der KIX Field Agent App benötigt werden. Die Entfernung "
+"wird in Metern angegeben. Der Wert muss in natürlichen Zahlen größer Null "
+"angegeben werden. Ungültige Einstellungen führen dazu, dass die App einen "
+"Standardwert verwendet."
 
 #. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
 msgid ""
-"Defines the minimum position changes required to report a new position "
-"for the user of the KIX Field Agent App. The distance is given in meters. "
-"The value must be given in natural numbers greater than zero. Invalid "
-"settings cause the app to use a default value."
+"Defines the minimum position changes required to report a new position for "
+"the user of the KIX Field Agent App. The distance is given in meters. The "
+"value must be given in natural numbers greater than zero. Invalid settings "
+"cause the app to use a default value."
 msgstr ""
-"Definiert die anfängliche Einstellung des Positionsmeldeverhaltens der "
-"KIX Field Agent-App bei der ersten Anmeldung des Benutzers in der App auf "
-"einem Gerät. Für die weitere Nutzung gilt die App-spezifische Einstellung."
+"Definiert die anfängliche Einstellung des Positionsmeldeverhaltens der KIX "
+"Field Agent-App bei der ersten Anmeldung des Benutzers in der App auf einem "
+"Gerät. Für die weitere Nutzung gilt die App-spezifische Einstellung."
 
 #. SysConfig: Kernel/Config/Files/Migration/KIX17.xml
 msgid "Object handler registration for data migration."
@@ -5432,7 +5461,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Registration of a macro action type for automation."
-msgstr ""
+msgstr "Registrierung eines Makroaktionstyps für die Automatisierung."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Registration of a macro type for automation."
