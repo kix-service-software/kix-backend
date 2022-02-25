@@ -2974,18 +2974,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###200-CreateFAQEntry" Required="0" Valid="0">
-        <Description Translatable="1">Enables creation of a FAQ entry from currently created article.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>FAQWorkflow</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::CreateFAQEntry</Item>
-                <Item Key="Event">(ArticleCreate)</Item>
-                <Item Key="Transaction">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###700-TicketStateWorkflowTypeUpdate" Required="0" Valid="0">
         <Description Translatable="1">Updates ticket state if configured or required after type update.</Description>
         <Group>Ticket</Group>
@@ -3161,18 +3149,6 @@ Thanks for your help!
                 <Item Key="Module">Kernel::System::Ticket::Event::DFTypeObjectReferenceAddLink</Item>
                 <Item Key="Event">DynamicFieldUpdate</Item>
             </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::TicketDynamicFields" Required="0" Valid="1">
-        <Description Translatable="1">Defines a list of Ticket Dynamic Fields which are evaluated by the KIXMobileApp. The lists consists of dynamic field names (e.g. 'MobileProcessingState') or regular expressions matching dynamic field names (e.g. 'MobileProcessingChecklist.*').</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::DynamicField</SubGroup>
-        <Setting>
-            <Array>
-                <Item>MobileProcessingState</Item>
-                <Item>RiskAssumptionRemark</Item>
-                <Item>MobileProcessingChecklist.*</Item>
-            </Array>
         </Setting>
     </ConfigItem>
 

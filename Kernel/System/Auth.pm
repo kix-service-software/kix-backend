@@ -253,7 +253,7 @@ sub Auth {
     if ( $Param{UsageContext} && $User ) {
         # remember failed logins
         my $UserID = $UserObject->UserLookup(
-            UserLogin => $Param{User},
+            UserLogin => $User,
         );
 
         return if !$UserID;
@@ -281,16 +281,17 @@ sub Auth {
         # remember failed logins
         my $UserID = $UserObject->UserLookup(
             UserLogin => $Param{User},
+            Silent    => 1,
         );
 
         return if !$UserID;
 
-        my %User = $UserObject->GetUserData(
+        my %UserData = $UserObject->GetUserData(
             UserID => $UserID,
             Valid  => 1,
         );
 
-        my $Count = $User{UserLoginFailed} || 0;
+        my $Count = $UserData{UserLoginFailed} || 0;
         $Count++;
 
         $UserObject->SetPreferences(
@@ -307,7 +308,7 @@ sub Auth {
             $PasswordMaxLoginFailed = $Config->{Password}->{PasswordMaxLoginFailed};
         }
 
-        return if !%User;
+        return if !%UserData;
         return if !$PasswordMaxLoginFailed;
         return if $Count < $PasswordMaxLoginFailed;
 
@@ -316,7 +317,7 @@ sub Auth {
         );
 
         my $Update = $UserObject->UserUpdate(
-            %User,
+            %UserData,
             ValidID      => $ValidID,
             ChangeUserID => 1,
         );
@@ -325,7 +326,7 @@ sub Auth {
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "Login failed $Count times. Set $User{UserLogin} to "
+            Message  => "Login failed $Count times. Set $UserData{UserLogin} to "
                 . "'invalid-temporarily'.",
         );
 

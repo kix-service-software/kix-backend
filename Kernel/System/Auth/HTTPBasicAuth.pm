@@ -25,6 +25,8 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    $Self->{Debug} = $Param{Config}->{Debug} || 0;
+
     $Self->{Count} = $Param{Count} || '';
 
     return $Self;

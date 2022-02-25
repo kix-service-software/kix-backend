@@ -402,9 +402,10 @@ sub ArticleCreate {
 
     # prepare IncomingTime if given
     if ( $Param{IncomingTime} ) {
-        $IncomingTime = $TimeObject->TimeStamp2SystemTime(
+        my $IncomingSystemTime = $TimeObject->TimeStamp2SystemTime(
             String => $Param{IncomingTime},
         );
+        $IncomingTime = $IncomingSystemTime if $IncomingSystemTime;
     }
 
     # check if this is the first article (for notifications)

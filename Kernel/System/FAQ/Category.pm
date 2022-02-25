@@ -561,7 +561,8 @@ sub CategoryLookup {
         $Value = $Param{CategoryID};
 
         my %Category = $Self->CategoryGet(
-            CategoryID => $Param{CategoryID} 
+            CategoryID => $Param{CategoryID},
+            UserID     => 1,
         );
         $ReturnData = $Category{Name};
     }

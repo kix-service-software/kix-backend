@@ -40,15 +40,17 @@ sub Log {
     my $ConfigObject = $Kernel::OM->Get('Config');
     my $EncodeObject = $Kernel::OM->Get('Encode');
 
+    my $Charset = $ConfigObject->Get('LogModule::SysLog::Charset');
+
     # prepare data for byte output
-    if ( $ConfigObject->Get('LogModule::SysLog::Charset') =~ m/^utf-?8$/ ) {
+    if ( $Charset && $Charset =~ m/^utf-?8$/ ) {
         $EncodeObject->EncodeOutput( \$Param{Message} );
     }
     else {
         $Param{Message} = $EncodeObject->Convert(
             Text  => $Param{Message},
             From  => 'utf8',
-            To    => $ConfigObject->Get('LogModule::SysLog::Charset') || 'iso-8859-15',
+            To    => $Charset || 'iso-8859-15',
             Force => 1,
         );
     }

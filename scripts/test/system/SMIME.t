@@ -778,60 +778,6 @@ $Certificates{OTRSRootCA} = {
         'Verify(), successful certificate chain verification, installed CA root certificate and embedded CA certs',
     );
 
-    # testing relations between certificates
-    # fail
-
-    # add relation
-    my $Success = $SMIMEObject->SignerCertRelationAdd(
-        CertFingerprint => 'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX',
-        CAFingerprint   => 'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:',
-        UserID          => 1,
-    );
-    $Self->False(
-        $Success,
-        'SignerCertRelationAdd(), fail, wrong cert fingerprint',
-    );
-
-    # get all relations for a certificate
-    $Success = $SMIMEObject->SignerCertRelationGet(
-        CertFingerprint => 'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX',
-    );
-    $Self->False(
-        $Success,
-        'SignerCertRelationGet(), fail, wrong cert fingerprint',
-    );
-
-    # get one relation by ID
-    $Success = $SMIMEObject->SignerCertRelationGet(
-        ID => '9999999',
-    );
-    $Self->False(
-        $Success,
-        'SignerCertRelationGet(), fail, wrong ID',
-    );
-
-    # true cert
-    # add relation
-    $Success = $SMIMEObject->SignerCertRelationAdd(
-        CertFingerprint => $SMIMEUser1Certificate{Fingerprint},
-        CAFingerprint   => $Certificates{OTRSRDCA}->{Fingerprint},
-        UserID          => 1,
-    );
-    $Self->True(
-        $Success,
-        'SignerCertRelationAdd(), add relation for certificate',
-    );
-
-    $Success = $SMIMEObject->SignerCertRelationAdd(
-        CertFingerprint => $SMIMEUser1Certificate{Fingerprint},
-        CAFingerprint   => $Certificates{OTRSLabCA}->{Fingerprint},
-        UserID          => 1,
-    );
-    $Self->True(
-        $Success,
-        'SignerCertRelationAdd(), add relation for certificate',
-    );
-
     # sign a message after relations added not send CA certs now should be taken automatically by the sign function
     $Sign = $SMIMEObject->Sign(
         Message  => $Message,
@@ -848,67 +794,6 @@ $Certificates{OTRSRootCA} = {
     $Self->True(
         $Data{Successful},
         'Sign(), successful certificate chain verification, signed using stored relations',
-    );
-
-    # get all relations for a certificate
-    my @CertResults = $SMIMEObject->SignerCertRelationGet(
-        CertFingerprint => $SMIMEUser1Certificate{Fingerprint},
-    );
-    $Self->Is(
-        scalar @CertResults,
-        2,
-        'SignerCertRelationGet(), get all certificate relations',
-    );
-
-    # get one relation by ID
-    $Success = $SMIMEObject->SignerCertRelationGet(
-        ID => $CertResults[0]->{ID},
-    );
-    $Self->True(
-        $Success,
-        'SignerCertRelationGet(), get one relation by id',
-    );
-
-    # exists function
-    $Success = $SMIMEObject->SignerCertRelationExists(
-        CertFingerprint => $CertResults[0]->{CertFingerprint},
-        CAFingerprint   => $CertResults[0]->{CAFingerprint},
-    );
-    $Self->True(
-        $Success,
-        'SignerCertRelationExists(), check relation by fingerprints',
-    );
-
-    $Success = $SMIMEObject->SignerCertRelationExists(
-        ID => $CertResults[0]->{ID},
-    );
-    $Self->True(
-        $Success,
-        'SignerCertRelationExists(), check relation by ID',
-    );
-
-    # delete one relation by ID
-    $SMIMEObject->SignerCertRelationDelete(
-        ID => $CertResults[0]->{ID},
-    );
-    $Success = $SMIMEObject->SignerCertRelationExists(
-        ID => $CertResults[0]->{ID},
-    );
-    $Self->False(
-        $Success,
-        'SignerCertRelationDelete(), by ID',
-    );
-
-    # delete all relations for a certificate
-    $SMIMEObject->SignerCertRelationDelete(
-        CertFingerprint => $SMIMEUser1Certificate{Fingerprint},
-    );
-    $Success = $SMIMEObject->SignerCertRelationExists(
-        ID => $CertResults[1]->{ID},
-    );
-    $Self->False(
-        $Success,
-        'SignerCertRelationDelete(), delete all relations',
     );
 
     # delete certificates
@@ -1906,26 +1791,6 @@ VvHrdzP1tlEqZhMhfEgiNYVhYaxg6SaKSVY9GlGmMVrL2rUNIJ5I+Ef0lZh842bF
             }
         };
 
-        # function to create certificate relations directly into the database
-        my $ManualCertRelationAdd = sub {
-            my ( $CertificateHash, $CertificateFingerprint, $CAHash, $CAFingerprint, $TestName ) = @_;
-
-            my $Success = $DBObject->Do(
-                SQL => 'INSERT INTO smime_signer_cert_relations'
-                    . ' ( cert_hash, cert_fingerprint, ca_hash, ca_fingerprint, create_time, create_by, change_time, change_by)'
-                    . ' VALUES (?, ?, ?, ?, current_timestamp, 1, current_timestamp, 1)',
-                Bind => [
-                    \$CertificateHash, \$CertificateFingerprint, \$CAHash, \$CAFingerprint,
-                ],
-            );
-
-            $Self->True(
-                $Success,
-                "Re-Hash $TestName: Manual certificate relation added for"
-                    . " Certificate $CertificateHash and CA $CAHash with true",
-            );
-        };
-
         # set wrong hashes
         my %WrongHashes = (
             OTRSRootCA => 'aaaaaaaa',
@@ -2162,71 +2027,6 @@ VvHrdzP1tlEqZhMhfEgiNYVhYaxg6SaKSVY9GlGmMVrL2rUNIJ5I+Ef0lZh842bF
                 );
             }
 
-            # create a check wrong DB certificate relations
-            if ( $Test->{UseRelations} ) {
-
-                my $ExpectedRelations = ( scalar keys %WrongCAs ) - 1;
-
-                # create certificates relations manually
-                CERTIFICATE:
-                for my $CertName ( sort keys %WrongCAs ) {
-
-                    my $CertificateHash;
-                    my $CertificateFingerprint;
-                    my $CAHash;
-                    my $CAFingerprint;
-
-                    CA:
-                    for my $CAName ( sort keys %WrongCAs ) {
-                        next CA if $CAName eq $CertName;
-
-                        # set relation data
-                        $CertificateHash        = $WrongHashes{$CertName};
-                        $CertificateFingerprint = $Certificates{$CertName}->{Fingerprint};
-                        $CAHash                 = $WrongHashes{$CAName};
-                        $CAFingerprint          = $Certificates{$CAName}->{Fingerprint};
-
-                        # create relations
-                        $ManualCertRelationAdd->(
-                            $CertificateHash,
-                            $CertificateFingerprint,
-                            $CAHash,
-                            $CAFingerprint,
-                            $Test->{Name},
-                        );
-                    }
-
-                    # get relations
-                    my @RelationsData = $SMIMEObject->SignerCertRelationGet(
-                        CertFingerprint => $CertificateFingerprint,
-                    );
-
-                    $Self->Is(
-                        scalar @RelationsData,
-                        $ExpectedRelations,
-                        "Re-Hash $Test->{Name}: Manual certificate relations for"
-                            . " Certificate $CertificateHash number (before re-hash)",
-                    );
-
-                    # remove extended information for easy compare
-                    for my $Relation (@RelationsData) {
-                        delete $Relation->{ID};
-                        delete $Relation->{CreatedBy};
-                        delete $Relation->{Changed};
-                        delete $Relation->{ChangedBy};
-                        delete $Relation->{Created};
-                    }
-
-                    # deep compare wrong relations
-                    $Self->IsDeeply(
-                        \@RelationsData,
-                        $Test->{WrongCAs}->{$CertName}->{WrongRelations},
-                        "Re-Hash $Test->{Name}: Manual certificate relations for"
-                            . " Certificate $CertificateHash data (before re-hash)",
-                    );
-                }
-            }
-
             # refresh the hashes
             my $Response = $SMIMEObject->CheckCertPath();
             $Self->True(
@@ -2255,49 +2055,6 @@ VvHrdzP1tlEqZhMhfEgiNYVhYaxg6SaKSVY9GlGmMVrL2rUNIJ5I+Ef0lZh842bF
                     $Test->{UsePrivateSecrets},
                     $Test->{Name},
                 );
-            }
-
-            # check updated DB certificate relations
-            if ( $Test->{UseRelations} ) {
-
-                my $ExpectedRelations = ( scalar keys %CorrectCAs ) - 1;
-
-                # check updated relations
-                CERTIFICATE:
-                for my $CertName ( sort keys %CorrectCAs ) {
-
-                    my $CertificateFingerprint = $Certificates{$CertName}->{Fingerprint};
-                    my $CertificateHash        = $Certificates{$CertName}->{Hash};
-
-                    # get relations
-                    my @RelationsData = $SMIMEObject->SignerCertRelationGet(
-                        CertFingerprint => $CertificateFingerprint,
-                    );
-
-                    $Self->Is(
-                        scalar @RelationsData,
-                        $ExpectedRelations,
-                        "Re-Hash $Test->{Name}: Manual certificate relations for"
-                            . " Certificate $CertificateHash number (after re-hash)",
-                    );
-
-                    # remove extended information for easy compare
-                    for my $Relation (@RelationsData) {
-                        delete $Relation->{ID};
-                        delete $Relation->{CreatedBy};
-                        delete $Relation->{Changed};
-                        delete $Relation->{ChangedBy};
-                        delete $Relation->{Created};
-                    }
-
-                    # deep compare wrong relations
-                    $Self->IsDeeply(
-                        \@RelationsData,
-                        $CorrectCAs{$CertName}->{CorrectRelations},
-                        "Re-Hash $Test->{Name}: Manual certificate relations for"
-                            . " Certificate $CertificateHash data (after re-hash)",
-                    );
-                }
             }
 
             # remove certificates, private keys and secrets from the file system
@@ -2341,11 +2098,6 @@ VvHrdzP1tlEqZhMhfEgiNYVhYaxg6SaKSVY9GlGmMVrL2rUNIJ5I+Ef0lZh842bF
                             . " $CorrectCAPrivateKeyFile with true",
                     );
 
-                    # remove also certificate relations (if any)
-                    my $Success = $SMIMEObject->SignerCertRelationDelete(
-                        CertFingerprint => $Certificates{$CAName}->{Fingerprint},
-                        UserID          => 1,
-                    );
                     $Self->True(
                         $RemoveSuccess,
                         "Re-Hash $Test->{Name}: system cleanup, remove certificate relations"
@@ -2363,17 +2115,6 @@ VvHrdzP1tlEqZhMhfEgiNYVhYaxg6SaKSVY9GlGmMVrL2rUNIJ5I+Ef0lZh842bF
                             . " $WrongCAPrivateSecretFile with true there was no private key",
                     );
                 }
-
-                # check for certificate relations
-                my @RelationsData = $SMIMEObject->SignerCertRelationGet(
-                    CertFingerprint => $Certificates{$CAName}->{Fingerprint},
-                );
-                $Self->Is(
-                    scalar @RelationsData,
-                    0,
-                    "Re-Hash $Test->{Name}: system cleanup, certificate relations for hash"
-                        . " $Certificates{$CAName}->{Hash} number",
-                );
             }
         }
     }

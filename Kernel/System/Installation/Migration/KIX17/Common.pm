@@ -663,10 +663,10 @@ sub ReplaceOIDMapping {
 
     # save the mapping
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'UPDATE migration SET object_id = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ? AND additional_data = ?',
+        SQL  => 'UPDATE migration SET object_id = ?, additional_data = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
         Bind => [
-            \$Param{ObjectID}, \$Self->{Source}, \$Self->{SourceID}, 
-            \$Param{ObjectType}, \$Param{SourceObjectID}, \$AdditionalData
+            \$Param{ObjectID}, \$AdditionalData, \$Self->{Source}, \$Self->{SourceID}, 
+            \$Param{ObjectType}, \$Param{SourceObjectID},
         ]
     );
     if ( !$Result ) {

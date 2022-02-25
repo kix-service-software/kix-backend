@@ -16,6 +16,7 @@ use Storable;
 
 BEGIN { $SIG{ __WARN__} = sub { return if $_[0] =~ /in cleanup/ }; }
 
+use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -1428,17 +1429,30 @@ sub _ApplyFilter {
                                         $FilterValue = exists( $ObjectItem->{$1} ) ? $ObjectItem->{$1} : undef;
                                     }
                                     elsif ($FilterValue) {
+                                        if(
+                                            IsStringWithData($FilterValue) &&
+                                            grep {$FilterItem->{Operator} eq $_} qw(CONTAINS STARTSWITH ENDSWITH LIKE)
+                                        ) {
+                                            # make non word characters literal to prevent invalid regex (e.g. only opened brackets "[some*test" ==> "\[some*test")
+                                            $FilterValue =~ s/([^\w\s\*\\])/\\$1/g;
+                                            # remove possible unnecessary added backslash
+                                            $FilterValue =~ s/\\\\/\\/g;
 
-                                        # replace wildcards with valid RegEx in FilterValue
-                                        $FilterValue =~ s/\*/.*?/g;
+                                            # replace wildcards with valid RegEx in FilterValue
+                                            $FilterValue =~ s/\*/.*?/g;
+                                        }
                                     }
                                     else {
                                         $FilterValue = undef;
                                     }
 
                                     my @FieldValues = ($FieldValue);
-                                    if ( IsArrayRefWithData($FieldValue) ) {
-                                        @FieldValues = @{$FieldValue}
+                                    if ( IsArrayRef($FieldValue) ) {
+                                        if (IsArrayRefWithData($FieldValue)) {
+                                            @FieldValues = @{$FieldValue}
+                                        } else {
+                                            @FieldValues = (undef);
+                                        }
                                     }
 
                                     # handle multiple FieldValues (array)
@@ -2267,7 +2281,7 @@ sub _ExpandObject {
         foreach my $Key ( keys %{$ResultData} ) {
             $Data->{$StoreTo.'.'.$Key} = $ResultData->{$Key}
         }
-        
+
         # reverse the flatten
         $Data = $Kernel::OM->Get('Main')->Unflatten(
             Data => $Data
@@ -3799,6 +3813,17 @@ sub _SetDynamicFieldValue {
         Value              => $Param{Value},
         UserID             => $Param{UserID},
     );
+    if ( !$Success ) {
+        # get the last error log entry as the message
+        my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message',
+        );
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => $Message,
+        );
+    }
 
     return $Self->_Success();
 }
@@ -3808,8 +3833,9 @@ sub _SetDynamicFieldValue {
 prepares the value of a dynamic field
 
     my $Result = $CommonObject->_GetPrepareDynamicFieldValue(
-        Config     => $Param{Config}HashRef,
-        Value      => 'some value',          # String or Integer or DateTime format
+        Config          => $Param{Config}HashRef,
+        Value           => 'some value',          # String or Integer or DateTime format
+        NoDisplayValues => [<DF types>],          # do not prepare the display value for those DF types
     );
 
     returns
@@ -3840,81 +3866,94 @@ sub _GetPrepareDynamicFieldValue {
         }
     }
 
-    # set language in layout object
-    my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
-        UserID => $Self->{Authorization}->{UserID},
-    );
-    $Kernel::OM->ObjectParamAdd(
-        'Output::HTML::Layout' => {
-            UserLanguage => $Language,
-        },
-    );
+    my %NoPrepare = map { $_ => 1 } @{$Param{NoDisplayValues} || []};
 
-    # add cache dependencies
-    my $Dependencies = $Kernel::OM->Get('DynamicField::Backend')->GetCacheDependencies(
-        DynamicFieldConfig => $Param{Config}
-    );
-    if ( IsArrayRefWithData($Dependencies) ) {
-        $Self->AddCacheDependency(Type => join( ',', @{$Dependencies} ));
-    }
+    if ( !$NoPrepare{$Param{Config}->{FieldType}} ) {
+        print STDERR "preparing\n";
+        # set language in layout object
+        my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+            UserID => $Self->{Authorization}->{UserID},
+        );
+        $Kernel::OM->ObjectParamAdd(
+            'Output::HTML::Layout' => {
+                UserLanguage => $Language,
+            },
+        );
 
-    # get prepared value
-    my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
-        DynamicFieldConfig => $Param{Config},
-        Key                => $Param{Value}
-    );
-
-    # get display value string
-    my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
-        DynamicFieldConfig => $Param{Config},
-        Value              => $Param{Value}
-    );
-
-    if (!IsHashRefWithData($DisplayValue)) {
-        my $Separator = ', ';
-        if (
-            IsHashRefWithData($Param{Config}) &&
-            IsHashRefWithData($Param{Config}->{Config}) &&
-            defined $Param{Config}->{Config}->{ItemSeparator}
-        ) {
-            $Separator = $Param{Config}->{Config}->{ItemSeparator};
+        # add cache dependencies
+        my $Dependencies = $Kernel::OM->Get('DynamicField::Backend')->GetCacheDependencies(
+            DynamicFieldConfig => $Param{Config}
+        );
+        if ( IsArrayRefWithData($Dependencies) ) {
+            $Self->AddCacheDependency(Type => join( ',', @{$Dependencies} ));
         }
 
-        my @Values;
-        if ( ref $DFPreparedValue eq 'ARRAY' ) {
-            @Values = @{ $DFPreparedValue };
-        }
-        else {
-            @Values = ($DFPreparedValue);
+        # get prepared value
+        my $DFPreparedValue = $Kernel::OM->Get('DynamicField::Backend')->ValueLookup(
+            DynamicFieldConfig => $Param{Config},
+            Key                => $Param{Value}
+        );
+
+        # get display value string
+        my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
+            DynamicFieldConfig => $Param{Config},
+            Value              => $Param{Value}
+        );
+
+        if (!IsHashRefWithData($DisplayValue)) {
+            my $Separator = ', ';
+            if (
+                IsHashRefWithData($Param{Config}) &&
+                IsHashRefWithData($Param{Config}->{Config}) &&
+                defined $Param{Config}->{Config}->{ItemSeparator}
+            ) {
+                $Separator = $Param{Config}->{Config}->{ItemSeparator};
+            }
+
+            my @Values;
+            if ( ref $DFPreparedValue eq 'ARRAY' ) {
+                @Values = @{ $DFPreparedValue };
+            }
+            else {
+                @Values = ($DFPreparedValue);
+            }
+
+            $DisplayValue = {
+                Value => join($Separator, @Values)
+            };
         }
 
-        $DisplayValue = {
-            Value => join($Separator, @Values)
+        # get html display value string
+        my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
+            DynamicFieldConfig => $Param{Config},
+            Value              => $Param{Value}
+        );
+
+        # get short display value string
+        my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
+            DynamicFieldConfig => $Param{Config},
+            Value              => $Param{Value}
+        );
+
+        return {
+            ID                => $Param{Config}->{ID},
+            Name              => $Param{Config}->{Name},
+            Label             => $Param{Config}->{Label},
+            Value             => $Param{Value},
+            DisplayValue      => $DisplayValue->{Value},
+            DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
+            DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
+            PreparedValue     => $DFPreparedValue
         };
     }
-
-    # get html display value string
-    my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
-        DynamicFieldConfig => $Param{Config},
-        Value              => $Param{Value}
-    );
-
-    # get short display value string
-    my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
-        DynamicFieldConfig => $Param{Config},
-        Value              => $Param{Value}
-    );
-
-    return {
-        ID                => $Param{Config}->{ID},
-        Name              => $Param{Config}->{Name},
-        Label             => $Param{Config}->{Label},
-        Value             => $Param{Value},
-        DisplayValue      => $DisplayValue->{Value},
-        DisplayValueHTML  => $DisplayValueHTML ? $DisplayValueHTML->{Value} : $DisplayValue->{Value},
-        DisplayValueShort => $DisplayValueShort ? $DisplayValueShort->{Value} : $DisplayValue->{Value},
-        PreparedValue     => $DFPreparedValue
-    };
+    else {
+        return {
+            ID                => $Param{Config}->{ID},
+            Name              => $Param{Config}->{Name},
+            Label             => $Param{Config}->{Label},
+            Value             => $Param{Value},
+        };
+    }
 }
 
 sub _AddSchemaAndExamples {

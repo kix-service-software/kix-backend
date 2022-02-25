@@ -194,7 +194,8 @@ sub Run {
             OperationType            => 'V1::FAQ::FAQArticleGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                FAQArticleID => join( ',', sort @{$ArticleIDs} ),
+                FAQArticleID                => join( ',', sort @{$ArticleIDs} ),
+                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

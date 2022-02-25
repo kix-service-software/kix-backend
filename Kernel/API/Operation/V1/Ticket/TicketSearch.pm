@@ -103,9 +103,10 @@ sub Run {
             OperationType            => 'V1::Ticket::TicketGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                TicketID  => join(',', @TicketIndex),
-                include   => $Param{Data}->{include},
-                expand    => $Param{Data}->{expand},
+                TicketID                    => join(',', @TicketIndex),
+                include                     => $Param{Data}->{include},
+                expand                      => $Param{Data}->{expand},
+                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

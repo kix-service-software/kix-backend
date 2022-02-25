@@ -182,8 +182,9 @@ sub _GetContactData {
                         next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
 
                         my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
-                            Config => $DynamicFieldConfig,
-                            Value  => $ContactData{$Attribute}
+                            Config          => $DynamicFieldConfig,
+                            Value           => $ContactData{$Attribute},
+                            NoDisplayValues => [ split(',', $Param{Data}->{NoDynamicFieldDisplayValues}||'') ]
                         );
 
                         if (IsHashRefWithData($PreparedValue)) {
