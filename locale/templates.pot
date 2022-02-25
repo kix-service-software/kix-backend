@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-2-21 10:42+0000\n"
+"POT-Creation-Date: 2022-2-25 13:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1612,10 +1612,6 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/CreateFAQEntry.pm
-msgid "FAQ Item suggested in source ticket:"
 msgstr ""
 
 #. Perl Module: update/build-1373.pl
@@ -4068,10 +4064,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Email sent to customer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Enables creation of a FAQ entry from currently created article."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
