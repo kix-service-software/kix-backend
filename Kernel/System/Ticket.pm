@@ -348,6 +348,22 @@ sub TicketCreate {
     # get queue object
     my $QueueObject = $Kernel::OM->Get('Queue');
 
+    if ( !$Param{QueueID} && !$Param{Queue} ) {
+
+        # get default queue
+        my $DefaultTicketQueue = $Kernel::OM->Get('Config')->Get('Ticket::Queue::Default');
+
+        # check if default queue exists
+        my %AllTicketQueues = reverse $QueueObject->QueueList();
+
+        if ( $AllTicketQueues{$DefaultTicketQueue} ) {
+            $Param{Queue} = $DefaultTicketQueue;
+        }
+        else {
+            $Param{QueueID} = 1;
+        }
+    }
+
     # QueueID/Queue lookup!
     if ( !$Param{QueueID} && $Param{Queue} ) {
         $Param{QueueID} = $QueueObject->QueueLookup( Queue => $Param{Queue} );
@@ -365,6 +381,22 @@ sub TicketCreate {
 
     # get state object
     my $StateObject = $Kernel::OM->Get('State');
+
+    if ( !$Param{StateID} && !$Param{State} ) {
+
+        # get default ticket state
+        my $DefaultTicketState = $Kernel::OM->Get('Config')->Get('Ticket::State::Default');
+
+        # check if default ticket state exists
+        my %AllTicketStates = reverse $StateObject->StateList();
+
+        if ( $AllTicketStates{$DefaultTicketState} ) {
+            $Param{State} = $DefaultTicketState;
+        }
+        else {
+            $Param{StateID} = 1;
+        }
+    }
 
     # StateID/State lookup!
     if ( !$Param{StateID} ) {
@@ -401,6 +433,22 @@ sub TicketCreate {
 
     # get priority object
     my $PriorityObject = $Kernel::OM->Get('Priority');
+
+    if ( !$Param{PriorityID} && !$Param{Priority} ) {
+
+        # get default priority
+        my $DefaultTicketPriority = $Kernel::OM->Get('Config')->Get('Ticket::Priority::Default');
+
+        # check if default priority exists
+        my %AllTicketPrioritys = reverse $PriorityObject->PriorityList();
+
+        if ( $AllTicketPrioritys{$DefaultTicketPriority} ) {
+            $Param{Priority} = $DefaultTicketPriority;
+        }
+        else {
+            $Param{PriorityID} = 1;
+        }
+    }
 
     # PriorityID/Priority lookup!
     if ( !$Param{PriorityID} && $Param{Priority} ) {
