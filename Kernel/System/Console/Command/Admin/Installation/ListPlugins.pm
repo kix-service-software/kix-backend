@@ -46,12 +46,12 @@ sub Run {
     );
 
     $Self->Print("Backend:\n\n");
-    $Self->Print("#  Name                           Build Requires                                           Description\n");
-    $Self->Print("-- ------------------------------ ----- -------------------------------------------------- --------------------------------------------------------------------------------\n");
+    $Self->Print("#  Name                           Build-Patch Requires                                           Description\n");
+    $Self->Print("-- ------------------------------ ----------- -------------------------------------------------- --------------------------------------------------------------------------------\n");
 
     my $Count = 0;
     foreach my $Plugin ( @PluginList ) {
-        $Self->Print(sprintf("%02i %-30s %-5s %-50s %-80s\n", ++$Count, $Plugin->{Product}, $Plugin->{BuildNumber}, ($Plugin->{Requires} || ''), $Plugin->{Description}));
+        $Self->Print(sprintf("%02i %-30s %11s %-50s %-80s\n", ++$Count, $Plugin->{Product},"$Plugin->{BuildNumber}-$Plugin->{PatchNumber}", ($Plugin->{Requires} || ''), $Plugin->{Description}));
     }
 
     my @ClientIDs = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList();
@@ -65,12 +65,12 @@ sub Run {
             next CLIENT if !IsArrayRefWithData($ClientData{Plugins});
         
             $Self->Print("\n\nClient $ClientID:\n\n");
-            $Self->Print("#  Name                           Build Requires                                           Description\n");
-            $Self->Print("-- ------------------------------ ----- -------------------------------------------------- --------------------------------------------------------------------------------\n");
+            $Self->Print("#  Name                           Build-Patch Requires                                           Description\n");
+            $Self->Print("-- ------------------------------ ----------- -------------------------------------------------- --------------------------------------------------------------------------------\n");
 
             my $Count = 0;
             foreach my $Plugin ( @{$ClientData{Plugins}} ) {
-                $Self->Print(sprintf("%02i %-30s %-5s %-50s %-80s\n", ++$Count, $Plugin->{Product}, $Plugin->{BuildNumber}, ($Plugin->{Requires} || ''), ($Plugin->{Description} || '')));
+                $Self->Print(sprintf("%02i %-30s %11s %-50s %-80s\n", ++$Count, $Plugin->{Product}, "$Plugin->{BuildNumber}-$Plugin->{PatchNumber}", ($Plugin->{Requires} || ''), ($Plugin->{Description} || '')));
             }   
         }
     }

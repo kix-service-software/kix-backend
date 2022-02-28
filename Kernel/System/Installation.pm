@@ -881,7 +881,7 @@ sub _ReadReleaseFile {
         # ignore comment lines
         next if ( $Line =~ /^#/ );
 
-        foreach my $Key ( qw(Product Version Description BuildDate BuildHost BuildNumber Requires) ) {
+        foreach my $Key ( qw(Product Version Description BuildDate BuildHost BuildNumber PatchNumber Requires) ) {
             my $Var = uc($Key);
 
             if ( $Line =~ /^$Var\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
