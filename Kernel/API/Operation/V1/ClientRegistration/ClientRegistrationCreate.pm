@@ -86,6 +86,7 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
                         "Requires": "backend::KIXPro(>10), framework(>3349)",
                         "Description": "KIXPro",
                         "BuildNumber": 1,
+                        "PatchNumber": 1,
                         "Version": "1.0.0",
                         "ExtendedData": {
                             "BuildDate": "..."
@@ -133,6 +134,7 @@ sub Run {
         $Plugins{framework} = {
             Name        => 'framework',
             BuildNumber => $Kernel::OM->Get('Config')->Get('BuildNumber'),
+            PatchNumber => $Kernel::OM->Get('Config')->Get('PatchNumber'),
             Version     => $Kernel::OM->Get('Config')->Get('Version')
         };
 
@@ -289,7 +291,7 @@ sub Run {
     my %Requesting;
     if ( IsHashRefWithData($ClientRegistration->{Requesting}) ) {
         if ( $ClientRegistration->{Requesting}->{SystemInfo} ) {
-            foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
+            foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber PatchNumber) ) {
                 $Requesting{SystemInfo}->{$Key} = $Kernel::OM->Get('Config')->Get($Key);
             }
         }
