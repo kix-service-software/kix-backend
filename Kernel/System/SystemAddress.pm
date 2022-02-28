@@ -400,9 +400,7 @@ sub SystemAddressLookup {
     if ( $Param{SystemAddressID} ) {
         # lookup
         $DBObject->Prepare(
-            SQL => "SELECT value0 FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) "
-                . "AND id = ?",        
+            SQL => "SELECT value0 FROM system_address WHERE id = ?",
             Bind  => [ \$Param{SystemAddressID}, ],
             Limit => 1,
         );
@@ -426,9 +424,7 @@ sub SystemAddressLookup {
 
         # lookup
         $DBObject->Prepare(
-            SQL => "SELECT id FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) "
-                . "AND value0 = ?",        
+            SQL => "SELECT id FROM system_address WHERE value0 = ?",
             Bind  => [ \$Param{Name} ],
             Limit => 1,
         );
