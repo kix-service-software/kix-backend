@@ -91,10 +91,11 @@ sub Run {
 
     # filter for customer assigned articles if necessary
     @ArticleIndex = $Self->_FilterCustomerUserVisibleObjectIds(
-        TicketID     => $Param{Data}->{TicketID},
-        ObjectType   => 'TicketArticle',
-        ObjectIDList => \@ArticleIndex,
-        UserID       => $Self->{Authorization}->{UserID}
+        TicketID               => $Param{Data}->{TicketID},
+        ObjectType             => 'TicketArticle',
+        ObjectIDList           => \@ArticleIndex,
+        UserID                 => $Self->{Authorization}->{UserID},
+        RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
     );
 
     if ( @ArticleIndex ) {
@@ -103,11 +104,12 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleGet',
             SuppressPermissionErrors => 1,
-            Data          => {
-                TicketID  => $Param{Data}->{TicketID},
-                ArticleID => join(',', @ArticleIndex),
-                include   => $Param{Data}->{include},
-                expand    => $Param{Data}->{expand}
+            Data                     => {
+                TicketID               => $Param{Data}->{TicketID},
+                ArticleID              => join(',', @ArticleIndex),
+                include                => $Param{Data}->{include},
+                expand                 => $Param{Data}->{expand},
+                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             }
         );
 

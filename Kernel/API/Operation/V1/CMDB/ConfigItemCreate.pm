@@ -89,17 +89,17 @@ perform ConfigItemCreate Operation. This will return the created ConfigItemLogin
     my $Result = $OperationObject->Run(
         Data => {
             ConfigItem => {
-                ...                                
+                ...
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            ConfigItemID  => '',                    # ConfigItemID 
+            ConfigItemID  => '',                    # ConfigItemID
         },
     };
 
@@ -114,7 +114,7 @@ sub Run {
     );
 
     # check ConfigItem attribute values
-    my $ConfigItemCheck = $Self->_CheckConfigItem( 
+    my $ConfigItemCheck = $Self->_CheckConfigItem(
         ConfigItem => $ConfigItem
     );
 
@@ -148,7 +148,7 @@ sub Run {
                     Image        => $Image,
                 }
             );
-            
+
             if ( !$Result->{Success} ) {
                 return $Result;
             }
@@ -160,8 +160,9 @@ sub Run {
         my $Result = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemVersionCreate',
             Data          => {
-                ConfigItemID      => $ConfigItemID,
-                ConfigItemVersion => $ConfigItem->{Version},
+                ConfigItemID           => $ConfigItemID,
+                ConfigItemVersion      => $ConfigItem->{Version},
+                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             }
         );
         if ( IsHashRefWithData($Result) && !$Result->{Success} ) {

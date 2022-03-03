@@ -2922,18 +2922,19 @@ sub GetAssignedArticlesForObject {
     my ( $Self, %Param ) = @_;
 
     my @AssignedArticleIDs = ();
+    my $TicketID = IsArrayRefWithData($Param{TicketID}) ? $Param{TicketID}->[0] : $Param{TicketID};
 
     # based on ticket
     if ($Param{TicketID}) {
         my $AssignedTicketIDList = $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
             %Param,
-            ObjectIDList => [$Param{TicketID}]
+            ObjectIDList => [$TicketID]
         );
 
         if (
             IsArrayRefWithData($AssignedTicketIDList) &&
             scalar(@{$AssignedTicketIDList}) == 1 &&
-            $AssignedTicketIDList->[0] == $Param{TicketID}
+            $AssignedTicketIDList->[0] == $TicketID
         ) {
             my %SearchData = $Self->_GetAssignedSearchParams(
                 %Param,
@@ -2952,7 +2953,7 @@ sub GetAssignedArticlesForObject {
                 }
 
                 @AssignedArticleIDs = $Self->ArticleIndex(
-                    TicketID        => $Param{TicketID},
+                    TicketID        => $TicketID,
                     CustomerVisible => $CustomerVisible,
                     UserID          => $Param{UserID},
                 );

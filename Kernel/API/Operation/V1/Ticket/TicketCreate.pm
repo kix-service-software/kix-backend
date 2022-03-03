@@ -175,8 +175,9 @@ sub Run {
 
     # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
-        Ticket => $Ticket,
-        UserID => $Self->{Authorization}->{UserID},
+        Ticket                 => $Ticket,
+        UserID                 => $Self->{Authorization}->{UserID},,
+        RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
     );
 }
 
@@ -466,8 +467,9 @@ sub _TicketCreate {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Ticket::ArticleCreate',
                 Data          => {
-                    TicketID => $TicketID,
-                    Article  => $Article,
+                    TicketID               => $TicketID,
+                    Article                => $Article,,
+                    RelevantOrganisationID => $Param{RelevantOrganisationID}
                 }
             );
 
