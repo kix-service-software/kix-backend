@@ -880,8 +880,8 @@ sub ContactUpdate {
     # update organisation IDs
     if (@DeleteOrgIDs) {
         return if !$Kernel::OM->Get('DB')->Do(
-            SQL  => 'DELETE FROM contact_organisation WHERE contact_id = ? AND org_id IN (?)',
-            Bind => [ \$Param{ID}, \${\(join ', ', @DeleteOrgIDs)} ],
+            SQL  => "DELETE FROM contact_organisation WHERE contact_id = ? AND org_id IN ( ${\(join ', ', @DeleteOrgIDs)} )",
+            Bind => [ \$Param{ID} ],
         );
     }
 

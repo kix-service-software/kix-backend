@@ -61,8 +61,9 @@ sub PreRun {
     # check if faq articles are accessible for current customer user
     if ($Param{Data}->{FAQArticleID}) {
         return $Self->_CheckCustomerAssignedObject(
-            ObjectType => 'FAQArticle',
-            IDList     => $Param{Data}->{FAQArticleID}
+            ObjectType             => 'FAQArticle',
+            IDList                 => $Param{Data}->{FAQArticleID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
     }
 

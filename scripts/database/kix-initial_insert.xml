@@ -6170,6 +6170,26 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
     <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/organisations]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/organisations/*{Organisation.ID !IN $CurrentUser.Contact.OrganisationIDs}]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/session]]></Data>
     <Data Key="value">15</Data>
     <Data Key="create_by">1</Data>
@@ -6430,7 +6450,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.OrganisationID !IN $CurrentUser.Contact.OrganisationIDs}]]></Data>
     <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>

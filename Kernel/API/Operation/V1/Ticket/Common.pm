@@ -58,21 +58,23 @@ some code to run before actual execution
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    if ($Param{Data}->{TicketID}) {
+    if ( IsArrayRefWithData($Param{Data}->{TicketID}) ) {
 
         # check if articles are accessible for current customer user
-        if ($Param{Data}->{ArticleID}) {
+        if ( IsArrayRefWithData($Param{Data}->{ArticleID}) ) {
             return $Self->_CheckCustomerAssignedObject(
-                ObjectType => 'TicketArticle',
-                IDList     => $Param{Data}->{ArticleID},
-                TicketID   => $Param{Data}->{TicketID}
+                ObjectType             => 'TicketArticle',
+                IDList                 => $Param{Data}->{ArticleID},
+                TicketID               => $Param{Data}->{TicketID},
+                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             );
         }
 
         # check if tickets are accessible for current customer user
         return $Self->_CheckCustomerAssignedObject(
-            ObjectType => 'Ticket',
-            IDList     => $Param{Data}->{TicketID}
+            ObjectType             => 'Ticket',
+            IDList                 => $Param{Data}->{TicketID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
     }
 

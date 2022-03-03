@@ -308,7 +308,7 @@
       },
       "SectionOwner::OwnerOrganisation": {
         "SearchAttributes": [
-          "PrimaryOrganisationID"
+          "RelevantOrganisationID"
         ]
       }
     },
@@ -320,7 +320,7 @@
       },
       "SectionOwner::OwnerOrganisation": {
         "SearchAttributes": [
-          "PrimaryOrganisationID"
+          "RelevantOrganisationID"
         ]
       }
     },
@@ -353,7 +353,7 @@
       },
       "SectionOwner::OwnerOrganisation": {
         "SearchAttributes": [
-          "PrimaryOrganisationID"
+          "RelevantOrganisationID"
         ]
       }
     }

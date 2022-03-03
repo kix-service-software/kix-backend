@@ -122,6 +122,9 @@ sub RunOperation {
 
             my $Data = $OperationConfig->{ObjectID} ? {
                     $OperationConfig->{ObjectID} => $Param{Data}->{$OperationConfig->{ObjectID}},
+
+                    # TODO: find generic solution ("AlwaysForwardAttrbutes" config?)
+                    RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID},
                 } : $Param{Data};
 
             my $ExecResult = $Self->ExecOperation(
@@ -2596,6 +2599,7 @@ sub _CheckObjectPermission {
             $ObjectData = $Param{Data};
         }
         elsif ( $Self->{RequestMethod} ne 'GET' && IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
+
             # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
             # a GET request will be handled differently
             my $GetResult = $Self->ExecOperation(
@@ -2808,6 +2812,7 @@ sub _CheckPropertyPermission {
                             $ObjectData = $Param{Data};
                         }
                         elsif ( $Self->{RequestMethod} ne 'GET' && IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
+
                             # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
                             # a GET request will be handled differently
                             my $GetResult = $Self->ExecOperation(
@@ -3003,8 +3008,9 @@ sub _CheckPermissionCondition {
     PART:
     foreach my $Part ( @Parts ) {
         my ( $Object, $Attribute, $Operator, $Value );
+        $Not = 0; # reset Not
 
-        next if $Part !~ /^(\w+)\.(\w+)\s+(\w+)\s+(.*?)$/;
+        next if $Part !~ /^(\w+)\.(\w+)\s+(!?\w+)\s+(.*?)$/;
 
         ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
         if ( $Operator =~ /^!(.*?)$/ ) {
@@ -3016,14 +3022,19 @@ sub _CheckPermissionCondition {
         $Value =~ s/["']//g;
 
         # prepare value for IN operator
-        if ( $Operator eq 'IN' ) {
-            if ( $Value =~ /^\[(.*?)\]$/ ) {
-                my @ValueParts = map { $_ = $Self->_ReplaceVariablesInPermission(Data => $_) } split(/\s*,\s*/, $1);
+        if ( $Operator eq 'IN' || $Operator eq '!IN' ) {
+            if ( $Value =~ /^(\[(.*?)\]|\$.*?)$/ ) {
+                my @ValueParts;
+                foreach my $ValueItem ( split(/\s*,\s*/, $2||$1) ) {
+                    my $ValuePart = $Self->_ReplaceVariablesInPermission(Data => $ValueItem);
+                    if ( IsArrayRef($ValuePart) ) {
+                        push @ValueParts, @{$ValuePart};
+                    }
+                    else {
+                        push @ValueParts, $ValuePart;
+                    }
+                }
                 $Value = \@ValueParts;
-            }
-            else {
-                $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Value of condition part \"%s\" is invalid!", $Part) );
-                return;
             }
         }
         else {
@@ -3064,7 +3075,7 @@ sub _CheckPermissionCondition {
         # check if the condition is true
         my $Result = 1;
         foreach my $FilteredObject ( @FilteredObjects ) {
-            if ( (!$Not && !defined $ObjectDataToFilter{$FilteredObject}) || ($Not && defined $ObjectDataToFilter{$FilteredObject}) ) {
+            if ( !defined $ObjectDataToFilter{$FilteredObject} ) {
                 $Result = 0;
                 last;
             }
@@ -3158,6 +3169,7 @@ sub _ReplaceVariablesInPermission {
         my %User = $Kernel::OM->Get('User')->GetUserData(
             UserID => $Self->{Authorization}->{UserID},
         );
+
         if ( %User ) {
             # get contact for user
             my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
@@ -3176,18 +3188,68 @@ sub _ReplaceVariablesInPermission {
 
                 $User{Contact} = \%Contact;
             }
+
+            # add roles
+            my @RoleIDs = $Kernel::OM->Get('User')->RoleList(
+                UserID => $Self->{Authorization}->{UserID},
+                Valid  => 1,
+            );
+            my %Roles = $Kernel::OM->Get('Role')->RoleList(
+                Valid => 1,
+            );
+            $User{Roles} = [ map { $Roles{$_} } @RoleIDs ];
         }
 
-        # get the relevant attribute
-        my $FlatData = $Kernel::OM->Get('Main')->Flatten(
-            Data => \%User,
+        $Result = $Self->_ResolveVariableValue(
+            Variable => $Attribute,
+            Data     => \%User
         );
-
-        $Result = $FlatData->{$Attribute};
-
     }
 
     return $Result;
+}
+
+sub _ResolveVariableValue {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Variable} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Variable!"
+        );
+        return;
+    }
+
+    # return undef if we have no data to work through
+    return if exists $Param{Data} && !$Param{Data};
+
+    my $Data = $Param{Data};
+
+    my @Parts = split( /\./, $Param{Variable});
+    my $Attribute = shift @Parts;
+    my $ArrayIndex;
+
+    if ( $Attribute =~ /(.*?):(\d+)/ ) {
+        $Attribute = $1;
+        $ArrayIndex = $2;
+    }
+
+    # get the value of $Attribute
+    $Data = $Data->{$Attribute};
+
+    if ( defined $ArrayIndex && IsArrayRef($Data) ) {
+        $Data = $Data->[$ArrayIndex];
+    }
+
+    if ( @Parts ) {
+        return $Self->_ResolveVariableValue(
+            Variable => join('.', @Parts),
+            Data     => $Data,
+        );
+    }
+
+    return $Data;
 }
 
 sub _RunParallel {
@@ -3453,24 +3515,39 @@ sub _GetCustomerUserVisibleObjectIds {
         $Self->{Authorization}->{UserType} eq 'Customer'
     ) {
 
-        # get contact and user data
+        # get contact data
         my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             UserID        => $Self->{Authorization}->{UserID},
             DynamicFields => 1
         );
-        if (!$ContactData{User} && $ContactData{AssignedUserID}) {
-            my $UserData = $Self->ExecOperation(
-                OperationType => 'V1::User::UserGet',
-                Data          => {
-                    UserID => $ContactData{AssignedUserID},
-                }
-            );
-            $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
-            $Self->AddCacheDependency(Type => 'User');
-        }
 
         # get object relevant ids
         if ( IsHashRefWithData(\%ContactData) ) {
+
+            # get user data
+            if (!$ContactData{User} && $ContactData{AssignedUserID}) {
+                my $UserData = $Self->ExecOperation(
+                    OperationType => 'V1::User::UserGet',
+                    Data          => {
+                        UserID => $ContactData{AssignedUserID},
+                    }
+                );
+                $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+                $Self->AddCacheDependency(Type => 'User');
+            }
+
+            # handle relevant organisation id
+            # if not given use primary
+            my @RelevantIDs = split(/\s*,\s*/, $Param{RelevantOrganisationID} // $ContactData{PrimaryOrganisationID});
+            # make sure given id belongs to contact, else given id is not usable
+            my @ValidRelevantIDs;
+            for my $RelevantID (@RelevantIDs) {
+                if ( grep { $_ eq $RelevantID } @{ $ContactData{OrganisationIDs} } ) {
+                    push(@ValidRelevantIDs, $RelevantID);
+                }
+            }
+            $ContactData{RelevantOrganisationID} = \@ValidRelevantIDs if (scalar @ValidRelevantIDs);
+
             if ($Param{ObjectType} eq 'ConfigItem') {
                 return $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
                     %Param,
@@ -3869,7 +3946,7 @@ sub _GetPrepareDynamicFieldValue {
     my %NoPrepare = map { $_ => 1 } @{$Param{NoDisplayValues} || []};
 
     if ( !$NoPrepare{$Param{Config}->{FieldType}} ) {
-        print STDERR "preparing\n";
+
         # set language in layout object
         my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
             UserID => $Self->{Authorization}->{UserID},

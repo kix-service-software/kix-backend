@@ -61,8 +61,9 @@ sub PreRun {
     # check if config items are accessible for current customer user
     if ($Param{Data}->{ConfigItemID}) {
         return $Self->_CheckCustomerAssignedObject(
-            ObjectType => 'ConfigItem',
-            IDList     => $Param{Data}->{ConfigItemID}
+            ObjectType             => 'ConfigItem',
+            IDList                 => $Param{Data}->{ConfigItemID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
     }
 
