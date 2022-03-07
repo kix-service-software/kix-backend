@@ -189,25 +189,24 @@ sub ContactAdd {
         $Param{OrganisationIDs} = ($Param{PrimaryOrganisationID}) ? [$Param{PrimaryOrganisationID}] : undef;
     }
 
-    #if assigned user ist given, check associated user exists
+    # if assigned user ist given, check associated user exists
+    my %ExistingUser;
     if ($Param{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
-            UserID => $Param{AssignedUserID},
-            Silent => 1,
+        %ExistingUser = $Kernel::OM->Get('User')->GetUserData(
+            UserID => $Param{AssignedUserID}
         );
-        if (!$ExistingUser) {
+        if (!IsHashRefWithData(\%ExistingUser)) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot create contact. No user with ID $Param{AssignedUserID} exists.",
             );
             return;
-        }
-        else {
-            my $ExistingContact = $Kernel::OM->Get('Contact')->ContactLookup(
+        } else {
+            my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Param{AssignedUserID},
                 Silent => 1,
             );
-            if ($ExistingContact) {
+            if ($ExistingContactID) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Cannot create contact. User '$Param{AssignedUserID}' already has a contact.",
@@ -289,6 +288,20 @@ sub ContactAdd {
             Priority => 'error',
             Message  => "Cannot find new contact with email $Param{Email}!",
         );
+    }
+
+    # update user valid if necessary (user is no agent/customer or contact is invalid = user is invalid)
+    if (IsHashRefWithData(\%ExistingUser)) {
+        my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
+        my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
+            || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
+        if ($NewUserValid != $ExistingUser{ValidID}) {
+            my $Success = $Kernel::OM->Get('User')->UserUpdate(
+                %ExistingUser,
+                ValidID      => $NewUserValid,
+                ChangeUserID => 1,
+            );
+        }
     }
 
     # return data
@@ -803,19 +816,18 @@ sub ContactUpdate {
     }
 
     # if assigned user ist given, check associated user exists
+    my %ExistingUser;
     if ($Param{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
-            UserID => $Param{AssignedUserID},
-            Silent => 1,
+        %ExistingUser = $Kernel::OM->Get('User')->GetUserData(
+            UserID => $Param{AssignedUserID}
         );
-        if (!$ExistingUser) {
+        if (!IsHashRefWithData(\%ExistingUser)) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot update contact. No user with ID $Param{AssignedUserID} exists.",
             );
             return;
-        }
-        else {
+        } else {
             my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Param{AssignedUserID},
                 Silent => 1,
@@ -924,6 +936,20 @@ sub ContactUpdate {
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
     );
+
+    # update user valid if necessary (user is no agent/customer or contact is invalid = user is invalid)
+    if (IsHashRefWithData(\%ExistingUser)) {
+        my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
+        my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
+            || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
+        if ($NewUserValid != $ExistingUser{ValidID}) {
+            my $Success = $Kernel::OM->Get('User')->UserUpdate(
+                %ExistingUser,
+                ValidID      => $NewUserValid,
+                ChangeUserID => 1,
+            );
+        }
+    }
 
     return 1;
 }
