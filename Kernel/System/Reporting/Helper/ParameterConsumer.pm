@@ -68,7 +68,7 @@ sub _ReplaceParametersInString {
         }
 
         if ( IsArrayRefWithData($ParameterValue) ) {
-            $ParameterValue = uc($Parameter->{DataType}) eq 'STRING' ? join(',', "'".@{$ParameterValue}."'") : join(',', @{$ParameterValue});
+            $ParameterValue = uc($Parameter->{DataType}) eq 'STRING' ? join(',', (map { "'".$_."'"} @{$ParameterValue})) : join(',', @{$ParameterValue});
         }
         $String =~ s/\$\{Parameters\.$Parameter->{Name}\}/$ParameterValue/gmx;
     }
