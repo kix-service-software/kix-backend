@@ -36,9 +36,9 @@ sub Configure {
 
     $Self->Description('Insert random data into the KIX database for testing purposes.');
     $Self->AddOption(
-        Name        => 'generate-tickets',
+        Name        => 'tickets',
         Description => "Specify how many tickets should be generated.",
-        Required    => 1,
+        Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
     );
@@ -50,36 +50,35 @@ sub Configure {
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-users',
+        Name        => 'users',
         Description => "Specify how many users should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-customer-users',
-        # rkaiser - T#2017020290001194 - changed customer user to contact
+        Name        => 'contacts',
         Description => "Specify how many contacts should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-organisations',
+        Name        => 'organisations',
         Description => "Specify how many organisations should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-roless',
+        Name        => 'roles',
         Description => "Specify how many roles should be generated.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/^\d+$/smx,
     );
     $Self->AddOption(
-        Name        => 'generate-queues',
+        Name        => 'queues',
         Description => "Specify how many queues should be generated.",
         Required    => 0,
         HasValue    => 1,
@@ -111,173 +110,62 @@ sub Run {
 
     # Refresh common objects after a certain number of loop iterations.
     #   This will call event handlers and clean up caches to avoid excessive mem usage.
-    my $CommonObjectRefresh = 50;
+    $Self->{CommonObjectRefresh} = 50;
 
     # get dynamic fields
-    my $TicketDynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+    $Self->{Data}->{TicketDynamicFields} = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => ['Ticket'],
     );
 
-    my $ArticleDynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+    $Self->{Data}->{ArticleDynamicFields} = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid      => 1,
         ObjectType => ['Article'],
     );
 
     # roles
-    my @RoleIDs;
-    if ( !$Self->GetOption('generate-roles') ) {
-        @RoleIDs = RoleGet();
+    if ( !$Self->GetOption('roles') ) {
+        $Self->{Data}->{RoleIDs} = [ $Self->RoleGet() ];
     }
     else {
-        @RoleIDs = RoleCreate( $Self->GetOption('generate-roles') );
+        $Self->{Data}->{RoleIDs} = [ $Self->RoleCreate( $Self->GetOption('roles') ) ];
     }
 
     # users
     my @UserIDs;
-    if ( !$Self->GetOption('generate-users') ) {
-        @UserIDs = UserGet();
+    if ( !$Self->GetOption('users') ) {
+        $Self->{Data}->{UserIDs} = [ $Self->UserGet() ];
     }
     else {
-        @UserIDs = UserCreate( $Self->GetOption('generate-users'), \@RoleIDs );
+        $Self->{Data}->{UserIDs} = [ $Self->UserCreate( $Self->GetOption('users') ) ];
     }
 
     # queues
-    my @QueueIDs;
-    if ( !$Self->GetOption('generate-queues') ) {
-        @QueueIDs = QueueGet();
+    if ( !$Self->GetOption('queues') ) {
+        $Self->{Data}->{QueueIDs} = [ $Self->QueueGet() ];
     }
     else {
-        @QueueIDs = QueueCreate( $Self->GetOption('generate-queues'));
+        $Self->{Data}->{QueueIDs} = [ $Self->QueueCreate( $Self->GetOption('queues')) ];
     }
 
     # customer users
-    if ( $Self->GetOption('generate-customer-users') ) {
-        CustomerCreate( $Self->GetOption('generate-customer-users') );
+    if ( !$Self->GetOption('contacts') ) {
+        $Self->{Data}->{ContactIDs} = [ $Self->ContactGet() ];
+    }
+    else {
+        $Self->{Data}->{ContactIDs} = [ $Self->ContactCreate( $Self->GetOption('contacts') ) ];
     }
 
     # customer companies
-    if ( $Self->GetOption('generate-organisations') ) {
-        OrganisationCreate( $Self->GetOption('generate-organisations') );
+    if ( !$Self->GetOption('organisations') ) {
+        $Self->{Data}->{OrganisationIDs} = [ $Self->OrganisationGet() ];
+    }
+    else {
+        $Self->{Data}->{OrganisationIDs} = [ $Self->OrganisationCreate( $Self->GetOption('organisations') ) ];
     }
 
-    my $Counter = 1;
-
-    # create tickets
-    my @TicketIDs;
-    for ( 1 .. $Self->GetOption('generate-tickets') ) {
-        my $TicketUserID =
-
-            my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
-            Title        => RandomSubject(),
-            QueueID      => $QueueIDs[ int( rand($#QueueIDs) ) ],
-            Lock         => 'unlock',
-            Priority     => '3 normal',
-            State        => 'new',
-            CustomerNo   => int( rand(1000) ),
-            Contact => RandomAddress(),
-            OwnerID      => $UserIDs[ int( rand($#UserIDs) ) ],
-            UserID       => $UserIDs[ int( rand($#UserIDs) ) ],
-            );
-
-        if ( $Self->GetOption('mark-tickets-as-seen') ) {
-
-            # bulk-insert the flags directly for improved performance
-            my $SQL = 'INSERT INTO ticket_flag (ticket_id, ticket_key, ticket_value, create_time, create_by) VALUES ';
-            my @Values;
-            for my $UserID (@UserIDs) {
-                push @Values, "($TicketID, 'Seen', 1, current_timestamp, $UserID)";
-            }
-            while ( my @ValuesPart = splice( @Values, 0, 50 ) ) {
-                $Kernel::OM->Get('DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
-            }
-        }
-
-        if ($TicketID) {
-
-            print "Ticket with ID '$TicketID' created.\n";
-
-            for ( 1 .. $Self->GetOption('articles-per-ticket') // 10 ) {
-                my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
-                    TicketID       => $TicketID,
-                    Channel        => 'note',
-                    CustomerVisible => 1,
-                    SenderType     => 'external',
-                    From           => RandomAddress(),
-                    To             => RandomAddress(),
-                    Cc             => RandomAddress(),
-                    Subject        => RandomSubject(),
-                    Body           => RandomBody(),
-                    ContentType    => 'text/plain; charset=ISO-8859-15',
-                    HistoryType    => 'AddNote',
-                    HistoryComment => 'Some free text!',
-                    UserID         => $UserIDs[ int( rand($#UserIDs) ) ],
-                    NoAgentNotify  => 1,                                 # if you don't want to send agent notifications
-                );
-
-                if ( $Self->GetOption('mark-tickets-as-seen') ) {
-
-                    # bulk-insert the flags directly for improved performance
-                    my $SQL
-                        = 'INSERT INTO article_flag (article_id, article_key, article_value, create_time, create_by) VALUES ';
-                    my @Values;
-                    for my $UserID (@UserIDs) {
-                        push @Values, "($ArticleID, 'Seen', 1, current_timestamp, $UserID)";
-                    }
-                    while ( my @ValuesPart = splice( @Values, 0, 50 ) ) {
-                        $Kernel::OM->Get('DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
-                    }
-                }
-
-                DYNAMICFIELD:
-                for my $DynamicFieldConfig ( @{$ArticleDynamicField} ) {
-                    next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
-                    next DYNAMICFIELD if $DynamicFieldConfig->{ObjectType} ne 'Article';
-                    next DYNAMICFIELD if $DynamicFieldConfig->{InternalField};
-
-                    # set a random value
-                    my $Result = $Kernel::OM->Get('DynamicField::Backend')->RandomValueSet(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        ObjectID           => $ArticleID,
-                        UserID             => $UserIDs[ int( rand($#UserIDs) ) ],
-                    );
-
-                    if ( $Result->{Success} ) {
-                        print "Article with ID '$ArticleID' set dynamic field "
-                            . "$DynamicFieldConfig->{Name}: $Result->{Value}.\n";
-                    }
-                }
-
-                print "New Article '$ArticleID' created for Ticket '$TicketID'.\n";
-            }
-
-            DYNAMICFIELD:
-            for my $DynamicFieldConfig ( @{$TicketDynamicField} ) {
-                next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
-                next DYNAMICFIELD if $DynamicFieldConfig->{ObjectType} ne 'Ticket';
-                next DYNAMICFIELD if $DynamicFieldConfig->{InternalField};
-
-                # set a random value
-                my $Result = $Kernel::OM->Get('DynamicField::Backend')->RandomValueSet(
-                    DynamicFieldConfig => $DynamicFieldConfig,
-                    ObjectID           => $TicketID,
-                    UserID             => $UserIDs[ int( rand($#UserIDs) ) ],
-                );
-
-                if ( $Result->{Success} ) {
-                    print "Ticket with ID '$TicketID' set dynamic field "
-                        . "$DynamicFieldConfig->{Name}: $Result->{Value}.\n";
-                }
-            }
-
-            push( @TicketIDs, $TicketID );
-
-            if ( $Counter++ % $CommonObjectRefresh == 0 ) {
-                $Kernel::OM->ObjectsDiscard(
-                    Objects => ['Ticket'],
-                );
-            }
-        }
+    if ( $Self->GetOption('tickets') ) {
+        $Self->{Data}->{TicketIDs} = [ $Self->TicketCreate( $Self->GetOption('tickets') ) ];
     }
 
     return $Self->ExitCodeOk();
@@ -287,113 +175,33 @@ sub Run {
 # Helper functions below
 #
 sub RandomAddress {
-    my $Name   = int( rand(1_000) );
-    my @Domain = (
-        'example.com',
-        'example-sales.com',
-        'example-service.com',
-        'example.net',
-        'example-sales.net',
-        'example-service.net',
-        'company.com',
-        'company-sales.com',
-        'company-service.com',
-        'fast-company-example.com',
-        'fast-company-example-sales.com',
-        'fast-company-example-service.com',
-        'slow-company-example.com',
-        'slow-company-example-sales.com',
-        'slow-company-example-service.com',
-    );
+    my ($Self) = @_;
 
-    return $Name . '@' . $Domain[ int( rand( $#Domain + 1 ) ) ];
-}
+    my $Name = $Self->_GetRandomData('Firstnames').' '.$Self->_GetRandomData('Lastnames');
 
-sub RandomSubject {
-    my @Text = (
-        'some subject alalal',
-        'Re: subject alalal 1234',
-        'Re: Some Problem with my ...',
-        'Re: RE: AW: subject with very long lines',
-        'and we go an very long way to home',
-        'Ask me about performance',
-        'What is the real questions?',
-        'Do not get out of your house!',
-        'Some other smart subject!',
-        'Why am I here?',
-        'No problem, everything is ok!',
-        'Good morning!',
-        'Hello again!',
-        'What a wonderful day!',
-        '1237891234123412784 2314 test testsetsetset set set',
-    );
-    return $Text[ int( rand( $#Text + 1 ) ) ];
+    return $Name . '@' . $Self->_GetRandomData('Domains');
 }
 
 sub RandomBody {
+    my ($Self) = @_;
+
     my $Body = '';
-    my @Text = (
-        'some body  alalal',
-        'Re: body alalal 1234',
-        'and we go an very long way to home',
-        'here are some other lines with what ever on information',
-        'Re: RE: AW: body with  very long lines body with  very long lines body with  very long lines body with  very long lines ',
-        '1237891234123412784 2314 test testsetsetset set set',
-        "alal \t lala",
-        'Location of the City and County of San Francisco, California',
-        'The combination of cold ocean water and the high heat of the California mainland create',
-        ' fall, which are the warmest months of the year. Due to its sharp topography',
-        'climate with little seasonal temperature variation',
-        'wet winters and dry summers.[31] In addition, since it is surrounded on three sides by water,',
-        'San Francisco is located on the west coast of the U.S. at the tip of the San Francisco Peninsula',
-        'Urban planning projects in the 1950s and 1960s saw widespread destruction and redevelopment of westside ',
-        'The license explicitly separates any kind of "Document" from "Secondary Sections", which may not be integrated with the Document',
-        'any subject matter itself. While the Document itself is wholly editable',
-        "\n",
-        "\r",
-        'The goal of invariant sections, ever since the 80s when we first made the GNU',
-        'Manifesto an invariant section in the Emacs Manual, was to make',
-        'sure they could not be removed. Specifically, to make sure that distributors',
-        ' Emacs that also distribute non-free software could not remove the statements of our philosophy,',
-        'which they might think of doing because those statements criticize their actions.',
-        'The definition of a "transparent" format is complicated, and may be difficult to apply. For example, drawings are required to be in a format that allows',
-        'them to be revised straightforwardly with "some widely available drawing editor." The definition',
-        'of "widely available" may be difficult to interpret, and may change over time, since, e.g., the open-source',
-        'Inkscape editor is rapidly maturing, but has not yet reached version 1.0. This section, which was rewritten somewhat between versions 1.1 and 1.2 of the license, uses the terms',
-        '"widely available" and "proprietary" inconsistently and without defining them. According to a strict interpretation of the license, the references to "generic text editors" ',
-        'could be interpreted as ruling out any non-human-readable format even if used by an open-source ',
-        'word-processor; according to a loose interpretation, however, Microsoft Word .doc format could',
-        'qualify as transparent, since a subset of .doc files can be edited perfectly using ',
-        'and the format therefore is not one "that can be read and edited only by proprietary word processors.',
-        'In addition to being an encyclopedic reference, Wikipedia has received major media attention as an online source of breaking',
-        'news as it is constantly updated.[14][15] When Time Magazine recognized "You" as their Person of',
-        'the Year 2006, praising the accelerating success of on-line collaboration and interaction by millions',
-        'of users around the world, Wikipedia was the first particular "Web 2.0" service mentioned.',
-        'Repeating thoughts and actions is an essential part of learning. ',
-        'Thinking about a specific memory will make it easy to recall. This is the reason why reviews are',
-        'such an integral part of education. On first performing a task, it is difficult as there is no path',
-        'from axon to dendrite. After several repetitions a pathway begins to form and the',
-        'task becomes easier. When the task becomes so easy that you can perform it at any time, the pathway',
-        'is fully formed. The speed at which a pathway is formed depends on the individual, but ',
-        'is usually localised resulting in talents.[citation needed]',
-    );
     for ( 1 .. 50 ) {
-        $Body .= $Text[ int( rand( $#Text + 1 ) ) ] . "\n";
+        $Body .= $Self->_GetRandomData('Textlines') . "\n";
     }
     return $Body;
 }
 
 sub QueueGet {
-    my @QueueIDs;
+    my ($Self) = @_;
+
     my %Queues = $Kernel::OM->Get('Queue')->GetAllQueues();
-    for ( sort keys %Queues ) {
-        push @QueueIDs, $_;
-    }
-    return @QueueIDs;
+
+    return sort keys %Queues;
 }
 
 sub QueueCreate {
-    my $Count = shift || return;
+    my ($Self, $Count) = @_;
 
     my @QueueIDs;
     for ( 1 .. $Count ) {
@@ -418,16 +226,15 @@ sub QueueCreate {
 }
 
 sub RoleGet {
-    my @RoleIDs;
+    my ($Self) = @_;
+
     my %Roles = $Kernel::OM->Get('Role')->RoleList( Valid => 1 );
-    for ( sort keys %Roles ) {
-        push @RoleIDs, $_;
-    }
-    return @RoleIDs;
+
+    return sort keys %Roles;
 }
 
 sub RoleCreate {
-    my $Count = shift || return;
+    my ($Self, $Count) = @_;
 
     my @RoleIDs;
     for ( 1 .. $Count ) {
@@ -454,44 +261,55 @@ sub RoleCreate {
 }
 
 sub UserGet {
-    my @UserIDs;
+    my ($Self) = @_;
+
     my %Users = $Kernel::OM->Get('User')->UserList(
         Type  => 'Short',    # Short|Long
         Valid => 1,          # not required
     );
-    for ( sort keys %Users ) {
-        push @UserIDs, $_;
-    }
-    return @UserIDs;
+    return sort keys %Users;
 }
 
 sub UserCreate {
-    my $Count = shift || return;
-    my @RoleIDs = @{ shift() };
+    my ($Self, $Count) = @_;
 
     my @UserIDs;
     for ( 1 .. $Count ) {
-        my $Name = 'fill-up-agent' . int( rand(100_000_000) );
+        my $Firstname = $Self->_GetRandomData('Firstnames');
+        my $Lastname = $Self->_GetRandomData('Lastnames');
+        my $Email = $Firstname . '.' . $Lastname . '@' . $Self->_GetRandomData('Domains');
+
+        print STDERR "$Firstname, $Lastname, $Email\n";
+
         my $UserID   = $Kernel::OM->Get('User')->UserAdd(
-            UserLogin    => $Name,
+            UserLogin    => $Firstname . ' ' . $Lastname,
             ValidID      => 1,
             ChangeUserID => 1,
             IsAgent      => 1,
         );
+        print "Agent '$Firstname $Lastname' with ID '$UserID' created.\n";
         if ($UserID) {
             my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
                 AssignedUserID => $UserID,
-                Firstname      => $Name,
-                LastName       => $Name,
-                Email          => $Name . '@example2.com',
+                Firstname      => $Firstname,
+                Lastname       => $Lastname,
+                Email          => $Email,
                 ValidID        => 1,
                 UserID         => 1,
                 ValidID        => 1,
             );
-            print "Agent '$Name' with ID '$UserID' and and contact ID '$ContactID' created.\n";
+            print "    Contact '$Firstname $Lastname' with ID '$ContactID' for user created.\n";
             push( @UserIDs, $UserID );
-            for my $RoleID (@RoleIDs) {
-                my $RoleAdd = int( rand(3) );
+            ROLEADD:
+            for ( 0..int( rand(5) ) ) {
+                my $RoleID = $Self->_GetRandomData('RoleIDs');
+
+                my @Users = $Kernel::OM->Get('Role')->RoleUserList(
+                    RoleID => $RoleID,
+                );
+                my %UserList = map { $_ => 1 } @Users;
+                next ROLEADD if $UserList{$UserID};
+
                 $Kernel::OM->Get('Role')->RoleUserAdd(
                     AssignUserID => $UserID,
                     RoleID       => $RoleID,
@@ -503,51 +321,229 @@ sub UserCreate {
     return @UserIDs;
 }
 
-sub CustomerCreate {
-    my $Count = shift || return;
+sub ContactGet {
+    my ($Self) = @_;
 
+    my %Contacts = $Kernel::OM->Get('Contact')->ContactList(
+        Valid => 1,          # not required
+    );
+    return sort keys %Contacts;
+}
+
+sub ContactCreate {
+    my ($Self, $Count) = @_;
+
+    my @ContactIDs;
     for ( 1 .. $Count ) {
-        my $Name      = 'fill-up-customer' . int( rand(100_000_000) );
-        my $UserID   = $Kernel::OM->Get('User')->UserAdd(
-            UserLogin    => $Name,
-            ValidID      => 1,
-            ChangeUserID => 1,
-            IsCustomer   => 1,
-        );
+        my $Firstname = $Self->_GetRandomData('Firstnames');
+        my $Lastname  = $Self->_GetRandomData('Lastnames');
+
         my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
-            AssignedUserID => $UserID,
-            Firstname      => $Name,
-            LastName       => $Name,
-            Email          => $Name . '@example2.com',
+            Firstname      => $Firstname,
+            Lastname       => $Lastname,
+            Email          => "$Firstname.$Lastname".'@'.$Self->_GetRandomData('Domains'),
+            Street         => $Self->_GetRandomData('Streets'),
+            City           => $Self->_GetRandomData('Cities'),
+            Zip            => $Self->_GetRandomData('Postcodes'),
             ValidID        => 1,
             UserID         => 1,
-            ValidID        => 1,
         );
-        print "Contact '$Name' (UserID '$UserID', ContactID '$ContactID') created.\n";
+
+        push @ContactIDs, $ContactID;
+
+        print "Contact '$Firstname $Lastname' (ID '$ContactID') created.\n";
     }
+
+    return @ContactIDs;
+}
+
+sub OrganisationGet {
+    my ($Self) = @_;
+
+    my %Organisations = $Kernel::OM->Get('Organisation')->OrganisationSearch(
+        Valid => 1,          # not required
+    );
+
+    return sort keys %Organisations;
 }
 
 sub OrganisationCreate {
-    my $Count = shift || return;
+    my ($Self, $Count) = @_;
 
+    my @OrganisationIDs;
     for ( 1 .. $Count ) {
 
-        my $Name       = 'fill-up-organisation' . int( rand(100_000_000) );
-        my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-            Number   => $Name . '_CustomerID',
+        my $Name       = $Self->_GetRandomData('Organisations');
+        my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
+            Number   => 'CO' . sprintf('%09i', rand(100_000_000)),
             Name     => $Name,
-            Street   => '5201 Blue Lagoon Drive',
-            Zip      => '33126',
-            City     => 'Miami',
-            Country  => 'USA',
-            Url      => 'http://www.example.org',
+            Street   => $Self->_GetRandomData('Streets'),
+            Zip      => $Self->_GetRandomData('Postcodes'),
+            City     => $Self->_GetRandomData('Cities'),
+            Country  => $Self->_GetRandomData('Countries'),
+            Url      => 'http://www.'.$Self->_GetRandomData('Domains'),
             Comment  => 'some comment',
             ValidID  => 1,
             UserID   => 1,
         );
+        push @OrganisationIDs, $OrganisationID;
 
         print "Organisation '$Name' created.\n";
     }
+
+    return @OrganisationIDs;
+}
+
+sub TicketCreate {
+    my ($Self, $Count) = @_;
+    my $Counter;
+
+    # create tickets
+    my @TicketIDs;
+    for ( 1 .. $Count ) {
+        my $TicketUserID =
+
+            my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+            Title        => $Self->_GetRandomData('Subjects'),
+            QueueID      => $Self->_GetRandomData('QueueIDs'),
+            Lock         => 'unlock',
+            Priority     => '3 normal',
+            State        => 'new',
+            OrganisationID => $Self->_GetRandomData('OrganisationIDs'),
+            ContactID    => $Self->_GetRandomData('ContactIDs'),
+            OwnerID      => $Self->_GetRandomData('UserIDs'),
+            UserID       => $Self->_GetRandomData('UserIDs'),
+            );
+
+        if ( $Self->GetOption('mark-tickets-as-seen') ) {
+
+            # bulk-insert the flags directly for improved performance
+            my $SQL = 'INSERT INTO ticket_flag (ticket_id, ticket_key, ticket_value, create_time, create_by) VALUES ';
+            my @Values;
+            for my $UserID (@{$Self->{Data}->{UserIDs}}) {
+                push @Values, "($TicketID, 'Seen', 1, current_timestamp, $UserID)";
+            }
+            while ( my @ValuesPart = splice( @Values, 0, 50 ) ) {
+                $Kernel::OM->Get('DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
+            }
+        }
+
+        if ($TicketID) {
+
+            print "Ticket with ID '$TicketID' created.\n";
+
+            for ( 1 .. $Self->GetOption('articles-per-ticket') // 10 ) {
+                my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+                    TicketID       => $TicketID,
+                    Channel        => 'note',
+                    CustomerVisible => 1,
+                    SenderType     => 'external',
+                    From           => $Self->RandomAddress(),
+                    To             => $Self->RandomAddress(),
+                    Cc             => $Self->RandomAddress(),
+                    Subject        => $Self->_GetRandomData('Subjects'),
+                    Body           => $Self->RandomBody(),
+                    ContentType    => 'text/plain; charset=ISO-8859-15',
+                    HistoryType    => 'AddNote',
+                    HistoryComment => 'Some free text!',
+                    UserID         => $Self->_GetRandomData('UserIDs'),
+                    NoAgentNotify  => 1,                                 # if you don't want to send agent notifications
+                );
+
+                if ( $Self->GetOption('mark-tickets-as-seen') ) {
+
+                    # bulk-insert the flags directly for improved performance
+                    my $SQL
+                        = 'INSERT INTO article_flag (article_id, article_key, article_value, create_time, create_by) VALUES ';
+                    my @Values;
+                    for my $UserID (@{$Self->{Data}->{UserIDs}}) {
+                        push @Values, "($ArticleID, 'Seen', 1, current_timestamp, $UserID)";
+                    }
+                    while ( my @ValuesPart = splice( @Values, 0, 50 ) ) {
+                        $Kernel::OM->Get('DB')->Do( SQL => $SQL . join( ',', @ValuesPart ) );
+                    }
+                }
+
+                DYNAMICFIELD:
+                for my $DynamicFieldConfig ( @{$Self->{Data}->{ArticleDynamicFields}} ) {
+                    next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+                    next DYNAMICFIELD if $DynamicFieldConfig->{ObjectType} ne 'Article';
+                    next DYNAMICFIELD if $DynamicFieldConfig->{InternalField};
+
+                    # set a random value
+                    my $Result = $Kernel::OM->Get('DynamicField::Backend')->RandomValueSet(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        ObjectID           => $ArticleID,
+                        UserID             => $Self->_GetRandomData('UserIDs'),
+                    );
+
+                    if ( $Result->{Success} ) {
+                        print "Article with ID '$ArticleID' set dynamic field "
+                            . "$DynamicFieldConfig->{Name}: $Result->{Value}.\n";
+                    }
+                }
+
+                print "New Article '$ArticleID' created for Ticket '$TicketID'.\n";
+            }
+
+            DYNAMICFIELD:
+            for my $DynamicFieldConfig ( @{$Self->{Data}->{TicketDynamicField}} ) {
+                next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
+                next DYNAMICFIELD if $DynamicFieldConfig->{ObjectType} ne 'Ticket';
+                next DYNAMICFIELD if $DynamicFieldConfig->{InternalField};
+
+                # set a random value
+                my $Result = $Kernel::OM->Get('DynamicField::Backend')->RandomValueSet(
+                    DynamicFieldConfig => $DynamicFieldConfig,
+                    ObjectID           => $TicketID,
+                    UserID             => $Self->_GetRandomData('UserIDs'),
+                );
+
+                if ( $Result->{Success} ) {
+                    print "Ticket with ID '$TicketID' set dynamic field "
+                        . "$DynamicFieldConfig->{Name}: $Result->{Value}.\n";
+                }
+            }
+
+            push( @TicketIDs, $TicketID );
+
+            if ( $Counter++ % $Self->{CommonObjectRefresh} == 0 ) {
+                $Kernel::OM->ObjectsDiscard(
+                    Objects => ['Ticket'],
+                );
+            }
+        }
+    }
+
+    return;
+}
+
+sub _GetRandomData {
+    my ($Self, $What) = @_;
+
+    if ( !IsArrayRef($Self->{Data}->{$What}) ) {
+        my $Home = $Kernel::OM->Get('Config')->Get('Home');
+        # load word list from file
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
+            Location => $Home.'/scripts/dev/RandomDataGenerate/'.$What.'.txt',
+            Result   => 'ARRAY',
+            Mode     => 'utf8'
+        );
+        if ( $Content ) {
+            $Self->{Data}->{$What} = $Content; 
+        }
+    }
+    
+    my @Array = @{$Self->{Data}->{$What} || []};
+
+    my $Result = $Array[int(rand($#Array - 1))];
+    chomp($Result) if $Result; 
+
+    $Result =~ s/\\\t/\t/;
+    $Result =~ s/\\\n/\n/;
+    $Result =~ s/\\\r/\r/;
+
+    return $Result;
 }
 
 1;

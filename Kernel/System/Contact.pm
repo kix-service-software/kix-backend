@@ -969,6 +969,19 @@ to search contacts
     my %List = $ContactObject->ContactSearch(
         PostMasterSearch => '*email@example.com*',
         Valid            => 1,                      # (optional) default 1
+        Limit            => 100,      # (optional) overrides limit of the config
+    );
+
+    # email search (exact match)
+    my %List = $ContactObject->ContactSearch(
+        EmailEquals => 'email@example.com',
+        Valid       => 1,                      # (optional) default 1
+    );
+
+    # email list search (exact match)
+    my %List = $ContactObject->ContactSearch(
+        EmailIn => ['email1@example.com', 'email2@example.com']
+        Valid   => 1,                      # (optional) default 1
     );
 
     # search by OrganisationID
@@ -986,6 +999,12 @@ to search contacts
     #search by UserID
     my %List = $ContactObject->ContactSearch(
         UserID         => 123,
+        Valid          => 1,                    # (optional) default 1
+    );
+
+    #search by AssignedUserID
+    my %List = $ContactObject->ContactSearch(
+        AssignedUserID => 123,
         Valid          => 1,                    # (optional) default 1
     );
 

@@ -54,30 +54,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
     my $ContactList;
 
-    # TODO: filter search - currently not all properties are possible
-    my %ContactSearch;
-    if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
-        foreach my $SearchType ( keys %{ $Self->{Search}->{Contact} } ) {
-            foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
-                next if (
-                    !($SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} =~ m/^(PrimaryOrganisationID|AssignedUserID|UserID)$/)
-                    && $SearchItem->{Field} !~ m/^(Fulltext|Email|Search|Login|OrganisationIDs)$/
-                );
-                next if ($SearchItem->{Operator} eq 'IN' && $SearchItem->{Field} !~ m/(OrganisationIDs|Email)/);
-
-                if (!$ContactSearch{$SearchType}) {
-                    $ContactSearch{$SearchType} = [];
-                }
-                push(@{$ContactSearch{$SearchType}}, $SearchItem);
-            }
-        }
-    }
-
     # prepare search if given
-    if ( IsHashRefWithData( \%ContactSearch ) ) {
-        foreach my $SearchType ( keys %ContactSearch ) {
+    if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
+        foreach my $SearchType ( keys %{$Self->{Search}->{Contact}} ) {
             my %SearchTypeResult;
-            foreach my $SearchItem ( @{ $ContactSearch{$SearchType} } ) {
+            foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
 
                 my %SearchResult;
 
@@ -97,11 +78,18 @@ sub Run {
                 } else {
                     my %SearchParam;
 
-                    if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'Login' ) {
-                        $SearchParam{LoginEquals} = $Value;
-                    } elsif ( $SearchItem->{Field} =~ m/^(Login|AssignedUserID|UserID|OrganisationIDs)$/ ) {
-                        $SearchParam{ $SearchItem->{Field} } = $Value;
-                    } elsif ($SearchItem->{Field} eq 'Email') {
+                    if ( $SearchItem->{Field} =~ /^(Login|UserLogin)$/ ) {
+                        if ( $SearchItem->{Operator} eq 'EQ' ) {
+                            $SearchParam{LoginEquals} = $Value;
+                        } 
+                        else {
+                            $SearchParam{Login} = $Value;
+                        }
+                    }
+                    elsif ( $SearchItem->{Field} =~ /^(AssignedUserID|UserID|OrganisationIDs)$/ ) {
+                        $SearchParam{$SearchItem->{Field}} = $Value;
+                    }
+                    elsif ( $SearchItem->{Field} eq 'Email' ) {
                         if ($SearchItem->{Operator} eq 'EQ') {
                             $SearchParam{EmailEquals} = $Value;
                         } elsif ($SearchItem->{Operator} eq 'IN') {
@@ -109,17 +97,18 @@ sub Run {
                         } else {
                             $SearchParam{PostMasterSearch} = $Value;
                         }
-                    } elsif ($SearchItem->{Field} eq 'PrimaryOrganisationID') {
+                    }
+                    elsif ( $SearchItem->{Field} eq 'PrimaryOrganisationID' ) {
                         $SearchParam{OrganisationID} = $Value;
-                    } elsif ($SearchItem->{Field} eq 'UserLogin') {
-                        $SearchParam{Login} = $Value;
-                    } else {
+                    }
+                    else {
                         $SearchParam{Search} = $Value;
                     }
 
                     %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                         %SearchParam,
-                        Valid => 0
+                        Valid => 0,
+                        Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
                     );
                 }
 
