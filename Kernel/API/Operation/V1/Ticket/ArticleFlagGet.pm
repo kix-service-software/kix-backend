@@ -127,6 +127,7 @@ sub Run {
     my @FlagList;
 
     my %ArticleFlags = $TicketObject->ArticleFlagGet(
+        TicketID  => $Param{Data}->{TicketID},
         ArticleID => $Param{Data}->{ArticleID},
         UserID    => $Self->{Authorization}->{UserID},
     );

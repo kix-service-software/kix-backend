@@ -2236,7 +2236,16 @@ sub ArticleFlagSet {
         }
     }
 
-    my %Flag = $Self->ArticleFlagGet(%Param);
+    my %Article = $Self->ArticleGet(
+        ArticleID     => $Param{ArticleID},
+        UserID        => $Param{UserID},
+        DynamicFields => 0,
+    );
+
+    my %Flag = $Self->ArticleFlagGet(
+        TicketID => $Article{TicketID},
+        %Param,
+    );
 
     # check if set is needed
     return 1 if defined $Flag{ $Param{Key} } && $Flag{ $Param{Key} } eq $Param{Value};
@@ -2258,13 +2267,6 @@ sub ArticleFlagSet {
             (article_id, article_key, article_value, create_time, create_by)
             VALUES (?, ?, ?, current_timestamp, ?)',
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
-    );
-
-    # event
-    my %Article = $Self->ArticleGet(
-        ArticleID     => $Param{ArticleID},
-        UserID        => $Param{UserID},
-        DynamicFields => 0,
     );
 
     $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
@@ -2382,6 +2384,8 @@ sub ArticleFlagDelete {
         );
     }
 
+    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
@@ -2397,6 +2401,7 @@ sub ArticleFlagDelete {
 get article flags
 
     my %Flags = $TicketObject->ArticleFlagGet(
+        TicketID  => 123,
         ArticleID => 123,
         UserID    => 123,
     );
@@ -2407,7 +2412,7 @@ sub ArticleFlagGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ArticleID UserID)) {
+    for (qw(TicketID ArticleID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -2416,6 +2421,15 @@ sub ArticleFlagGet {
             return;
         }
     }
+
+    my $CacheKey = 'ArticleFlagGet::' . $Param{TicketID} . '::' . $Param{ArticleID} . '::' . $Param{UserID};
+
+    my $Cached = $Self->_TicketCacheGet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        Key      => $CacheKey,
+    );
+    return %{$Cached} if ref $Cached eq 'HASH';
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -2435,6 +2449,14 @@ sub ArticleFlagGet {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Flag{ $Row[0] } = $Row[1];
     }
+
+    $Self->_TicketCacheSet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        TTL      => $Self->{CacheTTL},
+        Key      => $CacheKey,
+        Value    => \%Flag,
+    );
 
     return %Flag;
 }
@@ -2471,6 +2493,15 @@ sub ArticleFlagsOfTicketGet {
         }
     }
 
+    my $CacheKey = 'ArticleFlagsOfTicketGet::' . $Param{TicketID} . '::' . $Param{UserID};
+
+    my $Cached = $Self->_TicketCacheGet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        Key      => $CacheKey,
+    );
+    return %{$Cached} if ref $Cached eq 'HASH';
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -2490,6 +2521,14 @@ sub ArticleFlagsOfTicketGet {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Flag{ $Row[0] }->{ $Row[1] } = $Row[2];
     }
+
+    $Self->_TicketCacheSet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        TTL      => $Self->{CacheTTL},
+        Key      => $CacheKey,
+        Value    => \%Flag,
+    );
 
     return %Flag;
 }
