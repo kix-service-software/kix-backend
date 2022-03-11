@@ -433,7 +433,7 @@ cleanup all tokens in system
 sub CleanUp {
     my ( $Self, %Param ) = @_;
 
-    my %TokenList = $Self->GetAllTokens();
+    my %TokenList = %{$Self->GetAllTokens()};
 
     foreach my $Token ( keys %TokenList ) {
         my $Payload = $Self->ExtractToken(
