@@ -63,8 +63,8 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{Organisation} ) ) {
         for my $SearchType ( keys %{ $Self->{Search}->{Organisation} } ) {
             for my $SearchItem ( @{ $Self->{Search}->{Organisation}->{$SearchType} } ) {
-                next if ($SearchItem->{Operator} eq 'IN');
-                next if ($SearchItem->{Field} !~ m/^(Fulltext|Name|Number)$/);
+                next if ($SearchItem->{Operator} eq 'IN' && $SearchItem->{Field} !~ m/^DynamicField_/sxm);
+                next if ($SearchItem->{Field} !~ m/^(?:Fulltext|Name|Number|DynamicField_\w+)$/sxm);
 
                 if (!$OrgSearch{$SearchType}) {
                     $OrgSearch{$SearchType} = [];
@@ -104,6 +104,12 @@ sub Run {
                     $SearchParam{Number} = $Value;
                 } elsif ($SearchItem->{Field} eq 'Name') {
                     $SearchParam{Name} = $Value;
+                } elsif ($SearchItem->{Field} =~ /^DynamicField_/smx ) {
+                    $SearchParam{DynamicField} = {
+                        Field    => $SearchItem->{Field},
+                        Operator => $SearchItem->{Operator},
+                        Value    => $Value
+                    };
                 } else {
                     $SearchParam{Search} = $Value;
                 }
