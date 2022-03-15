@@ -121,9 +121,9 @@ sub PostRun {
 
     $Self->{DiscardCount}--;
 
-    if ( $Self->{Debug} ) {
-        print "  $Self->{DaemonName} Discard Count: $Self->{DiscardCount}\n";
-    }
+    # if ( $Self->{Debug} ) {
+    #     print "  $Self->{DaemonName} Discard Count: $Self->{DiscardCount}\n";
+    # }
 
     return if $Self->{DiscardCount} <= 0;
     return 1;
