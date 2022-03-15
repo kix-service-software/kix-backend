@@ -17,10 +17,10 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::DynamicField::Driver::BaseDateTime);
 
-our @ObjectDependencies = (
-    'Config',
-    'DynamicFieldValue',
-    'Main',
+our @ObjectDependencies = qw(
+    Config
+    DynamicFieldValue
+    Main
 );
 
 =head1 NAME
@@ -80,8 +80,7 @@ sub new {
             # check if module can be loaded
             if (
                 !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
-                )
-            {
+            ) {
                 die "Can't load dynamic fields backend module"
                     . " $Extension->{Module}! $@";
             }
