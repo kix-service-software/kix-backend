@@ -138,8 +138,17 @@ sub Run {
 
     my @TaskList = $Self->{SchedulerDBObject}->TaskListUnlocked();
 
+    if ( $Self->{Debug} && @TaskList ) {
+        print "  $Self->{DaemonName} unlocked tasks: ".join(',', @TaskList)."\n";
+    }
+
     TASK:
     for my $TaskID (@TaskList) {
+
+        if ( $Self->{Debug} ) {
+            print "  $Self->{DaemonName} handling TaskID: $TaskID\n";
+            print "  $Self->{DaemonName} current workers: $Self->{CurrentWorkersCount}/$Self->{MaximumWorkers}\n";
+        }
 
         last TASK if $Self->{CurrentWorkersCount} >= $Self->{MaximumWorkers};
 
@@ -232,11 +241,19 @@ sub Run {
                 exit 1;
             }
 
+            if ( $Self->{Debug} ) {
+                print "  $Self->{DaemonName} running task \"$Task{Name}\" (TaskID: $TaskID, Type: $Task{Type})\n";
+            }
+
             $TaskHandlerObject->Run(
                 TaskID   => $TaskID,
                 TaskName => $Task{Name} || '',
                 Data     => $Task{Data},
             );
+
+            if ( $Self->{Debug} ) {
+                print "  $Self->{DaemonName} task \"$Task{Name}\" (TaskID: $TaskID, Type: $Task{Type}) finished\n";
+            }
 
             # Force transactional events to run by discarding all objects before deleting the task.
             $Kernel::OM->ObjectsDiscard();
@@ -280,9 +297,9 @@ sub PostRun {
 
     $Self->{DiscardCount}--;
 
-    if ( $Self->{Debug} ) {
-        print "  $Self->{DaemonName} Discard Count: $Self->{DiscardCount}\n";
-    }
+    # if ( $Self->{Debug} ) {
+    #     print "  $Self->{DaemonName} Discard Count: $Self->{DiscardCount}\n";
+    # }
 
     # Update task locks and remove expired each 60 seconds.
     if ( !int $Self->{DiscardCount} % ( 60 / $Self->{SleepPost} ) ) {
@@ -292,9 +309,16 @@ sub PostRun {
 
         # Update locks (only for this node).
         if (@LockedTaskIDs) {
+            if ( $Self->{Debug} ) {
+                print "  $Self->{DaemonName} updating locks for task ids: ".join(',', @LockedTaskIDs)."\n";
+            }
             $Self->{SchedulerDBObject}->TaskLockUpdate(
                 TaskIDs => \@LockedTaskIDs,
             );
+        }
+
+        if ( $Self->{Debug} ) {
+            print "  $Self->{DaemonName} unlocking expired tasks\n";
         }
 
         # Unlock expired tasks (for all nodes).
@@ -303,6 +327,9 @@ sub PostRun {
 
     # Remove obsolete tasks before destroy.
     if ( $Self->{DiscardCount} == 0 ) {
+        if ( $Self->{Debug} ) {
+            print "  $Self->{DaemonName} cleaning up tasks\n";
+        }
         $Self->{SchedulerDBObject}->TaskCleanup();
     }
 

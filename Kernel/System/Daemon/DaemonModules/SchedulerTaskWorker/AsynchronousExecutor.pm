@@ -146,6 +146,10 @@ sub Run {
 
     };
 
+    if ( $Self->{Debug} ) {
+        print "    $Self->{WorkerName} execution finished\n";
+    }
+
     # Check if there are errors.
     if ($ErrorMessage) {
 
