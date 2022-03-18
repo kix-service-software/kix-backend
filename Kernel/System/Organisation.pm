@@ -560,30 +560,61 @@ Returns:
 sub OrganisationSearch {
     my ( $Self, %Param ) = @_;
 
+    # get needed objects
+    my $CacheObject = $Kernel::OM->Get('Cache');
+    my $ValidObject = $Kernel::OM->Get('Valid');
+    my $DBObject    = $Kernel::OM->Get('DB');
+
     # check needed stuff
     my $Valid = 1;
     if ( !$Param{Valid} && defined( $Param{Valid} ) ) {
         $Valid = 0;
     }
 
+    if (
+        $Param{DynamicField}
+        && $Param{DynamicField}->{Value}
+        && IsArrayRefWithData($Param{DynamicField}->{Value})
+    ) {
+        $Param{DynamicField}->{Value} = join( q{,} , @{$Param{DynamicField}->{Value}});
+    }
+
     # check cache
-    my $CacheKey = "OrganisationSearch::${Valid}::" . ( $Param{Limit} || 0) . "::" . ( $Param{Search} || '' ) . "::" . ( $Param{Number} || '' ) . "::" . ( $Param{Name} || '' );
-    my $Data = $Kernel::OM->Get('Cache')->Get(
+    my $CacheKey = "OrganisationSearch::${Valid}::";
+    foreach my $Key (
+        qw(
+            Search Limit Number Name DynamicField
+        )
+    ) {
+        if ( $Key eq 'DynamicField' ) {
+            $CacheKey .= q{::} . ($Param{$Key}->{Value} || q{});
+        }
+        else {
+            $CacheKey .= q{::} . ($Param{$Key} || q{});
+        }
+    }
+
+    if (
+        $Param{DynamicField}
+        && $Param{DynamicField}->{Value}
+    ) {
+        my @Values = split( m/,/smx , $Param{DynamicField}->{Value});
+        $Param{DynamicField}->{Value} = \@Values;
+    }
+
+    my $Data = $CacheObject->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return %{$Data} if ref $Data eq 'HASH';
 
     # add valid option if required
-    my $SQL;
+    my $Where;
     my @Bind;
+    my $Join = q{};
 
     if ($Valid) {
-
-        # get valid object
-        my $ValidObject = $Kernel::OM->Get('Valid');
-
-        $SQL .= "valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
+        $Where .= "o.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
     }
 
     # where
@@ -594,30 +625,30 @@ sub OrganisationSearch {
             $Part =~ s/\*/%/g;
             $Part =~ s/%%/%/g;
 
-            if ( defined $SQL ) {
-                $SQL .= " AND ";
+            if ( defined $Where ) {
+                $Where .= " AND ";
             }
 
             my @SQLParts;
             for my $Field ( qw(number name street zip city country url) ) {
                 if ( $Self->{CaseSensitive} ) {
-                    push(@SQLParts, "$Field LIKE ?");
+                    push(@SQLParts, "o.$Field LIKE ?");
                     push(@Bind, \$Part);
                 }
                 else {
-                    push(@SQLParts, "LOWER($Field) LIKE LOWER(?)");
+                    push(@SQLParts, "LOWER(o.$Field) LIKE LOWER(?)");
                     push(@Bind, \$Part);
                 }
             }
             if (@SQLParts) {
-                $SQL .= '(' . join( ' OR ', @SQLParts ) . ')';
+                $Where .= '(' . join( ' OR ', @SQLParts ) . ')';
             }
         }
     }
     elsif ( $Param{Number} ) {
 
-        if ( defined $SQL ) {
-            $SQL .= " AND ";
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
 
         my $Number = $Param{Number};
@@ -625,18 +656,18 @@ sub OrganisationSearch {
         $Number =~ s/%%/%/g;
 
         if ( $Self->{CaseSensitive} ) {
-            $SQL .= "number LIKE ?";
+            $Where .= "o.number LIKE ?";
             push(@Bind, \$Number);
         }
         else {
-            $SQL .= "LOWER(number) LIKE LOWER(?)";
+            $Where .= "LOWER(o.number) LIKE LOWER(?)";
             push(@Bind, \$Number);
         }
     }
     elsif ( $Param{Name} ) {
 
-        if ( defined $SQL ) {
-            $SQL .= " AND ";
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
 
         my $Name = $Param{Name};
@@ -644,30 +675,48 @@ sub OrganisationSearch {
         $Name =~ s/%%/%/g;
 
         if ( $Self->{CaseSensitive} ) {
-            $SQL .= "name LIKE ?";
+            $Where .= "o.name LIKE ?";
             push(@Bind, \$Name);
         }
         else {
-            $SQL .= "LOWER(name) LIKE LOWER(?)";
+            $Where .= "LOWER(o.name) LIKE LOWER(?)";
             push(@Bind, \$Name);
         }
     }
+    elsif (
+        $Param{DynamicField}
+        && IsHashRefWithData($Param{DynamicField})
+    ) {
+        my $SQLReturn = $Self->_SearchInDynamicField(
+           Search       => $Param{DynamicField},
+            BoolOperator => 'AND',
+            JoinCounter  => '0'
+        );
+
+        $Join  .= join( q{ }, @{$SQLReturn->{SQLJoin}});
+        $Where .= join( ' AND ', @{$SQLReturn->{SQLWhere}});
+    }
+
+    my $SQL = "SELECT o.id, o.name FROM organisation o $Join ";
+    if ( $Where ) {
+        $SQL .= "WHERE ".$Where;
+    }
 
     # ask database
-    $Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT id, name FROM organisation " . ($SQL ? "WHERE $SQL" : ''),
+    $DBObject->Prepare(
+        SQL   => $SQL,
         Bind  => \@Bind,
         Limit => $Param{Limit},
     );
 
     # fetch the result
     my %List;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         $List{$Row[0]} = $Row[1];
     }
 
     # cache request
-    $Kernel::OM->Get('Cache')->Set(
+    $CacheObject->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%List,
@@ -855,6 +904,147 @@ sub SetPreferences {
     return $Result;
 }
 
+sub _SearchInDynamicField {
+    my ( $Self, %Param ) = @_;
+
+    # get needed object
+    my $LogObject                 = $Kernel::OM->Get('Log');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+    my @SQLJoin;
+    my @SQLWhere;
+
+    # check params
+    if ( !$Param{Search} ) {
+        $LogObject->Log(
+            Priority => 'error',
+            Message  => "Need Search!",
+        );
+        return;
+    }
+
+    # validate operator
+    my %OperatorMap = (
+        'EQ'         => 'Equals',
+        'LIKE'       => 'Like',
+        'GT'         => 'GreaterThan',
+        'GTE'        => 'GreaterThanEquals',
+        'LT'         => 'SmallerThan',
+        'LTE'        => 'SmallerThanEquals',
+        'IN'         => 'Like',
+        'CONTAINS'   => 'Like',
+        'STARTSWITH' => 'StartsWith',
+        'ENDSWITH'   => 'EndsWith',
+    );
+    if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
+        $LogObject->Log(
+            Priority => 'error',
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
+        );
+        return;
+    }
+
+    if ( !$Self->{DynamicFields} ) {
+
+        # get all configured dynamic fields
+        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+            ObjectType => ['Organisation'],
+        );
+        if ( !IsArrayRefWithData($DynamicFieldList) ) {
+            # we don't have any  DFs
+            return {
+                SQLJoin  => [],
+                SQLWhere => [],
+            };
+        }
+        $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
+    }
+
+    my $DFName = $Param{Search}->{Field};
+    $DFName =~ s/DynamicField_//gsm;
+
+    my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
+
+    if ( !IsHashRefWithData($DynamicFieldConfig) ) {
+        $LogObject->Log(
+            Priority => 'notice',
+            Message  => "DynamicField '$DFName' doesn't exist or is disabled. Ignoring it.",
+        );
+        # return empty result
+        return {
+            SQLJoin  => [],
+            SQLWhere => [],
+        };
+    }
+
+    my $Value = $Param{Search}->{Value};
+    if ( !IsArrayRefWithData($Value) ) {
+        $Value = [ $Value ];
+    }
+    foreach my $ValueItem ( @{$Value} ) {
+        $Value =~ s/\*/%/g;
+    }
+
+    # increase count
+    my $Count = $Param{JoinCounter}++;
+
+    # join tables
+    my $JoinTable = "dfv$Count";
+    if ( $DynamicFieldConfig->{ObjectType} eq 'Organisation' ) {
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLJoin, "LEFT JOIN dynamic_field_value $JoinTable ON (CAST(o.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        } else {
+            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(o.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        }
+    }
+
+    my $DynamicFieldSQL;
+    foreach my $ValueItem ( @{$Value} ) {
+        # validate data type
+        my $ValidateSuccess = $DynamicFieldBackendObject->ValueValidate(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $ValueItem,
+            SearchValidation   => 1,
+            UserID             => 1,
+        );
+
+        if ( !$ValidateSuccess ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  =>
+                    "Search not executed due to invalid value '"
+                    . $ValueItem
+                    . "' on field '"
+                    . $DFName
+                    . "'!",
+            );
+            return;
+        }
+
+        # get field specific SQL
+        my $SQL = $DynamicFieldBackendObject->SearchSQLGet(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            TableAlias         => $JoinTable,
+            Operator           => $OperatorMap{$Param{Search}->{Operator}},
+            SearchTerm         => $ValueItem,
+        );
+
+        if ( $DynamicFieldSQL ) {
+            $DynamicFieldSQL .= " OR ";
+        }
+        $DynamicFieldSQL .= "($SQL)";
+    }
+
+    # add field specific SQL
+    push( @SQLWhere, "($DynamicFieldSQL)" );
+
+    return {
+        SQLJoin  => \@SQLJoin,
+        SQLWhere => \@SQLWhere,
+    };
+}
+
 sub DESTROY {
     my $Self = shift;
 
@@ -865,10 +1055,6 @@ sub DESTROY {
 }
 
 1;
-
-
-
-
 
 =back
 

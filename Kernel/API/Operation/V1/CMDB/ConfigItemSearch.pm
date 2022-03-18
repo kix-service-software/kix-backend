@@ -59,8 +59,9 @@ sub Run {
     my $CustomerCIIDList;
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         $CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
-            ObjectType => 'ConfigItem',
-            UserID     => $Self->{Authorization}->{UserID}
+            ObjectType             => 'ConfigItem',
+            UserID                 => $Self->{Authorization}->{UserID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 
         # return empty result if there are no assigned config items for customer
@@ -237,8 +238,9 @@ sub Run {
 
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
-            Data      => {
-                ConfigItemID => join(',', sort @{$ConfigItemList}),
+            Data          => {
+                ConfigItemID           => join(',', sort @{$ConfigItemList}),
+                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             }
         );
 

@@ -50,11 +50,8 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # KIX4OTRS-capeIT
     $Self->{UserObject}              = $Kernel::OM->Get('User');
     $Self->{DynamicFieldValueObject} = $Kernel::OM->Get('DynamicFieldValue');
-
-    # EO KIX4OTRS-capeIT
 
     # set field behaviors
     $Self->{Behaviors} = {
@@ -66,8 +63,7 @@ sub new {
     };
 
     # get the Dynamic Field Driver custmom extensions
-    my $DynamicFieldDriverExtensions
-        = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::User');
+    my $DynamicFieldDriverExtensions = $Kernel::OM->Get('Config')->Get('DynamicFields::Extension::Driver::User');
 
     EXTENSION:
     for my $ExtensionKey ( sort keys %{$DynamicFieldDriverExtensions} ) {
@@ -84,8 +80,7 @@ sub new {
             # check if module can be loaded
             if (
                 !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
-                )
-            {
+            ) {
                 die "Can't load dynamic fields backend module"
                     . " $Extension->{Module}! $@";
             }
@@ -128,10 +123,6 @@ sub ValueGet {
 sub ValueSet {
     my ( $Self, %Param ) = @_;
 
-    # KIX4OTRS-capeIT
-    # content removed
-    # EO KIX4OTRS-capeIT
-
     # check value
     my @Values;
     if ( ref $Param{Value} eq 'ARRAY' ) {
@@ -141,7 +132,6 @@ sub ValueSet {
         @Values = ( $Param{Value} );
     }
 
-    # KIX4OTRS-capeIT
     # check for valid UserLogin
     for my $Object (@Values) {
 
@@ -161,8 +151,6 @@ sub ValueSet {
             return 0;
         }
     }
-
-    # EO KIX4OTRS-capeIT
 
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
@@ -210,7 +198,6 @@ sub ValueValidate {
         @Values = ( $Param{Value} );
     }
 
-    # KIX4OTRS-capeIT
     # check for valid UserLogin
     for my $Object (@Values) {
         my %UserListCustomer =
@@ -227,8 +214,6 @@ sub ValueValidate {
             return 0;
         }
     }
-
-    # EO KIX4OTRS-capeIT
 
     # get dynamic field value object
     my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
@@ -247,322 +232,6 @@ sub ValueValidate {
     return $Success;
 }
 
-sub EditFieldRender {
-    my ( $Self, %Param ) = @_;
-
-    # take config from field config
-    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $FieldName   = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-    my $FieldLabel  = $Param{DynamicFieldConfig}->{Label};
-
-    # KIX4OTRS-capeIT
-    my $ObjectReference  = $FieldConfig->{ObjectReference};
-    my $DisplayFieldType = $FieldConfig->{DisplayFieldType};
-
-    # EO KIX4OTRS-capeIT
-
-    my $Value;
-
-    # set the field value or default
-    if ( $Param{UseDefaultValue} ) {
-        $Value = ( defined $FieldConfig->{DefaultValue} ? $FieldConfig->{DefaultValue} : '' );
-    }
-    $Value = $Param{Value} // $Value;
-
-    # check if a value in a template (GenericAgent etc.)
-    # is configured for this dynamic field
-    if (
-        IsHashRefWithData( $Param{Template} )
-        && defined $Param{Template}->{$FieldName}
-        )
-    {
-        $Value = $Param{Template}->{$FieldName};
-    }
-
-    # extract the dynamic field value form the web request
-    my $FieldValue = $Self->EditFieldValueGet(
-        %Param,
-    );
-
-    # set values from ParamObject if present
-    if ( $DisplayFieldType eq 'AutoComplete' && IsArrayRefWithData($FieldValue) ) {
-        $Value = $FieldValue->[0];
-    }
-    elsif ( IsArrayRefWithData($FieldValue) ) {
-        $Value = $FieldValue;
-    }
-
-    # check and set class if necessary
-    # KIX4OTRS-capeIT
-    # my $FieldClass = 'DynamicFieldText';
-    my $FieldClass = 'DynamicFieldObjectReference Modernize';
-
-    # EO KIX4OTRS-capeIT
-    if ( defined $Param{Class} && $Param{Class} ne '' ) {
-        $FieldClass .= ' ' . $Param{Class};
-    }
-
-    # set field as mandatory
-    if ( $Param{Mandatory} ) {
-        $FieldClass .= ' Validate_Required';
-    }
-
-    # set error css class
-    if ( $Param{ServerError} ) {
-        $FieldClass .= ' ServerError';
-    }
-
-    # set TreeView class
-    if ( $FieldConfig->{TreeView} ) {
-        $FieldClass .= ' DynamicFieldWithTreeView';
-    }
-
-    # KIX4OTRS-capeIT
-    # content removed
-    # EO KIX4OTRS-capeIT
-
-    # check value
-    my $SelectedValuesArrayRef;
-    if ( defined $Value ) {
-        if ( ref $Value eq 'ARRAY' ) {
-            $SelectedValuesArrayRef = $Value;
-        }
-        else {
-            $SelectedValuesArrayRef = [$Value];
-        }
-    }
-
-    # KIX4OTRS-capeIT
-    # create HTML string
-    my $HTMLString;
-
-    if ( $DisplayFieldType eq 'AutoComplete' ) {
-
-        # set value
-        if ( ref($SelectedValuesArrayRef) eq 'ARRAY' && scalar @{$SelectedValuesArrayRef} ) {
-            $Value = $SelectedValuesArrayRef->[0];
-        }
-        else {
-            $Value = '';
-        }
-
-        # set field as autocomplete
-        $FieldClass .= ' UserAutoComplete ';
-        my $FieldNameKey = $FieldName . '_Key';
-
-        # get user data to display value
-        my $UserDataString = '';
-        if ($Value) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $Value
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                $UserDataString
-                    = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
-                    . $ContactData{Email} . ">";
-            }
-        }
-
-        $HTMLString = <<"EOF";
-<input type="text" class="Hidden" id="$FieldName" name="$FieldName" title="$FieldLabel" value="$Value" />
-<input type="text" class="$FieldClass" id="$FieldNameKey" name="$FieldNameKey" title="$FieldLabel" value="$UserDataString" />
-EOF
-
-        # add JS for AutoComplete
-        my $FieldSelector = '.UserAutoComplete';
-
-        $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"EOF");
-                \$('$FieldSelector').each(function () {
-                    Core.Config.Set('Autocomplete.QueryDelay', 100);
-                    Core.Config.Set('Autocomplete.MaxResultsDisplayed', 20);
-                    Core.Config.Set('Autocomplete.MinQueryLength', 2);
-                    Core.Config.Set('Autocomplete.DynamicWidth', 1);
-                    Core.Config.Set('Autocomplete.ShowCustomerTickets', 0);
-                    Core.Config.Set('Autocomplete.SearchButtonText', "Search Customer");
-                    Core.KIX4OTRS.Agent.DynamicFieldObjectReference.Init(\$(this), 1, '$ObjectReference');
-                });
-EOF
-
-    }
-    elsif ( $DisplayFieldType eq 'Multiselect' || $DisplayFieldType eq 'Dropdown' ) {
-
-        # get data
-        my %ObjectList = $Self->{UserObject}->UserList(
-            Valid => 1,
-        );
-
-        # create user hash
-        my %UserHash = ();
-        for my $User (keys %ObjectList) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $User,
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                if (defined $ContactData{Firstname}) {
-                    $UserHash{$ObjectList{$User}}
-                        = $ContactData{Firstname} . " "
-                        . $ContactData{Lastname} . " <"
-                        . $ContactData{Email} . "> ("
-                        . $ObjectList{$User} . ")";
-                }
-            }
-        }
-
-        # multiselect or dropdown
-        my $Multiple = 0;
-        if ( $DisplayFieldType eq 'Multiselect' ) {
-            $Multiple = 1;
-        }
-
-        # create HTML string
-        $HTMLString = $Param{LayoutObject}->BuildSelection(
-            Data => \%UserHash || {},
-            SelectedID   => $Value,
-            Name         => $FieldName,
-            Class        => $FieldClass,
-            HTMLQuote    => 1,
-            Multiple     => $Multiple,
-            PossibleNone => $FieldConfig->{PossibleNone},
-        );
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    if ( $Param{ServerError} ) {
-
-        my $ErrorMessage = $Param{ErrorMessage} || 'This field is required.';
-        $ErrorMessage = $Param{LayoutObject}->{LanguageObject}->Translate($ErrorMessage);
-        my $DivID = $FieldName . 'ServerError';
-
-        # for server side validation
-        $HTMLString .= <<"EOF";
-
-<div id="$DivID" class="TooltipErrorMessage">
-    <p>
-        $ErrorMessage
-    </p>
-</div>
-EOF
-    }
-
-    # KIX4OTRS-capeIT
-    # removed, no AJAX update needed
-    # EO KIX4OTRS-capeIT
-
-    # call EditLabelRender on the common Driver
-    my $LabelString = $Self->EditLabelRender(
-        %Param,
-        Mandatory => $Param{Mandatory} || '0',
-        FieldName => $FieldName,
-    );
-
-    my $Data = {
-        Field => $HTMLString,
-        Label => $LabelString,
-    };
-
-    return $Data;
-}
-
-sub EditFieldValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    my $Value;
-
-    # check if there is a Template and retrieve the dynamic field value from there
-    if ( IsHashRefWithData( $Param{Template} ) && defined $Param{Template}->{$FieldName} ) {
-        $Value = $Param{Template}->{$FieldName};
-    }
-
-    # otherwise get dynamic field value from the web request
-    elsif (
-        defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'WebRequest'
-        )
-    {
-        my @Data = $Param{ParamObject}->GetArray( Param => $FieldName );
-
-        # delete empty values (can happen if the user has selected the "-" entry)
-        my $Index = 0;
-        ITEM:
-        for my $Item ( sort @Data ) {
-
-            if ( !$Item ) {
-                splice( @Data, $Index, 1 );
-                next ITEM;
-            }
-            $Index++;
-        }
-
-        $Value = \@Data;
-    }
-
-    if ( defined $Param{ReturnTemplateStructure} && $Param{ReturnTemplateStructure} eq 1 ) {
-        return {
-            $FieldName => $Value,
-        };
-    }
-
-    # for this field the normal return an the ReturnValueStructure are the same
-    return $Value;
-}
-
-sub EditFieldValueValidate {
-    my ( $Self, %Param ) = @_;
-
-    # get the field value from the http request
-    my $Values = $Self->EditFieldValueGet(
-        DynamicFieldConfig => $Param{DynamicFieldConfig},
-        ParamObject        => $Param{ParamObject},
-
-        # not necessary for this Driver but place it for consistency reasons
-        ReturnValueStructure => 1,
-    );
-
-    my $ServerError;
-    my $ErrorMessage;
-
-    # perform necessary validations
-    if ( $Param{Mandatory} && !IsArrayRefWithData($Values) ) {
-        return {
-            ServerError => 1,
-        };
-    }
-    else {
-
-        # KIX4OTRS-capeIT
-        # check if valid CustomerLogin
-        for my $Object ( @{$Values} ) {
-            next if !$Object;
-            my %UserListCustomer =
-                $Self->{UserObject}
-                ->UserSearch( UserLogin => $Object, );
-            if ( !%UserListCustomer ) {
-                $ServerError  = 1;
-                $ErrorMessage = 'The field content is invalid';
-            }
-        }
-
-        # EO KIX4OTRS-capeIT
-    }
-
-    # create resulting structure
-    my $Result = {
-        ServerError  => $ServerError,
-        ErrorMessage => $ErrorMessage,
-    };
-
-    return $Result;
-}
-
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 
@@ -572,10 +241,10 @@ sub DisplayValueRender {
     }
 
     # set Value and Title variables
-    my $Value         = '';
-    my $Title         = '';
-    my $ValueMaxChars = $Param{ValueMaxChars} || '';
-    my $TitleMaxChars = $Param{TitleMaxChars} || '';
+    my $Value         = q{};
+    my $Title         = q{};
+    my $ValueMaxChars = $Param{ValueMaxChars} || q{};
+    my $TitleMaxChars = $Param{TitleMaxChars} || q{};
 
     # check value
     my @Values;
@@ -585,10 +254,6 @@ sub DisplayValueRender {
     else {
         @Values = ( $Param{Value} );
     }
-
-    # KIX4OTRS-capeIT
-    # content removed
-    # EO KIX4OTRS-capeIT
 
     my @ReadableValues;
     my @ReadableTitles;
@@ -601,12 +266,6 @@ sub DisplayValueRender {
         next VALUEITEM if !$Item;
 
         my $ReadableValue = $Item;
-
-        # KIX4OTRS-capeIT
-        # content removed
-        # EO KIX4OTRS-capeIT
-
-        # KIX4OTRS-capeIT
         my $UserID = $Self->{UserObject}->UserLookup(
             UserLogin => $ReadableValue,
         );
@@ -622,10 +281,8 @@ sub DisplayValueRender {
         # alternative display string defined ?
         if ( $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay} ) {
             $ReadableValue = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-            $ReadableValue =~ s{<(.+?)>}{$ContactData{$1}}egx;
+            $ReadableValue =~ s{<(.+?)>}{$ContactData{$1}}egxsm;
         }
-
-        # EO KIX4OTRS-capeIT
 
         my $ReadableLength = length $ReadableValue;
 
@@ -633,7 +290,7 @@ sub DisplayValueRender {
         my $ReadableTitle = $ReadableValue;
 
         # cut strings if needed
-        if ( $ValueMaxChars ne '' ) {
+        if ( $ValueMaxChars ne q{} ) {
 
             if ( length $ReadableValue > $ValueMaxChars ) {
                 $ShowValueEllipsis = 1;
@@ -647,7 +304,7 @@ sub DisplayValueRender {
             }
         }
 
-        if ( $TitleMaxChars ne '' ) {
+        if ( $TitleMaxChars ne q{} ) {
 
             if ( length $ReadableTitle > $ValueMaxChars ) {
                 $ShowTitleEllipsis = 1;
@@ -710,270 +367,12 @@ sub DisplayValueRender {
     return $Data;
 }
 
-sub SearchFieldRender {
-    my ( $Self, %Param ) = @_;
-
-    # take config from field config
-    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $FieldName   = 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-    my $FieldLabel  = $Param{DynamicFieldConfig}->{Label};
-
-    # KIX4OTRS-capeIT
-    my $ObjectReference  = $FieldConfig->{ObjectReference};
-    my $DisplayFieldType = $FieldConfig->{DisplayFieldType};
-
-    # EO KIX4OTRS-capeIT
-
-    my $Value = '';
-
-    my @DefaultValue;
-
-    if ( defined $Param{DefaultValue} ) {
-        @DefaultValue = split /;/, $Param{DefaultValue};
-    }
-
-    # set the field value
-    if (@DefaultValue) {
-        $Value = \@DefaultValue;
-    }
-
-    # get the field value, this function is always called after the profile is loaded
-    my $FieldValues = $Self->SearchFieldValueGet(
-        %Param,
-    );
-
-    if ( $DisplayFieldType eq 'AutoComplete' && defined $FieldValues ) {
-        $Value = $FieldValues->[0];
-    }
-    elsif ( defined $FieldValues ) {
-        $Value = $FieldValues;
-    }
-
-    # check and set class if necessary
-    # KIX4OTRS-capeIT
-    # my $FieldClass = 'DynamicFieldMultiSelect';
-    my $FieldClass = 'DynamicFieldObjectReference Modernize';
-
-    # EO KIX4OTRS-capeIT
-
-    # KIX4OTRS-capeIT
-    # set PossibleValues
-    # my $SelectionData = $FieldConfig->{PossibleValues};
-    my $SelectionData;
-
-    # EO KIX4OTRS-capeIT
-
-    # get historical values from database
-    my $HistoricalValues = $Self->HistoricalValuesGet(%Param);
-
-    # add historic values to current values (if they don't exist anymore)
-    if ( IsHashRefWithData($HistoricalValues) ) {
-        for my $Key ( sort keys %{$HistoricalValues} ) {
-            if ( !$SelectionData->{$Key} ) {
-                $SelectionData->{$Key} = $HistoricalValues->{$Key}
-            }
-        }
-    }
-
-    # KIX4OTRS-capeIT
-    my $HTMLString;
-    if ( $DisplayFieldType eq 'AutoComplete' ) {
-
-        # set field as autocomplete
-        $FieldClass .= ' UserAutoComplete ';
-        my $FieldNameKey = $FieldName . '_Key';
-
-        # get user data to display value
-        my $UserDataString = '';
-        if ($Value) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $Value,
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                $UserDataString = "$ContactData{Firstname} $ContactData{Lastname}" . " <"
-                    . $ContactData{Email} . ">";
-            }
-        }
-
-        $HTMLString = <<"EOF";
-<input type="text" class="Hidden" id="$FieldName" name="$FieldName" title="$FieldLabel" value="$Value" />
-<input type="text" class="$FieldClass" id="$FieldNameKey" name="$FieldNameKey" title="$FieldLabel" value="$UserDataString" />
-EOF
-
-        # add JS for AutoComplete
-        my $FieldSelector = '.UserAutoComplete';
-
-        $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"EOF");
-                \$('$FieldSelector').each(function () {
-                    Core.Config.Set('Autocomplete.QueryDelay', 100);
-                    Core.Config.Set('Autocomplete.MaxResultsDisplayed', 20);
-                    Core.Config.Set('Autocomplete.MinQueryLength', 2);
-                    Core.Config.Set('Autocomplete.DynamicWidth', 1);
-                    Core.Config.Set('Autocomplete.ShowCustomerTickets', 0);
-                    Core.Config.Set('Autocomplete.SearchButtonText', "Search Customer");
-                    Core.KIX4OTRS.Agent.DynamicFieldObjectReference.Init(\$(this), 1, '$ObjectReference');
-                });
-EOF
-
-    }
-    elsif ( $DisplayFieldType eq 'Multiselect' || $DisplayFieldType eq 'Dropdown' ) {
-
-        # get data
-        my %ObjectList = $Self->{UserObject}->UserList(
-            Valid => 1,
-        );
-
-        # create user hash
-        my %UserHash = ();
-        for my $User (keys %ObjectList) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $User,
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                if (defined $ContactData{Firstname}) {
-                    $UserHash{$ObjectList{$User}}
-                        = $ContactData{Firstname} . " "
-                        . $ContactData{Lastname} . " <"
-                        . $ContactData{Email} . "> ("
-                        . $ObjectList{$User} . ")";
-                }
-            }
-        }
-
-        # create HTML string
-        $HTMLString = $Param{LayoutObject}->BuildSelection(
-            Data => \%UserHash || {},
-            SelectedID   => $Value,
-            Name         => $FieldName,
-            Class        => $FieldClass,
-            HTMLQuote    => 1,
-            Multiple     => 1,
-            PossibleNone => $FieldConfig->{PossibleNone},
-        );
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # call EditLabelRender on the common Driver
-    my $LabelString = $Self->EditLabelRender(
-        %Param,
-        DynamicFieldConfig => $Param{DynamicFieldConfig},
-        FieldName          => $FieldName,
-    );
-
-    my $Data = {
-        Field => $HTMLString,
-        Label => $LabelString,
-    };
-
-    return $Data;
-}
-
-sub SearchFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    # get field value
-    my $Value = $Self->SearchFieldValueGet(%Param);
-
-    my $DisplayValue;
-
-    if ( defined $Value && !$Value ) {
-        $DisplayValue = '';
-    }
-
-    if ($Value) {
-        if ( ref $Value eq 'ARRAY' ) {
-
-            my @DisplayItemList;
-            for my $Item ( @{$Value} ) {
-
-                # set the display value
-                my $DisplayItem = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Item}
-                    || $Item;
-
-                # translate the value
-                if (
-                    $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-                    && defined $Param{LayoutObject}
-                    )
-                {
-                    $DisplayItem = $Param{LayoutObject}->{LanguageObject}->Translate($DisplayItem);
-                }
-
-                push @DisplayItemList, $DisplayItem;
-            }
-
-            # combine different values into one string
-            $DisplayValue = join ' + ', @DisplayItemList;
-        }
-        else {
-
-            # set the display value
-            $DisplayValue = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Value};
-
-            # translate the value
-            if (
-                $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-                && defined $Param{LayoutObject}
-                )
-            {
-                $DisplayValue = $Param{LayoutObject}->{LanguageObject}->Translate($DisplayValue);
-            }
-        }
-    }
-
-    # return search parameter structure
-    return {
-        Parameter => {
-            Equals => $Value,
-        },
-        Display => $DisplayValue,
-    };
-}
-
-sub StatsFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    # KIX4OTRS-capeIT
-    # content removed
-    # EO KIX4OTRS-capeIT
-    return {
-
-        # KIX4OTRS-capeIT
-        # Values             => $Values,
-        # EO KIX4OTRS-capeIT
-        Name    => $Param{DynamicFieldConfig}->{Label},
-        Element => 'DynamicField_' . $Param{DynamicFieldConfig}->{Name},
-
-        # KIX4OTRS-capeIT
-        # TranslatableValues => $Param{DynamicFieldConfig}->{Config}->{TranslatableValues},
-        # EO KIX4OTRS-capeIT
-    };
-}
-
-sub CommonSearchFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    my $Operator = 'Equals';
-    my $Value    = $Param{Value};
-
-    return {
-        $Operator => $Value,
-    };
-}
-
 sub ReadableValueRender {
     my ( $Self, %Param ) = @_;
 
     # set Value and Title variables
-    my $Value = '';
-    my $Title = '';
+    my $Value = q{};
+    my $Title = q{};
 
     # check value
     my @Values;
@@ -1017,136 +416,6 @@ sub ReadableValueRender {
     return $Data;
 }
 
-sub TemplateValueTypeGet {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # set the field types
-    my $EditValueType   = 'ARRAY';
-    my $SearchValueType = 'ARRAY';
-
-    # return the correct structure
-    if ( $Param{FieldType} eq 'Edit' ) {
-        return {
-            $FieldName => $EditValueType,
-            }
-    }
-    elsif ( $Param{FieldType} eq 'Search' ) {
-        return {
-            'Search_' . $FieldName => $SearchValueType,
-            }
-    }
-    else {
-        return {
-            $FieldName             => $EditValueType,
-            'Search_' . $FieldName => $SearchValueType,
-            }
-    }
-}
-
-sub ObjectMatch {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # the attribute must be an array
-    return 0 if !IsArrayRefWithData( $Param{ObjectAttributes}->{$FieldName} );
-
-    my $Match;
-
-    # search in all values for this attribute
-    VALUE:
-    for my $AttributeValue ( @{ $Param{ObjectAttributes}->{$FieldName} } ) {
-
-        next VALUE if !defined $AttributeValue;
-
-        # only need to match one
-        if ( $Param{Value} eq $AttributeValue ) {
-            $Match = 1;
-            last VALUE;
-        }
-    }
-
-    return $Match;
-}
-
-sub PossibleValuesGet {
-    my ( $Self, %Param ) = @_;
-
-    # to store the possible values
-    my %PossibleValues = ();
-
-    if (   $Param{DynamicFieldConfig}->{Config}->{DisplayFieldType} ne 'AutoComplete'
-        || $Param{GetAutocompleteValues} )
-    {
-
-        # KIX4OTRS-capeIT
-        # get data
-        my %ObjectList;
-        if ($Param{Search}) {
-            %ObjectList = $Self->{UserObject}->UserSearch(
-                Search => $Param{Search},
-            );
-        }
-        else {
-            %ObjectList = $Self->{UserObject}->UserList(
-                Valid => 1,
-            );
-        }
-
-        # create user hash
-        my %UserHash = ();
-        for my $User (keys %ObjectList) {
-            my $UserID = $Self->{UserObject}->UserLookup(
-                UserLogin => $User,
-            );
-            if ($UserID) {
-                my %ContactData = $Self->{ContactObject}->ContactGet(
-                    UserID => $UserID,
-                );
-                if (defined $ContactData{Firstname}) {
-                    $UserHash{$ObjectList{$User}}
-                        = $ContactData{Firstname} . " "
-                        . $ContactData{Lastname} . " <"
-                        . $ContactData{Email} . "> ("
-                        . $ObjectList{$User} . ")";
-                }
-            }
-        }
-
-        # set PossibleValues
-        my $DefinedPossibleValues = \%UserHash;
-
-        # EO KIX4OTRS-capeIT
-
-        # set none value if defined on field config
-        if ( $Param{DynamicFieldConfig}->{Config}->{PossibleNone} ) {
-            %PossibleValues = ( '' => '-' );
-        }
-
-        # set all other possible values if defined on field config
-        # KIX4OTRS-capeIT
-        # if ( IsHashRefWithData( $Param{DynamicFieldConfig}->{Config}->{PossibleValues} ) ) {
-        if ( IsHashRefWithData($DefinedPossibleValues) ) {
-
-            # EO KIX4OTRS-capeIT
-            %PossibleValues = (
-                %PossibleValues,
-
-                # KIX4OTRS-capeIT
-                # %{ $Param{DynamicFieldConfig}->{Config}->{PossibleValues} },
-                %{$DefinedPossibleValues},
-
-                # EO KIX4OTRS-capeIT
-            );
-        }
-    }
-
-    # return the possible values hash as a reference
-    return \%PossibleValues;
-}
-
 sub HistoricalValuesGet {
     my ( $Self, %Param ) = @_;
 
@@ -1171,11 +440,6 @@ sub ValueLookup {
         @Keys = ( $Param{Key} );
     }
 
-# KIX4OTRS-capeIT
-#    # get real values
-#    my $PossibleValues = $Param{DynamicFieldConfig}->{Config}->{PossibleValues};
-# EO KIX4OTRS-capeIT
-
     # to store final values
     my @Values;
 
@@ -1185,23 +449,6 @@ sub ValueLookup {
 
         # set the value as the key by default
         my $Value = $Item;
-
-        # KIX4OTRS-capeIT
-        #        # try to convert key to real value
-        #        if ( $PossibleValues->{$Item} ) {
-        #            $Value = $PossibleValues->{$Item};
-        #
-        #            # check if translation is possible
-        #            if (
-        #                defined $Param{LanguageObject}
-        #                && $Param{DynamicFieldConfig}->{Config}->{TranslatableValues}
-        #                )
-        #            {
-        #
-        #                # translate value
-        #                $Value = $Param{LanguageObject}->Translate($Value);
-        #            }
-        #        }
         my $UserID = $Self->{UserObject}->UserLookup(
             UserLogin => $Value,
         );
@@ -1219,10 +466,9 @@ sub ValueLookup {
             # alternative display string defined ?
             if ($Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay}) {
                 $Value = $Param{DynamicFieldConfig}->{Config}->{AlternativeDisplay};
-                $Value =~ s{<(.+?)>}{$ContactData{$1} }egx;
+                $Value =~ s{<(.+?)>}{$ContactData{$1} }egxsm;
             }
-            # EO KIX4OTRS-capeIT
-            push @Values, $Value;
+            push(@Values, $Value);
         }
 
         return \@Values;
@@ -1231,9 +477,6 @@ sub ValueLookup {
 }
 
 1;
-
-
-
 
 =back
 

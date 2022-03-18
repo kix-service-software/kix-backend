@@ -73,7 +73,7 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
-                if ($SearchItem->{Field} eq 'UserLogin' || $SearchItem->{Field} eq 'Search') {
+                if ( $SearchItem->{Field} =~ /^(UserLogin|Search|IsAgent|IsCustomer|Preferences\..*?)$/ ) {
                     if (!$UserSearch{$SearchType}) {
                         $UserSearch{$SearchType} = [];
                     }
@@ -106,6 +106,27 @@ sub Run {
                 }
                 elsif ( $SearchItem->{Field} eq 'UserLogin' ) {
                     $SearchParam{UserLogin} = $Value;
+                }
+                elsif ( $SearchItem->{Field} =~ /^(IsAgent|IsCustomer)$/ ) {
+                    $SearchParam{$SearchItem->{Field}} = $Value;
+                }
+                elsif ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
+                    my @Values = ( $Value );
+                    @Values = @{$SearchItem->{Value}} if $SearchItem->{Operator} eq 'IN';
+
+                    foreach my $Value ( @Values ) {
+                        $Value =~ s/\*/%/g;
+                        # we can use the preferences search result directly because we only need the userid key
+                        my %SearchResultPreferences = $Kernel::OM->Get('User')->SearchPreferences(
+                            Key   => $1,
+                            Value => $Value,
+                            Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                        );
+                        %SearchResult = (
+                            %SearchResult,
+                            %SearchResultPreferences
+                        );
+                    }
                 } else {
                     $SearchParam{Search} = $Value;
 
@@ -143,7 +164,7 @@ sub Run {
                     }
                 }
 
-                if ( !%SearchResult ) {
+                if ( !%SearchResult && %SearchParam ) {
                     # perform User search
                     %SearchResult = $Kernel::OM->Get('User')->UserSearch(
                         %SearchParam,

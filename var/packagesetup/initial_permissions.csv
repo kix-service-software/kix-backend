@@ -133,6 +133,8 @@
 "Customer";"Resource";"/faq/articles/*/votes";"x";"x";;;
 "Customer";"Resource";"/i18n";;"x";;;
 "Customer";"Resource";"/links";;"x";;;
+"Customer";"Resource";"/organisations";;"x";;;
+"Customer";"Object";"/organisations/*{Organisation.ID !IN $CurrentUser.Contact.OrganisationIDs}";;;;;
 "Customer";"Resource";"/session";"x";"x";"x";"x";
 "Customer";"Resource";"/system";;"x";;;
 "Customer";"Resource";"/system/*";;;;;
@@ -159,7 +161,7 @@
 "Customer";"Resource";"/system/users";;"x";;;
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
-"Customer";"Object";"/tickets/*{Ticket.OrganisationID NE $CurrentUser.Contact.PrimaryOrganisationID}";;;;;
+"Customer";"Object";"/tickets/*{Ticket.OrganisationID !IN $CurrentUser.Contact.OrganisationIDs}";;;;;
 "Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;

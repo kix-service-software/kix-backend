@@ -127,6 +127,7 @@ sub Run {
 
     # check if flag exists
     my %ArticleFlags = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $Param{Data}->{TicketID},
         ArticleID => $Param{Data}->{ArticleID},
         UserID    => $Self->{Authorization}->{UserID},
     );

@@ -181,6 +181,9 @@ sub LoadSysConfig {
                 elsif ( $Line =~ /^BUILDNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
                     $Self->{Config}->{BuildNumber} = $1;
                 }
+                elsif ( $Line =~ /^PATCHNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                    $Self->{Config}->{PatchNumber} = $1;
+                }
             }
         }
         close($Product);

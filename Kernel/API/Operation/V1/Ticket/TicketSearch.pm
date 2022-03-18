@@ -60,8 +60,9 @@ sub Run {
     # check for customer relevant ids if necessary
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         my $CustomerTicketIDList = $Self->_GetCustomerUserVisibleObjectIds(
-            ObjectType => 'Ticket',
-            UserID     => $Self->{Authorization}->{UserID}
+            ObjectType             => 'Ticket',
+            UserID                 => $Self->{Authorization}->{UserID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 
         # return empty result if there are no assigned tickets for customer
@@ -102,11 +103,12 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::TicketGet',
             SuppressPermissionErrors => 1,
-            Data          => {
+            Data                     => {
                 TicketID                    => join(',', @TicketIndex),
                 include                     => $Param{Data}->{include},
                 expand                      => $Param{Data}->{expand},
                 NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
+                RelevantOrganisationID      => $Param{Data}->{RelevantOrganisationID}
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

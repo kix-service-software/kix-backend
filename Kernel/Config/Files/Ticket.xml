@@ -115,6 +115,30 @@
             <String Regex="" Translatable="1">Unclassified</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::State::Default" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default ticket state.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <String Regex="" Translatable="1">new</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::Priority::Default" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default ticket priority.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <String Regex="" Translatable="1">3 normal</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::Queue::Default" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default ticket queue.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <String Regex="" Translatable="1">Service Desk</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::ArchiveSystem" Required="1" Valid="1">
         <Description Translatable="1">Activates the ticket archive system to have a faster system by moving some tickets out of the daily scope. To search for these tickets, the archive flag has to be enabled in the ticket search.</Description>
         <Group>Ticket</Group>

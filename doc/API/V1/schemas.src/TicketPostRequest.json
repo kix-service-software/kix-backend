@@ -14,7 +14,8 @@
           }
         },
         "ContactID": {
-          "type": "integer"
+          "type": "integer",
+          "description": "if not given, the contact of the current API user will be used"
         },
         "DynamicFields": {
           "type": "array",
@@ -55,7 +56,6 @@
         }
       },
       "required": [
-        "ContactID",
         "Title"
       ]
     }

@@ -512,7 +512,8 @@ sub _NotificationSendToClient {
         my $ConfigObject       = $Kernel::OM->Get('Config');
         my $WebUserAgentObject = $Kernel::OM->Get('WebUserAgent');
         
-        $Self->{UserAgent} = LWP::UserAgent->new();
+        # create user agent with short timeout
+        $Self->{UserAgent} = LWP::UserAgent->new(timeout => 10);
 
         # set user agent
         $Self->{UserAgent}->agent(

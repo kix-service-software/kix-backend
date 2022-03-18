@@ -33,7 +33,7 @@ _AddReopenJob();
 sub _AddReopenJob {
     my ( $Self, %Param ) = @_;
 
-    my $JobName = 'Customer Response :: reopen from pending';
+    my $JobName = 'Customer Response - reopen from pending';
 
     my $AutomationObject = $Kernel::OM->Get('Automation');
 

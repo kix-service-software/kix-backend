@@ -108,11 +108,10 @@ sub Run {
         );
     }
 
-    my %ArticleFlags = $TicketObject->ArticleFlagGet(
-        ArticleID => $Param{Data}->{ArticleID},
+    my %ArticleFlags = $TicketObject->ArticleFlagsOfTicketGet(
+        TicketID  => $Param{Data}->{TicketID},
         UserID    => $Self->{Authorization}->{UserID},
     );
-
     if ( %ArticleFlags ) {
 
         # get already prepared ArticleFlag data from ArticleFlagGet operation
@@ -122,7 +121,7 @@ sub Run {
             Data          => {
                 TicketID  => $Param{Data}->{TicketID},
                 ArticleID => $Param{Data}->{ArticleID},
-                FlagName  => join(',', keys %ArticleFlags),
+                FlagName  => join(',', keys %{$ArticleFlags{$Param{Data}->{ArticleID}}}),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

@@ -606,6 +606,12 @@ to search users
         Valid           => 1, # not required
     );
 
+    my %List = $UserObject->UserSearch(
+        IsAgent    => 1, # not required
+        IsCustomer => 1, # not required
+        Valid      => 1, # not required
+    );
+
 Returns hash of UserID, Login pairs:
 
     my %List = (
@@ -623,10 +629,10 @@ sub UserSearch {
     my $Valid = $Param{Valid} // 1;
 
     # check needed stuff
-    if ( !$Param{Search} && !$Param{UserLogin} && !$Param{UserLoginEquals}) {
+    if ( !$Param{Search} && !$Param{UserLogin} && !$Param{UserLoginEquals} && !$Param{IsAgent} && !$Param{IsCustomer}) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search or UserLogin or UserLoginEquals!',
+            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer!',
         );
         return;
     }
@@ -636,6 +642,8 @@ sub UserSearch {
         . ( $Param{Search}    || '' ) . '::'
         . ( $Param{UserLogin} || '' ) . '::'
         . ( $Param{UserLoginEquals} || '' ) . '::'
+        . ( $Param{IsAgent}     || '' ) . '::'
+        . ( $Param{IsCustomer}     || '' ) . '::'
         . ( $Param{Valid}     || '' ) . '::'
         . ( $Param{Limit}     || '' );
 
@@ -677,6 +685,16 @@ sub UserSearch {
 
         $SQL .= " $Self->{UserTableUser} = ?";
         push @Bind, \$Param{UserLoginEquals};
+    }
+    elsif ( $Param{IsAgent} ) {
+
+        $SQL .= " is_agent = ? ";
+        push @Bind, \$Param{IsAgent};
+    }
+    elsif ( $Param{IsAgent} ) {
+
+        $SQL .= " is_customer = ? ";
+        push @Bind, \$Param{IsCustomer};
     }
 
     # add valid option
@@ -1718,6 +1736,13 @@ sub SetPreferences {
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User.UserPreference',
+        ObjectID  => $Param{UserID} . '::' . $Param{Key},
+    );
+
     # set preferences
     return $PreferencesObject->SetPreferences(%Param);
 }
@@ -1798,6 +1823,7 @@ search in user preferences
     my %UserList = $UserObject->SearchPreferences(
         Key   => 'UserLogin',
         Value => 'some_name',   # optional, limit to a certain value/pattern
+        Limit => 10,            # optional
     );
 
 =cut

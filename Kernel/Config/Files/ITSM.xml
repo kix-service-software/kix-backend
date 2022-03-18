@@ -98,7 +98,8 @@
         <SubGroup>Core::ITSMCore</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="DependsOn" Translatable="1">Both</Item>
+                <Item Key="DependsOn" Translatable="1">Source</Item>
+                <Item Key="ConnectedTo" Translatable="1">Both</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -307,7 +308,7 @@
       },
       "SectionOwner::OwnerOrganisation": {
         "SearchAttributes": [
-          "PrimaryOrganisationID"
+          "RelevantOrganisationID"
         ]
       }
     },
@@ -319,7 +320,7 @@
       },
       "SectionOwner::OwnerOrganisation": {
         "SearchAttributes": [
-          "PrimaryOrganisationID"
+          "RelevantOrganisationID"
         ]
       }
     },
@@ -352,7 +353,7 @@
       },
       "SectionOwner::OwnerOrganisation": {
         "SearchAttributes": [
-          "PrimaryOrganisationID"
+          "RelevantOrganisationID"
         ]
       }
     }
