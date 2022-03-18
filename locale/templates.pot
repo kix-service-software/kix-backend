@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-3-18 05:33+0000\n"
+"POT-Creation-Date: 2022-3-18 08:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -175,7 +175,7 @@ msgid "Customer Reader"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Customer Response :: reopen from pending"
+msgid "Customer Response - reopen from pending"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -207,7 +207,7 @@ msgid "Enterprise Licence"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Event based Execution Plan for Job \"Customer Response :: reopen from pending\""
+msgid "Event based Execution Plan for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -291,7 +291,7 @@ msgid "Laptop"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Macro for Job \"Customer Response :: reopen from pending\""
+msgid "Macro for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -299,7 +299,7 @@ msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "MacroAction for Job \"Customer Response :: reopen from pending\""
+msgid "MacroAction for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
