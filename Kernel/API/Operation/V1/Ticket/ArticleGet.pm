@@ -199,14 +199,44 @@ sub Run {
             $ArticleData{DynamicFields} = \@DynamicFields;
         }
 
-        # add flags array into 'Flags' hash key if included
+        # add flags array if included
         if ( $Param{Data}->{include}->{Flags} || $Param{Data}->{include}->{'Article.Flags'} ) {
-            my %ArticleFlags = $TicketObject->ArticleFlagGet(
+            if ( !IsHashRef($Self->{ArticleFlags}) ) {
+                my %ArticleFlags = $Kernel::OM->Get('Ticket')->ArticleFlagsOfTicketGet(
+                    TicketID  => $Param{Data}->{TicketID},
+                    UserID    => $Self->{Authorization}->{UserID},
+                );
+                $Self->{ArticleFlags} = \%ArticleFlags || {};
+            }
+
+            my @FlagList;
+            foreach my $Flag ( sort keys %{$Self->{ArticleFlags}->{$ArticleID} || {}} ) {
+                my %Flag = (
+                    ArticleID => 0 + $ArticleID,
+                    Name      => $Flag,
+                    Value     => $Self->{ArticleFlags}->{$ArticleID}->{$Flag},
+                );
+
+                # add
+                push(@FlagList, \%Flag);
+            }
+
+            $ArticleData{Flags} = \@FlagList;
+            $Self->SuppressSubResourceInclude(SubResource => 'flags');
+        }
+
+        # add attachments array included
+        if ( $Param{Data}->{include}->{Attachments} || $Param{Data}->{include}->{'Article.Attachments'} ) {
+            # get attachment index from backend
+            my %Attachments = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndexRaw(
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
             );
 
-            $ArticleData{Flags} = [ sort keys %ArticleFlags ];
+            if ( %Attachments ) {
+                $ArticleData{Attachments} = [ sort keys %Attachments ];
+            }
+            $Self->IncludeSubResourceIfProperty(SubResource => 'attachments', Property => 'Attachments');
         }
 
         if ( $Kernel::OM->Get('Queue')->NameExistsCheck(Name => $ArticleData{To}) ) {

@@ -680,6 +680,73 @@ sub PrepareData {
     return $Result;
 }
 
+=item SuppressSubResourceInclude()
+
+suppress a sub-resource include if it's already done somewhere else (due to performance reasons etc.)
+
+    $CommonObject->SuppressSubResourceInclude(
+        SubResource => '...'
+    );
+
+=cut
+
+sub SuppressSubResourceInclude {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(SubResource)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'SuppressSubResourceInclude.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    foreach my $SubResource ( split( /,/, $Param{SubResource} ) ) {
+
+        if ( exists $Self->{SuppressedSubResourceIncludes}->{$SubResource} ) {
+            next;
+        }
+        $Self->_Debug( $Self->{LevelIndent}, "supress including of sub-resource \"$SubResource\"" );
+        $Self->{SuppressSubResourceIncludes}->{lc($SubResource)} = 1;
+    }
+}
+
+=item IncludeSubResourceIfProperty()
+
+include a sub-resource only if a property exists and has a true value (due to performance reasons etc.)
+
+    $CommonObject->IncludeSubResourceIfProperty(
+        SubResource => '...',
+        Property    => '...'
+    );
+
+=cut
+
+sub IncludeSubResourceIfProperty {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(SubResource Property)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'IncludeSubResourceIfProperty.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    foreach my $SubResource ( split( /,/, $Param{SubResource} ) ) {
+
+        if ( exists $Self->{IncludeSubResourceIfProperty}->{$SubResource} ) {
+            next;
+        }
+        $Self->_Debug( $Self->{LevelIndent}, "including sub-resource \"$SubResource\" only if property \"$Param{Property}\"" );
+        $Self->{IncludeSubResourceIfProperty}->{lc($SubResource)} = $Param{Property};
+    }
+}
+
 =item AddCacheDependency()
 
 add a new cache dependency to inform the system about foreign depending objects included in the response
@@ -2004,16 +2071,23 @@ sub _ApplyInclude {
 
         foreach my $Include ( keys %{ $Self->{Include} } ) {
             next if !$Self->{OperationRouteMapping}->{ $Self->{OperationType} };
+            next if $Self->{SuppressSubResourceIncludes}->{lc($Include)};
 
             my $IncludeOperation = $ReverseOperationRouteMapping{ "$Self->{OperationRouteMapping}->{$Self->{OperationType}}/" . lc($Include) };
             next if !$IncludeOperation;
 
+            OBJECT:
             foreach my $Object ( keys %{ $Param{Data} } ) {
                 next if !$Param{Data}->{$Object};
 
                 if ( IsArrayRef( $Param{Data}->{$Object} ) ) {
                     my $Index = 0;
+                    ITEM:
                     foreach my $Item ( @{$Param{Data}->{$Object}} ) {
+                        if ( $Self->{IncludeSubResourceIfProperty}->{lc($Include)} && !$Item->{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}} ) {
+                            $Param{Data}->{$Object}->[ $Index++ ]->{$Include} = [];
+                            next ITEM;
+                        }
 
                         # we found a sub-resource include
                         my $Result = $Self->ExecOperation(
@@ -2031,6 +2105,10 @@ sub _ApplyInclude {
                     }
                 }
                 else {
+                    if ( $Self->{IncludeSubResourceIfProperty}->{lc($Include)} && !$Param{Data}->{$Object}->{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}} ) {
+                        $Param{Data}->{$Object}->{$Include} = [];
+                        next OBJECT;
+                    }
 
                     # we found a sub-resource include
                     my $Result = $Self->ExecOperation(
