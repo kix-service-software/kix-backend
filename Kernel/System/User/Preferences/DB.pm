@@ -257,8 +257,9 @@ sub SearchPreferences {
 
     # get preferences
     return if !$DBObject->Prepare(
-        SQL  => $SQL,
-        Bind => \@Bind,
+        SQL   => $SQL,
+        Bind  => \@Bind,
+        Limit => $Param{Limit},
     );
 
     # fetch the result
