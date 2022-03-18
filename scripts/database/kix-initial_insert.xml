@@ -4749,15 +4749,15 @@ DefaultValue:
         <Data Key="value_text" Type="Quote">service provider</Data>
     </Insert>
 
-<!-- initial job "Customer Response :: reopen from pending" -->
+<!-- initial job "Customer Response - reopen from pending" -->
     <Insert Table="exec_plan">
         <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response :: reopen from pending"</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
         <Data Key="type" Type="Quote">EventBased</Data>
         <Data Key="parameters" Type="Quote"><![CDATA[
 {"Event":["ArticleCreate"]}
     ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response :: reopen from pending"</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -4766,10 +4766,10 @@ DefaultValue:
     </Insert>
     <Insert Table="macro">
         <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Customer Response :: reopen from pending"</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
         <Data Key="type" Type="Quote">Ticket</Data>
         <Data Key="exec_order" Type="Quote">3</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Customer Response :: reopen from pending"</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -4783,7 +4783,7 @@ DefaultValue:
         <Data Key="parameters" Type="Quote"><![CDATA[
 {"State":"open"}
     ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Customer Response :: reopen from pending"</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Customer Response - reopen from pending"</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
@@ -4792,7 +4792,7 @@ DefaultValue:
     </Insert>
     <Insert Table="job">
         <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Customer Response :: reopen from pending</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Customer Response - reopen from pending</Data>
         <Data Key="type" Type="Quote">Ticket</Data>
         <Data Key="filter" Type="Quote"><![CDATA[
 {"AND":[
@@ -4824,7 +4824,7 @@ DefaultValue:
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-<!-- EO initial job "Customer Response :: reopen from pending" -->
+<!-- EO initial job "Customer Response - reopen from pending" -->
 
 <!-- \### DYNAMIC PERMISSION INSERT - DO NOT REMOVE THIS LINE!!! \### -->
 <Insert Table="role_permission">
