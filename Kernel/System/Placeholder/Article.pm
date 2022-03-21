@@ -164,6 +164,9 @@ sub _Replace {
 sub _ReplaceArticlePlaceholders {
     my ( $Self, %Param ) = @_;
 
+    # add (simple) ID
+    $Param{Article}->{ID} = $Param{Article}->{ArticleID};
+
     # replace <KIX_$Param{Tag}_Subject/Body_xx> tags
     for my $Attribute ( qw(Subject Body) ) {
         my $Tag = $Param{Tag} . $Attribute;
@@ -189,33 +192,112 @@ sub _ReplaceArticlePlaceholders {
         }
     }
 
-    # add html body content
+    # add html body content if necessary
     if ( $Param{Text} =~ /$Param{Tag}BodyRichtext$Self->{End}/g ) {
-        my %AttachmentIndex = $Self->{TicketObject}->ArticleAttachmentIndex(
-            ContentPath                => $Param{Article}->{ContentPath},
-            ArticleID                  => $Param{Article}->{ArticleID},
-            StripPlainBodyAsAttachment => 2,
-            UserID                     => $Param{UserID},
+        $Param{Article}->{BodyRichtext} = $Self->_GetBodyRichtext(
+            Article    => $Param{Article},
+            UserID     => $Param{UserID},
+            WithInline => 1
+        );
+    }
+    if ( $Param{Text} =~ /$Param{Tag}BodyRichtextNoInline$Self->{End}/g ) {
+        $Param{Article}->{BodyRichtextNoInline} = $Self->_GetBodyRichtext(
+            Article => $Param{Article},
+            UserID  => $Param{UserID}
         );
 
-        if (IsHashRefWithData(\%AttachmentIndex)) {
-            for my $AttachmentID ( keys %AttachmentIndex ) {
-                if ( $AttachmentIndex{$AttachmentID}->{Filename} eq 'file-2') {
-                    my %Attachment = $Self->{TicketObject}->ArticleAttachment(
-                        ArticleID => $Param{Article}->{ArticleID},
-                        FileID    => $AttachmentID,
-                        UserID    => $Param{UserID},
-                    );
-
-                    $Param{Article}->{BodyRichtext} = %Attachment ? $Attachment{Content} : '';
-                    last;
-                }
-            }
-        }
+        # remove not replaced images
+        $Param{Article}->{BodyRichtextNoInline} =~ s/<img.+?src="cid:.+?>//g;
     }
 
     # replace it
     return $Self->_HashGlobalReplace( $Param{Text}, $Param{Tag}, %{$Param{Article}} );
+}
+
+sub _GetBodyRichtext {
+    my ( $Self, %Param ) = @_;
+
+    my $BodyRichtext = '';
+
+    my %AttachmentIndex = $Self->{TicketObject}->ArticleAttachmentIndex(
+        ContentPath                => $Param{Article}->{ContentPath},
+        ArticleID                  => $Param{Article}->{ArticleID},
+        StripPlainBodyAsAttachment => 2,
+        UserID                     => $Param{UserID},
+    );
+
+    if (IsHashRefWithData(\%AttachmentIndex)) {
+        my @InlineAttachments;
+
+        for my $AttachmentID ( keys %AttachmentIndex ) {
+
+            # only inline attachments relevant
+            next if (
+                !$AttachmentIndex{ $AttachmentID }->{Disposition}
+                || $AttachmentIndex{ $AttachmentID }->{Disposition} ne 'inline'
+            );
+
+            if ( $AttachmentIndex{$AttachmentID}->{Filename} eq 'file-2') {
+                my %Attachment = $Self->{TicketObject}->ArticleAttachment(
+                    ArticleID => $Param{Article}->{ArticleID},
+                    FileID    => $AttachmentID,
+                    UserID    => $Param{UserID},
+                );
+
+                if (IsHashRefWithData(\%Attachment)) {
+                    my $Charset = $Attachment{ContentType} || '';
+                    $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+                    $Charset =~ s/"|'//g;
+                    $Charset =~ s/(.+?);.*/$1/g;
+
+                    # convert html body to correct charset
+                    my $Body = $Kernel::OM->Get('Kernel::System::Encode')->Convert(
+                        Text  => $Attachment{Content},
+                        From  => $Charset,
+                        To    => 'utf-8',
+                        Check => 1,
+                    );
+
+                    # add url quoting
+                    $Body = $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
+                        String => $Body,
+                    );
+
+                    # strip head, body and meta elements
+                    $Body = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentStrip(
+                        String => $Body,
+                    );
+                    $BodyRichtext = $Body;
+                }
+            } elsif ($AttachmentIndex{$AttachmentID}->{ContentID} && $Param{WithInline}) {
+                my %Attachment = $Self->{TicketObject}->ArticleAttachment(
+                    ArticleID => $Param{Article}->{ArticleID},
+                    FileID    => $AttachmentID,
+                    UserID    => $Param{UserID},
+                );
+                if (IsHashRefWithData(\%Attachment)) {
+                    push(@InlineAttachments, \%Attachment);
+                }
+            }
+        }
+
+        if ($BodyRichtext && scalar @InlineAttachments) {
+            for my $Attachment ( @InlineAttachments ) {
+                my $Content = MIME::Base64::encode_base64( $Attachment->{Content} );
+
+                my $ContentType = $Attachment->{ContentType};
+                $ContentType =~ s/"/\'/g;
+
+                my $ReplaceString = "data:$ContentType;base64,$Content";
+
+                # remove < and > arround id (eg. <123456> ==> 1323456)
+                my $ContentID = substr($Attachment->{ContentID}, 1, -1);
+                $BodyRichtext =~ s/cid:$ContentID/$ReplaceString/g;
+            }
+        }
+    }
+
+    return $BodyRichtext;
 }
 
 1;
