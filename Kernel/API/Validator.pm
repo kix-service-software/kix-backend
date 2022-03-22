@@ -20,6 +20,8 @@ use Kernel::System::VariableCheck qw(:all);
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
 
+use Math::BigInt;
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -126,9 +128,6 @@ sub Validate {
 
         # ignore placeholder values
         next if $Param{Data}->{$Attribute} =~ m/^<KIX_.+>$/;
-        if ($Param{Data}->{$Attribute} =~ m/^0$|^[1-9]\d{1,19}$/ ) {
-            $Param{Data}->{$Attribute} = 0 + $Param{Data}->{$Attribute};
-        }
 
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
