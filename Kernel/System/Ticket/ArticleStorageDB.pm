@@ -310,7 +310,7 @@ sub ArticleWriteAttachment {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Content Filename ContentType ArticleID UserID)) {
+    for (qw(Filename ContentType ArticleID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -346,11 +346,13 @@ sub ArticleWriteAttachment {
         }
     }
 
+    my $Content = $Param{Content} || '';
+
     # get file name
     $Param{Filename} = $NewFileName;
 
     # get attachment size
-    $Param{Filesize} = bytes::length( $Param{Content} );
+    $Param{Filesize} = bytes::length( $Content );
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -358,9 +360,9 @@ sub ArticleWriteAttachment {
     # encode attachment if it's a postgresql backend!!!
     if ( !$DBObject->GetDatabaseFunction('DirectBlob') ) {
 
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{Content} );
+        $Kernel::OM->Get('Encode')->EncodeOutput( \$Content );
 
-        $Param{Content} = encode_base64( $Param{Content} );
+        $Content = encode_base64( $Content );
     }
 
     # set content id in angle brackets
@@ -384,7 +386,7 @@ sub ArticleWriteAttachment {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{ArticleID}, \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize},
-            \$Param{Content}, \$Param{ContentID}, \$Param{ContentAlternative},
+            \$Content, \$Param{ContentID}, \$Param{ContentAlternative},
             \$Disposition, \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -509,17 +511,15 @@ sub ArticleAttachmentIndexRaw {
     while ( my @Row = $DBObject->FetchrowArray() ) {
 
         # human readable file size
-        my $FileSizeRaw = $Row[2];
-        if ( $Row[2] ) {
-            if ( $Row[2] > ( 1024 * 1024 ) ) {
-                $Row[2] = sprintf "%.1f MBytes", ( $Row[2] / ( 1024 * 1024 ) );
-            }
-            elsif ( $Row[2] > 1024 ) {
-                $Row[2] = sprintf "%.1f KBytes", ( ( $Row[2] / 1024 ) );
-            }
-            else {
-                $Row[2] = $Row[2] . ' Bytes';
-            }
+        my $FileSizeRaw = $Row[2] || 0;
+        if ( $Row[2] > ( 1024 * 1024 ) ) {
+            $Row[2] = sprintf "%.1f MBytes", ( $Row[2] / ( 1024 * 1024 ) );
+        }
+        elsif ( $Row[2] > 1024 ) {
+            $Row[2] = sprintf "%.1f KBytes", ( ( $Row[2] / 1024 ) );
+        }
+        else {
+            $Row[2] = $Row[2] . ' Bytes';
         }
 
         my $Disposition = $Row[5];
@@ -547,7 +547,7 @@ sub ArticleAttachmentIndexRaw {
         $Index{$Counter} = {
             Filename           => $Row[0],
             Filesize           => $Row[2] || '',
-            FilesizeRaw        => $FileSizeRaw || 0,
+            FilesizeRaw        => 0 + $FileSizeRaw || 0,
             ContentType        => $Row[1],
             ContentID          => $Row[3] || '',
             ContentAlternative => $Row[4] || '',
@@ -581,7 +581,7 @@ sub ArticleAttachmentIndexRaw {
 
     FILENAME:
     for my $Filename ( sort @List ) {
-        my $FileSize    = -s $Filename;
+        my $FileSize    = -s $Filename || 0;
         my $FileSizeRaw = $FileSize;
 
         # do not use control file
@@ -592,16 +592,14 @@ sub ArticleAttachmentIndexRaw {
         next FILENAME if $Filename =~ /\/plain.txt$/;
 
         # human readable file size
-        if ($FileSize) {
-            if ( $FileSize > ( 1024 * 1024 ) ) {
-                $FileSize = sprintf "%.1f MBytes", ( $FileSize / ( 1024 * 1024 ) );
-            }
-            elsif ( $FileSize > 1024 ) {
-                $FileSize = sprintf "%.1f KBytes", ( ( $FileSize / 1024 ) );
-            }
-            else {
-                $FileSize = $FileSize . ' Bytes';
-            }
+        if ( $FileSize > ( 1024 * 1024 ) ) {
+            $FileSize = sprintf "%.1f MBytes", ( $FileSize / ( 1024 * 1024 ) );
+        }
+        elsif ( $FileSize > 1024 ) {
+            $FileSize = sprintf "%.1f KBytes", ( ( $FileSize / 1024 ) );
+        }
+        else {
+            $FileSize = $FileSize . ' Bytes';
         }
 
         # read content type
@@ -681,7 +679,7 @@ sub ArticleAttachmentIndexRaw {
         $Index{$Counter} = {
             Filename           => $Filename,
             Filesize           => $FileSize,
-            FilesizeRaw        => $FileSizeRaw,
+            FilesizeRaw        => 0 + $FileSizeRaw,
             ContentType        => $ContentType,
             ContentID          => $ContentID,
             ContentAlternative => $Alternative,

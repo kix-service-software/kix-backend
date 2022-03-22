@@ -121,7 +121,7 @@ sub Run {
         delete $Attachment{ItemID};
 
         # rename Filesize to FilesizeRaw
-        $Attachment{FilesizeRaw} = $Attachment{Filesize};
+        $Attachment{FilesizeRaw} = 0 + $Attachment{Filesize};
 
         # human readable file size
         if ( $Attachment{FilesizeRaw} ) {

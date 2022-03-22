@@ -2671,12 +2671,12 @@ get plain article/email
 write an article attachment to storage
 
     my $Success = $TicketObject->ArticleWriteAttachment(
-        Content            => $ContentAsString,
+        Content            => $ContentAsString,                     # optional
         ContentType        => 'text/html; charset="iso-8859-15"',
         Filename           => 'lala.html',
-        ContentID          => 'cid-1234',   # optional
-        ContentAlternative => 0,            # optional, alternative content to shown as body
-        Disposition        => 'attachment', # or 'inline'
+        ContentID          => 'cid-1234',                           # optional
+        ContentAlternative => 0,                                    # optional, alternative content to shown as body
+        Disposition        => 'attachment',                         # or 'inline'
         ArticleID          => 123,
         UserID             => 123,
     );
