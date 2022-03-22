@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform TextModuleDelete Operation. This will return the deleted TextModuleID.
     my $Result = $OperationObject->Run(
         Data => {
             TextModuleID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -77,16 +77,16 @@ perform TextModuleDelete Operation. This will return the deleted TextModuleID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-         
+
     # start loop
     foreach my $TextModuleID ( @{$Param{Data}->{TextModuleID}} ) {
 
-        # delete TextModule	    
+        # delete TextModule
         my $Success = $Kernel::OM->Get('TextModule')->TextModuleDelete(
             ID     => $TextModuleID,
             UserID => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

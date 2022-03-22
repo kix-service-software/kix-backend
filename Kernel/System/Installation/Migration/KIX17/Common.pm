@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -99,7 +99,7 @@ sub GetSourceData {
     if ( !$Param{NoProgress} ) {
         $Self->UpdateProgressStatus($Param{Type}, Kernel::Language::Translatable('loading data from source'));
     }
-    
+
     if ( IsArrayRefWithData($Self->{Options}->{Ignore}) ) {
         foreach my $Ignore ( @{$Self->{Options}->{Ignore}} ) {
             return [] if ( $Param{Type} =~ /$Ignore/ );
@@ -443,7 +443,7 @@ sub Lookup {
             Key   => $CacheKey,
             Value => $Result[0],
             %{$Self->{CacheOptions}->{$Param{Table}} || {}},
-        ); 
+        );
     }
 
     return $Result[0];
@@ -540,7 +540,7 @@ sub GetOIDMapping {
         Key            => 'PreloadedOIDMappings',
         CacheInMemory  => 1,
         CacheInBackend => 0,
-    ); 
+    );
     if ( IsHashRefWithData($PreloadedOIDMappings) ) {
         if ( $Param{SourceObjectID} && $PreloadedOIDMappings->{$Param{ObjectType}}->{SourceObjectID}->{$Param{SourceObjectID}} ) {
             return $PreloadedOIDMappings->{$Param{ObjectType}}->{SourceObjectID}->{$Param{SourceObjectID}};
@@ -595,9 +595,9 @@ sub GetOIDMapping {
             Key   => $CacheKey,
             Value => $ID,
             %{$Self->{CacheOptions}->{$Param{ObjectType}} || {}},
-        ); 
+        );
     }
-    
+
     return $ID;
 }
 
@@ -665,7 +665,7 @@ sub ReplaceOIDMapping {
     my $Result = $Kernel::OM->Get('DB')->Do(
         SQL  => 'UPDATE migration SET object_id = ?, additional_data = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
         Bind => [
-            \$Param{ObjectID}, \$AdditionalData, \$Self->{Source}, \$Self->{SourceID}, 
+            \$Param{ObjectID}, \$AdditionalData, \$Self->{Source}, \$Self->{SourceID},
             \$Param{ObjectType}, \$Param{SourceObjectID},
         ]
     );
@@ -718,7 +718,7 @@ sub PreloadOIDMappings {
             Value          => \%PreloadedOIDMappings,
             CacheInMemory  => 1,
             CacheInBackend => 0,
-        ); 
+        );
     }
 
     return 1;
@@ -739,7 +739,7 @@ sub InitProgress {
             Ignored     => 0,
             Status      => Kernel::Language::Translatable('pending'),
         );
-        $MigrationState->{State}->{Progress}->{$Param{Type}} = \%Progress; 
+        $MigrationState->{State}->{Progress}->{$Param{Type}} = \%Progress;
     }
     else {
         $MigrationState->{State}->{Progress}->{$Param{Type}}->{ItemCount} = $Param{ItemCount};
@@ -756,7 +756,7 @@ sub UpdateProgress {
 
     # abort if we don't have a state
     return if $MigrationState->{Status} eq 'aborting';
-    
+
     my $Progress = $MigrationState->{State}->{Progress}->{$Type};
 
     $Progress->{Current}++;
@@ -768,7 +768,7 @@ sub UpdateProgress {
     if ( $Progress->{ElapsedTime} > 10 ) {
         # add forecast after 10 seconds
         $Progress->{AvgPerMinute} = $Progress->{Current} / $Progress->{ElapsedTime} * 60;
-        
+
         my $TimeRemaining = ($Progress->{ItemCount} - $Progress->{Current}) / $Progress->{AvgPerMinute} * 60;
         my $RemainingHours = int($TimeRemaining / 3600);
         my $RemainingMins  = int(($TimeRemaining - $RemainingHours) / 60);
@@ -916,7 +916,7 @@ sub _RunParallel {
     }
 
     $SIG{INT} = sub {
-        print "exiting threads\n"; 
+        print "exiting threads\n";
 
         foreach my $t ( threads->list() ) {
             $t->kill('INT');
@@ -948,9 +948,9 @@ sub _RunParallel {
             sub {
                 my ( $Self, %Param ) = @_;
 
-                $SIG{'INT'} = sub { 
-                    print "Thread exit\n"; 
-                    threads->exit(); 
+                $SIG{'INT'} = sub {
+                    print "Thread exit\n";
+                    threads->exit();
                 };
 
                 my $DBDPg_VERSION = $DBD::Pg::{VERSION};
@@ -977,8 +977,8 @@ sub _RunParallel {
                     $Self->UpdateProgress($Param{Type}, $Result);
                     $Semaphore->up();
                 }
-            }, 
-            $Self, 
+            },
+            $Self,
             %Param,
             WorkQueue   => $WorkQueue,
             ResultQueue => $ResultQueue,

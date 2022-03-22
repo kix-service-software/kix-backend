@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -202,9 +202,9 @@ sub ArticleDeletePlain {
     );
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( 
+    my $ContentPath = $Self->ArticleGetContentPath(
         TicketID  => $Article{TicketID},
-        ArticleID => $Param{ArticleID} 
+        ArticleID => $Param{ArticleID}
     );
     my $File = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt";
     if ( -f $File ) {
@@ -265,9 +265,9 @@ sub ArticleDeleteAttachment {
     );
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( 
+    my $ContentPath = $Self->ArticleGetContentPath(
         TicketID  => $Article{TicketID},
-        ArticleID => $Param{ArticleID} 
+        ArticleID => $Param{ArticleID}
     );
     my $Path = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}";
 
@@ -397,9 +397,9 @@ sub ArticleWriteAttachment {
     # prepare/filter ArticleID
     $Param{ArticleID} = quotemeta( $Param{ArticleID} );
     $Param{ArticleID} =~ s/\0//g;
-    my $ContentPath = $Self->ArticleGetContentPath( 
+    my $ContentPath = $Self->ArticleGetContentPath(
         TicketID  => $Article{TicketID},
-        ArticleID => $Param{ArticleID} 
+        ArticleID => $Param{ArticleID}
     );
 
     # define path
@@ -534,7 +534,7 @@ sub ArticleWriteAttachment {
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
     );
-    
+
     return 1;
 }
 

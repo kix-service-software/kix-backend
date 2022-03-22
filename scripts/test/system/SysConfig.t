@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -49,8 +49,8 @@ my $Result = $SysConfigObject->OptionAdd(
     Name        => $Random.'String',
     Description => 'some description',
     AccessLevel => 'internal',
-    Setting     => { 
-        "RegEx" => "" 
+    Setting     => {
+        "RegEx" => ""
     },
     Type        => 'String',
     UserID      => 1,
@@ -65,9 +65,9 @@ $Result = $SysConfigObject->OptionAdd(
     Name        => $Random.'Option',
     Description => 'some description',
     AccessLevel => 'internal',
-    Setting     => { 
+    Setting     => {
         "0" => "No",
-        "1" => "Yes" 
+        "1" => "Yes"
     },
     Default     => 0,
     Type        => 'Option',
@@ -97,9 +97,9 @@ $Result = $SysConfigObject->OptionAdd(
     Name        => $Random.'Hash',
     Description => 'some description',
     AccessLevel => 'internal',
-    Setting     => { 
-        "SourceName" => "Parent", 
-        "TargetName" => "Child" 
+    Setting     => {
+        "SourceName" => "Parent",
+        "TargetName" => "Child"
     },
     Type        => 'Hash',
     UserID      => 1,
@@ -160,10 +160,10 @@ $Self->Is(
 $Result = $SysConfigObject->OptionUpdate(
     %Option,
     Description => 'some other description',
-    Setting     => { 
+    Setting     => {
         "SomeUpdateKey" => "some Value",
-        "SourceName" => "Parent", 
-        "TargetName" => "Child" 
+        "SourceName" => "Parent",
+        "TargetName" => "Child"
     },
     UserID      => 1
 );
@@ -185,10 +185,10 @@ $Self->Is(
 
 $Self->IsDeeply(
     $UpdatedOption{Setting},
-    { 
+    {
         "SomeUpdateKey" => "some Value",
         "SourceName" => "Parent",
-        "TargetName" => "Child" 
+        "TargetName" => "Child"
     },
     'OptionGet() - updated setting',
 );
@@ -197,9 +197,9 @@ $Self->IsDeeply(
 $Result = $SysConfigObject->OptionUpdate(
     %Option,
     Description => 'some other description',
-    Value  => { 
-        "SourceName" => "Parent", 
-        "TargetName" => "Child" 
+    Value  => {
+        "SourceName" => "Parent",
+        "TargetName" => "Child"
     },
     UserID      => 1
 );
@@ -221,9 +221,9 @@ $Self->Is(
 
 $Self->IsDeeply(
     $UpdatedOption{Value},
-    { 
+    {
         "SourceName" => "Parent",
-        "TargetName" => "Child" 
+        "TargetName" => "Child"
     },
     'OptionGet() - updated value',
 );

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,7 +81,7 @@ perform TranslationPatternUpdate Operation. This will return the updated Transla
         Success         => 1,                       # 0 or 1
         Message    => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            TranslationID  => '',                   # TranslationID 
+            TranslationID  => '',                   # TranslationID
             Error => {                              # should not return errors
                     Code    => 'Translation.Create.Code'
                     Message => 'Error Description'
@@ -114,7 +114,7 @@ sub Run {
         my $PatternID = $Kernel::OM->Get('Translation')->PatternExistsCheck(
             Value => $TranslationPattern->{Value},
         );
-        if ( $PatternID && $PatternID != $Param{Data}->{PatternID} ) {        
+        if ( $PatternID && $PatternID != $Param{Data}->{PatternID} ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
             );
@@ -126,16 +126,16 @@ sub Run {
         ID     => $Param{Data}->{PatternID},
         Value  => $TranslationPattern->{Value} || $PatternData{Value},
         UserID => $Self->{Authorization}->{UserID}
-    );    
+    );
     if ( !$Success ) {
         return $Self->_Error(
             Code => 'Object.UnableToUpdate',
         );
     }
-    
+
     return $Self->_Success(
         PatternID => $PatternData{ID},
-    );   
+    );
 }
 
 1;

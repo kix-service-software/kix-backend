@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -51,7 +51,7 @@ sub new {
     my $ConfigObject  = $Kernel::OM->Get('Config');
     my $MainObject    = $Kernel::OM->Get('Main');
     $Self->{DBObject} = $Kernel::OM->Get('DB');
-    
+
     # load backend modules
     my $Backends = $ConfigObject->Get('TicketSearch::Database::Module');
 
@@ -85,10 +85,10 @@ sub new {
                     Message  => "SupportedAttributes->{$Type} return by module $Backends->{$Backend}->{Module} is not an ArrayRef!",
                 );
                 next BACKEND;
-            }            
+            }
             foreach my $Attribute ( @{$SupportedAttributes->{$Type}} ) {
                 $Self->{AttributeModules}->{$Type}->{$Attribute} = $Object;
-            }        
+            }
         }
     }
 
@@ -112,12 +112,12 @@ To find tickets in your system.
                 {
                     Field    => '...',      # see list of filterable fields
                     Operator => '...'       # see list of filterable fields
-                    Value    => ...         # see list of filterable fields 
+                    Value    => ...         # see list of filterable fields
                 },
                 ...
             ]
             OR => [         # optional, if not given, AND must be used
-                ...         # structure of field filter identical to AND        
+                ...         # structure of field filter identical to AND
             ]
         },
 
@@ -141,7 +141,7 @@ To find tickets in your system.
 
 Filterable fields and possible operators, values and sortablility:
     => see manual of REST API
-    
+
 Returns:
 
 Result: 'ARRAY'
@@ -257,7 +257,7 @@ sub TicketSearch {
             %Param,
         );
         if ( !%Result ) {
-            # return in case of error 
+            # return in case of error
             return;
         }
         foreach my $SQLPart ( @SQLPartsDef ) {
@@ -272,7 +272,7 @@ sub TicketSearch {
             Sort => $Param{Sort},
         );
         if ( !IsHashRef(\%Result) ) {
-            # return in case of error 
+            # return in case of error
             return;
         }
         $SQLDef{SQLOrderBy} .= join(', ', @{$Result{OrderBy}});
@@ -323,7 +323,7 @@ sub TicketSearch {
     if ( !$PrepareResult ) {
         # error
         return;
-    } 
+    }
 
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         $Count = $Row[0];
@@ -410,7 +410,7 @@ generate SQL for attribute filtering
         SQLPartsDef => []                      # required
         Search      => {},                     # required
         UserID      => ...,                    # required
-        UserType    => 'Agent' | 'Customer'    # required       
+        UserType    => 'Agent' | 'Customer'    # required
     );
 
 =cut
@@ -441,7 +441,7 @@ sub _CreateAttributeSQL {
             Message  => 'No user information for attribute search!',
         );
         return;
-    }    
+    }
 
     # generate SQL from attribute modules
     foreach my $BoolOperator ( keys %{$Param{Search}} ) {
@@ -578,11 +578,11 @@ sub _CreateOrderBySQL {
                 Priority => 'error',
                 Message  => "Unable to sort attribute $SortDef. Don't know how to handle it!",
             );
-            return;            
+            return;
         }
 
         # execute attribute module to prepare SQL
-        my $Result = $AttributeModule->Sort(            
+        my $Result = $AttributeModule->Sort(
             Attribute => $Attribute,
         );
 
@@ -609,7 +609,7 @@ sub _CreateOrderBySQL {
             foreach my $Element ( @{$Result->{SQLOrderBy}} ) {
                 push(  @OrderBy, $Element.' '.$Order);
             }
-        }        
+        }
     }
 
     return (

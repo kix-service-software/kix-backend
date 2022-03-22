@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -70,7 +70,7 @@ perform RoleUserIDDelete Operation. This will return the deleted RoleUserID.
         Data => {
             RoleID  => 123,
             UserID  => 123,
-        },		
+        },
     );
 
     $Result = {
@@ -82,12 +82,12 @@ perform RoleUserIDDelete Operation. This will return the deleted RoleUserID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # delete RoleUser	    
+    # delete RoleUser
     my $Success = $Kernel::OM->Get('Role')->RoleUserDelete(
         RoleID => $Param{Data}->{RoleID},
         UserID => $Param{Data}->{UserID},
     );
- 
+
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToDelete',

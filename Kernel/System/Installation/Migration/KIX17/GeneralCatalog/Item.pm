@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -25,7 +25,7 @@ our @ObjectDependencies = (
 
 =item Describe()
 
-describe what is supported and what is required 
+describe what is supported and what is required
 
 =cut
 
@@ -87,7 +87,7 @@ sub Run {
 
         # some special handling for CI classes if one already exists
         if ( $ID && $Item->{general_catalog_class} eq 'ITSM::ConfigItem::Class' ) {
-            $Item->{name} = 'Migration-'.$Item->{name}; 
+            $Item->{name} = 'Migration-'.$Item->{name};
             # do the lookup again
             goto LOOKUP;
         }

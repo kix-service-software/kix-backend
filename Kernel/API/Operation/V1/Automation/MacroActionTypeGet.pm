@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -117,7 +117,7 @@ sub Run {
             );
         }
 
-        # add some more data 
+        # add some more data
         $MacroActionTypeData{Name}        = $MacroActionType;
         $MacroActionTypeData{DisplayName} = $MacroActionTypes->{$MacroActionType}->{DisplayName} || $MacroActionTypesCommon->{$MacroActionType}->{DisplayName};
         $MacroActionTypeData{MacroType}   = $Param{Data}->{MacroType},
@@ -129,7 +129,7 @@ sub Run {
     if ( scalar(@MacroActionTypeList) == 1 ) {
         return $Self->_Success(
             MacroActionType => $MacroActionTypeList[0],
-        );    
+        );
     }
 
     # return result

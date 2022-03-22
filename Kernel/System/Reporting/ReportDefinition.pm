@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -121,14 +121,14 @@ sub ReportDefinitionGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT id, name, datasource, config, comments, valid_id, create_time, create_by, change_time, change_by FROM report_definition WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
     my %Result;
-    
+
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
@@ -151,7 +151,7 @@ sub ReportDefinitionGet {
             );
         }
     }
-    
+
     # no data found...
     if ( !%Result ) {
         $Kernel::OM->Get('Log')->Log(
@@ -160,14 +160,14 @@ sub ReportDefinitionGet {
         );
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Result,
-    ); 
+    );
 
     return %Result;
 }
@@ -206,7 +206,7 @@ sub ReportDefinitionAdd {
     }
 
     # check if this is a duplicate after the change
-    my $ID = $Self->ReportDefinitionLookup( 
+    my $ID = $Self->ReportDefinitionLookup(
         Name => $Param{Name},
     );
     if ( $ID ) {
@@ -244,8 +244,8 @@ sub ReportDefinitionAdd {
     # get new id
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM report_definition WHERE name = ?',
-        Bind => [ 
-            \$Param{Name}, 
+        Bind => [
+            \$Param{Name},
         ],
     );
 
@@ -274,7 +274,7 @@ sub ReportDefinitionAdd {
 updates a report definition
 
     my $Success = $ReportingObject->ReportDefinitionUpdate(
-        ID         => 123,        
+        ID         => 123,
         Name       => 'test',                       # optional
         DataSource => 'TicketList',                 # optional
         Config     => { ... },                      # optional
@@ -305,7 +305,7 @@ sub ReportDefinitionUpdate {
     );
 
     # check if this is a duplicate after the change
-    my $ID = $Self->ReportDefinitionLookup( 
+    my $ID = $Self->ReportDefinitionLookup(
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
@@ -419,7 +419,7 @@ sub ReportDefinitionList {
         push @Bind, \$DateSource;
     }
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => \@Bind,
     );
@@ -465,7 +465,7 @@ sub ReportDefinitionDelete {
     }
 
     # check if this report definition exists
-    my $ID = $Self->ReportDefinitionLookup( 
+    my $ID = $Self->ReportDefinitionLookup(
         ID => $Param{ID},
     );
     if ( !$ID ) {
@@ -497,7 +497,7 @@ sub ReportDefinitionDelete {
         SQL  => 'DELETE FROM report_definition WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-   
+
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
@@ -583,7 +583,7 @@ sub ReportDefinitionValidateParameters {
             return;
         }
     }
-    
+
     return 1;
 }
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -204,7 +204,7 @@ for my $PermissionTest (@PermissionTests) {
 
             $Self->Is(
                 $PermissionData{TypeID}.'::'.sprintf('%04x', $PermissionData{Value}).'::'.$PermissionData{TargetID},
-                $Permission->{TypeID}.'::'.sprintf('%04x', $Permission->{Value}).'::'.$Permission->{TargetID},                    
+                $Permission->{TypeID}.'::'.sprintf('%04x', $Permission->{Value}).'::'.$Permission->{TargetID},
                 "PermissionGet() - permission 0x".sprintf('%04x', $Permission->{Value})." on $Permission->{Target} should be assigned to role ID $RoleID"
             );
         }
@@ -247,7 +247,7 @@ for my $PermissionTest (@PermissionTests) {
                 RoleID => $RoleID,
                 %{$Permission}
             );
-        
+
             my $Success = $RoleObject->PermissionDelete(
                 ID => $PermissionID
             );

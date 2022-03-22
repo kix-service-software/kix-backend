@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -580,18 +580,18 @@ sub ImportDataSave {
         #        }
 
         if ( $MappingObjectData->{Key} ne "UserCountry" ) {
-            $NewContactData{ $MappingObjectData->{Key} } = 
+            $NewContactData{ $MappingObjectData->{Key} } =
             $Param{ImportDataRow}->[$Counter];
-        } 
+        }
         else {
             # Sanitize country if it isn't found in KIX to increase the chance it will
             # Note that standardizing against the ISO 3166-1 list might be a better approach...
             my $CountryList = $Kernel::OM->Get('ReferenceData')->CountryList();
             if ( exists $CountryList->{$Param{ImportDataRow}->[$Counter]} ) {
                 $NewContactData{ $MappingObjectData->{Key} } = $Param{ImportDataRow}->[$Counter];
-            } 
+            }
             else {
-                $NewContactData{ $MappingObjectData->{Key} } = 
+                $NewContactData{ $MappingObjectData->{Key} } =
                     join ('', map { ucfirst lc } split /(\s+)/, $Param{ImportDataRow}->[$Counter]);
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',

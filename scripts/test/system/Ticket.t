@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -279,7 +279,7 @@ my %TicketIDs = $TicketObject->TicketSearch(
     Result       => 'HASH',
     Limit        => 100,
     Search       => {
-        OR => [ 
+        OR => [
             {
                 Field => 'TicketNumber',
                 Value => $TicketSearchTicketNumber,
@@ -305,14 +305,14 @@ $Self->True(
     Result       => 'HASH',
     Limit        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => $Ticket{TicketNumber},
                 Operator => 'EQ',
             },
         ]
-    },    
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -325,14 +325,14 @@ $Self->True(
     Result       => 'HASH',
     Limit        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Age',
                 Value => 3600,
                 Operator => 'LT',
             },
         ]
-    },    
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -345,14 +345,14 @@ $Self->True(
     Result       => 'HASH',
     Limit        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Age',
                 Value => 3600,
                 Operator => 'GT',
             },
         ]
-    },    
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -365,14 +365,14 @@ $Self->False(
     Result     => 'HASH',
     Limit      => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketID',
                 Value => $TicketID,
                 Operator => 'EQ',
             },
         ]
-    },    
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -386,7 +386,7 @@ $Self->True(
     Result     => 'HASH',
     Limit      => 100,
     Search       => {
-        OR => [ 
+        OR => [
             {
                 Field => 'TicketID',
                 Value => $TicketID,
@@ -398,7 +398,7 @@ $Self->True(
                 Operator => 'EQ',
             },
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -411,14 +411,14 @@ $Self->True(
 my $Count = $TicketObject->TicketSearch(
     Result       => 'COUNT',
     Search       => {
-        OR => [ 
+        OR => [
             {
                 Field => 'TicketNumber',
                 Value => $Ticket{TicketNumber},
                 Operator => 'EQ',
             },
         ]
-    },      
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -432,14 +432,14 @@ $Self->Is(
     Result       => 'HASH',
     Limit        => 100,
     Search       => {
-        OR => [ 
+        OR => [
             {
                 Field => 'TicketNumber',
                 Value => [ $Ticket{TicketNumber}, '1234' ],
                 Operator => 'IN',
             },
-        ]  
-    },  
+        ]
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -452,14 +452,14 @@ $Self->True(
     Result     => 'HASH',
     Limit      => 100,
     Search     => {
-        OR => [ 
+        OR => [
             {
                 Field => 'Title',
                 Value => $Ticket{Title},
                 Operator => 'EQ',
             },
-        ]  
-    }, 
+        ]
+    },
     Title      => $Ticket{Title},
     UserID     => 1,
     Permission => 'rw',
@@ -473,7 +473,7 @@ $Self->True(
     Result     => 'HASH',
     Limit      => 100,
     Search     => {
-        OR => [ 
+        OR => [
             {
                 Field => 'Title',
                 Value => $Ticket{Title},
@@ -484,8 +484,8 @@ $Self->True(
                 Value => 'SomeTitleABC',
                 Operator => 'EQ',
             },
-        ]  
-    }, 
+        ]
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -498,14 +498,14 @@ $Self->True(
     Result     => 'HASH',
     Limit      => 100,
     Search     => {
-        OR => [ 
+        OR => [
             {
                 Field => 'OrganisationID',
                 Value => $Ticket{OrganisationID},
                 Operator => 'EQ',
             },
-        ]  
-    },     
+        ]
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -518,14 +518,14 @@ $Self->True(
     Result     => 'HASH',
     Limit      => 100,
     Search     => {
-        OR => [ 
+        OR => [
             {
                 Field => 'OrganisationID',
                 Value => [ $Ticket{OrganisationID}, 12345 ],
                 Operator => 'IN',
             },
-        ]  
-    },       
+        ]
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -538,7 +538,7 @@ $Self->True(
     Result     => 'HASH',
     Limit      => 100,
     Search     => {
-        AND => [ 
+        AND => [
             {
                 Field => 'OrganisationID',
                 Value => $Ticket{OrganisationID},
@@ -548,9 +548,9 @@ $Self->True(
                 Field => 'OrganisationID',
                 Value => 12345,
                 Operator => 'EQ',
-            },            
-        ]  
-    },  
+            },
+        ]
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -563,14 +563,14 @@ $Self->False(
     Result            => 'HASH',
     Limit             => 100,
     Search     => {
-        OR => [ 
+        OR => [
             {
                 Field => 'ContactID',
                 Value => $Ticket{ContactID},
                 Operator => 'EQ',
-            },          
-        ]  
-    },      
+            },
+        ]
+    },
     UserID            => 1,
     Permission        => 'rw',
 );
@@ -583,14 +583,14 @@ $Self->True(
     Result            => 'HASH',
     Limit             => 100,
     Search     => {
-        OR => [ 
+        OR => [
             {
                 Field => 'ContactID',
                 Value => [ $Ticket{ContactID}, '1234' ],
                 Operator => 'IN',
-            },          
-        ]  
-    },      
+            },
+        ]
+    },
     UserID            => 1,
     Permission        => 'rw',
 );
@@ -603,12 +603,12 @@ $Self->True(
     Result            => 'HASH',
     Limit             => 100,
     Search     => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => $Ticket{TicketNumber},
                 Operator => 'EQ',
-            }, 
+            },
             {
                 Field => 'Title',
                 Value => $Ticket{Title},
@@ -618,14 +618,14 @@ $Self->True(
                 Field => 'ContactID',
                 Value => $Ticket{ContactID},
                 Operator => 'EQ',
-            }, 
+            },
             {
                 Field => 'OrganisationID',
                 Value => $Ticket{OrganisationID},
                 Operator => 'EQ',
-            },     
-        ]  
-    },    
+            },
+        ]
+    },
     UserID            => 1,
     Permission        => 'rw',
 );
@@ -638,29 +638,29 @@ $Self->True(
     Result            => 'HASH',
     Limit             => 100,
     Search     => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => [ $Ticket{TicketNumber}, 'ABC' ],
                 Operator => 'IN',
-            }, 
+            },
             {
                 Field => 'Title',
                 Value => [ $Ticket{Title}, '123' ],
                 Operator => 'IN',
-            },                     
+            },
             {
                 Field => 'ContactID',
                 Value => [ $Ticket{ContactID}, 12345 ],
                 Operator => 'IN',
-            }, 
+            },
             {
                 Field => 'OrganisationID',
                 Value => [ $Ticket{OrganisationID}, 12345 ],
                 Operator => 'IN',
-            },     
-        ]  
-    },     
+            },
+        ]
+    },
     UserID            => 1,
     Permission        => 'rw',
 );
@@ -673,29 +673,29 @@ $Self->False(
     Result            => 'HASH',
     Limit             => 100,
     Search     => {
-        OR => [ 
+        OR => [
             {
                 Field => 'TicketNumber',
                 Value => [ $Ticket{TicketNumber}, 'ABC' ],
                 Operator => 'IN',
-            }, 
+            },
             {
                 Field => 'Title',
                 Value => [ $Ticket{Title}, '123' ],
                 Operator => 'IN',
-            },                     
+            },
             {
                 Field => 'ContactID',
                 Value => [ $Ticket{ContactID}, 12345 ],
                 Operator => 'IN',
-            }, 
+            },
             {
                 Field => 'OrganisationID',
                 Value => [ $Ticket{OrganisationID}, 12345 ],
                 Operator => 'IN',
-            },     
-        ]  
-    },     
+            },
+        ]
+    },
     UserID            => 1,
     Permission        => 'rw',
 );
@@ -708,19 +708,19 @@ $Self->True(
     Result       => 'HASH',
     Limit        => 100,
     Search     => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => [ $Ticket{TicketNumber}, 'ABC' ],
                 Operator => 'IN',
-            }, 
+            },
             {
                 Field => 'StateType',
                 Value => 'Closed',
                 Operator => 'EQ',
             },
-        ]  
-    },      
+        ]
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -733,19 +733,19 @@ $Self->True(
     Result       => 'HASH',
     Limit        => 100,
     Search     => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => [ $Ticket{TicketNumber}, 'ABC' ],
                 Operator => 'IN',
-            }, 
+            },
             {
                 Field => 'StateType',
                 Value => 'Open',
                 Operator => 'EQ',
             },
-        ]  
-    },     
+        ]
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -758,19 +758,19 @@ $Self->False(
     Result              => 'HASH',
     Limit               => 100,
     Search     => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Body',
                 Value => 'perl modules',
                 Operator => 'CONTAINS',
-            }, 
+            },
             {
                 Field => 'StateType',
                 Value => 'Closed',
                 Operator => 'EQ',
             },
-        ]  
-    },        
+        ]
+    },
     UserID              => 1,
     Permission          => 'rw',
 );
@@ -783,19 +783,19 @@ $Self->True(
     Result              => 'HASH',
     Limit               => 100,
     Search     => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Body',
                 Value => 'perl modules',
                 Operator => 'CONTAINS',
-            }, 
+            },
             {
                 Field => 'StateType',
                 Value => 'Open',
                 Operator => 'EQ',
             },
-        ]  
-    },    
+        ]
+    },
     UserID              => 1,
     Permission          => 'rw',
 );
@@ -857,7 +857,7 @@ $Self->True(
     Result       => 'HASH',
     Limit        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => [$Ticket{TicketNumber}, 'ABC'],
@@ -869,7 +869,7 @@ $Self->True(
                 Operator => 'EQ',
             }
         ]
-    },    
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -882,7 +882,7 @@ $Self->True(
     Result       => 'HASH',
     Limit        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => [$Ticket{TicketNumber}, 'ABC'],
@@ -894,7 +894,7 @@ $Self->True(
                 Operator => 'EQ',
             }
         ]
-    },      
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -1142,20 +1142,20 @@ $Self->True(
     Result         => 'HASH',
     Limit          => 100,
     Search         => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CreatedUserID',
                 Value => [ 1, 455, 32 ],
                 Operator => 'IN',
             },
         ]
-    },      
+    },
     Sort => [
         {
             Field => "TicketID",
             Direction => 'descending',
-        },  
-    ],      
+        },
+    ],
     UserID         => 1,
     Permission     => 'rw',
 );
@@ -1169,20 +1169,20 @@ $Self->True(
     Result             => 'HASH',
     Limit              => 100,
     Search             => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CreatedPriorityID',
                 Value => [ 2, 3 ],
                 Operator => 'IN',
             },
         ]
-    },     
+    },
     Sort => [
         {
             Field => "TicketID",
             Direction => 'descending',
-        },  
-    ],      
+        },
+    ],
     UserID             => 1,
     Permission         => 'rw',
 );
@@ -1196,20 +1196,20 @@ $Self->True(
     Result          => 'HASH',
     Limit           => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CreatedStateID',
                 Value => [ 2 ],
                 Operator => 'IN',
             },
         ]
-    },     
+    },
     Sort => [
         {
             Field => "TicketID",
             Direction => 'descending',
-        },  
-    ],      
+        },
+    ],
     UserID          => 1,
     Permission      => 'rw',
 );
@@ -1223,20 +1223,20 @@ $Self->True(
     Result          => 'HASH',
     Limit           => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CreatedQueueID',
                 Value => [ 2, 3 ],
                 Operator => 'IN',
             },
         ]
-    },  
+    },
     Sort => [
         {
             Field => "TicketID",
             Direction => 'descending',
-        },  
-    ],      
+        },
+    ],
     UserID          => 1,
     Permission      => 'rw',
 );
@@ -1253,7 +1253,7 @@ my $CreateTime = $TimeObject->SystemTime2TimeStamp(
     Result                       => 'HASH',
     Limit                        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CreateTime',
                 Value => $CreateTime,
@@ -1277,14 +1277,14 @@ $CreateTime = $TimeObject->SystemTime2TimeStamp(
     Result                           => 'HASH',
     Limit                            => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'LastChangeTime',
                 Value => $ChangeTime,
                 Operator => 'GTE',
             },
         ]
-    },    
+    },
     UserID                           => 1,
     Permission                       => 'rw',
 );
@@ -1298,7 +1298,7 @@ $Self->True(
     Result                        => 'HASH',
     Limit                         => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'ArticleCreateTime',
                 Value => $CreateTime,
@@ -1319,7 +1319,7 @@ $Self->True(
     Result                       => 'HASH',
     Limit                        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CreateTime',
                 Value => $CreateTime,
@@ -1340,7 +1340,7 @@ $Self->False(
     Result                           => 'HASH',
     Limit                            => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'LastChangeTime',
                 Value => $ChangeTime,
@@ -1361,7 +1361,7 @@ $Self->False(
     Result                        => 'HASH',
     Limit                         => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'ArticleCreateTime',
                 Value => $CreateTime,
@@ -1382,7 +1382,7 @@ $Self->False(
     Result                   => 'HASH',
     Limit                    => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CloseTime',
                 Value => $CreateTime,
@@ -1403,7 +1403,7 @@ $Self->True(
     Result                   => 'HASH',
     Limit                    => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CloseTime',
                 Value => $CreateTime,
@@ -1670,7 +1670,7 @@ my $QueueID = $QueueObject->QueueLookup( Queue => 'Junk' );
 my @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -1690,19 +1690,19 @@ my @TicketIDsSortOrder = $TicketObject->TicketSearch(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
         {
             Field => "PriorityID",
             Direction => 'descending',
-        },  
+        },
         {
             Field => "Age",
             Direction => 'ascending',
-        }        
-    ],      
+        }
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -1717,7 +1717,7 @@ $Self->Is(
 @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -1737,19 +1737,19 @@ $Self->Is(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
         {
             Field => "PriorityID",
             Direction => 'descending',
-        },  
+        },
         {
             Field => "Age",
             Direction => 'descending',
         }
-    ], 
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -1763,7 +1763,7 @@ $Self->Is(
 @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -1783,15 +1783,15 @@ $Self->Is(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
         {
             Field => "ChangeTime",
             Direction => 'descending',
-        },  
-    ], 
+        },
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -1806,7 +1806,7 @@ $Self->Is(
 @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -1826,15 +1826,15 @@ $Self->Is(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
         {
             Field => "ChangeTime",
             Direction => 'ascending',
-        },  
-    ], 
+        },
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -1876,7 +1876,7 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
 @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -1896,19 +1896,19 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
         {
             Field => "PriorityID",
             Direction => 'descending',
-        },  
+        },
         {
             Field => "Age",
             Direction => 'descending',
         }
-    ],     
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -1922,7 +1922,7 @@ $Self->Is(
 @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -1942,19 +1942,19 @@ $Self->Is(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
         {
             Field => "PriorityID",
             Direction => 'ascending',
-        },  
+        },
         {
             Field => "Age",
             Direction => 'descending',
         }
-    ],       
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -1968,7 +1968,7 @@ $Self->Is(
 @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -1988,7 +1988,7 @@ $Self->Is(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
@@ -1996,7 +1996,7 @@ $Self->Is(
             Field => "Age",
             Direction => 'descending',
         }
-    ],       
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -2010,7 +2010,7 @@ $Self->Is(
 @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Result       => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -2030,7 +2030,7 @@ $Self->Is(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     Sort => [
@@ -2038,7 +2038,7 @@ $Self->Is(
             Field => "Age",
             Direction => 'ascending',
         }
-    ],       
+    ],
     UserID       => 1,
     Limit        => 1,
 );
@@ -2051,7 +2051,7 @@ $Self->Is(
 $Count = $TicketObject->TicketSearch(
     Result       => 'COUNT',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => 'sort/order by test',
@@ -2071,7 +2071,7 @@ $Count = $TicketObject->TicketSearch(
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            }            
+            }
         ]
     },
     UserID       => 1,
@@ -2144,7 +2144,7 @@ for my $State ( values %StateList ) {
     my @TicketIDs = $TicketObject->TicketSearch(
         Result       => 'ARRAY',
         Search       => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => 'StateTypeTest',
@@ -2159,7 +2159,7 @@ for my $State ( values %StateList ) {
                     Field => 'StateTypeID',
                     Value => [ $StateAsKeyAndStateTypeAsValue{$State}->{ID} ],
                     Operator => 'IN',
-                }            
+                }
             ]
         },
         UserID       => 1,
@@ -2168,7 +2168,7 @@ for my $State ( values %StateList ) {
     my @TicketIDsType = $TicketObject->TicketSearch(
         Result    => 'ARRAY',
         Search       => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => 'StateTypeTest',
@@ -2183,7 +2183,7 @@ for my $State ( values %StateList ) {
                     Field => 'StateType',
                     Value => [ $StateAsKeyAndStateTypeAsValue{$State}->{Name} ],
                     Operator => 'IN',
-                }            
+                }
             ]
         },
         UserID    => 1,
@@ -2416,14 +2416,14 @@ my $FutureTime = $TimeObject->SystemTime2TimeStamp(
     Result                    => 'HASH',
     Limit                     => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CreateTime',
                 Value => $FutureTime,
                 Operator => 'GTE',
-            },       
+            },
         ]
-    },    
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -2437,14 +2437,14 @@ $Self->False(
     Result                     => 'HASH',
     Limit                      => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'ArticleCreateTime',
                 Value => $FutureTime,
                 Operator => 'GTE',
-            },       
+            },
         ]
-    },      
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -2458,14 +2458,14 @@ $Self->False(
     Result                   => 'HASH',
     Limit                    => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'CloseTime',
                 Value => $FutureTime,
                 Operator => 'GTE',
-            },       
+            },
         ]
-    },       
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -2506,7 +2506,7 @@ my @TicketIDs = $TicketObject->TicketSearch(
     Result       => 'LIST',
     Limit        => 100,
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'TicketNumber',
                 Value => [ $Ticket{TicketNumber}, 'ABC' ],
@@ -2516,9 +2516,9 @@ my @TicketIDs = $TicketObject->TicketSearch(
                 Field => 'StateType',
                 Value => 'New',
                 Operator => 'EQ',
-            },                    
+            },
         ]
-    },        
+    },
     UserID       => 1,
     Permission   => 'rw',
 );
@@ -2544,14 +2544,14 @@ for my $SearchParam (qw(ArticleCreateTime CreateTime PendingTime)) {
     for my $ParamOption (qw(LT GTE)) {
         $TicketObject->TicketSearch(
             Search       => {
-                AND => [ 
+                AND => [
                     {
                         Field => $SearchParam,
                         Value => '2000-02-31 00:00:00',
                         Operator => $ParamOption,
-                    },                
+                    },
                 ]
-            },                   
+            },
             UserID                      => 1,
         );
         my $ErrorMessage = $Kernel::OM->Get('Log')->GetLogEntry(
@@ -2570,14 +2570,14 @@ for my $SearchParam (qw(ArticleCreateTime CreateTime PendingTime)) {
 my @DeleteTicketList = $TicketObject->TicketSearch(
     Result            => 'ARRAY',
     Search       => {
-        AND => [ 
+        AND => [
             {
                 Field => 'ContactID',
                 Value => $ContactID,
                 Operator => 'EQ',
-            },                
+            },
         ]
-    },      
+    },
     UserID            => 1,
 );
 for my $TicketID (@DeleteTicketList) {

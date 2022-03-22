@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -2149,7 +2149,7 @@ sub Export {
     }
 
     # get template data
-    my $TemplateData = $Self->TemplateGet( 
+    my $TemplateData = $Self->TemplateGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
     );
@@ -2169,7 +2169,7 @@ sub Export {
     my $ObjectBackend = $Kernel::OM->Get(
         $ModuleList->{$TemplateData->{Object}}->{Module}
     );
-    
+
     return if !$ObjectBackend;
 
     $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
@@ -2530,7 +2530,7 @@ returns an array of all imports/exports of a template
         TemplateID    => 123,
         Type          => 'import',    # optional - import | export, both if omitted
         UserID        => 1
-    );    
+    );
 
 the result looks like
 
@@ -2681,7 +2681,7 @@ sub _TemplateRunAdd {
     # get new id
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM imexport_template_run WHERE template_id = ? AND type = ? ORDER by id DESC',
-        Bind => [ 
+        Bind => [
             \$Param{TemplateID}, \$Type
         ],
         Limit => 1,

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -68,7 +68,7 @@ sub new {
     $Self->{DisableClientNotifications} = $Param{DisableClientNotifications};
 
     $Self->{NotificationCount} = 0;
-    
+
     return $Self;
 }
 
@@ -85,18 +85,18 @@ Get a client registration.
 
 sub ClientRegistrationGet {
     my ( $Self, %Param ) = @_;
-    
+
     my %Result;
 
     # check required params...
     if ( !$Param{ClientID} ) {
-        $Self->{LogObject}->Log( 
-            Priority => 'error', 
-            Message  => 'Need ClientID!' 
+        $Self->{LogObject}->Log(
+            Priority => 'error',
+            Message  => 'Need ClientID!'
         );
         return;
     }
-   
+
     # check cache
     my $CacheKey = 'ClientRegistrationGet::' . $Param{ClientID};
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
@@ -104,14 +104,14 @@ sub ClientRegistrationGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Self->{DBObject}->Prepare( 
+
+    return if !$Self->{DBObject}->Prepare(
         SQL   => "SELECT client_id, notification_url, notification_authorization, additional_data FROM client_registration WHERE client_id = ?",
         Bind => [ \$Param{ClientID} ],
     );
 
     my %Data;
-    
+
     # fetch the result
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
         %Data = (
@@ -130,7 +130,7 @@ sub ClientRegistrationGet {
             }
         }
     }
-    
+
     # no data found...
     if ( !%Data ) {
         if ( !$Param{Silent} ) {
@@ -141,16 +141,16 @@ sub ClientRegistrationGet {
         }
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Data,
-    ); 
-       
-    return %Data;   
+    );
+
+    return %Data;
 
 }
 
@@ -244,14 +244,14 @@ sub ClientRegistrationList {
         Key  => $CacheKey
     );
     return @{$CacheResult} if (IsArrayRefWithData($CacheResult));
-  
+
     my $SQL = 'SELECT client_id FROM client_registration';
 
     if ( $Param{Notifiable} ) {
         $SQL .= ' WHERE notification_url IS NOT NULL'
     }
 
-    return if !$Self->{DBObject}->Prepare( 
+    return if !$Self->{DBObject}->Prepare(
         SQL => $SQL,
     );
 
@@ -465,16 +465,16 @@ sub NotificationSendWorker {
     }
 
     if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log( 
+        $Self->{LogObject}->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] sending client notifications: ".Data::Dumper::Dumper(\%Param)
         );
     }
 
     foreach my $ClientID ( @{$Param{ClientIDs}} ) {
-        $Self->{LogObject}->Log( 
+        $Self->{LogObject}->Log(
             Priority => 'debug',
-            Message  => "Sending ". @PreparedEventList . " notifications to client \"$ClientID\" (" . (join(', ', @StatsParts)) . ').' 
+            Message  => "Sending ". @PreparedEventList . " notifications to client \"$ClientID\" (" . (join(', ', @StatsParts)) . ').'
         );
 
         $Self->_NotificationSendToClient(
@@ -511,7 +511,7 @@ sub _NotificationSendToClient {
     if ( !$Self->{UserAgent} ) {
         my $ConfigObject       = $Kernel::OM->Get('Config');
         my $WebUserAgentObject = $Kernel::OM->Get('WebUserAgent');
-        
+
         # create user agent with short timeout
         $Self->{UserAgent} = LWP::UserAgent->new(timeout => 10);
 
@@ -537,7 +537,7 @@ sub _NotificationSendToClient {
     }
 
     my $Request = HTTP::Request->new('POST', $ClientRegistration{NotificationURL});
-    $Request->header('Content-Type' => 'application/json'); 
+    $Request->header('Content-Type' => 'application/json');
     if ( $ClientRegistration{Authorization} ) {
         $Request->header('Authorization' => $ClientRegistration{Authorization});
     }
@@ -547,15 +547,15 @@ sub _NotificationSendToClient {
     );
     $Request->content($JSON);
     if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log( 
+        $Self->{LogObject}->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] executing request to client: ".$Request->as_string()
         );
-        $Self->{LogObject}->Log( 
+        $Self->{LogObject}->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] LWP object: ".Data::Dumper::Dumper($Self->{UserAgent})
         );
-        $Self->{LogObject}->Log( 
+        $Self->{LogObject}->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] ENV: ".Data::Dumper::Dumper(\%ENV)
         );
@@ -563,7 +563,7 @@ sub _NotificationSendToClient {
     my $Response = $Self->{UserAgent}->request($Request);
 
     if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log( 
+        $Self->{LogObject}->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] client response: ".$Response->as_string()
         );

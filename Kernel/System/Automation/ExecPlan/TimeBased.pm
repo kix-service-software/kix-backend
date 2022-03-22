@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -127,7 +127,7 @@ sub Run {
             );
             return;
         }
-    }    
+    }
 
     return 0 if !IsHashRefWithData($Param{Config}) || !IsArrayRefWithData($Param{Config}->{Weekday}) || !IsArrayRefWithData($Param{Config}->{Time});
 
@@ -163,7 +163,7 @@ sub Run {
 
     $CanExecute = 0;
     foreach my $Time ( @{$Param{Config}->{Time}} ) {
-        # calculate time of next run 
+        # calculate time of next run
         my $NextRunSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => "$CurrYear-$CurrMonth-$CurrDay ".$Time.':00'
         );

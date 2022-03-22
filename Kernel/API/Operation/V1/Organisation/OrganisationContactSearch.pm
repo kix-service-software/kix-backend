@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -51,7 +51,7 @@ sub ParameterDefinition {
     return {
         'OrganisationID' => {
             Required => 1
-        }                
+        }
     }
 }
 
@@ -71,7 +71,7 @@ perform OrganisationContactSearch Operation. This will return a Organisation lis
             Contact => [
                 {
                 },
-                {                    
+                {
                 }
             ],
         },
@@ -89,7 +89,7 @@ sub Run {
     );
 
     if (IsHashRefWithData(\%ContactList)) {
-        
+
         # get already prepared Contact data from ContactGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::Contact::ContactGet',

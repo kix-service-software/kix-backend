@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -63,7 +63,7 @@ get the xml data of a version
 
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
-    
+
     return if !$Param{Value};
 
     my $StoredAttachment = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGet(
@@ -350,13 +350,13 @@ sub ValidateValue {
     my $ForbiddenContentTypes = $ConfigObject->Get('FileUpload::ForbiddenContentTypes');
     my $AllowedExtensions     = $ConfigObject->Get('FileUpload::AllowedExtensions');
     my $AllowedContentTypes   = $ConfigObject->Get('FileUpload::AllowedContentTypes');
-    
+
     # check allowed size
     if ( $Value->{Content} && bytes::length($Value->{Content}) > $ConfigObject->Get('FileUpload::MaxAllowedSize') ) {
         return "size of attachment exceeds maximum allowed size (attachment: $Value->{Filename})";
     }
 
-    # check forbidden file extension 
+    # check forbidden file extension
     if ( $ForbiddenExtensions && $Value->{Filename} =~ /$ForbiddenExtensions/ ) {
         return "file type not allowed (attachment: $Value->{Filename})";
     }
@@ -366,7 +366,7 @@ sub ValidateValue {
         return "content type not allowed (attachment: $Value->{Filename})";
     }
 
-    # check allowed file extension 
+    # check allowed file extension
     if ( $AllowedExtensions && $Value->{Filename} !~ /$AllowedExtensions/ ) {
         # check allowed content type as fallback
         if ( $AllowedContentTypes && $Value->{ContentType} !~ /$AllowedContentTypes/ ) {
@@ -377,7 +377,7 @@ sub ValidateValue {
         }
     }
 
-    # check allowed content type 
+    # check allowed content type
     if ( $AllowedContentTypes && $Value->{ContentType} !~ /$AllowedContentTypes/ ) {
         return "file type not allowed (attachment: $Value->{Filename})";
     }

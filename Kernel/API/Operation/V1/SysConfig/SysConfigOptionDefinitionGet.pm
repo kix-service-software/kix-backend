@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub ParameterDefinition {
         'Option' => {
             Type     => 'ARRAY',
             Required => 1
-        },           
+        },
     }
 }
 
@@ -96,7 +96,7 @@ sub Run {
 
     my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
-    # start loop 
+    # start loop
     foreach my $Option ( @{$Param{Data}->{Option}} ) {
 
         # get the SysConfig data
@@ -117,7 +117,7 @@ sub Run {
     if ( scalar(@SysConfigList) == 1 ) {
         return $Self->_Success(
             SysConfigOptionDefinition => $SysConfigList[0],
-        );    
+        );
     }
 
     # return result

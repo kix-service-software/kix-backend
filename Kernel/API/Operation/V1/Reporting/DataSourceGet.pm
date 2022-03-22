@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub ParameterDefinition {
         'DataSource' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -92,7 +92,7 @@ one or more entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
     my @Result;
-    
+
     my $DataSources = $Kernel::OM->Get('Config')->Get('Reporting::DataSource');
 
     # start loop
@@ -120,7 +120,7 @@ sub Run {
     if ( scalar(@Result) == 1 ) {
         return $Self->_Success(
             DataSource => $Result[0],
-        );    
+        );
     }
 
     # return result

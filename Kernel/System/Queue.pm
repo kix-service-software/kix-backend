@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -731,7 +731,7 @@ sub QueueUpdate {
     return if !$DBObject->Do(
         SQL => '
             UPDATE queue
-            SET name = ?, comments = ?, unlock_timeout = ?, follow_up_id = ?, 
+            SET name = ?, comments = ?, unlock_timeout = ?, follow_up_id = ?,
                 follow_up_lock = ?, system_address_id = ?,
                 calendar_name = ?, default_sign_key = ?, signature = ?,
                 valid_id = ?, change_time = current_timestamp, change_by = ?
@@ -798,7 +798,7 @@ sub QueueUpdate {
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},
     );
-    
+
     # check all SysConfig options
     #return 1 if !$Param{CheckSysConfig};
 
@@ -907,7 +907,7 @@ sub QueuePreferencesSet {
         Event     => 'CREATE',
         Namespace => 'Queue.Preference',
         ObjectID  => $Param{QueueID}.'::'.$Param{Key},
-    );    
+    );
 
     return $Result;
 }

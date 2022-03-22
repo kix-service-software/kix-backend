@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,11 +81,11 @@ perform ReportResultSearch Operation. This will return a ReportResult list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     my @ReportResultList = $Kernel::OM->Get('Reporting')->ReportResultList(
         ReportID => $Param{Data}->{ReportID}
     );
-   
+
     # get already prepared ReportResult data from ReportResultGet operation
     if ( IsArrayRefWithData(\@ReportResultList) ) {
         my $GetResult = $Self->ExecOperation(

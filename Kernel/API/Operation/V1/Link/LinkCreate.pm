@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -60,16 +60,16 @@ sub ParameterDefinition {
         },
         'Link::SourceKey' => {
             Required => 1
-        },            
+        },
         'Link::TargetObject' => {
             Required => 1
         },
         'Link::TargetKey' => {
             Required => 1
-        },            
+        },
         'Link::Type' => {
             Required => 1
-        },            
+        },
     }
 }
 
@@ -91,7 +91,7 @@ perform LinkCreate Operation. This will return the created LinkID.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             LinkID  => '',                         # ID of the created Link
@@ -109,7 +109,7 @@ sub Run {
     );
 
     # check attribute values
-    my $CheckResult = $Self->_CheckLink( 
+    my $CheckResult = $Self->_CheckLink(
         Link => $Link
     );
 
@@ -118,7 +118,7 @@ sub Run {
             %{$CheckResult},
         );
     }
-        	
+
     # check if Link exists
     my $LinkList = $Kernel::OM->Get('LinkObject')->LinkSearch(
         %{$Link},
@@ -135,7 +135,7 @@ sub Run {
     # create Link
     my $LinkID = $Kernel::OM->Get('LinkObject')->LinkAdd(
         %{$Link},
-        UserID  => $Self->{Authorization}->{UserID},        
+        UserID  => $Self->{Authorization}->{UserID},
     );
 
     if ( !$LinkID ) {
@@ -144,12 +144,12 @@ sub Run {
             Message => 'Could not create Link, please contact the system administrator',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         LinkID => $LinkID,
-    );    
+    );
 }
 
 

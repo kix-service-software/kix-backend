@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -262,7 +262,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'HASH',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -274,7 +274,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Operator => 'EQ',
                 }
             ]
-        },   
+        },
         UserID     => 1,
         Permission => 'rw',
     );
@@ -289,7 +289,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'HASH',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -304,9 +304,9 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle2$RandomID",
                     Value => 'fieldarticle2_ticket1_article1',
                     Operator => 'EQ',
-                }                
+                }
             ]
-        },   
+        },
         UserID     => 1,
         Permission => 'rw',
     );
@@ -321,7 +321,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'HASH',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -336,9 +336,9 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle2$RandomID",
                     Value => 'fieldarticle2_ticket1_article2',
                     Operator => 'EQ',
-                }                
+                }
             ]
-        },   
+        },
         UserID     => 1,
         Permission => 'rw',
     );
@@ -353,7 +353,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'HASH',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -368,9 +368,9 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle2$RandomID",
                     Value => 'fieldarticle2_ticket*_article1',
                     Operator => 'LIKE',
-                }                
+                }
             ]
-        },   
+        },
         UserID     => 1,
         Permission => 'rw',
     );
@@ -388,7 +388,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'HASH',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -403,9 +403,9 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle2$RandomID",
                     Value => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ],
                     Operator => 'IN',
-                }                
+                }
             ]
-        },   
+        },
         UserID     => 1,
         Permission => 'rw',
     );
@@ -423,7 +423,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'ARRAY',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -438,14 +438,14 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle2$RandomID",
                     Value => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ],
                     Operator => 'IN',
-                }                
+                }
             ]
-        },   
+        },
         Sort       => [
             {
                 Field => "DynamicField_DFTArticle2$RandomID",
                 Direction => 'ascending',
-            }            
+            }
         ],
         UserID     => 1,
         Permission => 'rw',
@@ -461,7 +461,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'ARRAY',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -476,14 +476,14 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle2$RandomID",
                     Value => [ 'fieldarticle2_ticket1_article1', 'fieldarticle2_ticket2_article1' ],
                     Operator => 'IN',
-                }                
+                }
             ]
-        },   
+        },
         Sort       => [
             {
                 Field => "DynamicField_DFTArticle2$RandomID",
                 Direction => 'descending',
-            }     
+            }
         ],
         UserID     => 1,
         Permission => 'rw',
@@ -499,7 +499,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'ARRAY',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -509,14 +509,14 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle1$RandomID",
                     Value => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ],
                     Operator => 'EQ',
-                },      
+                },
             ]
-        },   
+        },
         Sort       => [
             {
                 Field => "DynamicField_DFTArticle2$RandomID",
                 Direction => 'ascending',
-            }     
+            }
         ],
         UserID     => 1,
         Permission => 'rw',
@@ -532,7 +532,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Result  => 'ARRAY',
         Limit   => 100,
         Filter  => {
-            AND => [ 
+            AND => [
                 {
                     Field => 'Title',
                     Value => "Ticket$RandomID",
@@ -542,14 +542,14 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                     Field => "DynamicField_DFTArticle1$RandomID",
                     Value => [ 'fieldarticle1_ticket1_article1', 'fieldarticle1_ticket2_article1' ],
                     Operator => 'EQ',
-                },      
+                },
             ]
-        },   
+        },
         Sort       => [
             {
                 Field => "DynamicField_DFTArticle2$RandomID",
                 Direction => 'descending',
-            }     
+            }
         ],
         UserID     => 1,
         Permission => 'rw',

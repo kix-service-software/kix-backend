@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -59,7 +59,7 @@ sub Run {
     my %LogFileList = $Kernel::OM->Get('LogFile')->LogFileList();
 
 	# get already prepared LogFile data from LogFileGet operation
-    if ( IsHashRefWithData(\%LogFileList) ) {  	
+    if ( IsHashRefWithData(\%LogFileList) ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Log::LogFileGet',
             SuppressPermissionErrors => 1,

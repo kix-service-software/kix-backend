@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -103,7 +103,7 @@ sub Run {
             next;
         }
 
-        # lookup object 
+        # lookup object
         my $Value = $Self->_LookupValue(
             Object   => $Object,
             Parent   => $Parent,
@@ -131,7 +131,7 @@ sub Run {
                 UserID      => 1,
             );
         }
-        else 
+        else
         {
             # import
             $Result = $Kernel::OM->Get('ObjectIcon')->ObjectIconAdd(
@@ -159,7 +159,7 @@ sub Run {
 
 sub _LookupValue {
     my ($Self, %Param) = @_;
-    
+
     my $Value = $Param{RawValue};
 
     if ( $Param{Object} eq 'GeneralCatalogItem' ) {

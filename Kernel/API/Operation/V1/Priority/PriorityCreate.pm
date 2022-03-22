@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -71,15 +71,15 @@ perform PriorityCreate Operation. This will return the created PriorityID.
                 Name    => '...',
                 ValidID => 1,                   # optional
             },
-        },	
+        },
     );
 
     $Result = {
         Success      => 1,                       # 0 or 1
-        Code         => '',                      # 
+        Code         => '',                      #
         Message      => '',                      # in case of error
         Data         => {                        # result data payload after Operation
-            PriorityID  => '',                   # PriorityID 
+            PriorityID  => '',                   # PriorityID
         },
     };
 
@@ -93,14 +93,14 @@ sub Run {
         Data => $Param{Data}->{Priority}
     );
 
-    # get relevant function	
+    # get relevant function
     my $PriorityID;
-     	
+
     # check if Priority exists
     my $Exists = $Kernel::OM->Get('Priority')->PriorityLookup(
         Priority => $Priority->{Name},
     );
-    
+
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
@@ -122,12 +122,12 @@ sub Run {
             Message => 'Could not create priority, please contact the system administrator',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         PriorityID => $PriorityID,
-    );    
+    );
 }
 
 1;

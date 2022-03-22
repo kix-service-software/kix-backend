@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -358,9 +358,9 @@ sub _CheckPermission {
 
     foreach my $Resource ( @Resources ) {
         ($Granted, $AllowedPermission) = $Kernel::OM->Get('User')->CheckResourcePermission(
-                UserID              => $Param{Authorization}->{UserID}, 
-                UsageContext        => $Param{Authorization}->{UserType}, 
-                Target              => $ResourceBase.$Resource, 
+                UserID              => $Param{Authorization}->{UserID},
+                UsageContext        => $Param{Authorization}->{UserType},
+                Target              => $ResourceBase.$Resource,
                 RequestedPermission => $RequestedPermission
         );
 

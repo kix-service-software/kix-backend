@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
         },
         'TranslationPattern::Value' => {
             Required => 1
-        },            
+        },
     }
 }
 
@@ -81,10 +81,10 @@ perform TranslationPatternCreate Operation. This will return the created Transla
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            TranslationID  => '',                   # TranslationID 
+            TranslationID  => '',                   # TranslationID
         },
     };
 
@@ -108,12 +108,12 @@ sub Run {
             Code => 'Object.AlreadyExists',
         );
     }
-    
+
     # create pattern
     my $PatternID = $Kernel::OM->Get('Translation')->PatternAdd(
         Value  => $TranslationPattern->{Value},
         UserID => $Self->{Authorization}->{UserID},
-    );    
+    );
     if ( !$PatternID ) {
         return $Self->_Error(
             Code => 'Object.UnableToCreate',
@@ -137,11 +137,11 @@ sub Run {
             }
         }
     }
-    
+
     return $Self->_Success(
         Code      => 'Object.Created',
         PatternID => $PatternID,
-    );    
+    );
 }
 
 1;

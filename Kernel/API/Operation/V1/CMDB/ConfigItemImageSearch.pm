@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -93,7 +93,7 @@ sub Run {
             Code => 'ParentObject.NotFound',
         );
     }
-    
+
     # get ConfigItem versions
     my $ImageList = $Kernel::OM->Get('ITSMConfigItem')->ImageList(
         ConfigItemID => $Param{Data}->{ConfigItemID},
@@ -101,7 +101,7 @@ sub Run {
     );
 
 	# get already prepared CI version data from ConfigItemImageGet operation
-    if ( IsArrayRefWithData($ImageList) ) {  	
+    if ( IsArrayRefWithData($ImageList) ) {
 
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::CMDB::ConfigItemImageGet',

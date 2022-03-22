@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -324,10 +324,10 @@ sub DynamicFieldGet {
 
         # get config object
         my $ConfigObject = $Kernel::OM->Get('Config');
-    
+
         # get the Dynamic Field Backends configuration
         my $DynamicFieldsConfig = $ConfigObject->Get('DynamicFields::Driver');
-        
+
         if ( defined $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName} && $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName} ) {
             $Data{FieldTypeDisplayName} = $DynamicFieldsConfig->{$Data{FieldType}}->{DisplayName};
         }
@@ -583,7 +583,7 @@ get DynamicField list ordered by the the "Field Order" field in the DB
         # field  type (optional) as STRING or as ARRAYREF
         FieldType => 'Text',
         FieldType => [
-            'Text', 'Textarea', 'Date', 'DateTime', 'ITSMConfigItemReference', 
+            'Text', 'Textarea', 'Date', 'DateTime', 'ITSMConfigItemReference',
             'Multiselect', 'CheckList', 'TicketReference', 'Dropdown', ...
         ],
 
@@ -625,9 +625,9 @@ sub DynamicFieldList {
     # to store fieldIDs whitelist
     my %AllowedFieldIDs;
 
-    if ( 
-        defined $Param{FieldFilter} 
-        && ref $Param{FieldFilter} eq 'HASH' 
+    if (
+        defined $Param{FieldFilter}
+        && ref $Param{FieldFilter} eq 'HASH'
     ) {
 
         # fill the fieldIDs whitelist
@@ -748,9 +748,9 @@ sub DynamicFieldList {
             $SQL .= ' WHERE valid_id IN (' . join ', ', $ValidObject->ValidIDsGet() . ')';
 
             if ( $Param{ObjectType} ) {
-                if ( 
-                    IsStringWithData( $Param{ObjectType} ) 
-                    && $Param{ObjectType} ne 'All' 
+                if (
+                    IsStringWithData( $Param{ObjectType} )
+                    && $Param{ObjectType} ne 'All'
                 ) {
                     $SQL .=
                         " AND object_type = '"
@@ -767,9 +767,9 @@ sub DynamicFieldList {
             }
 
             if ( $Param{FieldType} ) {
-                if ( 
+                if (
                     IsStringWithData( $Param{FieldType} )
-                    && $Param{FieldType} ne 'All' 
+                    && $Param{FieldType} ne 'All'
                 ) {
                     $SQL .=
                         " AND field_type = '"

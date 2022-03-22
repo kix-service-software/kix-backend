@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -107,7 +107,7 @@ sub ValidateToken {
 
     # decode token
     my $Payload = decode_jwt(
-        $Param{Token}, 
+        $Param{Token},
         $ConfigObject->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
     );
 
@@ -119,7 +119,7 @@ sub ValidateToken {
     # remote ip check
     if (
         $ConfigObject->Get('TokenCheckRemoteIP') &&
-        $Payload->{RemoteIP} ne '0.0.0.0' &&  
+        $Payload->{RemoteIP} ne '0.0.0.0' &&
         $Payload->{RemoteIP} ne $RemoteAddr
         )
     {
@@ -174,10 +174,10 @@ sub ValidateToken {
         SQL => "UPDATE token SET last_request_time = ? WHERE token = ?",
         Bind =>  [
             \$TimeNow,
-            \$Param{Token} 
+            \$Param{Token}
         ],
     );
-    
+
     return $Payload;
 }
 
@@ -194,7 +194,7 @@ create a new token with given data
             RemoteIP    => '...'                   # optional, used to create special AccessTokens
             IgnoreMaxIdleTime => '...'             # optional, used to create special AccessTokens
             PermittedOperations => {}              # optional, used to create special AccessTokens
-            DeniedOperations => {}                 # optional, used to create special AccessTokens                          
+            DeniedOperations => {}                 # optional, used to create special AccessTokens
             Description => '...'                   # optional, used to create special AccessTokens
         }
     );
@@ -248,8 +248,8 @@ sub CreateToken {
 
     if ( !$ValidUntilTimeUnix ) {
         $ValidUntilTimeUnix = $TimeObject->SystemTime() + $Kernel::OM->Get('Config')->Get('TokenMaxTime');
-    } 
-    
+    }
+
     my %Payload = %{$Param{Payload}};
     my $CreateTimeString           = $TimeObject->CurrentTimestamp();
     $Payload{CreateTimeUnix}       = $TimeObject->SystemTime();
@@ -262,9 +262,9 @@ sub CreateToken {
     $Payload{DeniedOperations}     = $Param{Payload}->{DeniedOperations} || [];
 
     my $Token = encode_jwt(
-        \%Payload, 
+        \%Payload,
         $Kernel::OM->Get('Config')->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
-        'HS256', 
+        'HS256',
     );
 
     # store token in whitelist
@@ -336,7 +336,7 @@ sub ExtractToken {
         );
         return;
     }
- 
+
      # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
@@ -367,7 +367,7 @@ sub ExtractToken {
 
     # decode token
     my $Payload = decode_jwt(
-        $Param{Token}, 
+        $Param{Token},
         $ConfigObject->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
     );
 

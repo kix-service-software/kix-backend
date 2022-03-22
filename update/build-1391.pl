@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -44,7 +44,7 @@ sub _ReconfigureNotificationEvents {
     # remove event "TicketResponsibleUpdate"
     my %Events = map { $_ => 1 } @{$Notification{Data}->{Events}};
     delete $Events{TicketResponsibleUpdate};
-    $Notification{Data}->{Events} = [ sort keys %Events ]; 
+    $Notification{Data}->{Events} = [ sort keys %Events ];
 
     $Kernel::OM->Get('NotificationEvent')->NotificationUpdate(
         ID => $Notification{ID},
@@ -160,7 +160,7 @@ sub _GetDynamicFieldsDefinition {
                 CountMin => 1,
                 CountMax => 2,
                 CountDefault => 1,
-                DefaultValue => undef, 
+                DefaultValue => undef,
                 PossibleNone => 1,
                 PossibleValues => {
                     'customer' => 'Customer',

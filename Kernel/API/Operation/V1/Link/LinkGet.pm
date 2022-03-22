@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -104,7 +104,7 @@ sub Run {
             UserID  => $Self->{Authorization}->{UserID},
         );
 
-        # remove unwanted attributes 
+        # remove unwanted attributes
         foreach my $Attr ( qw(SourceObjectID TargetObjectID TypeID) ) {
             delete $LinkData{$Attr};
         }
@@ -114,7 +114,7 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
-        
+
         # add
         push(@LinkList, \%LinkData);
     }
@@ -122,7 +122,7 @@ sub Run {
     if ( scalar(@LinkList) == 1 ) {
         return $Self->_Success(
             Link => $LinkList[0],
-        );    
+        );
     }
 
     # return result

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -40,7 +40,7 @@ sub new {
     bless( $Self, $Type );
 
     $Self->{DBObject} = $Kernel::OM->Get('DB');
-    
+
     return $Self;
 }
 
@@ -104,7 +104,7 @@ empty method to be overridden by specific attribute module
 sub Search {
     my ( $Self, %Param ) = @_;
 
-    return;        
+    return;
 }
 
 =item Sort()
@@ -125,7 +125,7 @@ empty method to be overridden by specific attribute module
 sub Sort {
     my ( $Self, %Param ) = @_;
 
-    return;        
+    return;
 }
 
 =begin Internal:

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -70,7 +70,7 @@ sub ParameterDefinition {
 perform ConfigItemHistoryGet Operation.
 
     my $Result = $OperationObject->Run(
-        ConfigItemID => 1,                                # required 
+        ConfigItemID => 1,                                # required
         HistoryID    => 1                                 # required
     );
 
@@ -103,8 +103,8 @@ sub Run {
         );
     }
 
-    my @HistoryList;        
-    foreach my $HistoryID ( @{$Param{Data}->{HistoryID}} ) {                 
+    my @HistoryList;
+    foreach my $HistoryID ( @{$Param{Data}->{HistoryID}} ) {
 
         my $HistoryItem = $Kernel::OM->Get('ITSMConfigItem')->HistoryEntryGet(
             HistoryEntryID => $HistoryID
@@ -114,7 +114,7 @@ sub Run {
             return $Self->_Error(
                 Code    => 'Object.NotFound'
             );
-        }     
+        }
 
         push(@HistoryList, $HistoryItem);
     }
@@ -127,7 +127,7 @@ sub Run {
     elsif ( scalar(@HistoryList) == 1 ) {
         return $Self->_Success(
             ConfigItemHistory => $HistoryList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub ParameterDefinition {
         },
         'Name' => {
             Required => 1
-        },   
+        },
     }
 }
 
@@ -70,17 +70,17 @@ perform GeneralCatalogClassUpdate Operation. This will return the updated Genera
             Name        => '...'
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            GeneralCatalogClass => '...',       # new class name 
+            GeneralCatalogClass => '...',       # new class name
         },
     };
-   
+
 =cut
 
 
@@ -88,11 +88,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # trim Name parameter
-    my $Name = $Self->_Trim( 
+    my $Name = $Self->_Trim(
         Data => $Param{Data}->{Name},
     );
 
-    # check if Class exists 
+    # check if Class exists
     my %ClassList = map { $_ => 1 } sort @{ $Kernel::OM->Get('GeneralCatalog')->ClassList() };
 
     if ( !%ClassList || !$ClassList{$Param{Data}->{GeneralCatalogClass}} ) {
@@ -105,7 +105,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('GeneralCatalog')->ClassRename(
         ClassOld => $Param{Data}->{GeneralCatalogClass},
         ClassNew => $Param{Data}->{Name},
-        UserID   => $Self->{Authorization}->{UserID},                        
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -114,10 +114,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         GeneralCatalogClass => $Param{Data}->{Name},
-    );    
+    );
 }
 
 1;

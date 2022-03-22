@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -55,7 +55,7 @@ sub ParameterDefinition {
             DataType => 'STRING',
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -66,12 +66,12 @@ perform SysConfigOptionDefinitionDelete Operation. This will return nothing.
     my $Result = $OperationObject->Run(
         Data => {
             Option  => '...',
-        },		
+        },
     );
 
     $Result = {
         Success    => 1,
-        Code       => '',                       # in case of error    
+        Code       => '',                       # in case of error
         Message    => '',                       # in case of error
     };
 
@@ -79,7 +79,7 @@ perform SysConfigOptionDefinitionDelete Operation. This will return nothing.
 
 sub Run {
     my ( $Self, %Param ) = @_;
- 
+
     # start loop
     foreach my $Option ( @{$Param{Data}->{Option}} ) {
 
@@ -87,7 +87,7 @@ sub Run {
         my $Exists = $Kernel::OM->Get('SysConfig')->Exists(
             Name => $Option,
         );
-        
+
         if ( !$Exists ) {
             return $Self->_Error(
                 Code    => 'Object.NotFound',
@@ -95,7 +95,7 @@ sub Run {
             );
         }
 
-        # delete SysConfigOptionDefinition	    
+        # delete SysConfigOptionDefinition
         my $Success = $Kernel::OM->Get('SysConfig')->OptionDelete(
             Name    => $Option,
             UserID  => $Self->{Authorization}->{UserID},

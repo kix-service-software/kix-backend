@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -68,7 +68,7 @@ sub _CheckNotification {
 
             # error if message data is incomplete
             if ( !IsArrayRefWithData($Notification->{Data}->{$Key}) ) {
-                return $Self->_Error( 
+                return $Self->_Error(
                     Code    => 'BadRequest',
                     Message => "Parameter $Key is invalid!"
                 );
@@ -82,7 +82,7 @@ sub _CheckNotification {
 
             # error if Language is not a valid hash
             if ( !IsHashRefWithData($Notification->{Message}->{$Language}) ) {
-                return $Self->_Error( 
+                return $Self->_Error(
                     Code    => 'BadRequest',
                     Message => "Parameter Message::$Language is invalid!"
                 );
@@ -91,7 +91,7 @@ sub _CheckNotification {
             foreach my $Parameter (qw(Subject Body ContentType)) {
                 # error if message data is incomplete
                 if ( !$Notification->{Message}->{$Language}->{$Parameter} ) {
-                    return $Self->_Error( 
+                    return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Required parameter Message::$Language::$Parameter is missing or undefined!"
                     );
