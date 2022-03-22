@@ -127,7 +127,7 @@
                 <Item Key="Module">Kernel::API::Validator::HistoryTypeValidator</Item>
                 <Item Key="Validates">HistoryType,HistoryTypeID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(JobCreate|JobUpdate|MacroCreate|MacroUpdate|MacroActionCreate|MacroActionUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(JobCreate|JobUpdate|JobGet|MacroCreate|MacroUpdate|MacroGet|MacroActionCreate|MacroActionUpdate|MacroActionGet)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
