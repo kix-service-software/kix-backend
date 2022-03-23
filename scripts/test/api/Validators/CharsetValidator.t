@@ -29,6 +29,10 @@ my $ValidData = {
     Charset => 'utf8'
 };
 
+my $ValidDataAlias = {
+    Charset => 'utf-8'
+};
+
 my $InvalidData = {
     Charset => 'invalid-charset'
 };
@@ -42,6 +46,17 @@ my $Result = $ValidatorObject->Validate(
 $Self->True(
     $Result->{Success},
     'Validate() - valid Charset',
+);
+
+# validate valid Charset alias
+my $Result = $ValidatorObject->Validate(
+    Attribute => 'Charset',
+    Data      => $ValidDataAlias,
+);
+
+$Self->True(
+    $Result->{Success},
+    'Validate() - valid Charset alias',
 );
 
 # validate invalid Charset
