@@ -20,8 +20,6 @@ use Kernel::System::VariableCheck qw(:all);
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
 
-use Math::BigInt;
-
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
