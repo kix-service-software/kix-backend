@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -79,7 +79,7 @@ sub ValidateSetting {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
-            );        
+            );
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
@@ -87,7 +87,7 @@ sub ValidateSetting {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
         }
 
         $Self->{OptionTypeModules}->{$Param{Type}} = $BackendObject;
@@ -98,7 +98,7 @@ sub ValidateSetting {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Item has unknown type \"$Param{Type}\".",
-        );            
+        );
         return;
     }
 
@@ -135,7 +135,7 @@ sub Extend {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
-            );        
+            );
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
@@ -143,7 +143,7 @@ sub Extend {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
         }
 
         $Self->{OptionTypeModules}->{$Param{Type}} = $BackendObject;
@@ -154,7 +154,7 @@ sub Extend {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Item has unknown type \"$Param{Type}\".",
-        );            
+        );
         return;
     }
 

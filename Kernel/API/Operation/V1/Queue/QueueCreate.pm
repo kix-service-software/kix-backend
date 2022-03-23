@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -70,21 +70,21 @@ perform QueueCreate Operation. This will return the created QueueID.
 	    	Queue  => {
 	        	Name                => '...',
 	        	Comment             => '...',     # (optional)
-	        	ValidID             => '...',     # (optional)	        	
+	        	ValidID             => '...',     # (optional)
 		        Calendar            => '...',     # (optional)
 		        UnlockTimeout       => '...',,    # (optional)
 		        FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
 		        FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
 		        DefaultSignKey      => '...',     # (optional)
 		        SystemAddressID     => '...',
-		        Signature           => '...', 		               	        	
+		        Signature           => '...',
 	    	},
 	    },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             QueueID  => '',                         # ID of the created Queue
@@ -119,7 +119,7 @@ sub Run {
     my $Exists = $Kernel::OM->Get('Queue')->QueueLookup(
         Queue => $Queue->{Name},
     );
-    
+
     if ( $Exists ) {
         return $Self->_Error(
             Code => 'Object.AlreadyExists',
@@ -137,7 +137,7 @@ sub Run {
         FollowUpLock        => $Queue->{FollowUpLock} || '',
         DefaultSignKey      => $Queue->{DefaultSignKey} || '',
         SystemAddressID     => $Queue->{SystemAddressID} || 1,
-        Signature           => $Queue->{Signature} || '', 
+        Signature           => $Queue->{Signature} || '',
         UserID              => $Self->{Authorization}->{UserID},
     );
 
@@ -146,12 +146,12 @@ sub Run {
             Code => 'Object.UnableToCreate',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         QueueID => $QueueID,
-    );    
+    );
 }
 
 

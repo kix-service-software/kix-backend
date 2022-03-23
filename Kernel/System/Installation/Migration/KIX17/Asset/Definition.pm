@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -53,7 +53,7 @@ our %TypeMapping = (
 
 =item Describe()
 
-describe what is supported and what is required 
+describe what is supported and what is required
 
 =cut
 
@@ -174,7 +174,7 @@ sub _ReplaceAttributeTypes {
         if ( IsCodeRef($TypeMapping{$Attr->{Input}->{Type}}) ) {
             $Attr->{Input}->{MigratedType} = $Attr->{Input}->{Type};
             $Attr = $TypeMapping{$Attr->{Input}->{Type}}->(
-                $Self, 
+                $Self,
                 Attribute => $Attr
             );
         }
@@ -226,7 +226,7 @@ sub _MigrateBaselineReference {
         if ( !$Self->{SourceClassList} ) {
             my $SourceData = $Self->GetSourceData(Type => 'general_catalog', Where => "general_catalog_class='ITSM::ConfigItem::Class'", NoProgress => 1);
             if ( IsArrayRefWithData($SourceData) ) {
-                $Self->{SourceClassList} = { map { $_->{name} => $_->{id} } @{$SourceData} }; 
+                $Self->{SourceClassList} = { map { $_->{name} => $_->{id} } @{$SourceData} };
             }
         }
 

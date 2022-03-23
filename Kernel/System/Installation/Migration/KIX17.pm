@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub new {
     # prepare filter if given
     my %Filter;
     if ( IsArrayRefWithData($Param{Filter}) ) {
-        foreach my $FilterItem ( @{$Param{Filter}} ) { 
+        foreach my $FilterItem ( @{$Param{Filter}} ) {
             next if $FilterItem !~ /^(.*?)\{(.*?)\}$/g;
             $Filter{$1} = $2;
         }
@@ -120,13 +120,13 @@ sub new {
 
 =item ObjectTypeList()
 
-return the list (array) of supported object types 
+return the list (array) of supported object types
 
 =cut
 
 sub ObjectTypeList {
     my ( $Self, %Param ) = @_;
-    
+
     return sort keys %{$Self->{Handler}};
 }
 
@@ -138,7 +138,7 @@ run the migration
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     STDOUT->autoflush(1);
 
     my @Types = keys %{$Self->{Handler}};
@@ -201,7 +201,7 @@ sub Run {
     $MigrationState->{StartTime} = Time::HiRes::time();
     $MigrationState->{State}->{Types}  = \@Types;
     $Self->_UpdateMigrationState($MigrationState);
-    
+
     foreach my $Type (@Types) {
         my $ItemCount = $Self->{Handler}->{$Type}->Count(
             Type => $Type,
@@ -215,7 +215,7 @@ sub Run {
 
         # abort if we don't have a state
         last if $MigrationState->{Status} eq 'aborting';
-        
+
         my $StartTime = Time::HiRes::time();
 
         $MigrationState->{State}->{TypeInProgress} = $Type;
@@ -250,7 +250,7 @@ count the objects
 
 sub Count {
     my ( $Self, %Param ) = @_;
-    
+
     my @Types = keys %{$Self->{Handler}};
     if ( $Param{ObjectType} ) {
         my @SelectedTypes;

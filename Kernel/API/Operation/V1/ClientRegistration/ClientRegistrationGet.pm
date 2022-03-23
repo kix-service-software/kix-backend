@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -62,7 +62,7 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ClientRegistrationGet Operation. 
+perform ClientRegistrationGet Operation.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -98,7 +98,7 @@ sub Run {
 
         # get the ClientRegistration data
         my %ClientRegistrationData = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
-            ClientID => $ClientID,             
+            ClientID => $ClientID,
         );
 
         if ( !IsHashRefWithData( \%ClientRegistrationData ) ) {
@@ -106,15 +106,15 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
-        
+
         # add
         push(@ClientRegistrationList, \%ClientRegistrationData);
     }
-  
+
     if ( scalar(@ClientRegistrationList) == 1 ) {
         return $Self->_Success(
             ClientRegistration => $ClientRegistrationList[0],
-        );    
+        );
     }
 
     # return result

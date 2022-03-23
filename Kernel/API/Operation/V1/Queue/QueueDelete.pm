@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform QueueDelete Operation. This will return the deleted QueueID.
     my $Result = $OperationObject->Run(
         Data => {
             QueueID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -80,12 +80,12 @@ sub Run {
 
     # start loop
     foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
- 
-        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
+
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
-                AND => [ 
+                AND => [
                     {
                         Field => 'QueueID',
                         Value => $QueueID,
@@ -94,17 +94,17 @@ sub Run {
                 ]
             },
             UserID       => 1,
-            Permission   => 'ro',         
+            Permission   => 'ro',
         );
-        
+
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete queue. A ticket with this queue already exists.',
             );
         }
-         
-        # delete Queue	    
+
+        # delete Queue
         my $Success = $Kernel::OM->Get('Queue')->QueueDelete(
             QueueID  => $QueueID,
             UserID  => $Self->{Authorization}->{UserID},

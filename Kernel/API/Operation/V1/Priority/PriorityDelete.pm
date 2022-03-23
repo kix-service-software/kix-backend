@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -55,7 +55,7 @@ sub ParameterDefinition {
             DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -66,12 +66,12 @@ perform PriorityDelete Operation. This will return the deleted PriorityID.
     my $Result = $OperationObject->Run(
         Data => {
             PriorityID  => '...',
-        },		
+        },
     );
 
     $Result = {
         Success    => 1,
-        Code       => '',                       # in case of error    
+        Code       => '',                       # in case of error
         Message    => '',                       # in case of error
     };
 
@@ -79,16 +79,16 @@ perform PriorityDelete Operation. This will return the deleted PriorityID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
- 
+
     # start loop
     foreach my $PriorityID ( @{$Param{Data}->{PriorityID}} ) {
 
-        # search ticket       
-        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
+        # search ticket
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
-                AND => [ 
+                AND => [
                     {
                         Field => 'PriorityID',
                         Value => $PriorityID,
@@ -97,9 +97,9 @@ sub Run {
                 ]
             },
             UserID       => 1,
-            Permission   => 'ro',         
+            Permission   => 'ro',
         );
-    
+
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
@@ -107,7 +107,7 @@ sub Run {
             );
         }
 
-        # delete Priority	    
+        # delete Priority
         my $Success = $Kernel::OM->Get('Priority')->PriorityDelete(
             PriorityID  => $PriorityID,
             UserID  => $Self->{Authorization}->{UserID},

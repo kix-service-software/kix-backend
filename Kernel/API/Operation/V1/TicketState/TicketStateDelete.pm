@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -80,12 +80,12 @@ sub Run {
 
     # start loop
     foreach my $TicketStateID ( @{$Param{Data}->{StateID}} ) {
-	           
-        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
+
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
-                AND => [ 
+                AND => [
                     {
                         Field => 'TicketStateID',
                         Value => $TicketStateID,
@@ -94,17 +94,17 @@ sub Run {
                 ]
             },
             UserID       => 1,
-            Permission   => 'ro',         
+            Permission   => 'ro',
         );
-	    
+
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete state. A ticket with this state already exists.',
             );
         }
-	    
-        # delete ticketstate	    
+
+        # delete ticketstate
         my $Success = $Kernel::OM->Get('State')->StateDelete(
             StateID  => $TicketStateID,
             UserID  => $Self->{Authorization}->{UserID},

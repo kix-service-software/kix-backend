@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -71,7 +71,7 @@ sub Validate {
         }
         if ( !$Found ) {
             # contact is not in database, check if it is a valid email address
-            $Found = 0;            
+            $Found = 0;
             for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
                 $Found = 1;
                 if ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Email->address() ) ) {
@@ -92,10 +92,10 @@ sub Validate {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => "Validation of attribute $Param{Attribute} failed!",
-        );        
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;

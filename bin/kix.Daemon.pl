@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, http://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
@@ -281,7 +281,7 @@ sub _Run {
     $CacheObject->Set(
         Type  => 'Daemon',
         Key   => $$,
-        Value => { 
+        Value => {
             PID  => $$,
             Host => hostname,
         }
@@ -335,7 +335,7 @@ sub _Run {
 
             # check if daemon is still alive
             my $RunningPID = kill 0, $DaemonModules{$Module}->{PID};
-            
+
             if ( $DaemonModules{$Module}->{PID} && !$RunningPID ) {
                 $DaemonModules{$Module}->{PID} = 0;
             }
@@ -408,7 +408,7 @@ sub _RunModule {
     _LogFilesSet(
         Module => $Param{ModuleName}
     );
-    
+
     my $DaemonObject;
     LOOP:
     while ($ChildRun) {
@@ -441,7 +441,7 @@ sub _RunModule {
             last LOOP if !eval { $DaemonObject->$Method() };
         }
     }
-    
+
     return 0;
 }
 
@@ -477,7 +477,7 @@ sub _StopChildren {
 
             # check if PID is still alive
             my $RunningPID = kill 0, $DaemonModules{$Module}->{PID};
-            
+
             if ( !$RunningPID ) {
 
                 # remove daemon pid from list

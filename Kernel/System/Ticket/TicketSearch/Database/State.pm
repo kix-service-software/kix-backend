@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -102,9 +102,9 @@ sub Search {
         if ( IsArrayRefWithData($Value) ) {
             @StateTypes = @{$Value};
         }
-       
+
         foreach my $StateType ( @StateTypes ) {
-            
+
             if ( $StateType eq 'Open' ) {
                 # get all viewable states
                 my @ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
@@ -159,7 +159,7 @@ sub Search {
             @StateTypeIDs = @{$Value};
         }
 
-        foreach my $StateTypeID ( @StateTypeIDs ) {       
+        foreach my $StateTypeID ( @StateTypeIDs ) {
             my $StateType = $Kernel::OM->Get('State')->StateTypeLookup(
                 StateTypeID => $StateTypeID,
             );
@@ -201,7 +201,7 @@ sub Search {
                     Message  => "Unknown state $State!",
                 );
                 return;
-            }                
+            }
 
             push( @StateIDs, $StateID );
         }
@@ -229,7 +229,7 @@ sub Search {
 
     return {
         SQLWhere => \@SQLWhere,
-    };        
+    };
 }
 
 =item Sort()
@@ -257,7 +257,7 @@ sub Sort {
         SQLOrderBy => [
             'st.ticket_state_id'
         ],
-    };       
+    };
 }
 
 1;

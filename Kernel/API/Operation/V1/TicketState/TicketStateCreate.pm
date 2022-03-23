@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -60,7 +60,7 @@ sub ParameterDefinition {
         },
         'TicketState::TypeID' => {
             Required => 1
-        },                                        
+        },
     }
 }
 
@@ -79,10 +79,10 @@ perform TicketStateCreate Operation. This will return the created TicketStateID.
 
     $Result = {
         Success      => 1,                       # 0 or 1
-        Code         => '',                      # 
+        Code         => '',                      #
         Message      => '',                      # in case of error
         Data         => {                        # result data payload after Operation
-            StateID  => '',                      # StateID 
+            StateID  => '',                      # StateID
         },
     };
 
@@ -100,7 +100,7 @@ sub Run {
     my $Exists = $Kernel::OM->Get('State')->StateLookup(
         State => $TicketState->{Name},
     );
-    
+
     if ( $Exists ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
@@ -121,12 +121,12 @@ sub Run {
             Message => 'Could not create state, please contact the system administrator',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         TicketStateID => $TicketStateID,
-    );    
+    );
 }
 
 1;

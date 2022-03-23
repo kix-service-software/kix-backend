@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -264,7 +264,7 @@ This returns something like:
         'ID'         => 2,
         'ValidID'    => '1',
         'CreateTime' => '2010-04-07 15:41:15',CreateBy
-        'CreateBy'   => 1,       
+        'CreateBy'   => 1,
         'ChangeTime' => '2010-04-07 15:41:15',ChangeBy
         'ChangeBy'   => 1,
     );

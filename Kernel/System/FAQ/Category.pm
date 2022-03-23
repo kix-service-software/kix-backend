@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -448,7 +448,7 @@ sub CategoryGet {
     }
     else {
         $Data{Fullname} = $Data{Name};
-    } 
+    }
 
     # cache result
     $CacheObject->Set(
@@ -571,7 +571,7 @@ sub CategoryLookup {
         $Value = $Param{Name};
 
         my $CategoryList = $Self->CategorySearch(
-            Name   => $Param{Name}, 
+            Name   => $Param{Name},
             UserID => 1,
         );
         if ( IsArrayRefWithData($CategoryList) ) {
@@ -693,12 +693,12 @@ sub CategorySearch {
 
         $Ext = ' AND id IN (' . $InString . ')';
     }
-    
+
     if (
         defined $Param{ValidIDs}
         && ref $Param{ValidIDs} eq 'ARRAY'
         && @{ $Param{ValidIDs} }
-        ) 
+        )
     {
         # integer quote the valid ids
         for my $ValidID ( @{ $Param{ValidIDs} } ) {

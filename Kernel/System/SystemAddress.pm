@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -351,7 +351,7 @@ sub SystemAddressIsLocalAddress {
             return;
         }
     }
-    
+
     $Param{Name} = $Param{Address};
 
     return $Self->SystemAddressLookup(%Param);
@@ -434,7 +434,7 @@ sub SystemAddressLookup {
         while ( my @Row = $DBObject->FetchrowArray() ) {
             $SystemAddressID = $Row[0];
         }
-        
+
         $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
@@ -459,7 +459,7 @@ sub SystemAddressDelete {
             return;
         }
     }
- 
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(

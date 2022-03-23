@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -72,7 +72,7 @@ one or more ticket entries in one call.
             include => '...',    # Optional, 0 as default. Include additional objects
                                  # (supported: TicketStats, Tickets)
             expand  => 0,        # Optional, 0 as default. Expand referenced objects
-                                 # (supported: Tickets)             
+                                 # (supported: Tickets)
         },
     );
 
@@ -109,13 +109,13 @@ one or more ticket entries in one call.
                     Tickets => [
                         <TicketID>
                         # . . .
-                    ]                            
+                    ]
                     # If include=Tickets => 1 AND expand=Tickets => 1 was passed, you'll get an entry like this for each tickets:
                     Tickets => [
                         {
                             ...,
                         },
-                    ]                    
+                    ]
                 }
             ]
         },
@@ -225,7 +225,7 @@ sub Run {
     if ( scalar(@QueueList) == 1 ) {
         return $Self->_Success(
             Queue => $QueueList[0],
-        );    
+        );
     }
 
     # return result
@@ -256,7 +256,7 @@ sub GetTicketStatsFromTicketSearch {
     # execute ticket searches
     my %TicketStats;
     my @Filter;
-    
+
     # locked tickets
     @Filter = (
         {
@@ -272,7 +272,7 @@ sub GetTicketStatsFromTicketSearch {
     );
     if ( IsHashRefWithData($TicketStatsFilter) ) {
         push(@Filter, $TicketStatsFilter);
-    }            
+    }
     $TicketStats{LockCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
         Search => {
             AND => \@Filter
@@ -299,7 +299,7 @@ sub GetTicketStatsFromTicketSearch {
         UserID => $Self->{Authorization}->{UserID},
         Result => 'COUNT',
     );
-    
+
     # force numeric values
     foreach my $Key (keys %TicketStats) {
         $TicketStats{$Key} = 0 + $TicketStats{$Key};

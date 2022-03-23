@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -41,7 +41,7 @@ sub new {
     bless( $Self, $Type );
 
     $Self->{CacheType} = 'Channel';
-    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;    
+    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     return $Self;
 }
@@ -80,7 +80,7 @@ sub ChannelGet {
 
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id, name, comments, valid_id, create_time, create_by, change_time, change_by FROM channel WHERE id = ?',
-        Bind => [ \$Param{ID} ] 
+        Bind => [ \$Param{ID} ]
     );
 
     # fetch the result

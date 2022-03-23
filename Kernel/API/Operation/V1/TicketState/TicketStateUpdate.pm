@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -54,7 +54,7 @@ sub ParameterDefinition {
         'StateID' => {
             DataType => 'NUMERIC',
             Required => 1
-        },                
+        },
         'TicketState' => {
             Type  => 'HASH',
             Required => 1
@@ -64,7 +64,7 @@ sub ParameterDefinition {
         },
         'TicketState::TypeID' => {
             Required => 1
-        },                                              
+        },
     }
 }
 
@@ -75,27 +75,27 @@ perform TicketStateUpdate Operation. This will return the updated TicketStateID.
     my $Result = $OperationObject->Run(
         Data => {
         	StateID => '...',
-        }        
+        }
     	TicketState => (
         	Name    => ''...',
         	ValidID => '...',
         	TypeID  => '...',
-        	Comment => '...',        	        	
+        	Comment => '...',
     	),
     );
-    
+
     $Result = {
         Success      => 1,                  # 0 or 1
         Message      => '',                 # in case of error
         Data         => {                   # result data payload after Operation
-            StateID  => '',                 #StateID 
+            StateID  => '',                 #StateID
             Error    => {                         # should not return errors
                     Code    => 'TicketState.Update.ErrorCode'
                     Message => 'Error Description'
             },
         },
     };
-   
+
 =cut
 
 
@@ -106,14 +106,14 @@ sub Run {
     my $TicketState = $Self->_Trim(
         Data => $Param{Data}->{TicketState},
     );
-   
+
     my $StateID;
-    
+
     # check if ticketState exists
     my %TicketStateData = $Kernel::OM->Get('State')->StateGet(
         ID => $Param{Data}->{StateID},
     );
-    
+
     if ( !%TicketStateData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -121,7 +121,7 @@ sub Run {
     }
 
     my $Success = $Kernel::OM->Get('State')->StateUpdate(
-        %{$TicketState},    
+        %{$TicketState},
         ID      => $Param{Data}->{StateID},
         UserID  => $Self->{Authorization}->{UserID},
     );
@@ -131,11 +131,11 @@ sub Run {
             Code => 'Object.UnableToUpdate',
         );
     }
-    
-    # return result     
+
+    # return result
     return $Self->_Success(
         TicketStateID => $TicketStateData{ID},
-    );    
+    );
 }
 
 1;

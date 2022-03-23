@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -69,7 +69,7 @@ sub new {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
-            );        
+            );
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
@@ -77,12 +77,12 @@ sub new {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
         }
 
         $Self->{OptionTypeModules}->{$OptionType} = $BackendObject;
     }
-    
+
     return $Self;
 }
 
@@ -119,7 +119,7 @@ Check if a SysConfig option exists.
 
 sub Exists {
     my ( $Self, %Param ) = @_;
-    
+
     my %Result;
 
     # check needed stuff
@@ -132,7 +132,7 @@ sub Exists {
             return;
         }
     }
-   
+
     # check cache
     my $CacheKey = 'Exists::' . $Param{Name};
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
@@ -140,8 +140,8 @@ sub Exists {
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
-    
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT name FROM sysconfig WHERE (name = ? or name like ?)",
         Bind => [ \$Param{Name}, \"$Param{Name}###%" ],
     );
@@ -153,16 +153,16 @@ sub Exists {
         $Exists = 1;
         last;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => $Exists,
-    ); 
-       
-    return $Exists;   
+    );
+
+    return $Exists;
 }
 
 =item OptionGet()
@@ -177,7 +177,7 @@ Get a SysConfig option.
 
 sub OptionGet {
     my ( $Self, %Param ) = @_;
-    
+
     my %Result;
 
     # check needed stuff
@@ -199,16 +199,16 @@ sub OptionGet {
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
-        SQL   => "SELECT name, context, context_metadata, description, access_level, experience_level, 
-                  type, group_name, setting, is_required, is_modified, default_value, value, comments, 
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT name, context, context_metadata, description, access_level, experience_level,
+                  type, group_name, setting, is_required, is_modified, default_value, value, comments,
                   default_valid_id, valid_id, create_time, create_by, change_time, change_by
                   FROM sysconfig WHERE name = ?",
         Bind => [ \$Param{Name} ],
     );
 
     my %Data;
-    
+
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Data = (
@@ -232,7 +232,7 @@ sub OptionGet {
             CreateBy        => $Row[17],
             ChangeTime      => $Row[18],
             ChangeBy        => $Row[19],
-        );  
+        );
     }
 
     # no data found...
@@ -243,7 +243,7 @@ sub OptionGet {
         );
         return;
     }
-    
+
     # decode JSON attrs
     foreach my $Attr ( qw(Default Value) ) {
         $Data{$Attr} = $Self->{OptionTypeModules}->{$Data{Type}}->Decode(
@@ -261,7 +261,7 @@ sub OptionGet {
         Key   => $CacheKey,
         Value => \%Data,
     );
-       
+
     return %Data;
 }
 
@@ -286,16 +286,16 @@ sub OptionGetAll {
     );
     return %{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
-        SQL   => "SELECT name, context, context_metadata, description, access_level, experience_level, 
-                  type, group_name, setting, is_required, is_modified, default_value, value, comments, 
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT name, context, context_metadata, description, access_level, experience_level,
+                  type, group_name, setting, is_required, is_modified, default_value, value, comments,
                   default_valid_id, valid_id, create_time, create_by, change_time, change_by
                   FROM sysconfig"
     );
-    
+
     # fetch the result
     my $FetchResult = $Kernel::OM->Get('DB')->FetchAllArrayRef(
-        Columns => [ 'Name', 'Context', 'ContextMetadata', 'Description', 'AccessLevel', 'ExperienceLevel', 'Type', 'Group', 'Setting', 'IsRequired', 
+        Columns => [ 'Name', 'Context', 'ContextMetadata', 'Description', 'AccessLevel', 'ExperienceLevel', 'Type', 'Group', 'Setting', 'IsRequired',
                      'IsModified', 'Default', 'Value', 'Comment', 'DefaultValidID', 'ValidID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy']
     );
 
@@ -308,7 +308,7 @@ sub OptionGetAll {
         return;
     }
 
-    my %Data = map { 
+    my %Data = map {
         $_->{Setting} = $Kernel::OM->Get('JSON')->Decode(
             Data => $_->{Setting}
         );
@@ -340,7 +340,7 @@ Adds a new SysConfig option
         Name            => 'some name',
         Description     => 'some description',
         Type            => 1,
-        AccessLevel     => 'internal',              
+        AccessLevel     => 'internal',
         Context         => '...'                    # optional
         ContextMetadata => '...'                    # optional
         ExperienceLevel => 200,                     # optional
@@ -389,10 +389,10 @@ sub OptionAdd {
 
     # do the db insert...
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => "INSERT INTO sysconfig 
-                 (name, context, context_metadata, description, access_level, experience_level, type, group_name, setting, 
+        SQL  => "INSERT INTO sysconfig
+                 (name, context, context_metadata, description, access_level, experience_level, type, group_name, setting,
                   is_required, is_modified, default_value, comments, default_valid_id, valid_id,
-                  create_time, create_by, change_time, change_by) 
+                  create_time, create_by, change_time, change_by)
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
         Bind => [
             \$Param{Name}, \$Param{Context}, \$Param{ContextMetadata}, \$Param{Description},
@@ -432,7 +432,7 @@ sub OptionAdd {
 Update a SysConfig option
 
     my $Result = $SysConfigObject->OptionUpdate(
-        Name            => 'some name',             
+        Name            => 'some name',
         Description     => 'some description',      # optional
         Context         => '...'                    # optional
         ContextMetadata => '...'                    # optional
@@ -526,15 +526,15 @@ sub OptionUpdate {
 
     # do the db update...
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => "UPDATE sysconfig SET 
-                 name = ?, context = ?, context_metadata = ?, description = ?, access_level = ?, 
-                 experience_level = ?, type = ?, group_name = ?, setting = ?, is_required = ?, 
-                 is_modified = ?, default_value = ?, value = ?, comments = ?, default_valid_id = ?, valid_id = ?, 
-                 change_time = current_timestamp, change_by = ? WHERE name = ?", 
+        SQL  => "UPDATE sysconfig SET
+                 name = ?, context = ?, context_metadata = ?, description = ?, access_level = ?,
+                 experience_level = ?, type = ?, group_name = ?, setting = ?, is_required = ?,
+                 is_modified = ?, default_value = ?, value = ?, comments = ?, default_valid_id = ?, valid_id = ?,
+                 change_time = current_timestamp, change_by = ? WHERE name = ?",
         Bind => [
-            \$Param{Name}, \$Param{Context}, \$Param{ContextMetadata}, \$Param{Description}, 
-            \$Param{AccessLevel}, \$Param{ExperienceLevel}, \$Param{Type}, \$Param{Group}, 
-            \$Param{Setting}, \$Param{IsRequired}, \$IsModified, \$Param{Default}, \$Param{Value}, 
+            \$Param{Name}, \$Param{Context}, \$Param{ContextMetadata}, \$Param{Description},
+            \$Param{AccessLevel}, \$Param{ExperienceLevel}, \$Param{Type}, \$Param{Group},
+            \$Param{Setting}, \$Param{IsRequired}, \$IsModified, \$Param{Default}, \$Param{Value},
             \$Param{Comment}, \$Param{DefaultValidID}, \$Param{ValidID}, \$Param{UserID}, \$Param{Name}
         ],
     );
@@ -582,8 +582,8 @@ sub OptionList {
         Key  => $CacheKey
     );
     return @{$CacheResult} if (IsArrayRefWithData($CacheResult));
-  
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT name FROM sysconfig',
     );
 
@@ -653,7 +653,7 @@ sub OptionDelete {
 Get the value of a SysConfig option
 
     my $Value = $SysConfigObject->ValueGet(
-        Name => 'some name',             
+        Name => 'some name',
     );
 
 =cut
@@ -702,10 +702,10 @@ sub ValueGetAll {
         $Where = 'WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => "SELECT name, type, default_value, value FROM sysconfig ".$Where
     );
-    
+
     # fetch the result
     my $FetchResult = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'Name', 'Type', 'Default', 'Value' ]
@@ -720,7 +720,7 @@ sub ValueGetAll {
         return;
     }
 
-    my %Result = map { 
+    my %Result = map {
         my $Value = defined $_->{Value} && $_->{Value} ne '' ? $_->{Value} : $_->{Default};
         if ( $Value ) {
             $Value = $Self->{OptionTypeModules}->{$_->{Type}}->Decode(
@@ -841,14 +841,14 @@ sub Rebuild {
         next if ! -e $Directory;
 
         push @Directories, $Directory;
-    }    
+    }
 
     # get main object
     my $MainObject = $Kernel::OM->Get('Main');
 
     # This is the sorted configuration XML entry list that we must populate here.
     $Self->{XMLConfig} = [];
-    
+
     my %HandledKeys;
     my %AllOptions = $Self->OptionGetAll();
 
@@ -1014,7 +1014,7 @@ sub _RebuildFromFile {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Item has unknown type \"$Type\".",
-            );    
+            );
             next;
         }
 
@@ -1035,14 +1035,14 @@ sub _RebuildFromFile {
             DefaultValidID  => $OptionRaw->{Valid} == 1 ? 1 : 2,
         );
 
-        # check if we have to extend an existing option (only types Hash and Array can be extended at the moment) 
+        # check if we have to extend an existing option (only types Hash and Array can be extended at the moment)
         if ( $OptionRaw->{Extend} ) {
             # check if the option to extend exists
             if ( !$AllOptions{ $OptionRaw->{Name} } ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to extend option \"$Option{Name}\", because it doesn't exist.",
-                );    
+                );
                 next;
             }
 

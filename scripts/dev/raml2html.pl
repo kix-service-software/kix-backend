@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -41,7 +41,7 @@ foreach my $Option ( qw(SourceDirectory RamlFile OutputFile Template SchemaDirec
 # check if directory is given
 if ( $Options{Help} || %Missing ) {
     print "raml2html - Generates the HTML documentation from the RAML description.\n";
-    print "Copyright (c) 2006-2021 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
+    print "Copyright (C) 2006-2022 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
     print "\n";
     print "Required Options:\n";
     print "  --source-directory  - The directories where the documentation sources are located. All directories will be \"merged\" in the given order. The bundled schema files will also be created in these directories, depending on their schema sources.\n";
@@ -127,7 +127,7 @@ if ( -d "$Options{SchemaDirectory}" ) {
         # store schema URI for validation
         my $DraftURI = $BundledSchema->{'$schema'};
 
-        # some adjustments to preserve attribute order and cleanup 
+        # some adjustments to preserve attribute order and cleanup
         if ( !IsHashRefWithData($BundledSchema->{definitions}) ) {
             delete $BundledSchema->{definitions};
         }
@@ -157,7 +157,7 @@ if ( -d "$Options{SchemaDirectory}" ) {
 
         # validator resulting schema against the OpenAPI spec
         my @Errors;
-        eval { 
+        eval {
             @Errors = JSON::Validator->schema($DraftURI)->validate(
                 $JSONObject->decode( $BundledSchema )
             );
@@ -195,7 +195,7 @@ if ( -d "$Options{SchemaDirectory}" ) {
     foreach my $Directory ( @{$Options{SourceDirectory}} ) {
         chdir "$TmpDir/schemas\n";
         my $TargetDirectory;
-        if ( $Directory !~ /^\// ) { 
+        if ( $Directory !~ /^\// ) {
             $TargetDirectory = "$Cwd/$Directory/schemas";
         }
         else {
@@ -308,7 +308,7 @@ if ( ref $Options{Variables} eq 'ARRAY' && @{$Options{Variables}} ) {
     }
 }
 
-# execute raml2html 
+# execute raml2html
 print "\nexecuting raml2html -i $TmpDir/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}\n";
 my $ExecResult = `raml2html -i $TmpDir/$Options{RamlFile} -o $Options{OutputFile} -t $Options{Template}`;
 print STDERR "$ExecResult\n";

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform ReportDelete Operation. This will return {}.
     my $Result = $OperationObject->Run(
         Data => {
             ReportID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -77,16 +77,16 @@ perform ReportDelete Operation. This will return {}.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # start loop
     foreach my $ReportID ( @{$Param{Data}->{ReportID}} ) {
-   
-        # delete Report 
+
+        # delete Report
         my $Success = $Kernel::OM->Get('Reporting')->ReportDelete(
             ID  => $ReportID,
             UserID  => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -75,7 +75,7 @@ for my $Counter (1..10) {
     my $Class = $ConfigItemClasses[$Counter-1];
 
     my $Name = "Test$Counter-$Class";
-    
+
     # add the new config item
     my $ConfigItemID = $ConfigItemObject->ConfigItemAdd(
         Name    => $Name,
@@ -388,12 +388,12 @@ foreach my $Test ( @Tests ) {
         %{$Test->{Input}},
         UserID => 1,
     );
-    
+
     my %Nodes = map { $_->{Object}->{Name} => $_->{NodeID} } @{$Graph->{Nodes}};
 
     my %Links;
     foreach my $Link ( @{$Graph->{Links}} ) {
-        $Links{$Link->{SourceNodeID}}->{$Link->{TargetNodeID}}->{$Link->{LinkType}} = $Link 
+        $Links{$Link->{SourceNodeID}}->{$Link->{TargetNodeID}}->{$Link->{LinkType}} = $Link
     };
 
     # check expectations

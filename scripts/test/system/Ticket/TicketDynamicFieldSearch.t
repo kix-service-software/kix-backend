@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -215,7 +215,7 @@ my %TicketIDsSearch = $TicketObject->TicketSearch(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -227,7 +227,7 @@ my %TicketIDsSearch = $TicketObject->TicketSearch(
                 Operator => 'EQ',
             }
         ]
-    },    
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -242,7 +242,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -254,7 +254,7 @@ $Self->IsDeeply(
                 Operator => 'LIKE',
             }
         ]
-    },       
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -269,7 +269,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -284,9 +284,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket1_field2',
                 Operator => 'EQ',
-            }            
+            }
         ]
-    },       
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -301,7 +301,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -316,9 +316,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket1_field2',
                 Operator => 'EQ',
-            }            
+            }
         ]
-    },    
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -333,7 +333,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -348,9 +348,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket1_field2_nonexisting',
                 Operator => 'EQ',
-            }            
+            }
         ]
-    },    
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -365,7 +365,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -380,9 +380,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }            
+            }
         ]
-    },    
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -401,7 +401,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -431,9 +431,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1_field5',
                 Operator => 'EQ',
-            }                         
+            }
         ]
-    },   
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -448,7 +448,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -468,7 +468,7 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:01',
                 Operator => 'GTE',
-            },            
+            },
             {
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:01',
@@ -483,9 +483,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1_field5',
                 Operator => 'EQ',
-            }                         
+            }
         ]
-    },   
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -500,7 +500,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -520,7 +520,7 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:00',
                 Operator => 'GT',
-            },            
+            },
             {
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:02',
@@ -535,9 +535,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1_field5',
                 Operator => 'EQ',
-            }                         
+            }
         ]
-    },   
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -552,7 +552,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -572,7 +572,7 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:01',
                 Operator => 'GT',
-            },            
+            },
             {
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:01',
@@ -587,9 +587,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1_field5',
                 Operator => 'EQ',
-            }                         
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -604,7 +604,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -619,7 +619,7 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket1_field2',
                 Operator => 'EQ',
-            },        
+            },
             {
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2002-01-01 01:01:01',
@@ -634,9 +634,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1_field5',
                 Operator => 'EQ',
-            }                         
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -651,7 +651,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -666,7 +666,7 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket1_field2',
                 Operator => 'EQ',
-            },         
+            },
             {
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:01',
@@ -681,9 +681,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1_field5',
                 Operator => 'EQ',
-            }                         
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -698,7 +698,7 @@ $Self->IsDeeply(
     Result  => 'HASH',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -713,7 +713,7 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket1_field2',
                 Operator => 'EQ',
-            },         
+            },
             {
                 Field => "DynamicField_DFT3$RandomID",
                 Value => '2001-01-01 01:01:01',
@@ -728,9 +728,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1000_field5',
                 Operator => 'EQ',
-            }                         
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
 );
@@ -745,7 +745,7 @@ my @TicketResultSearch = $TicketObject->TicketSearch(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -760,9 +760,9 @@ my @TicketResultSearch = $TicketObject->TicketSearch(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -783,7 +783,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -798,9 +798,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -821,7 +821,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -831,9 +831,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -854,7 +854,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -864,9 +864,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -887,7 +887,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -897,9 +897,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -920,7 +920,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -930,9 +930,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -953,7 +953,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -963,9 +963,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -986,7 +986,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -996,9 +996,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT2$RandomID",
                 Value => 'ticket%_field2',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -1019,14 +1019,14 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
                 Operator => 'EQ',
-            }                  
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -1047,14 +1047,14 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
                 Operator => 'EQ',
-            }                  
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -1075,7 +1075,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -1085,9 +1085,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket%_field5',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -1108,7 +1108,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -1118,9 +1118,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => 'ticket1_field5',
                 Operator => 'LIKE',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [
@@ -1141,7 +1141,7 @@ $Self->IsDeeply(
     Result  => 'ARRAY',
     Limit   => 100,
     Filter  => {
-        AND => [ 
+        AND => [
             {
                 Field => 'Title',
                 Value => "Ticket$RandomID",
@@ -1151,9 +1151,9 @@ $Self->IsDeeply(
                 Field => "DynamicField_DFT5$RandomID",
                 Value => ['ticket2_field5', 'ticket4_field5'],
                 Operator => 'IN',
-            }                      
+            }
         ]
-    },  
+    },
     UserID     => 1,
     Permission => 'rw',
     Sort       => [

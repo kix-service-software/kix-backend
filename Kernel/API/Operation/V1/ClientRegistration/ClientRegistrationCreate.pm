@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -126,9 +126,9 @@ sub Run {
 
     # check requirements
     if ( IsArrayRefWithData($ClientRegistration->{Requires}) ) {
-        my @PluginList = $Kernel::OM->Get('Installation')->PluginList(Valid => 1);    
+        my @PluginList = $Kernel::OM->Get('Installation')->PluginList(Valid => 1);
         use Data::Dumper;
-        my %Plugins = map { $_->{Product} => $_ } @PluginList; 
+        my %Plugins = map { $_->{Product} => $_ } @PluginList;
 
         # add framework as pseudo plugin
         $Plugins{framework} = {
@@ -222,7 +222,7 @@ sub Run {
     if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
         foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
             my $Content = MIME::Base64::decode_base64($Item->{Content});
-                        
+
             # fire & forget, not result handling at the moment
             my ($CountTotal, $CountOK) = $Kernel::OM->Get('Translation')->ImportPO(
                 Language => $Item->{Language},

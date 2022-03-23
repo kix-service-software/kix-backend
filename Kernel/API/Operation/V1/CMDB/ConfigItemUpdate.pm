@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -68,17 +68,17 @@ perform ConfigItemUpdate Operation. This will return the created ConfigItemLogin
     my $Result = $OperationObject->Run(
         Data => {
             ConfigItem => {
-                ...                                
+                ...
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            ConfigItemID  => '',                    # ConfigItemID 
+            ConfigItemID  => '',                    # ConfigItemID
         },
     };
 
@@ -105,7 +105,7 @@ sub Run {
     );
 
     # check ConfigItem attribute values
-    my $ConfigItemCheck = $Self->_CheckConfigItem( 
+    my $ConfigItemCheck = $Self->_CheckConfigItem(
         ConfigItem => $ConfigItem
     );
 
@@ -116,7 +116,7 @@ sub Run {
     }
 
     # update config item
-    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemUpdate(        
+    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemUpdate(
         ConfigItemID   => $Param{Data}->{ConfigItemID},
         %{$ConfigItem},
         UserID  => $Self->{Authorization}->{UserID},

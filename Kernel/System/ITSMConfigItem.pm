@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1224,7 +1224,7 @@ sub ConfigItemSearchExtended {
                         $IsDate = 1;
                         $Value = "$2 00:00:00 $4";
                     }
-                    
+
                     my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                         String => $Value,
                     );
@@ -1904,7 +1904,7 @@ sub RecalculateCurrentIncidentState {
             my %StateListReverse = reverse %{$ItemList};
 
             $Self->{RelevantIncidentStateIDForType}->{$Type} = $StateListReverse{ (sort keys %StateListReverse)[0] };
-            
+
             $Self->{IncidentState2TypeMapping} //= {};
             %{$Self->{IncidentState2TypeMapping}} = (
                 %{$Self->{IncidentState2TypeMapping}},
@@ -2828,7 +2828,7 @@ sub GetAssignedConfigItemsForObject {
 
 =item GenerateLinkGraph()
 
-Generate a link graph for the given CI. 
+Generate a link graph for the given CI.
 
     my $Graph = $ConfigItemObject->GenerateLinkGraph(
         ConfigItemID => 1234,
@@ -2861,7 +2861,7 @@ sub GenerateLinkGraph {
     # simply return if we've reached the depth limit
     return if IsHashRefWithData($Param{Config}) && $Param{Config}->{MaxDepth} && $Param{Depth} > $Param{Config}->{MaxDepth};
 
-    # initialize the graph 
+    # initialize the graph
     my %Graph = (
         CreateTimUnix => $Kernel::OM->Get('Time')->SystemTime(),
         Type          => 'ConfigItemLinkGraph',
@@ -2926,7 +2926,7 @@ sub GenerateLinkGraph {
             CONFIGITEM:
             foreach my $ConfigItemID ( sort keys %{$LinkList->{ConfigItem}->{$LinkType}->{$LinkDirection}}) {
                 my $ConfigItem = $LinkList->{ConfigItem}->{$LinkType}->{$LinkDirection}->{$ConfigItemID};
-        
+
                 # ignore this config item if its class if not relevant according to graph config
                 next CONFIGITEM if IsHashRefWithData(\%RelevantClasses) && !$RelevantClasses{$ConfigItem->{Class}};
 

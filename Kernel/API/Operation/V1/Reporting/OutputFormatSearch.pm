@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -75,14 +75,14 @@ sub Run {
         if ( defined $GetResult->{Data}->{OutputFormat} ) {
             @ResultList = IsArrayRef($GetResult->{Data}->{OutputFormat}) ? @{$GetResult->{Data}->{OutputFormat}} : ( $GetResult->{Data}->{OutputFormat} );
         }
-        
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 OutputFormat => \@ResultList,
             )
         }
     }
-   
+
     # return result
     return $Self->_Success(
         OutputFormat => [],

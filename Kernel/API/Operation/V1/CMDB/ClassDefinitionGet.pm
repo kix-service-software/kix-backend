@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -70,7 +70,7 @@ sub ParameterDefinition {
 perform ClassDefinitionGet Operation.
 
     my $Result = $OperationObject->Run(
-        ClassID      => 1,                                # required 
+        ClassID      => 1,                                # required
         DefinitionID => 1                                 # required
     );
 
@@ -92,8 +92,8 @@ perform ClassDefinitionGet Operation.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @DefinitionList;        
-    foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {                 
+    my @DefinitionList;
+    foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {
 
         my $DefinitionRef = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
             DefinitionID => $DefinitionID,
@@ -103,7 +103,7 @@ sub Run {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
-        }     
+        }
 
         my %Definition = %{$DefinitionRef};
 
@@ -123,7 +123,7 @@ sub Run {
     elsif ( scalar(@DefinitionList) == 1 ) {
         return $Self->_Success(
             ConfigItemClassDefinition => $DefinitionList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -552,8 +552,8 @@ sub LinkAdd {
     return if !$DBObject->Prepare(
         SQL => '
             SELECT id FROM link_relation WHERE
-            source_object_id = ? AND source_key = ? AND 
-            target_object_id = ? AND target_key = ? AND 
+            source_object_id = ? AND source_key = ? AND
+            target_object_id = ? AND target_key = ? AND
             type_id = ? AND create_by = ?',
         Bind => [
             \$Param{SourceObjectID}, \$Param{SourceKey},
@@ -1334,7 +1334,7 @@ Return
         SourceKey     => '...',     # optional
         TargetObject  => '...',     # optional
         TargetKey     => '...',     # optional
-        Type          => '...'      # optional        
+        Type          => '...'      # optional
         Limit         => 123        # optional
     );
 
@@ -1512,14 +1512,14 @@ sub LinkGet {
     if ( $LinkData{ID} ) {
         $LinkData{SourceObject} = $Self->ObjectLookup(
             ObjectID => $LinkData{SourceObjectID}
-        );        
+        );
         $LinkData{TargetObject} = $Self->ObjectLookup(
             ObjectID => $LinkData{TargetObjectID}
-        );        
+        );
         $LinkData{Type} = $Self->TypeLookup(
             TypeID => $LinkData{TypeID},
             UserID => 1,
-        );        
+        );
     }
 
     # set cache

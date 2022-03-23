@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -76,17 +76,17 @@ perform ObjectIconUpdate Operation. This will return the updated ObjectIconID.
             }
 	    },
 	);
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            ObjectIconID  => 123,               # ID of the updated ObjectIcon 
+            ObjectIconID  => 123,               # ID of the updated ObjectIcon
         },
     };
-   
+
 =cut
 
 
@@ -96,23 +96,23 @@ sub Run {
      # isolate and trim ObjectIcon parameter
     my $ObjectIcon = $Self->_Trim(
         Data => $Param{Data}->{ObjectIcon},
-    );   
+    );
 
     # check if ObjectIcon entry exists
     my %ObjectIconData = $Kernel::OM->Get('ObjectIcon')->ObjectIconGet(
         ID => $Param{Data}->{ObjectIconID},
     );
-  
+
     if ( !%ObjectIconData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
     }
-    
+
     # check if ObjectIcon exists
     my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
         Object   => $ObjectIcon->{Object} || $ObjectIconData{Object},
-        ObjectID => $ObjectIcon->{ObjectID} || $ObjectIconData{ObjectID},        
+        ObjectID => $ObjectIcon->{ObjectID} || $ObjectIconData{ObjectID},
     );
 
     if ( IsArrayRefWithData($ObjectIconList) && $ObjectIconList->[0] != $Param{Data}->{ObjectIconID} ) {
@@ -120,7 +120,7 @@ sub Run {
             Code => 'Object.AlreadyExists',
         );
     }
-    
+
     # update ObjectIcon
     my $Success = $Kernel::OM->Get('ObjectIcon')->ObjectIconUpdate(
         ID          => $Param{Data}->{ObjectIconID},
@@ -137,10 +137,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         ObjectIconID => $Param{Data}->{ObjectIconID},
-    );    
+    );
 }
 
 1;

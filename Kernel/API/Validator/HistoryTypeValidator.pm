@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -65,12 +65,12 @@ sub Validate {
     if ( $Param{Attribute} eq 'HistoryTypeID' ) {
         $Found = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
             TypeID => $Param{Data}->{$Param{Attribute}},
-        );        
+        );
     }
     elsif ( $Param{Attribute} eq 'HistoryType' ) {
         $Found = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
             Type => $Param{Data}->{$Param{Attribute}},
-        );      
+        );
     }
     else {
         return $Self->_Error(
@@ -83,10 +83,10 @@ sub Validate {
         return $Self->_Error(
             Code    => 'Validator.Failed',
             Message => "Validation of attribute $Param{Attribute} failed!",
-        );        
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;

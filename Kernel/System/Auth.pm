@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -87,7 +87,7 @@ sub new {
             }
 
             $Config->{BackendObject} = $Config->{Module}->new(Config => $Config->{Config});
-            
+
             # set global config in module
             $Config->{BackendObject}->{Config} = $Config;
 
@@ -174,7 +174,7 @@ sub Auth {
 
         CONFIG:
         foreach my $Config ( @{$Self->{AuthConfig}->{$AuthReg}} ) {
-        
+
             next CONFIG if !$Config->{Enabled} || !$Config->{BackendObject};
             next CONFIG if defined $Config->{UsageContext} && $Config->{UsageContext} ne $Param{UsageContext};
 

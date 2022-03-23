@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -101,7 +101,7 @@ sub Search {
         my $Value = $Param{Search}->{Value};
         $Value =~ s/\*/%/g;
         push( @SQLWhere, "st.tn LIKE '$Value'" );
-    }    
+    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
@@ -115,7 +115,7 @@ sub Search {
 
     return {
         SQLWhere => \@SQLWhere,
-    };        
+    };
 }
 
 =item Sort()
@@ -143,7 +143,7 @@ sub Sort {
         SQLOrderBy => [
             'st.tn'
         ],
-    };       
+    };
 }
 
 1;

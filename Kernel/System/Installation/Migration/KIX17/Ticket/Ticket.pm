@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -29,7 +29,7 @@ our @ObjectDependencies = (
 
 =item Describe()
 
-describe what is supported and what is required 
+describe what is supported and what is required
 
 =cut
 
@@ -67,7 +67,7 @@ create a new item in the DB
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # only cache the following types in memory not redis 
+    # only cache the following types in memory not redis
     $Self->SetCacheOptions(
         ObjectType     => ['ticket', 'article', 'ticket_history', 'ticket_flag', 'article_flag', 'article_plain', 'article_attachment'],
         CacheInMemory  => 1,
@@ -101,7 +101,7 @@ sub Run {
             if ( $MappedID ) {
                 return 'Ignored';
             }
-            
+
             # get the ticket data
             $Item = $Self->GetSourceData(Type => 'ticket', Where => "id = $Item->{id}", NoProgress => 1);
             return if !IsArrayRefWithData($Item);
@@ -286,7 +286,7 @@ sub _AssignOrganisation {
     }
 
 
-    return $OrgID; 
+    return $OrgID;
 }
 
 sub _AssignContact {
@@ -368,8 +368,8 @@ sub _MigrateArticles {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type       => 'article', 
-        Where      => "ticket_id = $Param{SourceTicketID}", 
+        Type       => 'article',
+        Where      => "ticket_id = $Param{SourceTicketID}",
         OrderBy    => 'id',
         References => {
             'ticket_id' => 'ticket',
@@ -384,12 +384,12 @@ sub _MigrateArticles {
 
     if ( !$Self->{ArticleTypes} ) {
         my $ArticleTypesData = $Self->GetSourceData( Type => 'article_type', NoProgress => 1 );
-        $Self->{ArticleTypes} = { map { $_->{id} => $_->{name} } @{$ArticleTypesData} }; 
+        $Self->{ArticleTypes} = { map { $_->{id} => $_->{name} } @{$ArticleTypesData} };
     }
 
     if ( !$Self->{Channels} ) {
         my %ChannelList = $Kernel::OM->Get('Channel')->ChannelList();
-        $Self->{Channels} = { reverse %ChannelList }; 
+        $Self->{Channels} = { reverse %ChannelList };
     }
 
     foreach my $Item ( @{$SourceData} ) {
@@ -472,7 +472,7 @@ sub _MigrateAttachments {
 
     # migrate article attachments
     my $Attachments = $Self->GetSourceData(
-        Type       => 'article_attachment', 
+        Type       => 'article_attachment',
         ObjectID   => $Param{SourceArticleID},
         NoProgress => 1
     );
@@ -496,13 +496,13 @@ sub _MigrateAttachments {
 
     # get plain atttachments
     my $Plain = $Self->GetSourceData(
-        Type       => 'article_plain', 
+        Type       => 'article_plain',
         ObjectID   => $Param{SourceArticleID},
         NoProgress => 1
     );
     if ( IsHashRefWithData($Plain) ) {
         $Plain->{Content} = MIME::Base64::decode_base64($Plain->{Content});
-    
+
         my $Result = $TicketObject->ArticleWritePlain(
             ArticleID => $Param{ArticleID},
             Email     => $Plain->{Content},
@@ -536,8 +536,8 @@ sub _MigrateArticleFlags {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type       => 'article_flag', 
-        Where      => "article_id = $Param{SourceArticleID}", 
+        Type       => 'article_flag',
+        Where      => "article_id = $Param{SourceArticleID}",
         References => {
             'article_id' => 'article',
             'create_by'  => 'users',
@@ -608,8 +608,8 @@ sub _MigrateTicketFlags {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type       => 'ticket_flag', 
-        Where      => "ticket_id = $Param{SourceTicketID}", 
+        Type       => 'ticket_flag',
+        Where      => "ticket_id = $Param{SourceTicketID}",
         References => {
             'ticket_id' => 'ticket',
             'create_by' => 'users',
@@ -680,8 +680,8 @@ sub _MigrateHistory {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type       => 'ticket_history', 
-        Where      => "ticket_id = $Param{SourceTicketID}", 
+        Type       => 'ticket_history',
+        Where      => "ticket_id = $Param{SourceTicketID}",
         OrderBy    => 'id',
         References => {
             'ticket_id'       => 'ticket',
@@ -763,8 +763,8 @@ sub _MigrateTimeUnits {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type       => 'time_accounting', 
-        Where      => "ticket_id = $Param{SourceTicketID}", 
+        Type       => 'time_accounting',
+        Where      => "ticket_id = $Param{SourceTicketID}",
         References => {
             'ticket_id'  => 'ticket',
             'article_id' => 'article',

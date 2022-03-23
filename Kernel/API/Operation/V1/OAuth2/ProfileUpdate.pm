@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -111,7 +111,7 @@ perform OAuth2 ProfileUpdate Operation. This will return the updated ProfileID.
             ProfileID  => 123,                  # ID of the updated Profile
         },
     };
-   
+
 =cut
 
 sub Run {
@@ -150,7 +150,7 @@ sub Run {
 
     if ( !$Success ) {
         my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
-            Type => 'error', 
+            Type => 'error',
             What => 'Message',
         );
         return $Self->_Error(

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -80,7 +80,7 @@ perform MacroActionSearch Operation. This will return a MacroAction list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     my @MacroActionDataList;
 
     # check if macro exists
@@ -98,9 +98,9 @@ sub Run {
         MacroID => $Param{Data}->{MacroID},
         Valid   => 0,
     );
-   
+
     # get already prepared MacroAction data from MacroActionGet operation
-    if ( IsHashRefWithData(\%MacroActionList) ) {   
+    if ( IsHashRefWithData(\%MacroActionList) ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::MacroActionGet',
             SuppressPermissionErrors => 1,
@@ -124,7 +124,7 @@ sub Run {
             )
         }
     }
-    
+
     # return result
     return $Self->_Success(
         MacroAction => [],
