@@ -124,7 +124,7 @@ sub Run {
             Filename     => $StoredAttachment->{Filename},
             ContentType  => $StoredAttachment->{Preferences}->{Datatype},
             Content      => MIME::Base64::encode_base64(${$StoredAttachment->{ContentRef}}),
-            FilesizeRaw  => $StoredAttachment->{Preferences}->{FileSizeBytes},
+            FilesizeRaw  => 0 + $StoredAttachment->{Preferences}->{FileSizeBytes},
         );
 
         # human readable file size

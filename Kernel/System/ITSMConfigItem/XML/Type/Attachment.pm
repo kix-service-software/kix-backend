@@ -82,7 +82,7 @@ sub ValueLookup {
         AttachmentID => $Param{Value},
         Filename     => $StoredAttachment->{Filename},
         ContentType  => $StoredAttachment->{Preferences}->{Datatype},
-        FilesizeRaw  => (bytes::length ${$StoredAttachment->{ContentRef}}),
+        FilesizeRaw  => 0 + (bytes::length ${$StoredAttachment->{ContentRef}}),
     );
 
     # human readable file size

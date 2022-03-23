@@ -1201,7 +1201,7 @@ sub AttachmentIndex {
         my $Disposition = $Row[5];
 
         # convert to human readable file size
-        my $FileSizeRaw = $Filesize;
+        my $FileSizeRaw = 0 + $Filesize;
         if ($Filesize) {
             if ( $Filesize > ( 1024 * 1024 ) ) {
                 $Filesize = sprintf "%.1f MBytes", ( $Filesize / ( 1024 * 1024 ) );

@@ -187,7 +187,7 @@ sub Run {
     my %Attachment = (
         Filename    => $ZipFilename,
         ContentType => 'application/zip',
-        FilesizeRaw => length $ZipResult,
+        FilesizeRaw => 0 + length $ZipResult,
     );
 
     if ( $Attachment{FilesizeRaw} > ( 1024 * 1024 ) ) {
