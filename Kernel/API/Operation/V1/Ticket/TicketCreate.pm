@@ -176,8 +176,7 @@ sub Run {
     # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
         Ticket                 => $Ticket,
-        UserID                 => $Self->{Authorization}->{UserID},,
-        RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+        UserID                 => $Self->{Authorization}->{UserID},
     );
 }
 
@@ -468,8 +467,7 @@ sub _TicketCreate {
                 OperationType => 'V1::Ticket::ArticleCreate',
                 Data          => {
                     TicketID               => $TicketID,
-                    Article                => $Article,,
-                    RelevantOrganisationID => $Param{RelevantOrganisationID}
+                    Article                => $Article
                 }
             );
 

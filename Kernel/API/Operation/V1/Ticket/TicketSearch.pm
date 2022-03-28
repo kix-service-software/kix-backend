@@ -107,8 +107,7 @@ sub Run {
                 TicketID                    => join(',', @TicketIndex),
                 include                     => $Param{Data}->{include},
                 expand                      => $Param{Data}->{expand},
-                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
-                RelevantOrganisationID      => $Param{Data}->{RelevantOrganisationID}
+                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues}
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

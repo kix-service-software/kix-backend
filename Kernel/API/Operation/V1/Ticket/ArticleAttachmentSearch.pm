@@ -124,12 +124,12 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleAttachmentGet',
             SuppressPermissionErrors => 1,
-            Data          => {
-                TicketID     => $Param{Data}->{TicketID},
-                ArticleID    => $Param{Data}->{ArticleID},
-                AttachmentID => join(',', sort keys %AttachmentIndex),
-                include      => $Param{Data}->{include},
-                expand       => $Param{Data}->{expand},
+            Data                     => {
+                TicketID               => $Param{Data}->{TicketID},
+                ArticleID              => $Param{Data}->{ArticleID},
+                AttachmentID           => join(',', sort keys %AttachmentIndex),
+                include                => $Param{Data}->{include},
+                expand                 => $Param{Data}->{expand}
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
