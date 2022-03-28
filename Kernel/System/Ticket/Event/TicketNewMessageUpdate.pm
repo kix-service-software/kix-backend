@@ -101,6 +101,7 @@ sub Run {
         ARTICLE:
         for my $ArticleID (@ArticleList) {
             my %ArticleFlag = $TicketObject->ArticleFlagGet(
+                TicketID  => $Param{Data}->{TicketID},
                 ArticleID => $ArticleID,
                 UserID    => $Param{Data}->{UserID},
             );
