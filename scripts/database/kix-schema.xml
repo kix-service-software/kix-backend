@@ -2020,7 +2020,7 @@
 <!-- import run -->
 <Table Name="imexport_template_run">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
-    <Column Name="template_id" Required="true" Type="INTEGER" />
+    <Column Name="template_id" Required="true" Type="BIGINT" />
     <Column Name="state_id" Required="false" Type="SMALLINT" />
     <Column Name="success_count" Required="false" Type="INTEGER" />
     <Column Name="fail_count" Required="false" Type="INTEGER" />
