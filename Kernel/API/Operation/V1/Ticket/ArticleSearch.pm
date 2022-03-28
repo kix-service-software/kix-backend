@@ -108,8 +108,7 @@ sub Run {
                 TicketID               => $Param{Data}->{TicketID},
                 ArticleID              => join(',', @ArticleIndex),
                 include                => $Param{Data}->{include},
-                expand                 => $Param{Data}->{expand},
-                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+                expand                 => $Param{Data}->{expand}
             }
         );
 
