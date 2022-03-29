@@ -62,6 +62,10 @@ sub _Replace {
 
     my $Tag = $Self->{Start} . 'KIX_TICKET_';
     if ( IsHashRefWithData($Param{Ticket}) ) {
+
+        # add (simple) ID
+        $Param{Ticket}->{ID} = $Param{Ticket}->{TicketID};
+
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_ID $Self->{End}/$Param{Ticket}->{TicketID}/gixms;
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_NUMBER $Self->{End}/$Param{Ticket}->{TicketNumber}/gixms;
         $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Param{Ticket}->{Queue}/gixms;
