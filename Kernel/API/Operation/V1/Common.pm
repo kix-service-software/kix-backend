@@ -2245,7 +2245,7 @@ sub _ApplyExpand {
                 $Self->_Debug( $Self->{LevelIndent}, "GenericExpand: $AttributeToExpand" );
 
                 my @ItemList;
-                if ( IsArrayRefWithData( $Param{Data}->{$Object} ) ) {
+                if ( IsArrayRef( $Param{Data}->{$Object} ) ) {
                     @ItemList = @{ $Param{Data}->{$Object} };
                 }
                 else {
@@ -2253,14 +2253,16 @@ sub _ApplyExpand {
                 }
 
                 foreach my $ItemData (@ItemList) {
-                    my $Result = $Self->_ExpandObject(
-                        AttributeToExpand => $AttributeToExpand,
-                        ExpanderConfig    => $GenericExpands->{ $Object . '.' . $AttributeToExpand } || $GenericExpands->{$AttributeToExpand},
-                        Data              => $ItemData
-                    );
+                    if (IsHashRefWithData($ItemData)) {
+                        my $Result = $Self->_ExpandObject(
+                            AttributeToExpand => $AttributeToExpand,
+                            ExpanderConfig    => $GenericExpands->{ $Object . '.' . $AttributeToExpand } || $GenericExpands->{$AttributeToExpand},
+                            Data              => $ItemData
+                        );
 
-                    if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
-                        return $Result;
+                        if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
+                            return $Result;
+                        }
                     }
                 }
             }
