@@ -330,7 +330,7 @@ sub _MigrateAttachments {
     # get source data
     my $SourceData = $Self->GetSourceData(
         Type       => 'faq_attachment',
-        ObjectID   => $Param{SourceArticleID},
+        ObjectID   => $Param{SourceItemID},
         References => {
             'faq_id'     => 'faq_item',
             'created_by' => 'users',
