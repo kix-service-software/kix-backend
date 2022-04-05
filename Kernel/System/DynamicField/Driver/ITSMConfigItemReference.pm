@@ -440,7 +440,7 @@ sub ImportConfigPrepare {
 
                 next ITEM if !$ItemDataRef;
 
-                push(@IDs, $ItemDataRef->{Name});
+                push(@IDs, $ItemDataRef->{ItemID});
             }
 
             if ( scalar(@IDs) ) {
