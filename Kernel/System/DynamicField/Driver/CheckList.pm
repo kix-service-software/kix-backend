@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -119,7 +119,7 @@ sub DisplayValueRender {
 
     # set Value and Title variables
     my $Value = $Param{DynamicFieldConfig}->{Label} . $LineBreak;
-    my $Title = '';
+    my $Title = q{};
 
     # check value
     my @Values;
@@ -160,7 +160,7 @@ sub HTMLDisplayValueRender {
 
     # set Value and Title variables
     my $Value = '<h3>' . $Param{DynamicFieldConfig}->{Label} . '</h3>';
-    my $Title = '';
+    my $Title = q{};
 
     # check value
     my @Values;
@@ -189,7 +189,7 @@ sub HTMLDisplayValueRender {
 
             for my $Item (@{$Items}) {
                 my $ItemValue = $Item->{Value};
-                $ItemValue =~ s/\n/<br \/>/g;
+                $ItemValue =~ s/\n/<br \/>/gxsm;
                 $Value .= '<tr>'
                     . '<td style="padding:10px 15px;">' . $Item->{Title} . '</td>'
                     . '<td style="padding:10px 15px;">' . $ItemValue . '</td>'
@@ -213,8 +213,8 @@ sub ShortDisplayValueRender {
     my ( $Self, %Param ) = @_;
 
     # set Value and Title variables
-    my $Value = '';
-    my $Title = '';
+    my $Value = q{};
+    my $Title = q{};
 
     # check value
     my @Values;
@@ -245,7 +245,7 @@ sub ShortDisplayValueRender {
                     }
                 }
             }
-            $Value .= ($Value ? ', ' : '') . "$Done/$All";
+            $Value .= ($Value ? ', ' : q{}) . "$Done/$All";
         }
     }
 
@@ -269,8 +269,8 @@ sub _GetChecklistRows {
                 push(
                     @Rows,
                     {
-                        Title       => $Item->{title} || '',
-                        Value       => $Item->{value} || '',
+                        Title       => $Item->{title} || q{},
+                        Value       => $Item->{value} || q{},
                         IsCheckList => $Item->{input} eq 'ChecklistState' ? 1 : 0
                     }
                 );

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -45,13 +45,13 @@ sub _MigrateJobFilters {
     my $AutomationObject = $Kernel::OM->Get('Automation');
 
     my %ObjectList = (
-        Type      => { reverse $Kernel::OM->Get('Type')->TypeList() }, 
-        State     => { reverse $Kernel::OM->Get('State')->StateList( UserID => 1 ) }, 
-        StateType => { reverse $Kernel::OM->Get('State')->StateTypeList( UserID => 1 ) }, 
+        Type      => { reverse $Kernel::OM->Get('Type')->TypeList() },
+        State     => { reverse $Kernel::OM->Get('State')->StateList( UserID => 1 ) },
+        StateType => { reverse $Kernel::OM->Get('State')->StateTypeList( UserID => 1 ) },
     );
 
     my %Jobs = $AutomationObject->JobList();
-    
+
     foreach my $JobID ( keys %Jobs ) {
         my %Job = $AutomationObject->JobGet(
             ID => $JobID
@@ -116,15 +116,15 @@ sub _MigrateNotificationFilters {
     my $NotificationObject = $Kernel::OM->Get('NotificationEvent');
 
     my %ObjectList = (
-        Type      => { reverse $Kernel::OM->Get('Type')->TypeList() }, 
-        State     => { reverse $Kernel::OM->Get('State')->StateList( UserID => 1 ) }, 
-        StateType => { reverse $Kernel::OM->Get('State')->StateTypeList( UserID => 1 ) }, 
+        Type      => { reverse $Kernel::OM->Get('Type')->TypeList() },
+        State     => { reverse $Kernel::OM->Get('State')->StateList( UserID => 1 ) },
+        StateType => { reverse $Kernel::OM->Get('State')->StateTypeList( UserID => 1 ) },
     );
 
     my %Notifications = $NotificationObject->NotificationList(
         Details => 1
     );
-    
+
     foreach my $NotificationID ( keys %Notifications ) {
         my %Notification = %{$Notifications{$NotificationID}};
 

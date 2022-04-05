@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -71,7 +71,7 @@ perform PermissionDelete Operation. This will return the deleted PermissionID.
         Data => {
             RoleID        => 123,
             PermissionID  => 123,
-        },		
+        },
     );
 
     $Result = {
@@ -86,18 +86,18 @@ sub Run {
     # start loop
     foreach my $PermissionID ( @{$Param{Data}->{PermissionID}} ) {
 
-        # check if permission exists and belongs to this role    
+        # check if permission exists and belongs to this role
         my %Permission = $Kernel::OM->Get('Role')->PermissionGet(
             ID => $PermissionID,
         );
-   
+
         if ( !IsHashRefWithData(\%Permission) || $Permission{RoleID} != $Param{Data}->{RoleID} ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
 
-        # delete permission	    
+        # delete permission
         my $Success = $Kernel::OM->Get('Role')->PermissionDelete(
             ID  => $PermissionID,
         );

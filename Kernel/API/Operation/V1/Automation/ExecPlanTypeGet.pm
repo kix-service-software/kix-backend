@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub ParameterDefinition {
         'ExecPlanType' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -104,7 +104,7 @@ sub Run {
 	        Name => $ExecPlanType,
 	    );
 
-        if ( !%ExecPlanTypeData ) {         
+        if ( !%ExecPlanTypeData ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
@@ -121,7 +121,7 @@ sub Run {
     if ( scalar(@ExecPlanTypeList) == 1 ) {
         return $Self->_Success(
             ExecPlanType => $ExecPlanTypeList[0],
-        );    
+        );
     }
 
     # return result

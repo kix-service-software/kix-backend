@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -126,9 +126,6 @@ sub Validate {
 
         # ignore placeholder values
         next if $Param{Data}->{$Attribute} =~ m/^<KIX_.+>$/;
-        if ($Param{Data}->{$Attribute} =~ m/^0$|^[1-9]\d{1,19}$/ ) {
-            $Param{Data}->{$Attribute} = 0 + $Param{Data}->{$Attribute};
-        }
 
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {

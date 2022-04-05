@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -90,7 +90,7 @@ sub Run {
     );
 
     # get already prepared Run data from JobRunGet operation
-    if ( IsHashRefWithData(\%JobRunList) ) {   
+    if ( IsHashRefWithData(\%JobRunList) ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::JobRunGet',
             SuppressPermissionErrors => 1,
@@ -114,7 +114,7 @@ sub Run {
             )
         }
     }
-    
+
     # return result
     return $Self->_Success(
         JobRun => [],

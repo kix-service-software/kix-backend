@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -74,17 +74,17 @@ perform PriorityUpdate Operation. This will return the updated Priority.
     	    },
         }
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            PriorityID  => '',                  # PriorityID 
+            PriorityID  => '',                  # PriorityID
         },
     };
-   
+
 =cut
 
 
@@ -96,12 +96,12 @@ sub Run {
         Data => $Param{Data}->{Priority}
     );
 
-    # check if Priority exists 
+    # check if Priority exists
     my %PriorityData = $Kernel::OM->Get('Priority')->PriorityGet(
         PriorityID => $Param{Data}->{PriorityID},
         UserID  => $Self->{Authorization}->{UserID},
     );
-    
+
     if ( !%PriorityData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -124,10 +124,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         PriorityID => 0 + $Param{Data}->{PriorityID},
-    );    
+    );
 }
 
 1;

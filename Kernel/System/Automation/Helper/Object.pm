@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -64,7 +64,7 @@ sub AsObject {
             Data => $Self->{Definition}
         );
         if ( !$Success ) {
-            # the relevant error message is the 3rd last 
+            # the relevant error message is the 3rd last
             $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type  => 'error',
                 What  => 'Message',

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -312,12 +312,12 @@ sub GetSchemaInformation {
     my $SchemaInfo;
 
     $Self->Connect() || die "Unable to connect to database!";
-    
+
     my $SchemaName = $Self->{'DB::Type'} eq 'postgresql' ? 'public' : '';
 
     # get tables
-    my @Tables = map { 
-        my $Table = (split(/\./, $_))[1]; $Table =~ s/\`//g; $Table 
+    my @Tables = map {
+        my $Table = (split(/\./, $_))[1]; $Table =~ s/\`//g; $Table
     } $Self->{dbh}->tables('', $SchemaName, '', 'TABLE');
 
     foreach my $Table ( sort @Tables ) {
@@ -355,7 +355,7 @@ sub GetSchemaInformation {
 
             foreach my $Column ( @{$ForeignKeyInfos} ) {
                 $SchemaInfo->{$Table}->{ForeignKeys}->{$Column->{UK_COLUMN_NAME}} //= [];
-                push @{$SchemaInfo->{$Table}->{ForeignKeys}->{$Column->{UK_COLUMN_NAME}}}, 
+                push @{$SchemaInfo->{$Table}->{ForeignKeys}->{$Column->{UK_COLUMN_NAME}}},
                     "$Column->{FK_TABLE_NAME}.$Column->{FK_COLUMN_NAME}";
             }
         }

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -25,7 +25,7 @@ our @ObjectDependencies = (
 
 =item Describe()
 
-describe what is supported and what is required 
+describe what is supported and what is required
 
 =cut
 
@@ -60,7 +60,7 @@ create a new item in the DB
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # only cache the following types in memory not redis 
+    # only cache the following types in memory not redis
     $Self->SetCacheOptions(
         ObjectType     => ['configitem', 'configitem_history', 'configitem_version', 'xml_storage'],
         CacheInMemory  => 1,
@@ -167,8 +167,8 @@ sub _MigrateHistory {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type => 'configitem_history', 
-        Where => "configitem_id = $Param{SourceAssetID}", 
+        Type => 'configitem_history',
+        Where => "configitem_id = $Param{SourceAssetID}",
         OrderBy => 'id',
         References => {
             'configitem_id' => 'configitem',
@@ -242,8 +242,8 @@ sub _MigrateVersions {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type       => 'configitem_version', 
-        Where      => "configitem_id = $Param{SourceAssetID}", 
+        Type       => 'configitem_version',
+        Where      => "configitem_id = $Param{SourceAssetID}",
         OrderBy    => 'id',
         References => {
             'configitem_id' => 'configitem',
@@ -329,7 +329,7 @@ sub _MigrateXMLData {
 
     # get source data
     my $SourceData = $Self->GetSourceData(
-        Type       => 'configitem_xmldata', 
+        Type       => 'configitem_xmldata',
         ObjectID   => $Param{SourceVersionID},
         NoProgress => 1
     );
@@ -339,7 +339,7 @@ sub _MigrateXMLData {
 
     # fake CI attachments as additional items
     my $CIAttachments = $Self->GetSourceData(
-        Type       => 'configitem_attachment', 
+        Type       => 'configitem_attachment',
         ObjectID   => $Param{SourceAssetID},
         NoProgress => 1
     );
@@ -467,7 +467,7 @@ sub _MapAttributeValue {
     my $PreparedKey = join('.', @PreparedKeyParts);
     return 1 if !$PreparedKey;
     return 1 if !$Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey};
-    
+
     # now map the field type to the object type
     my $TypeMapping = $TypeLookupMapping{$Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey}};
     if ( $TypeMapping ) {
@@ -500,8 +500,8 @@ sub _MapAttributeValue {
                 my %ReferenceAttributeMapping = (
                     'contact' => 'id',
                 );
-                
-                # we have an object, so we can use its id for the OID mapping 
+
+                # we have an object, so we can use its id for the OID mapping
                 $Param{Item}->{xml_content_value} = $Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}->[0]->{$ReferenceAttributeMapping{$TypeMapping} || 'id'}
             }
         }
@@ -527,7 +527,7 @@ sub _CreateDefinitionFlatHash {
     foreach my $Attr ( @{$Param{Definition}} ) {
         my $Key = $Param{ParentKey} ? $Param{ParentKey}.'.'.$Attr->{Key} : $Attr->{Key};
 
-        $Result{$Key} = $Attr->{Input}->{Type}; 
+        $Result{$Key} = $Attr->{Input}->{Type};
         if ( IsArrayRefWithData($Attr->{Sub}) ) {
             my $SubResult = $Self->_CreateDefinitionFlatHash(
                 Definition => $Attr->{Sub},

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -36,7 +36,7 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
-    
+
     return;
 }
 
@@ -52,7 +52,7 @@ sub Run {
     my %PatternList = $Kernel::OM->Get('Translation')->PatternList();
 
     foreach my $ID ( sort { $PatternList{$a} cmp $PatternList{$b} } keys %PatternList ) {
-        # get pattern 
+        # get pattern
         my %Pattern = $Kernel::OM->Get('Translation')->PatternGet(
             ID => $ID,
         );

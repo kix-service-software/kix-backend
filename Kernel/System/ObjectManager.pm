@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -164,7 +164,7 @@ sub new {
     #   already create an instance here to make sure it is always done and done
     #   at the beginning of things.
     $Self->Get('Encode');
-    
+
     return $Self;
 }
 

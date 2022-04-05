@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -60,8 +60,9 @@ sub Run {
     my $CustomerFAQIDList;
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         $CustomerFAQIDList = $Self->_GetCustomerUserVisibleObjectIds(
-            ObjectType => 'FAQArticle',
-            UserID     => $Self->{Authorization}->{UserID}
+            ObjectType             => 'FAQArticle',
+            UserID                 => $Self->{Authorization}->{UserID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 
         # return empty result if there are no assigned faqs for customer
@@ -193,9 +194,10 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::FAQ::FAQArticleGet',
             SuppressPermissionErrors => 1,
-            Data          => {
+            Data                     => {
                 FAQArticleID                => join( ',', sort @{$ArticleIDs} ),
                 NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
+                RelevantOrganisationID      => $Param{Data}->{RelevantOrganisationID}
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

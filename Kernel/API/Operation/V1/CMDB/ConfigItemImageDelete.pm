@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub ParameterDefinition {
         'ConfigItemID' => {
             DataType => 'NUMERIC',
             Required => 1
-        },        
+        },
         'ImageID' => {
             DataType => 'STRING',
             Type     => 'ARRAY',
@@ -67,10 +67,10 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform Operation. 
+perform Operation.
 
     my $Result = $OperationObject->Run(
-        ConfigItemID => 1,                                # required 
+        ConfigItemID => 1,                                # required
         ImageID      => 123,                              # required
     );
 
@@ -95,8 +95,8 @@ sub Run {
             Code => 'ParentObject.NotFound',
         );
     }
-       
-    foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
+
+    foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {
 
         my %Image = $Kernel::OM->Get('ITSMConfigItem')->ImageGet(
             ConfigItemID => $Param{Data}->{ConfigItemID},
@@ -108,7 +108,7 @@ sub Run {
                 Code    => 'Object.NotFound',
                 Message => "Could not get data for ImageID $ImageID",
             );
-        }     
+        }
 
         my $Success = $Kernel::OM->Get('ITSMConfigItem')->ImageDelete(
             ConfigItemID => $Param{Data}->{ConfigItemID},

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -51,7 +51,7 @@ sub ParameterDefinition {
     return {
         'OrganisationID' => {
             Required => 1
-        }                
+        }
     }
 }
 
@@ -71,7 +71,7 @@ perform OrganisationTicketSearch Operation. This will return a Organisation list
             Ticket => [
                 {
                 },
-                {                    
+                {
                 }
             ],
         },
@@ -98,7 +98,7 @@ sub Run {
     );
 
     if (IsArrayRefWithData(\@TicketList)) {
-        
+
         # get already prepared Ticket data from TicketGet operation
         my $TicketGetResult = $Self->ExecOperation(
             OperationType => 'V1::Ticket::TicketGet',
@@ -111,7 +111,7 @@ sub Run {
         }
 
         my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
-        
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Ticket => \@ResultList,

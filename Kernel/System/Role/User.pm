@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -59,7 +59,7 @@ sub RoleUserAdd {
             return;
         }
     }
-    
+
     # insert new relation
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO role_user '
@@ -121,7 +121,7 @@ sub RoleUserList {
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT user_id FROM role_user WHERE role_id = ?',
         Bind => [ \$Param{RoleID} ]
     );
@@ -171,7 +171,7 @@ sub RoleUserDelete {
     if ( $Param{IgnoreContextRoles} ) {
         $SQL .= 'AND role_id NOT IN (SELECT id FROM roles WHERE name IN (\'Customer\', \'Agent User\')) ';
     }
-    
+
     my @Bind;
     if ( $Param{UserID} ) {
         $SQL .= 'AND user_id = ?';

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -98,12 +98,12 @@ sub Run {
     foreach my $NotificationID ( @{ $Param{Data}->{NotificationID} } ) {
 
         # get the Notification data
-        my %NotificationData = $Kernel::OM->Get('NotificationEvent')->NotificationGet( 
-            ID => $NotificationID, 
+        my %NotificationData = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
+            ID => $NotificationID,
         );
 
         if ( !IsHashRefWithData( \%NotificationData ) ) {
-            return $Self->_Error( 
+            return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }

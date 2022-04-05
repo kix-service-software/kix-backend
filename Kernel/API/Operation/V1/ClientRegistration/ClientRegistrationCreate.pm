@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -86,6 +86,7 @@ perform ClientRegistrationCreate Operation. This will return the created ClientR
                         "Requires": "backend::KIXPro(>10), framework(>3349)",
                         "Description": "KIXPro",
                         "BuildNumber": 1,
+                        "PatchNumber": 1,
                         "Version": "1.0.0",
                         "ExtendedData": {
                             "BuildDate": "..."
@@ -125,14 +126,15 @@ sub Run {
 
     # check requirements
     if ( IsArrayRefWithData($ClientRegistration->{Requires}) ) {
-        my @PluginList = $Kernel::OM->Get('Installation')->PluginList(Valid => 1);    
+        my @PluginList = $Kernel::OM->Get('Installation')->PluginList(Valid => 1);
         use Data::Dumper;
-        my %Plugins = map { $_->{Product} => $_ } @PluginList; 
+        my %Plugins = map { $_->{Product} => $_ } @PluginList;
 
         # add framework as pseudo plugin
         $Plugins{framework} = {
             Name        => 'framework',
             BuildNumber => $Kernel::OM->Get('Config')->Get('BuildNumber'),
+            PatchNumber => $Kernel::OM->Get('Config')->Get('PatchNumber'),
             Version     => $Kernel::OM->Get('Config')->Get('Version')
         };
 
@@ -220,7 +222,7 @@ sub Run {
     if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
         foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
             my $Content = MIME::Base64::decode_base64($Item->{Content});
-                        
+
             # fire & forget, not result handling at the moment
             my ($CountTotal, $CountOK) = $Kernel::OM->Get('Translation')->ImportPO(
                 Language => $Item->{Language},
@@ -289,7 +291,7 @@ sub Run {
     my %Requesting;
     if ( IsHashRefWithData($ClientRegistration->{Requesting}) ) {
         if ( $ClientRegistration->{Requesting}->{SystemInfo} ) {
-            foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber) ) {
+            foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber PatchNumber) ) {
                 $Requesting{SystemInfo}->{$Key} = $Kernel::OM->Get('Config')->Get($Key);
             }
         }

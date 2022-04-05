@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -59,8 +59,9 @@ sub Run {
     my $CustomerCIIDList;
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         $CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
-            ObjectType => 'ConfigItem',
-            UserID     => $Self->{Authorization}->{UserID}
+            ObjectType             => 'ConfigItem',
+            UserID                 => $Self->{Authorization}->{UserID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 
         # return empty result if there are no assigned config items for customer
@@ -237,8 +238,9 @@ sub Run {
 
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
-            Data      => {
-                ConfigItemID => join(',', sort @{$ConfigItemList}),
+            Data          => {
+                ConfigItemID           => join(',', sort @{$ConfigItemList}),
+                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             }
         );
 

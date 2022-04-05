@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -119,8 +119,12 @@ sub PostRun {
 
     $Self->{DiscardCount}--;
 
+    # if ( $Self->{Debug} ) {
+    #     print "  $Self->{DaemonName} Discard Count: $Self->{DiscardCount}\n";
+    # }
+
     if ( $Self->{Debug} ) {
-        print "  $Self->{DaemonName} Discard Count: $Self->{DiscardCount}\n";
+        print "  $Self->{DaemonName} unlocking expired automation tasks\n";
     }
 
     # Unlock long locked tasks.
@@ -130,6 +134,9 @@ sub PostRun {
 
     # Remove obsolete tasks before destroy.
     if ( $Self->{DiscardCount} == 0 ) {
+        if ( $Self->{Debug} ) {
+            print "  $Self->{DaemonName} cleaning up automation tasks\n";
+        }
         $Self->{SchedulerDBObject}->AutomationTaskCleanup();
     }
 

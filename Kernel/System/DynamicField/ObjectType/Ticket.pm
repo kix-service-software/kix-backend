@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -139,7 +139,7 @@ sub PostValueSet {
 
     my $FieldName;
     if ( !defined $Param{DynamicFieldConfig}->{Name} ) {
-        $FieldName = '',
+        $FieldName = q{};
     }
     else {
         $FieldName = $Param{DynamicFieldConfig}->{Name};

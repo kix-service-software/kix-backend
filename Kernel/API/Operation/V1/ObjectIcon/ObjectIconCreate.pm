@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -87,7 +87,7 @@ perform ObjectIconCreate Operation. This will return the created ObjectIconID.
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             ObjectIconID  => '',                          # ID of the created ObjectIcon
@@ -102,12 +102,12 @@ sub Run {
      # isolate and trim ObjectIcon parameter
     my $ObjectIcon = $Self->_Trim(
         Data => $Param{Data}->{ObjectIcon},
-    );        
-   
+    );
+
     # check if ObjectIcon exists
     my $ObjectIconList = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
         Object   => $ObjectIcon->{Object},
-        ObjectID => $ObjectIcon->{ObjectID},        
+        ObjectID => $ObjectIcon->{ObjectID},
     );
 
     if ( IsArrayRefWithData($ObjectIconList) ) {
@@ -132,12 +132,12 @@ sub Run {
             Message => 'Could not create ObjectIcon, please contact the system administrator',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         ObjectIconID => $ObjectIconID,
-    );    
+    );
 }
 
 1;

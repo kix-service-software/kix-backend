@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -60,7 +60,7 @@ sub ParameterDefinition {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -118,7 +118,7 @@ sub Run {
 	        ID => $MacroActionID,
 	    );
 
-        if ( !%MacroActionData ) {         
+        if ( !%MacroActionData ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
@@ -137,7 +137,7 @@ sub Run {
     if ( scalar(@MacroActionList) == 1 ) {
         return $Self->_Success(
             MacroAction => $MacroActionList[0],
-        );    
+        );
     }
 
     # return result

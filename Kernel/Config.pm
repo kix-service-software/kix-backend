@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -180,6 +180,9 @@ sub LoadSysConfig {
                 }
                 elsif ( $Line =~ /^BUILDNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
                     $Self->{Config}->{BuildNumber} = $1;
+                }
+                elsif ( $Line =~ /^PATCHNUMBER\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {
+                    $Self->{Config}->{PatchNumber} = $1;
                 }
             }
         }

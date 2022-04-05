@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -34,7 +34,7 @@ my %LinkObjectTypeMapping = (
 
 =item Describe()
 
-describe what is supported and what is required 
+describe what is supported and what is required
 
 =cut
 
@@ -68,7 +68,7 @@ create a new item in the DB
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # only cache the following types in memory not redis 
+    # only cache the following types in memory not redis
     $Self->SetCacheOptions(
         ObjectType     => ['link_relation'],
         CacheInMemory  => 1,
@@ -113,7 +113,7 @@ sub Run {
             my $Item = $Param{Item};
 
             my $SourceObjectID = $Item->{'type_id::raw'}.'::'.$Item->{'source_object_id::raw'}.'::'.$Item->{source_key}.'::'.$Item->{'target_object_id::raw'}.'::'.$Item->{target_key};
-            
+
             # check if this object is already mapped
             my $MappedID = $Self->GetOIDMapping(
                 ObjectType     => 'link_relation',
@@ -180,7 +180,7 @@ sub Run {
 
             return $Result;
         },
-        Items => $SourceData, 
+        Items => $SourceData,
         %Param,
     );
 }
@@ -219,7 +219,7 @@ sub _MapObjectKey {
 
     # get the correct object type to the id
     my $ObjectType = $LinkObjectTypeMapping{$Self->{LinkObjects}->{$Param{ObjectID}}};
-    # if we don't have a mapping we will ignore this 
+    # if we don't have a mapping we will ignore this
     return if !$ObjectType;
 
     my $ReferencedID = $Self->GetOIDMapping(
@@ -290,7 +290,7 @@ sub _MapLinkType {
     }
 
     # map to RelevantTo if type cannot be found
-    return $Self->{LinkTypesReverse}->{RelevantTo} if !$Self->{LinkTypes}->{$Param{Item}->{type_id}}; 
+    return $Self->{LinkTypesReverse}->{RelevantTo} if !$Self->{LinkTypes}->{$Param{Item}->{type_id}};
 
     my $SourceObject = $Self->{LinkObjects}->{$Param{Item}->{source_object_id}};
     my $TargetObject = $Self->{LinkObjects}->{$Param{Item}->{target_object_id}};
@@ -307,7 +307,7 @@ sub _MapLinkType {
 
     my $TypeID = $Param{Item}->{type_id};
 
-    # if the current type is no longer possible for the combination of objects, fall back to RelevantTo 
+    # if the current type is no longer possible for the combination of objects, fall back to RelevantTo
     if ( !IsHashRefWithData($Self->{PossibleLinkTypes}->{$SourceObject}->{$TargetObject}->{$Param{Item}->{type_id}}) ) {
         $TypeID = $Self->{LinkTypesReverse}->{RelevantTo}
     }

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub CheckAuthorization {
     # check authentication header
     my $cgi = CGI->new;
     my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-        
+
     if ( !$Headers{HTTP_AUTHORIZATION} ) {
         return $Self->_Error(
             Code => 'Authorization.NoHeader'
@@ -88,7 +88,7 @@ sub CheckAuthorization {
                 %{$ValidatedToken},
             }
         }
-    );    
+    );
 }
 
 =item ProcessRequest()
@@ -669,18 +669,18 @@ sub _Output {
 
     # log error message
     if ( $HTTPCode !~ /^2/ ) {
-        printf STDERR "\nAPI ERROR: ProcessID: %i Time: %s\n\n%11s: %s\n%11s: %s\n%11s: %i ms\n%11s: %s\n%11s: %s\n%11s: %s\n\n", 
-            $$, 
-            $Kernel::OM->Get('Time')->CurrentTimestamp(), 
+        printf STDERR "\nAPI ERROR: ProcessID: %i Time: %s\n\n%11s: %s\n%11s: %s\n%11s: %i ms\n%11s: %s\n%11s: %s\n%11s: %s\n\n",
+            $$,
+            $Kernel::OM->Get('Time')->CurrentTimestamp(),
             'Method', $Self->{RequestMethod},
             'Resource', $ENV{REQUEST_URI},
             'Duration', (time() - $Self->{RequestStartTime}) * 1000,
             'HTTPStatus', $HTTPCode.' '.$StatusMessage,
-            'Code', IsHashRefWithData($Content) ? $Content->{Code} : $Param{Content}->{Code}, 
+            'Code', IsHashRefWithData($Content) ? $Content->{Code} : $Param{Content}->{Code},
             'Message', IsHashRefWithData($Content) ? $Content->{Message} : $Param{Content}->{Message};
     }
 
-    # finally 
+    # finally
     if ( $Param{HTTPCode} == 500 && IsHashRefWithData($Content) ) {
         $Param{Content} = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Content},
@@ -770,7 +770,7 @@ sub _MapReturnCode {
         return $Self->_Error(
             Code    => 'Transport.InternalError',
             Message => 'No ReturnCodeMapping config!',
-        );        
+        );
     }
 
     if ( !IsHashRefWithData($Mapping->{$Param{Transport}}) ) {
@@ -781,10 +781,10 @@ sub _MapReturnCode {
 
     # get map entry
     my ($MappedCode, $MappedMessage) = split(/:/, $TransportMapping->{$Param{Code}} || $TransportMapping->{'DEFAULT'});
-    
+
     # override defualt message from mapping if we have some special message
     if ( !$MappedMessage || $Param{Message} ) {
-        $MappedMessage = $Param{Message} || ''; 
+        $MappedMessage = $Param{Message} || '';
     }
 
     # return

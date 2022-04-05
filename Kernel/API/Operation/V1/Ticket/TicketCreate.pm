@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -58,20 +58,8 @@ sub ParameterDefinition {
         },
         'Ticket::Title' => {
             Required => 1
-        },
-        'Ticket::ContactID' => {
-            Required => 1
-        },
-        'Ticket::State' => {
-            RequiredIfNot => ['Ticket::StateID'],
-        },
-        'Ticket::Priority' => {
-            RequiredIfNot => ['Ticket::PriorityID'],
-        },
-        'Ticket::Queue' => {
-            RequiredIfNot => ['Ticket::QueueID'],
-        },
         }
+    }
 }
 
 =item Run()
@@ -83,13 +71,12 @@ perform TicketCreate Operation. This will return the created TicketID.
             Ticket => {
                 Title           => 'some ticket title',
                 ContactID       => '123 or some email',                           # ContactID or some email
-                StateID         => 123,                                           # StateID or State is required
-                State           => 'some state name',
-                PriorityID      => 123,                                           # PriorityID or Priority is required
-                Priority        => 'some priority name',
-                QueueID         => 123,                                           # QueueID or Queue is required
-                Queue           => 'some queue name',
-
+                StateID         => 123,                                           # optional
+                State           => 'some state name',                             # optional
+                PriorityID      => 123,                                           # optional
+                Priority        => 'some priority name',                          # optional
+                QueueID         => 123,                                           # optional
+                Queue           => 'some queue name',                             # optional
                 LockID          => 123,                                           # optional
                 Lock            => 'some lock name',                              # optional
                 TypeID          => 123,                                           # optional
@@ -188,8 +175,8 @@ sub Run {
 
     # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
-        Ticket => $Ticket,
-        UserID => $Self->{Authorization}->{UserID},
+        Ticket                 => $Ticket,
+        UserID                 => $Self->{Authorization}->{UserID},
     );
 }
 
@@ -225,6 +212,22 @@ sub _TicketCreate {
     my ( $Self, %Param ) = @_;
 
     my $Ticket = $Param{Ticket};
+
+    # fallback for ContactID
+    if ( !$Ticket->{ContactID} ) {
+        # check if the current user has an assigned contact
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+            UserID => $Self->{Authorization}->{UserID}
+        );
+        if ( !%Contact ) {
+            return $Self->_Error(
+                Code    => 'Object.UnableToCreate',
+                Message => 'No Contact ID or valid Email provided.',
+            );
+        }
+        $Ticket->{ContactID} = $Contact{ID};
+        $Ticket->{OrganisationID} = $Contact{PrimaryOrganisationID};
+    }
 
     # use not number value as email for contact search
     if ($Ticket->{ContactID} !~ /^\d+$/) {
@@ -463,8 +466,8 @@ sub _TicketCreate {
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::Ticket::ArticleCreate',
                 Data          => {
-                    TicketID => $TicketID,
-                    Article  => $Article,
+                    TicketID               => $TicketID,
+                    Article                => $Article
                 }
             );
 

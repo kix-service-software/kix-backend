@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform SystemAddressDelete Operation. This will return the deleted SystemAddres
     my $Result = $OperationObject->Run(
         Data => {
             SystemAddressID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -77,27 +77,27 @@ perform SystemAddressDelete Operation. This will return the deleted SystemAddres
 
 sub Run {
     my ( $Self, %Param ) = @_;
-  
+
     # start loop
     foreach my $SystemAddressID ( @{$Param{Data}->{SystemAddressID}} ) {
-    	
+
 	    my %QueueIDs = $Kernel::OM->Get('Queue')->GetQueuesForEmailAddress(
 	        AddressID  => $SystemAddressID,
 	    );
-    		    	
+
         if ( %QueueIDs ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete SystemAddress. A Queue with this SystemAddress already exists.',
             );
-        }	    
-	    
-        # delete SystemAddress	    
+        }
+
+        # delete SystemAddress
         my $Success = $Kernel::OM->Get('SystemAddress')->SystemAddressDelete(
             SystemAddressID  => $SystemAddressID,
             UserID  => $Self->{Authorization}->{UserID},
         );
-  
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

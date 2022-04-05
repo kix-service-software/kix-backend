@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -270,7 +270,7 @@ sub AttachmentStorageAdd {
         " current_timestamp, ?, current_timestamp, ?)";
 
     #run SQL...
-    if ( $Kernel::OM->Get('DB')->Do( 
+    if ( $Kernel::OM->Get('DB')->Do(
             SQL  => $SQL,
             Bind => [ \$Param{StorageBackend}, \$Param{Filename}, \$Param{UserID}, \$Param{UserID} ]
         ) ) {
@@ -284,7 +284,7 @@ sub AttachmentStorageAdd {
             Bind => [ \$Param{Filename}, \$Param{StorageBackend}, \$Param{UserID} ]
         );
         while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-            $ID = $Row[0];            
+            $ID = $Row[0];
         }
 
     }
@@ -355,7 +355,7 @@ sub AttachmentStorageAdd {
         " file_path = ? " .
         " WHERE id = ?";
 
-    if ( $Kernel::OM->Get('DB')->Do( 
+    if ( $Kernel::OM->Get('DB')->Do(
             SQL  => $SQL,
             Bind => [ \$AttID, \$ID ]
         ) ) {
@@ -366,7 +366,7 @@ sub AttachmentStorageAdd {
             Namespace => 'CMDB.ConfigItem.Attachment',
             ObjectID  => $ID,
         );
-      
+
         return $ID;
     }
     else {

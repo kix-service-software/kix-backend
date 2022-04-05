@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -69,7 +69,7 @@ sub new {
     $Self->{CacheInMemory}  = $Param{CacheInMemory} // 0;
 
     $Self->{IgnoreTypes} = {};
-    
+
     return $Self;
 }
 
@@ -365,7 +365,7 @@ sub GetMulti {
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         my @Results;
-        foreach my $Key ( @{$Param{Keys}} ) { 
+        foreach my $Key ( @{$Param{Keys}} ) {
             if ( exists $Self->{Cache}->{ $Param{Type} }->{$Key} ) {
                 if ( !$Param{NoStatsUpdate} ) {
                     $Self->_UpdateCacheStats(
@@ -381,7 +381,7 @@ sub GetMulti {
     }
 
     if ( !$Self->{CacheInBackend} || !( $Param{CacheInBackend} // 1 ) ) {
-        foreach my $Key ( @{$Param{Keys}} ) { 
+        foreach my $Key ( @{$Param{Keys}} ) {
             next if $Param{NoStatsUpdate};
 
             $Self->_UpdateCacheStats(
@@ -400,7 +400,7 @@ sub GetMulti {
     # set in-memory cache
     if ( @Values ) {
         my $Index = 0;
-        foreach my $Key ( @{$Param{Keys}} ) { 
+        foreach my $Key ( @{$Param{Keys}} ) {
             if ( !$Param{NoStatsUpdate} ) {
                 $Self->_UpdateCacheStats(
                     Operation => 'Get',
@@ -415,7 +415,7 @@ sub GetMulti {
         }
     }
     else {
-        foreach my $Key ( @{$Param{Keys}} ) { 
+        foreach my $Key ( @{$Param{Keys}} ) {
             next if $Param{NoStatsUpdate};
 
             $Self->_UpdateCacheStats(
@@ -728,7 +728,7 @@ sub _HandleDependingCacheTypes {
         Key  => 'TypeDependencies',
     );
 
-    if ( $Self->{TypeDependencies} && IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {        
+    if ( $Self->{TypeDependencies} && IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
         $Self->_Debug($Param{Indent}, "type \"$Param{Type}\" of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
 
         foreach my $DependentType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {

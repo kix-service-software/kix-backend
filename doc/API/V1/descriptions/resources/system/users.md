@@ -1,3 +1,7 @@
+##### Special search behaviour
+
+Since the preferences of the user don't belong to the Config Item object itself, they must be referenced in the [```search```](#search_objects) definition using the prefix "```Preferences.```", i.e. "```Preferences.MyQueues```".
+
 ##### Supported Includes
 
 In addition to its sub-resources this resource supports the following includes.

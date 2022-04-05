@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform TicketTypeDelete Operation. This will return the deleted TypeID.
     my $Result = $OperationObject->Run(
         Data => {
             TypeID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -77,16 +77,16 @@ perform TicketTypeDelete Operation. This will return the deleted TypeID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-  
-    # start loop  
+
+    # start loop
     foreach my $TypeID ( @{$Param{Data}->{TypeID}} ) {
 
-        # search ticket       
-        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(        
+        # search ticket
+        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
-                AND => [ 
+                AND => [
                     {
                         Field => 'TypeID',
                         Value => $TypeID,
@@ -95,9 +95,9 @@ sub Run {
                 ]
             },
             UserID       => 1,
-            Permission   => 'ro',         
+            Permission   => 'ro',
         );
-     
+
         if ( $ResultTicketSearch ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
@@ -105,7 +105,7 @@ sub Run {
             );
         }
 
-        # delete tickettype	    
+        # delete tickettype
         my $Success = $Kernel::OM->Get('Type')->TypeDelete(
             TypeID  => $TypeID,
             UserID  => $Self->{Authorization}->{UserID},

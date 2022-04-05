@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform MailAccountDelete Operation. This will return the deleted MailAccountID.
     my $Result = $OperationObject->Run(
         Data => {
             MailAccountID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -77,16 +77,16 @@ perform MailAccountDelete Operation. This will return the deleted MailAccountID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-         
+
     # start loop
     foreach my $MailAccountID ( @{$Param{Data}->{MailAccountID}} ) {
 
-        # delete MailAccount	    
+        # delete MailAccount
         my $Success = $Kernel::OM->Get('MailAccount')->MailAccountDelete(
             ID     => $MailAccountID,
             UserID => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

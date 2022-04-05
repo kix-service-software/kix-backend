@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -54,7 +54,7 @@ sub ParameterDefinition {
         'MigrationID' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -65,12 +65,12 @@ perform MigrationDelete Operation. This will return the deleted MigrationID.
     my $Result = $OperationObject->Run(
         Data => {
             MigrationID  => '...',
-        },		
+        },
     );
 
     $Result = {
         Success    => 1,
-        Code       => '',                       # in case of error    
+        Code       => '',                       # in case of error
         Message    => '',                       # in case of error
     };
 
@@ -78,7 +78,7 @@ perform MigrationDelete Operation. This will return the deleted MigrationID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
- 
+
     # start loop
     foreach my $MigrationID ( @{$Param{Data}->{MigrationID}} ) {
 

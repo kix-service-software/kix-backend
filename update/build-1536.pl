@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -33,7 +33,7 @@ _AddReopenJob();
 sub _AddReopenJob {
     my ( $Self, %Param ) = @_;
 
-    my $JobName = 'Customer Response :: reopen from pending';
+    my $JobName = 'Customer Response - reopen from pending';
 
     my $AutomationObject = $Kernel::OM->Get('Automation');
 

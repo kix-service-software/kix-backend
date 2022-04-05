@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -58,21 +58,23 @@ some code to run before actual execution
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    if ($Param{Data}->{TicketID}) {
+    if ( IsArrayRefWithData($Param{Data}->{TicketID}) ) {
 
         # check if articles are accessible for current customer user
-        if ($Param{Data}->{ArticleID}) {
+        if ( IsArrayRefWithData($Param{Data}->{ArticleID}) ) {
             return $Self->_CheckCustomerAssignedObject(
-                ObjectType => 'TicketArticle',
-                IDList     => $Param{Data}->{ArticleID},
-                TicketID   => $Param{Data}->{TicketID}
+                ObjectType             => 'TicketArticle',
+                IDList                 => $Param{Data}->{ArticleID},
+                TicketID               => $Param{Data}->{TicketID},
+                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             );
         }
 
         # check if tickets are accessible for current customer user
         return $Self->_CheckCustomerAssignedObject(
-            ObjectType => 'Ticket',
-            IDList     => $Param{Data}->{TicketID}
+            ObjectType             => 'Ticket',
+            IDList                 => $Param{Data}->{TicketID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
     }
 
@@ -137,6 +139,23 @@ sub ValidatePendingTime {
     return if !$SystemTime;
 
     return 1;
+}
+
+sub ExecOperation {
+    my ( $Self, %Param ) = @_;
+
+    # add relevant orga id to data if given
+    if ( IsHashRefWithData($Self->{RequestData}) && $Self->{RequestData}->{RelevantOrganisationID} ) {
+        if (IsHashRefWithData($Param{Data})) {
+            $Param{Data}->{RelevantOrganisationID} = $Self->{RequestData}->{RelevantOrganisationID};
+        } else {
+            $Param{Data} = {
+                RelevantOrganisationID => $Self->{RequestData}->{RelevantOrganisationID}
+            };
+        }
+    }
+
+    return $Self->SUPER::ExecOperation(%Param);
 }
 
 =begin Internal:

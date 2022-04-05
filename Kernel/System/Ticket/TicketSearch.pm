@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -44,12 +44,12 @@ To find tickets in your system.
                 {
                     Field    => '...',      # see list of filterable fields
                     Operator => '...'       # see list of filterable fields
-                    Value    => ...         # see list of filterable fields 
+                    Value    => ...         # see list of filterable fields
                 },
                 ...
             ]
             OR => [         # optional, if not given, AND must be used
-                ...         # structure of field filter identical to AND        
+                ...         # structure of field filter identical to AND
             ]
         },
 
@@ -73,7 +73,7 @@ To find tickets in your system.
 
 Filterable fields and possible operators, values and sortablility:
     => see manual of REST-API (look for "Search Tickets")
-    
+
 Returns:
 
 Result: 'ARRAY'
@@ -118,7 +118,7 @@ sub TicketSearch {
             );
             return;
         }
-        
+
         $Self->{SearchBackendObject} = $BackendObject;
     }
 

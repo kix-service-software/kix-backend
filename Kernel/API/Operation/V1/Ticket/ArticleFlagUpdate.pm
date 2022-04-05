@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -78,7 +78,7 @@ perform ArticleFlagUpdate Operation. This will return the updated ArticleFlag
         Data => {
             TicketID  => 123,                                                  # required
             ArticleID => 123,                                                  # required
-            FlagName  => 'seen',                                               # required            
+            FlagName  => 'seen',                                               # required
             ArticleFlag => {                                                   # required
                 Value => '...'                                                 # required
             }
@@ -122,6 +122,7 @@ sub Run {
 
     # check if flag exists
     my %ArticleFlags = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $Param{Data}->{TicketID},
         ArticleID => $Param{Data}->{ArticleID},
         UserID    => $Self->{Authorization}->{UserID},
     );

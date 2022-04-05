@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform RoleDelete Operation. This will return the deleted RoleID.
     my $Result = $OperationObject->Run(
         Data => {
             RoleID  => '...',
-        },      
+        },
     );
 
     $Result = {
@@ -77,7 +77,7 @@ perform RoleDelete Operation. This will return the deleted RoleID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # start loop
     foreach my $RoleID ( @{$Param{Data}->{RoleID}} ) {
 
@@ -85,7 +85,7 @@ sub Run {
         my @UserList = $Kernel::OM->Get('Role')->RoleUserList(
             RoleID => $RoleID,
         );
-   
+
         if ( IsArrayRefWithData(\@UserList) ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
@@ -93,7 +93,7 @@ sub Run {
             );
         }
 
-        # delete Role       
+        # delete Role
         my $Success = $Kernel::OM->Get('Role')->RoleDelete(
             ID  => $RoleID,
         );

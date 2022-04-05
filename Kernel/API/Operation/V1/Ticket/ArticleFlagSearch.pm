@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -64,8 +64,8 @@ perform ArticleFlagSearch Operation. This will return a article attachment list.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID  => 1'                                             # required 
-            ArticleID => 32,                                            # required            
+            TicketID  => 1'                                             # required
+            ArticleID => 32,                                            # required
         }
     );
 
@@ -108,11 +108,10 @@ sub Run {
         );
     }
 
-    my %ArticleFlags = $TicketObject->ArticleFlagGet(
-        ArticleID => $Param{Data}->{ArticleID},
+    my %ArticleFlags = $TicketObject->ArticleFlagsOfTicketGet(
+        TicketID  => $Param{Data}->{TicketID},
         UserID    => $Self->{Authorization}->{UserID},
     );
-
     if ( %ArticleFlags ) {
 
         # get already prepared ArticleFlag data from ArticleFlagGet operation
@@ -122,7 +121,7 @@ sub Run {
             Data          => {
                 TicketID  => $Param{Data}->{TicketID},
                 ArticleID => $Param{Data}->{ArticleID},
-                FlagName  => join(',', keys %ArticleFlags),
+                FlagName  => join(',', keys %{$ArticleFlags{$Param{Data}->{ArticleID}}}),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
