@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -275,11 +275,11 @@ sub MacroUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID UserID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(ID UserID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!",
+                Message  => "Need $Needed!",
             );
             return;
         }
@@ -441,24 +441,48 @@ sub MacroDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(ID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }
     }
 
     # check if this macro exists
-    my $ID = $Self->MacroLookup(
+    my $Name = $Self->MacroLookup(
         ID => $Param{ID},
     );
-    if ( !$ID ) {
+    if ( !$Name ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A macro with the ID $Param{ID} does not exist.",
+        );
+        return;
+    }
+
+    # check if deletable
+    my $Deletable = $Self->MacroIsDeletable(
+        ID => $Param{ID}
+    );
+    if (!$Deletable) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Cannot delete macro, it is used/referenced in at least one object.",
+        );
+        return;
+    }
+
+    # delete actions
+    my $Success = $Self->MacroActionListDelete(
+        MacroID => $Param{ID}
+    );
+    if (!$Success) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Cannot delete macro. Could not delete als its actions!",
         );
         return;
     }
@@ -517,11 +541,11 @@ sub MacroIsExecutable {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID UserID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(ID UserID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }
@@ -559,11 +583,11 @@ sub MacroExecute {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID UserID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(ID UserID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }
@@ -676,15 +700,159 @@ sub MacroExecute {
     return $Success;
 }
 
+=item MacroIsDeletable()
+
+checks if a macro is deletable. Return 0 or 1.
+
+    my $Result = $AutomationObject->MacroIsDeletable(
+        ID => 123,        # the ID of the macro
+    );
+
+=cut
+
+sub MacroIsDeletable {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # check if this macro exists
+    my $Name = $Self->MacroLookup(
+        ID => $Param{ID},
+    );
+    return 0 if !$Name;
+
+    # not deletable if it should be ingored on delete
+    if ( IsArrayRefWithData($Self->{IgnoreMacroIDsForDelete}) ) {
+        return 0 if (grep { $_ == $Param{ID} } @{ $Self->{IgnoreMacroIDsForDelete} });
+    }
+
+    my $ReferenceObjects = $Kernel::OM->Get('Config')->Get('Automation::MacroReferenceObject');
+
+    if (IsHashRefWithData($ReferenceObjects)) {
+        for my $Object (keys %{$ReferenceObjects}) {
+            next if (!$Object);
+            if (!$ReferenceObjects->{$Object}) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No module given for object \"$Object\" for macro references!"
+                );
+                next;
+            }
+            next if ( !$Kernel::OM->Get('Main')->Require($ReferenceObjects->{$Object}) );
+
+            my $Module = $Kernel::OM->Get($ReferenceObjects->{$Object});
+
+            if ( !$Module->can('AllUsedMacroIDList') ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Module \"$ReferenceObjects->{$Object}\" cannot \"AllUsedMacroIDList\"!"
+                );
+                next;
+            }
+
+            # get all used macro ids
+            my @MacroIDs = $Module->AllUsedMacroIDList();
+
+            # not deletable if used/referenced
+            return 0 if (grep { $_ == $Param{ID} } @MacroIDs);
+        }
+    }
+
+    # not deletable if it is a sub macro
+    return 0 if $Self->IsSubMacro(
+        ID => $Param{ID}
+    );
+
+    return 1;
+}
+
+=item IsSubMacro()
+
+checks if a macro is a sub macro. Return 0 or 1.
+
+    my $Result = $AutomationObject->IsSubMacro(
+        ID => 123        # the ID of the macro
+    );
+
+=cut
+
+sub IsSubMacro {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my @AllSubMacroIDs = $Self->GetAllSubMacros();
+
+    if (IsArrayRefWithData(\@AllSubMacroIDs)) {
+        return 1 if (grep { $_ == $Param{ID} } @AllSubMacroIDs);
+    }
+
+    return 0;
+}
+
+=item IsSubMacroOf()
+
+checks if a macro is a sub macro from given list. Return 0 or 1.
+
+    my $Result = $AutomationObject->IsSubMacroOf(
+        ID     => 123,        # the ID of the macro
+        IDList => [1,5,8]     # the IDs of the potential parents
+    );
+
+=cut
+
+sub IsSubMacroOf {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ID IDList)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my @RelevantSubMacroIDs = $Self->GetAllSubMacrosOf(
+        MacroIDs => $Param{IDList}
+    );
+
+    if (IsArrayRefWithData(\@RelevantSubMacroIDs)) {
+        return 1 if (grep { $_ == $Param{ID} } @RelevantSubMacroIDs);
+    }
+
+    return 0;
+}
+
 sub _LoadMacroTypeBackend {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Name)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(Name)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }
@@ -749,11 +917,11 @@ sub MacroLogList {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(MacroID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(MacroID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }

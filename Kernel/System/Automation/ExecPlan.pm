@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -156,14 +156,14 @@ sub ExecPlanGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT id, name, type, parameters, comments, valid_id, create_time, create_by, change_time, change_by FROM exec_plan WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
     my %Result;
-    
+
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
@@ -186,7 +186,7 @@ sub ExecPlanGet {
             );
         }
     }
-    
+
     # no data found...
     if ( !%Result ) {
         $Kernel::OM->Get('Log')->Log(
@@ -195,14 +195,14 @@ sub ExecPlanGet {
         );
         return;
     }
-    
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
         Value => \%Result,
-    ); 
+    );
 
     return %Result;
 }
@@ -245,7 +245,7 @@ sub ExecPlanAdd {
     }
 
     # check if this is a duplicate after the change
-    my $ID = $Self->ExecPlanLookup( 
+    my $ID = $Self->ExecPlanLookup(
         Name => $Param{Name},
     );
     if ( $ID ) {
@@ -297,8 +297,8 @@ sub ExecPlanAdd {
     # get new id
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM exec_plan WHERE name = ?',
-        Bind => [ 
-            \$Param{Name}, 
+        Bind => [
+            \$Param{Name},
         ],
     );
 
@@ -327,7 +327,7 @@ sub ExecPlanAdd {
 updates an ExecPlan
 
     my $Success = $AutomationObject->ExecPlanUpdate(
-        ID         => 123,        
+        ID         => 123,
         Name       => 'test'
         Type       => 'test',
         Parameters => {                             # optional
@@ -362,7 +362,7 @@ sub ExecPlanUpdate {
     );
 
     # check if this is a duplicate after the change
-    my $ID = $Self->ExecPlanLookup( 
+    my $ID = $Self->ExecPlanLookup(
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
@@ -484,7 +484,7 @@ sub ExecPlanList {
         $SQL .= ' WHERE valid_id = 1'
     }
 
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => $SQL
     );
 
@@ -529,13 +529,24 @@ sub ExecPlanDelete {
     }
 
     # check if this ExecPlan exists
-    my $ID = $Self->ExecPlanLookup( 
+    my $ID = $Self->ExecPlanLookup(
         ID => $Param{ID},
     );
     if ( !$ID ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An ExecPlan with the ID $Param{ID} does not exist.",
+        );
+        return;
+    }
+
+    my $Deletable = $Self->ExecPlanIsDeletable(
+        ID => $Param{ID}
+    );
+    if (!$Deletable) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Could not delete exec plan, it is used/referenced in at least one object.",
         );
         return;
     }
@@ -551,7 +562,7 @@ sub ExecPlanDelete {
         SQL  => 'DELETE FROM exec_plan WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-   
+
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
@@ -573,7 +584,7 @@ sub ExecPlanDelete {
 checks an exec plan if the job can run
 
     my $CanExecute = $AutomationObject->ExecPlanCheck(
-        ID        => 123,       # the ID of the macro action
+        ID        => 123,       # the ID of the exec plan action
         JobID     => 123,       # the ID of the job to be executed
         Time      => '...',     # optional, required for time based execplans
         Event     => '...',     # optional, required for event based execplans
@@ -606,7 +617,7 @@ sub ExecPlanCheck {
             Priority => 'error',
             Message  => "No such ExecPlan with ID $Param{ID}!"
         );
-        return;        
+        return;
     }
 
     # igonore invalid exec plans
@@ -622,7 +633,7 @@ sub ExecPlanCheck {
             Priority => 'error',
             Message  => "No such job with ID $Param{JobID}!"
         );
-        return;        
+        return;
     }
 
     # load type backend module
@@ -640,6 +651,71 @@ sub ExecPlanCheck {
     );
 
     return $BackendResult;
+}
+
+=item ExecPlanIsDeletable()
+
+checks if a exec plan is deletable. Return 0 or 1.
+
+    my $Result = $AutomationObject->ExecPlanIsDeletable(
+        ID => 123,        # the ID of the exec plan
+    );
+
+=cut
+
+sub ExecPlanIsDeletable {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # check if this exec plan exists
+    my $Name = $Self->ExecPlanLookup(
+        ID => $Param{ID},
+    );
+    return 0 if !$Name;
+
+    my $ReferenceObjects = $Kernel::OM->Get('Config')->Get('Automation::ExecPlanReferenceObject');
+
+    if (IsHashRefWithData($ReferenceObjects)) {
+        for my $Object (keys %{$ReferenceObjects}) {
+            next if (!$Object);
+            if (!$ReferenceObjects->{$Object}) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No module given for object \"$Object\" for exec plan references!"
+                );
+                next;
+            }
+            next if ( !$Kernel::OM->Get('Main')->Require($ReferenceObjects->{$Object}) );
+
+            my $Module = $Kernel::OM->Get($ReferenceObjects->{$Object});
+
+            if ( !$Module->can('AllUsedExecPlanIDList') ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Module \"$ReferenceObjects->{$Object}\" cannot \"AllUsedExecPlanIDList\"!"
+                );
+                next;
+            }
+
+            # get all used exec plan ids
+            my @ExecPlanIDs = $Module->AllUsedExecPlanIDList();
+
+            # not deletable if used/referenced
+            return 0 if (grep { $_ == $Param{ID} } @ExecPlanIDs);
+        }
+    }
+
+    return 1;
 }
 
 sub _LoadExecPlanTypeBackend {
@@ -668,15 +744,15 @@ sub _LoadExecPlanTypeBackend {
                 Message  => "No exec plan backend modules found!",
             );
             return;
-        }        
+        }
 
-        my $Backend = $Backends->{$Param{Name}}->{Module}; 
-        
+        my $Backend = $Backends->{$Param{Name}}->{Module};
+
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Backend!"
-            );        
+            );
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
@@ -684,7 +760,7 @@ sub _LoadExecPlanTypeBackend {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
         }
 
         $Self->{ExecPlanTypeModules}->{$Param{Name}} = $BackendObject;

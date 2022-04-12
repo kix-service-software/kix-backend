@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -121,7 +121,7 @@ sub MacroActionGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT id, macro_id, type, parameters, result_variables, comments, valid_id, create_time, create_by, change_time, change_by FROM macro_action WHERE id = ?",
+        SQL   => "SELECT id, macro_id, type, parameters, result_variables, comments, valid_id, create_time, create_by, change_time, change_by, referenced_macro_id FROM macro_action WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
@@ -130,17 +130,18 @@ sub MacroActionGet {
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Result = (
-            ID              => $Row[0],
-            MacroID         => $Row[1],
-            Type            => $Row[2],
-            Parameters      => $Row[3],
-            ResultVariables => $Row[4],
-            Comment         => $Row[5],
-            ValidID         => $Row[6],
-            CreateTime      => $Row[7],
-            CreateBy        => $Row[8],
-            ChangeTime      => $Row[9],
-            ChangeBy        => $Row[10],
+            ID                => $Row[0],
+            MacroID           => $Row[1],
+            Type              => $Row[2],
+            Parameters        => $Row[3],
+            ResultVariables   => $Row[4],
+            Comment           => $Row[5],
+            ValidID           => $Row[6],
+            CreateTime        => $Row[7],
+            CreateBy          => $Row[8],
+            ChangeTime        => $Row[9],
+            ChangeBy          => $Row[10],
+            ReferencedMacroID => $Row[11]
         );
 
         if ( $Result{Parameters} ) {
@@ -248,6 +249,12 @@ sub MacroActionAdd {
         return;
     }
 
+    my $ReferencedMacroID = $Param{Parameters}->{MacroID};
+    return if !$Self->_ReferencedMacroCheck(
+        MacroID           => $Param{MacroID},
+        ReferencedMacroID => $ReferencedMacroID
+    );
+
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
@@ -268,10 +275,10 @@ sub MacroActionAdd {
 
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO macro_action (macro_id, type, parameters, result_variables, comments, valid_id, create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO macro_action (macro_id, referenced_macro_id, type, parameters, result_variables, comments, valid_id, create_time, create_by, change_time, change_by) '
+             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{MacroID}, \$Param{Type}, \$Parameters, \$ResultVariables, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{MacroID}, \$ReferencedMacroID, \$Param{Type}, \$Parameters, \$ResultVariables, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -396,6 +403,12 @@ sub MacroActionUpdate {
 
     return 1 if !$ChangeRequired;
 
+    my $ReferencedMacroID = $Param{Parameters}->{MacroID};
+    return if !$Self->_ReferencedMacroCheck(
+        MacroID           => $Param{MacroID},
+        ReferencedMacroID => $ReferencedMacroID
+    );
+
     # prepare Parameters as JSON
     my $Parameters;
     if ( $Param{Parameters} ) {
@@ -414,9 +427,9 @@ sub MacroActionUpdate {
 
     # update MacroAction in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE macro_action SET macro_id = ?, type = ?, parameters = ?, result_variables = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE macro_action SET macro_id = ?, referenced_macro_id = ?, type = ?, parameters = ?, result_variables = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{MacroID}, \$Param{Type}, \$Parameters, \$ResultVariables, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{MacroID}, \$ReferencedMacroID, \$Param{Type}, \$Parameters, \$ResultVariables, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -535,10 +548,10 @@ sub MacroActionDelete {
     }
 
     # check if this macro_action exists
-    my $Data = $Self->MacroActionGet(
+    my %Data = $Self->MacroActionGet(
         ID => $Param{ID},
     );
-    if ( !$Data ) {
+    if ( !IsHashRefWithData(\%Data) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "An macro action with the ID $Param{ID} does not exist.",
@@ -562,6 +575,24 @@ sub MacroActionDelete {
         Type => $Self->{CacheType},
     );
 
+    # delete sub macro (after action, because referenced_macro_id is a foreign key)
+    if (
+        $Data{ReferencedMacroID} &&
+        $Self->MacroIsDeletable(
+            ID => $Data{ReferencedMacroID}
+        )
+    ) {
+        my $Success = $Self->MacroDelete(
+            ID => $Data{ReferencedMacroID}
+        );
+        if (!$Success) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not delete sub macro ($Data{ReferencedMacroID}) of deleted macro action!",
+            );
+        }
+    }
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
@@ -571,6 +602,36 @@ sub MacroActionDelete {
 
     return 1;
 
+}
+
+=item MacroActionListDelete()
+
+deletes MacroActions of a Macro
+
+    my $Success = $AutomationObject->MacroActionListDelete(
+        MacroID => 123,
+    );
+
+=cut
+
+sub MacroActionListDelete {
+    my ( $Self, %Param ) = @_;
+
+    # get all macro actions
+    my %MacroActionList = $Self->MacroActionList(
+        MacroID => $Param{MacroID},
+        Valid   => 0,
+    );
+
+    if (IsHashRefWithData(\%MacroActionList)) {
+        for my $ActionID (keys %MacroActionList) {
+            return if !$Self->MacroActionDelete(
+                ID => $ActionID
+            );
+        }
+    }
+
+    return 1;
 }
 
 =item MacroActionExecute()
@@ -695,6 +756,160 @@ sub MacroActionExecute {
 
     # remove MacroActionID from log reference
     delete $Self->{MacroActionID};
+
+    return 1;
+}
+
+=item GetAllSubMacros()
+
+collects all IDs of sub macros
+
+    my @Result = $AutomationObject->GetAllSubMacros();
+
+=cut
+
+sub GetAllSubMacros {
+    my ( $Self, %Param ) = @_;
+
+    # create cache key
+    my $CacheKey = 'GetAllSubMacros';
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    my $SQL = 'SELECT referenced_macro_id FROM macro_action';
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => $SQL
+    );
+
+    my @SubMacroIDs;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        if ($Row[0]) {
+            push(@SubMacroIDs, $Row[0]);
+        }
+    }
+
+    # remove duplicates
+    @SubMacroIDs = $Self->_GetUnique(@SubMacroIDs);
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \@SubMacroIDs,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return @SubMacroIDs;
+}
+
+=item GetAllSubMacrosOf()
+
+collects all IDs of sub macros of a macro list
+
+    my @Result = $AutomationObject->GetAllSubMacrosOf(
+        MacroIDs  => [1,2,3],        # the IDs of the macro which should contain the sub macros
+        Recursive => 0               # if only children or grandchildren and so on should be considered - default is 1
+    );
+
+=cut
+
+sub GetAllSubMacrosOf {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(MacroIDs)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my @SubMacroIDs;
+
+    $Param{Recursive} //= 1;
+
+    if (IsArrayRefWithData($Param{MacroIDs})) {
+        my $IDString = join q{,}, map {'?'} @{ $Param{MacroIDs} };
+        my @Bind     = map { \$_ } @{ $Param{MacroIDs} };
+
+        my $SQL = "SELECT referenced_macro_id FROM macro_action WHERE macro_id IN ($IDString)";
+
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL => $SQL,
+            Bind => \@Bind
+        );
+
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            if ($Row[0]) {
+                push(@SubMacroIDs, $Row[0]);
+            }
+        }
+
+        # remove duplicates
+        @SubMacroIDs = $Self->_GetUnique(@SubMacroIDs);
+
+        # go deeper if requested
+        if ($Param{Recursive} && IsArrayRefWithData(\@SubMacroIDs)) {
+            my @ChildSubMacroIDs = $Self->GetAllSubMacrosOf(
+                MacroIDs  => \@SubMacroIDs
+            );
+
+            if (IsArrayRefWithData(\@ChildSubMacroIDs)) {
+                push(@SubMacroIDs, @ChildSubMacroIDs);
+            }
+        }
+    }
+
+    # remove duplicates
+    @SubMacroIDs = $Self->_GetUnique(@SubMacroIDs);
+
+    return @SubMacroIDs;
+}
+
+sub _ReferencedMacroCheck {
+    my ( $Self, %Param ) = @_;
+
+    if ($Param{ReferencedMacroID}) {
+        if ($Param{MacroID} == $Param{ReferencedMacroID}) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Cannot use current macro ($Param{ReferencedMacroID}) as sub macro (child) of itself)!"
+            );
+            return;
+        }
+        if (
+            !$Self->MacroLookup(
+                ID => $Param{ReferencedMacroID}
+            )
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Referenced macro does not exists!"
+            );
+            return;
+        }
+        if (
+            $Self->IsSubMacroOf(
+                ID     => $Param{MacroID},
+                IDList => [$Param{ReferencedMacroID}]
+            )
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Cannot use parent macro ($Param{ReferencedMacroID}) as sub macro (child) of current macro ($Param{MacroID})!"
+            );
+            return;
+        }
+    }
 
     return 1;
 }
