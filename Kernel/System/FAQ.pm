@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -2423,7 +2423,7 @@ sub GetAssignedFAQArticlesForObject {
 # TODO: move to a "common" module (used in other modules too)
 =item _GetCombinedList()
 
-combines to arrays (intersect or union)
+combines two arrays (intersect or union)
 
     my @CombinedList = $Self->_GetCombinedList(
         ListA   => $ListAArrayRef,

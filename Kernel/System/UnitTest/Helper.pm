@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -794,11 +794,38 @@ mock a webserver
 #     return $httpd;
 # }
 
+=item CombineLists()
+
+combines two arrays (intersect or union)
+
+    my @CombinedList = $Self->CombineLists(
+        ListA   => $ListAArrayRef,
+        ListB   => $ListBArrayRef,
+        Union   => 1                # (optional) default 0
+    );
+
+    e.g.
+        ListA = [ 1, 2, 3, 4 ]
+        ListB = [ 2, 4, 5 ]
+
+        as union = [1, 2, 3, 4, 5 ]
+        as intersect = [ 2, 4 ]
+
+=cut
+
+sub CombineLists {
+    my ( $Self, %Param ) = @_;
+
+    my %Union;
+    my %Isect;
+    for my $Element ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
+        $Union{$Element}++ && $Isect{$Element}++
+    }
+
+    return $Param{Union} ? keys %Union : keys %Isect;
+}
+
 1;
-
-
-
-
 
 =back
 

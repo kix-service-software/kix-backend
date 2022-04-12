@@ -2530,6 +2530,7 @@
 <Table Name="macro_action">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="macro_id" Required="true" Type="INTEGER"/>
+    <Column Name="referenced_macro_id" Required="false" Type="INTEGER"/>
     <Column Name="type" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="parameters" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="result_variables" Required="false" Size="10000" Type="VARCHAR"/>
@@ -2541,6 +2542,9 @@
     <Column Name="change_by" Required="true" Type="INTEGER"/>
     <ForeignKey ForeignTable="macro">
         <Reference Local="macro_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="macro">
+        <Reference Local="referenced_macro_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>
