@@ -714,7 +714,7 @@ sub MacroActionExecute {
     $Self->{MacroResults} //= {
         RootObjectID => $Self->{RootObjectID},
         ObjectID     => $Param{ObjectID},
-        Event        => $Self->{Event},
+        EventData    => $Self->{EventData}
     };
 
     # we need the result variables and macro results for the assignments
@@ -725,7 +725,7 @@ sub MacroActionExecute {
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
 
     # add event data
-    $BackendObject->{Event} = $Self->{Event};
+    $BackendObject->{EventData} = $Self->{EventData};
 
     my %Parameters = %{$MacroAction{Parameters} || {}};
 
