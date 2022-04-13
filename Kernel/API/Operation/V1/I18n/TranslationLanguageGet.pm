@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -60,7 +60,7 @@ sub ParameterDefinition {
         'Language' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -132,7 +132,7 @@ sub Run {
     if ( scalar(@TranslationLanguageList) == 1 ) {
         return $Self->_Success(
             TranslationLanguage => $TranslationLanguageList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -107,8 +107,7 @@ sub Run {
                 TicketID                    => join(',', @TicketIndex),
                 include                     => $Param{Data}->{include},
                 expand                      => $Param{Data}->{expand},
-                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
-                RelevantOrganisationID      => $Param{Data}->{RelevantOrganisationID}
+                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues}
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

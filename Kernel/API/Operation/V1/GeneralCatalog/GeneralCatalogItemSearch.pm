@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -55,20 +55,20 @@ perform GeneralCatalogItemSearch Operation. This will return a GeneralCatalogIte
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     my @GeneralCatalogDataList;
 
     my $GeneralCatalogClassList = $Kernel::OM->Get('GeneralCatalog')->ClassList();
-    
+
     foreach my $Class ( @$GeneralCatalogClassList ){
-     	
+
 	    my $GeneralCatalogItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
 	        Class => $Class,
             Valid => 0,
 	    );
-   
+
 	    # get already prepared GeneralCatalog data from GeneralCatalogGet operation
-	    if ( IsHashRefWithData($GeneralCatalogItemList) ) {   
+	    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
 	        my $GetResult = $Self->ExecOperation(
 	            OperationType            => 'V1::GeneralCatalog::GeneralCatalogItemGet',
                 SuppressPermissionErrors => 1,
@@ -94,7 +94,7 @@ sub Run {
             GeneralCatalogItem => \@GeneralCatalogDataList,
         )
     }
-    
+
     # return result
     return $Self->_Success(
         GeneralCatalogItem => [],

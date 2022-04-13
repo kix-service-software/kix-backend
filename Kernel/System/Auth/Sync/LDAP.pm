@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -159,7 +159,7 @@ sub Sync {
     my $ContactObject = $Kernel::OM->Get('Contact');
 
     my $ContactID;
-    
+
     # get current user id
     my $UserID = $UserObject->UserLookup(
         UserLogin => $Param{User},
@@ -338,16 +338,16 @@ sub Sync {
                     ObjectType => ['Contact'],
                 );
                 my %DynamicFieldConfig = map { $_->{Name} => $_ } @{$DynamicFieldList};
-    
+
                 # set Dynamic Fields
                 ATTRIBUTE:
                 foreach my $Attribute ( sort keys %SyncContact ) {
                     next ATTRIBUTE if $Attribute !~ /^DynamicField_(.*?)$/g;
                     my $DynamicFieldName = $1;
-    
+
                     next ATTRIBUTE if !IsHashRefWithData($DynamicFieldConfig{$DynamicFieldName});
                     next ATTRIBUTE if $DynamicFieldConfig{$DynamicFieldName}->{InternalField};
-    
+
                     # set value
                     my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
                         DynamicFieldConfig => $DynamicFieldConfig{$DynamicFieldName},
@@ -355,7 +355,7 @@ sub Sync {
                         Value              => $SyncContact{$Attribute},
                         UserID             => 1,
                     );
-    
+
                     if ( !$Success ) {
                         $Kernel::OM->Get('Log')->Log(
                             LogPrefix => 'Kernel::System::Auth::Sync::LDAP',

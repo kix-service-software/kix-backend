@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # --
@@ -56,7 +56,7 @@ sub TicketIndexUpdate {
     );
 
     if ( !$ViewableStates{$Ticket{StateID}} || $Ticket{ArchiveFlag} eq 'y' ) {
-        # remove the ticket from the index if it's archived or no longer viewable 
+        # remove the ticket from the index if it's archived or no longer viewable
         return $Self->TicketIndexDelete(%Param);
     }
 
@@ -194,7 +194,7 @@ sub TicketIndexRebuild {
             SQL  => 'INSERT INTO ticket_index (ticket_id, queue_id, lock_id, state_id, create_time_unix)'
                   . ' VALUES (?, ?, ?, ?, ?)',
             Bind => [
-                \$Data{TicketID}, \$Data{QueueID}, \$Data{LockID}, 
+                \$Data{TicketID}, \$Data{QueueID}, \$Data{LockID},
                 \$Data{StateID}, \$Data{CreateTimeUnix},
             ],
         );

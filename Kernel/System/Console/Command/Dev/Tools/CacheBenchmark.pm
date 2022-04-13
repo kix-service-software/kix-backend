@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,11 +13,11 @@ package Kernel::System::Console::Command::Dev::Tools::CacheBenchmark;
 use strict;
 use warnings;
 
-our $IsWin32 = 0; 
+our $IsWin32 = 0;
 if ( $^O eq 'MSWin32' ) {
-    eval { 
-        require Win32; 
-        require Win32::Process; 
+    eval {
+        require Win32;
+        require Win32::Process;
     } or last;
     $IsWin32 = 1;
 }
@@ -152,7 +152,7 @@ sub Run {
                 SID       => $SID,
                 Processes => $Processes || 1,
             );
-    
+
             # cleanup initial cache
             print "Removing preloaded 100k x 1kB items... ";
             for ( my $i = 0; $i < 10; $i++ ) {
@@ -191,14 +191,14 @@ sub Run {
 
         if ($Preload) {
             $Self->_DoPreload(
-                $Self, 
+                $Self,
                 SID       => $SID,
                 ProcessID => $ProcessID,
             );
         }
         else {
             $Self->_TestItemSize(
-                $Self, 
+                $Self,
                 SID       => $SID,
                 ItemSize  => $ItemSize,
                 ProcessID => $ProcessID,
@@ -216,7 +216,7 @@ sub Preload {
     print "Preloading cache with 100k x 1kB items per process... ";
     $| = 1;
     if (!$IsWin32) {
-        my $JobResult = $Self->_DoJob( 
+        my $JobResult = $Self->_DoJob(
             Backend   => $Param{Backend},
             SID       => $Param{SID},
             Preload   => 1,
@@ -224,7 +224,7 @@ sub Preload {
         );
     }
     else {
-        my $JobResult = $Self->_DoJobWin32( 
+        my $JobResult = $Self->_DoJobWin32(
             Backend   => $Param{Backend},
             SID       => $Param{SID},
             Preload   => 1,
@@ -252,7 +252,7 @@ sub Benchmark {
 
         my $JobResult;
         if (!$IsWin32) {
-            $JobResult = $Self->_DoJob( 
+            $JobResult = $Self->_DoJob(
                 Backend   => $Param{Backend},
                 SID       => $Param{SID},
                 ItemSize  => $ItemSize,
@@ -260,7 +260,7 @@ sub Benchmark {
             );
         }
         else {
-            $JobResult = $Self->_DoJobWin32( 
+            $JobResult = $Self->_DoJobWin32(
                 Backend   => $Param{Backend},
                 SID       => $Param{SID},
                 ItemSize  => $ItemSize,
@@ -286,7 +286,7 @@ sub _DoPreload {
     my $CacheObject = $Kernel::OM->Get('Cache');
 
     my $Content1kB = '.' x 1024;
-    
+
     for ( my $i = 0; $i < 100000; $i++ ) {
         my $Result = $CacheObject->Set(
             Type => 'CacheTestInitContent' . $Param{SID} . ( $i % 10 ),
@@ -333,21 +333,21 @@ sub _DoJob {
             push(@Children, $PID);
         }
     }
- 
+
     my $Result;
     if ($Param{ItemSize}) {
         my $SetOK = 0;
         my $GetOK = 0;
         my $DelOK = 0;
-        while (@Children) { 
+        while (@Children) {
             my $PID = shift @Children;
-            waitpid($PID, 0); 
+            waitpid($PID, 0);
 
             # read result file
             my $JobResult = $Kernel::OM->Get('Main')->FileRead(
                 Directory => $Kernel::OM->Get('Config')->Get('TempDir'),
                 Filename  => 'CacheBenchmark.'.$Param{ItemSize}.'.'.$PID.'.result',
-            );        
+            );
 
             my ($JobSetOK, $JobGetOK, $JobDelOK) = split(/::/, $$JobResult);
             $SetOK += $JobSetOK;
@@ -362,9 +362,9 @@ sub _DoJob {
         };
     }
     else {
-        while (@Children) { 
+        while (@Children) {
             my $PID = shift @Children;
-            waitpid($PID, 0); 
+            waitpid($PID, 0);
         }
         $Result = 1;
     }
@@ -382,15 +382,15 @@ sub _DoJobWin32 {
     for my $ProcessID ( 1 .. $Param{Processes} ) {
         my $Child;
         Win32::Process::Create(
-            $Child, 
+            $Child,
             $ENV{COMSPEC},
-            "/c $Home/bin/kix.Console.pl Dev::Tools::Database::SQLBenchmark --allow-root --backend $Param{Backend} --process-id $ProcessID --item-size $Param{ItemSize} --sid $Param{SID} --preload $Param{Preload}", 
+            "/c $Home/bin/kix.Console.pl Dev::Tools::Database::SQLBenchmark --allow-root --backend $Param{Backend} --process-id $ProcessID --item-size $Param{ItemSize} --sid $Param{SID} --preload $Param{Preload}",
             0, 0, "."
         );
         push(@Children, $Child);
     }
- 
-    while (@Children) { 
+
+    while (@Children) {
         my $ExitCode;
         $Children[0]->GetExitCode($ExitCode);
         if ($ExitCode != Win32::Process::STILL_ACTIVE()) {

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -78,17 +78,17 @@ perform ConfigItemImageCreate Operation. This will return the created VersionID.
         Data => {
             ConfigItemID => 123,
             Image => {
-                ...                                
+                ...
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            VersionID  => '',                       # VersionID 
+            VersionID  => '',                       # VersionID
         },
     };
 

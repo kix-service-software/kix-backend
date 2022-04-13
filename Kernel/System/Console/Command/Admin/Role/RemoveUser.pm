@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     $Self->Print("<yellow>Removing user $Self->{UserName} from role $Self->{RoleName}...</yellow>\n");
-    
+
     # remove user from role
     my $Success = $Kernel::OM->Get('Role')->RoleUserDelete(
         UserID => $Self->{UserID},

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -71,10 +71,10 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ConfigItemAttachmentGet Operation. 
+perform ConfigItemAttachmentGet Operation.
 
     my $Result = $OperationObject->Run(
-        AttachmentID => 1,                                # required 
+        AttachmentID => 1,                                # required
     );
 
     $Result = {
@@ -117,14 +117,14 @@ sub Run {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
-        }     
+        }
 
         my %Attachment = (
             AttachmentID => $AttachmentID,
             Filename     => $StoredAttachment->{Filename},
             ContentType  => $StoredAttachment->{Preferences}->{Datatype},
-            Content      => MIME::Base64::encode_base64(${$StoredAttachment->{ContentRef}}),                    
-            FilesizeRaw  => $StoredAttachment->{Preferences}->{FileSizeBytes},
+            Content      => MIME::Base64::encode_base64(${$StoredAttachment->{ContentRef}}),
+            FilesizeRaw  => 0 + $StoredAttachment->{Preferences}->{FileSizeBytes},
         );
 
         # human readable file size
@@ -151,7 +151,7 @@ sub Run {
     elsif ( scalar(@AttachmentList) == 1 ) {
         return $Self->_Success(
             Attachment => $AttachmentList[0],
-        );    
+        );
     }
 
     return $Self->_Success(
@@ -260,7 +260,7 @@ sub _GetVisibleAttachments {
             for my $RootHashKey ( sort keys %{$RootHash} ) {
                 next if $RootHashKey eq 'TagKey' || !IsArrayRefWithData($RootHash->{$RootHashKey});
 
-                # get attribute definition 
+                # get attribute definition
                 my %AttrDef = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeDefByKey(
                     Key           => $RootHashKey,
                     XMLDefinition => $Param{Definition},

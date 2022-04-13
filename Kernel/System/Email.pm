@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -178,7 +178,7 @@ sub Send {
     }
 
     my @ExtractedImages;
-    # extract images as cid 
+    # extract images as cid
     if ( $Kernel::OM->Get('Config')->Get('SendmailEmbeddedImages') eq 'cid' ) {
         $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
             DocumentRef    => \$Param{Body},

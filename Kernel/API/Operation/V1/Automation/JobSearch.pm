@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -54,15 +54,15 @@ perform JobSearch Operation. This will return a Job list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     my @JobDataList;
-         	
+
     my %JobList = $Kernel::OM->Get('Automation')->JobList(
         Valid => 0,
     );
-   
+
     # get already prepared Job data from JobGet operation
-    if ( IsHashRefWithData(\%JobList) ) {   
+    if ( IsHashRefWithData(\%JobList) ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::JobGet',
             SuppressPermissionErrors => 1,

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -135,7 +135,7 @@ sub Run {
             Message => "Article $Param{Data}->{ArticleID} not found!",
         );
     }
-    
+
     # check if article belongs to the given ticket
     if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
@@ -143,10 +143,10 @@ sub Run {
             Message => "Article $Param{Data}->{ArticleID} not found in ticket $Param{Data}->{TicketID}",
         );
     }
-    
+
     # check attachment values
-    my $AttachmentCheck = $Self->_CheckAttachment( 
-        Attachment => $Attachment 
+    my $AttachmentCheck = $Self->_CheckAttachment(
+        Attachment => $Attachment
     );
 
     if ( !$AttachmentCheck->{Success} ) {

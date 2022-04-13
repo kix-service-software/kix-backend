@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -530,14 +530,14 @@ sub _GetRandomData {
             Mode     => 'utf8'
         );
         if ( $Content ) {
-            $Self->{Data}->{$What} = $Content; 
+            $Self->{Data}->{$What} = $Content;
         }
     }
-    
+
     my @Array = @{$Self->{Data}->{$What} || []};
 
     my $Result = $Array[int(rand($#Array - 1))];
-    chomp($Result) if $Result; 
+    chomp($Result) if $Result;
 
     $Result =~ s/\\\t/\t/;
     $Result =~ s/\\\n/\n/;

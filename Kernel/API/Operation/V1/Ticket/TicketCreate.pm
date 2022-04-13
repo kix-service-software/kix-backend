@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -176,8 +176,7 @@ sub Run {
     # everything is ok, let's create the ticket
     return $Self->_TicketCreate(
         Ticket                 => $Ticket,
-        UserID                 => $Self->{Authorization}->{UserID},,
-        RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+        UserID                 => $Self->{Authorization}->{UserID},
     );
 }
 
@@ -468,8 +467,7 @@ sub _TicketCreate {
                 OperationType => 'V1::Ticket::ArticleCreate',
                 Data          => {
                     TicketID               => $TicketID,
-                    Article                => $Article,,
-                    RelevantOrganisationID => $Param{RelevantOrganisationID}
+                    Article                => $Article
                 }
             );
 

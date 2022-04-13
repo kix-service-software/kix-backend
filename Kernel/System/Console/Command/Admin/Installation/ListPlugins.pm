@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -29,7 +29,7 @@ sub Configure {
         Description => "Sort list by order of initialization.",
         Required    => 0,
         HasValue    => 0,
-    );    
+    );
 
     return;
 }
@@ -42,7 +42,7 @@ sub Run {
     # get all plugins
     my @PluginList = $Kernel::OM->Get('Installation')->PluginList(
         Valid     => 0,
-        InitOrder =>  $Self->GetOption('init-order'), 
+        InitOrder =>  $Self->GetOption('init-order'),
     );
 
     $Self->Print("Backend:\n\n");
@@ -63,7 +63,7 @@ sub Run {
             );
 
             next CLIENT if !IsArrayRefWithData($ClientData{Plugins});
-        
+
             $Self->Print("\n\nClient $ClientID:\n\n");
             $Self->Print("#  Name                           Build-Patch Requires                                           Description\n");
             $Self->Print("-- ------------------------------ ----------- -------------------------------------------------- --------------------------------------------------------------------------------\n");
@@ -71,7 +71,7 @@ sub Run {
             my $Count = 0;
             foreach my $Plugin ( @{$ClientData{Plugins}} ) {
                 $Self->Print(sprintf("%02i %-30s %11s %-50s %-80s\n", ++$Count, $Plugin->{Product}, "$Plugin->{BuildNumber}-$Plugin->{PatchNumber}", ($Plugin->{Requires} || ''), ($Plugin->{Description} || '')));
-            }   
+            }
         }
     }
 

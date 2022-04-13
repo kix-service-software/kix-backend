@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -124,12 +124,12 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleAttachmentGet',
             SuppressPermissionErrors => 1,
-            Data          => {
-                TicketID     => $Param{Data}->{TicketID},
-                ArticleID    => $Param{Data}->{ArticleID},
-                AttachmentID => join(',', sort keys %AttachmentIndex),
-                include      => $Param{Data}->{include},
-                expand       => $Param{Data}->{expand},
+            Data                     => {
+                TicketID               => $Param{Data}->{TicketID},
+                ArticleID              => $Param{Data}->{ArticleID},
+                AttachmentID           => join(',', sort keys %AttachmentIndex),
+                include                => $Param{Data}->{include},
+                expand                 => $Param{Data}->{expand}
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

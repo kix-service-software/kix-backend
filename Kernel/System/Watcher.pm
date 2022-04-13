@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -71,7 +71,7 @@ sub new {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to require $Package!"
-            );        
+            );
         }
 
         my $BackendObject = $Package->new( %{$Self} );
@@ -79,7 +79,7 @@ sub new {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create instance of $Backend!"
-            );        
+            );
         }
 
         $Self->{Backends}->{$Backend} = $BackendObject;
@@ -177,7 +177,7 @@ sub WatcherList {
 
     # fetch the result
     my $Data = $DBObject->FetchAllArrayRef(
-        Columns => [ 'ID', 'Object', 'ObjectID', 'UserID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ] 
+        Columns => [ 'ID', 'Object', 'ObjectID', 'UserID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy' ]
     );
 
     if ( $Param{Notify} ) {
@@ -259,11 +259,11 @@ sub WatcherAdd {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $WatcherID = $Row[0];
     }
-    
+
     # check if we have a backend for this object type and execute it
-    if ( $Self->{Backends}->{$Param{Object}} ) {                
+    if ( $Self->{Backends}->{$Param{Object}} ) {
         my$BackendResult = $Self->{Backends}->{$Param{Object}}->WatcherAdd(
-            %Param, 
+            %Param,
             WatcherID => $WatcherID
         );
     }
@@ -348,7 +348,7 @@ sub WatcherDelete {
             # check if we have a backend for this object type and execute it
             if ( $Self->{Backends}->{$Param{Object}} ) {
                 my$BackendResult = $Self->{Backends}->{$Param{Object}}->WatcherDelete(
-                    %Param, 
+                    %Param,
                     WatchUserID => $WatchUserID
                 );
             }
@@ -405,7 +405,7 @@ sub WatcherDelete {
         # check if we have a backend for this object type and execute it
         if ( $Self->{Backends}->{$Param{Object}} ) {
             my$BackendResult = $Self->{Backends}->{$Param{Object}}->WatcherDelete(
-                %Param, 
+                %Param,
             );
         }
 
@@ -475,7 +475,7 @@ sub WatcherTransfer {
     return if !$DBObject->Do(
         SQL  => 'DELETE FROM watcher WHERE object = ? AND object_id = ?',
         Bind => [ \$Param{Object}, \$Param{SourceObjectID} ],
-    );    
+    );
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(

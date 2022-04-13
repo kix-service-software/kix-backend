@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -146,7 +146,7 @@ sub GetMulti {
     my @Values = @{$Self->_RedisCall('hmget', $Param{Type}, @PreparedKeys) || []};
 
     return @Values if !@Values;
-    
+
     foreach my $Value ( @Values ) {
         next if !$Value;
         next if index($Value, '__b64') != 0;
@@ -200,7 +200,7 @@ sub CleanUp {
                 next if $KeepTypeLookup{$Type};
                 $Self->CleanUp( Type => $Type );
             }
-        } 
+        }
         else {
             return $Self->_RedisCall('flushall');
         }
@@ -225,7 +225,7 @@ sub GetKeysForType {
         if ( $Param{Type} ne '*' ) {
             ($Cursor, $Keys) = @{$Self->_RedisCall('hscan', $Param{Type}, $Cursor) || []};
             # remove the values in this case
-            my $Index=0; 
+            my $Index=0;
             $Keys = [ grep { $Index++ % 2 == 0 } @{$Keys} ];
         }
         else {

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -152,7 +152,7 @@ my @ConfigTests = (
             }
         },
         Expect => ['x','y','create_by'],
-    },    
+    },
     {
         Test   => 'valid SQL with column alias and table alias',
         Config => {
@@ -262,7 +262,7 @@ my @DataTests = (
                 }
             }
         },
-        Expect => { 
+        Expect => {
             Columns => ['item_count'],
             Data => [
                 { item_count => 3 }
@@ -278,7 +278,7 @@ my @DataTests = (
                 }
             }
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name'],
             Data => [
                 { id => 1, name => 'valid' },
@@ -296,7 +296,7 @@ my @DataTests = (
                 }
             }
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name'],
             Data => [
                 { id => 2, name => 'invalid' }
@@ -321,7 +321,7 @@ my @DataTests = (
         Parameters => {
             NameVar => 'inv'
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name'],
             Data => [
                 { id => 2, name => 'invalid' }
@@ -346,7 +346,7 @@ my @DataTests = (
         Parameters => {
             IDList => [1,2]
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name'],
             Data => [
                 { id => 1, name => 'valid' },
@@ -370,7 +370,7 @@ my @DataTests = (
                 }
             ]
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name'],
             Data => [
                 { id => 1, name => 'valid' },
@@ -387,7 +387,7 @@ my @DataTests = (
                 },
             },
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name'],
             Data => [
                 { id => 1, name => 'valid' },
@@ -403,7 +403,7 @@ my @DataTests = (
                 },
             },
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name', 'create_by'],
             Data => [
                 { id => 1, name => 'valid', create_by => 1 },
@@ -426,7 +426,7 @@ my @DataTests = (
                 }
             ]
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name', 'create_by'],
             Data => [
                 { id => 1, name => 'valid', create_by => 1 },
@@ -453,7 +453,7 @@ my @DataTests = (
                 }
             ]
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name', 'test', 'create_by', 'change_by'],
             Data => [
                 { id => 1, name => 'valid', test => 'dummy', create_by => 1, change_by => 1},
@@ -472,7 +472,7 @@ my @DataTests = (
                 },
             },
         },
-        Expect => { 
+        Expect => {
             Columns => ['id', 'name', 'test', 'test2'],
             Data => [
                 { id => 1, name => 'valid', test => 'dummy', test2 => 'hello' },

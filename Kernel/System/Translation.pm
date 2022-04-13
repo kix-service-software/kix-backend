@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -48,7 +48,7 @@ sub new {
     bless( $Self, $Type );
 
     $Self->{CacheType} = 'Translation';
-    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;    
+    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     return $Self;
 }
@@ -62,7 +62,7 @@ get Pattern
         IncludeAvailableLanguages => 0|1     # optional
     );
 
-or 
+or
 
     my @PatterList = $TranslationObject->PatternGet(
         ID => [ 123, 124, 125 ]              # required
@@ -162,8 +162,8 @@ sub _PatternGet {
 
                 if ( ref $Pattern->{AvailableLanguages} eq 'ARRAY' ) {
                     $Pattern->{AvailableLanguages} = [];
-                } 
-                
+                }
+
                 push(@AvailableLanguages, $Language->{Language});
             }
             $Pattern->{AvailableLanguages} = \@AvailableLanguages;
@@ -234,7 +234,7 @@ sub PatternList {
 
 check if a pattern exists
 
-    my $PatternID = $TranslationObject->PatternLookup( 
+    my $PatternID = $TranslationObject->PatternLookup(
         Value => '...'                  # required
     );
 
@@ -267,7 +267,7 @@ sub PatternExistsCheck {
 
     $Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id FROM translation_pattern WHERE value_md5= ?',
-        Bind => [ \$MD5 ] 
+        Bind => [ \$MD5 ]
     );
 
     # fetch the result
@@ -485,7 +485,7 @@ sub PatternDelete {
 
 =item TranslationLanguageAdd()
 
-Inserts a new translation language 
+Inserts a new translation language
 
     my $ID = $TranslationObject->TranslationLanguageAdd(
         PatternID  => 123,          # required
@@ -572,7 +572,7 @@ get translation language
         Language  => '...'          # required
     );
 
-or 
+or
 
     my @Translation = $TranslationObject->TranslationLanguageGet(
         PatternID => [ 123, 124, 125 ]      # required
@@ -665,7 +665,7 @@ get list of translation languages for a given PatternID
         PatternID => 123           # required
     );
 
-or 
+or
 
     my @List = $TranslationObject->TranslationLanguageList(
         PatternID => [ 123, 124, 125 ]          # required
@@ -805,7 +805,7 @@ sub TranslationLanguageUpdate {
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE translation_language SET value = ?, is_default = ?, change_time = current_timestamp, change_by = ? WHERE pattern_id = ? AND language = ?',
         Bind => [
-            \$Param{Value}, \$Param{IsDefault}, \$Param{UserID}, 
+            \$Param{Value}, \$Param{IsDefault}, \$Param{UserID},
             \$Param{PatternID}, \$Param{Language}
         ],
     );
@@ -1078,7 +1078,7 @@ sub ImportPO {
 
         foreach my $MsgId ( sort keys %{$Items} ) {
             $CountTotal++;
-            
+
             # the pattern is obsolete, go to the next one
             next if $Items->{$MsgId}->obsolete;
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -53,7 +53,7 @@ sub ParameterDefinition {
         'RoleID' => {
             DataType => 'NUMERIC',
             Required => 1
-        }              
+        }
     }
 }
 
@@ -84,11 +84,11 @@ perform PermissionSearch Operation. This will return a PermissionID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check if role exists 
+    # check if role exists
     my $Rolename = $Kernel::OM->Get('Role')->RoleLookup(
         RoleID => $Param{Data}->{RoleID},
     );
-  
+
     if ( !$Rolename ) {
         return $Self->_Error(
             Code => 'Object.ParentNotFound',
@@ -101,7 +101,7 @@ sub Run {
     );
 
 	# get already prepared Permission data from PermissionGet operation
-    if ( @PermissionList ) {  	
+    if ( @PermissionList ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Role::PermissionGet',
             SuppressPermissionErrors => 1,

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -72,7 +72,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            TicketID             => '1',                                           # required 
+            TicketID             => '1',                                           # required
             ArticleID            => '32',                                          # required
         },
     );
@@ -147,7 +147,7 @@ sub Run {
 
     #search attachments
     for my $AttachmentNr ( keys %ArticleAttachments ) {
-        
+
         my %Attachment = $TicketObject->ArticleAttachment(
             ArticleID => $Param{Data}->{ArticleID},
             FileID    => $AttachmentNr,
@@ -187,7 +187,7 @@ sub Run {
     my %Attachment = (
         Filename    => $ZipFilename,
         ContentType => 'application/zip',
-        FilesizeRaw => length $ZipResult,
+        FilesizeRaw => 0 + length $ZipResult,
     );
 
     if ( $Attachment{FilesizeRaw} > ( 1024 * 1024 ) ) {
@@ -204,7 +204,7 @@ sub Run {
     if ( $Param{Data}->{include}->{Content} ) {
         $Attachment{Content} = MIME::Base64::encode_base64($ZipResult),
     }
-    
+
 	# output zipped attachments
     return $Self->_Success(
         Attachment => \%Attachment

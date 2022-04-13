@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -55,7 +55,7 @@ sub ParameterDefinition {
             DataType => 'NUMERIC',
             Type     => 'ARRAY',
             Required => 1
-        },           
+        },
     }
 }
 
@@ -66,7 +66,7 @@ perform DynamicFieldDelete Operation. This will return the deleted DynamicFieldI
     my $Result = $OperationObject->Run(
         Data => {
             DynamicFieldID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -77,19 +77,19 @@ perform DynamicFieldDelete Operation. This will return the deleted DynamicFieldI
 
 sub Run {
     my ( $Self, %Param ) = @_;
-        
+
     # start loop
     foreach my $DynamicFieldID ( @{$Param{Data}->{DynamicFieldID}} ) {
 
         # check if df is writeable
         my $DynamicFieldData = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
             ID   => $DynamicFieldID,
-        );    
+        );
         if ( $DynamicFieldData->{InternalField} == 1 ) {
             return $Self->_Error(
                 Code    => 'Forbidden',
                 Message => "Cannot delete DynamicField. DynamicField with ID '$Param{Data}->{DynamicFieldID}' is internal and cannot be deleted.",
-            );        
+            );
         }
 
         # check if there is an object with this dynamic field
@@ -105,8 +105,8 @@ sub Run {
                 );
             }
         }
-        
-        # delete DynamicField	    
+
+        # delete DynamicField
         my $Success = $Kernel::OM->Get('DynamicField')->DynamicFieldDelete(
             ID      => $DynamicFieldID,
             UserID  => $Self->{Authorization}->{UserID},

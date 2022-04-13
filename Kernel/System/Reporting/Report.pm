@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -202,7 +202,7 @@ sub ReportCreate {
         return;
     }
 
-    return if !$Self->_ValidateReport( 
+    return if !$Self->_ValidateReport(
         Definition => \%Definition,
         %Param,
     );
@@ -311,7 +311,7 @@ sub ReportCreate {
             );
             next OUTPUTFORMAT;
         }
-        
+
         # store the generated output as a report result in DB
         my $Success = $Self->ReportResultAdd(
             ReportID => $ID,
@@ -355,7 +355,7 @@ sub ReportList {
     return @{$Cache} if $Cache;
 
     my $SQL = 'SELECT id FROM report WHERE 1=1';
-    
+
     my @Bind;
     if ( $Param{DefinitionID} ) {
         $SQL .= ' AND definition_id = ?';
@@ -471,7 +471,7 @@ sub _ValidateReport {
         }
     }
 
-    # validate data source config 
+    # validate data source config
     my $IsValid = $Self->DataSourceValidateConfig(
         Source => $Param{Definition}->{DataSource},
         Config => $Param{Definition}->{Config} || {},
@@ -545,8 +545,8 @@ sub _ValidateReport {
             );
             return;
         }
-    
-        # check if all required parameters without defaults are given 
+
+        # check if all required parameters without defaults are given
         my $Parameters = $Param{Config}->{Parameters} || {};
         foreach my $Parameter ( @{$Param{Definition}->{Config}->{Parameters}} ) {
             next if !$Parameter->{Required} || $Parameter->{Default};
@@ -558,9 +558,9 @@ sub _ValidateReport {
                 );
                 return;
             }
-        }    
+        }
     }
-    
+
     return 1;
 }
 

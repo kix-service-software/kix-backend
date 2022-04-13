@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -32,7 +32,7 @@ foreach my $Option ( qw(SourceDirectory ) ) {
 # check if directory is given
 if ( $Options{Help} || %Missing ) {
     print "allure2html - Generates a simple HTML table from pherkin Allure results.\n";
-    print "Copyright (c) 2006-2021 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
+    print "Copyright (C) 2006-2022 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
     print "\n";
     print "Required Options:\n";
     print "  --source-directory - The directory where the pherkin allure output files are located.\n";

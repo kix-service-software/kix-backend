@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -51,7 +51,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     my @Sources;
-    
+
     if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Migration::Sources')) ) {
         @Sources = sort keys %{ $Kernel::OM->Get('Config')->Get('Migration::Sources') };
     }
@@ -82,15 +82,15 @@ perform MigrationCreate Operation. This will return the created MigrationID.
                 SourceID => '...',
                 Options  => {}
             },
-        },	
+        },
     );
 
     $Result = {
         Success      => 1,                       # 0 or 1
-        Code         => '',                      # 
+        Code         => '',                      #
         Message      => '',                      # in case of error
         Data         => {                        # result data payload after Operation
-            MigrationID  => '',                  # MigrationID 
+            MigrationID  => '',                  # MigrationID
         },
     };
 
@@ -103,7 +103,7 @@ sub Run {
     my $Migration = $Self->_Trim(
         Data => $Param{Data}->{Migration}
     );
-    
+
     # check if a migration process is already running
     my @MigrationList = $Kernel::OM->Get('Installation')->MigrationList();
     my $Running;
@@ -134,12 +134,12 @@ sub Run {
             Message => 'Could not start migration, please contact the system administrator',
         );
     }
-    
+
     # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         MigrationID => $MigrationID,
-    );    
+    );
 }
 
 1;

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
     if ( IsHashRefWithData($GeneralCatalogItemList) ) {
        @DisplayGroupIDs = keys %{$GeneralCatalogItemList};
     }
-    
+
     return {
         'DynamicFieldID' => {
             Required => 1
@@ -96,17 +96,17 @@ perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldI
             }
 	    },
 	);
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            DynamicFieldID  => 123,             # ID of the updated DynamicField 
+            DynamicFieldID  => 123,             # ID of the updated DynamicField
         },
     };
-   
+
 =cut
 
 
@@ -119,7 +119,7 @@ sub Run {
     );
 
     # check attribute values
-    my $CheckResult = $Self->_CheckDynamicField( 
+    my $CheckResult = $Self->_CheckDynamicField(
         DynamicField => $DynamicField
     );
 
@@ -147,11 +147,11 @@ sub Run {
         );
     }
 
-    # check if DynamicField exists 
+    # check if DynamicField exists
     my $DynamicFieldData = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
         ID => $Param{Data}->{DynamicFieldID},
     );
-  
+
     if ( !IsHashRefWithData($DynamicFieldData) ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -163,7 +163,7 @@ sub Run {
         return $Self->_Error(
             Code    => 'Forbidden',
             Message => "Cannot update DynamicField. DynamicField with ID '$Param{Data}->{DynamicFieldID}' is internal and cannot be changed.",
-        );        
+        );
     }
 
     # if it's an internal field, it's name should not change
@@ -194,10 +194,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         DynamicFieldID => $Param{Data}->{DynamicFieldID},
-    );    
+    );
 }
 
 1;

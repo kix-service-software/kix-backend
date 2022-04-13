@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -73,17 +73,17 @@ perform DynamicFieldConfigUpdate Operation. This will return the updated Dynamic
             }
 	    },
 	);
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            DynamicFieldID  => 123,             # ID of the updated DynamicField 
+            DynamicFieldID  => 123,             # ID of the updated DynamicField
         },
     };
-   
+
 =cut
 
 
@@ -103,19 +103,19 @@ sub Run {
             #remove trailing spaces
             $DynamicFieldConfig->{$Attribute} =~ s{\s+\z}{};
         }
-    }   
+    }
 
-    # check if DynamicField exists 
+    # check if DynamicField exists
     my $DynamicFieldData = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
         ID => $Param{Data}->{DynamicFieldID},
     );
-  
+
     if ( !IsHashRefWithData($DynamicFieldData) ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
     }
-    
+
     # update DynamicField
     my $Success = $Kernel::OM->Get('DynamicField')->DynamicFieldUpdate(
         ID         => $Param{Data}->{DynamicFieldID},
@@ -134,10 +134,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         DynamicFieldID => $Param{Data}->{DynamicFieldID},
-    );    
+    );
 }
 
 1;

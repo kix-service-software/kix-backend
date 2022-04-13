@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
         'ReportDefinition' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -77,17 +77,17 @@ perform ReportDefinitionUpdate Operation. This will return the updated ReportDef
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            ReportDefinitionID  => 123,       # ID of the updated ReportDefinition 
+            ReportDefinitionID  => 123,       # ID of the updated ReportDefinition
         },
     };
-   
+
 =cut
 
 
@@ -99,7 +99,7 @@ sub Run {
         Data => $Param{Data}->{ReportDefinition}
     );
 
-    # check if ReportDefinition exists 
+    # check if ReportDefinition exists
     my %ReportDefinitionData = $Kernel::OM->Get('Reporting')->ReportDefinitionGet(
         ID => $Param{Data}->{ReportDefinitionID},
     );
@@ -125,7 +125,7 @@ sub Run {
 
     # update ReportDefinition
     my $Success = $Kernel::OM->Get('Reporting')->ReportDefinitionUpdate(
-        ID         => $Param{Data}->{ReportDefinitionID},    
+        ID         => $Param{Data}->{ReportDefinitionID},
         DataSource => $ReportDefinition->{DataSource} || $ReportDefinitionData{DataSource},
         Name       => $ReportDefinition->{Name} || $ReportDefinitionData{Name},
         Config     => exists $ReportDefinition->{Config} ? $ReportDefinition->{Config} : $ReportDefinitionData{Config},
@@ -140,10 +140,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         ReportDefinitionID => 0 + $Param{Data}->{ReportDefinitionID},
-    );    
+    );
 }
 
 1;

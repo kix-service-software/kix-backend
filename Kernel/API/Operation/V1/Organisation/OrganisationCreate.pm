@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -54,10 +54,10 @@ sub ParameterDefinition {
         'Organisation' => {
             Type     => 'HASH',
             Required => 1
-        },          
+        },
         'Organisation::Number' => {
             Required => 1
-        },            
+        },
         'Organisation::Name' => {
             Required => 1
         },
@@ -71,17 +71,17 @@ perform OrganisationCreate Operation. This will return the created OrganisationL
     my $Result = $OperationObject->Run(
         Data => {
             Organisation => {
-                ...                 # attributes (required and optional) depend on Map config 
+                ...                 # attributes (required and optional) depend on Map config
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            OrganisationID  => '',                       # OrganisationID 
+            OrganisationID  => '',                       # OrganisationID
         },
     };
 
@@ -105,20 +105,20 @@ sub Run {
             Message => 'Cannot create organisation. Another organisation with same number already exists.',
         );
     }
-    
+
     # create Organisation
     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
         %{$Organisation},
         ValidID => $Organisation->{ValidID} || 1,
         UserID  => $Self->{Authorization}->{UserID},
-    );    
+    );
     if ( !$OrganisationID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create organisation, please contact the system administrator',
         );
     }
-    
+
     # set dynamic fields
     if ( IsArrayRefWithData( $Organisation->{DynamicFields} ) ) {
 
@@ -143,7 +143,7 @@ sub Run {
     return $Self->_Success(
         Code   => 'Object.Created',
         OrganisationID => $OrganisationID,
-    );    
+    );
 }
 
 1;

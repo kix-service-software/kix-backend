@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -137,7 +137,7 @@ sub TextModuleAdd {
     my $DBInsert = $Self->{DBObject}->Do(
         SQL  => $SQL,
         Bind => [
-            \$Param{Name}, \$Param{ValidID}, \$Param{Keywords}, \$Param{Category}, 
+            \$Param{Name}, \$Param{ValidID}, \$Param{Keywords}, \$Param{Category},
             \$Param{Comment}, \$Param{Text}, \$Param{Subject}, \$Param{Language},
             \$Param{UserID}, \$Param{UserID},
         ],
@@ -220,9 +220,9 @@ sub TextModuleGet {
         . 'FROM text_module '
         . 'WHERE id = ?';
 
-    return if !$Self->{DBObject}->Prepare( 
+    return if !$Self->{DBObject}->Prepare(
         SQL  => $SQL,
-        Bind => [ \$Param{ID} ] 
+        Bind => [ \$Param{ID} ]
     );
 
     if ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
@@ -239,7 +239,7 @@ sub TextModuleGet {
             CreateTime          => $Data[8],
             CreateBy            => $Data[9],
             ChangeTime          => $Data[10],
-            ChangeBy            => $Data[11],            
+            ChangeBy            => $Data[11],
         );
 
         # set cache
@@ -412,7 +412,7 @@ sub TextModuleList {
     my $Cache = $Self->{CacheObject}->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
-    );    
+    );
     return $Cache if $Cache;
 
     # set valid
@@ -439,7 +439,7 @@ sub TextModuleList {
     }
 
     # do query
-    return if !$Self->{DBObject}->Prepare( 
+    return if !$Self->{DBObject}->Prepare(
         SQL  => $SQL,
         Bind => \@BindVars
     );
@@ -472,7 +472,7 @@ sub TextModuleCategoryList {
 
     my $SQL = "SELECT DISTINCT(category) FROM text_module WHERE category <> ''";
 
-    return if !$Self->{DBObject}->Prepare( 
+    return if !$Self->{DBObject}->Prepare(
         SQL => $SQL,
     );
 

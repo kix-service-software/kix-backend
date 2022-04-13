@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -167,7 +167,7 @@ sub _GetParameterValue {
 
     my $Value = $Self->{Parameters}->{$Param{Parameter}};
 
-    # set the default if no value is given and a default exists 
+    # set the default if no value is given and a default exists
     if ( !$Value ) {
         my $Definition = $Self->_GetParameterDefinition(
             Parameter => $Param{Parameter}

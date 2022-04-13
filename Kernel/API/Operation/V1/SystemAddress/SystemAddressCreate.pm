@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -60,7 +60,7 @@ sub ParameterDefinition {
         },
         'SystemAddress::Realname' => {
             Required => 1
-        },                           
+        },
     }
 }
 
@@ -81,7 +81,7 @@ perform SystemAddressCreate Operation. This will return the created SystemAddres
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
             SystemAddressID  => '',                         # ID of the created SystemAddress
@@ -116,7 +116,7 @@ sub Run {
         Comment  => $SystemAddress->{Comment} || '',
         ValidID  => $SystemAddress->{ValidID} || 1,
         Realname => $SystemAddress->{Realname},
-        UserID   => $Self->{Authorization}->{UserID},              
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$SystemAddressID ) {
@@ -125,12 +125,12 @@ sub Run {
             Message => 'Could not create SystemAddress, please contact the system administrator',
         );
     }
-    
-    # return result    
+
+    # return result
     return $Self->_Success(
         Code   => 'Object.Created',
         SystemAddressID => $SystemAddressID,
-    );    
+    );
 }
 
 

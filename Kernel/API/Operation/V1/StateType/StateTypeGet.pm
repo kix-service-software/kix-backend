@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -107,13 +107,13 @@ sub Run {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
-        }	
+        }
 
         my %StateType;
-        
+
         $StateType{ID} = $StateTypeID;
         $StateType{Name} = $StateTypeName;
-      
+
         # add
         push(@StateTypeList, \%StateType);
     }
@@ -121,7 +121,7 @@ sub Run {
     if ( scalar(@StateTypeList) == 1 ) {
         return $Self->_Success(
             StateType => $StateTypeList[0],
-        );    
+        );
     }
 
     # return result

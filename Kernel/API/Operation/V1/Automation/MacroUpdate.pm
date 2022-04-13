@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
         'Macro' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -77,17 +77,17 @@ perform MacroUpdate Operation. This will return the updated MacroID.
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            MacroID  => 123,       # ID of the updated Macro 
+            MacroID  => 123,       # ID of the updated Macro
         },
     };
-   
+
 =cut
 
 
@@ -99,7 +99,7 @@ sub Run {
         Data => $Param{Data}->{Macro}
     );
 
-    # check if Macro exists 
+    # check if Macro exists
     my %MacroData = $Kernel::OM->Get('Automation')->MacroGet(
         ID => $Param{Data}->{MacroID},
     );
@@ -125,7 +125,7 @@ sub Run {
 
     # update Macro
     my $Success = $Kernel::OM->Get('Automation')->MacroUpdate(
-        ID        => $Param{Data}->{MacroID},    
+        ID        => $Param{Data}->{MacroID},
         Type      => $Macro->{Type} || $MacroData{Type},
         Name      => $Macro->{Name} || $MacroData{Name},
         ExecOrder => exists $Macro->{ExecOrder} ? $Macro->{ExecOrder} : $MacroData{ExecOrder},
@@ -159,7 +159,7 @@ sub Run {
     # return result
     return $Self->_Success(
         MacroID => 0 + $Param{Data}->{MacroID},
-    );    
+    );
 }
 
 1;

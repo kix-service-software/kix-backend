@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -2671,12 +2671,12 @@ get plain article/email
 write an article attachment to storage
 
     my $Success = $TicketObject->ArticleWriteAttachment(
-        Content            => $ContentAsString,
+        Content            => $ContentAsString,                     # optional
         ContentType        => 'text/html; charset="iso-8859-15"',
         Filename           => 'lala.html',
-        ContentID          => 'cid-1234',   # optional
-        ContentAlternative => 0,            # optional, alternative content to shown as body
-        Disposition        => 'attachment', # or 'inline'
+        ContentID          => 'cid-1234',                           # optional
+        ContentAlternative => 0,                                    # optional, alternative content to shown as body
+        Disposition        => 'attachment',                         # or 'inline'
         ArticleID          => 123,
         UserID             => 123,
     );

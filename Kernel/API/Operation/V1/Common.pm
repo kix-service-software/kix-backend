@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -2101,6 +2101,10 @@ sub _ApplyInclude {
 
                             # get first response object as the include - this is not the perfect solution but it works for the moment
                             $Param{Data}->{$Object}->[ $Index++ ]->{$Include} = $Result->{Data}->{ ( keys %{ $Result->{Data} } )[0] };
+                        } else {
+
+                            # no success means empty list
+                            $Param{Data}->{$Object}->[ $Index++ ]->{$Include} = [];
                         }
                     }
                 }
@@ -2122,6 +2126,10 @@ sub _ApplyInclude {
 
                         # get first response object as the include - this is not the perfect solution but it works for the moment
                         $Param{Data}->{$Object}->{$Include} = $Result->{Data}->{ ( keys %{ $Result->{Data} } )[0] };
+                    } else {
+
+                        # no success means empty list
+                        $Param{Data}->{$Object}->{$Include} = [];
                     }
                 }
             }

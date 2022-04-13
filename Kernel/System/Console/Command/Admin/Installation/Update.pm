@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -65,7 +65,7 @@ sub Run {
 
     if ( !$Result ) {
         $Self->PrintError("Something went wrong. Update aborted. Please check the KIX log for details.");
-        return $Self->ExitCodeError();        
+        return $Self->ExitCodeError();
     }
 
     $Self->Print("<green>Done.</green>\n");
