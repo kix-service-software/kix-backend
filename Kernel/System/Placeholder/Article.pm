@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -57,6 +57,7 @@ sub _Replace {
     # TODO: keep old placeholder syntax for backward compatibility
     my $OldTag = $Self->{Start} . 'KIX_ARTICLE_DATA_';
 
+    $Param{ArticleID} ||= IsHashRefWithData($Param{Data}) ? $Param{Data}->{ArticleID} : undef;
     if ( $Param{ArticleID} ) {
         my %Article = $Self->{TicketObject}->ArticleGet(
             ArticleID => $Param{ArticleID},

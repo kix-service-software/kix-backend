@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -96,15 +96,9 @@ sub Run {
     return if !$Self->_CheckParams(%Param);
 
     foreach my $Key (keys %{$Param{Config}}) {
-        $Param{Config}->{$Key} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText  => 0,
-            Text      => $Param{Config}->{$Key},
-            Data      => {},
-            UserID    => $Param{UserID},
-            Translate => 0,
-
-            # FIXME: as common action, object id could be not a ticket!
-            TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
+        $Param{Config}->{$Key} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $Param{Config}->{$Key}
         );
     }
 

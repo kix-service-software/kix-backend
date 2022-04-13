@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -192,7 +192,7 @@ sub SetResult {
         );
         return;
     }
-    
+
     $Self->{MacroResults} //= {};
 
     my $VariableName = $Self->{ResultVariables}->{$Param{Name}} || $Param{Name};
@@ -301,6 +301,44 @@ sub _CheckParams {
     }
 
     return 1;
+}
+
+=item _ReplaceValuePlaceholder()
+
+replaces palceholders
+
+Example:
+    my $Value = $Self->_ReplaceValuePlaceholder(
+        Value     => $SomeValue,
+        Richtext  => 0             # optional: 0 will be used if omitted
+        Translate => 0             # optional: 0 will be used if omitted
+        UserID    => 1             # optional: 1 will be used if omitted
+        Data      => {}            # optional: {} will be used
+    );
+
+=cut
+
+sub _ReplaceValuePlaceholder {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Value} if (!$Param{Value} || $Param{Value} !~ m/(<|&lt;)KIX_/);
+
+    my $Data = $Param{EventData} || $Self->{EventData} || {};
+    if(IsHashRefWithData($Param{Data})) {
+        $Data = {
+            %{$Data},
+            %{$Param{Data}}
+        }
+    };
+
+    return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+        Text            => $Param{Value},
+        RichText        => $Param{Richtext} || 0,
+        Translate       => $Param{Translate} || 0,
+        UserID          => $Param{UserID} || 1,
+        Data            => $Data,
+        ReplaceNotFound => $Param{ReplaceNotFound}
+    );
 }
 
 1;
