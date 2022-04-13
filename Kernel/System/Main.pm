@@ -1173,7 +1173,6 @@ sub _Dump {
 
     # data is a hash reference
     if ( ref ${$Data} eq 'HASH' ) {
-        print STDERR Data::Dumper::Dumper($Data);
         KEY:
         for my $Key ( sort keys %{ ${$Data} } ) {
             next KEY if !defined ${$Data}->{$Key};
