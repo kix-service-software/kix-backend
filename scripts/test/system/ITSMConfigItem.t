@@ -37,9 +37,6 @@ my $RandomID = $Helper->GetRandomID();
 # make preparations
 # ------------------------------------------------------------ #
 
-# perform ConfigItemCount to fill the empty fields
-$ConfigItemObject->ConfigItemCount();
-
 # create needed users
 my @UserIDs;
 {

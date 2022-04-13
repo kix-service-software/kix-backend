@@ -53,9 +53,9 @@ sub _ConfigItemNumberCreate {
     my $SystemID = $Kernel::OM->Get('Config')->Get('SystemID');
 
     # get current counter
-    my $CurrentCounter = $Self->CurrentCounterGet(
+    my $CurrentCounter = $Self->ConfigItemCounterGet(
         ClassID => $Param{ClassID},
-        Type    => 'AutoIncrement',
+        Counter => 'AutoIncrement',
     ) || 0;
 
     CIPHER:
@@ -72,10 +72,10 @@ sub _ConfigItemNumberCreate {
         next CIPHER if $Duplicate;
 
         # set counter
-        $Self->CurrentCounterSet(
+        $Self->ConfigItemCounterSet(
             ClassID => $Param{ClassID},
-            Type    => 'AutoIncrement',
-            Counter => ( $CurrentCounter + $Cipher ),
+            Counter => 'AutoIncrement',
+            Value   => ( $CurrentCounter + $Cipher ),
         );
 
         return $Number;

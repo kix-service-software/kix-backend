@@ -110,6 +110,7 @@ Console::Command::Maint::ClientRegistration::SendNotifications                = 
 Console::Command::Maint::Config::CleanUp                                      = Kernel::System::Console::Command::Maint::Config::CleanUp
 Console::Command::Maint::Config::Dump                                         = Kernel::System::Console::Command::Maint::Config::Dump
 Console::Command::Maint::Config::Rebuild                                      = Kernel::System::Console::Command::Maint::Config::Rebuild
+Console::Command::Maint::ITSM::Configitem::UpdateCounters                     = Kernel::System::Console::Command::Maint::ITSM::Configitem::UpdateCounters
 Console::Command::Maint::Daemon::List                                         = Kernel::System::Console::Command::Maint::Daemon::List
 Console::Command::Maint::Daemon::Summary                                      = Kernel::System::Console::Command::Maint::Daemon::Summary
 Console::Command::Maint::Database::Check                                      = Kernel::System::Console::Command::Maint::Database::Check

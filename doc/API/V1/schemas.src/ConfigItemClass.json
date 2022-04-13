@@ -23,7 +23,7 @@
       "type": "object",
       "description": "result of include \"ConfigItemStats\"",
       "properties": {
-        "PostProductiveCount": {
+        "PreProductiveCount": {
           "type": "integer",
           "readOnly": true
         },
@@ -33,7 +33,7 @@
         }
       },
       "required": [
-        "PostProductiveCount",
+        "PreProductiveCount",
         "ProductiveCount"
       ]
     },
