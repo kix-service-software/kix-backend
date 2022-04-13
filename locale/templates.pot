@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-4-13 05:23+0000\n"
+"POT-Creation-Date: 2022-4-13 06:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3540,6 +3540,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Config item event module that shows passed parameters BEFORE action is perdormed. May be used as template for own CI-events."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid "Config item event module that updates the counters for basic configitem stats."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
