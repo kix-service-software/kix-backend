@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -881,7 +881,7 @@ sub _ReadReleaseFile {
         # ignore comment lines
         next if ( $Line =~ /^#/ );
 
-        foreach my $Key ( qw(Product Version Description BuildDate BuildHost BuildNumber Requires) ) {
+        foreach my $Key ( qw(Product Version Description BuildDate BuildHost BuildNumber PatchNumber Requires) ) {
             my $Var = uc($Key);
 
             if ( $Line =~ /^$Var\s{0,2}=\s{0,2}(.*)\s{0,2}$/i ) {

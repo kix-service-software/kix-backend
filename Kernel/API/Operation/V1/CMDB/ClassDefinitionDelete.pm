@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -64,12 +64,12 @@ sub ParameterDefinition {
         'ClassID' => {
             DataType => 'NUMERIC',
             Required => 1,
-            OneOf    => \@ClassIDs,            
-        },       
+            OneOf    => \@ClassIDs,
+        },
         'DefinitionID' => {
             DataType => 'NUMERIC',
             Required => 1,
-            Type     => 'ARRAY',            
+            Type     => 'ARRAY',
         },
     }
 }
@@ -80,8 +80,8 @@ perform ClassDefinitionDelete Operation.
 
     my $Result = $OperationObject->Run(
         Data => {
-            DefinitionID  => '...',     
-        },      
+            DefinitionID  => '...',
+        },
     );
 
     $Result = {
@@ -94,7 +94,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     foreach my $DefinitionID ( @{$Param{Data}->{DefinitionID}} ) {
-     
+
         my $Definition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
             DefinitionID => $DefinitionID,
         );
@@ -104,12 +104,12 @@ sub Run {
                 Code => 'Object.NotFound'
             );
         }
-        
+
         my $Success = $Kernel::OM->Get('ITSMConfigItem')->DefinitionDelete(
             DefinitionID => $DefinitionID,
             UserID       => $Self->{Authorization}->{UserID},
         );
-    
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
@@ -117,7 +117,7 @@ sub Run {
             );
         }
     }
-    
+
     # return result
     return $Self->_Success();
 }

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -99,7 +99,7 @@ sub ValidateConfig {
     # do some basic checks
     return if !$Self->SUPER::ValidateConfig(
         %Param,
-        Config => $Param{Config} || {}      # Config 
+        Config => $Param{Config} || {}      # Config
     );
 
     # validate if Columns is an ArrayRef
@@ -203,7 +203,7 @@ sub Run {
             );
         }
         my $LanguageObject = $Kernel::OM->Get('Language');
-        
+
         foreach my $Column ( @Columns ) {
             $Column = $LanguageObject->Translate($Column);
         }

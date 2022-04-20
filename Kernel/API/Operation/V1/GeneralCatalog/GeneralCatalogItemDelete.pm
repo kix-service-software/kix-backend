@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ perform GeneralCatalogItemDelete Operation. This will return {}.
     my $Result = $OperationObject->Run(
         Data => {
             GeneralCatalogItemID  => '...',
-        },		
+        },
     );
 
     $Result = {
@@ -77,27 +77,27 @@ perform GeneralCatalogItemDelete Operation. This will return {}.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     # start loop
     foreach my $GeneralCatalogItemID ( @{$Param{Data}->{GeneralCatalogItemID}} ) {
 
         my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
             ClassIDs     => [$GeneralCatalogItemID],
         );
-	    
+
         if ( $ConfigItemID->[0] ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete GeneralCatalogItem. A ConfigItem with this GeneralCatalogItem already exists.',
             );
-        } 
-         	       
-        # delete GeneralCatalog	    
+        }
+
+        # delete GeneralCatalog
         my $Success = $Kernel::OM->Get('GeneralCatalog')->GeneralCatalogItemDelete(
             GeneralCatalogItemID  => $GeneralCatalogItemID,
             UserID  => $Self->{Authorization}->{UserID},
         );
- 
+
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',

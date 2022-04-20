@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-2-3 14:22+0000\n"
-"PO-Revision-Date: 2021-12-08 09:48+0000\n"
-"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
+"POT-Creation-Date: 2022-3-18 10:43+0000\n"
+"PO-Revision-Date: 2022-04-05 11:44+0000\n"
+"Last-Translator: khuesig <Katja.Huesig@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
 "Language: en\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.4\n"
+"X-Generator: Weblate 4.10.1\n"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
@@ -179,7 +179,7 @@ msgid "Customer Reader"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Customer Response :: reopen from pending"
+msgid "Customer Response - reopen from pending"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -212,7 +212,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
-"Event based Execution Plan for Job \"Customer Response :: reopen from pending"
+"Event based Execution Plan for Job \"Customer Response - reopen from pending"
 "\""
 msgstr ""
 
@@ -303,7 +303,7 @@ msgid "Laptop"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Macro for Job \"Customer Response :: reopen from pending\""
+msgid "Macro for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -311,7 +311,7 @@ msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "MacroAction for Job \"Customer Response :: reopen from pending\""
+msgid "MacroAction for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -825,11 +825,23 @@ msgid "d"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "day(s)"
+msgstr ""
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "h"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "hour(s)"
+msgstr ""
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "m"
+msgstr ""
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "minute(s)"
 msgstr ""
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
@@ -1522,88 +1534,8 @@ msgstr ""
 msgid "This setting is not active by default."
 msgstr ""
 
-#. Perl Module: Kernel/System/DynamicField/Driver/BaseText.pm
-msgid "This field is required."
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "and"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "before/after"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "between"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "day"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "day(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "hour(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "in more than ..."
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "minute(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "month(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "more than ... ago"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "week(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "within the last ..."
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "within the next ..."
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "year(s)"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Multiselect.pm
-msgid "Show Tree Selection"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
-msgid "Remove selection"
-msgstr ""
-
 #. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
 msgid "%s rows"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
-msgid "Maximum size is %s characters."
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
-msgid "The field content is too long!"
-msgstr ""
-
-#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
-msgid "This field is required or"
 msgstr ""
 
 #. Perl Module: Kernel/System/FwdLinkedObjectData.pm
@@ -1789,10 +1721,6 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
-msgstr ""
-
-#. Perl Module: Kernel/System/Ticket/Event/CreateFAQEntry.pm
-msgid "FAQ Item suggested in source ticket:"
 msgstr ""
 
 #. Perl Module: update/build-1373.pl
@@ -2025,7 +1953,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Queue"
-msgstr "Queue"
+msgstr "Team"
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
 msgid "Up"
@@ -4791,6 +4719,18 @@ msgid "Defines the default state of new tickets."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the default ticket priority."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the default ticket queue."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the default ticket state."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the default ticket type."
 msgstr ""
 
@@ -4928,10 +4868,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Email sent to customer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Enables creation of a FAQ entry from currently created article."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

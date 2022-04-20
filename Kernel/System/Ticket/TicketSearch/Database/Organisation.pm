@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Search => [ 
+        Search => [
             'OrganisationID',
         ],
         Sort => [
@@ -86,7 +86,7 @@ sub Search {
         return;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {        
+    if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, "st.organisation_id = '".$Param{Search}->{Value}."'" );
     }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
@@ -119,7 +119,7 @@ sub Search {
             Value => $Param{Search}->{Value}
         );
         push( @SQLWhere, $Field." LIKE ".$Value );
-    }    
+    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.organisation_id IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
@@ -133,7 +133,7 @@ sub Search {
 
     return {
         SQLWhere => \@SQLWhere,
-    };        
+    };
 }
 
 =item Sort()
@@ -161,7 +161,7 @@ sub Sort {
         SQLOrderBy => [
             "st.organisation_id"
         ],
-    };        
+    };
 }
 
 1;

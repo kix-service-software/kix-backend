@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,10 +91,11 @@ sub Run {
 
     # filter for customer assigned articles if necessary
     @ArticleIndex = $Self->_FilterCustomerUserVisibleObjectIds(
-        TicketID     => $Param{Data}->{TicketID},
-        ObjectType   => 'TicketArticle',
-        ObjectIDList => \@ArticleIndex,
-        UserID       => $Self->{Authorization}->{UserID}
+        TicketID               => $Param{Data}->{TicketID},
+        ObjectType             => 'TicketArticle',
+        ObjectIDList           => \@ArticleIndex,
+        UserID                 => $Self->{Authorization}->{UserID},
+        RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
     );
 
     if ( @ArticleIndex ) {
@@ -103,11 +104,11 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleGet',
             SuppressPermissionErrors => 1,
-            Data          => {
-                TicketID  => $Param{Data}->{TicketID},
-                ArticleID => join(',', @ArticleIndex),
-                include   => $Param{Data}->{include},
-                expand    => $Param{Data}->{expand}
+            Data                     => {
+                TicketID               => $Param{Data}->{TicketID},
+                ArticleID              => join(',', @ArticleIndex),
+                include                => $Param{Data}->{include},
+                expand                 => $Param{Data}->{expand}
             }
         );
 

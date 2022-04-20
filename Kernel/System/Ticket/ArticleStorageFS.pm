@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -202,9 +202,9 @@ sub ArticleDeletePlain {
     );
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( 
+    my $ContentPath = $Self->ArticleGetContentPath(
         TicketID  => $Article{TicketID},
-        ArticleID => $Param{ArticleID} 
+        ArticleID => $Param{ArticleID}
     );
     my $File = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt";
     if ( -f $File ) {
@@ -265,9 +265,9 @@ sub ArticleDeleteAttachment {
     );
 
     # delete from fs
-    my $ContentPath = $Self->ArticleGetContentPath( 
+    my $ContentPath = $Self->ArticleGetContentPath(
         TicketID  => $Article{TicketID},
-        ArticleID => $Param{ArticleID} 
+        ArticleID => $Param{ArticleID}
     );
     my $Path = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}";
 
@@ -379,7 +379,7 @@ sub ArticleWriteAttachment {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Content Filename ContentType ArticleID UserID)) {
+    for (qw(Filename ContentType ArticleID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -397,9 +397,9 @@ sub ArticleWriteAttachment {
     # prepare/filter ArticleID
     $Param{ArticleID} = quotemeta( $Param{ArticleID} );
     $Param{ArticleID} =~ s/\0//g;
-    my $ContentPath = $Self->ArticleGetContentPath( 
+    my $ContentPath = $Self->ArticleGetContentPath(
         TicketID  => $Article{TicketID},
-        ArticleID => $Param{ArticleID} 
+        ArticleID => $Param{ArticleID}
     );
 
     # define path
@@ -514,7 +514,7 @@ sub ArticleWriteAttachment {
         Directory  => $Param{Path},
         Filename   => $Param{Filename},
         Mode       => 'binmode',
-        Content    => \$Param{Content},
+        Content    => \($Param{Content} || ''),
         Permission => 660,
     );
 
@@ -534,7 +534,7 @@ sub ArticleWriteAttachment {
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
     );
-    
+
     return 1;
 }
 
@@ -699,7 +699,7 @@ sub ArticleAttachmentIndexRaw {
 
     FILENAME:
     for my $Filename ( sort @List ) {
-        my $FileSize    = -s $Filename;
+        my $FileSize    = -s $Filename || 0;
         my $FileSizeRaw = $FileSize;
 
         # do not use control file
@@ -710,16 +710,14 @@ sub ArticleAttachmentIndexRaw {
         next FILENAME if $Filename =~ /\/plain.txt$/;
 
         # human readable file size
-        if ($FileSize) {
-            if ( $FileSize > ( 1024 * 1024 ) ) {
-                $FileSize = sprintf "%.1f MBytes", ( $FileSize / ( 1024 * 1024 ) );
-            }
-            elsif ( $FileSize > 1024 ) {
-                $FileSize = sprintf "%.1f KBytes", ( ( $FileSize / 1024 ) );
-            }
-            else {
-                $FileSize = $FileSize . ' Bytes';
-            }
+        if ( $FileSize > ( 1024 * 1024 ) ) {
+            $FileSize = sprintf "%.1f MBytes", ( $FileSize / ( 1024 * 1024 ) );
+        }
+        elsif ( $FileSize > 1024 ) {
+            $FileSize = sprintf "%.1f KBytes", ( ( $FileSize / 1024 ) );
+        }
+        else {
+            $FileSize = $FileSize . ' Bytes';
         }
 
         # read content type
@@ -801,7 +799,7 @@ sub ArticleAttachmentIndexRaw {
         $Index{$Counter} = {
             Filename           => $Filename,
             Filesize           => $FileSize,
-            FilesizeRaw        => $FileSizeRaw,
+            FilesizeRaw        => 0 + $FileSizeRaw,
             ContentType        => $ContentType,
             ContentID          => $ContentID,
             ContentAlternative => $Alternative,
@@ -847,17 +845,15 @@ sub ArticleAttachmentIndexRaw {
     while ( my @Row = $DBObject->FetchrowArray() ) {
 
         # human readable file size
-        my $FileSizeRaw = $Row[2];
-        if ( $Row[2] ) {
-            if ( $Row[2] > ( 1024 * 1024 ) ) {
-                $Row[2] = sprintf "%.1f MBytes", ( $Row[2] / ( 1024 * 1024 ) );
-            }
-            elsif ( $Row[2] > 1024 ) {
-                $Row[2] = sprintf "%.1f KBytes", ( ( $Row[2] / 1024 ) );
-            }
-            else {
-                $Row[2] = $Row[2] . ' Bytes';
-            }
+        my $FileSizeRaw = $Row[2] || 0;
+        if ( $Row[2] > ( 1024 * 1024 ) ) {
+            $Row[2] = sprintf "%.1f MBytes", ( $Row[2] / ( 1024 * 1024 ) );
+        }
+        elsif ( $Row[2] > 1024 ) {
+            $Row[2] = sprintf "%.1f KBytes", ( ( $Row[2] / 1024 ) );
+        }
+        else {
+            $Row[2] = $Row[2] . ' Bytes';
         }
 
         my $Disposition = $Row[5];
@@ -885,7 +881,7 @@ sub ArticleAttachmentIndexRaw {
         $Index{$Counter} = {
             Filename           => $Row[0],
             Filesize           => $Row[2] || '',
-            FilesizeRaw        => $FileSizeRaw || 0,
+            FilesizeRaw        => 0 + $FileSizeRaw || 0,
             ContentType        => $Row[1],
             ContentID          => $Row[3] || '',
             ContentAlternative => $Row[4] || '',

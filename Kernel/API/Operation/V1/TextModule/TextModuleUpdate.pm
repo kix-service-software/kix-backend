@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -96,10 +96,10 @@ perform TextModuleUpdate Operation. This will return the updated TypeID.
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            TextModuleID  => 123,              # ID of the updated TextModule 
+            TextModuleID  => 123,              # ID of the updated TextModule
         },
     };
-   
+
 =cut
 
 
@@ -110,13 +110,13 @@ sub Run {
     my $TextModule = $Self->_Trim(
         Data => $Param{Data}->{TextModule}
     );
-    
-    # check if TextModule exists 
+
+    # check if TextModule exists
     my %TextModuleData = $Kernel::OM->Get('TextModule')->TextModuleGet(
         ID     => $Param{Data}->{TextModuleID},
         UserID => $Self->{Authorization}->{UserID},
     );
- 
+
     if ( !%TextModuleData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -128,7 +128,7 @@ sub Run {
         my $ExistingProfileIDs = $Kernel::OM->Get('TextModule')->TextModuleList(
             Name        => $TextModule->{Name},
         );
-        
+
         if ( IsArrayRefWithData($ExistingProfileIDs) && $ExistingProfileIDs->[0] != $TextModuleData{ID}) {
             return $Self->_Error(
                 Code => 'Object.AlreadyExists',
@@ -146,7 +146,7 @@ sub Run {
         Subject            => exists $TextModule->{Subject} ? $TextModule->{Subject} : $TextModuleData{Subject},
         Keywords           => IsArrayRef($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : $TextModuleData{Keywords},
         Comment            => exists $TextModule->{Comment} ? $TextModule->{Comment} : $TextModuleData{Comment},
-        ValidID            => $TextModule->{ValidID} || $TextModuleData{ValidID},        
+        ValidID            => $TextModule->{ValidID} || $TextModuleData{ValidID},
         UserID             => $Self->{Authorization}->{UserID},
     );
 
@@ -156,10 +156,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         TextModuleID => $Param{Data}->{TextModuleID},
-    );    
+    );
 }
 
 1;

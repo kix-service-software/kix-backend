@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -51,7 +51,7 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     my @JobTypes;
-    
+
     if ( IsHashRefWithData($Kernel::OM->Get('Config')->Get('Automation::JobType')) ) {
         @JobTypes = sort keys %{ $Kernel::OM->Get('Config')->Get('Automation::JobType') };
     }
@@ -77,7 +77,7 @@ perform JobCreate Operation. This will return the created JobID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Job  => {                
+            Job  => {
                 Name    => 'Item Name',
                 Type    => 'Ticket',
                 Comment => 'Comment',              # optional
@@ -95,7 +95,7 @@ perform JobCreate Operation. This will return the created JobID.
 
     $Result = {
         Success => 1,                       # 0 or 1
-        Code    => '',                      # 
+        Code    => '',                      #
         Message => '',                      # in case of error
         Data    => {                        # result data payload after Operation
             JobID  => '',    # ID of the created Job

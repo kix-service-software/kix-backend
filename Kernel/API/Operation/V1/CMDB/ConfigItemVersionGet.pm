@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -70,7 +70,7 @@ sub ParameterDefinition {
 perform ConfigItemVersionGet Operation.
 
     my $Result = $OperationObject->Run(
-        ConfigItemID => 1,                                # required 
+        ConfigItemID => 1,                                # required
         VersionID    => 1                                 # required
     );
 
@@ -112,7 +112,7 @@ sub Run {
 
     if (IsArrayRefWithData($Versions)) {
         my %VersionListMap = map { $_->{VersionID} => $_ } @{$Versions};
-    
+
         foreach my $VersionID ( @{$Param{Data}->{VersionID}} ) {
 
             my $Version = $VersionListMap{$VersionID};
@@ -121,7 +121,7 @@ sub Run {
                 return $Self->_Error(
                     Code => 'Object.NotFound',
                 );
-            }     
+            }
 
             # include Definition if requested
             if ( $Param{Data}->{include}->{Definition} ) {
@@ -191,7 +191,7 @@ sub Run {
         elsif ( scalar(@VersionList) == 1 ) {
             return $Self->_Success(
                 ConfigItemVersion => $VersionList[0],
-            );    
+            );
         }
     }
 

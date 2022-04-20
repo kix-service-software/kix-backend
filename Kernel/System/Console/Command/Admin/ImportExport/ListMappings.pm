@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -57,7 +57,7 @@ sub Run {
                 )
             {
                 $TemplateListString .= sprintf(
-                    "%-6s %-60.60s %-20.20s %-20.20s %s\n", 
+                    "%-6s %-60.60s %-20.20s %-20.20s %s\n",
                     $CurrTemplateID, $TemplateDataRef->{Name}, $TemplateDataRef->{Format},$TemplateDataRef->{Object},
                     %ValidList ? $ValidList{$TemplateDataRef->{ValidID}} : $TemplateDataRef->{ValidID}
                 );

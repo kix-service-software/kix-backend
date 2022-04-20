@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -77,7 +77,7 @@ sub Run {
                     $Value = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                         Value  => $Permission{Value},
                         Format => 'Long'
-                    );     
+                    );
                 }
                 elsif ( $Key eq 'TypeID' ) {
                     $Label = 'Type';
@@ -114,7 +114,7 @@ sub Run {
             my $Value = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                 Value  => $Permission{Value},
                 Format => 'Short'
-            );      
+            );
 
             # prepare type
             my %PermissionType = $Kernel::OM->Get('Role')->PermissionTypeGet(

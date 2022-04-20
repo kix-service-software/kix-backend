@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-2-3 14:22+0000\n"
-"PO-Revision-Date: 2022-02-04 14:44+0000\n"
+"POT-Creation-Date: 2022-3-18 10:43+0000\n"
+"PO-Revision-Date: 2022-03-21 10:44+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -179,8 +179,8 @@ msgid "Customer Reader"
 msgstr "Customer Reader"
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Customer Response :: reopen from pending"
-msgstr "Customer Response - reopen from pending"
+msgid "Customer Response - reopen from pending"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer removed ticket."
@@ -212,11 +212,9 @@ msgstr "Enterprise Lizenz"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
-"Event based Execution Plan for Job \"Customer Response :: reopen from pending"
+"Event based Execution Plan for Job \"Customer Response - reopen from pending"
 "\""
 msgstr ""
-"Event-basierter Ausführungsplan für Job \"Customer Response :: reopen from "
-"pending\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -313,7 +311,7 @@ msgid "Laptop"
 msgstr "Laptop"
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Macro for Job \"Customer Response :: reopen from pending\""
+msgid "Macro for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -321,7 +319,7 @@ msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr "Macro für Job \"KIX Field Agent - Mobile Processing Rejected\""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "MacroAction for Job \"Customer Response :: reopen from pending\""
+msgid "MacroAction for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -863,12 +861,24 @@ msgid "d"
 msgstr "d"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "day(s)"
+msgstr "Tag(e)"
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "h"
 msgstr "h"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "hour(s)"
+msgstr "Stunde(n)"
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "m"
 msgstr "m"
+
+#. Perl Module: Kernel/Output/HTML/Layout.pm
+msgid "minute(s)"
+msgstr "Minute(n)"
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "No matches found."
@@ -1264,7 +1274,7 @@ msgstr "Sendertyp"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Show in Customer Portal"
-msgstr "Für Self Service Portal freigeben"
+msgstr "Im SSP anzeigen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Subject"
@@ -1642,89 +1652,9 @@ msgstr "Diese Einstellung kann nicht deaktiviert werden."
 msgid "This setting is not active by default."
 msgstr "Diese Einstellung ist als Vorgabe inaktiv."
 
-#. Perl Module: Kernel/System/DynamicField/Driver/BaseText.pm
-msgid "This field is required."
-msgstr "Dieses Feld ist ein Pflichtfeld."
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "and"
-msgstr "und"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "before/after"
-msgstr "vor/nach"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "between"
-msgstr "zwischen"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "day"
-msgstr "Tag"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "day(s)"
-msgstr "Tag(e)"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "hour(s)"
-msgstr "Stunde(n)"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "in more than ..."
-msgstr "in mehr als..."
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "minute(s)"
-msgstr "Minute(n)"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "month(s)"
-msgstr "Monat(e)"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "more than ... ago"
-msgstr "vor mehr als ..."
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "week(s)"
-msgstr "Woche(n)"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "within the last ..."
-msgstr "innerhalb der letzten ..."
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "within the next ..."
-msgstr "innerhalb der nächsten ..."
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Date.pm
-msgid "year(s)"
-msgstr "Jahr(e)"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/Multiselect.pm
-msgid "Show Tree Selection"
-msgstr "Baumauswahl anzeigen"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/RemoteDB.pm
-msgid "Remove selection"
-msgstr "Auswahl entfernen"
-
 #. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
 msgid "%s rows"
 msgstr "%s Zeilen"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
-msgid "Maximum size is %s characters."
-msgstr "Maximale Länge ist %s Zeichen."
-
-#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
-msgid "The field content is too long!"
-msgstr "Der Feldinhalt ist zu lang!"
-
-#. Perl Module: Kernel/System/DynamicField/Driver/TextArea.pm
-msgid "This field is required or"
-msgstr "Das Feld wird benötigt oder"
 
 #. Perl Module: Kernel/System/FwdLinkedObjectData.pm
 msgid "Location Information"
@@ -1938,10 +1868,6 @@ msgstr "Titel"
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
 msgstr "Entsperrzeit zurück setzen."
-
-#. Perl Module: Kernel/System/Ticket/Event/CreateFAQEntry.pm
-msgid "FAQ Item suggested in source ticket:"
-msgstr "FAQ Eintrag vorgeschlagen in Quellticket:"
 
 #. Perl Module: update/build-1373.pl
 msgid "Related Assets"
@@ -3294,7 +3220,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Excel"
-msgstr ""
+msgstr "Excel"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Execute Macro"
@@ -3552,7 +3478,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
-msgstr "Includes"
+msgstr "Beinhaltet"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Inline"
@@ -4983,6 +4909,18 @@ msgid "Defines the default state of new tickets."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the default ticket priority."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the default ticket queue."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Defines the default ticket state."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the default ticket type."
 msgstr ""
 
@@ -5121,10 +5059,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Email sent to customer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Enables creation of a FAQ entry from currently created article."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6233,6 +6167,70 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid "Customer Response :: reopen from pending"
+#~ msgstr "Customer Response - reopen from pending"
+
+#~ msgid ""
+#~ "Event based Execution Plan for Job \"Customer Response :: reopen from "
+#~ "pending\""
+#~ msgstr ""
+#~ "Event-basierter Ausführungsplan für Job \"Customer Response :: reopen "
+#~ "from pending\""
+
+#~ msgid "This field is required."
+#~ msgstr "Dieses Feld ist ein Pflichtfeld."
+
+#~ msgid "and"
+#~ msgstr "und"
+
+#~ msgid "before/after"
+#~ msgstr "vor/nach"
+
+#~ msgid "between"
+#~ msgstr "zwischen"
+
+#~ msgid "day"
+#~ msgstr "Tag"
+
+#~ msgid "in more than ..."
+#~ msgstr "in mehr als..."
+
+#~ msgid "month(s)"
+#~ msgstr "Monat(e)"
+
+#~ msgid "more than ... ago"
+#~ msgstr "vor mehr als ..."
+
+#~ msgid "week(s)"
+#~ msgstr "Woche(n)"
+
+#~ msgid "within the last ..."
+#~ msgstr "innerhalb der letzten ..."
+
+#~ msgid "within the next ..."
+#~ msgstr "innerhalb der nächsten ..."
+
+#~ msgid "year(s)"
+#~ msgstr "Jahr(e)"
+
+#~ msgid "Show Tree Selection"
+#~ msgstr "Baumauswahl anzeigen"
+
+#~ msgid "Remove selection"
+#~ msgstr "Auswahl entfernen"
+
+#~ msgid "Maximum size is %s characters."
+#~ msgstr "Maximale Länge ist %s Zeichen."
+
+#~ msgid "The field content is too long!"
+#~ msgstr "Der Feldinhalt ist zu lang!"
+
+#~ msgid "This field is required or"
+#~ msgstr "Das Feld wird benötigt oder"
+
+#~ msgid "FAQ Item suggested in source ticket:"
+#~ msgstr "FAQ Eintrag vorgeschlagen in Quellticket:"
 
 #~ msgid "External Supplier"
 #~ msgstr "Externer Lieferant"

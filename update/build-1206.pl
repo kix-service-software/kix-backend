@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -26,15 +26,15 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 );
 
 use vars qw(%INC);
-    
-# store current CI name in table configitem as well 
+
+# store current CI name in table configitem as well
 _MigrateConfigItemNames();
 
 sub _MigrateConfigItemNames {
     my ( $Self, %Param ) = @_;
 
     my $SQL = 'UPDATE configitem ci SET name = (SELECT name FROM configitem_version civ WHERE civ.configitem_id = ci.id AND civ.id = ci.last_version_id)';
-    
+
     my $Result = $Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
     );
@@ -48,7 +48,7 @@ sub _MigrateConfigItemNames {
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
-    
+
     return 1;
 }
 

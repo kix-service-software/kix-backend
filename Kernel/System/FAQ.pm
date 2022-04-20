@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1201,7 +1201,7 @@ sub AttachmentIndex {
         my $Disposition = $Row[5];
 
         # convert to human readable file size
-        my $FileSizeRaw = $Filesize;
+        my $FileSizeRaw = 0 + $Filesize;
         if ($Filesize) {
             if ( $Filesize > ( 1024 * 1024 ) ) {
                 $Filesize = sprintf "%.1f MBytes", ( $Filesize / ( 1024 * 1024 ) );

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -62,7 +62,7 @@ sub Run {
     );
 
 	# get already prepared Lock data from LockGet operation
-    if ( IsHashRefWithData(\%LockList) ) {  	
+    if ( IsHashRefWithData(\%LockList) ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Lock::LockGet',
             SuppressPermissionErrors => 1,

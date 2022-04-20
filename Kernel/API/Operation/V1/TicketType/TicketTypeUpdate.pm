@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -54,7 +54,7 @@ sub ParameterDefinition {
         'TypeID' => {
             DataType => 'NUMERIC',
             Required => 1
-        },                
+        },
         'TicketType' => {
             Type     => 'HASH',
             Required => 1
@@ -74,31 +74,31 @@ perform TicketTypeUpdate Operation. This will return the updated TypeID.
             ...
 	    },
 	);
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            TypeID  => '',                      # TypeID 
+            TypeID  => '',                      # TypeID
             Error   => {                        # should not return errors
                     Code    => 'TicketType.Update.ErrorCode'
                     Message => 'Error Description'
             },
         },
     };
-   
+
 =cut
 
 
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check if tickettype exists 
+    # check if tickettype exists
     my %TicketTypeData = $Kernel::OM->Get('Type')->TypeGet(
         ID => $Param{Data}->{TypeID},
     );
-    
+
     if ( !%TicketTypeData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -115,7 +115,7 @@ sub Run {
         Name => $TicketType->{Name},
         ID   => $Param{Data}->{TypeID},
     );
-    
+
     if ( $Exists ) {
         return $Self->_Error(
             Code => 'Object.AlreadyExists',
@@ -137,10 +137,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         TypeID => $TicketTypeData{ID},
-    );    
+    );
 }
 
 1;

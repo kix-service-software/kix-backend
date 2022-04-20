@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -59,20 +59,20 @@ sub _RemoveDuplicatePermissions {
             SQL => 'DELETE rp FROM role_permission rp
                     INNER JOIN role_permission rp2
                     WHERE rp2.id > rp.id
-                        AND rp2.role_id = rp.role_id 
-                        AND rp2.target = rp.target 
-                        AND rp2.type_id = rp.type_id 
+                        AND rp2.role_id = rp.role_id
+                        AND rp2.target = rp.target
+                        AND rp2.type_id = rp.type_id
                         AND rp2.id <> rp.id'
         );
     }
     else {
         $Result = $DBObject->Do(
-            SQL => 'DELETE FROM role_permission rp 
+            SQL => 'DELETE FROM role_permission rp
                     WHERE EXISTS (
-                        SELECT id FROM role_permission rp2 
-                        WHERE rp2.role_id = rp.role_id 
-                            AND rp2.target = rp.target 
-                            AND rp2.type_id = rp.type_id 
+                        SELECT id FROM role_permission rp2
+                        WHERE rp2.role_id = rp.role_id
+                            AND rp2.target = rp.target
+                            AND rp2.type_id = rp.type_id
                             AND rp2.id > rp.id
                     )'
         );

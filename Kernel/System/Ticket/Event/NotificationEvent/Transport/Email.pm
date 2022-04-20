@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -427,7 +427,7 @@ sub SendNotification {
         return if !$SecurityOptions;
 
         my $Sent = $Kernel::OM->Get('Email')->Send(
-            From       => $Address{Email},
+            From       => "$Address{RealName} <$Address{Email}>",
             To         => $Recipient{Email},
             Subject    => $Notification{Subject},
             MimeType   => $Notification{ContentType},

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -133,7 +133,7 @@ sub DefinitionGet {
             }
         }
     }
-    
+
     return %Definition;
 }
 
@@ -171,7 +171,7 @@ sub ValidateConfig {
         );
         return;
     }
-    
+
     foreach my $DBMS ( sort keys %{$Param{Config}->{SQL}} ) {
         # validate DBMS
         if ( $DBMS !~ /^(postgresql|mysql|any)$/g ) {
@@ -207,7 +207,7 @@ sub ValidateConfig {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # prepare the SQL statement
-    my $Result = $DBObject->Prepare( 
+    my $Result = $DBObject->Prepare(
         SQL => $SQL
     );
     if ( !$Result ) {
@@ -291,7 +291,7 @@ sub GetProperties {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # prepare the SQL statement
-    my $Result = $DBObject->Prepare( 
+    my $Result = $DBObject->Prepare(
         SQL => $SQL
     );
     if ( !$Result ) {
@@ -340,7 +340,7 @@ sub GetData {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # prepare the SQL statement
-    my $Success = $DBObject->Prepare( 
+    my $Success = $DBObject->Prepare(
         SQL => $SQL
     );
     if ( !$Success ) {
@@ -350,7 +350,7 @@ sub GetData {
         );
         return;
     }
-    
+
     my $Columns = $Self->GetProperties(Config => $Param{Config});
     if ( !$Columns ) {
         $Kernel::OM->Get('Log')->Log(
@@ -534,7 +534,7 @@ sub _LoadOutputHandlerBackend {
             return;
         }
 
-        my $Backend = $Backends->{$Param{Name}}->{Module}; 
+        my $Backend = $Backends->{$Param{Name}}->{Module};
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
@@ -591,7 +591,7 @@ sub _LoadFunctionBackend {
             return;
         }
 
-        my $Backend = $Backends->{$Param{Name}}->{Module}; 
+        my $Backend = $Backends->{$Param{Name}}->{Module};
 
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -351,7 +351,7 @@ sub SystemAddressIsLocalAddress {
             return;
         }
     }
-    
+
     $Param{Name} = $Param{Address};
 
     return $Self->SystemAddressLookup(%Param);
@@ -400,9 +400,7 @@ sub SystemAddressLookup {
     if ( $Param{SystemAddressID} ) {
         # lookup
         $DBObject->Prepare(
-            SQL => "SELECT value0 FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) "
-                . "AND id = ?",        
+            SQL => "SELECT value0 FROM system_address WHERE id = ?",
             Bind  => [ \$Param{SystemAddressID}, ],
             Limit => 1,
         );
@@ -426,9 +424,7 @@ sub SystemAddressLookup {
 
         # lookup
         $DBObject->Prepare(
-            SQL => "SELECT id FROM system_address WHERE "
-                . "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) "
-                . "AND value0 = ?",        
+            SQL => "SELECT id FROM system_address WHERE value0 = ?",
             Bind  => [ \$Param{Name} ],
             Limit => 1,
         );
@@ -438,7 +434,7 @@ sub SystemAddressLookup {
         while ( my @Row = $DBObject->FetchrowArray() ) {
             $SystemAddressID = $Row[0];
         }
-        
+
         $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
@@ -463,7 +459,7 @@ sub SystemAddressDelete {
             return;
         }
     }
- 
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
     return if !$DBObject->Prepare(

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -390,7 +390,7 @@ sub _NotificationFilter {
 
     # create or extend the filter with the ArticleID or TicketID
     if ( $Param{Data}->{ArticleID} ) {
-        # add ArticleID to filter 
+        # add ArticleID to filter
         $Filter //= {};
         $Filter->{AND} //= [];
         push @{$Filter->{AND}}, {
@@ -400,7 +400,7 @@ sub _NotificationFilter {
         };
     }
     elsif ( $Param{Ticket}->{TicketID} ) {
-        # add TicketID to filter 
+        # add TicketID to filter
         $Filter //= {};
         $Filter->{AND} //= [];
         push @{$Filter->{AND}}, {
@@ -839,10 +839,10 @@ sub _SendRecipientNotification {
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # check if the notification needs to be sent just one time per day
-    if ( 
-        IsArrayRefWithData($Param{Notification}->{Data}->{OncePerDay}) 
+    if (
+        IsArrayRefWithData($Param{Notification}->{Data}->{OncePerDay})
         && $Param{Notification}->{Data}->{OncePerDay}->[0]
-        && $Param{Recipient}->{UserLogin} 
+        && $Param{Recipient}->{UserLogin}
     ) {
 
         # get ticket history
@@ -915,7 +915,7 @@ sub _SendRecipientNotification {
                 CreateUserID => $Param{UserID},
             );
         }
-        elsif ( $Param{Recipient}->{Type} eq 'Customer' && $Param{Recipient}->{Email} ) {        
+        elsif ( $Param{Recipient}->{Type} eq 'Customer' && $Param{Recipient}->{Email} ) {
             # write history
             $TicketObject->HistoryAdd(
                 TicketID     => $Param{TicketID},

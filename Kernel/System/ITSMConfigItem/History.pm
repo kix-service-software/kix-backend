@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -508,7 +508,7 @@ sub _EnrichHistoryEntries {
     my $ConfigItem = $Self->ConfigItemGet(
         ConfigItemID => $Param{ConfigItemID},
     );
-    
+
     # get definition for CI's class
     my $Definition = $Self->DefinitionGet(
         ClassID => $ConfigItem->{ClassID},

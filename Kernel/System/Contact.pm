@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -189,25 +189,24 @@ sub ContactAdd {
         $Param{OrganisationIDs} = ($Param{PrimaryOrganisationID}) ? [$Param{PrimaryOrganisationID}] : undef;
     }
 
-    #if assigned user ist given, check associated user exists
+    # if assigned user ist given, check associated user exists
+    my %ExistingUser;
     if ($Param{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
-            UserID => $Param{AssignedUserID},
-            Silent => 1,
+        %ExistingUser = $Kernel::OM->Get('User')->GetUserData(
+            UserID => $Param{AssignedUserID}
         );
-        if (!$ExistingUser) {
+        if (!IsHashRefWithData(\%ExistingUser)) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot create contact. No user with ID $Param{AssignedUserID} exists.",
             );
             return;
-        }
-        else {
-            my $ExistingContact = $Kernel::OM->Get('Contact')->ContactLookup(
+        } else {
+            my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Param{AssignedUserID},
                 Silent => 1,
             );
-            if ($ExistingContact) {
+            if ($ExistingContactID) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Cannot create contact. User '$Param{AssignedUserID}' already has a contact.",
@@ -289,6 +288,20 @@ sub ContactAdd {
             Priority => 'error',
             Message  => "Cannot find new contact with email $Param{Email}!",
         );
+    }
+
+    # update user valid if necessary (user is no agent/customer or contact is invalid = user is invalid)
+    if (IsHashRefWithData(\%ExistingUser)) {
+        my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
+        my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
+            || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
+        if ($NewUserValid != $ExistingUser{ValidID}) {
+            my $Success = $Kernel::OM->Get('User')->UserUpdate(
+                %ExistingUser,
+                ValidID      => $NewUserValid,
+                ChangeUserID => 1,
+            );
+        }
     }
 
     # return data
@@ -803,19 +816,18 @@ sub ContactUpdate {
     }
 
     # if assigned user ist given, check associated user exists
+    my %ExistingUser;
     if ($Param{AssignedUserID}) {
-        my $ExistingUser = $Kernel::OM->Get('User')->UserLookup(
-            UserID => $Param{AssignedUserID},
-            Silent => 1,
+        %ExistingUser = $Kernel::OM->Get('User')->GetUserData(
+            UserID => $Param{AssignedUserID}
         );
-        if (!$ExistingUser) {
+        if (!IsHashRefWithData(\%ExistingUser)) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot update contact. No user with ID $Param{AssignedUserID} exists.",
             );
             return;
-        }
-        else {
+        } else {
             my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 UserID => $Param{AssignedUserID},
                 Silent => 1,
@@ -880,8 +892,8 @@ sub ContactUpdate {
     # update organisation IDs
     if (@DeleteOrgIDs) {
         return if !$Kernel::OM->Get('DB')->Do(
-            SQL  => 'DELETE FROM contact_organisation WHERE contact_id = ? AND org_id IN (?)',
-            Bind => [ \$Param{ID}, \${\(join ', ', @DeleteOrgIDs)} ],
+            SQL  => "DELETE FROM contact_organisation WHERE contact_id = ? AND org_id IN ( ${\(join ', ', @DeleteOrgIDs)} )",
+            Bind => [ \$Param{ID} ],
         );
     }
 
@@ -925,6 +937,20 @@ sub ContactUpdate {
         ObjectID  => $Param{ID},
     );
 
+    # update user valid if necessary (user is no agent/customer or contact is invalid = user is invalid)
+    if (IsHashRefWithData(\%ExistingUser)) {
+        my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
+        my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
+            || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
+        if ($NewUserValid != $ExistingUser{ValidID}) {
+            my $Success = $Kernel::OM->Get('User')->UserUpdate(
+                %ExistingUser,
+                ValidID      => $NewUserValid,
+                ChangeUserID => 1,
+            );
+        }
+    }
+
     return 1;
 }
 
@@ -943,6 +969,19 @@ to search contacts
     my %List = $ContactObject->ContactSearch(
         PostMasterSearch => '*email@example.com*',
         Valid            => 1,                      # (optional) default 1
+        Limit            => 100,      # (optional) overrides limit of the config
+    );
+
+    # email search (exact match)
+    my %List = $ContactObject->ContactSearch(
+        EmailEquals => 'email@example.com',
+        Valid       => 1,                      # (optional) default 1
+    );
+
+    # email list search (exact match)
+    my %List = $ContactObject->ContactSearch(
+        EmailIn => ['email1@example.com', 'email2@example.com']
+        Valid   => 1,                      # (optional) default 1
     );
 
     # search by OrganisationID
@@ -963,6 +1002,12 @@ to search contacts
         Valid          => 1,                    # (optional) default 1
     );
 
+    #search by AssignedUserID
+    my %List = $ContactObject->ContactSearch(
+        AssignedUserID => 123,
+        Valid          => 1,                    # (optional) default 1
+    );
+
     #search by UserLogin
     my %List = $ContactObject->ContactSearch(
         Login         => '*some_user_login*',
@@ -980,22 +1025,42 @@ to search contacts
 sub ContactSearch {
     my ( $Self, %Param ) = @_;
 
+    # get needed objects
+    my $CacheObject = $Kernel::OM->Get('Cache');
+    my $ValidObject = $Kernel::OM->Get('Valid');
+    my $DBObject    = $Kernel::OM->Get('DB');
+
     # check needed stuff
     my $Valid = 1;
     if ( !$Param{Valid} && defined( $Param{Valid} ) ) {
         $Valid = 0;
     }
 
-    $Param{OrganisationIDs} = join(',',$Param{OrganisationIDs}) if ($Param{OrganisationIDs} && IsArrayRefWithData($Param{OrganisationIDs}));
-
     # check cache
     my $CacheKey = "ContactSearch::${Valid}::";
     foreach my $Key (
-        qw(OrganisationIDs OrganisationID AssignedUserID UserID Search PostMasterSearch Limit Login LoginEquals EmailEquals EmailIn)
+        qw(
+            OrganisationIDs OrganisationID AssignedUserID UserID
+            Search PostMasterSearch Limit Login LoginEquals
+            EmailEquals EmailIn DynamicField
+        )
     ) {
-        $CacheKey .= '::'.($Param{$Key} || '');
+        my $CacheStrg = $Param{$Key};
+
+        if (
+            $Key eq 'DynamicField'
+            && $Param{$Key}->{Value}
+            && IsArrayRefWithData($Param{$Key}->{Value})
+        ) {
+            $CacheStrg = join( q{,} , @{$Param{$Key}->{Value}});
+        }
+        elsif ( IsArrayRefWithData($Param{$Key}) ) {
+            $CacheStrg = join( q{,} , @{$Param{$Key}});
+        }
+        $CacheKey .= q{::} . ($CacheStrg  || q{});
     }
-    my $Data = $Kernel::OM->Get('Cache')->Get(
+
+    my $Data = $CacheObject->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -1004,13 +1069,9 @@ sub ContactSearch {
     # add valid option if required
     my $Where;
     my @Bind;
-    my $Join = '';
+    my $Join = q{};
 
     if ($Valid) {
-
-        # get valid object
-        my $ValidObject = $Kernel::OM->Get('Valid');
-
         $Where .= "c.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
     }
 
@@ -1074,7 +1135,7 @@ sub ContactSearch {
             push(@BindVars, '?');
             push(@Bind, \$OrgID);
         }
-        $Where .= "(co.org_id IN ( " . join(',', @BindVars) . " ))";
+        $Where .= "(co.org_id IN ( " . join(q{,}, @BindVars) . " ))";
     }
     elsif ($Param{AssignedUserID}) {
         if (defined $Where) {
@@ -1140,6 +1201,19 @@ sub ContactSearch {
         $Where .= "$Self->{Lower}(u.login) = $Self->{Lower}(?)";
         push(@Bind, \$Param{LoginEquals});
     }
+    elsif (
+        $Param{DynamicField}
+        && IsHashRefWithData($Param{DynamicField})
+    ) {
+        my $SQLReturn = $Self->_SearchInDynamicField(
+            Search       => $Param{DynamicField},
+            BoolOperator => 'AND',
+            JoinCounter  => '0'
+        );
+
+        $Join  .= join( q{ }, @{$SQLReturn->{SQLJoin}});
+        $Where .= join( ' AND ', @{$SQLReturn->{SQLWhere}});
+    }
 
     my $SQL = "SELECT DISTINCT c.id, c.email FROM contact c $Join ";
     if ( $Where ) {
@@ -1147,7 +1221,7 @@ sub ContactSearch {
     }
 
     # ask database
-    $Kernel::OM->Get('DB')->Prepare(
+    $DBObject->Prepare(
         SQL   => $SQL,
         Bind  => \@Bind,
         Limit => $Param{Limit},
@@ -1155,12 +1229,12 @@ sub ContactSearch {
 
     # fetch the result
     my %List;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         $List{$Row[0]} = $Row[1];
     }
 
     # cache request
-    $Kernel::OM->Get('Cache')->Set(
+    $CacheObject->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \%List,
@@ -1580,6 +1654,147 @@ sub _ContactFullname {
             . ' ' . $Param{Firstname};
     }
     return $ContactFullname;
+}
+
+sub _SearchInDynamicField {
+    my ( $Self, %Param ) = @_;
+
+    # get needed object
+    my $LogObject                 = $Kernel::OM->Get('Log');
+    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+    my @SQLJoin;
+    my @SQLWhere;
+
+    # check params
+    if ( !$Param{Search} ) {
+        $LogObject->Log(
+            Priority => 'error',
+            Message  => "Need Search!",
+        );
+        return;
+    }
+
+    # validate operator
+    my %OperatorMap = (
+        'EQ'         => 'Equals',
+        'LIKE'       => 'Like',
+        'GT'         => 'GreaterThan',
+        'GTE'        => 'GreaterThanEquals',
+        'LT'         => 'SmallerThan',
+        'LTE'        => 'SmallerThanEquals',
+        'IN'         => 'Like',
+        'CONTAINS'   => 'Like',
+        'STARTSWITH' => 'StartsWith',
+        'ENDSWITH'   => 'EndsWith',
+    );
+    if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
+        $LogObject->Log(
+            Priority => 'error',
+            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
+        );
+        return;
+    }
+
+    if ( !$Self->{DynamicFields} ) {
+
+        # get all configured dynamic fields
+        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+            ObjectType => ['Contact'],
+        );
+        if ( !IsArrayRefWithData($DynamicFieldList) ) {
+            # we don't have any  DFs
+            return {
+                SQLJoin  => [],
+                SQLWhere => [],
+            };
+        }
+        $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
+    }
+
+    my $DFName = $Param{Search}->{Field};
+    $DFName =~ s/DynamicField_//gsm;
+
+    my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
+
+    if ( !IsHashRefWithData($DynamicFieldConfig) ) {
+        $LogObject->Log(
+            Priority => 'notice',
+            Message  => "DynamicField '$DFName' doesn't exist or is disabled. Ignoring it.",
+        );
+        # return empty result
+        return {
+            SQLJoin  => [],
+            SQLWhere => [],
+        };
+    }
+
+    my $Value = $Param{Search}->{Value};
+    if ( !IsArrayRefWithData($Value) ) {
+        $Value = [ $Value ];
+    }
+    foreach my $ValueItem ( @{$Value} ) {
+        $Value =~ s/\*/%/g;
+    }
+
+    # increase count
+    my $Count = $Param{JoinCounter}++;
+
+    # join tables
+    my $JoinTable = "dfv$Count";
+    if ( $DynamicFieldConfig->{ObjectType} eq 'Contact' ) {
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLJoin, "LEFT JOIN dynamic_field_value $JoinTable ON (CAST(c.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        } else {
+            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(c.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+        }
+    }
+
+    my $DynamicFieldSQL;
+    foreach my $ValueItem ( @{$Value} ) {
+        # validate data type
+        my $ValidateSuccess = $DynamicFieldBackendObject->ValueValidate(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Value              => $ValueItem,
+            SearchValidation   => 1,
+            UserID             => 1,
+        );
+
+        if ( !$ValidateSuccess ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  =>
+                    "Search not executed due to invalid value '"
+                    . $ValueItem
+                    . "' on field '"
+                    . $DFName
+                    . "'!",
+            );
+            return;
+        }
+
+        # get field specific SQL
+        my $SQL = $DynamicFieldBackendObject->SearchSQLGet(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            TableAlias         => $JoinTable,
+            Operator           => $OperatorMap{$Param{Search}->{Operator}},
+            SearchTerm         => $ValueItem,
+        );
+
+        if ( $DynamicFieldSQL ) {
+            $DynamicFieldSQL .= " OR ";
+        }
+        $DynamicFieldSQL .= "($SQL)";
+    }
+
+    # add field specific SQL
+    push( @SQLWhere, "($DynamicFieldSQL)" );
+
+    return {
+        SQLJoin  => \@SQLJoin,
+        SQLWhere => \@SQLWhere,
+    };
 }
 
 =end Internal

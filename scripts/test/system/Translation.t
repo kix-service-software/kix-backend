@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -213,7 +213,7 @@ $Self->False(
 
 
 # get the TranslationLanguage using the id
-my %TranslationLanguageData = $TranslationObject->TranslationLanguageGet( 
+my %TranslationLanguageData = $TranslationObject->TranslationLanguageGet(
     PatternID => $PatternID,
     Language  => $TranslationLanguage{Language}
 );
@@ -267,7 +267,7 @@ $Self->False(
     'TranslationLanguageUpdate() - update with non-existing PatternID',
 );
 
-%TranslationLanguageData = $TranslationObject->TranslationLanguageGet( 
+%TranslationLanguageData = $TranslationObject->TranslationLanguageGet(
     PatternID => $PatternID,
     Language  => $TranslationLanguage{Language},
 );
@@ -290,7 +290,7 @@ $Self->True(
     "TranslationLanguageDelete() - Try to delete the TranslationLanguage",
 );
 
-%TranslationLanguageData = $TranslationObject->TranslationLanguageGet( 
+%TranslationLanguageData = $TranslationObject->TranslationLanguageGet(
     PatternID => $PatternID,
     Language   => $TranslationLanguage{Language},
 );

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -105,7 +105,7 @@ sub Search {
                 );
                 return;
             }
-            
+
             if ( !$Param{Search}->{Not} ) {
                 if ( $Param{BoolOperator} eq 'OR') {
                     push( @SQLJoin, "LEFT OUTER JOIN article art_for_aflag$Index\_left ON st.id = art_for_aflag$Index\_left.ticket_id" );
@@ -147,7 +147,7 @@ sub Search {
                     push( @SQLWhere, "af$Index.create_by = $SearchValue->{UserID}" );
                 }
                 else {
-                    push( @SQLWhere, "naf$Index.create_by = $SearchValue->{UserID}" );                    
+                    push( @SQLWhere, "naf$Index.create_by = $SearchValue->{UserID}" );
                 }
             }
             $Index++;
@@ -164,7 +164,7 @@ sub Search {
     return {
         SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
-    };        
+    };
 }
 
 1;

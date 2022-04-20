@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -34,7 +34,7 @@ use vars qw(%INC);
 
 sub _MigratePriorities {
     my ( $Self, %Param ) = @_;
-    
+
     $Self->{PriorityObject} = $Kernel::OM->Get('Priority');
 
     $Self->{PriorityObject}->PriorityUpdate(
@@ -101,7 +101,7 @@ sub _AddRecipientSubjectToNotifications {
 
     return 1;
 }
-# change existing mobile processing dynamic fields 
+# change existing mobile processing dynamic fields
 _MigratePriorities();
 _AddRecipientSubjectToNotifications();
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -199,7 +199,7 @@ converts a given time stamp to local system time.
         String => '2004-08-14 22:45:00',
     );
 
-simple calculations using time units can be used to calculate a relative point in time. 
+simple calculations using time units can be used to calculate a relative point in time.
 supported units: Y(years),M(months),w(weeks),d(days),h(hours),m(minutes),s(seconds).
 
     my $SystemTime = $TimeObject->TimeStamp2SystemTime(
@@ -374,7 +374,7 @@ sub TimeStamp2SystemTime {
             SystemTime => $SystemTime
         );
         ($Year,$Month,$Day, $Hour,$Min,$Sec) = Add_Delta_YMDHMS(
-            $Year,$Month,$Day,$Hour,$Min,$Sec, 
+            $Year,$Month,$Day,$Hour,$Min,$Sec,
             $Diffs{Y},$Diffs{M},$Diffs{w}*7 + $Diffs{d},$Diffs{h},$Diffs{m},$Diffs{s}
         );
         $SystemTime = $Self->Date2SystemTime(

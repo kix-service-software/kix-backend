@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -72,7 +72,7 @@ perform OrganisationUpdate Operation. This will return the updated OrganisationI
         Data => {
             OrganisationID => 123         # required
             Organisation   => {
-                ...                 # attributes (required and optional) depend on Map config 
+                ...                 # attributes (required and optional) depend on Map config
                 ...
             },
         },
@@ -80,10 +80,10 @@ perform OrganisationUpdate Operation. This will return the updated OrganisationI
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Code            => '',                      # 
+        Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            OrganisationID  => '',                  # OrganisationID 
+            OrganisationID  => '',                  # OrganisationID
         },
     };
 
@@ -112,28 +112,28 @@ sub Run {
         my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
             Number => $Organisation->{Number},
         );
-        if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {        
+        if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update organisation. Another organisation with this number already exists.',
             );
         }
     }
-    
+
     # update Organisation
     my $Success = $Kernel::OM->Get('Organisation')->OrganisationUpdate(
         %OrganisationData,
         %{$Organisation},
         ID     => $Param{Data}->{OrganisationID},
         UserID => $Self->{Authorization}->{UserID},
-    );    
+    );
     if ( !$Success ) {
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
             Message => 'Could not update organisation, please contact the system administrator',
         );
     }
-    
+
     # set dynamic fields
     if ( IsArrayRefWithData($Organisation->{DynamicFields}) ) {
 
@@ -157,7 +157,7 @@ sub Run {
 
     return $Self->_Success(
         OrganisationID => 0 + $Param{Data}->{OrganisationID},
-    );   
+    );
 }
 
 1;

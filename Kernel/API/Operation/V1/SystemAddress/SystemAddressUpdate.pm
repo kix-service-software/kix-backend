@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
         'SystemAddress' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -76,17 +76,17 @@ perform SystemAddressUpdate Operation. This will return the updated TypeID.
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            SystemAddressID  => 123,                     # ID of the updated SystemAddress 
+            SystemAddressID  => 123,                     # ID of the updated SystemAddress
         },
     };
-   
+
 =cut
 
 
@@ -98,12 +98,12 @@ sub Run {
         Data => $Param{Data}->{SystemAddress},
     );
 
-    # check if SystemAddress exists 
+    # check if SystemAddress exists
     my %SystemAddressData = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
         ID => $Param{Data}->{SystemAddressID},
-        UserID      => $Self->{Authorization}->{UserID},        
+        UserID      => $Self->{Authorization}->{UserID},
     );
- 
+
     if ( !%SystemAddressData ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -112,12 +112,12 @@ sub Run {
 
     # update SystemAddress
     my $Success = $Kernel::OM->Get('SystemAddress')->SystemAddressUpdate(
-        ID       => $Param{Data}->{SystemAddressID},    
+        ID       => $Param{Data}->{SystemAddressID},
         Name     => $SystemAddress->{Name} || $SystemAddressData{Name},
         Comment  => exists $SystemAddress->{Comment} ? $SystemAddress->{Comment} : $SystemAddressData{Comment},
         ValidID  => $SystemAddress->{ValidID} || $SystemAddressData{ValidID},
-        Realname => $SystemAddress->{Realname} || $SystemAddressData{Realname},        
-        UserID   => $Self->{Authorization}->{UserID},               
+        Realname => $SystemAddress->{Realname} || $SystemAddressData{Realname},
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -126,10 +126,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         SystemAddressID => $Param{Data}->{SystemAddressID},
-    );    
+    );
 }
 
 1;

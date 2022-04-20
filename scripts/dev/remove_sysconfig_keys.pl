@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -63,8 +63,8 @@ foreach my $File (sort @FileList) {
 
     my $Result = $ContentRef;
 
-    print STDERR "    Lines before: ".@{$Result}."\n";    
-    
+    print STDERR "    Lines before: ".@{$Result}."\n";
+
     my $FileChanged = 0;
     foreach my $Key ( @KeyList ) {
         chomp($Key);
@@ -74,7 +74,7 @@ foreach my $File (sort @FileList) {
         my $Index = 0;
         foreach my $Line ( @{$Result} ) {
             next if !$Line;
-            
+
             if ( $Line =~ /<ConfigItem Name="$Key"/ ) {
                 $FileChanged = 1;
                 $Removing = 1;
@@ -99,7 +99,7 @@ foreach my $File (sort @FileList) {
     }
 
     my @Content = grep defined, @{$Result};
-    print STDERR "    Lines after: ".@Content."\n";    
+    print STDERR "    Lines after: ".@Content."\n";
 
     if ( $FileChanged ) {
         my $Result = $MainObject->FileWrite(

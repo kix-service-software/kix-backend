@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -69,7 +69,7 @@ sub ParameterDefinition {
 perform ConfigItemImageGet Operation.
 
     my $Result = $OperationObject->Run(
-        ConfigItemID => 1,                                # required 
+        ConfigItemID => 1,                                # required
         ImageID      => 1                                 # required
     );
 
@@ -89,7 +89,7 @@ perform ConfigItemImageGet Operation.
 =cut
 
 sub Run {
-    my ( $Self, %Param ) = @_;     
+    my ( $Self, %Param ) = @_;
 
     # check if ConfigItem exists
     my $Exist = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
@@ -103,7 +103,7 @@ sub Run {
     }
 
     my @ImageList;
-    foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {                 
+    foreach my $ImageID ( @{$Param{Data}->{ImageID}} ) {
 
         my %Image = $Kernel::OM->Get('ITSMConfigItem')->ImageGet(
             ConfigItemID => $Param{Data}->{ConfigItemID},
@@ -138,7 +138,7 @@ sub Run {
     elsif ( scalar(@ImageList) == 1 ) {
         return $Self->_Success(
             Image => $ImageList[0],
-        );    
+        );
     }
 
     return $Self->_Success(

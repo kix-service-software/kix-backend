@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -45,7 +45,7 @@ perform TranslationPatternSearch Operation. This will return a Translation ID li
             TranslationPattern => [
                 {
                 },
-                {                    
+                {
                 }
             ],
         },
@@ -79,7 +79,7 @@ sub Run {
         if ( defined $GetResult->{Data}->{TranslationPattern} ) {
             @ResultList = IsArrayRef($GetResult->{Data}->{TranslationPattern}) ? @{$GetResult->{Data}->{TranslationPattern}} : ( $GetResult->{Data}->{TranslationPattern} );
         }
-        
+
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 TranslationPattern => \@ResultList,

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
             Type     => 'ARRAY',
             DataType => 'NUMERIC',
             Required => 1
-        },           
+        },
     }
 }
 
@@ -95,7 +95,7 @@ sub Run {
 
     my @DynamicFieldList;
 
-    # start loop 
+    # start loop
     foreach my $DynamicFieldID ( @{$Param{Data}->{DynamicFieldID}} ) {
 
         # get the DynamicField data
@@ -108,12 +108,12 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
-        
+
         if ( !$Param{Data}->{include}->{Config} ) {
             # remove Config if not included
             delete $DynamicFieldData->{Config};
         }
-        
+
         # add
         push(@DynamicFieldList, $DynamicFieldData);
     }

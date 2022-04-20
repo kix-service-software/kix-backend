@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
         'ExecPlan' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -81,17 +81,17 @@ perform ExecPlanUpdate Operation. This will return the updated ExecPlanID.
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            ExecPlanID  => 123,       # ID of the updated ExecPlan 
+            ExecPlanID  => 123,       # ID of the updated ExecPlan
         },
     };
-   
+
 =cut
 
 
@@ -103,7 +103,7 @@ sub Run {
         Data => $Param{Data}->{ExecPlan}
     );
 
-    # check if ExecPlan exists 
+    # check if ExecPlan exists
     my %ExecPlanData = $Kernel::OM->Get('Automation')->ExecPlanGet(
         ID => $Param{Data}->{ExecPlanID},
     );
@@ -123,19 +123,19 @@ sub Run {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => "Cannot update exec plan. Another exec plan with the same name '$ExecPlan->{Name}' already exists.",
-            );    		
+            );
         }
     }
 
     # update ExecPlan
     my $Success = $Kernel::OM->Get('Automation')->ExecPlanUpdate(
-        ID          => $Param{Data}->{ExecPlanID},    
+        ID          => $Param{Data}->{ExecPlanID},
         Type        => $ExecPlan->{Type} || $ExecPlanData{Type},
         Name        => $ExecPlan->{Name} || $ExecPlanData{Name},
         Parameters  => exists $ExecPlan->{Parameters} ? $ExecPlan->{Parameters} : $ExecPlanData{Parameters},
         Comment     => exists $ExecPlan->{Comment} ? $ExecPlan->{Comment} : $ExecPlanData{Comment},
         ValidID     => exists $ExecPlan->{ValidID} ? $ExecPlan->{ValidID} : $ExecPlanData{ValidID},
-        UserID      => $Self->{Authorization}->{UserID},                        
+        UserID      => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -144,10 +144,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         ExecPlanID => 0 + $Param{Data}->{ExecPlanID},
-    );    
+    );
 }
 
 1;

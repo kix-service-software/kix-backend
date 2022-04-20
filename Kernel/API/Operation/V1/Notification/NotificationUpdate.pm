@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -58,7 +58,7 @@ sub ParameterDefinition {
         },
         'Notification::Name' => {
             RequiresValudIfUsed => 1
-        },        
+        },
     };
 }
 
@@ -97,10 +97,10 @@ perform NotificationUpdate Operation. This will return the updated TypeID.
         Code              => '',                      # in case of error
         Message           => '',                      # in case of error
         Data              => {                        # result data payload after Operation
-            NotificationID  => 123,                     # ID of the updated Notification 
+            NotificationID  => 123,                     # ID of the updated Notification
         },
     };
-   
+
 =cut
 
 sub Run {

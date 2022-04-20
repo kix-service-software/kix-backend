@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -57,7 +57,7 @@ sub ParameterDefinition {
         'ConfigItemClass' => {
             Type => 'HASH',
             Required => 1
-        },   
+        },
     }
 }
 
@@ -75,17 +75,17 @@ perform Class Update Operation. This will return the updated ClassID.
             },
         },
     );
-    
+
 
     $Result = {
         Success     => 1,                       # 0 or 1
         Code        => '',                      # in case of error
         Message     => '',                      # in case of error
         Data        => {                        # result data payload after Operation
-            ConfigItemClassID  => 123,          # ID of the updated class 
+            ConfigItemClassID  => 123,          # ID of the updated class
         },
     };
-   
+
 =cut
 
 
@@ -97,7 +97,7 @@ sub Run {
         Data => $Param{Data}->{ConfigItemClass}
     );
 
-    # check if class exists 
+    # check if class exists
     my $GeneralCatalogData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
         ItemID => $Param{Data}->{ClassID},
     );
@@ -117,18 +117,18 @@ sub Run {
 	        return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => "Cannot update class. Another class with the same name '$ConfigItemClass->{Name}' already exists.",
-	        );    		
+	        );
     	}
     }
 
     # update GeneralCatalog
     my $Success = $Kernel::OM->Get('GeneralCatalog')->ItemUpdate(
-        ItemID   => $Param{Data}->{ClassID},    
+        ItemID   => $Param{Data}->{ClassID},
         Class    => 'ITSM::ConfigItem::Class',
         Name     => $ConfigItemClass->{Name} || $GeneralCatalogData->{Name},
         Comment  => exists $ConfigItemClass->{Comment} ? $ConfigItemClass->{Comment} : $GeneralCatalogData->{Comment},
         ValidID  => $ConfigItemClass->{ValidID} || $GeneralCatalogData->{ValidID},
-        UserID   => $Self->{Authorization}->{UserID},                        
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
     if ( !$Success ) {
@@ -138,10 +138,10 @@ sub Run {
         );
     }
 
-    # return result    
+    # return result
     return $Self->_Success(
         ConfigItemClassID => $Param{Data}->{ClassID},
-    );    
+    );
 }
 
 1;

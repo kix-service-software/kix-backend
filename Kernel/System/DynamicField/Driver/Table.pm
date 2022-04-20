@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -166,7 +166,7 @@ sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
     return if ( !defined( $Param{Key} ) );
-    return '' if ( $Param{Key} eq '' );
+    return q{} if ( $Param{Key} eq q{} );
 
     # return array or scalar depending on $Param{Key}
     my $Result;
@@ -185,38 +185,6 @@ sub ValueLookup {
     }
 
     return $Result;
-}
-
-sub ValueIsDifferent {
-    my ( $Self, %Param ) = @_;
-
-    # special cases where the values are different but they should be reported as equals
-    if (
-        !defined $Param{Value1}
-        && ref $Param{Value2} eq 'ARRAY'
-        && (
-            !IsArrayRefWithData( $Param{Value2} )
-            || !$Param{Value2}->[0]
-        )
-    ) {
-        return
-    }
-    if (
-        !defined $Param{Value2}
-        && ref $Param{Value1} eq 'ARRAY'
-        && (
-            !IsArrayRefWithData( $Param{Value1} )
-            || !$Param{Value1}->[0]
-        )
-    ) {
-        return
-    }
-
-    # compare the results
-    return DataIsDifferent(
-        Data1 => \$Param{Value1},
-        Data2 => \$Param{Value2}
-    );
 }
 
 sub ValueValidate {
@@ -249,185 +217,36 @@ sub ValueValidate {
     return $Success;
 }
 
-sub TemplateValueTypeGet {
+sub ValueIsDifferent {
     my ( $Self, %Param ) = @_;
 
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # set the field types
-    my $EditValueType   = 'ARRAY';
-    my $SearchValueType = 'SCALAR';
-
-    # return the correct structure
-    if ( $Param{FieldType} eq 'Edit' ) {
-        return {
-            $FieldName => $EditValueType,
-            }
-    }
-    elsif ( $Param{FieldType} eq 'Search' ) {
-        return {
-            'Search_' . $FieldName => $SearchValueType,
-            }
-    }
-    else {
-        return {
-            $FieldName             => $EditValueType,
-            'Search_' . $FieldName => $SearchValueType,
-        }
-    }
-}
-
-sub EditFieldValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $JSONObject = $Kernel::OM->Get('JSON');
-    my $FieldName  = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-    my $Value;
-    my @Values;
-
-    # check if there is a Template and retrieve the dynamic field value from there
+    # special cases where the values are different but they should be reported as equals
     if (
-        IsHashRefWithData( $Param{Template} )
-        && defined $Param{Template}->{$FieldName}
+        !defined $Param{Value1}
+        && ref $Param{Value2} eq 'ARRAY'
+        && (
+            !IsArrayRefWithData( $Param{Value2} )
+            || !$Param{Value2}->[0]
+        )
     ) {
-        $Value  = $Param{Template}->{$FieldName};
+        return
     }
-
-    # otherwise get dynamic field value from the web request
-    elsif (
-        defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'WebRequest'
-    ) {
-        my @ParamNames = $Param{ParamObject}->GetParamNames();
-
-        for my $Key ( sort @ParamNames ) {
-            my $Pattern = '^'
-                . $FieldName
-                . '_\d+$';
-
-            next if $Key !~ /$Pattern/;
-
-            my @Data = $Param{ParamObject}->GetArray( Param => $Key );
-            push(@Values, \@Data);
-        }
-
-        if ( scalar( @Values ) ) {
-
-            my $IsEmpty = 1;
-            EMPTY:
-            for my $Index ( @Values ) {
-                for my $Val ( @{$Index} ) {
-                    if ( $Val ) {
-                        $IsEmpty = 0;
-                        last EMPTY;
-                    }
-                }
-            }
-
-            if ( !$IsEmpty ) {
-                $Value = $JSONObject->Encode(
-                    Data => \@Values
-                );
-            }
-        }
-    }
-
     if (
-        defined $Param{ReturnTemplateStructure}
-        && $Param{ReturnTemplateStructure} eq '1'
+        !defined $Param{Value2}
+        && ref $Param{Value1} eq 'ARRAY'
+        && (
+            !IsArrayRefWithData( $Param{Value1} )
+            || !$Param{Value1}->[0]
+        )
     ) {
-        return {
-            $FieldName => $Value,
-        };
+        return
     }
 
-    if (
-        defined $Param{ReturnValueStructure}
-        && $Param{ReturnValueStructure} eq '1'
-    ) {
-        return \@Values;
-    }
-
-    # for this field the normal return are an json string
-    return $Value;
-}
-
-sub EditFieldValueValidate {
-    my ( $Self, %Param ) = @_;
-
-    # get the field value from the http request
-    my $Values = $Self->EditFieldValueGet(
-        DynamicFieldConfig => $Param{DynamicFieldConfig},
-        ParamObject        => $Param{ParamObject},
-
-        # not necessary for this Driver but place it for consistency reasons
-        ReturnValueStructure => 1,
+    # compare the results
+    return DataIsDifferent(
+        Data1 => \$Param{Value1},
+        Data2 => \$Param{Value2}
     );
-
-    my $ServerError;
-    my $ErrorMessage;
-
-    # perform necessary validations
-    if (
-        $Param{Mandatory}
-        && !IsArrayRefWithData($Values)
-    ) {
-        return {
-            ServerError => 1,
-        };
-    }
-
-    # create resulting structure
-    my $Result = {
-        ServerError  => $ServerError,
-        ErrorMessage => $ErrorMessage,
-    };
-
-    return $Result;
-}
-
-sub SearchFieldValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $Value = '';
-
-    # get dynamic field value from param object
-    if ( defined $Param{ParamObject} ) {
-        $Value = $Param{ParamObject}->GetParam(
-            Param => 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name}
-        ) || '';
-    }
-
-    # otherwise get the value from the profile
-    elsif ( defined $Param{Profile} ) {
-        $Value = $Param{Profile}->{ 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name} } || '';
-    }
-    else {
-        return;
-    }
-
-    if ( defined $Param{ReturnProfileStructure} && $Param{ReturnProfileStructure} eq '1' ) {
-        return {
-            'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name} => $Value,
-        };
-    }
-
-    return $Value;
-}
-
-sub SearchFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    # get field value
-    my $Value = $Self->SearchFieldValueGet(%Param);
-
-    # return search parameter structure
-    return {
-        Parameter => {
-            'Like' => '*' . $Value . '*',
-        },
-        Display => $Value,
-    };
 }
 
 sub SearchSQLGet {
@@ -468,22 +287,10 @@ sub SearchSQLGet {
     return;
 }
 
-sub StatsFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    return ;
-}
-
-sub StatsSearchFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    return ;
-}
-
 sub ReadableValueRender {
     my ( $Self, %Param ) = @_;
 
-    my $Value = '';
+    my $Value = q{};
 
     if (
         ref $Param{Value} eq 'ARRAY'
@@ -531,7 +338,7 @@ sub DisplayValueRender {
     my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
     my $HTMLData = $Self->HTMLDisplayValueRender(%Param);
 
-    my $Output = '';
+    my $Output = q{};
     if ( $HTMLData->{Value} ) {
         $Output = $HTMLUtilsObject->ToAscii(
             String => $HTMLData->{Value}
@@ -553,10 +360,10 @@ sub HTMLDisplayValueRender {
     my $LanguageObject = $Param{LayoutObject}->{LanguageObject};
 
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $Output      = '';
+    my $Output      = q{};
 
     # get raw Value strings from field value
-    my $Title = '';
+    my $Title = q{};
     my $Values;
     if (
         ref $Param{Value} eq 'ARRAY'
@@ -635,7 +442,7 @@ END
     my $Data = {
         Value => $Output,
         Title => $Title,
-        Link  => '',
+        Link  => q{},
     };
 
     return $Data;
@@ -648,10 +455,10 @@ sub ShortDisplayValueRender {
     my $LanguageObject = $Param{LayoutObject}->{LanguageObject};
 
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $Output      = '';
+    my $Output      = q{};
 
     # get raw Value strings from field value
-    my $Title = '';
+    my $Title = q{};
     my $Values;
     if (
         ref $Param{Value} eq 'ARRAY'

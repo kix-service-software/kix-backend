@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -95,7 +95,7 @@ sub ImageGet {
                     Priority => 'error',
                     Message  => "Unable to read image file $File!",
                 );
-                return;               
+                return;
             }
 
             my($Filename, $Dir, $Suffix) = fileparse($File, qr/\.[^.]*/);
@@ -208,7 +208,7 @@ sub ImageAdd {
                 Priority => 'error',
                 Message  => "Unable to store image file $Directory/$Filename!",
             );
-            return;            
+            return;
         }
 
         $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
@@ -222,8 +222,8 @@ sub ImageAdd {
                 Priority => 'error',
                 Message  => "Unable to store content type file $Directory/$Filename.content_type!",
             );
-            return;            
-        }    
+            return;
+        }
 
         if ($Param{Comment}) {
             my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
@@ -237,9 +237,9 @@ sub ImageAdd {
                     Priority => 'error',
                     Message  => "Unable to store comment file $Directory/$Filename.txt!",
                 );
-                return;            
-            }    
-        }   
+                return;
+            }
+        }
     }
 
     # clear cache
@@ -362,7 +362,7 @@ sub ImageList {
             my($Filename, $Dirs, $Suffix) = fileparse($File, qr/\.[^.]*/);
             $ImageIDs{$Filename} = 1;
         }
-    
+
         @Result = (sort keys %ImageIDs);
     }
 
@@ -455,7 +455,7 @@ sub _GetImageFileList {
     my @ImageFiles = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Directory,
         Filter    => $Filter,
-    );    
+    );
 
     return \@ImageFiles;
 }

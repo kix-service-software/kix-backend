@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -67,7 +67,7 @@ sub Validate {
             $Found = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
                 TicketID => $Param{Data}->{$Param{Attribute}},
                 UserID   => 1,
-            );        
+            );
         }
     }
     else {
@@ -80,10 +80,10 @@ sub Validate {
     if ( !$Found ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
-        );        
+        );
     }
 
-    return $Self->_Success();        
+    return $Self->_Success();
 }
 
 1;

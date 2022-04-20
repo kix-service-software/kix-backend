@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -2215,6 +2215,7 @@ set article flags
         Key       => 'Seen',
         Value     => 1,
         UserID    => 123,
+        Silent    => 1       # optional - if set, no client notification will be triggered
     );
 
 Events:
@@ -2236,7 +2237,16 @@ sub ArticleFlagSet {
         }
     }
 
-    my %Flag = $Self->ArticleFlagGet(%Param);
+    my %Article = $Self->ArticleGet(
+        ArticleID     => $Param{ArticleID},
+        UserID        => $Param{UserID},
+        DynamicFields => 0,
+    );
+
+    my %Flag = $Self->ArticleFlagGet(
+        TicketID => $Article{TicketID},
+        %Param,
+    );
 
     # check if set is needed
     return 1 if defined $Flag{ $Param{Key} } && $Flag{ $Param{Key} } eq $Param{Value};
@@ -2260,13 +2270,6 @@ sub ArticleFlagSet {
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
     );
 
-    # event
-    my %Article = $Self->ArticleGet(
-        ArticleID     => $Param{ArticleID},
-        UserID        => $Param{UserID},
-        DynamicFields => 0,
-    );
-
     $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
 
     $Self->EventHandler(
@@ -2282,11 +2285,13 @@ sub ArticleFlagSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'CREATE',
-        Namespace => 'Ticket.Article.Flag',
-        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
-    );
+    if (!$Param{Silent}) {
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'CREATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+        );
+    }
 
     return 1;
 }
@@ -2382,6 +2387,8 @@ sub ArticleFlagDelete {
         );
     }
 
+    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
@@ -2397,6 +2404,7 @@ sub ArticleFlagDelete {
 get article flags
 
     my %Flags = $TicketObject->ArticleFlagGet(
+        TicketID  => 123,
         ArticleID => 123,
         UserID    => 123,
     );
@@ -2407,7 +2415,7 @@ sub ArticleFlagGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ArticleID UserID)) {
+    for (qw(TicketID ArticleID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -2416,6 +2424,15 @@ sub ArticleFlagGet {
             return;
         }
     }
+
+    my $CacheKey = 'ArticleFlagGet::' . $Param{TicketID} . '::' . $Param{ArticleID} . '::' . $Param{UserID};
+
+    my $Cached = $Self->_TicketCacheGet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        Key      => $CacheKey,
+    );
+    return %{$Cached} if ref $Cached eq 'HASH';
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -2435,6 +2452,14 @@ sub ArticleFlagGet {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Flag{ $Row[0] } = $Row[1];
     }
+
+    $Self->_TicketCacheSet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        TTL      => $Self->{CacheTTL},
+        Key      => $CacheKey,
+        Value    => \%Flag,
+    );
 
     return %Flag;
 }
@@ -2471,6 +2496,15 @@ sub ArticleFlagsOfTicketGet {
         }
     }
 
+    my $CacheKey = 'ArticleFlagsOfTicketGet::' . $Param{TicketID} . '::' . $Param{UserID};
+
+    my $Cached = $Self->_TicketCacheGet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        Key      => $CacheKey,
+    );
+    return %{$Cached} if ref $Cached eq 'HASH';
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -2490,6 +2524,14 @@ sub ArticleFlagsOfTicketGet {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Flag{ $Row[0] }->{ $Row[1] } = $Row[2];
     }
+
+    $Self->_TicketCacheSet(
+        TicketID => $Param{TicketID},
+        Type     => $Self->{CacheType},
+        TTL      => $Self->{CacheTTL},
+        Key      => $CacheKey,
+        Value    => \%Flag,
+    );
 
     return %Flag;
 }
@@ -2632,12 +2674,12 @@ get plain article/email
 write an article attachment to storage
 
     my $Success = $TicketObject->ArticleWriteAttachment(
-        Content            => $ContentAsString,
+        Content            => $ContentAsString,                     # optional
         ContentType        => 'text/html; charset="iso-8859-15"',
         Filename           => 'lala.html',
-        ContentID          => 'cid-1234',   # optional
-        ContentAlternative => 0,            # optional, alternative content to shown as body
-        Disposition        => 'attachment', # or 'inline'
+        ContentID          => 'cid-1234',                           # optional
+        ContentAlternative => 0,                                    # optional, alternative content to shown as body
+        Disposition        => 'attachment',                         # or 'inline'
         ArticleID          => 123,
         UserID             => 123,
     );
@@ -2922,18 +2964,19 @@ sub GetAssignedArticlesForObject {
     my ( $Self, %Param ) = @_;
 
     my @AssignedArticleIDs = ();
+    my $TicketID = IsArrayRefWithData($Param{TicketID}) ? $Param{TicketID}->[0] : $Param{TicketID};
 
     # based on ticket
     if ($Param{TicketID}) {
         my $AssignedTicketIDList = $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
             %Param,
-            ObjectIDList => [$Param{TicketID}]
+            ObjectIDList => [$TicketID]
         );
 
         if (
             IsArrayRefWithData($AssignedTicketIDList) &&
             scalar(@{$AssignedTicketIDList}) == 1 &&
-            $AssignedTicketIDList->[0] == $Param{TicketID}
+            $AssignedTicketIDList->[0] == $TicketID
         ) {
             my %SearchData = $Self->_GetAssignedSearchParams(
                 %Param,
@@ -2952,7 +2995,7 @@ sub GetAssignedArticlesForObject {
                 }
 
                 @AssignedArticleIDs = $Self->ArticleIndex(
-                    TicketID        => $Param{TicketID},
+                    TicketID        => $TicketID,
                     CustomerVisible => $CustomerVisible,
                     UserID          => $Param{UserID},
                 );

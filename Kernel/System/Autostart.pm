@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -37,7 +37,7 @@ Add address book functions.
 
 =item new()
 
-create a Autostart object. 
+create a Autostart object.
 
 =cut
 
@@ -51,7 +51,7 @@ sub new {
     # get needed objects
     $Self->{ConfigObject} = $Kernel::OM->Get('Config');
     $Self->{LogObject}    = $Kernel::OM->Get('Log');
-    
+
     return $Self;
 }
 
@@ -65,7 +65,7 @@ Run autostart.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    
+
     my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
     my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
@@ -80,9 +80,9 @@ sub Run {
         );
 
         if ( !IsArrayRefWithData($Content) ) {
-            $Self->{LogObject}->Log( 
-                Priority => 'error', 
-                Message => "Unable to read autostart file $File!" 
+            $Self->{LogObject}->Log(
+                Priority => 'error',
+                Message => "Unable to read autostart file $File!"
             );
             return;
         }
@@ -106,21 +106,21 @@ sub Run {
             $Line =~ s/(^\s+|\s+$)//g;
 
             my @Command = Text::ParseWords::quotewords('\s+', 0, $Line);
-    
+
             if ( @Command ) {
                 my $Result = $Kernel::OM->Get('Console')->Run(@Command);
                 if ( $Result ) {
-                    $Self->{LogObject}->Log( 
-                        Priority => 'error', 
-                        Message => "Unable to execute autostart file $File!" 
+                    $Self->{LogObject}->Log(
+                        Priority => 'error',
+                        Message => "Unable to execute autostart file $File!"
                     );
                     return $Result;
                 }
             }
             else {
-                $Self->{LogObject}->Log( 
-                    Priority => 'error', 
-                    Message => "Unable to execute line '$Line' in autostart file $File!" 
+                $Self->{LogObject}->Log(
+                    Priority => 'error',
+                    Message => "Unable to execute line '$Line' in autostart file $File!"
                 );
                 return 1;
             }

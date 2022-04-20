@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -102,14 +102,14 @@ sub Run {
         ObjectID => $Watcher->{ObjectID},
     );
     my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
-    
+
     if ( $Watchers{$Watcher->{UserID}} ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => "Cannot create Watcher. Watcher already exists.",
         );
     }
-    
+
     my $WatcherID = $Kernel::OM->Get('Watcher')->WatcherAdd(
         Object      => $Watcher->{Object},
         ObjectID    => $Watcher->{ObjectID},

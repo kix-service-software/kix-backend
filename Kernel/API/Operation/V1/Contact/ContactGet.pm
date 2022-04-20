@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -92,7 +92,6 @@ one or more ticket entries in one call.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
     my @ContactList;
 
     if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) {
@@ -114,6 +113,8 @@ sub Run {
     else {
         # start loop
         foreach my $ContactID ( @{$Param{Data}->{ContactID}} ) {
+            next if !$ContactID;
+
             my $ContactData = $Self->_GetContactData(
                 ContactID => $ContactID,
                 Data      => $Param{Data}

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -39,7 +39,7 @@ define parameter preparation and check for this operation
 
     my $Result = $OperationObject->ParameterDefinition(
         Data => {
-            FileID => '...'         # multiple values are comma separated 
+            FileID => '...'         # multiple values are comma separated
         },
     );
 
@@ -56,7 +56,7 @@ sub ParameterDefinition {
         'FileID' => {
             Type     => 'ARRAY',
             Required => 1
-        }                
+        }
     }
 }
 
@@ -99,7 +99,7 @@ sub Run {
             );
         }
     }
-    
+
     # return result
     return $Self->_Success();
 }

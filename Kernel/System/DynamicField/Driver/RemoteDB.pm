@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -82,8 +82,7 @@ sub new {
             # check if module can be loaded
             if (
                 !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
-                )
-            {
+            ) {
                 die "Can't load dynamic fields backend module"
                     . " $Extension->{Module}! $@";
             }
@@ -170,7 +169,7 @@ sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
     return if (!defined ($Param{Key}));
-    return '' if ($Param{Key} eq '');
+    return q{} if ($Param{Key} eq q{});
 
     # return array or scalar depending on $Param{Key}
     my $Result;
@@ -181,7 +180,7 @@ sub ValueLookup {
     }
     else{
         push(@Keys, $Param{Key});
-        $Result = '';
+        $Result = q{};
     }
 
     for my $Key ( @Keys ){
@@ -236,13 +235,11 @@ sub _ValueLookup {
         $QueryCondition .= $DFRemoteDBObject->QueryCondition(
             Key           => $DynamicFieldConfig->{Config}->{DatabaseFieldKey},
             Value         => $QuotedValue,
-            # always lookup keys casesensitive
             CaseSensitive => 1,
-            # EO always lookup keys casesensitive
         );
     }
     else {
-        $QueryCondition = "";
+        $QueryCondition = q{};
     }
 
     my $SQL = 'SELECT '
@@ -255,9 +252,8 @@ sub _ValueLookup {
         SQL   => $SQL,
         Limit => 1,
     );
-    if ( !$Success ) {
-        return;
-    }
+
+    return if !$Success;
 
     my $Value;
     while (my @Row = $DFRemoteDBObject->FetchrowArray()) {
@@ -277,34 +273,6 @@ sub _ValueLookup {
         );
     }
     return $Value;
-}
-
-sub ValueIsDifferent {
-    my ( $Self, %Param ) = @_;
-
-    # special cases where the values are different but they should be reported as equals
-    if (
-        !defined $Param{Value1}
-        && ref $Param{Value2} eq 'ARRAY'
-        && !IsArrayRefWithData( $Param{Value2} )
-        )
-    {
-        return
-    }
-    if (
-        !defined $Param{Value2}
-        && ref $Param{Value1} eq 'ARRAY'
-        && !IsArrayRefWithData( $Param{Value1} )
-        )
-    {
-        return
-    }
-
-    # compare the results
-    return DataIsDifferent(
-        Data1 => \$Param{Value1},
-        Data2 => \$Param{Value2}
-    );
 }
 
 sub ValueValidate {
@@ -335,676 +303,30 @@ sub ValueValidate {
     return $Success;
 }
 
-sub PossibleValuesGet {
+sub ValueIsDifferent {
     my ( $Self, %Param ) = @_;
 
-    # to store the possible values
-    my $PossibleValues = $Self->_GetPossibleValues(%Param);
-
-    # return the possible values hash as a reference
-    return $PossibleValues;
-}
-
-sub TemplateValueTypeGet {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    # set the field types
-    my $EditValueType   = 'ARRAY';
-    my $SearchValueType = 'ARRAY';
-
-    # return the correct structure
-    if ( $Param{FieldType} eq 'Edit' ) {
-        return {
-            $FieldName => $EditValueType,
-        }
-    }
-    elsif ( $Param{FieldType} eq 'Search' ) {
-        return {
-            'Search_' . $FieldName => $SearchValueType,
-        }
-    }
-    else {
-        return {
-            $FieldName             => $EditValueType,
-            'Search_' . $FieldName => $SearchValueType,
-        }
-    }
-}
-
-sub EditFieldRender {
-    my ( $Self, %Param ) = @_;
-
-    # take config from field config
-    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $FieldID     = $Param{DynamicFieldConfig}->{ID};
-    my $FieldName   = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-    my $FieldLabel  = $Param{DynamicFieldConfig}->{Label};
-
-    my $Value;
-
-    # set the field value or default
-    if ( $Param{UseDefaultValue} ) {
-        $Value = ( defined $FieldConfig->{DefaultValues} ? $FieldConfig->{DefaultValues} : '' );
-    }
-    $Value = $Param{Value} // $Value;
-
-    # check if a value in a template (GenericAgent etc.)
-    # is configured for this dynamic field
+    # special cases where the values are different but they should be reported as equals
     if (
-        IsHashRefWithData( $Param{Template} )
-        && defined $Param{Template}->{$FieldName}
-        )
-    {
-        $Value = $Param{Template}->{$FieldName};
+        !defined $Param{Value1}
+        && ref $Param{Value2} eq 'ARRAY'
+        && !IsArrayRefWithData( $Param{Value2} )
+    ) {
+        return
+    }
+    if (
+        !defined $Param{Value2}
+        && ref $Param{Value1} eq 'ARRAY'
+        && !IsArrayRefWithData( $Param{Value1} )
+    ) {
+        return
     }
 
-    # extract the dynamic field value form the web request
-    my $FieldValue = $Self->EditFieldValueGet(
-        %Param,
+    # compare the results
+    return DataIsDifferent(
+        Data1 => \$Param{Value1},
+        Data2 => \$Param{Value2}
     );
-
-    # set values from ParamObject if present
-    if ( IsArrayRefWithData($FieldValue) ) {
-        $Value = $FieldValue;
-    }
-
-    # check and set class if necessary
-    my $FieldClass = '';
-    if ( defined $Param{Class} && $Param{Class} ne '' ) {
-        $FieldClass = $Param{Class};
-    }
-
-    # set field as mandatory
-    if ( $Param{Mandatory} ) {
-        $FieldClass .= ' Validate_Required';
-    }
-
-    # set error css class
-    if ( $Param{ServerError} ) {
-        $FieldClass .= ' ServerError';
-    }
-
-    # check value
-    my $SelectedValuesArrayRef = [];
-    if ( defined $Value ) {
-        if ( ref $Value eq 'ARRAY' ) {
-            $SelectedValuesArrayRef = $Value;
-        }
-        else {
-            $SelectedValuesArrayRef = [$Value];
-        }
-    }
-
-    my $AutoCompleteFieldName = $FieldName . "_AutoComplete";
-    my $ContainerFieldName    = $FieldName . "_Container";
-    my $DisplayFieldName      = $FieldName . "_Display";
-    my $IDCounterName         = $FieldName . "_IDCount";
-    my $ValidateFieldName     = $FieldName . "_Validate";
-    my $ValueFieldName        = $FieldName . "_";
-
-    my $MaxArraySize          = $FieldConfig->{MaxArraySize} || 1;
-
-    # get used Constrictions
-    my $ConstrictionString = $FieldName . ';TicketID';
-    my $Constrictions      = $Param{DynamicFieldConfig}->{Config}->{Constrictions};
-    if ( $Constrictions ) {
-        my $CustomerConstriction = 0;
-        my @Constrictions = split(/[\n\r]+/, $Constrictions);
-        CONSTRICTION:
-        for my $Constriction ( @Constrictions ) {
-            my @ConstrictionRule = split(/::/, $Constriction);
-            # check for valid constriction
-            next CONSTRICTION if (
-                scalar(@ConstrictionRule) != 4
-                || $ConstrictionRule[0] eq ""
-                || $ConstrictionRule[1] eq ""
-                || $ConstrictionRule[2] eq ""
-            );
-            # only handle static constrictions in admininterface
-            if (
-                $ConstrictionRule[1] eq 'Ticket'
-            ) {
-                $ConstrictionString .= ';' . $ConstrictionRule[2];
-            }
-            elsif (
-                $ConstrictionRule[1] eq 'Contact'
-            ) {
-                $CustomerConstriction = 1;
-            }
-        }
-        if ( $CustomerConstriction ) {
-            $ConstrictionString .= ';ContactID;SelectedContact';
-        }
-    }
-
-    my $TranslateRemoveSelection = $Param{LayoutObject}->{LanguageObject}->Translate("Remove selection");
-
-    my $HTMLString = <<"END";
-    <input id="$FieldName" type="text" style="display:none;" />
-    <div class="InputField_Container W50pc">
-        <input id="$AutoCompleteFieldName" type="text" style="margin-bottom:2px;" />
-        <div class="Clear"></div>
-        <div id="$ContainerFieldName" class="InputField_InputContainer" style="display:block;">
-END
-
-    my $ValueCounter = 0;
-    for my $Key ( @{ $SelectedValuesArrayRef } ) {
-        next if (!$Key);
-        $ValueCounter++;
-
-        my $Label = $Self->ValueLookup(
-            %Param,
-            Key => $Key,
-        );
-
-        my $Title = $Label;
-        if ( $Param{DynamicFieldConfig}->{Config}->{ShowKeyInTitle} ) {
-            $Title .= ' (' . $Key . ')';
-        }
-
-        $HTMLString .= <<"END";
-        <div class="InputField_Selection" style="display:block;position:inherit;top:0px;">
-            <input id="$ValueFieldName$ValueCounter" type="hidden" name="$FieldName" value="$Key" />
-            <div class="Text" title="$Title">$Label</div><div class="Remove"><a href="#" role="button" title="$TranslateRemoveSelection" tabindex="-1" aria-label="$TranslateRemoveSelection: $Label">x</a></div>
-            <div class="Clear"></div>
-        </div>
-END
-    }
-
-    my $ValidValue = "";
-    if($ValueCounter){
-       $ValidValue = '1';
-    }
-
-    $HTMLString .= <<"END";
-        </div>
-        <input id="$ValidateFieldName" type="text" class="$FieldClass" value="$ValidValue" style="display:none;" />
-        <div class="Clear"></div>
-    </div>
-END
-
-    $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
-Core.Config.Set('DynamicFieldRemoteDB.TranslateRemoveSelection', '$TranslateRemoveSelection');
-DynamicFieldRemoteDB.InitEditField("$FieldName", "$FieldID", "$MaxArraySize", "$ValueCounter", "$FieldConfig->{QueryDelay}", "$FieldConfig->{MinQueryLength}", "$ConstrictionString");
-END
-
-    my $JSValueCounter = 0;
-    for my $Key ( @{ $SelectedValuesArrayRef } ) {
-        next if (!$Key);
-        $JSValueCounter++;
-
-        $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
-DynamicFieldRemoteDB.InitEditValue("$FieldName", "$JSValueCounter");
-END
-    }
-
-    if ( $Param{Mandatory} ) {
-        my $DivID = $FieldName . 'Error';
-
-        my $FieldRequiredMessage = $Param{LayoutObject}->{LanguageObject}->Translate("This field is required.");
-
-        # for client side validation
-        $HTMLString .= <<"END";
-        <div id="$DivID" class="TooltipErrorMessage">
-            <p>
-                $FieldRequiredMessage
-            </p>
-        </div>
-END
-    }
-
-    if ( $Param{ServerError} ) {
-
-        my $ErrorMessage = $Param{ErrorMessage} || 'This field is required.';
-        $ErrorMessage = $Param{LayoutObject}->{LanguageObject}->Translate($ErrorMessage);
-        my $DivID = $FieldName . 'ServerError';
-
-        # for server side validation
-        $HTMLString .= <<"END";
-        <div id="$DivID" class="TooltipErrorMessage">
-            <p>
-                $ErrorMessage
-            </p>
-        </div>
-END
-    }
-
-    if ( $Param{AJAXUpdate} ) {
-
-        my $FieldSelector = '#' . $FieldName;
-
-        my $FieldsToUpdate;
-        if ( IsArrayRefWithData( $Param{UpdatableFields} ) ) {
-
-            # Remove current field from updatable fields list
-            my @FieldsToUpdate = grep { $_ ne $FieldName } @{ $Param{UpdatableFields} };
-
-            # quote all fields, put commas in between them
-            $FieldsToUpdate = join( ', ', map {"'$_'"} @FieldsToUpdate );
-        }
-
-        # add js to call FormUpdate()
-        $Param{LayoutObject}->AddJSOnDocumentComplete( Code => <<"END");
-DynamicFieldRemoteDB.InitAJAXUpdate("$FieldName", [ $FieldsToUpdate ]);
-END
-    }
-
-    # call EditLabelRender on the common Driver
-    my $LabelString = $Self->EditLabelRender(
-        %Param,
-        Mandatory => $Param{Mandatory} || '0',
-        FieldName => $FieldName,
-    );
-
-    my $Data = {
-        Field => $HTMLString,
-        Label => $LabelString,
-    };
-
-    return $Data;
-}
-
-sub EditFieldValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $FieldName = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-
-    my $Value;
-
-    # check if there is a Template and retrieve the dynamic field value from there
-    if ( IsHashRefWithData( $Param{Template} ) ) {
-        $Value = $Param{Template}->{$FieldName};
-    }
-
-    # otherwise get dynamic field value from the web request
-    elsif (
-        defined $Param{ParamObject}
-        && ref $Param{ParamObject} eq 'WebRequest'
-        )
-    {
-        my @Data = $Param{ParamObject}->GetArray( Param => $FieldName );
-
-        # delete empty values (can happen if the user has selected the "-" entry)
-        my $Index = 0;
-        ITEM:
-        for my $Item ( sort @Data ) {
-
-            if ( !$Item ) {
-                splice( @Data, $Index, 1 );
-                next ITEM;
-            }
-            $Index++;
-        }
-
-        $Value = \@Data;
-    }
-
-    if ( defined $Param{ReturnTemplateStructure} && $Param{ReturnTemplateStructure} eq 1 ) {
-        return {
-            $FieldName => $Value,
-        };
-    }
-
-    # for this field the normal return an the ReturnValueStructure are the same
-    return $Value;
-}
-
-sub EditFieldValueValidate {
-    my ( $Self, %Param ) = @_;
-
-    # get the field value from the http request
-    my $Values = $Self->EditFieldValueGet(
-        DynamicFieldConfig => $Param{DynamicFieldConfig},
-        ParamObject        => $Param{ParamObject},
-
-        # not necessary for this Driver but place it for consistency reasons
-        ReturnValueStructure => 1,
-    );
-
-    my $ServerError;
-    my $ErrorMessage;
-
-    # perform necessary validations
-    if ( $Param{Mandatory} && !IsArrayRefWithData($Values) ) {
-        return {
-            ServerError => 1,
-        };
-    }
-
-     # get possible values list
-    my $PossibleValues = {};
-
-    # overwrite possible values if PossibleValuesFilter
-    if ( defined $Param{PossibleValuesFilter} ) {
-        $PossibleValues = $Param{PossibleValuesFilter}
-    } else {
-        for my $Key ( @{$Values} ) {
-            my $Result = $Self->_ValueLookup(
-                %Param,
-                Key => $Key,
-            );
-            $PossibleValues->{$Key} = $Result;
-        }
-    }
-
-    CHECK:
-    for my $Test ( @{$Values} ) {
-
-        # validate if value is in possible values list (but let pass empty values)
-        if ( $Test && !$PossibleValues->{$Test} ) {
-            $ServerError  = 1;
-            $ErrorMessage = 'The field content is invalid';
-            last CHECK;
-        }
-    }
-
-    # create resulting structure
-    my $Result = {
-        ServerError  => $ServerError,
-        ErrorMessage => $ErrorMessage,
-    };
-
-    return $Result;
-}
-
-sub SearchFieldRender {
-    my ( $Self, %Param ) = @_;
-
-    # take config from field config
-    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-    my $FieldID     = $Param{DynamicFieldConfig}->{ID};
-    my $FieldName   = 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name};
-    my $FieldLabel  = $Param{DynamicFieldConfig}->{Label};
-
-    my $Value;
-    my @DefaultValue;
-
-    if ( defined $Param{DefaultValue} ) {
-        @DefaultValue = split /;/, $Param{DefaultValue};
-    }
-
-    # set the field value
-    if (@DefaultValue) {
-        $Value = \@DefaultValue;
-    }
-
-    # get the field value, this function is always called after the profile is loaded
-    my $FieldValue = $Self->SearchFieldValueGet(%Param);
-
-    # set values from ParamObject if present
-    if ( IsArrayRefWithData($FieldValue) ) {
-        $Value = $FieldValue;
-    }
-
-    # check and set class if necessary
-    my $FieldClass = '';
-
-    my $AutoCompleteFieldName = $FieldName . "_AutoComplete";
-    my $ContainerFieldName    = $FieldName . "_Container";
-    my $DisplayFieldName      = $FieldName . "_Display";
-    my $IDCounterName         = $FieldName . "_IDCount";
-    my $ValueFieldName        = $FieldName . "_";
-
-    my $MaxArraySize          = $FieldConfig->{MaxArraySize} || 1;
-
-    my $TranslateRemoveSelection = $Param{LayoutObject}->{LanguageObject}->Translate("Remove selection");
-
-    my $HTMLString = <<"END";
-    <div class="InputField_Container W50pc">
-        <input id="$AutoCompleteFieldName" type="text" style="margin-bottom:2px;" />
-        <div class="Clear"></div>
-        <div id="$ContainerFieldName" class="InputField_InputContainer" style="display:block;">
-END
-
-    my $ValueCounter = 0;
-    for my $Key ( @{ $Value } ) {
-        next if (!$Key);
-        $ValueCounter++;
-
-        my $Label = $Self->ValueLookup(
-            %Param,
-            Key => $Key,
-        );
-
-        my $Title = $Label;
-        if ( $Param{DynamicFieldConfig}->{Config}->{ShowKeyInTitle} ) {
-            $Title .= ' (' . $Key . ')';
-        }
-
-        $HTMLString .= <<"END";
-        <div class="InputField_Selection" style="display:block;position:inherit;top:0px;">
-            <input id="$ValueFieldName$ValueCounter" type="hidden" name="$FieldName" value="$Key" />
-            <div class="Text" title="$Title">$Label</div><div class="Remove"><a href="#" role="button" title="$TranslateRemoveSelection" tabindex="-1" aria-label="$TranslateRemoveSelection: $Label">x</a></div>
-            <div class="Clear"></div>
-        </div>
-<script type="text/javascript">//<![CDATA[
-    function Init$ValueFieldName$ValueCounter() {
-        \$('#$ValueFieldName$ValueCounter').siblings('div.Remove').find('a').bind('click', function() {
-            \$('#$ValueFieldName$ValueCounter').parent().remove();
-            if (\$('input[name=$FieldName]').length == 0) {
-                \$('#$ContainerFieldName').hide();
-            }
-            return false;
-        });
-    }
-    function Wait$ValueFieldName$ValueCounter() {
-        if (window.jQuery) {
-            \$('#Attribute').bind('redraw.InputField', function() {
-                Init$ValueFieldName$ValueCounter();
-            });
-            if (
-                \$('form[name=compose] input[name=Action]').first().val() == 'AdminGenericAgent'
-                && \$('form[name=compose] input[name=Subaction]').first().val() == 'UpdateAction'
-            ) {
-                Init$ValueFieldName$ValueCounter();
-            }
-        } else {
-            window.setTimeout(Wait$ValueFieldName$ValueCounter, 1);
-        }
-    }
-    window.setTimeout(Wait$ValueFieldName$ValueCounter, 0);
-//]]></script>
-END
-    }
-
-    $HTMLString .= <<"END";
-        </div>
-        <div class="Clear"></div>
-    </div>
-<script type="text/javascript">//<![CDATA[
-    function Init$AutoCompleteFieldName() {
-        var $IDCounterName = $ValueCounter;
-        \$('#$AutoCompleteFieldName').autocomplete({
-            delay: $FieldConfig->{QueryDelay},
-            minLength: $FieldConfig->{MinQueryLength},
-            source: function (Request, Response) {
-                var Data = {};
-                Data.Action         = 'DynamicFieldRemoteDBAJAXHandler';
-                Data.Subaction      = 'Search';
-                Data.ConfigOnly     = '1';
-                Data.FieldPrefix    = 'Search_';
-                Data.Search         = Request.term;
-                Data.DynamicFieldID = $FieldID;
-
-                var QueryString = Core.AJAX.SerializeForm(\$('#$AutoCompleteFieldName'), Data);
-                \$.each(Data, function (Key, Value) {
-                    QueryString += ';' + encodeURIComponent(Key) + '=' + encodeURIComponent(Value);
-                });
-
-                if (\$('#$AutoCompleteFieldName').data('AutoCompleteXHR')) {
-                    \$('#$AutoCompleteFieldName').data('AutoCompleteXHR').abort();
-                    \$('#$AutoCompleteFieldName').removeData('AutoCompleteXHR');
-                }
-                \$('#$AutoCompleteFieldName').data('AutoCompleteXHR', Core.AJAX.FunctionCall(Core.Config.Get('CGIHandle'), QueryString, function (Result) {
-                    var Data = [];
-                    \$.each(Result, function () {
-                        Data.push({
-                            key:   this.Key,
-                            value: this.Value,
-                            title: this.Title
-                        });
-                    });
-                    \$('#$AutoCompleteFieldName').data('AutoCompleteData', Data);
-                    \$('#$AutoCompleteFieldName').removeData('AutoCompleteXHR');
-                    Response(Data);
-                }).fail(function() {
-                    Response(\$('#$AutoCompleteFieldName').data('AutoCompleteData'));
-                }));
-            },
-            select: function (Event, UI) {
-                $IDCounterName++;
-                \$('#$ContainerFieldName').append(
-                    '<div class="InputField_Selection" style="display:block;position:inherit;top:0px;">'
-                    + '<input id="$ValueFieldName'
-                    + $IDCounterName
-                    + '" type="hidden" name="$FieldName" value="'
-                    + UI.item.key
-                    + '" />'
-                    + '<div class="Text" title="'
-                    + UI.item.title
-                    + '">'
-                    + UI.item.value
-                    + '</div>'
-                    + '<div class="Remove"><a href="#" role="button" title="$TranslateRemoveSelection" tabindex="-1" aria-label="$TranslateRemoveSelection: '
-                    + UI.item.value
-                    + '">x</a></div><div class="Clear"></div>'
-                    + '</div>'
-                );
-                \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').data('counter', $IDCounterName);
-                \$('#$ValueFieldName' + $IDCounterName).siblings('div.Remove').find('a').bind('click', function() {
-                    \$('#$ValueFieldName' + \$(this).data('counter')).parent().remove();
-                    if (\$('input[name=$FieldName]').length == 0) {
-                        \$('#$ContainerFieldName').hide();
-                    }
-                    return false;
-                });
-                \$('#$ContainerFieldName').show();
-                \$('#$AutoCompleteFieldName').val('');
-                Event.preventDefault();
-                return false;
-            },
-        });
-        \$('#$AutoCompleteFieldName').blur(function() {
-            \$(this).val('');
-        });
-
-        if (\$('input[name=$FieldName]').length == 0) {
-            \$('#$ContainerFieldName').hide();
-        }
-    }
-    function Wait$AutoCompleteFieldName() {
-        if (window.jQuery) {
-            \$('#Attribute').bind('redraw.InputField', function() {
-                Init$AutoCompleteFieldName();
-            });
-            if (
-                \$('form[name=compose] input[name=Action]').first().val() == 'AdminGenericAgent'
-                && \$('form[name=compose] input[name=Subaction]').first().val() == 'UpdateAction'
-            ) {
-                Init$AutoCompleteFieldName();
-            }
-        } else {
-            window.setTimeout(Wait$AutoCompleteFieldName, 1);
-        }
-    }
-    window.setTimeout(Wait$AutoCompleteFieldName, 0);
-//]]></script>
-END
-
-    # call EditLabelRender on the common Driver
-    my $LabelString = $Self->EditLabelRender(
-        %Param,
-        FieldName => $FieldName,
-    );
-
-    my $Data = {
-        Field => $HTMLString,
-        Label => $LabelString,
-    };
-
-    return $Data;
-}
-
-sub SearchFieldValueGet {
-    my ( $Self, %Param ) = @_;
-
-    my $Value;
-
-    # get dynamic field value from param object
-    if ( defined $Param{ParamObject} ) {
-        my @FieldValues = $Param{ParamObject}->GetArray(
-            Param => 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name}
-        );
-
-        $Value = \@FieldValues;
-    }
-
-    # otherwise get the value from the profile
-    elsif ( defined $Param{Profile} ) {
-        $Value = $Param{Profile}->{ 'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name} };
-    }
-    else {
-        return;
-    }
-
-    if ( defined $Param{ReturnProfileStructure} && $Param{ReturnProfileStructure} eq 1 ) {
-        return {
-            'Search_DynamicField_' . $Param{DynamicFieldConfig}->{Name} => $Value,
-        };
-    }
-
-    return $Value;
-}
-
-sub SearchFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    # get field value
-    my $Value = $Self->SearchFieldValueGet(%Param);
-
-    my $DisplayValue;
-
-    if ( defined $Value && !$Value ) {
-        $DisplayValue = '';
-    }
-
-    if ($Value) {
-        if ( ref $Value eq 'ARRAY' ) {
-
-            my @DisplayItemList;
-            for my $Item ( @{$Value} ) {
-
-                # set the display value
-                my $DisplayItem = $Self->ValueLookup(
-                    %Param,
-                    Key => $Item,
-                );
-
-                push @DisplayItemList, $DisplayItem;
-            }
-
-            # combine different values into one string
-            $DisplayValue = join ' + ', @DisplayItemList;
-        }
-        else {
-
-            # set the display value
-            $DisplayValue = $Self->ValueLookup(
-                %Param,
-                Key => $Value,
-            );
-        }
-    }
-
-    # return search parameter structure
-    return {
-        Parameter => {
-            Equals => $Value,
-        },
-        Display => $DisplayValue,
-    };
 }
 
 sub SearchSQLGet {
@@ -1055,8 +377,8 @@ sub ReadableValueRender {
     my ( $Self, %Param ) = @_;
 
     # set Value and Title variables
-    my $Value = '';
-    my $Title = '';
+    my $Value = q{};
+    my $Title = q{};
 
     # check value
     my @Values;
@@ -1122,7 +444,7 @@ sub DisplayValueRender {
 
     for my $Key (@Keys) {
 
-        $Key ||= '';
+        $Key ||= q{};
 
         my $EntryValue = $Self->ValueLookup(
             %Param,
@@ -1139,12 +461,12 @@ sub DisplayValueRender {
         if ( $Param{HTMLOutput} ) {
             $EntryValue = $Param{LayoutObject}->Ascii2Html(
                 Text => $EntryValue,
-                Max => $Param{ValueMaxChars} || '',
+                Max => $Param{ValueMaxChars} || q{},
             );
 
             $EntryTitle = $Param{LayoutObject}->Ascii2Html(
                 Text => $EntryTitle,
-                Max => $Param{TitleMaxChars} || '',
+                Max => $Param{TitleMaxChars} || q{},
             );
 
             # set field link form config
@@ -1183,27 +505,27 @@ sub DisplayValueRender {
             if ($HasLink) {
 
                 # Replace <RDB_Key>
-                if ( $EntryValue =~ /<RDB_Key>/ ) {
+                if ( $EntryValue =~ /<RDB_Key>/smx ) {
                     my $Replace = $Param{LayoutObject}->LinkEncode($Key);
-                    $EntryValue =~ s/<RDB_Key>/$Replace/g;
+                    $EntryValue =~ s/<RDB_Key>/$Replace/gsmx;
                 }
 
                 # Replace <RDB_Value>
-                if ( $EntryValue =~ /<RDB_Value>/ ) {
+                if ( $EntryValue =~ /<RDB_Value>/smx ) {
                     my $Replace = $Param{LayoutObject}->LinkEncode($OldValue);
-                    $EntryValue =~ s/<RDB_Value>/$Replace/g;
+                    $EntryValue =~ s/<RDB_Value>/$Replace/gsmx;
                 }
 
                 # Replace <RDB_Title>
-                if ( $EntryValue =~ /<RDB_Title>/ ) {
+                if ( $EntryValue =~ /<RDB_Title>/smx ) {
                     my $Replace = $Param{LayoutObject}->LinkEncode($EntryTitle);
-                    $EntryValue =~ s/<RDB_Title>/$Replace/g;
+                    $EntryValue =~ s/<RDB_Title>/$Replace/gsmx;
                 }
 
                 # Replace <SessionID>
-                if ( $EntryValue =~ /<SessionID>/ ) {
+                if ( $EntryValue =~ /<SessionID>/smx ) {
                     my $Replace = $Param{LayoutObject}->{SessionID};
-                    $EntryValue =~ s/<SessionID>/$Replace/g;
+                    $EntryValue =~ s/<SessionID>/$Replace/gsmx;
                 }
             }
         }
@@ -1216,8 +538,8 @@ sub DisplayValueRender {
             }
         }
 
-        push ( @Values, $EntryValue );
-        push ( @Titles, $EntryTitle );
+        push( @Values, $EntryValue );
+        push( @Titles, $EntryTitle );
     }
 
     # set item separator
@@ -1237,76 +559,6 @@ sub DisplayValueRender {
     };
 
     return $Data;
-}
-
-sub StatsFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    # set PossibleValues
-    my $Values = $Self->PossibleValuesGet(%Param);
-
-    # get historical values from database
-    my $HistoricalValues = $Self->{DynamicFieldValueObject}->HistoricalValueGet(
-        FieldID   => $Param{DynamicFieldConfig}->{ID},
-        ValueType => 'Text,',
-    );
-
-    # add historic values to current values (if they don't exist anymore)
-    for my $Key ( sort keys %{$HistoricalValues} ) {
-        if ( !$Values->{$Key} ) {
-            my $Value = $Self->ValueLookup(
-                %Param,
-                Key => $Key,
-            );
-            $Values->{$Key} = $Value;
-        }
-    }
-
-    # use PossibleValuesFilter if defined
-    $Values = $Param{PossibleValuesFilter} if ( defined($Param{PossibleValuesFilter}) );
-
-    return {
-        Values             => $Values,
-        Name               => $Param{DynamicFieldConfig}->{Label},
-        Element            => 'DynamicField_' . $Param{DynamicFieldConfig}->{Name},
-        Block              => 'MultiSelectField',
-    };
-}
-
-sub StatsSearchFieldParameterBuild {
-    my ( $Self, %Param ) = @_;
-
-    my $Operator = 'Equals';
-    my $Value    = $Param{Value};
-
-    return {
-        $Operator => $Value,
-    };
-}
-
-sub ColumnFilterValuesGet {
-    my ( $Self, %Param ) = @_;
-
-    # take config from field config
-    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
-
-    # get column filter values from database
-    my $ColumnFilterValues = $Kernel::OM->Get('Ticket::ColumnFilter')->DynamicFieldFilterValuesGet(
-        TicketIDs => $Param{TicketIDs},
-        FieldID   => $Param{DynamicFieldConfig}->{ID},
-        ValueType => 'Text',
-    );
-
-    # get the display value if still exist in dynamic field configuration
-    for my $Key ( sort ( keys ( %{$ColumnFilterValues} ) ) ) {
-        my $Value = $Self->ValueLookup(
-            %Param,
-            Key => $Key,
-        );
-        $ColumnFilterValues->{$Key} = $Value;
-    }
-
-    return $ColumnFilterValues;
 }
 
 sub _GetPossibleValues {
@@ -1337,15 +589,15 @@ sub _GetPossibleValues {
 
     my %Constrictions = ();
     if ($Param{DynamicFieldConfig}->{Config}->{Constrictions}) {
-        my @Constrictions = split(/[\n\r]+/, $Param{DynamicFieldConfig}->{Config}->{Constrictions});
+        my @Constrictions = split(/[\n\r]+/smx, $Param{DynamicFieldConfig}->{Config}->{Constrictions});
         RESTRICTION:
         for my $Constriction ( @Constrictions ) {
-            my @ConstrictionRule = split(/::/, $Constriction);
+            my @ConstrictionRule = split(/::/smx, $Constriction);
             next RESTRICTION if (
                 scalar(@ConstrictionRule) != 4
-                || $ConstrictionRule[0] eq ""
-                || $ConstrictionRule[1] eq ""
-                || $ConstrictionRule[2] eq ""
+                || $ConstrictionRule[0] eq q{}
+                || $ConstrictionRule[1] eq q{}
+                || $ConstrictionRule[2] eq q{}
             );
 
             if (
@@ -1368,8 +620,8 @@ sub _GetPossibleValues {
     );
 
     while (my @Row = $DFRemoteDBObject->FetchrowArray()) {
-        my $Key   = $Row[0] || '';
-        my $Value = $Row[1] || '';
+        my $Key   = $Row[0] || q{};
+        my $Value = $Row[1] || q{};
         $PossibleValues->{$Key} = $Value;
     }
 
@@ -1387,10 +639,6 @@ sub _GetPossibleValues {
 }
 
 1;
-
-
-
-
 
 =back
 
