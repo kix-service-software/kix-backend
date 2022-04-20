@@ -145,16 +145,62 @@ sub Run {
     }
 
     # everything is ok, let's update the ticket
-    my $Result = $Self->_TicketUpdate(
-        TicketID => $Param{Data}->{TicketID},
-        Ticket   => {
-            StateID => (!$Ticket->{State} && !$Ticket->{StateID}) ? $TicketData{StateID} : undef,
-            %{$Ticket}
-        },
-        UserID   => $Self->{Authorization}->{UserID},
-    );
+    # do not update if only MarkAsSeen is given
+    if ( scalar(keys %{$Ticket}) > 1 || !$Ticket->{MarkAsSeen} ) {
+        my $Result = $Self->_TicketUpdate(
+            TicketID => $Param{Data}->{TicketID},
+            Ticket   => {
+                StateID => (!$Ticket->{State} && !$Ticket->{StateID}) ? $TicketData{StateID} : undef,
+                %{$Ticket}
+            },
+            UserID => $Self->{Authorization}->{UserID},
+        );
 
-    return $Result;
+        # return on error
+        return $Result if (!$Result->{Success});
+    }
+
+    if ( $Ticket->{MarkAsSeen} ) {
+        my $TicketObject = $Kernel::OM->Get('Ticket');
+
+        my @ArticleList = $TicketObject->ArticleIndex(
+            TicketID => $Param{Data}->{TicketID}
+        );
+
+        # mark all article as seen
+        for my $ArticleID (@ArticleList) {
+            $TicketObject->ArticleFlagSet(
+                ArticleID => $ArticleID,
+                Key       => 'Seen',
+                Value     => 1,
+                UserID    => $Self->{Authorization}->{UserID},
+                Silent    => 1
+            );
+        }
+
+        # mark ticket as seen
+        my $Success = $TicketObject->TicketFlagSet(
+            TicketID => $Param{Data}->{TicketID},
+            Key      => 'Seen',
+            Value    => 1,
+            UserID   => $Self->{Authorization}->{UserID},
+        );
+
+        if ( !$Success ) {
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                Type => 'error',
+                What => 'Message',
+            );
+            return $Self->_Error(
+                Code    => 'InternalError',
+                Message => "Could not mark ticket as seen ($LogMessage).",
+            );
+        }
+    }
+
+    return $Self->_Success(
+        TicketID => "" . $Param{Data}->{TicketID}
+    );
 }
 
 =begin Internal:

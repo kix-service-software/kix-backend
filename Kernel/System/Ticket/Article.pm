@@ -2215,6 +2215,7 @@ set article flags
         Key       => 'Seen',
         Value     => 1,
         UserID    => 123,
+        Silent    => 1       # optional - if set, no client notification will be triggered
     );
 
 Events:
@@ -2284,11 +2285,13 @@ sub ArticleFlagSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'CREATE',
-        Namespace => 'Ticket.Article.Flag',
-        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
-    );
+    if (!$Param{Silent}) {
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'CREATE',
+            Namespace => 'Ticket.Article.Flag',
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+        );
+    }
 
     return 1;
 }

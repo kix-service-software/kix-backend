@@ -72,7 +72,7 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ArticleFlagUpdate Operation. This will return the updated ArticleFlag
+perform ArticleFlagCreate Operation. This will return the created ArticleFlag
 
     my $Result = $OperationObject->Run(
         Data => {

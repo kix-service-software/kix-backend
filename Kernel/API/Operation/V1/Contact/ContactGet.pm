@@ -92,7 +92,6 @@ one or more ticket entries in one call.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-print STDERR Data::Dumper::Dumper(\%Param);
     my @ContactList;
 
     if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) {
