@@ -308,7 +308,7 @@ sub _MapLinkType {
     my $TypeID = $Param{Item}->{type_id};
 
     # if the current type is no longer possible for the combination of objects, fall back to RelevantTo
-    if ( !IsHashRefWithData($Self->{PossibleLinkTypes}->{$SourceObject}->{$TargetObject}->{$Param{Item}->{type_id}}) ) {
+    if ( !IsHashRefWithData($Self->{PossibleLinkTypes}->{$SourceObject}->{$TargetObject}) || !$Self->{PossibleLinkTypes}->{$SourceObject}->{$TargetObject}->{$Type} ) {
         $TypeID = $Self->{LinkTypesReverse}->{RelevantTo}
     }
 
