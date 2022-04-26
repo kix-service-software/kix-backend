@@ -732,7 +732,8 @@ sub MacroActionExecute {
     # replace result variables
     if (IsHashRefWithData($Self->{MacroResults})) {
         $Self->_ReplaceResultVariables(
-            Data => \%Parameters,
+            Data   => \%Parameters,
+            UserID => $Param{UserID}
         );
     }
 
@@ -984,34 +985,39 @@ sub _ReplaceResultVariables {
     if ( IsHashRefWithData($Param{Data}) ) {
         foreach my $Key ( sort keys %{$Param{Data}} ) {
             $Param{Data}->{$Key} = $Self->_ReplaceResultVariables(
-                Data => $Param{Data}->{$Key}
+                Data   => $Param{Data}->{$Key},
+                UserID => $Param{UserID}
             );
         }
     }
     elsif ( IsArrayRefWithData($Param{Data}) ) {
         foreach my $Item ( @{$Param{Data}} ) {
             $Item = $Self->_ReplaceResultVariables(
-                Data => $Item
+                Data   => $Item,
+                UserID => $Param{UserID}
             );
         }
     }
     else {
-        while ( $Param{Data} =~ /^(.*?)(\$\{(.*?)(\|(.*?))?\})(.*?)$/xms ) {
+        while ( $Param{Data} =~ /^(.*?)(\$\{(.*?)(?:\|(.*?))?\})(.*?)$/xms ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
             my $Filter     = $4;
-            my $Trailing   = $6;
+            my $Trailing   = $5;
 
             my $Value = $Self->_ResolveVariableValue(
                 Variable => $Variable
             );
+
             if ( $Filter ) {
                 $Value = $Self->_ExecuteVariableFilters(
                     Data   => $Value,
                     Filter => $Filter,
+                    UserID => $Param{UserID}
                 );
             }
+
             if ( $Leading || $Trailing ) {
                 # variable is part of a string, we have to do a string replace
                 $Param{Data} =~ s/\Q$Expression\E/$Value/gmx;
@@ -1038,14 +1044,14 @@ sub _ExecuteVariableFilters {
     foreach my $Filter ( @Filters ) {
         next if !$Filter;
 
-        if ( $Filter =~ /^(JSON|ToJSON)$/ ) {
+        if ( $Filter =~ /^(JSON|ToJSON)$/i ) {
             $Value = $Kernel::OM->Get('JSON')->Encode(
                 Data => $Value
             );
             $Value =~ s/^"//;
             $Value =~ s/"$//;
         }
-        elsif ( $Filter =~ /^FromJSON$/ && IsStringWithData($Value) ) {
+        elsif ( $Filter =~ /^FromJSON$/i && IsStringWithData($Value) ) {
             $Value = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Value
             );
@@ -1060,6 +1066,35 @@ sub _ExecuteVariableFilters {
         elsif ( $Filter eq 'base64' ) {
             $Value = MIME::Base64::encode_base64($Value);
             $Value =~ s/\n//g;
+        }
+        elsif (IsHashRefWithData($Self->{VariableFilter})) {
+            $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
+            my $Parameter = $+{parameter};
+
+            my $Handler;
+            for my $HandlerName ( %{$Self->{VariableFilter}} ) {
+                if (lc($HandlerName) eq lc($Filter)) {
+                    $Handler = $Self->{VariableFilter}->{$HandlerName};
+                    last;
+                }
+            }
+            if ($Handler && ref $Handler eq 'CODE') {
+                $Value = $Handler->(
+                    $Self,
+                    Value     => $Value,
+                    Parameter => $Parameter
+                )
+            } else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown filter \"$Filter\"!"
+                );
+            }
+        } else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unknown filter \"$Filter\"!"
+            );
         }
     }
 
