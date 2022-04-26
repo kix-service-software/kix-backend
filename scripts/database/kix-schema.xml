@@ -1397,7 +1397,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="notification_id" Required="true" Type="INTEGER"/>
     <Column Name="event_key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="event_value" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="event_value" Required="true" Size="2000" Type="VARCHAR"/>
     <ForeignKey ForeignTable="notification_event">
         <Reference Foreign="id" Local="notification_id"/>
     </ForeignKey>
