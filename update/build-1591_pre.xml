@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="notification_event_item">
+        <ColumnChange NameOld="event_value" NameNew="event_value" Required="true" Size="2000" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>
