@@ -1149,6 +1149,11 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">3</Data>
+        <Data Key="event_key" Type="Quote">Recipients</Data>
+        <Data Key="event_value" Type="Quote">AgentWatcher</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">3</Data>
         <Data Key="event_key" Type="Quote">SendOnOutOfOffice</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
@@ -1185,6 +1190,11 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">4</Data>
+        <Data Key="event_key" Type="Quote">Recipients</Data>
+        <Data Key="event_value" Type="Quote">AgentWatcher</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">4</Data>
         <Data Key="event_key" Type="Quote">SendOnOutOfOffice</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
@@ -1218,6 +1228,11 @@
         <Data Key="notification_id">5</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentOwner</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">5</Data>
+        <Data Key="event_key" Type="Quote">Recipients</Data>
+        <Data Key="event_value" Type="Quote">AgentWatcher</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">5</Data>
@@ -1295,6 +1310,11 @@
         <Data Key="notification_id">7</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentResponsible</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">7</Data>
+        <Data Key="event_key" Type="Quote">Recipients</Data>
+        <Data Key="event_value" Type="Quote">AgentWatcher</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">7</Data>
@@ -1384,6 +1404,11 @@
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">9</Data>
+        <Data Key="event_key" Type="Quote">Recipients</Data>
+        <Data Key="event_value" Type="Quote">AgentWatcher</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">9</Data>
         <Data Key="event_key" Type="Quote">SendOnOutOfOffice</Data>
         <Data Key="event_value" Type="Quote">1</Data>
     </Insert>
@@ -1431,6 +1456,11 @@
         <Data Key="notification_id">10</Data>
         <Data Key="event_key" Type="Quote">Recipients</Data>
         <Data Key="event_value" Type="Quote">AgentResponsible</Data>
+    </Insert>
+    <Insert Table="notification_event_item">
+        <Data Key="notification_id">10</Data>
+        <Data Key="event_key" Type="Quote">Recipients</Data>
+        <Data Key="event_value" Type="Quote">AgentWatcher</Data>
     </Insert>
     <Insert Table="notification_event_item">
         <Data Key="notification_id">10</Data>
