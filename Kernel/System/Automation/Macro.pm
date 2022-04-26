@@ -614,7 +614,10 @@ sub MacroExecute {
     # set possible new id e.g. if we are a sub macro
     $Self->{ObjectID} = $Param{ObjectID};
     my $OrgObjectID;
-    if ($Self->{MacroResults}->{ObjectID} != $Param{ObjectID}) {
+    if (
+        $Self->{MacroResults}->{ObjectID} &&
+        $Self->{MacroResults}->{ObjectID} != $Param{ObjectID}
+    ) {
         $OrgObjectID = $Self->{MacroResults}->{ObjectID};
         $Self->{MacroResults}->{ObjectID} = $Param{ObjectID};
     }
@@ -673,6 +676,11 @@ sub MacroExecute {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $CacheType
     );
+
+    # init variable filter if necessary
+    if ( !IsHashRefWithData($Self->{VariableFilter}) ) {
+        $Self->_GetVariableFilter();
+    }
 
     my $Success = $BackendObject->Run(
         ObjectID  => $Param{ObjectID},
@@ -738,7 +746,7 @@ sub MacroIsDeletable {
     my $ReferenceObjects = $Kernel::OM->Get('Config')->Get('Automation::MacroReferenceObject');
 
     if (IsHashRefWithData($ReferenceObjects)) {
-        for my $Object (keys %{$ReferenceObjects}) {
+        for my $Object (sort keys %{$ReferenceObjects}) {
             next if (!$Object);
             if (!$ReferenceObjects->{$Object}) {
                 $Kernel::OM->Get('Log')->Log(
@@ -901,6 +909,62 @@ sub _LoadMacroTypeBackend {
     }
 
     return $Self->{MacroTypeModules}->{$Param{Name}};
+}
+
+sub _GetVariableFilter {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{VariableFilter} = {};
+    my $VariableFilter = $Kernel::OM->Get('Config')->Get('Automation::VariableFilter');
+
+    if (IsHashRefWithData($VariableFilter)) {
+        for my $Filter (sort keys %{$VariableFilter}) {
+            next if (!$Filter);
+
+            if (!$VariableFilter->{$Filter}) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No module given for variable filter \"$Filter\"!"
+                );
+                next;
+            }
+            next if ( !$Kernel::OM->Get('Main')->Require($VariableFilter->{$Filter}) );
+
+            my $Module = $VariableFilter->{$Filter}->new( %{$Self} );
+            if ( !$Module ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to create instance of $VariableFilter->{$Filter}!"
+                );
+                return;
+            }
+
+            if ( !$Module->can('GetFilterHandler') ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Module \"$VariableFilter->{$Filter}\" cannot \"GetFilterHandler\"!"
+                );
+                next;
+            }
+
+            my %Handler = $Module->GetFilterHandler();
+
+            for my $HandlerName ( keys %Handler ) {
+                next if (!$HandlerName);
+                if (
+                    !$Handler{$HandlerName} ||
+                    ref $Handler{$HandlerName} ne 'CODE'
+                ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "$HandlerName is no function!"
+                    );
+                    next;
+                }
+                $Self->{VariableFilter}->{$HandlerName} = $Handler{$HandlerName};
+            }
+        }
+    }
 }
 
 =item MacroLogList()

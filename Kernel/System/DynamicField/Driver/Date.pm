@@ -111,25 +111,29 @@ sub ValueValidate {
     my $Prefix          = 'DynamicField_' . $Param{DynamicFieldConfig}->{Name};
     my $DateRestriction = $Param{DynamicFieldConfig}->{Config}->{DateRestriction};
 
+    if (
+        $Param{Value} &&
+        $Param{Value} =~ m/^\d{4}-\d{2}-\d{2}/ &&
+        $Param{Value} !~ m/\s(23:59:59|00:00:00)$/
+    ) {
+        $Param{Value} =~ s/^(\d{4}-\d{2}-\d{2}).*/$1 00:00:00/
+    }
+
     # check for no time in date fields
     if (
-        $Param{Value}
-        && $Param{Value} !~ m{\A \d{4}-\d{2}-\d{2}\s00:00:00 \z}xms
-        && $Param{Value} !~ m{\A \d{4}-\d{2}-\d{2}\s23:59:59 \z}xms
-        )
-    {
+        $Param{Value} &&
+        $Param{Value} !~ m/^\d{4}-\d{2}-\d{2}/
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The value for the field Date is invalid!\n"
-                . "The date must be valid and the time must be 00:00:00"
-                . " (or 23:59:59 for search parameters)",
+                . "The date have to be something like \"YYYY-MM-DD\"",
         );
-        return;
     }
 
     my $Success = $Kernel::OM->Get('DynamicFieldValue')->ValueValidate(
         Value => {
-            ValueDateTime => $Param{Value},
+            ValueDateTime => $Param{Value}
         },
         UserID => $Param{UserID},
     );
@@ -185,6 +189,37 @@ sub ValueValidate {
     }
 
     return $Success;
+}
+
+
+sub ValueSet {
+    my ( $Self, %Param ) = @_;
+
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    # make sure about time value
+    my $Index = 0;
+    for my $Value (@Values) {
+        if (
+            $Value &&
+            $Value =~ m/^\d{4}-\d{2}-\d{2}/ &&
+            $Value !~ m/\s(23:59:59|00:00:00)$/
+        ) {
+            $Values[$Index] =~ s/^(\d{4}-\d{2}-\d{2}).*/$1 00:00:00/;
+        }
+        $Index++;
+    }
+
+    return $Self->SUPER::ValueSet(
+        %Param,
+        Value => \@Values
+    );
 }
 
 sub SearchSQLGet {

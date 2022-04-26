@@ -504,7 +504,7 @@ sub ValueSet {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not update field $Param{DynamicFieldConfig}->{Name} for "
-                . "$Param{DynamicFieldConfig}->{ObjectType} ID $Param{ObjectID} !",
+                . "$Param{DynamicFieldConfig}->{ObjectType} ID $Param{ObjectID}!",
         );
         return;
     }
@@ -668,7 +668,7 @@ sub ValueDelete {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not update field $Param{DynamicFieldConfig}->{Name} for "
-                . "$Param{DynamicFieldConfig}->{ObjectType} ID $Param{ObjectID} !",
+                . "$Param{DynamicFieldConfig}->{ObjectType} ID $Param{ObjectID}!",
         );
         return;
     }
@@ -1323,7 +1323,7 @@ sub RandomValueSet {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not update field $Param{DynamicFieldConfig}->{Name} for "
-                . "$Param{DynamicFieldConfig}->{ObjectType} ID $Param{ObjectID} !",
+                . "$Param{DynamicFieldConfig}->{ObjectType} ID $Param{ObjectID}!",
         );
         return;
     }

@@ -337,7 +337,10 @@ sub _ReplaceValuePlaceholder {
         Translate       => $Param{Translate} || 0,
         UserID          => $Param{UserID} || 1,
         Data            => $Data,
-        ReplaceNotFound => $Param{ReplaceNotFound}
+        ReplaceNotFound => $Param{ReplaceNotFound},
+
+        # FIXME: use object id as ticket id, but it could be another object (needed if no event data is given)!
+        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
     );
 }
 
