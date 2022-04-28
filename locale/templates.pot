@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-4-27 13:18+0000\n"
+"POT-Creation-Date: 2022-4-28 10:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -215,6 +215,10 @@ msgid "Event based Execution Plan for Job \"KIX Field Agent - Mobile Processing 
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Executes all reports that should be created periodically."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
 msgstr ""
 
@@ -299,11 +303,19 @@ msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Macro for Job \"Periodic Reports\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "MacroAction for Job \"Periodic Reports\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -380,6 +392,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per User"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Periodic Reports"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -588,6 +604,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Time Restricted"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Time based Execution Plan for Job \"Periodic Reports\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1612,6 +1632,54 @@ msgstr ""
 
 #. Perl Module: update/build-1507.pl
 msgid "allows working on tickets in team \"Servicedesk\", but requires role \"Ticket Agent (w/o teams)\" in order to grant access"
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Lists closed tickets within the last 7 days."
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Lists open tickets by priority."
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Lists open tickets by state."
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Lists open tickets by team."
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Lists open tickets in teams by priority."
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Lists tickets created within the last 7 days."
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Number of open tickets by priority"
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Number of open tickets by state"
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Number of open tickets by team"
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Number of open tickets in teams by priority"
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Number of tickets closed within the last 7 days"
+msgstr ""
+
+#. Perl Module: update/build-1584.pl
+msgid "Number of tickets created within the last 7 days"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
