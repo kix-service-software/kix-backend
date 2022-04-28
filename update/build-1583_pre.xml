@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
 
+    <TableAlter Name="report_definition">
+        <ColumnAdd Name="is_periodic" Required="false" Type="INTEGER"/>
+        <ColumnAdd Name="max_reports" Required="false" Type="INTEGER"/>
+    </TableAlter>
+
     <TableAlter Name="configitem_counter">
         <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
         <ColumnChange NameOld="class_id" NameNew="class_id" Required="true" PrimaryKey="false" Type="INTEGER" />

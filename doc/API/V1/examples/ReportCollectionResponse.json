@@ -5,6 +5,8 @@
             "CreateTime": "2021-03-01 16:16:37",
             "DefinitionID": 1,
             "ID": 1,
+            "IsPeriodic": 1,
+            "MaxReports": 1,
             "Config": {
                 "OutputFormats": [
                     "CSV"

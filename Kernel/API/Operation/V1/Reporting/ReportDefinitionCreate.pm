@@ -82,6 +82,8 @@ perform ReportDefinitionCreate Operation. This will return the created ReportDef
                 Name       => 'Item Name',
                 DataSource => '...',
                 Config     => {...},                  # optional
+                IsPeriodic => 0|1,                    # optional
+                MaxReports => ...,                    # optional
                 Comment    => 'Comment',              # optional
                 ValidID    => 1,                      # optional
             },
@@ -123,6 +125,8 @@ sub Run {
         Name       => $ReportDefinition->{Name},
         DataSource => $ReportDefinition->{DataSource},
         Config     => $ReportDefinition->{Config},
+        IsPeriodic => $ReportDefinition->{IsPeriodic},
+        MaxReports => $ReportDefinition->{MaxReports},
         Comment    => $ReportDefinition->{Comment} || '',
         ValidID    => $ReportDefinition->{ValidID} || 1,
         UserID     => $Self->{Authorization}->{UserID},
