@@ -92,6 +92,8 @@ This returns something like:
         'Name'          => 'Test',
         'DataSource'    => 'TicketList',
         'Config'        => { ... },
+        'IsPeriodic'    => 1|0,
+        'MaxReports'    => ...,
         'Comment'       => '...',
         'ValidID'       => '1',
         'CreateTime'    => '2010-04-07 15:41:15',
@@ -121,9 +123,9 @@ sub ReportDefinitionGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-
-    return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT id, name, datasource, config, comments, valid_id, create_time, create_by, change_time, change_by FROM report_definition WHERE id = ?",
+    
+    return if !$Kernel::OM->Get('DB')->Prepare( 
+        SQL   => "SELECT id, name, datasource, config, is_periodic, max_reports, comments, valid_id, create_time, create_by, change_time, change_by FROM report_definition WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
@@ -136,12 +138,14 @@ sub ReportDefinitionGet {
             Name       => $Row[1],
             DataSource => $Row[2],
             Config     => $Row[3],
-            Comment    => $Row[4],
-            ValidID    => $Row[5],
-            CreateTime => $Row[6],
-            CreateBy   => $Row[7],
-            ChangeTime => $Row[8],
-            ChangeBy   => $Row[9],
+            IsPeriodic => $Row[4],
+            MaxReports => $Row[5],
+            Comment    => $Row[6],
+            ValidID    => $Row[7],
+            CreateTime => $Row[8],
+            CreateBy   => $Row[9],
+            ChangeTime => $Row[10],
+            ChangeBy   => $Row[11],
         );
 
         if ( $Result{Config} ) {
@@ -180,6 +184,8 @@ adds a new Report ReportDefinition
         Name       => 'test',
         DataSource => 'TicketList',
         Config     => { ... },                      # optional
+        IsPeriodic => 0|1,                          # optional
+        MaxReports => ...,                          # optional
         Comment    => '...',                        # optional
         ValidID    => 1,                            # optional
         UserID     => 123,
@@ -234,10 +240,11 @@ sub ReportDefinitionAdd {
 
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO report_definition (name, datasource, config, comments, valid_id, create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO report_definition (name, datasource, config, is_periodic, max_reports, comments, valid_id, create_time, create_by, change_time, change_by) '
+             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{DataSource}, \$Config, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Name}, \$Param{DataSource}, \$Config, \$Param{IsPeriodic}, \$Param{MaxReports}, 
+            \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -278,6 +285,8 @@ updates a report definition
         Name       => 'test',                       # optional
         DataSource => 'TicketList',                 # optional
         Config     => { ... },                      # optional
+        IsPeriodic => 0|1,                          # optional
+        MaxReports => ...,                          # optional
         Comment    => '...',                        # optional
         ValidID    => 1,                            # optional
         UserID     => 123,
@@ -335,7 +344,7 @@ sub ReportDefinitionUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key ( qw(Name DataSource Config Comment ValidID) ) {
+    for my $Key ( qw(Name DataSource Config IsPeriodic MaxReports Comment ValidID) ) {
 
         next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
 
@@ -350,9 +359,11 @@ sub ReportDefinitionUpdate {
 
     # update ReportDefinition in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE report_definition SET name = ?, datasource = ?, config = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE report_definition SET name = ?, datasource = ?, config = ?, is_periodic = ?, max_reports = ?,'
+            .  'comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{DataSource}, \$Config, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{Name}, \$Param{DataSource}, \$Config, \$Param{IsPeriodic}, \$Param{MaxReports},
+            \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -366,6 +377,11 @@ sub ReportDefinitionUpdate {
         Event     => 'UPDATE',
         Namespace => 'ReportDefinition',
         ObjectID  => $Param{ID},
+    );
+
+    # cleanup if max reports is configured
+    $Self->_RemoveExcessReports(
+        DefinitionID => $Param{DefinitionID},
     );
 
     return 1;

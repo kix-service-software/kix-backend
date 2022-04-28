@@ -2668,6 +2668,8 @@
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="datasource" Required="true" Size="255" Type="VARCHAR"/>
     <Column Name="config" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="is_periodic" Required="false" Type="INTEGER" Default="0"/>
+    <Column Name="max_reports" Required="false" Type="INTEGER" Default="0"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

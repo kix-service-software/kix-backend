@@ -4664,10 +4664,188 @@ DefaultValue:
     </Insert>
 <!-- EO initial job "KIX Field Agent - Mobile Processing Rejected" -->
 
+<!-- initial job "Customer Response - reopen from pending" -->
+    <Insert Table="exec_plan">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
+        <Data Key="type" Type="Quote">EventBased</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"Event":["ArticleCreate"]}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="macro">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
+        <Data Key="type" Type="Quote">Ticket</Data>
+        <Data Key="exec_order" Type="Quote">3</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="macro_action">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="macro_id">2</Data>
+        <Data Key="type" Type="Quote">StateSet</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"State":"open"}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Customer Response - reopen from pending"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job">
+        <Data Key="id" Type="AutoIncrement">2</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Customer Response - reopen from pending</Data>
+        <Data Key="type" Type="Quote">Ticket</Data>
+        <Data Key="filter" Type="Quote"><![CDATA[
+{"AND":[
+{"Field":"SenderTypeID","Value":3,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"StateTypeID","Value":[4,5],"Operator":"IN","Type":"NUMERIC"},
+{"Field":"ChannelID","Value":1,"Operator":"EQ","Type":"NUMERIC"}
+]}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Reopens ticket from pending by customer response.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_exec_plan">
+        <Data Key="job_id">2</Data>
+        <Data Key="exec_plan_id">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_macro">
+        <Data Key="job_id">2</Data>
+        <Data Key="macro_id">2</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+<!-- EO initial job "Customer Response - reopen from pending" -->
+
+<!-- initial job "Periodic Reports" -->
+    <Insert Table="exec_plan">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Time based Execution Plan for Job "Periodic Reports"</Data>
+        <Data Key="type" Type="Quote">TimeBased</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"Weekday": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], "Time": [
+            "00:00:00","00:15:00","00:30:00","00:45:00",
+            "01:00:00","01:15:00","01:30:00","01:45:00",
+            "02:00:00","02:15:00","02:30:00","02:45:00",
+            "03:00:00","03:15:00","03:30:00","03:45:00",
+            "04:00:00","04:15:00","04:30:00","04:45:00",
+            "05:00:00","05:15:00","05:30:00","05:45:00",
+            "06:00:00","06:15:00","06:30:00","06:45:00",
+            "07:00:00","07:15:00","07:30:00","07:45:00",
+            "08:00:00","08:15:00","08:30:00","08:45:00",
+            "09:00:00","09:15:00","09:30:00","09:45:00",
+            "10:00:00","10:15:00","10:30:00","10:45:00",
+            "11:00:00","11:15:00","11:30:00","11:45:00",
+            "12:00:00","12:15:00","12:30:00","12:45:00",
+            "13:00:00","13:15:00","13:30:00","13:45:00",
+            "14:00:00","14:15:00","14:30:00","14:45:00",
+            "15:00:00","15:15:00","15:30:00","15:45:00",
+            "16:00:00","16:15:00","16:30:00","16:45:00",
+            "17:00:00","17:15:00","17:30:00","17:45:00",
+            "18:00:00","18:15:00","18:30:00","18:45:00",
+            "19:00:00","19:15:00","19:30:00","19:45:00",
+            "20:00:00","20:15:00","20:30:00","20:45:00",
+            "21:00:00","21:15:00","21:30:00","21:45:00",
+            "22:00:00","22:15:00","22:30:00","22:45:00",
+            "23:00:00","23:15:00","23:30:00","23:45:00"
+        ]
+}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Time based Execution Plan for Job "Periodic Reports"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="macro">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Periodic Reports"</Data>
+        <Data Key="type" Type="Quote">Reporting</Data>
+        <Data Key="exec_order" Type="Quote">4</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Periodic Reports"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="macro_action">
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="macro_id">3</Data>
+        <Data Key="type" Type="Quote">CreateReport</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"DefinitionID":"${ObjectID}", "OutputFormats":["CSV"]}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Periodic Reports"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Periodic Reports</Data>
+        <Data Key="type" Type="Quote">Reporting</Data>
+        <Data Key="filter" Type="Quote"><![CDATA[
+{"AND":[{"Field":"IsPeriodic","Value":1,"Operator":"EQ"}]}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Executes all reports that should be created periodically.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_exec_plan">
+        <Data Key="job_id">3</Data>
+        <Data Key="exec_plan_id">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_macro">
+        <Data Key="job_id">3</Data>
+        <Data Key="macro_id">3</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+<!-- EO initial job "Periodic Reports" -->
+
     <Insert Table="report_definition">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">Tickets Created In Date Range</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Lists tickets created in a specific date range. Organization may be selected before report creation.</Data>
+        <Data Key="is_periodic">0</Data>
+        <Data Key="max_reports">0</Data>
         <Data Key="datasource" Type="Quote">GenericSQL</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="config" Type="Quote"><![CDATA[
@@ -4721,6 +4899,8 @@ DefaultValue:
         <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">Tickets Closed In Date Range</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Lists tickets closed in a specific date range. Organization may be selected before report creation.</Data>
+        <Data Key="is_periodic">0</Data>
+        <Data Key="max_reports">0</Data>
         <Data Key="datasource" Type="Quote">GenericSQL</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="config" Type="Quote"><![CDATA[
@@ -4771,91 +4951,199 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
-    <!-- assign type to initial organisation -->
-    <Insert Table="dynamic_field_value">
-        <Data Key="id" Type="AutoIncrement">1</Data>
-        <Data Key="field_id">8</Data>
-        <Data Key="object_id" Type="Quote">1</Data>
-        <Data Key="value_text" Type="Quote">service provider</Data>
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Number of tickets created within the last 7 days</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists tickets created within the last 7 days.</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)"
+    }
+  },
+  "OutputFormats": {
+    "CSV": {
+        "IncludeColumnHeader": 1,
+        "Quote": "\"",
+        "Separator": ",",
+        "TranslateColumnNames": 0
+    }
+  }
+}
+]]></Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
-<!-- initial job "Customer Response - reopen from pending" -->
-    <Insert Table="exec_plan">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
-        <Data Key="type" Type="Quote">EventBased</Data>
-        <Data Key="parameters" Type="Quote"><![CDATA[
-{"Event":["ArticleCreate"]}
-    ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Number of open tickets by priority</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists open tickets by priority.</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
         <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIHAubmFtZSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQgdCAKSk9JTiB0aWNrZXRfcHJpb3JpdHkgcCBPTiB0LnRpY2tldF9wcmlvcml0eV9pZD1wLmlkCldIRVJFIHQudGlja2V0X3N0YXRlX2lkIElOICgKCVNFTEVDVCBpZCBGUk9NIHRpY2tldF9zdGF0ZSBzIAoJV0hFUkUgcy50eXBlX2lkIElOICgKCQlTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSAKCQlXSEVSRSBuYW1lIElOKCduZXcnLCAnb3BlbicsJ3BlbmRpbmdfcmVtaW5kZXInLCAncGVuZGluZ19hdXRvJykKCSkKKQpHUk9VUCBCWSB0LnRpY2tldF9wcmlvcml0eV9pZCwgcC5pZApPUkRFUiBCWSBwLm5hbWU7)"
+    }
+  },
+  "OutputFormats": {
+      "CSV": {
+          "IncludeColumnHeader": 1,
+          "Quote": "\"",
+          "Separator": ",",
+          "TranslateColumnNames": 0
+      }
+  }
+}
+]]></Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="macro">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
-        <Data Key="type" Type="Quote">Ticket</Data>
-        <Data Key="exec_order" Type="Quote">3</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
+
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Number of open tickets by state</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists open tickets by state.</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
         <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIHMubmFtZSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQgdCAKSk9JTiB0aWNrZXRfc3RhdGUgcyBPTiB0LnRpY2tldF9zdGF0ZV9pZD1zLmlkCldIRVJFIHQudGlja2V0X3N0YXRlX2lkIElOICgKCVNFTEVDVCBpZCBGUk9NIHRpY2tldF9zdGF0ZSB0cyAKCVdIRVJFIHRzLnR5cGVfaWQgSU4gKAoJCVNFTEVDVCBpZCBGUk9NIHRpY2tldF9zdGF0ZV90eXBlIAoJCVdIRVJFIG5hbWUgSU4oJ25ldycsICdvcGVuJywncGVuZGluZ19yZW1pbmRlcicsICdwZW5kaW5nX2F1dG8nKQoJKQopCkdST1VQIEJZIHQudGlja2V0X3N0YXRlX2lkLCBzLmlkOw==)"
+    }
+  },
+  "OutputFormats": {
+      "CSV": {
+          "IncludeColumnHeader": 1,
+          "Quote": "\"",
+          "Separator": ",",
+          "TranslateColumnNames": 0
+      }
+  }
+}
+]]></Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="macro_action">
-        <Data Key="id" Type="AutoIncrement">3</Data>
-        <Data Key="macro_id">2</Data>
-        <Data Key="type" Type="Quote">StateSet</Data>
-        <Data Key="parameters" Type="Quote"><![CDATA[
-{"State":"open"}
-    ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Customer Response - reopen from pending"</Data>
+
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">6</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Number of open tickets in teams by priority</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists open tickets in teams by priority.</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
         <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIHEubmFtZSBhcyBxdWV1ZV9uYW1lLCBwLm5hbWUgYXMgcHJpb3JpdHlfbmFtZSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQgdCAKSk9JTiBxdWV1ZSBxIE9OIHQucXVldWVfaWQ9cS5pZApKT0lOIHRpY2tldF9wcmlvcml0eSBwIG9uIHQudGlja2V0X3ByaW9yaXR5X2lkPXAuaWQKV0hFUkUgdC50aWNrZXRfc3RhdGVfaWQgSU4gKAoJU0VMRUNUIGlkIEZST00gdGlja2V0X3N0YXRlIHRzIAoJV0hFUkUgdHMudHlwZV9pZCBJTiAoCgkJU0VMRUNUIGlkIEZST00gdGlja2V0X3N0YXRlX3R5cGUgCgkJV0hFUkUgbmFtZSBJTignbmV3JywgJ29wZW4nLCdwZW5kaW5nX3JlbWluZGVyJywgJ3BlbmRpbmdfYXV0bycpCgkpCikKR1JPVVAgQlkgcS5uYW1lLCBwLm5hbWUKT1JERVIgQlkgcS5uYW1lOwo=)"
+    }
+  },
+  "OutputFormats": {
+      "CSV": {
+          "IncludeColumnHeader": 1,
+          "Quote": "\"",
+          "Separator": ",",
+          "TranslateColumnNames": 0
+      }
+  }
+}
+]]></Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="job">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Customer Response - reopen from pending</Data>
-        <Data Key="type" Type="Quote">Ticket</Data>
-        <Data Key="filter" Type="Quote"><![CDATA[
-{"AND":[
-{"Field":"SenderTypeID","Value":3,"Operator":"EQ","Type":"NUMERIC"},
-{"Field":"StateTypeID","Value":[4,5],"Operator":"IN","Type":"NUMERIC"},
-{"Field":"ChannelID","Value":1,"Operator":"EQ","Type":"NUMERIC"},
-{"Field":"CreateTime","Operator":"LT","Type":"DATETIME","Value":"-5m"}
-]}
-    ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Reopens ticket from pending by customer response.</Data>
+
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">7</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Number of open tickets by team</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists open tickets by team.</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
         <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIHEubmFtZSBhcyBuYW1lLCBDb3VudCgqKSBhcyBjb3VudCBGUk9NIHRpY2tldCB0IApKT0lOIHF1ZXVlIHEgT04gdC5xdWV1ZV9pZD1xLmlkCldIRVJFIHQudGlja2V0X3N0YXRlX2lkIElOICgKCVNFTEVDVCBpZCBGUk9NIHRpY2tldF9zdGF0ZSB0cyAKCVdIRVJFIHRzLnR5cGVfaWQgSU4gKAoJCVNFTEVDVCBpZCBGUk9NIHRpY2tldF9zdGF0ZV90eXBlIAoJCVdIRVJFIG5hbWUgSU4oJ25ldycsICdvcGVuJywncGVuZGluZ19yZW1pbmRlcicsICdwZW5kaW5nX2F1dG8nKQoJKQopCkdST1VQIEJZIHEubmFtZQpPUkRFUiBCWSBxLm5hbWU7)"
+    }
+  },
+  "OutputFormats": {
+      "CSV": {
+          "IncludeColumnHeader": 1,
+          "Quote": "\"",
+          "Separator": ",",
+          "TranslateColumnNames": 0
+      }
+  }
+}
+]]></Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="job_exec_plan">
-        <Data Key="job_id">2</Data>
-        <Data Key="exec_plan_id">2</Data>
+
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">8</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Number of tickets closed within the last 7 days</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists closed tickets within the last 7 days.</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIAogICAgZGF0ZSh0aC5jcmVhdGVfdGltZSkgYXMgZGF5LAogICAgQ291bnQoKikgYXMgY291bnQKRlJPTSB0aWNrZXQgdAogICAgCiAgICBMRUZUIEpPSU4gdGlja2V0X2hpc3RvcnkgdGggT04gCiAgICAgICAgdGgudGlja2V0X2lkPXQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkIElOICgKICAgICAgICAgICAgU0VMRUNUIGlkIEZST00gdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQgV0hFUkUgKHRodC5uYW1lID0gJ1N0YXRlVXBkYXRlJyBPUiB0aHQubmFtZSA9ICdOZXdUaWNrZXQnKQogICAgICAgICkKICAgICAgICBBTkQgdGguc3RhdGVfaWQgSU4gKAogICAgICAgICAgICBTRUxFQ1QgaWQgZnJvbSB0aWNrZXRfc3RhdGUgdHMgV0hFUkUgdHMudHlwZV9pZCBJTiAoCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSBXSEVSRSBuYW1lID0gJ2Nsb3NlZCcKICAgICAgICAgICAgKQogICAgICAgICkKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSBBTkQgTk9XKCkKICAgICAgICAKV0hFUkUgdGguY3JlYXRlX3RpbWUgSVMgTk9UIE5VTEwKCkdST1VQIEJZIGRheQpPUkRFUiBCWSBkYXk7)"
+    }
+  },
+  "OutputFormats": {
+      "CSV": {
+          "IncludeColumnHeader": 1,
+          "Quote": "\"",
+          "Separator": ",",
+          "TranslateColumnNames": 0
+      }
+  }
+}
+]]></Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
-    <Insert Table="job_macro">
-        <Data Key="job_id">2</Data>
-        <Data Key="macro_id">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-<!-- EO initial job "Customer Response - reopen from pending" -->
+
+<!-- assign type to initial organisation -->
+<Insert Table="dynamic_field_value">
+    <Data Key="id" Type="AutoIncrement">1</Data>
+    <Data Key="field_id">8</Data>
+    <Data Key="object_id" Type="Quote">1</Data>
+    <Data Key="value_text" Type="Quote">service provider</Data>
+</Insert>
 
 <!-- \### DYNAMIC PERMISSION INSERT - DO NOT REMOVE THIS LINE!!! \### -->
 <Insert Table="role_permission">
@@ -5189,6 +5477,126 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [3,4,5,6,7,8]}]]]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/3]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/4]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/5]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/6]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/7]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/8]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
     <Data Key="role_id">5</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
@@ -5352,6 +5760,126 @@ DefaultValue:
     <Data Key="role_id">5</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/textmodules]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [3,4,5,6,7,8]}]]]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/3]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/4]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/5]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/6]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/7]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/8]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -5553,6 +6081,126 @@ DefaultValue:
     <Data Key="type_id">2</Data>
     <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.QueueID GT 0}]]></Data>
     <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [3,4,5,6,7,8]}]]]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/*]]></Data>
+    <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/3]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/4]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/5]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/6]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/7]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">16</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/8]]></Data>
+    <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
@@ -6700,6 +7348,66 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/3]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/4]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/5]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/6]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/7]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/8]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
     <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{}]]></Data>
     <Data Key="value">0</Data>
@@ -6721,7 +7429,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{Report.DefinitionID IN [1,2]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}]]></Data>
     <Data Key="value">3</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -6731,7 +7439,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [1,2]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>

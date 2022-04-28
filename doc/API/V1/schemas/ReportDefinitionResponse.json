@@ -122,6 +122,14 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "IsPeriodic" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MaxReports" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true

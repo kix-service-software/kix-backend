@@ -77,6 +77,12 @@
                         "DataSource"
                     ]
                 },
+                "IsPeriodic": {
+                    "type": "integer"
+                },
+                "MaxReports": {
+                    "type": "integer"
+                },
                 "Name": {
                     "type": "string",
                     "readOnly": true
