@@ -78,7 +78,7 @@ sub Validate {
         foreach my $Needed ( qw(ContentType Filename) ) {
             if ( !$Attachment->{$Needed} ) {
                 $Found = 0;
-                last ATTACHMENT;
+                last;
             }
 
             # check allowed size
