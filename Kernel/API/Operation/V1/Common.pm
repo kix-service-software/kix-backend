@@ -3791,7 +3791,8 @@ sub _GetPrepareDynamicFieldValue {
         # get display value string
         my $DisplayValue = $Kernel::OM->Get('DynamicField::Backend')->DisplayValueRender(
             DynamicFieldConfig => $Param{Config},
-            Value              => $Param{Value}
+            Value              => $Param{Value},
+            HTMLOutput         => 0
         );
 
         if (!IsHashRefWithData($DisplayValue)) {
@@ -3820,13 +3821,14 @@ sub _GetPrepareDynamicFieldValue {
         # get html display value string
         my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
             DynamicFieldConfig => $Param{Config},
-            Value              => $Param{Value}
+            Value              => $Param{Value}            
         );
 
         # get short display value string
         my $DisplayValueShort = $Kernel::OM->Get('DynamicField::Backend')->ShortDisplayValueRender(
             DynamicFieldConfig => $Param{Config},
-            Value              => $Param{Value}
+            Value              => $Param{Value},
+            HTMLOutput         => 0
         );
 
         return {
