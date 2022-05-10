@@ -195,6 +195,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
+        OrderBySwitch => ($Param{Attribute} eq 'Age') ? 1 : undef
     };
 }
 

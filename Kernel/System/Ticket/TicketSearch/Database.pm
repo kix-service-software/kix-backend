@@ -269,15 +269,21 @@ sub TicketSearch {
     # sorting
     if ( IsArrayRefWithData($Param{Sort}) ) {
         my %Result = $Self->_CreateOrderBySQL(
-            Sort => $Param{Sort},
+            Sort => $Param{Sort}
         );
         if ( !IsHashRef(\%Result) ) {
             # return in case of error
             return;
         }
-        $SQLDef{SQLOrderBy} .= join(', ', @{$Result{OrderBy}});
-        $SQLDef{SQLAttrs}   .= join(', ', @{$Result{Attrs}});
-        $SQLDef{SQLJoin}    .= join(' ', @{$Result{Join}});
+        if (IsArrayRefWithData($Result{OrderBy})) {
+            $SQLDef{SQLOrderBy} .= join(', ', @{$Result{OrderBy}});
+        }
+        if (IsArrayRefWithData($Result{Attrs})) {
+            $SQLDef{SQLAttrs}   .= join(', ', @{$Result{Attrs}});
+        }
+        if (IsArrayRefWithData($Result{Join})) {
+            $SQLDef{SQLJoin}    .= join(' ', @{$Result{Join}});
+        }
     }
 
     # generate SQL
@@ -330,6 +336,10 @@ sub TicketSearch {
         push( @TicketIDs, $Row[0] );
         $Tickets{ $Row[0] } = $Row[1];
     }
+
+    # get unique if distinct id is not given because of joins
+    my %Known;
+    @TicketIDs = grep { !$Known{$_}++ } @TicketIDs;
 
     # return COUNT
     if ( $Result eq 'COUNT' ) {
@@ -576,20 +586,20 @@ sub _CreateOrderBySQL {
         if ( !$AttributeModule ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to sort attribute $SortDef. Don't know how to handle it!",
+                Message  => "Unable to sort attribute. Don't know how to handle it!\n" . Data::Dumper::Dumper($SortDef),
             );
             return;
         }
 
         # execute attribute module to prepare SQL
         my $Result = $AttributeModule->Sort(
-            Attribute => $Attribute,
+            Attribute => $Attribute
         );
 
         if ( !IsHashRefWithData($Result) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Attribute module for sort $SortDef returned an error!",
+                Message  => "Attribute module for sort returned an error!\n" . Data::Dumper::Dumper($SortDef),
             );
             return;
         }
@@ -604,6 +614,10 @@ sub _CreateOrderBySQL {
             my $Order = 'ASC';
             if ( uc($SortDef->{Direction}) eq 'DESCENDING' ) {
                 $Order = 'DESC';
+            }
+
+            if ( $Result->{OrderBySwitch} ) {
+                $Order = $Order eq 'ASC' ? 'DESC' : 'ASC';
             }
 
             foreach my $Element ( @{$Result->{SQLOrderBy}} ) {
