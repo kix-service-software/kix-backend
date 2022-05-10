@@ -1725,6 +1725,7 @@ sub _ApplySort {
 
                     # convert field values to unixtime
                     foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
+                        next if (!$ObjectItem->{ $Sort->{Field} });
                         my ( $DatePart, $TimePart ) = split( /\s+/, $ObjectItem->{ $Sort->{Field} } );
                         $ObjectItem->{$SortField} = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                             String => $DatePart . ' 12:00:00',
@@ -1740,9 +1741,20 @@ sub _ApplySort {
 
                     # convert field values to unixtime
                     foreach my $ObjectItem ( @{ $Param{Data}->{$Object} } ) {
+                        next if (!$ObjectItem->{ $Sort->{Field} });
                         $ObjectItem->{$SortField} = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                             String => $ObjectItem->{ $Sort->{Field} },
                         );
+                    }
+                }
+
+                # special handling for "number-strings"
+                if (lc($Type) eq 'textual') {
+                    my $HasNotNumeric = grep {
+                        $_->{$SortField} && $_->{$SortField} !~ m/^\d+$/
+                    } @{ $Param{Data}->{$Object} };
+                    if (!$HasNotNumeric) {
+                        $Type = 'NUMERIC';
                     }
                 }
 
@@ -3821,7 +3833,7 @@ sub _GetPrepareDynamicFieldValue {
         # get html display value string
         my $DisplayValueHTML = $Kernel::OM->Get('DynamicField::Backend')->HTMLDisplayValueRender(
             DynamicFieldConfig => $Param{Config},
-            Value              => $Param{Value}            
+            Value              => $Param{Value}
         );
 
         # get short display value string

@@ -70,6 +70,24 @@ sub Run {
         ) if (!IsArrayRefWithData($CustomerCIIDList));
     }
 
+    # allow some sorting (not all is supported in core)
+    my %Sorting;
+    if ( IsArrayRefWithData($Self->{Sort}->{ConfigItem}) ) {
+        %Sorting = (
+            OrderBy => [],
+            OrderByDirection => []
+        );
+        for my $Sort ( @{ $Self->{Sort}->{ConfigItem} } ) {
+            if ( IsHashRefWithData($Sort) && $Sort->{Field} ) {
+                push(@{ $Sorting{OrderBy} }, $Sort->{Field});
+                push(
+                    @{ $Sorting{OrderByDirection} },
+                    ($Sort->{Direction} eq 'ascending' ? 'Up' : 'Down')
+                );
+            }
+        }
+    }
+
     my $ConfigItemList;
 
     # prepare search if given
@@ -158,6 +176,7 @@ sub Run {
                             %SearchParam,
                             UserID  => $Self->{Authorization}->{UserID},
                             Limit   => $Limit,
+                            %Sorting,
 
                             # use ids of customer if given
                             ConfigItemIDs => $CustomerCIIDList
@@ -199,7 +218,8 @@ sub Run {
                         %SearchParam,
                         UserID        => $Self->{Authorization}->{UserID},
                         Limit         => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-                        ConfigItemIDs => \@KnownIDs
+                        ConfigItemIDs => \@KnownIDs,
+                        %Sorting
                     );
                     @SearchTypeResult = @{$SearchResult};
                 }
@@ -226,6 +246,7 @@ sub Run {
         my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
             UserID  => $Self->{Authorization}->{UserID},
             Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+            %Sorting,
 
             # use ids of customer if given
             ConfigItemIDs => $CustomerCIIDList

@@ -112,10 +112,10 @@ sub Search {
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} ) {
         if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, 'LEFT OUTER JOIN ticket_history th_left ON st.id = th_left.ticket_id' );
-            push( @SQLJoin, 'RIGHT OUTER JOIN ticket_history th_right ON st.id = th_right.ticket_id' );
+            push( @SQLJoin, 'LEFT OUTER JOIN ticket_history th_left ON st.id = th_left.ticket_id ' );
+            push( @SQLJoin, 'RIGHT OUTER JOIN ticket_history th_right ON st.id = th_right.ticket_id ' );
         } else {
-            push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id' );
+            push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id ' );
         }
         $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
     }
@@ -171,14 +171,18 @@ sub Search {
                     push( @SQLWhere, 'th_left.state_id IN ('.(join(', ', sort @List)).')' );
                     push( @SQLWhere, 'th_right.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th_right.state_id IN ('.(join(', ', sort @List)).')' );
-                    push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."'" );
-                    push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."'" );
                 } else {
                     push( @SQLWhere, 'th.history_type_id IN ('.(join(', ', sort @StateID)).')' );
                     push( @SQLWhere, 'th.state_id IN ('.(join(', ', sort @List)).')' );
-                    push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."'" );
                 }
             }
+        }
+
+        if ( $Param{BoolOperator} eq 'OR') {
+            push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."' " );
+            push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."' " );
+        } else {
+            push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."' " );
         }
     }
     else {
@@ -244,6 +248,7 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     # map search attributes to table attributes
+    my @SQLJoin;
     my %AttributeMapping = (
         'ChangeTime'        => 'st.change_time',
         'CloseTime'         => 'th.create_time',
@@ -254,6 +259,11 @@ sub Sort {
         'CreatedPriorityID' => 'th.priority_id',
     );
 
+    # check if we have to add a join
+    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{AND} ) {
+        push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id' );
+    }
+
     return {
         SQLAttrs => [
             $AttributeMapping{$Param{Attribute}}
@@ -261,6 +271,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
+        SQLJoin  => \@SQLJoin
     };
 }
 
