@@ -85,7 +85,10 @@ sub Run {
 
     # map DF types
     my %DynamicFieldObjectTypes = map { $_->{id} => $_->{object_type} } @{$DynamicFieldData};
-    my %DynamicFieldTypes       = map { $_->{id} => $_->{field_type} } @{$DynamicFieldData};
+    my $DynamicFields = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+        Valid => 0
+    );
+    my %DynamicFieldTypes = map { $_->{ID} => $_->{FieldType} } @{$DynamicFields};
 
     # get the list of types contained in the values to preload the OIDs
     my %TypesToPreload = map { $ObjectTypeReferenceMapping{$DynamicFieldObjectTypes{$_->{field_id}}} => 1 } @{$SourceData};
@@ -164,10 +167,14 @@ sub Run {
                 }
                 elsif ( $FieldTypeReferenceMapping{$DynamicFieldTypes{$Item->{field_id}}} ) {
                     # map the value to the new object
-                    $Item->{value_text} = $Self->GetOIDMapping(
-                        ObjectType     => $FieldTypeReferenceMapping{$DynamicFieldTypes{$Item->{field_id}}},
-                        SourceObjectID => $Item->{value_text}
-                    );
+                    ATTR:
+                    foreach my $Attr ( qw(value_text value_int) ) {
+                        next ATTR if !$Item->{$Attr};
+                        $Item->{$Attr} = $Self->GetOIDMapping(
+                            ObjectType     => $FieldTypeReferenceMapping{$DynamicFieldTypes{$Item->{field_id}}},
+                            SourceObjectID => $Item->{$Attr}
+                        );
+                    }
                 }
 
                 $ID = $Self->Insert(
