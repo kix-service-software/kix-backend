@@ -424,7 +424,10 @@ sub ValueValidate {
     # validate date
     if ( $Value{ValueDateTime} ) {
 
-        if ($Value{ValueDateTime} !~ m/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/) {
+        if (
+            $Value{ValueDateTime} !~ m/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ &&
+            $Value{ValueDateTime} !~ m/[+-]\d+[YMwdhms]/
+        ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid DateTime string \"$Value{ValueDateTime}\"!"
