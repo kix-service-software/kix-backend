@@ -293,6 +293,7 @@ sub Run {
                 {
                     next BUNDLE;
                 }
+
                 # Check if notification should not be send to the customer.
                 if (
                     $Bundle->{Recipient}->{Type} eq 'Customer'

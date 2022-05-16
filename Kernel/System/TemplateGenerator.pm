@@ -512,22 +512,6 @@ sub NotificationEvent {
         $Notification{Subject} =~ s/<KIX_CUSTOMER_DATA_$Key>/$Param{CustomerMessageParams}->{$Key}{$_}/gi;
     }
 
-    # do text/plain to text/html convert
-    if ( $Self->{RichText} && $Notification{ContentType} =~ /text\/plain/i ) {
-        $Notification{ContentType} = 'text/html';
-        $Notification{Body}        = $Kernel::OM->Get('HTMLUtils')->ToHTML(
-            String => $Notification{Body},
-        );
-    }
-
-    # do text/html to text/plain convert
-    if ( !$Self->{RichText} && $Notification{ContentType} =~ /text\/html/i ) {
-        $Notification{ContentType} = 'text/plain';
-        $Notification{Body}        = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-            String => $Notification{Body},
-        );
-    }
-
     # get notify texts
     for my $Text (qw(Subject Body)) {
         if ( !$Notification{$Text} ) {
@@ -537,7 +521,7 @@ sub NotificationEvent {
 
     # replace place holder stuff
     $Notification{Body} = $Self->_Replace(
-        RichText  => $Self->{RichText},
+        RichText  => $Notification{ContentType} =~ /text\/html/i ? 1 : 0, # no richtext if not html
         Text      => $Notification{Body},
         Recipient => $Param{Recipient},
         Data      => $Param{CustomerMessageParams},
