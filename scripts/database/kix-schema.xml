@@ -1408,7 +1408,7 @@
         <IndexColumn Name="event_key"/>
     </Index>
     <Index Name="notification_event_item_event_value">
-        <IndexColumn Name="event_value"/>
+        <IndexColumn Name="event_value" Size="100"/>
     </Index>
 </Table>
 
