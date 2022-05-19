@@ -103,13 +103,13 @@ sub _CreateChartReports {
                     }
                 },
                 "OutputFormats" => {
-					"CSV" => {
-						"IncludeColumnHeader"   => 1,
-						"Quote"                 => "\"",
-						"Separator"             => ",",
-						"TranslateColumnNames"  => 0
-					}
-				}
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
             }
         },
         {
@@ -125,13 +125,13 @@ sub _CreateChartReports {
                     }
                 },
                 "OutputFormats" => {
-					"CSV" => {
-						"IncludeColumnHeader"   => 1,
-						"Quote"                 => "\"",
-						"Separator"             => ",",
-						"TranslateColumnNames"  => 0
-					}
-				}
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
             }
         },
         {
@@ -147,13 +147,13 @@ sub _CreateChartReports {
                     }
                 },
                 "OutputFormats" => {
-					"CSV" => {
-						"IncludeColumnHeader"   => 1,
-						"Quote"                 => "\"",
-						"Separator"             => ",",
-						"TranslateColumnNames"  => 0
-					}
-				}
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
             }
         },
         {
@@ -169,13 +169,13 @@ sub _CreateChartReports {
                     }
                 },
                 "OutputFormats" => {
-					"CSV" => {
-						"IncludeColumnHeader"   => 1,
-						"Quote"                 => "\"",
-						"Separator"             => ",",
-						"TranslateColumnNames"  => 0
-					}
-				}
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
             }
         },
         {
@@ -191,13 +191,13 @@ sub _CreateChartReports {
                     }
                 },
                 "OutputFormats" => {
-					"CSV" => {
-						"IncludeColumnHeader"   => 1,
-						"Quote"                 => "\"",
-						"Separator"             => ",",
-						"TranslateColumnNames"  => 0
-					}
-				}
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
             }
         },
         {
@@ -213,13 +213,13 @@ sub _CreateChartReports {
                     }
                 },
                 "OutputFormats" => {
-					"CSV" => {
-						"IncludeColumnHeader"   => 1,
-						"Quote"                 => "\"",
-						"Separator"             => ",",
-						"TranslateColumnNames"  => 0
-					}
-				}
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
             }
         }
     );
@@ -276,24 +276,30 @@ sub _CreateChartReports {
                 TypeID => 1
             },
             {
-                Target => '/reporting/reportdefinitions/' . $DefinitionID,
-                Value  => 2,
-                TypeID => 1
-            },
-            {
-                Target => '/reporting/reportdefinitions/' . $DefinitionID,
-                Value  => 2,
-                TypeID => 1
-            },
-            {
                 Target => '/reporting/reports{Report.DefinitionID IN ['.(join(',', @DefinitionIDs)).']}',
                 Value  => 2,
                 TypeID => 2
             }
         );
+        for my $DefinitionID (@DefinitionIDs) {
+            push(
+                @Permissions,
+                {
+                    Target => '/reporting/reportdefinitions/' . $DefinitionID,
+                    Value  => 2,
+                    TypeID => 1
+                }
+            );
+        }
 
         foreach my $RoleID ( @RoleIDs ) {
             foreach my $Permission ( @Permissions ) {
+                next if $RoleObject->PermissionLookup(
+                    RoleID => $RoleID,
+                    TypeID => $Permission->{TypeID},
+                    Target => $Permission->{Target}
+                );
+
                 # assign object permissions
                 my $Result = $RoleObject->PermissionAdd(
                     RoleID     => $RoleID,
