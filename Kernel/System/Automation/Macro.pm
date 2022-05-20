@@ -605,6 +605,7 @@ sub MacroExecute {
     } else {
         $Self->{MacroResults} = {
             RootObjectID => $Param{RootObjectID} || $Param{ObjectID},
+            ObjectID     => $Param{ObjectID},
             EventData    => $Param{EventData} || {}
         };
     }

@@ -85,7 +85,7 @@ sub _AddPeriodicReportsJob {
     # create macro
     my $MacroID = $AutomationObject->MacroAdd(
         Name       => "Macro for Job \"$JobName\"",
-        Type       => 'Ticket',
+        Type       => 'Reporting',
         Comment    => "Macro for Job \"$JobName\"",
         ValidID    => 1,
         UserID     => 1
@@ -150,10 +150,10 @@ sub _AddPeriodicReportsJob {
     $JobID = $AutomationObject->JobAdd(
         Name       => $JobName,
         Type       => 'Reporting',
-        Filter     => { 
+        Filter     => {
             AND => [
                 { Field => 'IsPeriodic', Operator => 'EQ', Type => "NUMERIC", Value => 1 }
-            ] 
+            ]
         },
         Comment    => Encode::decode_utf8('Executes all reports that should be created periodically.'),
         ValidID    => 1,
