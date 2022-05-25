@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-5-20 08:22+0000\n"
+"POT-Creation-Date: 2022-5-25 08:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1634,51 +1634,51 @@ msgstr ""
 msgid "allows working on tickets in team \"Servicedesk\", but requires role \"Ticket Agent (w/o teams)\" in order to grant access"
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Lists closed tickets within the last 7 days."
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Lists open tickets by priority."
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Lists open tickets by state."
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Lists open tickets by team."
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Lists open tickets in teams by priority."
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Lists tickets created within the last 7 days."
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Number of open tickets by priority"
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Number of open tickets by state"
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Number of open tickets by team"
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Number of open tickets in teams by priority"
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Number of tickets closed within the last 7 days"
 msgstr ""
 
-#. Perl Module: update/build-1584.pl
+#. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
 msgstr ""
 
