@@ -167,6 +167,7 @@
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;
 "Customer";"Object";"/tickets/*/articles/*{Article.CustomerVisible NE 1}";;;;;
 "Customer";"Property";"/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit]}";;"x";;;
+"Customer";"Property";"/tickets/*/articles/*{Article.[!To,!ToRealname,!Cc,!CcRealname,!From,!FromRealname] IF Article.ChannelID EQ 1 && Article.SenderTypeID EQ 1}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles/*/flags";"x";"x";;;
 "Customer";"Resource";"/system/config";;"x";;;
 "Customer";"Resource";"/system/config/*";;"x";;;
