@@ -724,6 +724,11 @@ sub _DoUpdate {
         return;
     }
 
+    # check and execute SQL script (to prepare some thing in the DB)
+    if ( !$Self->_ExecUpdateSQL(%Param) ) {
+        return;
+    }
+
     # check and exec main update script (after preparation)
     if ( !$Self->_ExecUpdateScript(%Param) ) {
         return;
@@ -750,9 +755,6 @@ sub _ExecUpdateScript {
 
     if ( $Type ) {
         $Type = '_'.$Type;
-    }
-    else {
-        $Type = '';
     }
 
     my $ScriptFile = $Param{Directory}.'/update/'.$Param{Build}.$Type.'.pl';
@@ -781,8 +783,14 @@ sub _ExecUpdateScript {
 sub _ExecUpdateSQL {
     my ($Self, %Param) = @_;
 
-    # check if xml file exists, if it doesn't, exit gracefully
-    my $XMLFile = $Param{Directory}.'/update/'.$Param{Build}.'_'.$Param{Type}.'.xml';
+    my $Type    = $Param{Type} || '';
+    my $OrgType = $Param{Type} || '';
+    if ( $Type ) {
+        $Type = '_'.$Type;
+    }
+
+    # check if xml file exists, if not, exit gracefully
+    my $XMLFile = $Param{Directory}.'/update/'.$Param{Build}.$Type.'.xml';
 
     if ( ! -f "$XMLFile" ) {
         return 1;
@@ -790,7 +798,7 @@ sub _ExecUpdateSQL {
 
     $Kernel::OM->Get('Log')->Log(
         Priority => "info",
-        Message  => "    executing $Param{Type} SQL",
+        Message  => "    executing $OrgType SQL",
     );
 
     my $XML = $Kernel::OM->Get('Main')->FileRead(

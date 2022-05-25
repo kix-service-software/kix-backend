@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -21,7 +21,7 @@ use Kernel::System::VariableCheck qw(:all);
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-1584',
+        LogPrefix => 'framework_update-to-build-1586',
     },
 );
 
