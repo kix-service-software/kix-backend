@@ -64,8 +64,12 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'Charset' ) {
-        my %EncodingList = map { $_ => 1 } Encode->encodings();
-        $Found = $EncodingList{$Param{Data}->{$Param{Attribute}}};
+        # check if this is an alias
+        $Found = Encode::resolve_alias($Param{Data}->{$Param{Attribute}});
+        if ( !$Found ) {
+            my %EncodingList = map { $_ => 1 } Encode->encodings(':all');
+            $Found = $EncodingList{$Param{Data}->{$Param{Attribute}}};
+        }
     }
     else {
         return $Self->_Error(
