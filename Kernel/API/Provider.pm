@@ -14,7 +14,8 @@ use warnings;
 use URI::Escape;
 use Time::HiRes qw(time);
 
-use Kernel::System::VariableCheck (qw(IsHashRefWithData IsInteger));
+use Kernel::System::VariableCheck qw(IsHashRefWithData IsInteger);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 our @ObjectDependencies = (
     'Config',
@@ -78,7 +79,7 @@ web service.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->{RequestStartTime} = time();
+    $Self->{RequestStartTime} = Time::HiRes::time();
 
     #
     # First, we need to locate the desired webservice and load its configuration data.
@@ -116,8 +117,8 @@ sub Run {
         return;    # bail out, this will generate 500 Error
     }
 
-    # Check if web service has valid state.
-    if ( $Kernel::OM->Get('Valid')->ValidLookup( ValidID => $Webservice->{ValidID} ) ne 'valid' ) {
+    # Check if web service has valid state (we are explicitely using the numeric ID here to prevent additional executing time)
+    if ( $Webservice->{ValidID} != 1 ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
@@ -137,8 +138,12 @@ sub Run {
         $Self->{TransportConfig}->{Config}->{MaxLength} = $LengthFromConfig;
     }
 
+    printf STDERR "%3i ms preparation\n", TimeDiff($Self->{RequestStartTime});
+
     # read request content
     my $ProcessedRequest = $Self->ProcessRequest();
+
+    printf STDERR "%3i ms ProcessRequest\n", TimeDiff($Self->{RequestStartTime});
 
     if ( $Self->{Debug} && $Self->{LogRequestContent} ) {
         use Data::Dumper;
@@ -159,6 +164,8 @@ sub Run {
     # check authorization if needed
     my $Authorization;
     my $AuthorizationResult = $Self->CheckAuthorization();
+
+    printf STDERR "%3i ms CheckAuth\n", TimeDiff($Self->{RequestStartTime});
 
     if (
         $ProcessedRequest->{RequestMethod} ne 'OPTIONS' &&
@@ -307,6 +314,7 @@ sub Run {
         RequestURI                   => $ProcessedRequest->{RequestURI},
         Authorization                => $Authorization,
     );
+    printf STDERR "%3i ms OperationModule->new\n", TimeDiff($Self->{RequestStartTime});
 
     # if operation init failed, bail out
     if ( ref $OperationObject ne $OperationModule ) {
@@ -319,6 +327,7 @@ sub Run {
     my $OperationResult = $OperationObject->Run(
         Data => $ProcessedRequest->{Data},
     );
+    printf STDERR "%3i ms OperationModule->Run\n", TimeDiff($Self->{RequestStartTime});
 
     if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
         use Data::Dumper;
@@ -326,6 +335,7 @@ sub Run {
     }
 
     if ( !$OperationResult->{Success} ) {
+        printf STDERR "%3i ms Request end\n", TimeDiff($Self->{RequestStartTime});
 
         return $Self->_GenerateErrorResponse(
             %{$OperationResult},
@@ -348,6 +358,8 @@ sub Run {
             Data    => $GeneratedResponse->{ErrorMessage},
         );
     }
+
+        printf STDERR "%3i ms Request end\n", TimeDiff($Self->{RequestStartTime});
 
     return;
 }

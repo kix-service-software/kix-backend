@@ -18,12 +18,16 @@ use Module::Refresh;
 use Plack::Builder;
 use File::Path qw();
 use Fcntl qw(:flock);
+use Time::HiRes;
 
 # use ../../ as lib location
 use FindBin qw($Bin);
 use lib "$Bin/../..";
 use lib "$Bin/../../Kernel/cpan-lib";
 use lib "$Bin/../../plugins";
+
+use Kernel::API::Provider;
+use Kernel::System::ObjectManager;
 
 $ENV{KIX_HOME} = "$Bin/../.." if !$ENV{KIX_HOME};
 
@@ -67,13 +71,21 @@ my $App = CGI::Emulate::PSGI->handler(
             DB::enable_profile()
         }
 
-        # run the request
-        eval {
-            do "$Bin/$ENV{SCRIPT_NAME}";
-        };
-        if ( $@ && $@ ne "exit called\n" ) {
-            warn $@;
-        }
+        my $StartTime = Time::HiRes::time();
+
+        my $Provider = Kernel::API::Provider->new();
+        $Provider->Run();
+
+        # # run the request
+        # eval {
+        #     do "$Bin/$ENV{SCRIPT_NAME}";
+        # };
+        # if ( $@ && $@ ne "exit called\n" ) {
+        #     warn $@;
+        # }
+
+        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
+        printf STDERR "Provider took %i ms\n", $TimeDiff;
 
         if ( $ENV{NYTPROF} ) {
             DB::finish_profile();

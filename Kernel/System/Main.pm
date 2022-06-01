@@ -21,6 +21,7 @@ use Unicode::Normalize;
 use List::Util qw();
 use Storable;
 use Fcntl qw(:flock);
+use Time::HiRes;
 
 use Kernel::System::VariableCheck qw(:all);
 

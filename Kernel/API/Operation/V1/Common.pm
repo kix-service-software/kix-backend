@@ -18,6 +18,7 @@ BEGIN { $SIG{ __WARN__} = sub { return if $_[0] =~ /in cleanup/ }; }
 
 use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 our $ObjectManagerDisabled = 1;
 
@@ -145,19 +146,24 @@ sub RunOperation {
         }
 
         # check if we have permission for this object
+        my $StartTime = Time::HiRes::time();
         my $Result =  $Self->_CheckObjectPermission(
             %Param,
             Data => $Param{Data},
         );
+        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
+
         if ( !$Result->{Success} ) {
             return $Result;
         }
 
         # check if we have permission for specific properties of this object
+        $StartTime = Time::HiRes::time();
         $Result =  $Self->_CheckPropertyPermission(
             %Param,
             Data => $Param{Data},
         );
+        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
 
         if ( !$Result->{Success} ) {
             return $Result;
@@ -871,8 +877,7 @@ sub _Success {
                 return $Result;
             }
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
         }
 
         if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
@@ -883,8 +888,7 @@ sub _Success {
                 Filter => $Self->{Search}
             );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("search in API layer took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("search in API layer took %i ms", TimeDiff($StartTime)));
         }
 
         # honor a filter, if we have one
@@ -895,8 +899,7 @@ sub _Success {
                 Data => \%Param,
             );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("filtering took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("filtering took %i ms", TimeDiff($StartTime)));
         }
 
         # honor a sorter, if we have one
@@ -907,8 +910,7 @@ sub _Success {
                 Data => \%Param,
             );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", TimeDiff($StartTime)));
         }
 
         # honor a field selector, if we have one
@@ -920,8 +922,7 @@ sub _Success {
                 Fields => $Self->{Fields},
             );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
         }
 
         if ( !$Self->{PermissionCheckOnly} ) {
@@ -933,8 +934,7 @@ sub _Success {
                     Data => \%Param,
                 );
 
-                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", $TimeDiff));
+                $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", TimeDiff($StartTime)));
             }
 
             # honor an expander, if we have one
@@ -945,8 +945,7 @@ sub _Success {
                     Data => \%Param,
                 );
 
-                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", $TimeDiff));
+                $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", TimeDiff($StartTime)));
             }
 
         }
@@ -963,8 +962,7 @@ sub _Success {
                 IsPermissionFieldSelection => 1
             );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", TimeDiff($StartTime)));
         }
 
         # cache request without offset and limit if CacheType is set for this operation
@@ -982,8 +980,7 @@ sub _Success {
                 Data => \%Param,
             );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
         }
 
         # honor a limiter, if we have one
@@ -994,8 +991,7 @@ sub _Success {
                 Data => \%Param,
             );
 
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", $TimeDiff));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
         }
     }
 
@@ -2418,8 +2414,6 @@ sub _CheckObjectPermission {
     # do something if we have at least one permission
     if ( IsArrayRefWithData(\@RelevantPermissions) ) {
 
-        my $StartTime = Time::HiRes::time();
-
         # load the object data (if we have to)
         my $ObjectData = {};
         if ( $Self->{RequestMethod} eq 'POST' ) {
@@ -2439,10 +2433,6 @@ sub _CheckObjectPermission {
             );
 
             if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
-
-                my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
-
                 # no success, simply return what we got
                 return $GetResult;
             }
@@ -2516,18 +2506,12 @@ sub _CheckObjectPermission {
                 if ( ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
                     $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
 
-                    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                    $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
-
                     # return 403, because we don't have permission to execute this
                     return $Self->_Error(
                         Code => 'Forbidden',
                     );
                 }
             }
-
-            my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", $TimeDiff));
 
             if ( $ResultingPermission != -1 && ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
                 $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
@@ -2611,8 +2595,6 @@ sub _CheckPropertyPermission {
 
     # do something if we have at least one permission
     if ( IsArrayRefWithData(\@RelevantPermissions) ) {
-
-        my $StartTime = Time::HiRes::time();
 
         my $ResultingPermission = -1;
 
@@ -2769,9 +2751,6 @@ sub _CheckPropertyPermission {
                     if ( !$Not && !$IsPermissionMatch || $Not && $IsPermissionMatch || $IsDeny ) {
                         $Self->_PermissionDebug($Self->{LevelIndent}, "request data doesn't match the required criteria - denying request" );
 
-                        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-                        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
-
                         # return 403, because we don't have permission to execute this
                         return $Self->_Error(
                             Code => 'Forbidden',
@@ -2786,9 +2765,6 @@ sub _CheckPropertyPermission {
                 }
             }
         }
-
-        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", $TimeDiff));
     }
 
     return $Self->_Success();
@@ -3114,7 +3090,7 @@ sub _RunParallel {
     my $ResultQueue : shared;
     $ResultQueue = Thread::Queue->new();
 
-    $Self->_Debug("executing with parallel algorithm ($NumWorkers workers)");
+    $Self->_Debug("executing with parallel algorithm ($NumWorkers workers) ");
 
     # create parallel instances
     my %Workers;
