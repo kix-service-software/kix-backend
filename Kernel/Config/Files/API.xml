@@ -134,5 +134,11 @@
             <String Regex="^\d*$">52428800</String>
         </Setting>
     </ConfigItem>
-
+    <ConfigItem AccessLevel="internal" Name="API::Request::DefaultLimit" Required="1" Valid="1">
+        <Description Translatable="1">Default limit used on api requests. Set to 0 to disable (disabling may have performance impact).</Description>
+        <Group>API</Group>
+        <Setting>
+            <String Regex="">1000</String>
+        </Setting>
+    </ConfigItem>
 </kix_config>
