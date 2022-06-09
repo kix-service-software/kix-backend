@@ -1,7 +1,7 @@
 # --
 # Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
+# Copyright (C) 2001-2022 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -54,6 +54,19 @@ sub Run {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
+    # reset protection: check if owner was just set, dont reset directly
+    my $CacheKey = '_ForceOwnerReset::OwnerUpdate';
+    return 1 if ( $TicketObject->{$CacheKey}->{ $Param{Data}->{TicketID} } );
+
+    if ( $Param{Event} eq 'TicketOwnerUpdate' ) {
+
+        # Remember that owner was just set
+        #   Store the information on the ticketobject
+        $TicketObject->{$CacheKey}->{ $Param{Data}->{TicketID} } = 1;
+
+        return 1;
+    }
+
     # reset owner
     $TicketObject->TicketOwnerSet(
         TicketID           => $Param{Data}->{TicketID},
@@ -74,9 +87,6 @@ sub Run {
 }
 
 1;
-
-
-
 
 =back
 
