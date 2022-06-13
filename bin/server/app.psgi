@@ -31,6 +31,7 @@ use Kernel::System::ObjectManager;
 
 $ENV{KIX_HOME} = "$Bin/../.." if !$ENV{KIX_HOME};
 
+use Kernel::Config;
 use Kernel::API::Provider;
 use Kernel::System::ObjectManager;
 
@@ -40,7 +41,7 @@ $Kernel::OM = Kernel::System::ObjectManager->new(
     },
 );
 
-use Kernel::Config;
+$API::Provider = Kernel::API::Provider->new();
 
 # Workaround: some parts of KIX use exit to interrupt the control flow.
 #   This would kill the Plack server, so just use die instead.
@@ -60,12 +61,6 @@ my $App = CGI::Emulate::PSGI->handler(
         # Populate SCRIPT_NAME as KIX needs it in some places.
         $ENV{SCRIPT_NAME} = 'api';
 
-        eval {
-            # Reload files in @INC that have changed since the last request.
-            Module::Refresh->refresh();
-        };
-        warn $@ if $@;
-
         if ( $ENV{NYTPROF} ) {
             print STDERR "!!!PROFILING ENABLED!!! ($ENV{NYTPROF})\n";
             DB::enable_profile()
@@ -73,16 +68,7 @@ my $App = CGI::Emulate::PSGI->handler(
 
         my $StartTime = Time::HiRes::time();
 
-        my $Provider = Kernel::API::Provider->new();
-        $Provider->Run();
-
-        # # run the request
-        # eval {
-        #     do "$Bin/$ENV{SCRIPT_NAME}";
-        # };
-        # if ( $@ && $@ ne "exit called\n" ) {
-        #     warn $@;
-        # }
+        $API::Provider->Run();
 
         my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
         printf STDERR "Provider took %i ms\n", $TimeDiff;
@@ -94,40 +80,40 @@ my $App = CGI::Emulate::PSGI->handler(
 );
 
 sub _LockPID {
-	# create ConfigObject
-	my $ConfigObject = $Kernel::OM->Get('Config');
+    # create ConfigObject
+    my $ConfigObject = $Kernel::OM->Get('Config');
 
-	my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
-	my $PIDFile = $PIDDir . "service.pid";
-	my $PIDFH;
+    my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
+    my $PIDFile = $PIDDir . "service.pid";
+    my $PIDFH;
 
-	if ( !-e $PIDDir ) {
+    if ( !-e $PIDDir ) {
 
-		File::Path::mkpath( $PIDDir, 0, 0770 );    ## no critic
+        File::Path::mkpath( $PIDDir, 0, 0770 );    ## no critic
 
-		if ( !-e $PIDDir ) {
-			print STDERR "Can't create directory '$PIDDir': $!";
-			exit 1;
-		}
-	}
-	if ( !-w $PIDDir ) {
-		print STDERR "Don't have write permissions in directory '$PIDDir': $!";
-		exit 1;
-	}
+        if ( !-e $PIDDir ) {
+            print STDERR "Can't create directory '$PIDDir': $!";
+            exit 1;
+        }
+    }
+    if ( !-w $PIDDir ) {
+        print STDERR "Don't have write permissions in directory '$PIDDir': $!";
+        exit 1;
+    }
 
-	# create new PID file (set exclusive lock while writing the PIDFile)
-	open my $FH, '>', $PIDFile || die "Cannot create PID file: $PIDFile\n";    ## no critic
-	return if !flock( $FH, LOCK_EX | LOCK_NB );
-	print $FH $$;
-	close $FH;
+    # create new PID file (set exclusive lock while writing the PIDFile)
+    open my $FH, '>', $PIDFile || die "Cannot create PID file: $PIDFile\n";    ## no critic
+    return if !flock( $FH, LOCK_EX | LOCK_NB );
+    print $FH $$;
+    close $FH;
 }
 
 sub _Autostart {
     my $Result = $Kernel::OM->Get('Autostart')->Run();
- 	if ( $Result ) {
-		print STDERR "At least one autostart module failed. Please see the KIX log for details.\n";
-		exit $Result;
-	}
+     if ( $Result ) {
+        print STDERR "At least one autostart module failed. Please see the KIX log for details.\n";
+        exit $Result;
+    }
 }
 
 # add middlewares
