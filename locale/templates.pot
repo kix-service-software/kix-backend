@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-6-7 05:33+0000\n"
+"POT-Creation-Date: 2022-6-14 09:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1406,7 +1406,7 @@ msgstr ""
 msgid "CIHistory::"
 msgstr ""
 
-#. Perl Module: Kernel/System/Installation.pm
+#. Perl Module: Kernel/System/Installation/Migration.pm
 msgid "aborting"
 msgstr ""
 
