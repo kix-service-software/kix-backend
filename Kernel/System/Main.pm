@@ -1161,6 +1161,7 @@ sub FilterObjectList {
 
     OBJECTITEM:
     foreach my $ObjectItem ( @{$Param{Data}} ) {
+
         if ( IsHashRef($ObjectItem) ) {
             my $Match = 1;
 
@@ -1173,8 +1174,8 @@ sub FilterObjectList {
                     my $FilterMatch = 1;
 
                     if ( !$FilterItem->{AlwaysTrue} ) {
-                        # if filter attributes are not contained in the response, check if it references a sub-structure                        
-                        if ( !exists( $ObjectItem->{ $FilterItem->{Field} } ) ) {                           
+                        # if filter attributes are not contained in the response, check if it references a sub-structure
+                        if ( !exists( $ObjectItem->{ $FilterItem->{Field} } ) ) {
 
                             if ( $FilterItem->{Field} =~ /\./ ) {
 
@@ -1187,8 +1188,6 @@ sub FilterObjectList {
                                 # continue if the sub-structure attribute exists
                                 if ( exists( $ObjectItem->{$SubObject} ) ) {
 
-                                    print STDERR "\n\nCall FilterObjectList";
-                                    print STDERR Data::Dumper::Dumper($SubData);
                                     # execute filter on sub-structure
                                     my @FilteredData = $Self->FilterObjectList(
                                         Data   => $SubData,
@@ -1225,18 +1224,14 @@ sub FilterObjectList {
                                 $FilterValue = exists( $ObjectItem->{$1} ) ? $ObjectItem->{$1} : undef;
                             }
                             elsif ($FilterValue) {
-                                if(
-                                    IsStringWithData($FilterValue) &&
-                                    grep {$FilterItem->{Operator} eq $_} qw(CONTAINS STARTSWITH ENDSWITH LIKE)
-                                ) {
+                                if ( IsStringWithData($FilterValue) && $FilterItem->{Operator} eq 'LIKE' ) {
                                     # make non word characters literal to prevent invalid regex (e.g. only opened brackets "[some*test" ==> "\[some*test")
                                     $FilterValue =~ s/([^\w\s\*\\])/\\$1/g;
                                     # remove possible unnecessary added backslash
                                     $FilterValue =~ s/\\\\/\\/g;
-
-                                    # replace wildcards with valid RegEx in FilterValue
-                                    $FilterValue =~ s/\*/.*?/g;
                                 }
+                                # replace wildcards with valid RegEx in FilterValue
+                                $FilterValue =~ s/\*/.*?/g;
                             }
                             else {
                                 $FilterValue = undef;
@@ -1249,7 +1244,7 @@ sub FilterObjectList {
                                 } else {
                                     @FieldValues = (undef);
                                 }
-                            }                            
+                            }
 
                             # handle multiple FieldValues (array)
                             FIELDVALUE:
@@ -1298,7 +1293,7 @@ sub FilterObjectList {
                                     }
                                     elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) != ( $FilterValue || '' ) ) {
                                         $FilterMatch = 0;
-                                    }                                    
+                                    }
                                 }
 
                                 # not equal (!=)
@@ -1383,7 +1378,7 @@ sub FilterObjectList {
                                     if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/im ) {
                                         $FilterMatch = 0;
                                     }
-                                }                                
+                                }
 
                                 last FIELDVALUE if $FilterMatch;
                             }
