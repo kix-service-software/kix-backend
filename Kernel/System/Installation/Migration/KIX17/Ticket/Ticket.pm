@@ -69,13 +69,15 @@ sub Run {
 
     # only cache the following types in memory not redis
     $Self->SetCacheOptions(
-        ObjectType     => ['ticket', 'article', 'ticket_history', 'ticket_flag', 'article_flag', 'article_plain', 'article_attachment'],
+        ObjectType     => ['article', 'ticket_history'],
         CacheInMemory  => 1,
         CacheInBackend => 0,
     );
 
-    # disable the caching of type "Ticket"
-    $Kernel::OM->Get('Cache')->{IgnoreTypes}->{Ticket} = 1;
+    # disable the caching for some types
+    foreach my $Type ( qw(Ticket ticket_flag article_flag article_attachment article_plain) ) {
+        $Kernel::OM->Get('Cache')->{IgnoreTypes}->{$Type} = 1;
+    }
 
     # get source data - only get the id, otherwise it's too much data
     my $SourceData = $Self->GetSourceData(Type => 'ticket', What => 'id', OrderBy => 'id');
@@ -445,11 +447,13 @@ sub _MigrateArticles {
                 SourceArticleID => $Item->{id}
             );
 
-            $Self->_MigrateAttachments(
-                %Param,
-                ArticleID       => $ID,
-                SourceArticleID => $Item->{id}
-            );
+            if ( !$Self->{Options}->{SkipTicketAttachments} ) {
+                $Self->_MigrateAttachments(
+                    %Param,
+                    ArticleID       => $ID,
+                    SourceArticleID => $Item->{id}
+                );
+            }
         }
 
         if ( $ID ) {
@@ -541,21 +545,33 @@ sub _MigrateArticleFlags {
         }
     }
 
-    # get source data
-    my $SourceData = $Self->GetSourceData(
-        Type       => 'article_flag',
-        Where      => "article_id = $Param{SourceArticleID}",
-        References => {
-            'article_id' => 'article',
-            'create_by'  => 'users',
-        },
-        NoProgress => 1,
-    );
+    if ( !IsHashRef($Self->{ArticleFlags}) || !$Self->{ArticleFlags}->{$Param{SourceArticleID}} ) {
 
-    # bail out if we don't have something to todo
-    return %Result if !IsArrayRefWithData($SourceData);
+        my $PreloadBlockSize = 100;
 
-    foreach my $Item ( @{$SourceData} ) {
+        # get source data
+        my $SourceData = $Self->GetSourceData(
+            Type       => 'article_flag', 
+            Where      => "article_id >= $Param{SourceArticleID} AND article_id <= $Param{SourceArticleID} + $PreloadBlockSize",
+            References => {
+                'create_by'  => 'users',
+            },
+            NoProgress => 1,
+        );
+
+        # bail out if we don't have something to todo
+        return %Result if !IsArrayRefWithData($SourceData);
+
+        foreach my $Item ( @{$SourceData} ) {
+            $Self->{ArticleFlags}->{$Item->{article_id}} //= [];
+            push @{$Self->{ArticleFlags}->{$Item->{article_id}}}, $Item;
+        }
+        for my $Id ( $Param{SourceArticleID} .. $Param{SourceArticleID} + $PreloadBlockSize ) {
+            $Self->{ArticleFlags}->{$Id} = [] if !exists $Self->{ArticleFlags}->{$Id};
+        }
+    }
+
+    foreach my $Item ( @{$Self->{ArticleFlags}->{$Param{SourceArticleID} || []}} ) {
 
         # check if this object is already mapped
         my $MappedID = $Self->GetOIDMapping(
@@ -563,6 +579,9 @@ sub _MigrateArticleFlags {
             SourceObjectID => $Param{SourceArticleID} . '::' . $Item->{article_key} . '::' . $Item->{'create_by::raw'}
         );
         next if $MappedID;
+
+        # do the mapping
+        $Item->{article_id} = $Param{ArticleID};
 
         # check if this item already exists (i.e. some initial data)
         my $ID = $Self->Lookup(
@@ -613,21 +632,33 @@ sub _MigrateTicketFlags {
         }
     }
 
-    # get source data
-    my $SourceData = $Self->GetSourceData(
-        Type       => 'ticket_flag',
-        Where      => "ticket_id = $Param{SourceTicketID}",
-        References => {
-            'ticket_id' => 'ticket',
-            'create_by' => 'users',
-        },
-        NoProgress => 1,
-    );
+    if ( !IsHashRef($Self->{TicketFlags}) || !$Self->{TicketFlags}->{$Param{SourceTicketID}} ) {
 
-    # bail out if we don't have something to todo
-    return %Result if !IsArrayRefWithData($SourceData);
+        my $PreloadBlockSize = 500;
 
-    foreach my $Item ( @{$SourceData} ) {
+        # get source data
+        my $SourceData = $Self->GetSourceData(
+            Type       => 'ticket_flag', 
+            Where      => "ticket_id >= $Param{SourceTicketID} AND ticket_id <= $Param{SourceTicketID} + $PreloadBlockSize",
+            References => {
+                'create_by'  => 'users',
+            },
+            NoProgress => 1,
+        );
+
+        # bail out if we don't have something to todo
+        return %Result if !IsArrayRefWithData($SourceData);
+
+        foreach my $Item ( @{$SourceData} ) {
+            $Self->{TicketFlags}->{$Item->{ticket_id}} //= [];
+            push @{$Self->{TicketFlags}->{$Item->{ticket_id}}}, $Item;
+        }
+        for my $Id ( $Param{SourceTicketID} .. $Param{SourceTicketID} + $PreloadBlockSize ) {
+            $Self->{TicketFlags}->{$Id} = [] if !exists $Self->{TicketFlags}->{$Id};
+        }
+    }
+
+    foreach my $Item ( @{$Self->{TicketFlags}->{$Param{SourceTicketID}} || []} ) {
 
         # check if this object is already mapped
         my $MappedID = $Self->GetOIDMapping(
@@ -635,6 +666,9 @@ sub _MigrateTicketFlags {
             SourceObjectID => $Param{SourceTicketID} . '::' . $Item->{ticket_key} . '::' . $Item->{'create_by::raw'}
         );
         next if $MappedID;
+
+        # do the mapping
+        $Item->{ticket_id} = $Param{TicketID};
 
         # check if this item already exists (i.e. some initial data)
         my $ID = $Self->Lookup(
