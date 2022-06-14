@@ -425,6 +425,13 @@ sub _MigrateArticles {
                 $Item->{customer_visible} = 0;
             }
 
+            # fix faulty email adresses - remove trailing comma
+            foreach my $Attr ( qw(a_from a_to a_cc a_bcc) ) {
+                if ( $Item->{$Attr} =~ /^(.*?),$/gmx ) {
+                    $Item->{$Attr} = $1;
+                }
+            }
+
             $ID = $Self->Insert(
                 Table          => 'article',
                 PrimaryKey     => 'id',
