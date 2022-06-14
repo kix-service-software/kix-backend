@@ -16,7 +16,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Installation',
+    'Migration',
 );
 
 sub Configure {
