@@ -1958,7 +1958,7 @@ sub _ApplyLimit {
                 # ignore the object if we have a specific limiter for it
                 next if exists( $Self->{Limit}->{$DataObject} );
 
-                if ( ref( $Param{Data}->{$DataObject} ) eq 'ARRAY' ) {
+                if ( $Self->{Limit}->{$Object} && ref( $Param{Data}->{$DataObject} ) eq 'ARRAY' ) {
                     my @LimitedArray = splice @{ $Param{Data}->{$DataObject} }, 0, $Self->{Limit}->{$Object};
                     $Param{Data}->{$DataObject} = \@LimitedArray;
                 }
