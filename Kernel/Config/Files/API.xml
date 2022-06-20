@@ -41,17 +41,23 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Parallelity" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines how many threads should be used for parallel tasks. Enter 0 to deactivate.</Description>
+        <Description Translatable="1">Enable parallel API worker tasks for response preparation. Enter 0 to deactivate.</Description>
         <Group>API</Group>
         <Setting>
-            <String Regex="">4</String>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="API::MinTasksPerWorker" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines how many tasks are needed per thread (see API::Parallelity) to use the parallel alogorithm.</Description>
+    <ConfigItem AccessLevel="internal" Name="API::Parallelity::Workers" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines how many parallel worker tasks should be used to prepare the response depending on the number of items in the response. Define the lower threshold of items and the number of tasks that should be used if there are >= items in the API response. By default only 1 worker will be used. ATTENTION: be aware that this setting improves or decreases the overall system performance depending on the hardware resources and number and size of the requests.</Description>
         <Group>API</Group>
         <Setting>
-            <String Regex="">10</String>
+            <Hash>
+                <Item Key="500">2</Item>
+                <Item Key="2000">4</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 

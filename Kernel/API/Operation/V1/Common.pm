@@ -3370,7 +3370,7 @@ sub _RunParallel {
     use threads::shared;
     use Thread::Queue;
 
-    my $NumWorkers = $Kernel::OM->Get('Config')->Get('API::Parallelity') || 4;
+    my $NumWorkers = $Self->_CanRunParallel(%Param);
 
     my $WorkQueue : shared;
     $WorkQueue = Thread::Queue->new();
@@ -3394,6 +3394,8 @@ sub _RunParallel {
                     },
                 );
 
+                $Kernel::OM->{ParallelProcessing} = 1;
+
                 $Kernel::OM->Get('DB')->Disconnect();
                 $DBD::Pg::VERSION = $DBDPg_VERSION;
 
@@ -3405,6 +3407,8 @@ sub _RunParallel {
                         Result => $Result,
                     });
                 }
+
+                $Kernel::OM->{ParallelProcessing} = 0;
             },
             $Self,
             %Param,
@@ -3436,6 +3440,8 @@ sub _RunParallel {
         push @Result, $ResultHash{$Item};
     }
 
+    $Self->{ParallelProcessing} = 0;
+
     return @Result;
 }
 
@@ -3456,11 +3462,22 @@ sub _CanRunParallel {
     # check if deactivated
     return 0 if !$Kernel::OM->Get('Config')->Get('API::Parallelity');
 
-    my $NumWorkers = $Kernel::OM->Get('Config')->Get('API::Parallelity') || 4;
-    my $MinChecksPerWorker = $Kernel::OM->Get('Config')->Get('API::MinTasksPerWorker') || 10;
+    # no further parallel processes if we are already in a parallel state
+    return 0 if $Kernel::OM->{ParallelProcessing};
 
-    return 1 if ( scalar(@{$Param{Items}}) >= $NumWorkers * $MinChecksPerWorker );
-    return 0;
+    my $Workers = $Kernel::OM->Get('Config')->Get('API::Parallelity::Workers');
+
+    my $WorkerCount = 0;
+
+    THRESHOLD:
+    foreach my $Threshold ( sort { $b cmp $a } keys %{$Workers} ) {
+        if ( scalar(@{$Param{Items}}) >= $Threshold ) {
+            $WorkerCount = $Workers->{$Threshold};
+            last THRESHOLD;
+        }
+    }
+
+    return $WorkerCount;
 }
 
 sub _Debug {
