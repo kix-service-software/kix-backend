@@ -52,7 +52,7 @@ sub _UpdateCustomerRole {
                 ID      => $PermissionID,
                 RoleID  => $RoleID,
                 TypeID  => $PermissionTypeID,
-                Target  => '/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit,!To,!ToRealname,!Cc,!CcRealname,!From,!FromRealname]',
+                Target  => '/tickets/*/articles/*{Article.[*,!Bcc,!BccRealname,!TimeUnit,!To,!ToRealname,!Cc,!CcRealname,!From,!FromRealname]}',
                 Value   => 2,
                 Comment => 'hide communication properties (may be personal agent email addresses)',
                 UserID  => 1
