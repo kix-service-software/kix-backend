@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-6-14 09:34+0000\n"
+"POT-Creation-Date: 2022-6-23 11:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1695,11 +1695,11 @@ msgid "Cache time in seconds for the web service config backend."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines how many tasks are needed per thread (see API::Parallelity) to use the parallel alogorithm."
+msgid "Default limit used on api requests. Set to 0 to disable (disabling may have performance impact)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
-msgid "Defines how many threads should be used for parallel tasks. Enter 0 to deactivate."
+msgid "Defines how many parallel worker tasks should be used to prepare the response depending on the number of items in the response. Define the lower threshold of items and the number of tasks that should be used if there are >= items in the API response. By default only 1 worker will be used. ATTENTION: be aware that this setting improves or decreases the overall system performance depending on the hardware resources and number and size of the requests."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1716,6 +1716,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Enable API response data debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid "Enable parallel API worker tasks for response preparation. Enter 0 to deactivate."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
