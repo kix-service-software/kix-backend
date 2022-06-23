@@ -213,11 +213,13 @@ sub _DoFulltextSearch {
 
                 my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                     Search => $AndSearchString,
-                    Valid  => 0
+                    Valid  => 0,
+                    Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
                 );
                 my %LoginResult = $Kernel::OM->Get('Contact')->ContactSearch(
                     Login => $AndSearchString,
-                    Valid  => 0
+                    Valid  => 0,
+                    Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
                 );
 
                 # search and login are OR combined
