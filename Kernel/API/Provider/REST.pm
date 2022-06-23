@@ -177,7 +177,7 @@ sub ProcessRequest {
             $EncodeObject->EncodeInput( \$Value );
 
             if ( !defined $QueryParams{$Key} ) {
-                $QueryParams{$Key} = $Value || '';
+                $QueryParams{$Key} = $Value // '';
             }
 
             # elements specified multiple times will be added as array reference
