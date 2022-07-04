@@ -307,6 +307,10 @@ sub ReportCreate {
             push @OutputFormats, $OutputFormat;
         }
     }
+    else {
+        # if no explicit config is given in the definition, we just use the requested formats 
+        @OutputFormats = @{$Param{Config}->{OutputFormats}}
+    }
 
     if ( !@OutputFormats ) {
         $Kernel::OM->Get('Log')->Log(
