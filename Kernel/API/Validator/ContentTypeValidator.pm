@@ -70,7 +70,7 @@ sub Validate {
         my $ContentType = lc($Param{Data}->{$Param{Attribute}});
 
         # check Charset part
-        my $Charset = '';
+        my $Charset = q{};
         if ( $ContentType =~ /charset=/i ) {
             $Charset = $ContentType;
             $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
@@ -92,10 +92,13 @@ sub Validate {
         }
 
         # check MimeType part
-        my $MimeType = '';
-        if ( $ContentType =~ /^(\w+\/\w+)/i ) {
+        my $MimeType = q{};
+        if ( $ContentType =~ /^(\w+\/[-.\w]+(?:\+[-.\w]+)?)/i ) {
             $MimeType = $1;
-            $MimeType =~ s/"|'//g;
+            $MimeType =~ s/["']//g;
+        }
+        elsif ( $ContentType eq 'text' ) {
+            return $Self->_Success();
         }
         my $Result = Kernel::API::Validator::MimeTypeValidator::Validate(
             $Self,
