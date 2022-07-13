@@ -95,10 +95,13 @@ sub Run {
     if ( IsHashRefWithData($Self->{Search}->{ConfigItem}) ) {
 
         # do first OR to prevent replacement of prior AND search with empty result
+        SEARCHTYPE:
         foreach my $SearchType ( qw(OR AND) ) {
-            next if ( !IsArrayRefWithData($Self->{Search}->{ConfigItem}->{$SearchType}) );
+            next SEARCHTYPE if ( !IsArrayRefWithData($Self->{Search}->{ConfigItem}->{$SearchType}) );
 
+            my %SearchItems = map{$_->{Field} => $_ } @{$Self->{Search}->{ConfigItem}->{$SearchType}};
             my @SearchTypeResult;
+            SEARCHITEM:
             foreach my $SearchItem ( @{$Self->{Search}->{ConfigItem}->{$SearchType}} ) {
                 my $Value = $SearchItem->{Value};
                 my $Field = $SearchItem->{Field};
@@ -107,6 +110,9 @@ sub Run {
                 if ( $Field =~ /\./ ) {
                     $Field = ( split(/\./, $Field) )[-1];
                 }
+
+                # skip field AssignedOrganisation, only used for AssignedContact
+                next SEARCHITEM if ( $Field eq 'AssignedOrganisation' );
 
                 # prepare value
                 if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
@@ -160,7 +166,8 @@ sub Run {
                         # --> do not include ids for other contacts
                         if ($Self->{Authorization}->{UserType} ne 'Customer') {
                             $SearchResult = $Self->_GetContactAssignedConfigItems(
-                                ContactID => $SearchParam{AssignedContact}
+                                ContactID => $SearchParam{AssignedContact},
+                                RelevantOrganisationID => $SearchItems{AssignedOrganisation}->{Value} || q{}
                             );
                         }
                     } else {
@@ -198,7 +205,8 @@ sub Run {
                 my $SkipAndSearch = 0;
                 if (exists $SearchParam{AssignedContact} && $Self->{Authorization}->{UserType} ne 'Customer') {
                     $CustomerCIIDList = $Self->_GetContactAssignedConfigItems(
-                        ContactID => $SearchParam{AssignedContact}
+                        ContactID => $SearchParam{AssignedContact},
+                        RelevantOrganisationID => $SearchItems{AssignedOrganisation}->{Value} || q{}
                     );
 
                     # skip and search if no id are found (AND can not be fulfilled)
@@ -303,6 +311,10 @@ sub _GetContactAssignedConfigItems {
                 UserID => $ContactData{AssignedUserID},
             );
             $ContactData{User} = IsHashRefWithData(\%User) ? \%User : undef;
+        }
+
+        if ($Param{RelevantOrganisationID}) {
+            $ContactData{RelevantOrganisationID} = $Param{RelevantOrganisationID} || undef;
         }
 
         # get object relevant ids
