@@ -1150,6 +1150,61 @@ sub GenerateRandomString {
     return $String;
 }
 
+=item ResolveValueByKey()
+
+resolve a value from a complex data structure
+
+    my $Value = $MainObject->ResolveValueByKey(
+        Data => {} || [],
+        Key  => '...'
+    );
+=cut
+
+sub ResolveValueByKey {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Key)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # return undef if we have no data to work through
+    return if !$Param{Data};
+
+    my $Data = $Param{Data};
+
+    my @Parts = split( /\./, $Param{Key});
+    my $Attribute = shift @Parts;
+    my $ArrayIndex;
+
+    if ( $Attribute =~ /(.*?):(\d+)/ ) {
+        $Attribute = $1;
+        $ArrayIndex = $2;
+    }
+
+    # get the value of $Attribute
+    $Data = exists $Data->{$Attribute} ? $Data->{$Attribute} : return;
+
+    if ( defined $ArrayIndex && IsArrayRef($Data) ) {
+        $Data = $Data->[$ArrayIndex];
+    }
+
+    if ( @Parts ) {
+        return $Self->ResolveValueByKey(
+            Key  => join('.', @Parts),
+            Data => $Data,
+        );
+    }
+
+    return $Data;
+}
+
 sub FilterObjectList {
     my ($Self, %Param) = @_;
     my @FilteredResult;
@@ -1503,6 +1558,7 @@ sub _Dump {
 
     return;
 }
+
 
 1;
 
