@@ -1201,6 +1201,8 @@ sub ExecOperation {
         Level                    => ($Self->{Level} || 0) + 1,
         IgnorePermissions        => $Param{IgnorePermissions},
         SuppressPermissionErrors => $Param{SuppressPermissionErrors},
+        Limit                    => $Self->{Limit},
+        SearchLimit              => $Self->{SearchLimit}
     );
 
     # if operation init failed, bail out
