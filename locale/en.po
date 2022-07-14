@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-3-18 10:43+0000\n"
+"POT-Creation-Date: 2022-7-13 13:36+0000\n"
 "PO-Revision-Date: 2022-04-05 11:44+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@cape-it.de>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -223,6 +223,10 @@ msgid ""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Executes all reports that should be created periodically."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
 msgstr ""
 
@@ -311,11 +315,19 @@ msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Macro for Job \"Periodic Reports\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "MacroAction for Job \"Periodic Reports\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -392,6 +404,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per User"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Periodic Reports"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -606,6 +622,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Time Restricted"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Time based Execution Plan for Job \"Periodic Reports\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1546,7 +1566,7 @@ msgstr ""
 msgid "CIHistory::"
 msgstr ""
 
-#. Perl Module: Kernel/System/Installation.pm
+#. Perl Module: Kernel/System/Installation/Migration.pm
 msgid "aborting"
 msgstr ""
 
@@ -1801,6 +1821,54 @@ msgid ""
 "\"Ticket Agent (w/o teams)\" in order to grant access"
 msgstr ""
 
+#. Perl Module: update/build-1586.pl
+msgid "Lists closed tickets within the last 7 days."
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Lists open tickets by priority."
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Lists open tickets by state."
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Lists open tickets by team."
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Lists open tickets in teams by priority."
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Lists tickets created within the last 7 days."
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Number of open tickets by priority"
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Number of open tickets by state"
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Number of open tickets by team"
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Number of open tickets in teams by priority"
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Number of tickets closed within the last 7 days"
+msgstr ""
+
+#. Perl Module: update/build-1586.pl
+msgid "Number of tickets created within the last 7 days"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
 msgstr ""
@@ -1817,14 +1885,19 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
-"Defines how many tasks are needed per thread (see API::Parallelity) to use "
-"the parallel alogorithm."
+"Default limit used on api requests. Set to 0 to disable (disabling may have "
+"performance impact)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
-"Defines how many threads should be used for parallel tasks. Enter 0 to "
-"deactivate."
+"Defines how many parallel worker tasks should be used to prepare the "
+"response depending on the number of items in the response. Define the lower "
+"threshold of items and the number of tasks that should be used if there are "
+">= items in the API response. By default only 1 worker will be used. "
+"ATTENTION: be aware that this setting improves or decreases the overall "
+"system performance depending on the hardware resources and number and size "
+"of the requests."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -1841,6 +1914,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "Enable API response data debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid ""
+"Enable parallel API worker tasks for response preparation. Enter 0 to "
+"deactivate."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -3567,11 +3646,23 @@ msgid "Registration of a function for reporting data source GenericSQL."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a object (module) which uses exec plans."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a object (module) which uses macros."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a report type for reporting."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a supported permission of type Object."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Registration of a variable filter module."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4247,6 +4338,12 @@ msgstr ""
 msgid ""
 "Config item event module that shows passed parameters BEFORE action is "
 "perdormed. May be used as template for own CI-events."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid ""
+"Config item event module that updates the counters for basic configitem "
+"stats."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
